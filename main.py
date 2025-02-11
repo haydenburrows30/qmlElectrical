@@ -1,19 +1,35 @@
-from PySide6.QtWidgets import QApplication
 import sys
+import os.path
 
-from PySide6.QtCore import QAbstractTableModel, Qt
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon
+from PySide6.QtQuickControls2 import QQuickStyle
 
-from PythonModel import PythonModel
+from models.PythonModel import PythonModel
+from models.models import VoltageDropModel
 
-app = QApplication(sys.argv)
-engine = QQmlApplicationEngine()
+import rc_resources as rc_resources
 
-qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    engine = QQmlApplicationEngine()
 
-engine.load("main.qml")
+    QQuickStyle.setStyle("Universal")
+    QApplication.setApplicationName("Electrical")
+    QApplication.setOrganizationName("QtProject")
 
-if not engine.rootObjects():
-    sys.exit(-1)
+    QIcon.setThemeName("gallery")
 
-sys.exit(app.exec())
+    # Load CSV before QML window appears
+    csv_path = "cable_data.csv"  # Change this path if needed
+    voltage_model = VoltageDropModel(csv_path)
+
+    qmlRegisterType(VoltageDropModel, "VoltageDrop", 1, 0, "VoltageDropModel")
+    qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
+
+    engine.load("qml/main.qml")
+
+    if not engine.rootObjects():
+        sys.exit(-1)
+    sys.exit(app.exec())

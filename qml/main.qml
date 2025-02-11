@@ -2,8 +2,12 @@ import QtQuick 6.2
 import QtQuick.Controls 6.2
 import Qt.labs.qmlmodels 1.0
 import QtQml 6.2
+import QtQuick.Dialogs
+
+import QtQuick.Controls.Universal
 
 import Python 1.0
+import VoltageDrop 1.0
 
 Window {
     id: window
@@ -17,11 +21,19 @@ Window {
         id: pythonModel
     }
 
+    VoltageDropModel {
+        id: voltageDropModel
+    }
+
     Button {
         id: addRowButton
         text: "Add Row"
-        anchors.top: parent.top
-        anchors.left: parent.left
+        anchors {
+            top: parent.top
+            left: parent.left
+            margins: 5
+        }
+         
         onClicked: {
             //if text field is in edit mode, close it
             tableView.closeEditor()
@@ -32,8 +44,11 @@ Window {
     Button {
         id: deleteLastRowButton
         text: "Delete Last Row"
-        anchors.top: parent.top
-        anchors.left: addRowButton.right
+        anchors {
+            top: parent.top
+            left: addRowButton.right
+            margins: 5
+        }
         onClicked: {
             if (pythonModel.rowCount() > 1) {
                 pythonModel.removeRows(pythonModel.rowCount() - 1)
@@ -44,10 +59,37 @@ Window {
     Button {
         id: clearAllRowsButton
         text: "Clear All Rows"
-        anchors.top: parent.top
-        anchors.left: deleteLastRowButton.right
+        anchors {
+            top: parent.top
+            left: deleteLastRowButton.right
+            margins: 5
+        }
         onClicked: {
             pythonModel.clearAllRows()
+        }
+    }
+
+        Button {
+        id: loadCSVButton
+        text: "Load CSV"
+        anchors {
+            top: parent.top
+            left: clearAllRowsButton.right
+            margins: 5
+        }
+        onClicked: {
+            fileDialog.open()
+        }
+    }
+
+    FileDialog {
+        id: fileDialog
+        title: "Select CSV File"
+        nameFilters: ["CSV Files (*.csv)"]
+        onAccepted: {
+            if (fileDialog.selectedFile) {
+                voltageDropModel.load_csv_file(fileDialog.selectedFile.toString().replace("file://", ""))
+            }
         }
     }
 
