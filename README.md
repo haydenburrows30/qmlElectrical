@@ -3,5 +3,6 @@
 - Dynamic creation of table rows
 - Addition and deletion of rows
 - Dropdown and textfield inside cells
+- Voltage drop calculation based on resistance and reactance of cable type
 
-![Image](https://github.com/user-attachments/assets/a13d4fb2-6985-4f43-8dc6-a870c082f0b9)
+![Image](https://github.com/user-attachments/assets/788977db-77a5-4e72-888f-9c96efb9ac28)
