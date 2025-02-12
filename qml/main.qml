@@ -4,82 +4,18 @@ import Qt.labs.qmlmodels 1.0
 import QtQml 6.2
 import QtQuick.Dialogs
 
-import QtQuick.Controls.Universal
-
 import Python 1.0
-import VoltageDrop 1.0
 
 Window {
     id: window
     
-    minimumWidth: 600
+    minimumWidth: 900
     minimumHeight: 400
     height: 400
-    visible: true
+    visible: true    
 
     PythonModel {
         id: pythonModel
-    }
-
-    VoltageDropModel {
-        id: voltageDropModel
-    }
-
-    Button {
-        id: addRowButton
-        text: "Add Row"
-        anchors {
-            top: parent.top
-            left: parent.left
-            margins: 5
-        }
-         
-        onClicked: {
-            //if text field is in edit mode, close it
-            tableView.closeEditor()
-            pythonModel.appendRow([1, "2", "3", "4", "5"])
-        }
-    }
-
-    Button {
-        id: deleteLastRowButton
-        text: "Delete Last Row"
-        anchors {
-            top: parent.top
-            left: addRowButton.right
-            margins: 5
-        }
-        onClicked: {
-            if (pythonModel.rowCount() > 1) {
-                pythonModel.removeRows(pythonModel.rowCount() - 1)
-            }
-        }
-    }
-
-    Button {
-        id: clearAllRowsButton
-        text: "Clear All Rows"
-        anchors {
-            top: parent.top
-            left: deleteLastRowButton.right
-            margins: 5
-        }
-        onClicked: {
-            pythonModel.clearAllRows()
-        }
-    }
-
-        Button {
-        id: loadCSVButton
-        text: "Load CSV"
-        anchors {
-            top: parent.top
-            left: clearAllRowsButton.right
-            margins: 5
-        }
-        onClicked: {
-            fileDialog.open()
-        }
     }
 
     FileDialog {
@@ -91,6 +27,58 @@ Window {
                 voltageDropModel.load_csv_file(fileDialog.selectedFile.toString().replace("file://", ""))
             }
         }
+    }
+
+    Button {
+        id: addRowButton
+        text: "Add Row"
+        anchors.top: parent.top
+        anchors.left: parent.left
+        focusPolicy: Qt.ClickFocus
+        onClicked: {
+            // forces the editor to close which takes focus away from the editor
+            tableView.closeEditor()
+            // Clear focus for ComboBox and TextField
+            tableView.children.forEach(child => {
+                if (child instanceof TextField) {
+                    child.editingFinished()  // Force editing finished
+                }
+                if (child instanceof ComboBox || child instanceof TextField) {
+                    child.clearFocus()  // Clear focus
+                }
+            })
+            pythonModel.appendRow()
+        }
+    }
+
+    Button {
+        id: deleteLastRowButton
+        text: "Delete Last Row"
+        anchors.top: parent.top
+        anchors.left: addRowButton.right
+        onClicked: {
+            if (pythonModel.rowCount() > 1) {
+                pythonModel.removeRows(pythonModel.rowCount() - 1)
+            }
+        }
+    }
+
+    Button {
+        id: clearAllRowsButton
+        text: "Clear All Rows"
+        anchors.top: parent.top
+        anchors.left: deleteLastRowButton.right
+        onClicked: {
+            pythonModel.clearAllRows()
+        }
+    }
+
+    Button {
+        id: loadCSVButton
+        text: "Load CSV"
+        anchors.top: parent.top
+        anchors.left: clearAllRowsButton.right
+        onClicked: fileDialog.open()
     }
 
     Rectangle {
@@ -137,9 +125,11 @@ Window {
                 DelegateChoice {
                     roleValue: "dropdown"
                     delegate: ComboBox {
+                        id: comboBox
                         implicitWidth: 100
                         implicitHeight: 50
-                        model: pythonModel.getDropdownValues()
+                        // get comboBox index from model data of voltagedropmodel
+                        model: pythonModel.cable_types
                         currentIndex: {
                             var modelData = TableView.view.model.data(TableView.view.index(row, column)).toString()
                             var index = model.indexOf(modelData)
@@ -178,28 +168,66 @@ Window {
                             verticalAlignment: TextInput.AlignVCenter
                             text: display
 
-                            // Component.onCompleted: {
-                            //     var modelData = TableView.view.model.data(TableView.view.index(row, column)).toString()
-                            //     var dropdownValues = pythonModel.getDropdownValues()
-                            //     var index = dropdownValues.indexOf(modelData)
-                            //     display = index !== -1 ? index.toString() : modelData  // Initialize display using ComboBox index
-                            // }
-
                             onTextChanged: {
                                 if (text !== display) {
                                     TableView.view.model.setData(TableView.view.index(row, column), text)
-                                    display = text  // Update the display property
+                                    display = text
                                 }
                             }
 
-                            // TableView.onCommit: {
-                            //     display = text
-                            //     focus = false  // Clear focus after committing changes
-                            // }
+                            TableView.onCommit: {
+                                display = text
+                                focus = false  // Clear focus after committing changes
+                            }
 
-                            // onEditingFinished: {
-                            //     focus = false  // Clear focus after editing is finished
-                            // }
+                            onEditingFinished: {
+                                focus = false  // Clear focus after editing is finished
+                            }
+                        }
+                    }
+                }
+
+                DelegateChoice {
+                    roleValue: "button"
+                    delegate: Button {
+                        text: "Calculate"
+                        onClicked: {
+                            pythonModel.calculateResistance(row)
+                        }
+                    }
+                }
+
+                DelegateChoice {
+                    roleValue: "resistance"
+                    delegate: TextField {
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        text: display
+                        readOnly: true
+                    }
+                }
+
+                DelegateChoice {
+                    roleValue: "length"
+                    delegate: TextField {
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        text: display
+
+                        onTextChanged: {
+                            if (text !== display) {
+                                TableView.view.model.setData(TableView.view.index(row, column), text)
+                                display = text
+                            }
+                        }
+
+                        TableView.onCommit: {
+                            display = text
+                            focus = false  // Clear focus after committing changes
+                        }
+
+                        onEditingFinished: {
+                            focus = false  // Clear focus after editing is finished
                         }
                     }
                 }

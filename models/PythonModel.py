@@ -1,18 +1,36 @@
-from PySide6.QtCore import QAbstractTableModel, Qt, Slot, Signal
+from PySide6.QtCore import QAbstractTableModel, Qt, Slot, Signal, Property
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import QApplication
+from .ResistanceCalculator import ResistanceCalculator 
+from .CableData import CableData
 
 class PythonModel(QAbstractTableModel):
     dataChangedSignal = Signal()
+    voltageDropChanged = Signal()
+    csvLoaded = Signal()
+    chartDataChanged = Signal()
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, csv_file="cable_data.csv"):
+        super().__init__()
         self._data = [
-            [1, "2", "3", "4", "5"]
-            # Add more rows as needed
+            [1, "0", "0", "415", "50", "", "", "100"]
         ]
-        self._headers = ["Cable Type", "Lots", "Current", "Voltage", "Power"]
-        self._dropdown_values = ["95Al", "120Al", "185Al", "300Al", "400Al"]
+        self._headers = ["Cable Type", "Lots", "Current", "Voltage", "Power", "Action", "Voltage Drop", "Length (m)"]
+        self.cable_data = CableData()  # Initialize CableData
+
+        if csv_file:
+            self.load_csv_file(csv_file)
+
+    @Slot(str)
+    def load_csv_file(self, file_path):
+        if file_path:
+            self.cable_data.load_csv(file_path)
+            self.csvLoaded.emit()
+
+            # Automatically select the first cable type and trigger calculation
+            cable_types = self.cable_data.get_cable_types()
+            if cable_types:
+                self.cable_type = cable_types[0]
 
     def rowCount(self, parent=None):
         return len(self._data)
@@ -26,18 +44,17 @@ class PythonModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             return self._data[index.row()][index.column()]
         if role == Qt.ItemDataRole.UserRole:
-            # print(index.column())
-            return "dropdown" if index.column() == 0 else "number"
+            if index.column() == 0:
+                return "dropdown"
+            elif index.column() == 5:
+                return "button"
+            else:
+                return "number"
         return None
 
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.ItemDataRole.EditRole:
-            if index.column() == 0:
-                # Handle data from ComboBox
-                self._data[index.row()][index.column()] = str(value)
-            else:
-                # Handle data from TextField
-                self._data[index.row()][index.column()] = value
+            self._data[index.row()][index.column()] = value
             self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
             self.dataChangedSignal.emit()
             return True
@@ -58,8 +75,10 @@ class PythonModel(QAbstractTableModel):
         roles[Qt.ItemDataRole.UserRole] = b'roleValue'
         return roles
 
-    @Slot(list)
-    def appendRow(self, row_data):
+    @Slot()
+    def appendRow(self):
+        row_data = [1, "0", "0", "415", "50","", "", "100"]
+        # row_data.extend(["", "", ""])
         self.beginInsertRows(self.index(0, 0).parent(), self.rowCount(), self.rowCount())
         self._data.append(row_data)
         self.endInsertRows()
@@ -78,14 +97,32 @@ class PythonModel(QAbstractTableModel):
     def clearAllRows(self):
         self.beginResetModel()
         self._data.clear()
-        self._data = [[1, "2", "3", "4", "5"]]
+        self._data = [[1, "0", "0", "415", "50", "", "", "100"]]
         self.endResetModel()
 
-    @Slot(result=list)
-    def getDropdownValues(self):
-        return self._dropdown_values
+    @Slot(int)
+    def calculateResistance(self, row):
+        voltage = float(self._data[row][3])
+        current = float(self._data[row][2])
+        length = float(self._data[row][7])
+        power = float(self._data[row][4])
+        cable_type = self._data[row][0]
+
+        cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
+
+        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance)
+        voltage_drop = calculator.calculate_voltage_drop()
+
+        formatted_voltage_drop = f"{voltage_drop:.2f}"
+
+        self.setData(self.index(row, 6), formatted_voltage_drop, Qt.ItemDataRole.EditRole) 
 
     def printTableView(self):
         for row in range(self.rowCount()):
             for column in range(self.columnCount()):
                 print(f"Row {row}, Column {column}: {self._data[row][column]}")
+
+
+    @Property('QStringList', notify=csvLoaded)
+    def cable_types(self):
+        return self.cable_data.get_cable_types()

@@ -7,7 +7,6 @@ from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from models.PythonModel import PythonModel
-from models.models import VoltageDropModel
 
 import rc_resources as rc_resources
 
@@ -23,9 +22,8 @@ if __name__ == "__main__":
 
     # Load CSV before QML window appears
     csv_path = "cable_data.csv"  # Change this path if needed
-    voltage_model = VoltageDropModel(csv_path)
+    voltage_model = PythonModel(csv_path)
 
-    qmlRegisterType(VoltageDropModel, "VoltageDrop", 1, 0, "VoltageDropModel")
     qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
 
     engine.load("qml/main.qml")
