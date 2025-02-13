@@ -8,8 +8,9 @@ Item {
 
     width: 105
     height: 700
+    property string statey: sideBar.state
+
     state: 'close'
-    // anchors.centerIn: parent
 
     states: [
         State {
@@ -117,7 +118,7 @@ Item {
             Repeater {
                 id: columnItems
 
-                model: ['Menu', 'Home', 'Search', 'Explore', 'Notifications', 'Bookmarks', 'Messages', 'Profile', 'Setting']
+                model: ['Menu', 'Home', 'Voltage Drop', 'Explore', 'Notifications', 'Bookmarks', 'Messages', 'Profile', 'Setting']
                 delegate: Rectangle {
                     id: button
 
@@ -191,7 +192,6 @@ Item {
 
                     MouseArea {
                         id: buttonMouseArea
-
                         hoverEnabled: true
                         anchors.fill: parent
 
@@ -208,6 +208,9 @@ Item {
                             if (model.index === 2) {
                                 stackView.push("../pages/voltage_drop.qml")
                             }
+                            if (model.index === 3) {
+                                console.log("Explore")
+                            }
                         }
                     }
 
@@ -217,6 +220,31 @@ Item {
                         source: '../../icons/' + modelData + '.svg'
                         sourceSize: Qt.size(30, 30)
                         anchors { verticalCenter: parent.verticalCenter; left: parent.left; leftMargin: 10 }
+
+                        HoverHandler {
+                            id: hover
+                            target: icon
+                        }
+
+                        ToolTip {
+                            id: control
+                            visible: hover.hovered
+                            text: modelData
+                            delay: 1000
+
+                            x: parent.width
+                            y: parent.height
+
+                            contentItem: Text {
+                                text: control.text
+                                font: control.font
+                                color: "#21be2b"
+                            }
+
+                            background: Rectangle {
+                                border.color: "#21be2b"
+                            }
+                        }
                     }
 
                     Text {

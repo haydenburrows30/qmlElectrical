@@ -8,6 +8,15 @@ import QtQuick.Layouts
 
 Page {
     id: home
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            onClicked: {
+                if (sideBar.statey == 'open') {
+                    sideBar.state = 'close'
+                }
+            }
+        }
 
     Image {
         anchors.centerIn: parent

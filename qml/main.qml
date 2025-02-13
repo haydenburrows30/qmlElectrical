@@ -12,9 +12,8 @@ import 'components'
 Window {
     id: window
     
-    minimumWidth: 900
-    minimumHeight: 400
-    height: 400
+    minimumWidth: 1080
+    minimumHeight: 900
     visible: true    
 
     PythonModel {
@@ -34,18 +33,19 @@ Window {
 
     FontLoader {
         id: sourceSansProFont
-
         source: '../fonts/SourceSansPro-Regular.ttf'
-        // name: 'SourceSansPro'
     }
 
     Rectangle {
         id: mainview
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.leftMargin: sideBar.width + 2
-        anchors.right: parent.right
+
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            left: parent.left
+            leftMargin: sideBar.width + 2
+            right: parent.right
+        }
 
         StackView {
             id: stackView
@@ -58,6 +58,4 @@ Window {
         id: sideBar
         anchors.left: parent.left
     }
-   
-
 }

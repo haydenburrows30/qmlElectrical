@@ -8,6 +8,16 @@ import QtQuick.Layouts
 import Python 1.0
     
     Page {
+
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            onClicked: {
+                if (sideBar.statey == 'open') {
+                    sideBar.state = 'close'
+                }
+            }
+        }
         
         header: ToolBar {
             id: toolbar
@@ -84,7 +94,6 @@ import Python 1.0
                 Layout.fillWidth: true
             }
         }
-
 
         StackView {
             id: rect
