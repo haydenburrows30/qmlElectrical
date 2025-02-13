@@ -72,10 +72,53 @@ Window {
                 }
             }
         }
+
+        ColumnLayout {
+            id: columnLayout
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: 10
+
+            RowLayout {
+                spacing: 10
+
+                Label {
+                    text: "Voltage Drop Threshold (%):"
+                }
+                TextField {
+                    id: voltageDropThresholdField
+                    text: "5"
+                    onTextChanged: pythonModel.voltageDropThreshold = text
+                }
+
+                Label {
+                    text: "Power Factor:"
+                }
+                TextField {
+                    id: powerFactorField
+                    text: "0.9"
+                    onTextChanged: pythonModel.powerFactor = text
+                }
+
+                Label {
+                    text: "Current:"
+                }
+                TextField {
+                    id: currentField
+                    text: "0"
+                    onTextChanged: pythonModel.current = text
+                }
+            }
+        }
         
         StackView {
             id: rect
-            anchors.fill: parent
+            anchors {
+                top: columnLayout.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
 
             HorizontalHeaderView {
                 id: horizontalHeader
@@ -140,7 +183,7 @@ Window {
                         delegate: Rectangle {
                             implicitWidth: 100
                             implicitHeight: 50
-                            color: palette.base
+                            color: parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
 
                             Text {
                                 anchors.centerIn: parent

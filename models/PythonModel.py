@@ -17,6 +17,9 @@ class PythonModel(QAbstractTableModel):
         ]
         self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)","Action"]
         self.cable_data = CableData()  # Initialize CableData
+        self._voltageDropThreshold = 5.0
+        self._powerFactor = 0.9
+        self._current = 0
 
         if csv_file:
             self.load_csv_file(csv_file)
@@ -111,19 +114,51 @@ class PythonModel(QAbstractTableModel):
 
         cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, 0.9, lots)
+        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots)
         voltage_drop = calculator.calculate_voltage_drop()
 
         formatted_voltage_drop = f"{voltage_drop:.2f}"
 
         self.setData(self.index(row, 6), formatted_voltage_drop, Qt.ItemDataRole.EditRole) 
 
+        if voltage_drop > self._voltageDropThreshold:
+            print(f"Row {row}: Voltage Drop = {formatted_voltage_drop}% exceeds the threshold of {self._voltageDropThreshold}%")
+
     def printTableView(self):
         for row in range(self.rowCount()):
             for column in range(self.columnCount()):
                 print(f"Row {row}, Column {column}: {self._data[row][column]}")
 
-
     @Property('QStringList', notify=csvLoaded)
     def cable_types(self):
         return self.cable_data.get_cable_types()
+
+    @Property(float, notify=dataChangedSignal)
+    def voltageDropThreshold(self):
+        return self._voltageDropThreshold
+
+    @voltageDropThreshold.setter
+    def voltageDropThreshold(self, value):
+        if self._voltageDropThreshold != value:
+            self._voltageDropThreshold = value
+            self.dataChangedSignal.emit()
+
+    @Property(float, notify=dataChangedSignal)
+    def powerFactor(self):
+        return self._powerFactor
+
+    @powerFactor.setter
+    def powerFactor(self, value):
+        if self._powerFactor != value:
+            self._powerFactor = value
+            self.dataChangedSignal.emit()
+
+    @Property(float, notify=dataChangedSignal)
+    def current(self):
+        return self._current
+
+    @current.setter
+    def current(self, value):
+        if self._current != value:
+            self._current = value
+            self.dataChangedSignal.emit()
