@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>qml/main.qml</file>
+    <file>qml/SideBar.qml</file>
 </qresource>
 
 <qresource>
@@ -21,5 +22,15 @@
     <file>icons/gallery/20x20@4/menu.png</file>
     <file>icons/gallery/index.theme</file>
     <file>qtquickcontrols2.conf</file>
+    <file>fonts/SourceSansPro-Regular.ttf</file>
+    <file>icons/Bookmarks.svg</file>
+    <file>icons/Explore.svg</file>
+    <file>icons/Home.svg</file>
+    <file>icons/Menu.svg</file>
+    <file>icons/Messages.svg</file>
+    <file>icons/Notifications.svg</file>
+    <file>icons/Profile.svg</file>
+    <file>icons/Search.svg</file>
+    <file>icons/Setting.svg</file>
 </qresource>
 </RCC>
