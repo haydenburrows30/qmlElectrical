@@ -1,7 +1,9 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>qml/main.qml</file>
-    <file>qml/SideBar.qml</file>
+    <file>qml/pages/home.qml</file>
+    <file>qml/pages/voltage_drop.qml</file>
+    <file>qml/components/SideBar.qml</file>
 </qresource>
 
 <qresource>

@@ -12,7 +12,7 @@ import Python 1.0
         header: ToolBar {
             id: toolbar
             RowLayout {
-                anchors.fill: parent
+                spacing: 20
                 
                 ToolButton {
                     id: row
@@ -39,13 +39,13 @@ import Python 1.0
                     text: qsTr("Load CSV")
                     onClicked: fileDialog.open()
                 }
-                Label {
-                    text: "Voltage Drop Calculation"
-                    elide: Label.ElideRight
-                    horizontalAlignment: Qt.AlignHCenter
-                    verticalAlignment: Qt.AlignVCenter
-                    Layout.fillWidth: true
-                }
+                // Label {
+                //     text: "Voltage Drop Calculation"
+                //     elide: Label.ElideRight
+                //     horizontalAlignment: Qt.AlignHCenter
+                //     verticalAlignment: Qt.AlignVCenter
+                //     Layout.fillWidth: true
+                // }
             }
         }
 
@@ -61,6 +61,7 @@ import Python 1.0
                 id: voltageDropThresholdField
                 text: "5"
                 onTextChanged: pythonModel.voltageDropThreshold = text
+                Layout.fillWidth: true
             }
 
             Label {
@@ -70,6 +71,7 @@ import Python 1.0
                 id: powerFactorField
                 text: "0.9"
                 onTextChanged: pythonModel.powerFactor = text
+                Layout.fillWidth: true
             }
 
             Label {
@@ -79,8 +81,10 @@ import Python 1.0
                 id: currentField
                 text: "0"
                 onTextChanged: pythonModel.current = text
+                Layout.fillWidth: true
             }
         }
+
 
         StackView {
             id: rect

@@ -7,6 +7,8 @@ import QtQuick.Layouts
 
 import Python 1.0
 
+import 'components'
+
 Window {
     id: window
     

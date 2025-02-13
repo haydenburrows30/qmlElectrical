@@ -203,10 +203,10 @@ Item {
                                     sideBar.state = 'close';
                             }
                             if (model.index === 1) {
-                                stackView.push("../qml/pages/home.qml")
+                                stackView.push("../pages/home.qml")
                             }
                             if (model.index === 2) {
-                                stackView.push("../qml/pages/voltage_drop.qml")
+                                stackView.push("../pages/voltage_drop.qml")
                             }
                         }
                     }
@@ -214,7 +214,7 @@ Item {
                     Image {
                         id: icon
 
-                        source: '../icons/' + modelData + '.svg'
+                        source: '../../icons/' + modelData + '.svg'
                         sourceSize: Qt.size(30, 30)
                         anchors { verticalCenter: parent.verticalCenter; left: parent.left; leftMargin: 10 }
                     }
