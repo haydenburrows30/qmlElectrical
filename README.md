@@ -5,4 +5,4 @@
 - Dropdown and textfield inside cells
 - Voltage drop calculation based on resistance and reactance of cable type
 
-![Image](https://github.com/user-attachments/assets/788977db-77a5-4e72-888f-9c96efb9ac28)
+![Image](https://github.com/user-attachments/assets/f42ab055-60b1-4665-aa9b-c36c9ffd45c4)
