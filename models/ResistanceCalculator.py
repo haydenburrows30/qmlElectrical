@@ -1,7 +1,7 @@
 import math
 
 class ResistanceCalculator:
-    def __init__(self, voltage=415.0, length=0.0, power=0.0, cable_resistance=0.00, reactance=0.00, power_factor=0.9):
+    def __init__(self, voltage=415.0, length=0.0, power=0.0, cable_resistance=0.00, reactance=0.00, power_factor=0.9, lots=10):
         """
         Constructor
         :param resistance: resistance from csv in ohms/km
@@ -17,7 +17,7 @@ class ResistanceCalculator:
         self.length = length / 1000
         self.cable_resistance = cable_resistance
         self.reactance = reactance
-        self.power = power
+        self.power = power * lots
         self.power_factor = power_factor
 
     def calculate_voltage_drop(self):

@@ -13,9 +13,9 @@ class PythonModel(QAbstractTableModel):
     def __init__(self, csv_file="cable_data.csv"):
         super().__init__()
         self._data = [
-            [1, "0", "0", "415", "50", "", "", "100"]
+            [1, "10", "0", "415", "5", "100", "", ""]
         ]
-        self._headers = ["Cable Type", "Lots", "Current", "Voltage", "Power", "Action", "Voltage Drop", "Length (m)"]
+        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)","Action"]
         self.cable_data = CableData()  # Initialize CableData
 
         if csv_file:
@@ -46,7 +46,7 @@ class PythonModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.UserRole:
             if index.column() == 0:
                 return "dropdown"
-            elif index.column() == 5:
+            elif index.column() == 7:
                 return "button"
             else:
                 return "number"
@@ -77,8 +77,7 @@ class PythonModel(QAbstractTableModel):
 
     @Slot()
     def appendRow(self):
-        row_data = [1, "0", "0", "415", "50","", "", "100"]
-        # row_data.extend(["", "", ""])
+        row_data = [1, "10", "0", "415", "5", "100", "", ""]
         self.beginInsertRows(self.index(0, 0).parent(), self.rowCount(), self.rowCount())
         self._data.append(row_data)
         self.endInsertRows()
@@ -97,20 +96,22 @@ class PythonModel(QAbstractTableModel):
     def clearAllRows(self):
         self.beginResetModel()
         self._data.clear()
-        self._data = [[1, "0", "0", "415", "50", "", "", "100"]]
+        self._data = [[1, "10", "0", "415", "5", "100", "", ""]]
         self.endResetModel()
 
     @Slot(int)
     def calculateResistance(self, row):
-        voltage = float(self._data[row][3])
+        lots = float(self._data[row][1])
         current = float(self._data[row][2])
-        length = float(self._data[row][7])
+        voltage = float(self._data[row][3])
         power = float(self._data[row][4])
+        length = float(self._data[row][5])
+
         cable_type = self._data[row][0]
 
         cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance)
+        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, 0.9, lots)
         voltage_drop = calculator.calculate_voltage_drop()
 
         formatted_voltage_drop = f"{voltage_drop:.2f}"
