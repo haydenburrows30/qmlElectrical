@@ -5,9 +5,6 @@ import Qt5Compat.GraphicalEffects
 
 Item {
     id: sideBar
-
-    width: 105
-    height: 700
     property string statey: sideBar.state
 
     state: 'close'
@@ -31,7 +28,7 @@ Item {
 
             PropertyChanges {
                 target: sideBar
-                width: 105
+                width: 95
             }
 
             PropertyChanges {
@@ -112,7 +109,7 @@ Item {
             id: buttonColumn
 
             width: parent.width
-            spacing: 20
+            spacing: 10
             anchors { top: parent.top; topMargin: 30 }
 
             Repeater {
@@ -221,30 +218,30 @@ Item {
                         sourceSize: Qt.size(30, 30)
                         anchors { verticalCenter: parent.verticalCenter; left: parent.left; leftMargin: 10 }
 
-                        HoverHandler {
-                            id: hover
-                            target: icon
-                        }
+                        // HoverHandler {
+                        //     id: hover
+                        //     target: icon
+                        // }
 
-                        ToolTip {
-                            id: control
-                            visible: hover.hovered
-                            text: modelData
-                            delay: 1000
+                        // ToolTip {
+                        //     id: control
+                        //     visible: hover.hovered
+                        //     text: modelData
+                        //     delay: 1000
 
-                            x: parent.width
-                            y: parent.height
+                        //     x: parent.width
+                        //     y: parent.height
 
-                            contentItem: Text {
-                                text: control.text
-                                font: control.font
-                                color: "#21be2b"
-                            }
+                        //     contentItem: Text {
+                        //         text: control.text
+                        //         font: control.font
+                        //         color: "#21be2b"
+                        //     }
 
-                            background: Rectangle {
-                                border.color: "#21be2b"
-                            }
-                        }
+                        //     background: Rectangle {
+                        //         border.color: "#21be2b"
+                        //     }
+                        // }
                     }
 
                     Text {
