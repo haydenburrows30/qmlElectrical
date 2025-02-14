@@ -1,7 +1,7 @@
-import QtQuick 6.2
-import QtQuick.Controls 6.2
+import QtQuick
+import QtQuick.Controls
 import Qt.labs.qmlmodels 1.0
-import QtQml 6.2
+import QtQml
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
