@@ -50,14 +50,9 @@ Item {
                     icon.height: 30
 
                     onClicked: {
-                        if (listView.currentIndex == index && detailed.state == 'open') {
-                            detailed.state = 'close'
-                        } else {
-                            detailed.state = 'open'
+                        if (detailed.state == 'close') {
+                                detailed.state = 'open'
                         }
-                        // if (detailed.state == 'close') {
-                        //         detailed.state = 'open'
-                        // }
                             // } else {
                             //     detailed.state = 'close'
                             // }
@@ -157,9 +152,6 @@ Item {
                     highlighted: ListView.isCurrentItem
 
                     onClicked: {
-                        if (detailed.state == 'open') {
-                                detailed.state = 'close'
-                        }
                         listView.currentIndex = index
                         detailed.currentIndex = index
                         stackView.push(model.source)

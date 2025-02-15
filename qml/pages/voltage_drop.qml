@@ -7,140 +7,141 @@ import QtQuick.Layouts
 
 import Python 1.0
     
-    Page {
-        MouseArea {
-            anchors.fill: parent
+Page {
+    MouseArea {
+        anchors.fill: parent
 
-            onClicked:  {
-                if (sideBar.expanded.state == 'open') {
-                            sideBar.expanded.state = 'close'
-                    }
+        onClicked:  {
+            if (sideBar.expanded.state == 'open') {
+                sideBar.expanded.state = 'close'
             }
         }
-       
-        header: ToolBar {
-            id: toolbar
-            RowLayout {
-                spacing: 20
+    }
+   
+    header: ToolBar {
+        id: toolbar
+        RowLayout {
+            spacing: 20
+            
+            ToolButton {
+                id: row
+                text: qsTr("Add Row")
                 
-                ToolButton {
-                    id: row
-                    text: qsTr("Add Row")
-                    
-                    onClicked: {
-                        tableView.closeEditor()
-                        pythonModel.appendRow()
+                onClicked: {
+                    tableView.closeEditor()
+                    pythonModel.appendRow()
+                }
+            }
+            ToolButton {
+                text: qsTr("Remove Row")
+                onClicked: {
+                    if (pythonModel.rowCount() > 1) {
+                        pythonModel.removeRows(pythonModel.rowCount() - 1)
                     }
                 }
-                ToolButton {
-                    text: qsTr("Remove Row")
-                    onClicked: {
-                        if (pythonModel.rowCount() > 1) {
-                            pythonModel.removeRows(pythonModel.rowCount() - 1)
-                        }
-                    }
-                }
-                ToolButton {
-                    text: qsTr("Clear Rows")
-                    onClicked: pythonModel.clearAllRows()
-                }
-                ToolButton {
-                    text: qsTr("Load CSV")
-                    onClicked: fileDialog.open()
-                }
+            }
+            ToolButton {
+                text: qsTr("Clear Rows")
+                onClicked: pythonModel.clearAllRows()
+            }
+            ToolButton {
+                text: qsTr("Load CSV")
+                onClicked: fileDialog.open()
             }
         }
+    }
 
-        ColumnLayout {
-            id: columnLayout
-            width: 200
-            anchors.left: parent.left
+    ColumnLayout {
+        id: columnLayout
+        width: 200
+        anchors.left: parent.left
 
-            Label {
-                text: "Voltage Drop Threshold (%):"
-            }
-            TextField {
-                id: voltageDropThresholdField
-                text: "5"
-                onTextChanged: pythonModel.voltageDropThreshold = text
-                Layout.fillWidth: true
-            }
-
-            Label {
-                text: "Power Factor:"
-            }
-            TextField {
-                id: powerFactorField
-                text: "0.9"
-                onTextChanged: pythonModel.powerFactor = text
-                Layout.fillWidth: true
-            }
-
-            Label {
-                text: "Current:"
-            }
-            TextField {
-                id: currentField
-                text: "0"
-                onTextChanged: pythonModel.current = text
-                Layout.fillWidth: true
-            }
+        Label {
+            text: "Voltage Drop Threshold (%):"
+        }
+        TextField {
+            id: voltageDropThresholdField
+            text: "5"
+            onTextChanged: pythonModel.voltageDropThreshold = text
+            Layout.fillWidth: true
         }
 
-        StackView {
-            id: rect
-            anchors.left: columnLayout.right
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+        Label {
+            text: "Power Factor:"
+        }
+        TextField {
+            id: powerFactorField
+            text: "0.9"
+            onTextChanged: pythonModel.powerFactor = text
+            Layout.fillWidth: true
+        }
+
+        Label {
+            text: "Current:"
+        }
+        TextField {
+            id: currentField
+            text: "0"
+            onTextChanged: pythonModel.current = text
+            Layout.fillWidth: true
+        }
+    }
+
+    StackView {
+        id: rect
+        anchors.left: columnLayout.right
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+
+        HorizontalHeaderView {
+            id: horizontalHeader
+            anchors.left: tableView.left
             anchors.top: parent.top
+            syncView: tableView
+            clip: true
+        }
 
-            HorizontalHeaderView {
-                id: horizontalHeader
-                anchors.left: tableView.left
-                anchors.top: parent.top
-                syncView: tableView
-                clip: true
+        VerticalHeaderView {
+            id: verticalHeader
+            anchors.top: tableView.top
+            anchors.left: parent.left
+            syncView: tableView
+            clip: true
+        }
+
+        TableView {
+            id: tableView
+            anchors {
+                left: verticalHeader.right
+                top: horizontalHeader.bottom
+                right: parent.right
+                bottom: parent.bottom
             }
+            
+            clip: true
+            interactive: true
+            model: pythonModel
+            selectionModel: ItemSelectionModel {}
 
-            VerticalHeaderView {
-                id: verticalHeader
-                anchors.top: tableView.top
-                anchors.left: parent.left
-                syncView: tableView
-                clip: true
-            }
+            delegate: DelegateChooser {
+                role: "roleValue"
 
-            TableView {
-                id: tableView
-                anchors {
-                    left: verticalHeader.right
-                    top: horizontalHeader.bottom
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-                
-                clip: true
-                interactive: true
-                model: pythonModel
-                selectionModel: ItemSelectionModel {}
+                DelegateChoice {
+                    roleValue: "dropdown"
+                    delegate: ComboBox {
+                        id: comboBox
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        model: pythonModel ? pythonModel.cable_types : []
 
-                delegate: DelegateChooser {
-                    role: "roleValue"
-
-                    DelegateChoice {
-                        roleValue: "dropdown"
-                        delegate: ComboBox {
-                            id: comboBox
-                            implicitWidth: 100
-                            implicitHeight: 50
-                            model: pythonModel.cable_types
-
-                            currentIndex: {
-                                var modelData = TableView.view.model.data(TableView.view.index(row, column)).toString()
-                                var index = model.indexOf(modelData)
-                                return index !== -1 ? index : 0
-                            }
-                            onCurrentIndexChanged: {
+                        currentIndex: {
+                            var modelData = TableView.view.model ? TableView.view.model.data(TableView.view.index(row, column)).toString() : ""
+                            var index = model.indexOf(modelData)
+                            return index !== -1 ? index : 0
+                        }
+                        onCurrentIndexChanged: {
+                            if (TableView.view.model) {
                                 TableView.view.model.setData(TableView.view.index(row, column), model[currentIndex])
                                 for (var r = 0; r < TableView.view.model.rowCount(); r++) {
                                     var rowData = []
@@ -151,71 +152,30 @@ import Python 1.0
                             }
                         }
                     }
+                }
 
-                    DelegateChoice {
-                        roleValue: "number"
-                        delegate: Rectangle {
-                            implicitWidth: 100
-                            implicitHeight: 50
-                            color: parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
+                DelegateChoice {
+                    roleValue: "number"
+                    delegate: Rectangle {
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        color: TableView.view.model && parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
 
-                            Text {
-                                anchors.centerIn: parent
-                                text: display
-                            }
-
-                            TableView.editDelegate: TextField {
-                                anchors.fill: parent
-                                text: display
-
-                                onTextChanged: {
-                                    if (text !== display) {
-                                        TableView.view.model.setData(TableView.view.index(row, column), text)
-                                        display = text
-                                    }
-                                }
-
-                                TableView.onCommit: {
-                                    display = text
-                                    focus = false
-                                }
-                            }
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "button"
-                        delegate: Button {
-                            text: "Calculate"
-                            onClicked: {
-                                tableView.closeEditor()
-                                pythonModel.calculateResistance(row)
-                            }
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "resistance"
-                        delegate: TextField {
-                            implicitWidth: 100
-                            implicitHeight: 50
+                        Text {
+                            anchors.centerIn: parent
                             text: display
-                            readOnly: true
                         }
-                    }
 
-                    DelegateChoice {
-                        roleValue: "length"
-                        delegate: TextField {
-                            implicitWidth: 100
-                            implicitHeight: 50
+                        TableView.editDelegate: TextField {
+                            anchors.fill: parent
                             text: display
-                            // selectByMouse: true
 
                             onTextChanged: {
                                 if (text !== display) {
-                                    TableView.view.model.setData(TableView.view.index(row, column), text)
-                                    display = text
+                                    if (TableView.view.model) {
+                                        TableView.view.model.setData(TableView.view.index(row, column), text)
+                                        display = text
+                                    }
                                 }
                             }
 
@@ -226,6 +186,52 @@ import Python 1.0
                         }
                     }
                 }
+
+                DelegateChoice {
+                    roleValue: "button"
+                    delegate: Button {
+                        text: "Calculate"
+                        onClicked: {
+                            tableView.closeEditor()
+                            pythonModel.calculateResistance(row)
+                        }
+                    }
+                }
+
+                DelegateChoice {
+                    roleValue: "resistance"
+                    delegate: TextField {
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        text: display
+                        readOnly: true
+                    }
+                }
+
+                DelegateChoice {
+                    roleValue: "length"
+                    delegate: TextField {
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        text: display
+                        // selectByMouse: true
+
+                        onTextChanged: {
+                            if (text !== display) {
+                                if (TableView.view.model) {
+                                    TableView.view.model.setData(TableView.view.index(row, column), text)
+                                    display = text
+                                }
+                            }
+                        }
+
+                        TableView.onCommit: {
+                            display = text
+                            focus = false
+                        }
+                    }
+                }
             }
         }
     }
+}
