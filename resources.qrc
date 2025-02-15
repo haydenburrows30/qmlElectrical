@@ -14,6 +14,7 @@
     <file>icons/gallery/20x20/chart.png</file>
     <file>icons/gallery/20x20/calc.png</file>
     <file>icons/gallery/20x20/home.png</file>
+     <file>icons/gallery/20x20/Home.svg</file>
     <file>icons/gallery/20x20@2/back.png</file>
     <file>icons/gallery/20x20@2/drawer.png</file>
     <file>icons/gallery/20x20@2/menu.png</file>
@@ -33,7 +34,7 @@
     <file>icons/Messages.svg</file>
     <file>icons/Notifications.svg</file>
     <file>icons/Profile.svg</file>
-    <file>icons/Voltage Drop.svg</file>
+    <file>icons/gallery/20x20/Voltage Drop.svg</file>
     <file>icons/Setting.svg</file>
 </qresource>
 </RCC>

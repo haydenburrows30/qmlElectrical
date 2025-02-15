@@ -8,7 +8,7 @@ Item {
     property var expanded: {detailed}
     width: sideBar.width
 
-            MouseArea {
+        MouseArea {
             anchors.fill: parent
 
             onClicked:  {
@@ -22,7 +22,7 @@ Item {
         id: sideBar
         // width automatically derived from RowLayout child's implicitWidth
         height: parent.height
-        
+
         Component.onCompleted: {
             sideBar.open()
         }
@@ -38,13 +38,16 @@ Item {
                 id: listView
                 // focus: true
                 currentIndex: 0
-                Layout.preferredWidth: 50
+                Layout.preferredWidth: 60
                 Layout.fillHeight: true
-
+                
                 delegate: ItemDelegate {
-                    width: 50
+                    width: 60
+                    height: 60
                     highlighted: ListView.isCurrentItem
                     icon.name: model.icon
+                    icon.width: 30
+                    icon.height: 30
 
                     onClicked: {
                         if (detailed.state == 'close') {
@@ -60,15 +63,15 @@ Item {
                 }
 
                 model: ListModel {
-                    ListElement { 
+                    ListElement {
                         source: "../pages/home.qml"
                         tooltip: "Home"
-                        icon: "home"
+                        icon: "Home"
                         }
-                    ListElement { 
+                    ListElement {
                         source: "../pages/voltage_drop.qml"
                         tooltip: "Voltage Drop"
-                        icon: "chart"
+                        icon: "Voltage Drop"
                     }
                 }
             }
@@ -88,12 +91,12 @@ Item {
                         from: 'close'
                         to: 'open'
 
-                        NumberAnimation { 
+                        NumberAnimation {
                             properties: "Layout.preferredWidth,x,y,opacity"
                             easing.type: Easing.InOutQuad
                             duration: 250
                             }
-                        NumberAnimation { 
+                        NumberAnimation {
                             properties: "visible"
                             easing.type: Easing.InOutQuad
                             duration: 100
@@ -103,13 +106,13 @@ Item {
                         from: 'open'
                         to: 'close'
 
-                        NumberAnimation { 
+                        NumberAnimation {
                             properties: "Layout.preferredWidth,x,y,opacity"
                             easing.type: Easing.InOutQuad
                             duration: 250
                             }
 
-                        NumberAnimation { 
+                        NumberAnimation {
                             properties: "visible"
                             easing.type: Easing.InOutQuad
                             duration: 350
@@ -118,18 +121,18 @@ Item {
                 ]
 
                 states: [
-                    State { 
+                    State {
                         name: 'open'
                             PropertyChanges {
                                 target: detailed
                                 Layout.preferredWidth: 120
-                                x: 50
+                                x: 60
                                 y: 0
                                 visible: true
                                 opacity: 1
                             }
                         },
-                    State { 
+                    State {
                         name: 'close'
                             PropertyChanges {
                                 target: detailed
@@ -143,8 +146,8 @@ Item {
                     ]
 
                 delegate: ItemDelegate {
-                    id: icon1
                     width:120
+                    height: 60
                     text: model.title
                     highlighted: ListView.isCurrentItem
 
@@ -156,12 +159,12 @@ Item {
                 }
 
                 model: ListModel {
-                    ListElement { 
+                    ListElement {
                         title: 'Home'
                         source: "../pages/home.qml"
                         tooltip: "Home"
                         }
-                    ListElement { 
+                    ListElement {
                         title: 'Voltage Drop'
                         source: "../pages/voltage_drop.qml"
                         tooltip: "Voltage Drop"
