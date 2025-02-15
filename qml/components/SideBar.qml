@@ -1,269 +1,173 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 
 Item {
-    id: sideBar
-    property string statey: sideBar.state
+    id: root
 
-    state: 'close'
+    property var expanded: {detailed}
+    width: sideBar.width
 
-    states: [
-        State {
-            name: 'open'
+            MouseArea {
+            anchors.fill: parent
 
-            PropertyChanges {
-                target: sideBar
-                width: 270
-            }
-
-            PropertyChanges {
-                target: timer
-                index: 0
-            }
-        },
-        State {
-            name: 'close'
-
-            PropertyChanges {
-                target: sideBar
-                width: 95
-            }
-
-            PropertyChanges {
-                target: timer
-                index: 0
-            }
-        }
-    ]
-
-    transitions: [
-        Transition {
-            from: 'close'
-            to: 'open'
-
-            NumberAnimation {
-                properties: 'width'
-                duration: 300
-                easing.type: Easing.OutCubic
-            }
-
-            ScriptAction {
-                script: {
-                    timer.start();
-                }
-            }
-        },
-        Transition {
-            from: 'open'
-            to: 'close'
-
-            SequentialAnimation {
-
-                ScriptAction {
-                    script: {
-                        timer.start();
+            onClicked:  {
+                if (sideBar.expanded.state == 'open') {
+                            sideBar.expanded.state = 'close'
                     }
-                }
-
-                PauseAnimation {
-                    duration: 600
-                }
-
-                NumberAnimation {
-                    properties: 'width'
-                    duration: 300
-                    easing.type: Easing.OutCubic
-                }
             }
         }
-    ]
 
-    Timer {
-        id: timer
-
-        property int index: 0
-
-        interval: 10
-
-        onTriggered: {
-            if (sideBar.state == 'open')
-                columnItems.itemAt(index).state = 'left';
-            else
-                columnItems.itemAt(index).state = 'middle';
-
-            if (++index != 9)
-                timer.start();
+    Drawer {
+        id: sideBar
+        // width automatically derived from RowLayout child's implicitWidth
+        height: parent.height
+        
+        Component.onCompleted: {
+            sideBar.open()
         }
-    }
 
-    Rectangle {
-        id: body
+        modal: false
+        interactive: false
 
-        radius: 10
-        color: '#FFFFFF'
-        anchors.fill: parent
+        RowLayout {
+            id: rowLayout
+            height: parent.height
 
-        ColumnLayout {
-            id: buttonColumn
+            ListView {
+                id: listView
+                // focus: true
+                currentIndex: 0
+                Layout.preferredWidth: 50
+                Layout.fillHeight: true
 
-            width: parent.width
-            spacing: 10
-            anchors { top: parent.top; topMargin: 30 }
+                delegate: ItemDelegate {
+                    width: 50
+                    highlighted: ListView.isCurrentItem
+                    icon.name: model.icon
 
-            Repeater {
-                id: columnItems
-
-                model: ['Menu', 'Home', 'Voltage Drop', 'Explore', 'Notifications', 'Bookmarks', 'Messages', 'Profile', 'Setting']
-                delegate: Rectangle {
-                    id: button
-
-                    Layout.preferredWidth: 50
-                    Layout.preferredHeight: 50
-                    radius: 10
-                    color: buttonMouseArea.containsMouse ? '#f0f0f0' : '#ffffff'
-                    Layout.alignment: Qt.AlignLeft
-                    Layout.topMargin: model.index === 1 ? 20 : 0
-                    state: 'middle'
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 200
+                    onClicked: {
+                        if (detailed.state == 'close') {
+                                detailed.state = 'open'
                         }
+                            // } else {
+                            //     detailed.state = 'close'
+                            // }
+                        listView.currentIndex = index
+                        detailed.currentIndex = index
+                        stackView.push(model.source,StackView.Immediate)
                     }
+                }
 
-                    states: [
-                        State {
-                            name: 'left'
+                model: ListModel {
+                    ListElement { 
+                        source: "../pages/home.qml"
+                        tooltip: "Home"
+                        icon: "home"
+                        }
+                    ListElement { 
+                        source: "../pages/voltage_drop.qml"
+                        tooltip: "Voltage Drop"
+                        icon: "chart"
+                    }
+                }
+            }
 
-                            PropertyChanges {
-                                target: button
-                                Layout.leftMargin: 10
-                                Layout.preferredWidth: model.index !== 0 ? 240 : 50
+            ListView {
+                id: detailed
+                Layout.preferredWidth: 120
+                Layout.fillHeight: true
+                Layout.leftMargin: -5
+                currentIndex: 0
+                visible: true
+
+                state: 'close'
+
+                transitions: [
+                    Transition {
+                        from: 'close'
+                        to: 'open'
+
+                        NumberAnimation { 
+                            properties: "Layout.preferredWidth,x,y,opacity"
+                            easing.type: Easing.InOutQuad
+                            duration: 250
+                            }
+                        NumberAnimation { 
+                            properties: "visible"
+                            easing.type: Easing.InOutQuad
+                            duration: 100
+                            }
+                    },
+                    Transition {
+                        from: 'open'
+                        to: 'close'
+
+                        NumberAnimation { 
+                            properties: "Layout.preferredWidth,x,y,opacity"
+                            easing.type: Easing.InOutQuad
+                            duration: 250
                             }
 
+                        NumberAnimation { 
+                            properties: "visible"
+                            easing.type: Easing.InOutQuad
+                            duration: 350
+                            }
+                    }
+                ]
+
+                states: [
+                    State { 
+                        name: 'open'
                             PropertyChanges {
-                                target: title
+                                target: detailed
+                                Layout.preferredWidth: 120
+                                x: 50
+                                y: 0
+                                visible: true
                                 opacity: 1
                             }
                         },
-                        State {
-                            name: 'middle'
-
+                    State { 
+                        name: 'close'
                             PropertyChanges {
-                                target: button
-                                Layout.leftMargin: Math.ceil((sideBar.width - 50) / 2)
-                                Layout.preferredWidth: 50
-                            }
-
-                            PropertyChanges {
-                                target: title
+                                target: detailed
+                                Layout.preferredWidth: 0
+                                x: -100
+                                y: 0
+                                visible: false
                                 opacity: 0
                             }
                         }
                     ]
 
-                    transitions: [
-                        Transition {
-                            from: 'left'
-                            to: 'middle'
+                delegate: ItemDelegate {
+                    id: icon1
+                    width:120
+                    text: model.title
+                    highlighted: ListView.isCurrentItem
 
-                            NumberAnimation {
-                                properties: 'Layout.leftMargin, Layout.preferredWidth, opacity'
-                                duration: 300
-                                easing.type: Easing.InOutSine
-                            }
-                        },
-                        Transition {
-                            from: 'middle'
-                            to: 'left'
-
-                            NumberAnimation {
-                                properties: 'Layout.leftMargin, Layout.preferredWidth, opacity'
-                                duration: 300
-                                easing.type: Easing.InOutSine
-                            }
-                        }
-                    ]
-
-                    MouseArea {
-                        id: buttonMouseArea
-                        hoverEnabled: true
-                        anchors.fill: parent
-
-                        onClicked: {
-                            if (model.index === 0) {
-                                if (sideBar.state == 'close')
-                                    sideBar.state = 'open';
-                                else
-                                    sideBar.state = 'close';
-                            }
-                            if (model.index === 1) {
-                                stackView.push("../pages/home.qml")
-                            }
-                            if (model.index === 2) {
-                                stackView.push("../pages/voltage_drop.qml")
-                            }
-                            if (model.index === 3) {
-                                console.log("Explore")
-                            }
-                        }
+                    onClicked: {
+                        listView.currentIndex = index
+                        detailed.currentIndex = index
+                        stackView.push(model.source)
                     }
+                }
 
-                    Image {
-                        id: icon
-
-                        source: '../../icons/' + modelData + '.svg'
-                        sourceSize: Qt.size(30, 30)
-                        anchors { verticalCenter: parent.verticalCenter; left: parent.left; leftMargin: 10 }
-
-                        // HoverHandler {
-                        //     id: hover
-                        //     target: icon
-                        // }
-
-                        // ToolTip {
-                        //     id: control
-                        //     visible: hover.hovered
-                        //     text: modelData
-                        //     delay: 1000
-
-                        //     x: parent.width
-                        //     y: parent.height
-
-                        //     contentItem: Text {
-                        //         text: control.text
-                        //         font: control.font
-                        //         color: "#21be2b"
-                        //     }
-
-                        //     background: Rectangle {
-                        //         border.color: "#21be2b"
-                        //     }
-                        // }
-                    }
-
-                    Text {
-                        id: title
-
-                        text: model.index === 0 ? '' : modelData
-                        font.family: sourceSansProFont.name
-                        anchors { verticalCenter: parent.verticalCenter; left: parent.left; leftMargin: 55 }
-
+                model: ListModel {
+                    ListElement { 
+                        title: 'Home'
+                        source: "../pages/home.qml"
+                        tooltip: "Home"
+                        }
+                    ListElement { 
+                        title: 'Voltage Drop'
+                        source: "../pages/voltage_drop.qml"
+                        tooltip: "Voltage Drop"
                     }
                 }
             }
         }
-    }
-
-    DropShadow {
-        id: shadow
-
-        anchors.fill: body
-        source: body
-        radius: 20
-        samples: radius * 2 + 1
-        color: Qt.rgba(0, 0, 0, 0.05)
     }
 }

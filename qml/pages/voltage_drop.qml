@@ -8,17 +8,16 @@ import QtQuick.Layouts
 import Python 1.0
     
     Page {
-
         MouseArea {
-            id: mouseArea
             anchors.fill: parent
-            onClicked: {
-                if (sideBar.statey == 'open') {
-                    sideBar.state = 'close'
-                }
+
+            onClicked:  {
+                if (sideBar.expanded.state == 'open') {
+                            sideBar.expanded.state = 'close'
+                    }
             }
         }
-        
+       
         header: ToolBar {
             id: toolbar
             RowLayout {
@@ -49,13 +48,6 @@ import Python 1.0
                     text: qsTr("Load CSV")
                     onClicked: fileDialog.open()
                 }
-                // Label {
-                //     text: "Voltage Drop Calculation"
-                //     elide: Label.ElideRight
-                //     horizontalAlignment: Qt.AlignHCenter
-                //     verticalAlignment: Qt.AlignVCenter
-                //     Layout.fillWidth: true
-                // }
             }
         }
 

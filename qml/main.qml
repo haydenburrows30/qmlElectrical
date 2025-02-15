@@ -10,10 +10,9 @@ import Python 1.0
 import 'components'
 
 Window {
-    id: window
-    
+   
     minimumWidth: 1080
-    minimumHeight: 900
+    minimumHeight: 400
     visible: true    
 
     PythonModel {
@@ -31,31 +30,24 @@ Window {
         }
     }
 
-    FontLoader {
-        id: sourceSansProFont
-        source: '../fonts/SourceSansPro-Regular.ttf'
-    }
-
     Rectangle {
-        id: mainview
-
         anchors {
             top: parent.top
             bottom: parent.bottom
             left: parent.left
-            leftMargin: sideBar.width + 2
+            leftMargin: sideBar.width + 5
             right: parent.right
         }
 
         StackView {
             id: stackView
             anchors.fill: parent
-            Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/home.qml"))
+            Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/home.qml"),StackView.Immediate)
         }
     }
 
     SideBar {
         id: sideBar
-        anchors.left: parent.left
+        height: parent.height
     }
 }
