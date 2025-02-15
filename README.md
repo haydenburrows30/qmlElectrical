@@ -5,6 +5,6 @@
 - Dropdown and textfield inside cells
 - Voltage drop calculation based on resistance and reactance of cable type
 
-![Image](https://github.com/user-attachments/assets/f42ab055-60b1-4665-aa9b-c36c9ffd45c4)
+![Image](https://github.com/user-attachments/assets/6b412034-73d4-4e08-902a-c58abbffb5de)
 
 Icons used in the program: https://www.figma.com/community/file/944228750903853832
