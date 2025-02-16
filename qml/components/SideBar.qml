@@ -8,16 +8,6 @@ Item {
     property var expanded: {detailed}
     width: sideBar.width
 
-        MouseArea {
-            anchors.fill: parent
-
-            onClicked:  {
-                if (sideBar.expanded.state == 'open') {
-                            sideBar.expanded.state = 'close'
-                    }
-            }
-        }
-
     Drawer {
         id: sideBar
         // width automatically derived from RowLayout child's implicitWidth
@@ -58,10 +48,10 @@ Item {
                             detailed.state = 'close'
                         } else {
                             detailed.state = 'open'
+                            stackView.push(model.source,StackView.Immediate)
                         }
                         listView.currentIndex = index
                         detailed.currentIndex = index
-                        stackView.push(model.source,StackView.Immediate)
                     }
                 }
 
@@ -90,14 +80,18 @@ Item {
                         icon.height: 60
 
                         onClicked: {
-                            if (listView.currentIndex == listView.index && detailed.state == 'open') {
+                            if (listView.currentIndex == -1 && detailed.state == 'open') {
                                 detailed.state = 'close'
+                            } else if (footerdel.highlighted == true && detailed.state == 'close') {
+                                detailed.state = 'open'
+                                
                             } else {
                                 detailed.state = 'open'
+                                stackView.push("../pages/settings.qml")
                             }
                             listView.currentIndex = -1
                             detailed.currentIndex = -1
-                            stackView.push("../pages/settings.qml")
+                            
                         }
                     }
             }
@@ -181,12 +175,15 @@ Item {
                     highlighted: ListView.isCurrentItem
 
                     onClicked: {
-                        if (detailed.state == 'open') {
+                        if (listView.currentIndex == index && detailed.state == 'open') {
                                 detailed.state = 'close'
+                        } else {
+                            detailed.state = 'open'
+                            stackView.push(model.source)
+
                         }
                         listView.currentIndex = index
                         detailed.currentIndex = index
-                        stackView.push(model.source)
                     }
                 }
 
@@ -212,14 +209,14 @@ Item {
                         text: "Settings"
 
                         onClicked: {
-                            if (listView.currentIndex == listView.index && detailed.state == 'open') {
+                            if (listView.currentIndex == -1 && detailed.state == 'open') {
                                 detailed.state = 'close'
                             } else {
                                 detailed.state = 'open'
+                                stackView.push("../pages/settings.qml")
                             }
                             listView.currentIndex = -1
                             detailed.currentIndex = -1
-                            stackView.push("../pages/settings.qml")
                         }
                     }
             }
