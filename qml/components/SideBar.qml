@@ -40,22 +40,25 @@ Item {
                 currentIndex: 0
                 Layout.preferredWidth: 60
                 Layout.fillHeight: true
-                
+                clip: true
+                footerPositioning : ListView.OverlayFooter
+
                 delegate: ItemDelegate {
-                    width: 60
-                    height: 60
+                    implicitHeight: 60
+                    
                     highlighted: ListView.isCurrentItem
+                    anchors.horizontalCenter:parent.horizontalCenter
+
                     icon.name: model.icon
-                    icon.width: 30
-                    icon.height: 30
+                    icon.width: 60
+                    icon.height: 60
 
                     onClicked: {
-                        if (detailed.state == 'close') {
-                                detailed.state = 'open'
+                        if (listView.currentIndex == index && detailed.state == 'open') {
+                            detailed.state = 'close'
+                        } else {
+                            detailed.state = 'open'
                         }
-                            // } else {
-                            //     detailed.state = 'close'
-                            // }
                         listView.currentIndex = index
                         detailed.currentIndex = index
                         stackView.push(model.source,StackView.Immediate)
@@ -74,6 +77,29 @@ Item {
                         icon: "Voltage Drop"
                     }
                 }
+
+                footer:
+                    ItemDelegate {
+                        id: footerdel
+                        anchors.horizontalCenter:parent.horizontalCenter
+                        highlighted: listView.currentIndex == -1
+                        implicitHeight: 60
+
+                        icon.name: 'Setting'
+                        icon.width: 60
+                        icon.height: 60
+
+                        onClicked: {
+                            if (listView.currentIndex == listView.index && detailed.state == 'open') {
+                                detailed.state = 'close'
+                            } else {
+                                detailed.state = 'open'
+                            }
+                            listView.currentIndex = -1
+                            detailed.currentIndex = -1
+                            stackView.push("../pages/settings.qml")
+                        }
+                    }
             }
 
             ListView {
@@ -81,8 +107,11 @@ Item {
                 Layout.preferredWidth: 120
                 Layout.fillHeight: true
                 Layout.leftMargin: -5
+                clip: true
+
+                footerPositioning : ListView.OverlayFooter
+
                 currentIndex: 0
-                visible: true
 
                 state: 'close'
 
@@ -152,6 +181,9 @@ Item {
                     highlighted: ListView.isCurrentItem
 
                     onClicked: {
+                        if (detailed.state == 'open') {
+                                detailed.state = 'close'
+                        }
                         listView.currentIndex = index
                         detailed.currentIndex = index
                         stackView.push(model.source)
@@ -170,6 +202,26 @@ Item {
                         tooltip: "Voltage Drop"
                     }
                 }
+                footer:
+                    ItemDelegate {
+                        width:120
+                        height: 60
+                        
+                        highlighted: listView.currentIndex == -1
+                        anchors.horizontalCenter:parent.horizontalCenter
+                        text: "Settings"
+
+                        onClicked: {
+                            if (listView.currentIndex == listView.index && detailed.state == 'open') {
+                                detailed.state = 'close'
+                            } else {
+                                detailed.state = 'open'
+                            }
+                            listView.currentIndex = -1
+                            detailed.currentIndex = -1
+                            stackView.push("../pages/settings.qml")
+                        }
+                    }
             }
         }
     }

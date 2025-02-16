@@ -35,6 +35,6 @@
     <file>icons/Notifications.svg</file>
     <file>icons/Profile.svg</file>
     <file>icons/gallery/20x20/Voltage Drop.svg</file>
-    <file>icons/Setting.svg</file>
+    <file>icons/gallery/20x20/Setting.svg</file>
 </qresource>
 </RCC>
