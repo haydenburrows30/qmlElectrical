@@ -5,6 +5,8 @@ import QtQml
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
+import QtQuick.Controls.Universal
+
 import Python 1.0
 
 import 'components'
@@ -12,12 +14,14 @@ import 'components'
 Window {
    
     minimumWidth: 1080
-    minimumHeight: 400
+    minimumHeight: 800
     visible: true    
 
     PythonModel {
         id: pythonModel
     }
+
+    Universal.theme: Universal["light"]
 
     FileDialog {
         id: fileDialog

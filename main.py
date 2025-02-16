@@ -21,7 +21,7 @@ if __name__ == "__main__":
     QIcon.setThemeName("gallery")
 
     # Load CSV before QML window appears
-    csv_path = "cable_data.csv"  # Change this path if needed
+    csv_path = "cable_data.csv"
     voltage_model = PythonModel(csv_path)
 
     qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")

@@ -4,9 +4,23 @@ import QtQuick.Layouts
 
 Item {
     id: root
+    focus: true
 
     property var expanded: {detailed}
     width: sideBar.width
+
+    MouseArea {
+            anchors.fill: parent
+            onClicked:  {
+                if (sideBar.expanded.state == 'open') {
+                            sideBar.expanded.state = 'close'
+                    }
+            }
+
+            onEntered: {
+                console.log("entered")
+            }
+        }
 
     Drawer {
         id: sideBar
@@ -66,6 +80,11 @@ Item {
                         tooltip: "Voltage Drop"
                         icon: "Voltage Drop"
                     }
+                    // ListElement {
+                    //     source: "../pages/Perceptron.qml"
+                    //     tooltip: "Perceptron"
+                    //     icon: "Voltage Drop"
+                    // }
                 }
 
                 footer:

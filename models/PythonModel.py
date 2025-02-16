@@ -70,7 +70,7 @@ class PythonModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             if orientation == Qt.Orientation.Horizontal:
                 return self._headers[section]
-            return f"Row {section}"
+            return section
         return None
 
     def roleNames(self):
