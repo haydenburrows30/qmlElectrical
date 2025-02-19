@@ -5,6 +5,9 @@
     <file>qml/pages/voltage_drop.qml</file>
     <file>qml/components/SideBar.qml</file>
     <file>qml/components/CToolTip.qml</file>
+    <file>qml/components/MenuBar.qml</file>
+    <file>qml/components/ToolBar.qml</file>
+
 </qresource>
 
 <qresource>

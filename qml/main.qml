@@ -1,27 +1,49 @@
 import QtQuick
+import QtCore
 import QtQuick.Controls
-import Qt.labs.qmlmodels 1.0
-import QtQml
 import QtQuick.Dialogs
 import QtQuick.Layouts
-
-import QtQuick.Controls.Universal
+import Qt.labs.qmlmodels 1.0
 
 import Python 1.0
 
 import 'components'
 
-Window {
+ApplicationWindow {
+    id: window
    
     minimumWidth: 1080
     minimumHeight: 800
-    visible: true    
+    visible: true
 
     PythonModel {
         id: pythonModel
     }
 
-    Universal.theme: Universal["light"]
+    ToolBar{
+        id: toolBar
+        width: parent.width
+        onMySignal: sideBar.react()
+    }
+    
+    SideBar {
+        id: sideBar
+        y: toolBar.height
+        height: window.height - toolBar.height
+    }
+
+    StackView {
+        id: stackView
+        anchors {
+            top: toolBar.bottom
+            bottom: parent.bottom
+            left: parent.left
+            leftMargin: sideBar.width + 5
+            right: parent.right
+        }
+        Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/home.qml"),StackView.Immediate)
+    }
+
 
     FileDialog {
         id: fileDialog
@@ -34,24 +56,5 @@ Window {
         }
     }
 
-    Rectangle {
-        anchors {
-            top: parent.top
-            bottom: parent.bottom
-            left: parent.left
-            leftMargin: sideBar.width + 5
-            right: parent.right
-        }
-
-        StackView {
-            id: stackView
-            anchors.fill: parent
-            Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/home.qml"),StackView.Immediate)
-        }
-    }
-
-    SideBar {
-        id: sideBar
-        height: parent.height
-    }
+    Universal.theme: toolBar.toggle ? Universal.Dark : Universal.Light
 }

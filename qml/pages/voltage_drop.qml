@@ -14,11 +14,10 @@ Page {
         anchors.fill: parent
 
         onClicked:  {
-            if (sideBar.expanded.state == 'open') {
-                sideBar.expanded.state = 'close'
+            stackView.anchors.leftMargin = 0
+            sideBar.close()
             }
         }
-    }
 
     GroupBox {
         id: settings
@@ -81,7 +80,6 @@ Page {
             width: parent.width
             anchors.bottomMargin: 10
 
-            
             Button {
                 text: qsTr("Add Row")
                 Layout.fillWidth: true

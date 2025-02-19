@@ -9,15 +9,14 @@ import QtQuick.Layouts
 Page {
     id: home
 
-        MouseArea {
-            anchors.fill: parent
+    MouseArea {
+        anchors.fill: parent
 
-            onClicked:  {
-                if (sideBar.expanded.state == 'open') {
-                            sideBar.expanded.state = 'close'
-                    }
-            }
+        onClicked:  {
+            stackView.anchors.leftMargin = 0
+            sideBar.close()
         }
+    }
 
     Image {
         anchors.centerIn: parent

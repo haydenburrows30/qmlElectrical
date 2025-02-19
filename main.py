@@ -1,5 +1,4 @@
 import sys
-import os.path
 
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from PySide6.QtWidgets import QApplication
