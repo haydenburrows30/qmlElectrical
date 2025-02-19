@@ -7,4 +7,4 @@
 
 Icons used in the program: https://www.figma.com/community/file/944228750903853832
 
-https://github.com/user-attachments/assets/a3c42708-7bd9-4124-850f-231dbeb0ca0f
+https://github.com/user-attachments/assets/6aecb0c9-37bd-4319-a1c8-c4f9bcc3c858
