@@ -8,21 +8,26 @@ Drawer {
     // width automatically derived from RowLayout child's implicitWidth
     height: parent.height
     property int position1: {sideBar.position}
+    property int hide: 0
+    property int show: 0
+
+    onAboutToHide: {
+        show = 0
+        hide = 1
+    }
+
+    onAboutToShow: {
+        hide = 0
+        show = 1
+    }
 
     function react() {
         if (sideBar.position == 0) {
             sideBar.open()
-            stackView.anchors.leftMargin = sideBar.width + 5
         }
         else {
-            stackView.anchors.leftMargin = 0
             sideBar.close()
         }
-    }
-
-    function closey() {
-        stackView.anchors.leftMargin = 0
-        sideBar.close()
     }
 
     modal: false

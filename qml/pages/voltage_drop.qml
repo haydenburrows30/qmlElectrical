@@ -1,20 +1,19 @@
 import QtQuick
-import QtQuick.Controls
-import Qt.labs.qmlmodels 1.0
 import QtQml
+import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-
+import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls.Universal
 
 import Python 1.0
     
 Page {
     MouseArea {
+        id: area
         anchors.fill: parent
 
         onClicked:  {
-            stackView.anchors.leftMargin = 0
             sideBar.close()
             }
         }

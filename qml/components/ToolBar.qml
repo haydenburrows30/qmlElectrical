@@ -29,12 +29,9 @@ ToolBar {
             }
             radius: 20
             Layout.alignment: Qt.AlignVCenter
-            Layout.leftMargin: 5
+            Layout.leftMargin: 10
             
         }
-        // ToolButton {
-        //     text: qsTr("Action 2")
-        // }
         // empty label to push toggle to right
         Label {
             elide: Label.ElideRight
@@ -45,8 +42,12 @@ ToolBar {
 
         Switch {
             id: darkModeToggle
-            text: qsTr("Mode")
+            // text: qsTr("Mode")
             Layout.alignment: Qt.AlignVCenter
+            // contentItem: Text {
+            //     text: parent.texts
+            //     anchors.right: parent.left
+            // }
         }
     }
 }

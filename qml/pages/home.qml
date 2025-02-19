@@ -13,7 +13,6 @@ Page {
         anchors.fill: parent
 
         onClicked:  {
-            stackView.anchors.leftMargin = 0
             sideBar.close()
         }
     }

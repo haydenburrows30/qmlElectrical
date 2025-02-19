@@ -38,12 +38,25 @@ ApplicationWindow {
             top: toolBar.bottom
             bottom: parent.bottom
             left: parent.left
-            leftMargin: sideBar.width + 5
+            leftMargin: 0
             right: parent.right
         }
         Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/home.qml"),StackView.Immediate)
-    }
 
+        states: [State {
+            name: "closed"; when: sideBar.hide
+            PropertyChanges { target: stackView; anchors.leftMargin: 0;}
+        },
+        State {
+            name: "open"; when: sideBar.show
+            PropertyChanges { target: stackView; anchors.leftMargin: sideBar.width + 5;}
+        }]
+
+
+        transitions: Transition {
+            NumberAnimation { properties: "anchors.leftMargin"; easing.type: Easing.InOutQuad; duration: 200  }
+        }
+    }
 
     FileDialog {
         id: fileDialog
