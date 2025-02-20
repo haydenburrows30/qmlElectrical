@@ -10,14 +10,13 @@ import QtQuick.Studio.DesignEffects
 
 Rectangle {
     id: menuPanel
-    width: 391
-    height: 725
+    width: 200
+    height: 400
     color: "transparent"
 
     Rectangle {
         id: background
         color: "#45d9d9d9"
-        radius: 30
         border.color: "#ededed"
         border.width: 1
         anchors.fill: parent
@@ -25,76 +24,35 @@ Rectangle {
 
     Rectangle {
         id: menuColumn
-        width: 350
-        height: 613
         color: "transparent"
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.fill: parent
+        anchors.topMargin: 10
+        
         ColumnLayout {
             id: menuColumn_layout
-            anchors.fill: parent
-            spacing: 19
-            MenuButton {
+            spacing: 5
+            
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Button {
                 id: menuItem1
-                state: "state_idle"
-                menuText: "Draggable Panel"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
+                text: "Draggable Panel"
+                Layout.preferredWidth: 180
+                Layout.preferredHeight: 50
                 onClicked: {
                     console.log("clicked1")
                 }
             }
 
-            MenuButton {
+            Button {
                 id: menuItem2
-                state: "state_hover"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
-            }
-
-            MenuButton {
-                id: menuItem3
-                state: "state_idle"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
-            }
-
-            MenuButton {
-                id: menuItem4
-                state: "state_idle"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
-            }
-
-            MenuButton {
-                id: menuItem5
-                state: "state_idle"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
-            }
-
-            MenuButton {
-                id: menuItem6
-                state: "state_idle"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
-            }
-
-            MenuButton {
-                id: menuItem7
-                state: "state_idle"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
-            }
-
-            MenuButton {
-                id: menuItem8
-                state: "state_idle"
-                Layout.preferredWidth: 350
-                Layout.preferredHeight: 60
+                text: "Draggable Panel"
+                Layout.preferredWidth: 180
+                Layout.preferredHeight: 50
+                onClicked: {
+                    console.log("clicked1")
+                }
             }
         }
-        anchors.verticalCenterOffset: 5
-        anchors.horizontalCenterOffset: 3
-        anchors.horizontalCenter: parent.horizontalCenter
     }
 }

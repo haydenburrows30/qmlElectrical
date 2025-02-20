@@ -27,8 +27,8 @@ Page {
         id: draggablePanel
         x: Math.round((window.width - width) / 2)
         y: Math.round(window.height / 6)
-        width: 397
-        height: 675
+        width: 200
+        height: 400
         z: 99
 
         visible: false

@@ -26,7 +26,7 @@ if __name__ == "__main__":
     for path in import_paths:
         engine.addImportPath(os.fspath(app_dir / path))
 
-    print(engine.importPathList())
+    # print(engine.importPathList())
 
     QQuickStyle.setStyle("Universal")
     QApplication.setApplicationName("Electrical")
