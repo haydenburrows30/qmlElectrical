@@ -5,19 +5,23 @@
     <file>qml/pages/voltage_drop.qml</file>
     <file>qml/components/SideBar.qml</file>
     <file>qml/components/CToolTip.qml</file>
-    <file>qml/components/MenuBar.qml</file>
     <file>qml/components/ToolBar.qml</file>
+    <file>qml/components/Settings.qml</file>
 
 </qresource>
 
 <qresource>
+ <file>icons/gallery/20x20/backgroundBlurDemo.png</file>
     <file>icons/gallery/20x20/back.png</file>
     <file>icons/gallery/20x20/drawer.png</file>
     <file>icons/gallery/20x20/menu.png</file>
     <file>icons/gallery/20x20/chart.png</file>
     <file>icons/gallery/20x20/calc.png</file>
     <file>icons/gallery/20x20/home.png</file>
-     <file>icons/gallery/20x20/Home.svg</file>
+    <file>icons/gallery/20x20/Home.svg</file>
+    <file>icons/gallery/20x20/Menu.svg</file>
+    <file>icons/gallery/20x20/Voltage Drop.svg</file>
+    <file>icons/gallery/20x20/Setting.svg</file>
     <file>icons/gallery/20x20@2/back.png</file>
     <file>icons/gallery/20x20@2/drawer.png</file>
     <file>icons/gallery/20x20@2/menu.png</file>
@@ -30,14 +34,5 @@
     <file>icons/gallery/index.theme</file>
     <file>qtquickcontrols2.conf</file>
     <file>fonts/SourceSansPro-Regular.ttf</file>
-    <file>icons/Bookmarks.svg</file>
-    <file>icons/explore.svg</file>
-    <file>icons/Home.svg</file>
-    <file>icons/Menu.svg</file>
-    <file>icons/Messages.svg</file>
-    <file>icons/Notifications.svg</file>
-    <file>icons/Profile.svg</file>
-    <file>icons/gallery/20x20/Voltage Drop.svg</file>
-    <file>icons/gallery/20x20/Setting.svg</file>
 </qresource>
 </RCC>

@@ -86,23 +86,23 @@ Drawer {
                 // }
             }
 
-            footer:
-                ItemDelegate {
-                    id: footerdel
-                    highlighted: listView.currentIndex == -1
-                    implicitHeight: 60
-                    implicitWidth: 160
-                    text: "Settings"
+            // footer:
+            //     ItemDelegate {
+            //         id: footerdel
+            //         highlighted: listView.currentIndex == -1
+            //         implicitHeight: 60
+            //         implicitWidth: 160
+            //         text: "Settings"
                     
-                    icon.name: 'Setting'
-                    icon.width: 30
-                    icon.height: 30
+            //         icon.name: 'Setting'
+            //         icon.width: 30
+            //         icon.height: 30
 
-                    onClicked: {
-                        stackView.push("../pages/settings.qml", StackView.Immediate)
-                        listView.currentIndex = -1
-                    }
-                }
+            //         onClicked: {
+            //             stackView.push("../pages/settings.qml", StackView.Immediate)
+            //             listView.currentIndex = -1
+            //         }
+            //     }
         }
     }
 }

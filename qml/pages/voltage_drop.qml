@@ -6,9 +6,14 @@ import QtQuick.Layouts
 import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls.Universal
 
+import QtQuick.Studio.DesignEffects
+
+import '../components'
+
 import Python 1.0
     
 Page {
+    id: voltage_drop
     MouseArea {
         id: area
         anchors.fill: parent
@@ -18,6 +23,31 @@ Page {
             }
         }
 
+    MenuPanel {
+        id: draggablePanel
+        x: Math.round((window.width - width) / 2)
+        y: Math.round(window.height / 6)
+        width: 397
+        height: 675
+        z: 99
+
+        visible: false
+        DragHandler {
+            xAxis.minimum: 0
+            yAxis.minimum: 0
+            xAxis.maximum: voltage_drop.width - draggablePanel.width
+            yAxis.maximum: voltage_drop.height - draggablePanel.height
+        }
+
+        DesignEffect {
+            backgroundBlurRadius: 500
+            backgroundLayer: parent
+            effects: [
+                DesignDropShadow {}
+            ]
+        }
+    }
+
     GroupBox {
         id: settings
         title: 'Settings'
@@ -25,6 +55,7 @@ Page {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: 10
+        anchors.leftMargin: 10
         Component.onCompleted: {
             settings.width = columnLayout.width + 25
         }
@@ -61,6 +92,13 @@ Page {
                 onTextChanged: pythonModel.current = text
                 Layout.fillWidth: true
             }
+            Button {
+                text: "Options"
+                Layout.fillWidth: true
+                onClicked: {
+                    draggablePanel.visible = true
+                }
+            }
         }
     }
 
@@ -69,11 +107,13 @@ Page {
         title: 'Table'
         width: 960
         height: 180
-        anchors.left: settings.right
-        anchors.top: parent.top
-        anchors.leftMargin: 20
-        anchors.topMargin: 10
-
+        anchors {
+            left: settings.right
+            top: parent.top
+            leftMargin: 20
+            topMargin: 10
+        }
+        
         RowLayout {
             id: buttons
             width: parent.width

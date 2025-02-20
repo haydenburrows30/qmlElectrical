@@ -5,6 +5,9 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Qt.labs.qmlmodels 1.0
 
+
+import QtQuick.Studio.DesignEffects
+
 import Python 1.0
 
 import 'components'
@@ -32,6 +35,12 @@ ApplicationWindow {
         height: window.height - toolBar.height
     }
 
+    Settings {
+        id: settings
+    }
+
+
+
     StackView {
         id: stackView
         anchors {
@@ -52,9 +61,14 @@ ApplicationWindow {
             PropertyChanges { target: stackView; anchors.leftMargin: sideBar.width + 5;}
         }]
 
-
         transitions: Transition {
             NumberAnimation { properties: "anchors.leftMargin"; easing.type: Easing.InOutQuad; duration: 200  }
+        }
+
+        MenuPanel {
+            id: menuPanel
+            visible: true
+            z:0
         }
     }
 
