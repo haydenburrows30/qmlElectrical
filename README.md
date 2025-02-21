@@ -7,4 +7,4 @@
 
 Icons used in the program: https://www.figma.com/community/file/944228750903853832
 
-![video](https://raw.githubusercontent.com/haydenburrows30/qmlTableView/main/screencast.mp4)
+![video](https://github.com/haydenburrows30/qmlTableView/blob/main/media/screencast.mp4)
