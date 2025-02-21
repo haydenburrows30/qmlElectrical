@@ -127,13 +127,6 @@ Page {
                     }
                 }
             }
-            // TextField {
-            //     id: powerFactorField
-            //     text: "0.9"
-            //     onTextChanged: pythonModel.powerFactor = text
-            //     Layout.fillWidth: true
-            // }
-
             Label {
                 text: "Current:"
             }
