@@ -1,6 +1,4 @@
 import QtQuick
-import QtCharts
-
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Dialogs

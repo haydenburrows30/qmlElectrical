@@ -5,6 +5,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls.Universal
+import QtCharts
 
 import QtQuick.Studio.DesignEffects
 
@@ -14,6 +15,39 @@ import Python 1.0
     
 Page {
     id: voltage_drop
+
+    DialogOnTop {
+        id: chart
+        visible:false
+    }
+
+    function updateChart() {
+
+        barSeries.clear()
+        let categories = []
+        let maxPercentVoltageDrop = 0  // Track highest voltage drop
+
+        for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
+            let entry = pythonModel.chart_data_qml[i]
+            // create new barset for each cable type
+            let example = barSeries.append(entry.cable, [entry.percentage_drop])
+            // set label font and colour
+            example.labelFont = Qt.font({pointSize: 12}); //bold:true
+            example.labelColor = "black"
+
+            // Track the highest voltage drop to set the Y-axis max value
+            if (entry.percentage_drop > maxPercentVoltageDrop) {
+                maxPercentVoltageDrop = entry.percentage_drop
+            }
+        }
+
+        axisX.categories = ["Aluminium"] // ,"Copper"
+
+        // Dynamically adjust Y-axis scale
+        axisY.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
+        axisY.min = 0
+    }
+
     MouseArea {
         id: area
         anchors.fill: parent
@@ -21,7 +55,7 @@ Page {
         onClicked:  {
             sideBar.close()
             }
-        }
+    }
 
     MenuPanel {
         id: draggablePanel
@@ -30,7 +64,6 @@ Page {
         width: 200
         height: 400
         z: 99
-
         visible: false
         DragHandler {
             xAxis.minimum: 0
@@ -76,12 +109,30 @@ Page {
             Label {
                 text: "Power Factor:"
             }
-            TextField {
-                id: powerFactorField
-                text: "0.9"
-                onTextChanged: pythonModel.powerFactor = text
-                Layout.fillWidth: true
+            Row {
+                Layout.fillWidth : true
+
+                Slider {
+                    // width: parent.width / 0.9
+                    id: powerFactorSlider
+                    from: 0.5
+                    to: 1.0
+                    value: 0.8
+                    stepSize: 0.01
+                    onValueChanged: {
+                        pythonModel.powerFactor = value
+                        pythonModel.update_chart(0)
+                        updateChart()
+                        pythonModel.calculateResistance(0)
+                    }
+                }
             }
+            // TextField {
+            //     id: powerFactorField
+            //     text: "0.9"
+            //     onTextChanged: pythonModel.powerFactor = text
+            //     Layout.fillWidth: true
+            // }
 
             Label {
                 text: "Current:"
@@ -95,8 +146,14 @@ Page {
             Button {
                 text: "Options"
                 Layout.fillWidth: true
+
+                ToolTip {
+                    text: "Options"
+                }
                 onClicked: {
-                    draggablePanel.visible = true
+                    draggablePanel.visible == false ? draggablePanel.visible = true:draggablePanel.visible = false
+                    // chart.visible = true
+
                 }
             }
         }
@@ -268,6 +325,8 @@ Page {
                             onClicked: {
                                 tableView.closeEditor()
                                 pythonModel.calculateResistance(row)
+                                pythonModel.update_chart(row)
+                                updateChart()
                             }
                         }
                     }
@@ -306,6 +365,86 @@ Page {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    ChartView {
+        id: barChart
+        anchors.top: table.bottom
+        anchors.bottom: parent.bottom
+        // anchors.right: parent.right
+        anchors.left: settings.right
+        width: table.width
+        // height: 350
+        // anchors.fill: parent
+        Layout.rowSpan: 10
+        title: "% Voltage Drop vs Cable Type"
+        antialiasing: true
+        legend.alignment: Qt.AlignBottom
+        titleFont {
+            pointSize: 13
+            bold: true
+        }
+
+        BarCategoryAxis {
+            id: axisX
+            // titleText: "Cable Type"
+        }
+
+        ValueAxis {
+            id: axisY
+            titleText: "Voltage Drop (%)"
+            min: 0
+            max: 10
+        }
+
+        HoverHandler {
+            id: stylus
+            acceptedPointerTypes: PointerDevice.AllPointerTypes
+        }
+
+        BarSeries {
+            id: barSeries
+            axisX: axisX
+            axisY: axisY
+            labelsVisible: true
+            labelsPosition: AbstractBarSeries.LabelsOutsideEnd
+            labelsPrecision: 2
+            labelsAngle: 90
+            labelsFormat: "@value %"
+            barWidth: 0.9
+
+            onHovered: (status, index, barset) => {
+                if (status) {
+                    tooltiptext.text = barset.label + ": " + barset.at(index).toFixed(2) + " V"
+                    tooltip.visible = true
+                    tooltip.x = stylus.point.position.x
+                    tooltip.y = stylus.point.position.y - 20
+                    tooltip.visible = true
+                } else {
+                    tooltip.visible = false
+                }
+            }
+        }
+
+        Rectangle {
+            id: tooltip
+            visible: false
+            color: "#333"
+            radius: 5
+            opacity: 0.8
+            width: 100
+            height: 40
+            Text {
+                id: tooltiptext
+                anchors.fill: parent
+                text: ""
+                font.pixelSize: 14
+                color: "white"
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
         }
     }

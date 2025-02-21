@@ -3,9 +3,9 @@ import QtQuick.Controls
 
 ToolTip {
     id: control
-    visible: parent.hovered
+    visible: parent.hovered | parent.down
     text: qsTr("A descriptive tool tip of what the button does")
-    delay: 1500
+    delay: 500
 
     x: parent.width
     y: parent.height

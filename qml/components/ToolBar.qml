@@ -27,6 +27,9 @@ ToolBar {
             icon.width: 30
             icon.height: 30
             Layout.leftMargin: 10
+            ToolTip {
+                text: "Settings"
+            }
             // Layout.alignment: Qt.AlignVCenter
 
             background: Rectangle {
@@ -68,12 +71,16 @@ ToolBar {
             id: control
 
             icon.name: 'Setting'
-                        implicitWidth: 50
+            implicitWidth: 50
             implicitHeight: 50
             icon.width: 30
             icon.height: 30
             Layout.rightMargin: 10
+            ToolTip {
+                text: "Settings"
+            }
 
+            
             background: Rectangle {
                 radius: control.radius
                 visible: !control.flat || control.down || control.checked || control.highlighted
