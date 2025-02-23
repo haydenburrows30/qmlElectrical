@@ -10,7 +10,7 @@ import QtQuick.Studio.DesignEffects
 
 Rectangle {
     id: menuPanel
-    width: 200
+    width: 250
     height: 400
     color: "transparent"
 
@@ -34,23 +34,58 @@ Rectangle {
             
             anchors.horizontalCenter: parent.horizontalCenter
 
-            Button {
-                id: menuItem1
-                text: "Draggable Panel"
-                Layout.preferredWidth: 180
-                Layout.preferredHeight: 50
-                onClicked: {
-                    console.log("clicked1")
-                }
+            // Button {
+            //     id: menuItem1
+            //     text: "Draggable Panel"
+            //     Layout.preferredWidth: 180
+            //     Layout.preferredHeight: 50
+            //     onClicked: {
+            //         console.log("clicked1")
+            //     }
+            // }
+
+            // Button {
+            //     id: menuItem2
+            //     text: "Draggable Panel"
+            //     Layout.preferredWidth: 180
+            //     Layout.preferredHeight: 50
+            //     onClicked: {
+            //         console.log("clicked1")
+            //     }
+            // }
+
+            Label {
+                text: "Voltage Drop Threshold (%):"
+            }
+            TextField {
+                id: voltageDropThresholdField
+                text: "5"
+                onTextChanged: pythonModel.voltageDropThreshold = text
+                Layout.fillWidth: true
             }
 
-            Button {
-                id: menuItem2
-                text: "Draggable Panel"
-                Layout.preferredWidth: 180
-                Layout.preferredHeight: 50
-                onClicked: {
-                    console.log("clicked1")
+            Label {
+                text: "Power Factor:"
+            }
+            Row {
+                Layout.fillWidth : true
+
+                Slider {
+                    id: powerFactorSlider
+                    from: 0.5
+                    to: 1.0
+                    value: 0.8
+                    stepSize: 0.01
+                    onValueChanged: {
+                        pythonModel.powerFactor = value
+                        pythonModel.update_chart(0)
+                        updateChart()
+                        pythonModel.calculateResistance(0)
+                    }
+                }
+
+                Text {
+                    text: powerFactorSlider.value.toFixed(2)
                 }
             }
         }

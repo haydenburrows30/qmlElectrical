@@ -15,7 +15,7 @@ class PythonModel(QAbstractTableModel):
         self._data = [
             [1, "10", "0", "415", "5", "100", "", ""]
         ]
-        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)","Action"]
+        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)", "Action"]
         self.cable_data = CableData()
         self._voltageDropThreshold = 5.0
         self._powerFactor = 0.9
@@ -52,6 +52,8 @@ class PythonModel(QAbstractTableModel):
                 return "dropdown"
             elif index.column() == 7:
                 return "button"
+            elif index.column() == 6:
+                return "result"
             else:
                 return "number"
         return None
@@ -106,7 +108,7 @@ class PythonModel(QAbstractTableModel):
     @Slot(int)
     def calculateResistance(self, row):
         lots = float(self._data[row][1])
-        current = float(self._data[row][2])
+        base_current = float(self._data[row][2])
         voltage = float(self._data[row][3])
         power = float(self._data[row][4])
         length = float(self._data[row][5])
@@ -115,15 +117,15 @@ class PythonModel(QAbstractTableModel):
 
         cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots)
+        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots, base_current)
         voltage_drop = calculator.calculate_voltage_drop()
 
         formatted_voltage_drop = f"{voltage_drop:.2f}"
 
         self.setData(self.index(row, 6), formatted_voltage_drop, Qt.ItemDataRole.EditRole) 
 
-        if voltage_drop > self._voltageDropThreshold:
-            print(f"Row {row}: Voltage Drop = {formatted_voltage_drop}% exceeds the threshold of {self._voltageDropThreshold}%")
+        # if voltage_drop > self._voltageDropThreshold:
+        #     print(f"Row {row}: Voltage Drop = {formatted_voltage_drop}% exceeds the threshold of {self._voltageDropThreshold}%")
 
     def printTableView(self):
         for row in range(self.rowCount()):
@@ -172,19 +174,20 @@ class PythonModel(QAbstractTableModel):
             cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
             lots = float(self._data[row][1])
-            # current = float(self._data[row][2])
+            base_current = float(self._data[row][2])
             voltage = float(self._data[row][3])
             power = float(self._data[row][4])
             length = float(self._data[row][5])
 
             cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-            calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots)
+            calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots, base_current)
             voltage_drop = calculator.calculate_voltage_drop()
 
             self.chart_data.append({"cable": cable_type, "percentage_drop": voltage_drop})
         self.chartDataChanged.emit()
 
-    @Property("QVariantList", notify=chartDataChanged)
+    @Property("QVariantList")
     def chart_data_qml(self):
+        # print(self.chart_data)
         return self.chart_data

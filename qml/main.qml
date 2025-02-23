@@ -15,7 +15,7 @@ import 'components'
 ApplicationWindow {
     id: window
    
-    minimumWidth: 1080
+    minimumWidth: 1200
     minimumHeight: 800
     visible: true
 

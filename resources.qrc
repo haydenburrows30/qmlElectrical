@@ -4,15 +4,15 @@
     <file>qml/pages/home.qml</file>
     <file>qml/pages/voltage_drop.qml</file>
     <file>qml/components/SideBar.qml</file>
-    <file>qml/components/ToolTip.qml</file>
+    <file>qml/components/CToolTip.qml</file>
     <file>qml/components/ToolBar.qml</file>
     <file>qml/components/Settings.qml</file>
     <file>qml/components/CellBox.qml</file>
-
+    <file>qml/components/LineChart.qml</file>
 </qresource>
 
 <qresource>
- <file>icons/gallery/20x20/backgroundBlurDemo.png</file>
+    <file>icons/gallery/20x20/backgroundBlurDemo.png</file>
     <file>icons/gallery/20x20/back.png</file>
     <file>icons/gallery/20x20/drawer.png</file>
     <file>icons/gallery/20x20/menu.png</file>

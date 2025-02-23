@@ -1,7 +1,7 @@
 import math
 
 class ResistanceCalculator:
-    def __init__(self, voltage=415.0, length=0.0, power=0.0, cable_resistance=0.00, reactance=0.00, power_factor=0.9, lots=10):
+    def __init__(self, voltage=415.0, length=0.0, power=0.0, cable_resistance=0.00, reactance=0.00, power_factor=0.9, lots=10, base_current=0.0):
         """
         Constructor
         :param resistance: resistance from csv in ohms/km
@@ -19,9 +19,10 @@ class ResistanceCalculator:
         self.reactance = reactance
         self.power = power * lots
         self.power_factor = power_factor
+        self.base_current = base_current
 
     def calculate_voltage_drop(self):
-        self.current = (self.power * 1000) / (1.732 * self.voltage * self.power_factor)
+        self.current = ((self.power * 1000) / (1.732 * self.voltage * self.power_factor)) + self.base_current
         
         angle = math.acos(self.power_factor)
         voltage_drop_factor = math.sqrt(3)  # Assuming three-phase system

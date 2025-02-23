@@ -15,37 +15,59 @@ import Python 1.0
     
 Page {
     id: voltage_drop
-
+//Popup Window
     DialogOnTop {
         id: chart
         visible:false
     }
 
+    property int rowvalue: 0
+    property var rowsadded: ({})
+    property int rowselected: tableView.currentRow
+    property int previousrow
+
     function updateChart() {
 
-        barSeries.clear()
-        let categories = []
-        let maxPercentVoltageDrop = 0  // Track highest voltage drop
-
-        for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
-            let entry = pythonModel.chart_data_qml[i]
-            // create new barset for each cable type
-            let example = barSeries.append(entry.cable, [entry.percentage_drop])
-            // set label font and colour
-            example.labelFont = Qt.font({pointSize: 12}); //bold:true
-            example.labelColor = "black"
-
-            // Track the highest voltage drop to set the Y-axis max value
-            if (entry.percentage_drop > maxPercentVoltageDrop) {
-                maxPercentVoltageDrop = entry.percentage_drop
+        // see if the object is empty
+        if (Object.values(rowsadded).includes(rowvalue)) {
+            console.log("clear rows to show new graph")
             }
+        else {
+            let maxPercentVoltageDrop = 0  // Track highest voltage drop
+            //create series with rowvalue as the name
+
+            let series = lineChart.createSeries(ChartView.SeriesTypeScatter,rowvalue,lineChart.axisx2,lineChart.axisy2)
+
+            //apend the series with cable types.  Get the 
+            for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
+                let entry = pythonModel.chart_data_qml[i]
+
+                lineChart.series(Object.keys(rowsadded).length).append(i, [entry.percentage_drop])
+
+                // Track the highest voltage drop to set the Y-axis max value
+                if (entry.percentage_drop > maxPercentVoltageDrop) {
+                    maxPercentVoltageDrop = entry.percentage_drop
+                }
+            }
+            series.pointLabelsVisible = true
+
+            series.pointsVisible = true
+            series.pointLabelsFont.pointSize = 14
+            series.pointLabelsFormat = "@yPoint %"
+            series.pointLabelsClipping = false
+            series.style = Qt.NoPen
+            series.width = 5
+            series.selectedColor = "red"
+
+            // init no of series in lineChart
+            let noseries = lineChart.count
+            // create an object with linechart_series:row_number
+            rowsadded[noseries] = rowvalue
+
+            // Dynamically adjust Y-axis scale
+            lineChart.axisy2.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
+            lineChart.axisy2.min = 0
         }
-
-        axisX.categories = ["Aluminium"] // ,"Copper"
-
-        // Dynamically adjust Y-axis scale
-        axisY.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
-        axisY.min = 0
     }
 
     MouseArea {
@@ -56,12 +78,12 @@ Page {
             sideBar.close()
             }
     }
-
+//Popup Menu
     MenuPanel {
         id: draggablePanel
         x: Math.round((window.width - width) / 2)
         y: Math.round(window.height / 6)
-        width: 200
+        width: 250
         height: 400
         z: 99
         visible: false
@@ -80,7 +102,7 @@ Page {
             ]
         }
     }
-
+//Settings
     GroupBox {
         id: settings
         title: 'Settings'
@@ -104,6 +126,10 @@ Page {
                 text: "5"
                 onTextChanged: pythonModel.voltageDropThreshold = text
                 Layout.fillWidth: true
+
+                ToolTip {
+                    text: "Voltage Drop Threshold"
+                }
             }
 
             Label {
@@ -113,7 +139,6 @@ Page {
                 Layout.fillWidth : true
 
                 Slider {
-                    // width: parent.width / 0.9
                     id: powerFactorSlider
                     from: 0.5
                     to: 1.0
@@ -121,20 +146,19 @@ Page {
                     stepSize: 0.01
                     onValueChanged: {
                         pythonModel.powerFactor = value
-                        pythonModel.update_chart(0)
-                        updateChart()
-                        pythonModel.calculateResistance(0)
+                        // pythonModel.update_chart(0)
+                        // updateChart()
+                        pythonModel.calculateResistance(tableView.currentRow)
+                    }
+                    ToolTip {
+                        text: "Power Factor"
                     }
                 }
-            }
-            Label {
-                text: "Current:"
-            }
-            TextField {
-                id: currentField
-                text: "0"
-                onTextChanged: pythonModel.current = text
-                Layout.fillWidth: true
+
+                Text {
+                    text: powerFactorSlider.value.toFixed(2)
+                                        color: Universal.theme
+                }
             }
             Button {
                 text: "Options"
@@ -151,7 +175,7 @@ Page {
             }
         }
     }
-
+//Table
     GroupBox {
         id: table
         title: 'Table'
@@ -178,17 +202,28 @@ Page {
                     rect.height = rect.height + 51
                     table.height = table.height + 51
                 }
+
+                ToolTip {
+                    text: "Add Row"
+                }
             }
             Button {
                 text: qsTr("Remove Row")
                 onClicked: {
-                    if (pythonModel.rowCount() > 1) {
-                        pythonModel.removeRows(pythonModel.rowCount() - 1)
+                    if (pythonModel.rowCount() > 1 && tableView.currentRow > 0) {
+                        pythonModel.removeRows(tableView.currentRow)
+                        lineChart.removeSeries(lineChart.series(tableView.currentRow +1));
                         rect.height = rect.height - 51
                         table.height = table.height - 51
+                        // delete rowsadded[tableView.currentRow]
+                        // console.log(rowsadded)
                     }
                 }
                  Layout.fillWidth: true
+
+                 ToolTip {
+                    text: "Remove Row"
+                }
             }
             Button {
                 text: qsTr("Clear Rows")
@@ -196,13 +231,22 @@ Page {
                     rect.height = 85
                     table.height = 180
                     pythonModel.clearAllRows()
+                    lineChart.removeAllSeries()
+                    rowsadded = []
                 }
                 Layout.fillWidth: true
+
+                ToolTip {
+                    text: "Clear all rows"
+                }
             }
             Button {
                 text: qsTr("Load CSV")
                 onClicked: fileDialog.open()
                 Layout.fillWidth: true
+                ToolTip {
+                    text: "Load csv"
+                }
             }
         }
 
@@ -248,6 +292,13 @@ Page {
                 columnSpacing: 1
                 rowSpacing: 1
 
+                onCurrentRowChanged: {
+                    if (lineChart.count > tableView.currentRow && tableView.currentRow !== -1) {
+                    lineChart.series(tableView.currentRow).color = "red"
+                    console.log (tableView.currentRow,lineChart.count)
+                    }
+                }
+
                 delegate: DelegateChooser {
                     role: "roleValue"
 
@@ -274,6 +325,7 @@ Page {
                                         }
                                     }
                                 }
+                                pythonModel.calculateResistance(row)
                             }
                         }
                     }
@@ -283,7 +335,10 @@ Page {
                         delegate: Rectangle {
                             implicitWidth: 120
                             implicitHeight: 50
-                            color: TableView.view.model && parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
+                            color: current ? "blue" : palette.base
+
+                            required property bool selected
+                            required property bool current
 
                             Text {
                                 anchors.centerIn: parent
@@ -301,6 +356,7 @@ Page {
                                             display = text
                                         }
                                     }
+                                    pythonModel.calculateResistance(row)
                                 }
 
                                 TableView.onCommit: {
@@ -312,12 +368,25 @@ Page {
                     }
 
                     DelegateChoice {
+                        roleValue: "result"
+                        delegate: Rectangle {
+                            implicitWidth: 120
+                            implicitHeight: 50
+                            color: TableView.view.model && parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: display
+                            }
+                        }
+                    }
+
+                    DelegateChoice {
                         roleValue: "button"
                         delegate: Button {
-                            text: "Calculate"
+                            text: "Add Chart"
                             onClicked: {
-                                tableView.closeEditor()
-                                pythonModel.calculateResistance(row)
+                                rowvalue = row
                                 pythonModel.update_chart(row)
                                 updateChart()
                             }
@@ -340,7 +409,6 @@ Page {
                             implicitWidth: 100
                             implicitHeight: 50
                             text: display
-                            // selectByMouse: true
 
                             onTextChanged: {
                                 if (text !== display) {
@@ -362,83 +430,12 @@ Page {
         }
     }
 
-    ChartView {
-        id: barChart
+    LineChart {
+        id: lineChart
         anchors.top: table.bottom
         anchors.bottom: parent.bottom
-        // anchors.right: parent.right
         anchors.left: settings.right
         width: table.width
-        // height: 350
-        // anchors.fill: parent
-        Layout.rowSpan: 10
-        title: "% Voltage Drop vs Cable Type"
-        antialiasing: true
-        legend.alignment: Qt.AlignBottom
-        titleFont {
-            pointSize: 13
-            bold: true
-        }
-
-        BarCategoryAxis {
-            id: axisX
-            // titleText: "Cable Type"
-        }
-
-        ValueAxis {
-            id: axisY
-            titleText: "Voltage Drop (%)"
-            min: 0
-            max: 10
-        }
-
-        HoverHandler {
-            id: stylus
-            acceptedPointerTypes: PointerDevice.AllPointerTypes
-        }
-
-        BarSeries {
-            id: barSeries
-            axisX: axisX
-            axisY: axisY
-            labelsVisible: true
-            labelsPosition: AbstractBarSeries.LabelsOutsideEnd
-            labelsPrecision: 2
-            labelsAngle: 90
-            labelsFormat: "@value %"
-            barWidth: 0.9
-
-            onHovered: (status, index, barset) => {
-                if (status) {
-                    tooltiptext.text = barset.label + ": " + barset.at(index).toFixed(2) + " V"
-                    tooltip.visible = true
-                    tooltip.x = stylus.point.position.x
-                    tooltip.y = stylus.point.position.y - 20
-                    tooltip.visible = true
-                } else {
-                    tooltip.visible = false
-                }
-            }
-        }
-
-        Rectangle {
-            id: tooltip
-            visible: false
-            color: "#333"
-            radius: 5
-            opacity: 0.8
-            width: 100
-            height: 40
-            Text {
-                id: tooltiptext
-                anchors.fill: parent
-                text: ""
-                font.pixelSize: 14
-                color: "white"
-                font.bold: true
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
+        currentrow: tableView.currentRow
     }
 }
