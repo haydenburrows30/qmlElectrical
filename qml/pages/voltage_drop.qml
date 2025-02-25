@@ -273,6 +273,15 @@ Page {
                 clip: true
             }
 
+            Button {
+                    z: 99
+                    y: rect.y
+                    x: rect.x
+                    text: "#"
+                    width: 40
+                    height: 40
+                }
+
             TableView {
                 id: tableView
                 anchors {
@@ -283,9 +292,11 @@ Page {
                 }
                 
                 clip: true
-                interactive: true
+                interactive: false
                 model: pythonModel
                 selectionModel: ItemSelectionModel {}
+
+                animate: false
 
                 columnSpacing: 1
                 rowSpacing: 1
