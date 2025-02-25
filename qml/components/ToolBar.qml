@@ -62,6 +62,10 @@ ToolBar {
             Layout.leftMargin: menu.width
         }
 
+        Image {
+            source: darkModeToggle.checked ? "../../icons/gallery/20x20/dark.svg":"../../icons/gallery/20x20/light.svg"
+        }
+
         Switch {
             id: darkModeToggle
             Layout.alignment: Qt.AlignVCenter

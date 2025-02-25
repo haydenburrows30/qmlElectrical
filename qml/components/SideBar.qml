@@ -79,11 +79,12 @@ Drawer {
                     tooltip: "Voltage Drop"
                     icon: "Voltage Drop"
                 }
-                // ListElement {
-                //     source: "../pages/Perceptron.qml"
-                //     tooltip: "Perceptron"
-                //     icon: "Voltage Drop"
-                // }
+                ListElement {
+                    title: "Calculator"
+                    source: "../pages/calculator.qml"
+                    tooltip: "Calculator"
+                    icon: "Calculator"
+                }
             }
 
             // footer:

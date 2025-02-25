@@ -10,8 +10,6 @@ import QtCharts
 import QtQuick.Studio.DesignEffects
 
 import '../components'
-
-import Python 1.0
     
 Page {
     id: voltage_drop

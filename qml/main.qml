@@ -5,10 +5,11 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Qt.labs.qmlmodels 1.0
 
-
 import QtQuick.Studio.DesignEffects
 
 import Python 1.0
+import Calculator 1.0
+import Charging 1.0
 
 import 'components'
 
@@ -22,6 +23,15 @@ ApplicationWindow {
     PythonModel {
         id: pythonModel
     }
+
+    PowerCalculator {
+        id: powerCalculator
+    }
+
+    ChargingCalc {
+        id: chargingCalc
+    }
+
 
     ToolBar{
         id: toolBar
