@@ -255,7 +255,7 @@ Page {
             width: 930
             height: 85
 
-            color: palette.dark
+            color: toolBar.toggle ? palette.base : palette.dark
 
             HorizontalHeaderView {
                 id: horizontalHeader
@@ -273,14 +273,24 @@ Page {
                 clip: true
             }
 
-            Button {
-                    z: 99
-                    y: rect.y
-                    x: rect.x
+            // box to cover in the left upper corner
+
+            Rectangle {
+                z: 99
+                anchors.left: parent.left
+                anchors.top: parent.top
+                width: verticalHeader.width
+                height: horizontalHeader.height
+                color: toolBar.toggle ?  "black":"white"
+                Text {
                     text: "#"
-                    width: 40
-                    height: 40
+                    horizontalAlignment : Text.AlignHCenter
+                    verticalAlignment :  Text.AlignVCenter
+                    color: toolBar.toggle ?  "white":"black"
+                    width: parent.width
+                    height: parent.height
                 }
+            }
 
             TableView {
                 id: tableView
@@ -317,7 +327,16 @@ Page {
                             id: comboBox
                             implicitWidth: 100
                             implicitHeight: 50
+                            flat: true
                             model: pythonModel ? pythonModel.cable_types : []
+
+                            background: Rectangle {
+                                implicitWidth: 120
+                                implicitHeight: 40
+                                // border.width: comboBox.visualFocus ? 2 : 1
+                                color: palette.base
+                                radius: 2
+                            }
 
                             currentIndex: {
                                 var modelData = TableView.view.model ? TableView.view.model.data(TableView.view.index(row, column)).toString() : ""
@@ -344,7 +363,7 @@ Page {
                         delegate: Rectangle {
                             implicitWidth: 120
                             implicitHeight: 50
-                            color: current ? "blue" : palette.base
+                            color: current ? palette.dark : palette.base
 
                             required property bool selected
                             required property bool current
