@@ -9,6 +9,7 @@
     <file>qml/components/Settings.qml</file>
     <file>qml/components/CellBox.qml</file>
     <file>qml/components/LineChart.qml</file>
+    <file>qml/components/TableView.qml</file>
 </qresource>
 
 <qresource>

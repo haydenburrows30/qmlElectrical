@@ -1,4 +1,4 @@
-function updateChart() {
+function updateBarChart() {
         barChart.removeAllSeries()
         let maxPercentVoltageDrop = 0  // Track highest voltage drop
 

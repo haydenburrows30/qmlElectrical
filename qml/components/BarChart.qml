@@ -15,17 +15,15 @@ import Python 1.0
 
 ChartView {
     id: barChart
-    anchors.top: table.bottom
-    anchors.bottom: parent.bottom
-    anchors.left: settings.right
-    anchors.leftMargin: 20
-    width: table.width
-    // Layout.rowSpan: 10
     title: "% Voltage Drop vs Cable Type"
     antialiasing: true
     legend.alignment: Qt.AlignBottom
 
     theme: Universal.theme
+
+    property var barSeries: barSeries
+    property var axisX1: axisX1
+    property var axisY1: axisY1
 
     titleFont {
         pointSize: 13
@@ -33,12 +31,11 @@ ChartView {
     }
 
     BarCategoryAxis {
-        id: axisX
-        // titleText: "Cable Type"
+        id: axisX1
     }
 
     ValueAxis {
-        id: axisY
+        id: axisY1
         titleText: "Voltage Drop (%)"
         min: 0
         max: 10
@@ -51,8 +48,8 @@ ChartView {
 
     BarSeries {
         id: barSeries
-        axisX: axisX
-        axisY: axisY
+        axisX: axisX1
+        axisY: axisY1
         labelsVisible: true
         labelsPosition: AbstractBarSeries.LabelsOutsideEnd
         labelsPrecision: 2

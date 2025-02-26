@@ -19,28 +19,23 @@ Page {
         visible:false
     }
 
-    property int rowvalue: 0
-    property var rowsadded: ({})
-    property int rowselected: tableView.currentRow
-    property int previousrow
-
     function updateChart() {
 
         // see if the object is empty
-        if (Object.values(rowsadded).includes(rowvalue)) {
+        if (Object.values(tableView.rowsadded).includes(tableView.rowvalue)) {
             console.log("clear rows to show new graph")
             }
         else {
             let maxPercentVoltageDrop = 0  // Track highest voltage drop
             //create series with rowvalue as the name
 
-            let series = lineChart.createSeries(ChartView.SeriesTypeScatter,rowvalue,lineChart.axisx2,lineChart.axisy2)
+            let series = lineChart.createSeries(ChartView.SeriesTypeScatter,tableView.rowvalue,lineChart.axisx,lineChart.axisy)
 
             //apend the series with cable types.  Get the 
             for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
                 let entry = pythonModel.chart_data_qml[i]
 
-                lineChart.series(Object.keys(rowsadded).length).append(i, [entry.percentage_drop])
+                lineChart.series(Object.keys(tableView.rowsadded).length).append(i, [entry.percentage_drop])
 
                 // Track the highest voltage drop to set the Y-axis max value
                 if (entry.percentage_drop > maxPercentVoltageDrop) {
@@ -60,12 +55,41 @@ Page {
             // init no of series in lineChart
             let noseries = lineChart.count
             // create an object with linechart_series:row_number
-            rowsadded[noseries] = rowvalue
+            tableView.rowsadded[noseries] = tableView.rowvalue
 
             // Dynamically adjust Y-axis scale
-            lineChart.axisy2.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
-            lineChart.axisy2.min = 0
+            lineChart.axisy.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
+            lineChart.axisy.min = 0
         }
+    }
+
+    function updateBarChart() {
+        
+        if (draggablePanel.barChart.barSeries.count > 0) {
+            draggablePanel.barChart.barSeries.clear()
+        }
+        let categories = []
+        let maxPercentVoltageDrop = 0  // Track highest voltage drop
+
+        for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
+            let entry = pythonModel.chart_data_qml[i]
+            // create new barset for each cable type
+            let example = draggablePanel.barChart.barSeries.append(entry.cable, [entry.percentage_drop])
+            // set label font and colour
+            example.labelFont = Qt.font({pointSize: 12}); //bold:true
+            example.labelColor = "black"
+
+            // Track the highest voltage drop to set the Y-axis max value
+            if (entry.percentage_drop > maxPercentVoltageDrop) {
+                maxPercentVoltageDrop = entry.percentage_drop
+            }
+        }
+
+        draggablePanel.barChart.axisX1.categories = ["Aluminium"] // ,"Copper"
+
+        // Dynamically adjust Y-axis scale
+        draggablePanel.barChart.axisY1.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
+        draggablePanel.barChart.axisY1.min = 0
     }
 
     MouseArea {
@@ -81,7 +105,7 @@ Page {
         id: draggablePanel
         x: Math.round((window.width - width) / 2)
         y: Math.round(window.height / 6)
-        width: 250
+        width: 400
         height: 400
         z: 99
         visible: false
@@ -144,8 +168,6 @@ Page {
                     stepSize: 0.01
                     onValueChanged: {
                         pythonModel.powerFactor = value
-                        // pythonModel.update_chart(0)
-                        // updateChart()
                         pythonModel.calculateResistance(tableView.currentRow)
                     }
                     ToolTip {
@@ -155,24 +177,23 @@ Page {
 
                 Text {
                     text: powerFactorSlider.value.toFixed(2)
-                                        color: Universal.theme
+                    color: Universal.theme
                 }
             }
-            Button {
-                text: "Options"
-                Layout.fillWidth: true
+            // Button {
+            //     text: "Options"
+            //     Layout.fillWidth: true
 
-                ToolTip {
-                    text: "Options"
-                }
-                onClicked: {
-                    draggablePanel.visible == false ? draggablePanel.visible = true:draggablePanel.visible = false
-                    // chart.visible = true
-
-                }
-            }
+            //     ToolTip {
+            //         text: "Options"
+            //     }
+            //     onClicked: {
+            //         draggablePanel.visible == false ? draggablePanel.visible = true:draggablePanel.visible = false
+            //     }
+            // }
         }
     }
+
 //Table
     GroupBox {
         id: table
@@ -213,8 +234,6 @@ Page {
                         lineChart.removeSeries(lineChart.series(tableView.currentRow +1));
                         rect.height = rect.height - 51
                         table.height = table.height - 51
-                        // delete rowsadded[tableView.currentRow]
-                        // console.log(rowsadded)
                     }
                 }
                  Layout.fillWidth: true
@@ -230,7 +249,8 @@ Page {
                     table.height = 180
                     pythonModel.clearAllRows()
                     lineChart.removeAllSeries()
-                    rowsadded = []
+                    draggablePanel.barChart.barSeries.clear()
+                    tableView.rowsadded = []
                 }
                 Layout.fillWidth: true
 
@@ -300,164 +320,10 @@ Page {
                     right: parent.right
                     bottom: parent.bottom
                 }
-                
-                clip: true
-                interactive: false
-                model: pythonModel
-                selectionModel: ItemSelectionModel {}
-
-                animate: false
-
-                columnSpacing: 1
-                rowSpacing: 1
-
-                onCurrentRowChanged: {
-                    if (lineChart.count > tableView.currentRow && tableView.currentRow !== -1) {
-                    lineChart.series(tableView.currentRow).color = "red"
-                    console.log (tableView.currentRow,lineChart.count)
-                    }
-                }
-
-                delegate: DelegateChooser {
-                    role: "roleValue"
-
-                    DelegateChoice {
-                        roleValue: "dropdown"
-                        delegate: ComboBox {
-                            id: comboBox
-                            implicitWidth: 100
-                            implicitHeight: 50
-                            flat: true
-                            model: pythonModel ? pythonModel.cable_types : []
-
-                            background: Rectangle {
-                                implicitWidth: 120
-                                implicitHeight: 40
-                                // border.width: comboBox.visualFocus ? 2 : 1
-                                color: palette.base
-                                radius: 2
-                            }
-
-                            currentIndex: {
-                                var modelData = TableView.view.model ? TableView.view.model.data(TableView.view.index(row, column)).toString() : ""
-                                var index = model.indexOf(modelData)
-                                return index !== -1 ? index : 0
-                            }
-                            onCurrentIndexChanged: {
-                                if (TableView.view.model) {
-                                    TableView.view.model.setData(TableView.view.index(row, column), model[currentIndex])
-                                    for (var r = 0; r < TableView.view.model.rowCount(); r++) {
-                                        var rowData = []
-                                        for (var c = 0; c < TableView.view.model.columnCount(); c++) {
-                                            rowData.push(TableView.view.model.data(TableView.view.model.index(r, c)))
-                                        }
-                                    }
-                                }
-                                pythonModel.calculateResistance(row)
-                            }
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "number"
-                        delegate: Rectangle {
-                            implicitWidth: 120
-                            implicitHeight: 50
-                            color: current ? palette.dark : palette.base
-
-                            required property bool selected
-                            required property bool current
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: display
-                            }
-
-                            TableView.editDelegate: TextField {
-                                anchors.fill: parent
-                                text: display
-
-                                onTextChanged: {
-                                    if (text !== display) {
-                                        if (TableView.view.model) {
-                                            TableView.view.model.setData(TableView.view.index(row, column), text)
-                                            display = text
-                                        }
-                                    }
-                                    pythonModel.calculateResistance(row)
-                                }
-
-                                TableView.onCommit: {
-                                    display = text
-                                    focus = false
-                                }
-                            }
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "result"
-                        delegate: Rectangle {
-                            implicitWidth: 120
-                            implicitHeight: 50
-                            color: TableView.view.model && parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: display
-                            }
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "button"
-                        delegate: Button {
-                            text: "Add Chart"
-                            onClicked: {
-                                rowvalue = row
-                                pythonModel.update_chart(row)
-                                updateChart()
-                            }
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "resistance"
-                        delegate: TextField {
-                            implicitWidth: 100
-                            implicitHeight: 50
-                            text: display
-                            readOnly: true
-                        }
-                    }
-
-                    DelegateChoice {
-                        roleValue: "length"
-                        delegate: TextField {
-                            implicitWidth: 100
-                            implicitHeight: 50
-                            text: display
-
-                            onTextChanged: {
-                                if (text !== display) {
-                                    if (TableView.view.model) {
-                                        TableView.view.model.setData(TableView.view.index(row, column), text)
-                                        display = text
-                                    }
-                                }
-                            }
-
-                            TableView.onCommit: {
-                                display = text
-                                focus = false
-                            }
-                        }
-                    }
-                }
             }
         }
     }
-
+//LineChart
     LineChart {
         id: lineChart
         anchors.top: table.bottom

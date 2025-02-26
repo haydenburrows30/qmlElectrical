@@ -12,8 +12,8 @@ ChartView {
     anchors.leftMargin: 20
 
     property int currentrow
-    property var axisx2: axisX
-    property var axisy2: axisY
+    property var axisx: axisX
+    property var axisy: axisY
     property bool pointy: false 
     property var pointhovered
     
@@ -162,19 +162,4 @@ ChartView {
             linemarkerx.visible = false
         }
     }
-
-    // LineSeries {
-    //     id: lineSeries
-    //     axisX: axisX
-    //     axisY: axisY
-    //     onHovered: {
-    //         pointy = true
-    //         var text = point.y
-    //         legend.x = point.x
-    //         legend.y = point.y - legend.height
-    //         legend.text = text
-    //         legend.visible = true
-    //         console.log(point)
-    //     }
-    // }
 }
