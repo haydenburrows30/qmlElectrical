@@ -10,6 +10,8 @@ import QtQuick.Studio.DesignEffects
 import Python 1.0
 import Calculator 1.0
 import Charging 1.0
+import Fault 1.0
+import Sine 1.0
 
 import 'components'
 
@@ -30,6 +32,14 @@ ApplicationWindow {
 
     ChargingCalc {
         id: chargingCalc
+    }
+
+    FaultCalculator {
+        id: faultCalc
+    }
+
+    SineWaveModel {
+        id: sineModel
     }
 
 

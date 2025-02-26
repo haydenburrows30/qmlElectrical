@@ -42,12 +42,13 @@ Page {
                     maxPercentVoltageDrop = entry.percentage_drop
                 }
             }
-            series.pointLabelsVisible = true
+            // series.pointLabelsVisible = true
 
-            series.pointsVisible = true
-            series.pointLabelsFont.pointSize = 14
-            series.pointLabelsFormat = "@yPoint %"
-            series.pointLabelsClipping = false
+            // series.pointsVisible = true
+            // series.pointLabelsFont.pointSize = 14
+            // series.pointLabelsFormat = "@yPoint %"
+            // series.pointLabelsClipping = false
+            // series.pointClipping = false
             series.style = Qt.NoPen
             series.width = 5
             series.selectedColor = "red"

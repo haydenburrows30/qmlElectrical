@@ -31,7 +31,6 @@ ChartView {
     ValueAxis {
         id: axisX
         titleText: "Cable Type"
-        
         min: 0
         max: 4
     }

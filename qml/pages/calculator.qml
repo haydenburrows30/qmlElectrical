@@ -202,4 +202,70 @@ Page {
             }
         }
     }
+
+    GroupBox {
+        id: fault_current
+        title: 'Fault Current'
+        width: 270
+        anchors.top: charging_current.bottom
+        anchors.left: parent.left
+        anchors.topMargin: 10
+        anchors.leftMargin: 10
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            RowLayout {
+                spacing: 10
+
+                Label {
+                    text: "Voltage:"
+                    Layout.preferredWidth: 80
+                }
+
+                TextField {
+                    id: faultVoltageInput
+                    placeholderText: "Enter Voltage"
+                    onTextChanged: {
+                        faultCalc.setVoltage(parseFloat(text))
+                    }
+                    Layout.preferredWidth: 150
+                    Layout.alignment: Qt.AlignRight
+                }
+            }
+
+            RowLayout {
+                spacing: 10
+
+                Label {
+                    text: "Impedance (Ω):"
+                    Layout.preferredWidth: 80
+                }
+
+                TextField {
+                    id: impedanceInput
+                    Layout.preferredWidth: 150
+                    Layout.alignment: Qt.AlignRight
+                    placeholderText: "Enter Impedance"
+                    onTextChanged: faultCalc.setImpedance(parseFloat(text))
+                }
+            }
+
+            RowLayout {
+                spacing: 10
+
+                Label {
+                    text: "Fault Current:"
+                    Layout.preferredWidth: 80
+                }
+
+                Text {
+                    id: faultCurrentOutput
+                    text: faultCalc.faultCurrent.toFixed(2) + "A"
+                    Layout.preferredWidth: 150
+                    Layout.alignment: Qt.AlignRight
+                }
+            }
+        }
+    }
 }

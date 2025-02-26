@@ -1,6 +1,6 @@
-from PySide6.QtCore import QAbstractTableModel, Qt, Slot, Signal, Property, QObject
-from PySide6.QtGui import QKeyEvent
-from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QAbstractListModel, Qt, Slot, Signal, Property, QObject
+
+import numpy as np
 
 class PowerCalculator(QObject):
     currentCalculated = Signal(float)
@@ -78,3 +78,89 @@ class ChargingCalc(QObject):
     @Property(float, notify=chargingCurrentCalculated)
     def chargingCurrent(self):
         return self._chargingCurrent
+    
+class FaultCurrentCalculator(QObject):
+    faultCurrentCalculated = Signal(float)
+
+    def __init__(self):
+        super().__init__()
+        self._voltage = 0.0
+        self._impedance = 0.0
+        self._faultCurrent = 0.0
+
+    @Slot(float)
+    def setVoltage(self, voltage):
+        self._voltage = voltage
+        self.calculateFaultCurrent()
+
+    @Slot(float)
+    def setImpedance(self, impedance):
+        self._impedance = impedance
+        self.calculateFaultCurrent()
+
+    def calculateFaultCurrent(self):
+        if self._voltage != 0 and self._impedance != 0:
+            self._faultCurrent = self._voltage / self._impedance
+            self.faultCurrentCalculated.emit(self._faultCurrent)
+
+    @Property(float, notify=faultCurrentCalculated)
+    def faultCurrent(self):
+        return self._faultCurrent
+    
+class SineWaveModel(QObject):
+    dataChanged = Signal()
+    
+    def __init__(self):
+        super().__init__()
+        self._frequency = 1.0
+        self._amplitude = 1.0
+        self._y_scale = 1.0
+        self._x_scale = 1.0
+        self._sample_rate = 100
+        self._y_values = []
+        self._rms = 0.0
+        self._peak = 0.0
+        self.update_wave()
+    
+    def update_wave(self):
+        t = np.linspace(0, 2 * np.pi * self._x_scale, self._sample_rate)
+        self._y_values = (self._y_scale * self._amplitude * np.sin(self._frequency * t)).tolist()
+        self._rms = np.sqrt(np.mean(np.square(self._y_values)))
+        self._peak = max(abs(min(self._y_values)), max(self._y_values))
+        self.dataChanged.emit()
+    
+    @Property(list, notify=dataChanged)
+    def yValues(self):
+        return self._y_values
+    
+    @Property(float, notify=dataChanged)
+    def rms(self):
+        return self._rms
+    
+    @Property(float, notify=dataChanged)
+    def peak(self):
+        return self._peak
+
+    @Slot(float)
+    def setFrequency(self, freq):
+        if self._frequency != freq:
+            self._frequency = freq
+            self.update_wave()
+    
+    @Slot(float)
+    def setAmplitude(self, amp):
+        if self._amplitude != amp:
+            self._amplitude = amp
+            self.update_wave()
+    
+    @Slot(float)
+    def setYScale(self, scale):
+        if self._y_scale != scale:
+            self._y_scale = scale
+            self.update_wave()
+    
+    @Slot(float)
+    def setXScale(self, scale):
+        if self._x_scale != scale:
+            self._x_scale = scale
+            self.update_wave()
