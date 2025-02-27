@@ -171,18 +171,6 @@ class SineWaveModel(QObject):
         if abs(self._amplitude - amp) > 1:  # Ignore tiny changes
             self._amplitude = amp
             self.update_wave()
-    
-    # @Slot(float)
-    # def setYScale(self, scale):
-    #     if self._y_scale != scale:
-    #         self._y_scale = scale
-    #         self.update_wave()
-    
-    # @Slot(float)
-    # def setXScale(self, scale):
-    #     if self._x_scale != scale:
-    #         self._x_scale = scale
-    #         self.update_wave()
 
 class ThreePhaseSineWaveModel(QObject):
     dataChanged = Signal()
@@ -315,15 +303,3 @@ class ThreePhaseSineWaveModel(QObject):
         if abs(self._amplitude - amp) > 1:  # Ignore tiny changes
             self._amplitude = amp
             self.update_wave()
-    
-    # @Slot(float)
-    # def setYScale(self, scale):
-    #     if self._y_scale != scale:
-    #         self._y_scale = scale
-    #         self.update_wave()
-    
-    # @Slot(float)
-    # def setXScale(self, scale):
-    #     if self._x_scale != scale:
-    #         self._x_scale = scale
-    #         self.update_wave()

@@ -85,6 +85,12 @@ Drawer {
                     tooltip: "Calculator"
                     icon: "Calculator"
                 }
+                ListElement {
+                    title: "Three Phase"
+                    source: "../pages/ThreePhase.qml"
+                    tooltip: "Calculator"
+                    icon: "Calculator"
+                }
             }
 
             // footer:
