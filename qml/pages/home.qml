@@ -17,13 +17,15 @@ Page {
     }
 
     function updateSeries() {
-        sineSeries.clear();
-        for (var i = 0; i < sineModel.yValues.length; i++) {
-            sineSeries.append(i, sineModel.yValues[i]);
-        }
-        // xAxis.max = sineModel.yValues.length;
-        // yAxis.min = -sineModel.yScale * sineModel.amplitude;
-        // yAxis.max = sineModel.yScale * sineModel.amplitude;
+        line_view.removeAllSeries()
+        var series1 = line_view.createSeries(ChartView.SeriesTypeLine,"Pressure",xAxis,yAxis)
+        var series2 = line_view.createSeries(ChartView.SeriesTypeLine,"Pressure",xAxis,yAxis)
+        var series3 = line_view.createSeries(ChartView.SeriesTypeLine,"Pressure",xAxis,yAxis)
+        threePhaseSineModel.fill_series1(line_view.series(0))
+        threePhaseSineModel.fill_series2(line_view.series(1))
+        threePhaseSineModel.fill_series3(line_view.series(2))
+        // threePhaseSineModel.fill_series(line_view.series(2))
+
     }
 
     Column {
@@ -31,14 +33,16 @@ Page {
         spacing: 10
 
         ChartView {
+            id: line_view
             width: parent.width
             height: 250
             antialiasing: true
+            animationOptions: ChartView.NoAnimation
 
             ValueAxis {
                 id: xAxis
                 min: 0
-                max: 50
+                max: 100
                 labelFormat: "%.0f"
                 titleText: "Time"
             }
@@ -51,24 +55,30 @@ Page {
                 titleText: "Amplitude"
             }
 
-            LineSeries {
-                name: "Sine Wave"
-                id: sineSeries
-                useOpenGL: true
-                color: "blue"
-                axisX: xAxis
-                axisY: yAxis
-
-                Component.onCompleted: updateSeries()
-            }
+            // Component.onCompleted: updateSeries()
         }
 
         Label {
-            text: "RMS Value: " + sineModel.rms.toFixed(1)
+            text: "RMS Value: " + threePhaseSineModel.rmsA.toFixed(2)
+        }
+        Label {
+            text: "RMS Value: " + threePhaseSineModel.rmsB.toFixed(2)
+        }
+        Label {
+            text: "RMS Value: " + threePhaseSineModel.rmsC.toFixed(2)
         }
 
         Label {
-            text: "Peak Value: " + sineModel.peak.toFixed(1)
+            text: "Peak-to-Peak Value: " + threePhaseSineModel.peakA.toFixed(2)
+        }
+        Label {
+            text: "Peak-to-Peak Value: " + threePhaseSineModel.peakB.toFixed(2)
+        }
+        Label {
+            text: "Peak-to-Peak Value: " + threePhaseSineModel.peakC.toFixed(2)
+        }
+        Label {
+            text: "Frequency: " + threePhaseSineModel.frequency.toFixed(1)
         }
 
         Row {
@@ -77,7 +87,7 @@ Page {
                 id: freqSlider
                 from: 1; to: 50.0; value: 50
                 onValueChanged: {
-                    sineModel.setFrequency(value)
+                    threePhaseSineModel.setFrequency(value)
                     updateSeries()
                 }
             }
@@ -90,31 +100,11 @@ Page {
                 id: ampSlider
                 from: 100; to: 400.0; value: 330
                 onValueChanged: {
-                    sineModel.setAmplitude(value)
+                    threePhaseSineModel.setAmplitude(value)
                     updateSeries()
                 }
             }
             Label { text: "Amplitude: " + ampSlider.value.toFixed(1) }
         }
-
-        // Row {
-        //     spacing: 10
-        //     Slider {
-        //         id: yScaleSlider
-        //         from: 0.5; to: 5.0; value: 1.0
-        //         onValueChanged: sineModel.setYScale(value)
-        //     }
-        //     Label { text: "Y Scale: " + yScaleSlider.value.toFixed(1) }
-        // }
-
-        // Row {
-        //     spacing: 10
-        //     Slider {
-        //         id: xScaleSlider
-        //         from: 0.5; to: 5.0; value: 1.0
-        //         onValueChanged: sineModel.setXScale(value)
-        //     }
-        //     Label { text: "X Scale: " + xScaleSlider.value.toFixed(1) }
-        // }
     }
 }

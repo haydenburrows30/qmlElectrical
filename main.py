@@ -7,8 +7,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from models.PythonModel import PythonModel
-from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc, SineWaveModel
-
+from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc, ThreePhaseSineWaveModel
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
@@ -28,13 +27,13 @@ if __name__ == "__main__":
     voltage_model = PythonModel(csv_path)
     power_calculator = PowerCalculator()
     fault_current_calculator = FaultCurrentCalculator()
-    sine_wave = SineWaveModel()
+    sine_wave = ThreePhaseSineWaveModel()
     
     qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
     qmlRegisterType(ChargingCalc, "Charging", 1, 0, "ChargingCalc")
     qmlRegisterType(PowerCalculator, "Calculator", 1, 0, "PowerCalculator")
     qmlRegisterType(FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator")
-    qmlRegisterType(SineWaveModel, "Sine", 1, 0, "SineWaveModel")    
+    qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")    
 
     engine.load(os.path.join(CURRENT_DIR, "qml", "main.qml"))
     if not engine.rootObjects():

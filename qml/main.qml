@@ -39,7 +39,7 @@ ApplicationWindow {
     }
 
     SineWaveModel {
-        id: sineModel
+        id: threePhaseSineModel
     }
 
     ToolBar{
