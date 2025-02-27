@@ -3,7 +3,7 @@ import sys
 
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from PySide6.QtWidgets import QApplication
-from PySide6.QtGui import QIcon, QGuiApplication
+from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from models.PythonModel import PythonModel
@@ -24,19 +24,17 @@ if __name__ == "__main__":
     QIcon.setThemeName("gallery")
 
     # Load CSV before QML window appears
-    csv_path = "cable_data.csv"  # Change this path if needed
+    csv_path = "cable_data.csv"
     voltage_model = PythonModel(csv_path)
     power_calculator = PowerCalculator()
     fault_current_calculator = FaultCurrentCalculator()
     sine_wave = SineWaveModel()
     
-    
-
     qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
     qmlRegisterType(ChargingCalc, "Charging", 1, 0, "ChargingCalc")
     qmlRegisterType(PowerCalculator, "Calculator", 1, 0, "PowerCalculator")
     qmlRegisterType(FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator")
-    qmlRegisterType(SineWaveModel, "Sine", 1, 0, "SineWaveModel")
+    qmlRegisterType(SineWaveModel, "Sine", 1, 0, "SineWaveModel")    
 
     engine.load(os.path.join(CURRENT_DIR, "qml", "main.qml"))
     if not engine.rootObjects():

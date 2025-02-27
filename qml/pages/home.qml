@@ -16,11 +16,15 @@ Page {
         }
     }
 
-    // Image {
-    //     anchors.centerIn: parent
-    //     fillMode: Image.PreserveAspectFit
-    //     source: "../../icons/gallery/20x20/logo.png" 
-    // }
+    function updateSeries() {
+        sineSeries.clear();
+        for (var i = 0; i < sineModel.yValues.length; i++) {
+            sineSeries.append(i, sineModel.yValues[i]);
+        }
+        // xAxis.max = sineModel.yValues.length;
+        // yAxis.min = -sineModel.yScale * sineModel.amplitude;
+        // yAxis.max = sineModel.yScale * sineModel.amplitude;
+    }
 
     Column {
         anchors.fill: parent
@@ -34,15 +38,15 @@ Page {
             ValueAxis {
                 id: xAxis
                 min: 0
-                max: 100
+                max: 50
                 labelFormat: "%.0f"
                 titleText: "Time"
             }
 
             ValueAxis {
                 id: yAxis
-                min: -2
-                max: 2
+                min: -400
+                max: 400
                 labelFormat: "%.1f"
                 titleText: "Amplitude"
             }
@@ -55,39 +59,27 @@ Page {
                 axisX: xAxis
                 axisY: yAxis
 
-                function updateSeries() {
-                    sineSeries.clear();
-                    for (var i = 0; i < sineModel.yValues.length; i++) {
-                        sineSeries.append(i, sineModel.yValues[i]);
-                    }
-                    xAxis.max = sineModel.yValues.length;
-                    yAxis.min = -sineModel.yScale * sineModel.amplitude;
-                    yAxis.max = sineModel.yScale * sineModel.amplitude;
-                }
-
                 Component.onCompleted: updateSeries()
-
-                Connections {
-                    target: sineModel
-                    onDataChanged: sineSeries.updateSeries()
-                }
             }
         }
 
         Label {
-            text: "RMS Value: " + sineModel.rms.toFixed(3)
+            text: "RMS Value: " + sineModel.rms.toFixed(1)
         }
 
         Label {
-            text: "Peak Value: " + sineModel.peak.toFixed(3)
+            text: "Peak Value: " + sineModel.peak.toFixed(1)
         }
 
         Row {
             spacing: 10
             Slider {
                 id: freqSlider
-                from: 0.5; to: 5.0; value: 1.0
-                onValueChanged: sineModel.setFrequency(value)
+                from: 1; to: 50.0; value: 50
+                onValueChanged: {
+                    sineModel.setFrequency(value)
+                    updateSeries()
+                }
             }
             Label { text: "Frequency: " + freqSlider.value.toFixed(1) }
         }
@@ -96,30 +88,33 @@ Page {
             spacing: 10
             Slider {
                 id: ampSlider
-                from: 0.5; to: 2.0; value: 1.0
-                onValueChanged: sineModel.setAmplitude(value)
+                from: 100; to: 400.0; value: 330
+                onValueChanged: {
+                    sineModel.setAmplitude(value)
+                    updateSeries()
+                }
             }
             Label { text: "Amplitude: " + ampSlider.value.toFixed(1) }
         }
 
-        Row {
-            spacing: 10
-            Slider {
-                id: yScaleSlider
-                from: 0.5; to: 5.0; value: 1.0
-                onValueChanged: sineModel.setYScale(value)
-            }
-            Label { text: "Y Scale: " + yScaleSlider.value.toFixed(1) }
-        }
+        // Row {
+        //     spacing: 10
+        //     Slider {
+        //         id: yScaleSlider
+        //         from: 0.5; to: 5.0; value: 1.0
+        //         onValueChanged: sineModel.setYScale(value)
+        //     }
+        //     Label { text: "Y Scale: " + yScaleSlider.value.toFixed(1) }
+        // }
 
-        Row {
-            spacing: 10
-            Slider {
-                id: xScaleSlider
-                from: 0.5; to: 5.0; value: 1.0
-                onValueChanged: sineModel.setXScale(value)
-            }
-            Label { text: "X Scale: " + xScaleSlider.value.toFixed(1) }
-        }
+        // Row {
+        //     spacing: 10
+        //     Slider {
+        //         id: xScaleSlider
+        //         from: 0.5; to: 5.0; value: 1.0
+        //         onValueChanged: sineModel.setXScale(value)
+        //     }
+        //     Label { text: "X Scale: " + xScaleSlider.value.toFixed(1) }
+        // }
     }
 }

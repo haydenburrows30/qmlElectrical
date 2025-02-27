@@ -1,6 +1,7 @@
-from PySide6.QtCore import QAbstractListModel, Qt, Slot, Signal, Property, QObject
+from PySide6.QtCore import Slot, Signal, Property, QObject
 
 import numpy as np
+import pyqtgraph as pg
 
 class PowerCalculator(QObject):
     currentCalculated = Signal(float)
@@ -112,11 +113,11 @@ class SineWaveModel(QObject):
     
     def __init__(self):
         super().__init__()
-        self._frequency = 1.0
-        self._amplitude = 1.0
+        self._frequency = 50
+        self._amplitude = 330
         self._y_scale = 1.0
         self._x_scale = 1.0
-        self._sample_rate = 100
+        self._sample_rate = 500
         self._y_values = []
         self._rms = 0.0
         self._peak = 0.0
@@ -124,7 +125,16 @@ class SineWaveModel(QObject):
     
     def update_wave(self):
         t = np.linspace(0, 2 * np.pi * self._x_scale, self._sample_rate)
-        self._y_values = (self._y_scale * self._amplitude * np.sin(self._frequency * t)).tolist()
+        y = self._y_scale * self._amplitude * np.sin(self._frequency * t)
+
+        # Apply downsampling dynamically if the sample rate is too high
+        max_points = 1000  # Limit the number of points plotted
+        if len(y) > max_points:
+            indices = np.linspace(0, len(y) - 1, max_points, dtype=int)
+            self._y_values = y[indices].tolist()
+        else:
+            self._y_values = y.tolist()
+
         self._rms = np.sqrt(np.mean(np.square(self._y_values)))
         self._peak = max(abs(min(self._y_values)), max(self._y_values))
         self.dataChanged.emit()
@@ -143,7 +153,7 @@ class SineWaveModel(QObject):
 
     @Slot(float)
     def setFrequency(self, freq):
-        if self._frequency != freq:
+        if abs(self._frequency - freq) > 1:  # Ignore tiny changes
             self._frequency = freq
             self.update_wave()
     
@@ -153,14 +163,14 @@ class SineWaveModel(QObject):
             self._amplitude = amp
             self.update_wave()
     
-    @Slot(float)
-    def setYScale(self, scale):
-        if self._y_scale != scale:
-            self._y_scale = scale
-            self.update_wave()
+    # @Slot(float)
+    # def setYScale(self, scale):
+    #     if self._y_scale != scale:
+    #         self._y_scale = scale
+    #         self.update_wave()
     
-    @Slot(float)
-    def setXScale(self, scale):
-        if self._x_scale != scale:
-            self._x_scale = scale
-            self.update_wave()
+    # @Slot(float)
+    # def setXScale(self, scale):
+    #     if self._x_scale != scale:
+    #         self._x_scale = scale
+    #         self.update_wave()

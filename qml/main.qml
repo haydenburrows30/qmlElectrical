@@ -42,7 +42,6 @@ ApplicationWindow {
         id: sineModel
     }
 
-
     ToolBar{
         id: toolBar
         width: parent.width
@@ -82,12 +81,6 @@ ApplicationWindow {
         transitions: Transition {
             NumberAnimation { properties: "anchors.leftMargin"; easing.type: Easing.InOutQuad; duration: 200  }
         }
-
-        // MenuPanel {
-        //     id: menuPanel
-        //     visible: true
-        //     z:0
-        // }
     }
 
     FileDialog {
