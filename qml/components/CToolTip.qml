@@ -4,10 +4,9 @@ import QtQuick.Controls
 ToolTip {
     id: control
     visible: parent.hovered | parent.down
-    text: qsTr("A descriptive tool tip of what the button does")
     delay: 0
 
-    x:  parent.width
+    x: parent.width
     y: 0
 
     height: parent.height
@@ -15,12 +14,20 @@ ToolTip {
     contentItem: Text {
         text: control.text
         font: control.font
-        color: toolBar.toggle ? palette.base:palette.dark
+        color: toolBar.toggle ? "white": "black"
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
     }
 
-    // background: Rectangle {
-    //     border.color: "#21be2b"
-    // }
+    background: CustomBorderRect{
+                    width : 110
+                    height: 60
+                    color: toolBar.toggle ? Qt.darker(palette.dark,5): palette.light
+
+                    lBorderwidth: 5
+                    rBorderwidth: 1
+                    tBorderwidth: 1
+                    bBorderwidth: 1
+                    borderColor: palette.accent
+                    }
 }
