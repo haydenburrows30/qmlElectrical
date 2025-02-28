@@ -10,13 +10,13 @@ import Charging 1.0
 Page {
     id: home
 
-    MouseArea {
-        anchors.fill: parent
+    // MouseArea {
+    //     anchors.fill: parent
 
-        onClicked:  {
-            sideBar.close()
-        }
-    }
+    //     onClicked:  {
+    //         sideBar.close()
+    //     }
+    // }
 
     GroupBox {
         id: settings

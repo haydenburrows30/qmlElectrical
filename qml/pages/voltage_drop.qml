@@ -93,14 +93,25 @@ Page {
         draggablePanel.barChart.axisY1.min = 0
     }
 
-    MouseArea {
-        id: area
-        anchors.fill: parent
+    // MouseArea {
+    //     id: area
+    //     anchors.fill: parent
 
-        onClicked:  {
-            sideBar.close()
-            }
-    }
+    //     onClicked:  {
+    //         sideBar.close()
+    //         }
+    // }
+
+    // MouseArea {
+    //     anchors.fill: parent
+
+    //     onClicked:  {
+    //         if (sideBar.expanded.state == 'open') {
+    //             sideBar.expanded.state = 'close'
+    //         }
+    //     }
+    // }
+
 //Popup Menu
     MenuPanel {
         id: draggablePanel

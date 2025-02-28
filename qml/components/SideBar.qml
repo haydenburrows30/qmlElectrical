@@ -7,6 +7,7 @@ Drawer {
     id: sideBar
     // width automatically derived from RowLayout child's implicitWidth
     height: parent.height
+    width: 60
     property int position1: {sideBar.position}
     property int hide: 0
     property int show: 0
@@ -32,17 +33,33 @@ Drawer {
 
     modal: false
     interactive: false
+    visible: true
+
+    Rectangle {
+        id:fade
+        width: parent.width
+        anchors.top: parent.top
+        height: 20
+        z:99
+        gradient: Gradient {
+            orientation: Gradient.Vertical
+
+            GradientStop { position: 1.0; color: "transparent" }
+            GradientStop { position: 0; color: palette.base }
+        }
+    }
 
     RowLayout {
         id: rowLayout
-        height: parent.height
+        height: parent.height - 10
+        // anchors.top: fade.bottom
 
         Layout.alignment: Qt.AlignHCenter
 
         ListView {
             id: listView
             currentIndex: 0
-            Layout.preferredWidth: 160
+            Layout.preferredWidth: 60
             Layout.fillHeight: true
 
             clip: true
@@ -51,8 +68,8 @@ Drawer {
             delegate: 
                 ItemDelegate {
                     implicitHeight: 60
-                    implicitWidth: 160
-                    text: model.title
+                    implicitWidth: 60
+                    // text: model.title
 
                     highlighted: ListView.isCurrentItem
 
@@ -60,9 +77,16 @@ Drawer {
                     icon.width: 30
                     icon.height: 30
 
+                    CToolTip {
+                        id: toolTip
+                        text: model.title
+                        width: 110
+                    }
+
                     onClicked: {
                         stackView.push(model.source,StackView.Immediate)
                         listView.currentIndex = index
+                        toolTip.close()
                     }
                 }
 

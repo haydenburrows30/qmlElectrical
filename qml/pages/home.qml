@@ -8,11 +8,21 @@ import QtCharts
 Page {
     id: home
 
-    MouseArea {
-        anchors.fill: parent
+    // MouseArea {
+    //     anchors.fill: parent
 
-        onClicked:  {
-            sideBar.close()
-        }
-    }
+    //     onClicked:  {
+    //         sideBar.close()
+    //     }
+    // }
+
+    // MouseArea {
+    //     anchors.fill: parent
+
+    //     onClicked:  {
+    //         if (sideBar.expanded.state == 'open') {
+    //             sideBar.expanded.state = 'close'
+    //         }
+    //     }
+    // }
 }
