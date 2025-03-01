@@ -5,23 +5,22 @@
     <file>qml/pages/voltage_drop.qml</file>
     <file>qml/pages/calculator.qml</file>
     <file>qml/pages/ThreePhase.qml</file>
-    <file>qml/components/SideBar.qml</file>
     <file>qml/components/CToolTip.qml</file>
-    <file>qml/components/ToolBar.qml</file>
-    <file>qml/components/Settings.qml</file>
-    <file>qml/components/CellBox.qml</file>
     <file>qml/components/LineChart.qml</file>
+    <file>qml/components/Settings.qml</file>
+    <file>qml/components/SideBar.qml</file>
     <file>qml/components/TableView.qml</file>
+    <file>qml/components/ToolBar.qml</file>
 </qresource>
 
 <qresource>
     <file>icons/gallery/24x24/Calculator.svg</file>
-    <file>icons/gallery/24x24/Home.svg</file>
-    <file>icons/gallery/24x24/Menu.svg</file>
-    <file>icons/gallery/24x24/Voltage Drop.svg</file>
-    <file>icons/gallery/24x24/Setting.svg</file>
     <file>icons/gallery/24x24/Dark.svg</file>
+    <file>icons/gallery/24x24/Home.svg</file>
     <file>icons/gallery/24x24/Light.svg</file>
+    <file>icons/gallery/24x24/Menu.svg</file>
+    <file>icons/gallery/24x24/Setting.svg</file>
+    <file>icons/gallery/24x24/Voltage Drop.svg</file>
     <file>icons/gallery/index.theme</file>
     <file>qtquickcontrols2.conf</file>
     <file>fonts/SourceSansPro-Regular.ttf</file>

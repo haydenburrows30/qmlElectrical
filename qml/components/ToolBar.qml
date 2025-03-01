@@ -26,7 +26,7 @@ ToolBar {
             implicitHeight: 50
             icon.width: 30
             icon.height: 30
-            Layout.leftMargin: 10
+            Layout.leftMargin: 5
             ToolTip {
                 text: "Settings"
             }

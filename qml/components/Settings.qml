@@ -17,6 +17,13 @@ Dialog {
 
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
+        switch(themey.currentIndex) {
+            case 0: iconFont.source = "../fonts/MaterialIcons-Regular.ttf"; break;
+            case 1: iconFont.source = "../fonts/MaterialIconsRound-Regular.otf"; break;
+            case 2: iconFont.source = "../fonts/MaterialIconsSharp-Regular.otf"; break;
+            case 3: iconFont.source = "../fonts/MaterialIconsOutlined-Regular.otf"; break;
+            case 4: iconFont.source = "../fonts/MaterialIconsTwoTone-Regular.otf"; break;
+        }
         settingsDialog.close()
     }
     onRejected: {
@@ -31,12 +38,12 @@ Dialog {
             spacing: 10
 
             Label {
-                text: "Style:"
+                text: "Icon Style:"
             }
 
             ComboBox {
                 id: themey
-                model: ['Light', 'Dark']
+                model: ['Regular', 'Round', 'Sharp', 'Outlined', 'Two Tone']
                 flat: true
                 Layout.fillWidth: true
             }

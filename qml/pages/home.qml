@@ -5,24 +5,20 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtCharts
 
+import "../../scripts/MaterialDesignRegular.js" as MD
+
 Page {
     id: home
 
-    // MouseArea {
-    //     anchors.fill: parent
+	background: Rectangle {
+		anchors.fill: parent
+		color: "white"
+    }
 
-    //     onClicked:  {
-    //         sideBar.close()
-    //     }
-    // }
-
-    // MouseArea {
-    //     anchors.fill: parent
-
-    //     onClicked:  {
-    //         if (sideBar.expanded.state == 'open') {
-    //             sideBar.expanded.state = 'close'
-    //         }
-    //     }
-    // }
+Text {
+    anchors.centerIn: parent
+	font.family: iconFont.name
+	font.pixelSize: 48
+	text: MD.icons.library_music
+}
 }
