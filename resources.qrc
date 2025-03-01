@@ -7,6 +7,7 @@
     <file>qml/pages/ThreePhase.qml</file>
     <file>qml/components/CToolTip.qml</file>
     <file>qml/components/LineChart.qml</file>
+    <file>qml/components/PhasorDiagram.qml</file>
     <file>qml/components/Settings.qml</file>
     <file>qml/components/SideBar.qml</file>
     <file>qml/components/TableView.qml</file>

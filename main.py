@@ -7,7 +7,8 @@ from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from models.PythonModel import PythonModel
-from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc, ThreePhaseSineWaveModel
+from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc
+from models.ThreePhase import ThreePhaseSineWaveModel
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
