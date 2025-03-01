@@ -9,6 +9,10 @@ import '../components'
 
 Page {
 
+    property bool showRMSA: false
+    property bool showRMSB: false
+    property bool showRMSC: false
+
     function updateSeries() {
         phase_chart.removeAllSeries()
         var series1 = phase_chart.createSeries(ChartView.SeriesTypeLine,"A",xAxis,yAxis)
@@ -19,6 +23,42 @@ Page {
         series2.color = "yellow"
         series3.color = "blue"
         threePhaseSineModel.fill_series(phase_chart.series(0),phase_chart.series(1),phase_chart.series(2))
+
+        if (showRMSA) {
+            var rmsLineA = phase_chart.createSeries(ChartView.SeriesTypeLine, "RMSA", xAxis, yAxis)
+            rmsLineA.color = "red"
+            rmsLineA.append(0, threePhaseSineModel.rmsA)
+            rmsLineA.append(1000, threePhaseSineModel.rmsA)
+            rmsTextA.text = "RMSA: " + threePhaseSineModel.rmsA.toFixed(0)
+            rmsTextA.visible = true
+            rmsTextA.y = phase_chart.height - (threePhaseSineModel.rmsA - yAxis.min) / (yAxis.max - yAxis.min) * phase_chart.height
+        } else {
+            rmsTextA.visible = false
+        }
+
+        if (showRMSB) {
+            var rmsLineB = phase_chart.createSeries(ChartView.SeriesTypeLine, "RMSB", xAxis, yAxis)
+            rmsLineB.color = "yellow"
+            rmsLineB.append(0, threePhaseSineModel.rmsB)
+            rmsLineB.append(1000, threePhaseSineModel.rmsB)
+            rmsTextB.text = "RMSB: " + threePhaseSineModel.rmsB.toFixed(0) + "V"
+            rmsTextB.visible = true
+            rmsTextB.y = phase_chart.height - (threePhaseSineModel.rmsB - yAxis.min) / (yAxis.max - yAxis.min) * phase_chart.height
+        } else {
+            rmsTextB.visible = false
+        }
+
+        if (showRMSC) {
+            var rmsLineC = phase_chart.createSeries(ChartView.SeriesTypeLine, "RMSC", xAxis, yAxis)
+            rmsLineC.color = "blue"
+            rmsLineC.append(0, threePhaseSineModel.rmsC)
+            rmsLineC.append(1000, threePhaseSineModel.rmsC)
+            rmsTextC.text = "RMSC: " + threePhaseSineModel.rmsC.toFixed(0)
+            rmsTextC.visible = true
+            rmsTextC.y = phase_chart.height - (threePhaseSineModel.rmsC - yAxis.min) / (yAxis.max - yAxis.min) * phase_chart.height
+        } else {
+            rmsTextC.visible = false
+        }
     }
 
     function updatePhasorDiagram() {
@@ -27,8 +67,8 @@ Page {
 
     ChartView {
         id: phase_chart
-        width: parent.width
-        height: 350
+        width: parent.width - 50
+        height: 400
         antialiasing: true
         animationOptions: ChartView.NoAnimation
 
@@ -50,22 +90,48 @@ Page {
             titleText: "Amplitude"
         }
 
+        legend.visible: false
+
         Component.onCompleted: updateSeries()
+    }
+
+    Text {
+        id: rmsTextA
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        color: "red"
+        visible: false
+    }
+
+    Text {
+        id: rmsTextB
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        color: "yellow"
+        visible: false
+    }
+
+    Text {
+        id: rmsTextC
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        color: "blue"
+        visible: false
     }
 
     GroupBox {
         id: settings
         title: 'Settings'
-        // Layout.fillWidth: true
         anchors.left: parent.left
         anchors.top: phase_chart.bottom
         anchors.leftMargin: 5
+
         GridLayout {
             anchors.fill: parent
             columns: 4
             Label { 
                 text: "Frequency: "
-                Layout.alignment: Qt.AlignHCenter
+                Layout.alignment: Qt.AlignLeft
                 }
             Slider {
                 id: freqSlider
@@ -93,11 +159,28 @@ Page {
             }
             Label { text: "Hz" }
 
-            Label { text: "RMSA: "}
+            Row {
+                Label { 
+                    text: "RMSA: "
+                    }
+
+                CheckBox {
+                    id: checkbox_a
+                    checked: false
+                    onCheckedChanged: {
+                        showRMSA = checked
+                        updateSeries()
+                    }
+
+                    AToolTip {
+                        text: "Show/hide A chart line"
+                    }
+                }
+            }
 
             Slider {
                     id: ampSliderA
-                    from: 100; to: 400.0; value: 230
+                    from: 100; to: 280.0; value: 230
                     stepSize: 1.0
                     onValueChanged: {
                         threePhaseSineModel.setAmplitudeA(value * Math.sqrt(2))
@@ -120,11 +203,27 @@ Page {
             }
             Label { text: "V" }
 
-            Label { text: "RMSB: " }
+            Row {
+                Label { 
+                    text: "RMSB: "
+                    }
+                    
+                CheckBox {
+                    checked: false
+                    onCheckedChanged: {
+                        showRMSB = checked
+                        updateSeries()
+                    }
+
+                    AToolTip {
+                        text: "Show/hide B chart line"
+                    }
+                }
+            }
 
             Slider {
                     id: ampSliderB
-                    from: 100; to: 400.0; value: 230
+                    from: 100; to: 280.0; value: 230
                     stepSize: 1.0
                     onValueChanged: {
                         threePhaseSineModel.setAmplitudeB(value * Math.sqrt(2))
@@ -148,11 +247,26 @@ Page {
 
             Label { text: "V" }
 
-            Label { text: "RMSC: "}
+            Row {
+                Label { 
+                    text: "RMSC: "
+                    }
+                    
+                CheckBox {
+                    checked: false
+                    onCheckedChanged: {
+                        showRMSC = checked
+                        updateSeries()
+                    }
+                    AToolTip {
+                        text: "Show/hide C chart line"
+                    }
+                }
+            }
 
             Slider {
                 id: ampSliderC
-                from: 100; to: 400.0; value: 230
+                from: 100; to: 280.0; value: 230
                 stepSize: 1.0
                 onValueChanged: {
                     threePhaseSineModel.setAmplitudeC(value * Math.sqrt(2))
@@ -258,13 +372,30 @@ Page {
         }
     }
 
+    Button {
+        text: "Reset"
+        anchors.top: settings.bottom
+        anchors.topMargin: 10
+        onClicked: {
+            threePhaseSineModel.reset()
+            freqSlider.value = 50
+            ampSliderA.value = 230
+            ampSliderB.value = 230
+            ampSliderC.value = 230
+            phaseSliderA.value = 0
+            phaseSliderB.value = 120
+            phaseSliderC.value = 240
+            updateSeries()
+        }
+    }
+
     GroupBox {
         id: settingsA
         title: 'Values'
-        // Layout.fillWidth: true
         anchors.left: settings.right
         anchors.top: phase_chart.bottom
         anchors.leftMargin: 5
+
         GridLayout {
             anchors.fill: parent
             columns: 3
@@ -284,19 +415,6 @@ Page {
             Label {
                 text: "A: "
             }
-
-            // TextField {
-            //     text: threePhaseSineModel.rmsA.toFixed(0)
-            //     onEditingFinished: {
-            //         threePhaseSineModel.setAmplitudeA(text * Math.sqrt(2))
-            //         ampSliderA.value = text * Math.sqrt(2)
-            //         updateSeries()
-            //     }
-            //     onFocusChanged:{
-            //         if(focus)
-            //             selectAll()
-            //     }
-            // }
 
             Label {
                 text: threePhaseSineModel.peakA.toFixed(0)

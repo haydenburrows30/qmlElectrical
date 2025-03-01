@@ -11,7 +11,9 @@ class ThreePhaseSineWaveModel(QObject):
     def __init__(self):
         super().__init__()
         self._frequency = 50
-        self._amplitudeA = 330; self._amplitudeB = 330; self._amplitudeC = 330
+        self._amplitudeA = 230 * np.sqrt(2)
+        self._amplitudeB = 230 * np.sqrt(2)
+        self._amplitudeC = 230 * np.sqrt(2)
 
         self._y_scale = 1.0
         self._x_scale = 1.0
@@ -175,3 +177,15 @@ class ThreePhaseSineWaveModel(QObject):
             self._phase_angle_c = angle
             self.update_wave()
             self.dataChanged.emit()
+
+    @Slot()
+    def reset(self):
+        self._frequency = 50
+        self._amplitudeA = 230 * np.sqrt(2)
+        self._amplitudeB = 230 * np.sqrt(2)
+        self._amplitudeC = 230 * np.sqrt(2)
+        self._phase_angle_a = 0.0
+        self._phase_angle_b = 120.0
+        self._phase_angle_c = 240.0
+        self.update_wave()
+        self.dataChanged.emit()

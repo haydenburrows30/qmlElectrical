@@ -5,6 +5,7 @@
     <file>qml/pages/voltage_drop.qml</file>
     <file>qml/pages/calculator.qml</file>
     <file>qml/pages/ThreePhase.qml</file>
+    <file>qml/components/AToolTip.qml</file>
     <file>qml/components/CToolTip.qml</file>
     <file>qml/components/LineChart.qml</file>
     <file>qml/components/PhasorDiagram.qml</file>
