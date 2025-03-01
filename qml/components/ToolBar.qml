@@ -6,7 +6,7 @@ import QtQuick.Layouts
 
 ToolBar {
     id:toolBar
-    property bool toggle : {darkModeToggle.checked}
+    property bool toggle : action.checked //{darkModeToggle.checked}
 
     background: Rectangle {
         implicitHeight: 60
@@ -62,14 +62,38 @@ ToolBar {
             Layout.leftMargin: menu.width
         }
 
-        Image {
-            source: darkModeToggle.checked ? "../../icons/gallery/20x20/dark.svg":"../../icons/gallery/20x20/light.svg"
+        RoundButton {
+            id: action
+            implicitWidth: 40
+            implicitHeight: 40
+            icon.width: 30
+            icon.height: 30
+            checkable: true
+            icon.name: action.checked ? "Dark":"Light"
+
+            background: Rectangle {
+                radius: action.radius
+                visible: !action.flat || action.down || action.checked || action.highlighted
+                color: action.down ? action.Universal.baseMediumLowColor :
+                    action.enabled && (action.highlighted || action.checked) ? action.Universal.accent :
+                                                                                    "transparent"
+
+                Rectangle {
+                    width: parent.width
+                    height: parent.height
+                    radius: action.radius
+                    color: "transparent"
+                    visible: enabled && action.hovered
+                    border.width: 2
+                    border.color: action.Universal.baseMediumLowColor
+                }
+            }
         }
 
-        Switch {
-            id: darkModeToggle
-            Layout.alignment: Qt.AlignVCenter
-        }
+        // Switch {
+        //     id: darkModeToggle
+        //     Layout.alignment: Qt.AlignVCenter
+        // }
 
         RoundButton {
             id: control

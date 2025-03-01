@@ -42,6 +42,13 @@ ApplicationWindow {
         id: threePhaseSineModel
     }
 
+    FontLoader {
+        id: sourceSansProFont
+
+        source: "../fonts/SourceSansPro-Regular.ttf"
+        // name: "SourceSansPro"
+    }
+
     ToolBar{
         id: toolBar
         width: parent.width
