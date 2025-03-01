@@ -8,7 +8,7 @@ Drawer {
     // width automatically derived from RowLayout child's implicitWidth
     height: parent.height
     width: 60
-    property int position1: {sideBar.position}
+    property int open_closed: {sideBar.position}
     property int hide: 0
     property int show: 0
 

@@ -59,7 +59,6 @@ ApplicationWindow {
         id: sideBar
         y: toolBar.height
         height: window.height - toolBar.height
-
     }
 
     Settings {

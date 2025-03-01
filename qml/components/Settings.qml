@@ -17,7 +17,7 @@ Dialog {
 
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
-        switch(themey.currentIndex) {
+        switch(icon_style.currentIndex) {
             case 0: iconFont.source = "../fonts/MaterialIcons-Regular.ttf"; break;
             case 1: iconFont.source = "../fonts/MaterialIconsRound-Regular.otf"; break;
             case 2: iconFont.source = "../fonts/MaterialIconsSharp-Regular.otf"; break;
@@ -42,7 +42,7 @@ Dialog {
             }
 
             ComboBox {
-                id: themey
+                id: icon_style
                 model: ['Regular', 'Round', 'Sharp', 'Outlined', 'Two Tone']
                 flat: true
                 Layout.fillWidth: true

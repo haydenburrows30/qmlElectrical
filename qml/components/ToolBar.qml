@@ -28,7 +28,13 @@ ToolBar {
             icon.height: 30
             Layout.leftMargin: 5
             ToolTip {
-                text: "Settings"
+                id: sidebar_tooltip
+                text: sideBar.open_closed ? "Close Menu":"Open Menu"
+                visible: parent.hovered
+                x: parent.width
+                y: parent.height
+                delay: 500
+                timeout: 2000
             }
             // Layout.alignment: Qt.AlignVCenter
 
@@ -50,7 +56,10 @@ ToolBar {
                 }
             }
 
-            onClicked: mySignal()
+            onClicked: {
+                sidebar_tooltip.hide()
+                mySignal()
+            }
         }
 
         Label {
@@ -70,6 +79,20 @@ ToolBar {
             icon.height: 30
             checkable: true
             icon.name: action.checked ? "Dark":"Light"
+
+            ToolTip {
+                id: mode_tooltip
+                text: action.checked ? "Light Mode":"Dark Mode"
+                visible: parent.hovered
+                x: parent.width
+                y: parent.height
+                delay: 500
+                timeout: 2000
+            }
+
+            onClicked: {
+                mode_tooltip.hide()
+            }
 
             background: Rectangle {
                 radius: action.radius
@@ -108,6 +131,14 @@ ToolBar {
                 text: "Settings"
             }
 
+            ToolTip {
+                text: "Settings"
+                visible: parent.hovered
+                x: parent.width
+                y: parent.height
+                delay: 500
+                timeout: 2000
+            }
             
             background: Rectangle {
                 radius: control.radius
