@@ -112,8 +112,8 @@ Drawer {
                 ListElement {
                     title: "Three Phase"
                     source: "../pages/ThreePhase.qml"
-                    tooltip: "Calculator"
-                    icon: "Calculator"
+                    tooltip: "Wave"
+                    icon: "Wave"
                 }
             }
 
@@ -136,7 +136,7 @@ Drawer {
                     icon.height: 30
 
                     onClicked: {
-                        stackView.push("../pages/settings.qml", StackView.Immediate)
+                        settings.open()
                         listView.currentIndex = -1
                     }
                 }

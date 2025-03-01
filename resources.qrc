@@ -21,8 +21,13 @@
     <file>icons/gallery/24x24/Menu.svg</file>
     <file>icons/gallery/24x24/Setting.svg</file>
     <file>icons/gallery/24x24/Voltage Drop.svg</file>
+    <file>icons/gallery/24x24/Wave.svg</file>
     <file>icons/gallery/index.theme</file>
     <file>qtquickcontrols2.conf</file>
-    <file>fonts/SourceSansPro-Regular.ttf</file>
+    <file>fonts/MaterialIcons-Regular.ttf</file>
+    <file>fonts/MaterialIconsOutlined-Regular.otf</file>
+    <file>fonts/MaterialIconsRound-Regular.otf</file>
+    <file>fonts/MaterialIconsSharp-Regular.otf</file>
+    <file>fonts/MaterialIconsTwoTone-Regular.otf</file>
 </qresource>
 </RCC>
