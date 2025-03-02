@@ -17,8 +17,6 @@
     <file>qml/components/SideBar.qml</file>
     <file>qml/components/TableView.qml</file>
     <file>qml/components/ToolBar.qml</file>
-
-    GraphPanel
 </qresource>
 
 <qresource>

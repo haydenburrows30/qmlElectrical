@@ -88,6 +88,8 @@ ApplicationWindow {
         transitions: Transition {
             NumberAnimation { properties: "anchors.leftMargin"; easing.type: Easing.InOutQuad; duration: 200  }
         }
+
+        
     }
 
     FileDialog {
