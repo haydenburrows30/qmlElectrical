@@ -11,7 +11,6 @@ Drawer {
     property int open_closed: {sideBar.position}
     property int hide: 0
     property int show: 0
-    property int indexchange: 0
 
     onAboutToHide: {
         show = 0
@@ -32,7 +31,7 @@ Drawer {
         }
     }
 
-    function change() {
+    function change(indexchange) {
         listView.currentIndex = indexchange
     }
 

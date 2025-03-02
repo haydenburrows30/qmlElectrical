@@ -4,13 +4,10 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
-import "../../scripts/MaterialDesignRegular.js" as MD
 import '../components'
 
 Page {
     id: home
-
-	signal changeIndex()
 
 	GridLayout {
 		height: 400
@@ -29,8 +26,7 @@ Page {
 			fore: Qt.lighter(palette.accent,1.0)
 			onClicked: {
 				stackView.push("../pages/home.qml")
-				sideBar.indexchange = 1
-				sideBar.change()
+				sideBar.change(0)
 			}
 		}
 
@@ -45,8 +41,7 @@ Page {
 			fore: Qt.lighter(palette.accent,1.0)
 			onClicked: {
 				stackView.push("../pages/voltage_drop.qml")
-				sideBar.indexchange = 1
-				sideBar.change()
+				sideBar.change(1)
 			}
 		}
 
@@ -61,8 +56,7 @@ Page {
 			fore: Qt.lighter(palette.accent,1.0)
 			onClicked: {
 				stackView.push("../pages/calculator.qml")
-				sideBar.indexchange = 2
-				sideBar.change()
+				sideBar.change(2)
 			}
 		}
 
@@ -77,8 +71,7 @@ Page {
 			fore: Qt.lighter(palette.accent,1.0)
 			onClicked: {
 				stackView.push("../pages/ThreePhase.qml")
-				sideBar.indexchange = 3
-				sideBar.change()
+				sideBar.change(3)
 			}
 		}
 	}
