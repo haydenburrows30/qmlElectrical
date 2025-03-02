@@ -18,6 +18,16 @@ Page {
     //     }
     // }
 
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+
+        onClicked: (mouse)=> {
+        if ((mouse.button == Qt.XButton1 |  Qt.ExtraButton1) )
+            console.log("backbutton");
+    }
+    }
+
     GroupBox {
         id: settings
         title: 'Power -> Current'

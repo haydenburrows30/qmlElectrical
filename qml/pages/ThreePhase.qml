@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtCharts
+import Qt.labs.animation
 
 import '../components'
 
@@ -205,10 +206,15 @@ Page {
             Slider {
                 id: freqSlider
                 from: 1; to: 100.0; value: 50
-                stepSize: 1.0
+                stepSize: 1
                 onValueChanged: {
                     threePhaseSineModel.setFrequency(value)
                     updateSeries()
+                }
+                WheelHandler {
+                    property: "value"
+                    margin: 10
+                    rotationScale: 1 / 15
                 }
             }
 
@@ -240,6 +246,12 @@ Page {
                         threePhaseSineModel.setAmplitudeA(value * Math.sqrt(2))
                         updateSeries()
                     }
+
+                    WheelHandler {
+                        property: "value"
+                        margin: 10
+                        rotationScale: 1 / 15
+                    }
                 }
             TextField { 
                 text: ampSliderA.value.toFixed(0)
@@ -268,6 +280,12 @@ Page {
                     onValueChanged: {
                         threePhaseSineModel.setAmplitudeB(value * Math.sqrt(2))
                         updateSeries()
+                    }
+
+                    WheelHandler {
+                        property: "value"
+                        margin: 10
+                        rotationScale: 1 / 15
                     }
                 }
             TextField { 
@@ -299,6 +317,11 @@ Page {
                     threePhaseSineModel.setAmplitudeC(value * Math.sqrt(2))
                     updateSeries()
                 }
+                WheelHandler {
+                    property: "value"
+                    margin: 10
+                    rotationScale: 1 / 15
+                }
             }
 
             TextField { 
@@ -328,6 +351,11 @@ Page {
                     threePhaseSineModel.setPhaseAngleA(value)
                     updateSeries()
                 }
+                WheelHandler {
+                    property: "value"
+                    margin: 10
+                    rotationScale: 1 / 15
+                }
             }
             TextField { 
                 text: phaseSliderA.value.toFixed(0)
@@ -354,6 +382,11 @@ Page {
                     threePhaseSineModel.setPhaseAngleB(value)
                     updateSeries()
                 }
+                WheelHandler {
+                    property: "value"
+                    margin: 10
+                    rotationScale: 1 / 15
+                }
             }
             TextField { 
                 text: phaseSliderB.value.toFixed(0)
@@ -379,6 +412,11 @@ Page {
                 onValueChanged: {
                     threePhaseSineModel.setPhaseAngleC(value)
                     updateSeries()
+                }
+                WheelHandler {
+                    property: "value"
+                    margin: 10
+                    rotationScale: 1 / 15
                 }
             }
             TextField { 
