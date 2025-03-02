@@ -12,6 +12,7 @@ Page {
     property bool showRMSA: false
     property bool showRMSB: false
     property bool showRMSC: false
+
 //update graph
     function updateSeries() {
         phase_chart.removeAllSeries()
@@ -64,14 +65,18 @@ Page {
     function updatePhasorDiagram() {
         phasorDiagram.phaseAngles = [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
     }
+
 //Popup graph settings
     GraphPanel {
         id: graphPanel
     }
+
 //chart
     ChartView {
         id: phase_chart
-        width: parent.width - 50
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.right: phasorDiagram.left
         height: 400
         antialiasing: true
         animationOptions: ChartView.NoAnimation
@@ -122,7 +127,21 @@ Page {
             visible: false
         }
     }
+
+//Phasor diagram
+
+    PhasorDiagram {
+        id: phasorDiagram
+        width: 300
+        height: 300
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 10
+        phaseAngles: [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
+    }
+
 //Settings
+
     GroupBox {
         id: settings
         title: 'Settings'
@@ -209,24 +228,9 @@ Page {
             }
             Label { text: "Hz" }
 
-            Row {
-                Label { 
+            Label { 
                     text: "RMSA: "
                     }
-
-                CheckBox {
-                    id: checkbox_a
-                    checked: false
-                    onCheckedChanged: {
-                        showRMSA = checked
-                        updateSeries()
-                    }
-
-                    AToolTip {
-                        text: "Show/hide A chart line"
-                    }
-                }
-            }
 
             Slider {
                     id: ampSliderA
@@ -253,23 +257,9 @@ Page {
             }
             Label { text: "V" }
 
-            Row {
-                Label { 
-                    text: "RMSB: "
-                    }
-                    
-                CheckBox {
-                    checked: false
-                    onCheckedChanged: {
-                        showRMSB = checked
-                        updateSeries()
-                    }
-
-                    AToolTip {
-                        text: "Show/hide B chart line"
-                    }
+            Label { 
+                text: "RMSB: "
                 }
-            }
 
             Slider {
                     id: ampSliderB
@@ -297,22 +287,9 @@ Page {
 
             Label { text: "V" }
 
-            Row {
-                Label { 
-                    text: "RMSC: "
-                    }
-                    
-                CheckBox {
-                    checked: false
-                    onCheckedChanged: {
-                        showRMSC = checked
-                        updateSeries()
-                    }
-                    AToolTip {
-                        text: "Show/hide C chart line"
-                    }
+            Label { 
+                text: "RMSC: "
                 }
-            }
 
             Slider {
                 id: ampSliderC
@@ -422,6 +399,7 @@ Page {
         }
     }
 //Values
+
     GroupBox {
         id: value_all
         title: 'Values'
@@ -481,15 +459,5 @@ Page {
                 text: threePhaseSineModel.rmsCA.toFixed(0)
             }
         }
-    }
-//Phasor diagram
-    PhasorDiagram {
-        id: phasorDiagram
-        width: 300
-        height: 300
-        anchors.top: phase_chart.bottom
-        anchors.left: value_all.right
-        anchors.topMargin: 10
-        phaseAngles: [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
     }
 }

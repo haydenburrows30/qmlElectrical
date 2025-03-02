@@ -169,17 +169,6 @@ Page {
                     color: Universal.theme
                 }
             }
-            // Button {
-            //     text: "Options"
-            //     Layout.fillWidth: true
-
-            //     ToolTip {
-            //         text: "Options"
-            //     }
-            //     onClicked: {
-            //         draggablePanel.visible == false ? draggablePanel.visible = true:draggablePanel.visible = false
-            //     }
-            // }
         }
     }
 
@@ -220,7 +209,7 @@ Page {
                 onClicked: {
                     if (pythonModel.rowCount() > 1 && tableView.currentRow > 0) {
                         pythonModel.removeRows(tableView.currentRow)
-                        lineChart.removeSeries(lineChart.series(tableView.currentRow +1));
+                        // lineChart.removeSeries(lineChart.series(tableView.currentRow +1));
                         rect.height = rect.height - 51
                         table.height = table.height - 51
                     }
@@ -237,8 +226,9 @@ Page {
                     rect.height = 85
                     table.height = 180
                     pythonModel.clearAllRows()
-                    lineChart.removeAllSeries()
+                    // lineChart.removeAllSeries()
                     draggablePanel.barChart.barSeries.clear()
+                    barChart.barSeries.clear()
                     tableView.rowsadded = []
                 }
                 Layout.fillWidth: true
@@ -327,6 +317,5 @@ Page {
         anchors.bottom: parent.bottom
         anchors.left: settings.right
         width: table.width
-        // currentrow: tableView.currentRow
     }
 }

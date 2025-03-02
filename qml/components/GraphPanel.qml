@@ -8,34 +8,90 @@ import '../components'
 
 Window {
     id: myWindow
-    width: 300
-    height: 400
+    width: 200
+    height: 200
     flags: Qt.Window | Qt.FramelessWindowHint
-    color: "transparent"
-    
-    Rectangle {
-        anchors.fill: parent
-        border.color : palette.base
-        border.width : 1
+    color: Qt.darker(palette.dark, 2)
 
-        gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop { position: 1.0; color: "transparent" }
-            GradientStop { position: 0.2; color: palette.dark }
+    CButton {
+        id: close
+        icon_name: "Close"
+        tooltip_text: "Close"
+        anchors.top: parent.top
+        anchors.right: parent.right
+
+        onClicked: { 
+            myWindow.close()
+        }
+    }
+
+    GridLayout {
+        anchors.centerIn: parent
+        columns: 2
+        Label { 
+            text: "RMSA: "
             }
 
-        DragHandler {
-            id: handler
-            onActiveChanged: if (active) myWindow.startSystemMove()
+        CheckBox {
+            id: checkbox_a
+            checked: false
+            onCheckedChanged: {
+                showRMSA = checked
+                updateSeries()
+            }
+
+            AToolTip {
+                text: "Show/hide A chart line"
+            }
         }
 
-        CButton {
-            id: close
-            icon_name: "Close"
-            tooltip_text: "Close"
-            onClicked: { 
-                myWindow.close()
+        Label { 
+            text: "RMSB: "
+            }
+            
+        CheckBox {
+            checked: false
+            onCheckedChanged: {
+                showRMSB = checked
+                updateSeries()
+            }
+
+            AToolTip {
+                text: "Show/hide B chart line"
+            }
+        }
+
+        Label { 
+            text: "RMSC: "
+            }
+            
+        CheckBox {
+            checked: false
+            onCheckedChanged: {
+                showRMSC = checked
+                updateSeries()
+            }
+            AToolTip {
+                text: "Show/hide C chart line"
             }
         }
     }
+
+    DragHandler {
+        id: handler
+        onActiveChanged: if (active) myWindow.startSystemMove()
+    }
+    
+    // Rectangle {
+    //     anchors.fill: parent
+    //     border.color : palette.base
+    //     border.width : 1
+
+    //     // gradient: Gradient {
+    //     //     orientation: Gradient.Vertical
+    //     //     GradientStop { position: 1.0; color: "transparent" }
+    //     //     GradientStop { position: 0.2; color: palette.dark }
+    //     //     }
+    // }s
+
 }
