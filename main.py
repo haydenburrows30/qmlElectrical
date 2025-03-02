@@ -20,6 +20,7 @@ if __name__ == "__main__":
     QQuickStyle.setStyle("Universal")
     QApplication.setApplicationName("Electrical")
     QApplication.setOrganizationName("QtProject")
+    QApplication.setWindowIcon(QIcon("icons\\gallery\\24x24\\Wave_dark.ico"))
 
     QIcon.setThemeName("gallery")
 
