@@ -143,40 +143,12 @@ Page {
                     Layout.fillWidth: true
                 }
 
-                RoundButton {
+                CButton {
                     id: reset
                     icon.name: 'Reset'
                     implicitWidth: 40
                     implicitHeight: 40
-                    icon.width: 30
-                    icon.height: 30             
-
-                    ToolTip {
-                        text: "Reset"
-                        visible: parent.hovered
-                        x: parent.width
-                        y: parent.height
-                        delay: 500
-                        timeout: 2000
-                    }
-                    
-                    background: Rectangle {
-                        radius: reset.radius
-                        visible: !reset.flat || reset.down || reset.checked || reset.highlighted
-                        color: reset.down ? reset.Universal.baseMediumLowColor :
-                            reset.enabled && (reset.highlighted || reset.checked) ? reset.Universal.accent :
-                                                                                            "transparent"
-
-                        Rectangle {
-                            width: parent.width
-                            height: parent.height
-                            radius: reset.radius
-                            color: "transparent"
-                            visible: enabled && reset.hovered
-                            border.width: 2
-                            border.color: reset.Universal.baseMediumLowColor
-                        }
-                    }
+                    tooltip_text: "Reset"
 
                     onClicked: {
                         threePhaseSineModel.reset()
@@ -188,50 +160,22 @@ Page {
                         phaseSliderB.value = 120
                         phaseSliderC.value = 240
                         updateSeries()
-                    }   
+                    }  
                 }
 
-                RoundButton {
+                CButton {
                     id: graph_settings
                     icon.name: 'Setting'
                     implicitWidth: 40
                     implicitHeight: 40
-                    icon.width: 30
-                    icon.height: 30             
-
-                    ToolTip {
-                        text: "Graph Settings"
-                        visible: parent.hovered
-                        x: parent.width
-                        y: parent.height
-                        delay: 500
-                        timeout: 2000
-                    }
-                    
-                    background: Rectangle {
-                        radius: graph_settings.radius
-                        visible: !graph_settings.flat || graph_settings.down || graph_settings.checked || graph_settings.highlighted
-                        color: graph_settings.down ? graph_settings.Universal.baseMediumLowColor :
-                            graph_settings.enabled && (graph_settings.highlighted || graph_settings.checked) ? graph_settings.Universal.accent :
-                                                                                            "transparent"
-
-                        Rectangle {
-                            width: parent.width
-                            height: parent.height
-                            radius: graph_settings.radius
-                            color: "transparent"
-                            visible: enabled && graph_settings.hovered
-                            border.width: 2
-                            border.color: graph_settings.Universal.baseMediumLowColor
-                        }
-                    }
+                    tooltip_text: "Graph settings"
 
                     onClicked: {
                         if (graphPanel.visible == false) {
                         graphPanel.show()
                         }
                         else graphPanel.close()
-                    }
+                    } 
                 }
             }
             

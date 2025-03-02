@@ -7,11 +7,11 @@ import QtQuick.Layouts
 RoundButton {
     id: control
 
-    implicitWidth: 50
-    implicitHeight: 50
+    // implicitWidth: 50
+    // implicitHeight: 50
     icon.width: 30
     icon.height: 30
-    Layout.rightMargin: 10
+    // Layout.rightMargin: 10
     icon.name: icon_name
 
     property var icon_name : ""

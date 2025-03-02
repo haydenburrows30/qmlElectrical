@@ -53,13 +53,13 @@ ChartView {
         labelsVisible: true
         labelsPosition: AbstractBarSeries.LabelsOutsideEnd
         labelsPrecision: 2
-        labelsAngle: 90
+        // labelsAngle: 90
         labelsFormat: "@value %"
         barWidth: 0.9
 
         onHovered: (status, index, barset) => {
             if (status) {
-                tooltiptext.text = barset.label + ": " + barset.at(index).toFixed(2) + " V"
+                tooltiptext.text = barset.label + ": " + barset.at(index).toFixed(2) + " %"
                 tooltip.visible = true
                 tooltip.x = stylus.point.position.x
                 tooltip.y = stylus.point.position.y - 20

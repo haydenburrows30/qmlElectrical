@@ -19,65 +19,54 @@ Page {
         visible:false
     }
 
-    function updateChart() {
+    // function updateChart() {
 
-        // see if the object is empty
-        if (Object.values(tableView.rowsadded).includes(tableView.rowvalue)) {
-            console.log("clear rows to show new graph")
-            }
-        else {
-            let maxPercentVoltageDrop = 0  // Track highest voltage drop
-            //create series with rowvalue as the name
+    //     // see if the object is empty
+    //     if (Object.values(tableView.rowsadded).includes(tableView.rowvalue)) {
+    //         console.log("clear rows to show new graph")
+    //         }
+    //     else {
+    //         let maxPercentVoltageDrop = 0
+    //         //create series with rowvalue as the name
 
-            let series = lineChart.createSeries(ChartView.SeriesTypeScatter,tableView.rowvalue,lineChart.axisx,lineChart.axisy)
+    //         let series = lineChart.createSeries(ChartView.SeriesTypeScatter,tableView.rowvalue,lineChart.axisx,lineChart.axisy)
 
-            //apend the series with cable types.  Get the 
-            for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
-                let entry = pythonModel.chart_data_qml[i]
+    //         for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
+    //             let entry = pythonModel.chart_data_qml[i]
 
-                lineChart.series(Object.keys(tableView.rowsadded).length).append(i, [entry.percentage_drop])
+    //             lineChart.series(Object.keys(tableView.rowsadded).length).append(i, [entry.percentage_drop])
 
-                // Track the highest voltage drop to set the Y-axis max value
-                if (entry.percentage_drop > maxPercentVoltageDrop) {
-                    maxPercentVoltageDrop = entry.percentage_drop
-                }
-            }
-            // series.pointLabelsVisible = true
+    //             if (entry.percentage_drop > maxPercentVoltageDrop) {
+    //                 maxPercentVoltageDrop = entry.percentage_drop
+    //             }
+    //         }
+    //         series.style = Qt.NoPen
+    //         series.width = 5
+    //         series.selectedColor = "red"
 
-            // series.pointsVisible = true
-            // series.pointLabelsFont.pointSize = 14
-            // series.pointLabelsFormat = "@yPoint %"
-            // series.pointLabelsClipping = false
-            // series.pointClipping = false
-            series.style = Qt.NoPen
-            series.width = 5
-            series.selectedColor = "red"
+    //         let noseries = lineChart.count
+    //         // create an object with linechart_series:row_number
+    //         tableView.rowsadded[noseries] = tableView.rowvalue
 
-            // init no of series in lineChart
-            let noseries = lineChart.count
-            // create an object with linechart_series:row_number
-            tableView.rowsadded[noseries] = tableView.rowvalue
+    //         lineChart.axisy.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
+    //         lineChart.axisy.min = 0
+    //     }
+    // }
 
-            // Dynamically adjust Y-axis scale
-            lineChart.axisy.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
-            lineChart.axisy.min = 0
-        }
-    }
-
-    function updateBarChart() {
+    function updateBarChartPopUp() {
         
         if (draggablePanel.barChart.barSeries.count > 0) {
             draggablePanel.barChart.barSeries.clear()
         }
         let categories = []
-        let maxPercentVoltageDrop = 0  // Track highest voltage drop
+        let maxPercentVoltageDrop = 0 
 
         for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
             let entry = pythonModel.chart_data_qml[i]
             // create new barset for each cable type
             let example = draggablePanel.barChart.barSeries.append(entry.cable, [entry.percentage_drop])
-            // set label font and colour
-            example.labelFont = Qt.font({pointSize: 12}); //bold:true
+
+            example.labelFont = Qt.font({pointSize: 12});
             example.labelColor = "black"
 
             // Track the highest voltage drop to set the Y-axis max value
@@ -86,31 +75,38 @@ Page {
             }
         }
 
+        draggablePanel.barChart.title = "Row " + tableView.rowvalue + " Voltage Drop"
         draggablePanel.barChart.axisX1.categories = ["Aluminium"] // ,"Copper"
-
-        // Dynamically adjust Y-axis scale
-        draggablePanel.barChart.axisY1.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
+        draggablePanel.barChart.axisY1.max = maxPercentVoltageDrop * 1.4 
         draggablePanel.barChart.axisY1.min = 0
     }
 
-    // MouseArea {
-    //     id: area
-    //     anchors.fill: parent
+    function updateBarChartMain() {
+        
+        if (barChart.barSeries.count > 0) {
+            barChart.barSeries.clear()
+        }
 
-    //     onClicked:  {
-    //         sideBar.close()
-    //         }
-    // }
+        let categories = []
+        let maxPercentVoltageDrop = 0  
 
-    // MouseArea {
-    //     anchors.fill: parent
+        for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
+            let entry = pythonModel.chart_data_qml[i]
+            let example = barChart.barSeries.append(entry.cable, [entry.percentage_drop])
 
-    //     onClicked:  {
-    //         if (sideBar.expanded.state == 'open') {
-    //             sideBar.expanded.state = 'close'
-    //         }
-    //     }
-    // }
+            example.labelFont = Qt.font({pointSize: 12});
+            example.labelColor = "black"
+
+            if (entry.percentage_drop > maxPercentVoltageDrop) {
+                maxPercentVoltageDrop = entry.percentage_drop
+            }
+        }
+
+        barChart.title = "Row " + tableView.rowvalue + " Voltage Drop"
+        barChart.axisX1.categories = ["Aluminium"] 
+        barChart.axisY1.max = maxPercentVoltageDrop * 1.4  
+        barChart.axisY1.min = 0
+    }
 
 //Popup Menu
     BarChartPopUp {
@@ -316,13 +312,21 @@ Page {
             }
         }
     }
-//LineChart
-    LineChart {
-        id: lineChart
+//LineChart/BarChart
+    // LineChart {
+    //     id: lineChart
+    //     anchors.top: table.bottom
+    //     anchors.bottom: parent.bottom
+    //     anchors.left: settings.right
+    //     width: table.width
+    //     currentrow: tableView.currentRow
+    // }
+    BarChart {
+        id: barChart
         anchors.top: table.bottom
         anchors.bottom: parent.bottom
         anchors.left: settings.right
         width: table.width
-        currentrow: tableView.currentRow
+        // currentrow: tableView.currentRow
     }
 }

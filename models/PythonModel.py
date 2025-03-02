@@ -13,9 +13,9 @@ class PythonModel(QAbstractTableModel):
     def __init__(self, csv_file="cable_data.csv"):
         super().__init__()
         self._data = [
-            [1, "10", "0", "415", "5", "100", "", ""]
+            [1, "10", "0", "415", "5", "100", "", "",""]
         ]
-        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)", "Action"]
+        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)", "Action","Action2"]
         self.cable_data = CableData()
         self._voltageDropThreshold = 5.0
         self._powerFactor = 0.9
@@ -50,8 +50,10 @@ class PythonModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.UserRole:
             if index.column() == 0:
                 return "dropdown"
+            elif index.column() == 8:
+                return "button2"
             elif index.column() == 7:
-                return "button"
+                return "button1"
             elif index.column() == 6:
                 return "result"
             else:
@@ -83,7 +85,7 @@ class PythonModel(QAbstractTableModel):
 
     @Slot()
     def appendRow(self):
-        row_data = [1, "10", "0", "415", "5", "100", "", ""]
+        row_data = [1, "10", "0", "415", "5", "100", "", "", ""]
         self.beginInsertRows(self.index(0, 0).parent(), self.rowCount(), self.rowCount())
         self._data.append(row_data)
         self.endInsertRows()
@@ -102,7 +104,7 @@ class PythonModel(QAbstractTableModel):
     def clearAllRows(self):
         self.beginResetModel()
         self._data.clear()
-        self._data = [[1, "10", "0", "415", "5", "100", "", ""]]
+        self._data = [[1, "10", "0", "415", "5", "100", "", "", ""]]
         self.endResetModel()
 
     @Slot(int)

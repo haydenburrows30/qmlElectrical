@@ -28,12 +28,12 @@ TableView {
     columnSpacing: 1
     rowSpacing: 1
 
-    onCurrentRowChanged: {
-        if (lineChart.count > tableView.currentRow && tableView.currentRow !== -1) {
-        lineChart.series(tableView.currentRow).color = "red"
-        // console.log (tableView.currentRow,lineChart.count)
-        }
-    }
+    // onCurrentRowChanged: {
+    //     if (lineChart.count > tableView.currentRow && tableView.currentRow !== -1) {
+    //     lineChart.series(tableView.currentRow).color = "red"
+    //     // console.log (tableView.currentRow,lineChart.count)
+    //     }
+    // }
 
     delegate: DelegateChooser {
         role: "roleValue"
@@ -127,14 +127,25 @@ TableView {
         }
 
         DelegateChoice {
-            roleValue: "button"
+            roleValue: "button1"
             delegate: Button {
-                text: "Add Chart"
+                text: "Chart Main"
                 onClicked: {
                     rowvalue = row
                     pythonModel.update_chart(row)
-                    updateChart()
-                    updateBarChart()
+                    updateBarChartMain()
+                }
+            }
+        }
+
+        DelegateChoice {
+            roleValue: "button2"
+            delegate: Button {
+                text: "Chart Popup"
+                onClicked: {
+                    rowvalue = row
+                    pythonModel.update_chart(row)
+                    updateBarChartPopUp()
                     draggablePanel.visible = true
                 }
             }
