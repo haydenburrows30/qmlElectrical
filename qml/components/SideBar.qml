@@ -52,7 +52,6 @@ Drawer {
     RowLayout {
         id: rowLayout
         height: parent.height - 10
-        // anchors.top: fade.bottom
 
         Layout.alignment: Qt.AlignHCenter
 
@@ -69,7 +68,6 @@ Drawer {
                 ItemDelegate {
                     implicitHeight: 60
                     implicitWidth: 60
-                    // text: model.title
 
                     highlighted: ListView.isCurrentItem
 
@@ -123,7 +121,6 @@ Drawer {
                     highlighted: listView.currentIndex == -1
                     implicitHeight: 60
                     implicitWidth: 60
-                    // text: "Settings"
 
                     CToolTip {
                         id: toolTip

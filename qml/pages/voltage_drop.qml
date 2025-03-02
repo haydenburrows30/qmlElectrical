@@ -113,28 +113,9 @@ Page {
     // }
 
 //Popup Menu
-    MenuPanel {
+    BarChartPopUp {
         id: draggablePanel
-        x: Math.round((window.width - width) / 2)
-        y: Math.round(window.height / 6)
-        width: 400
-        height: 400
-        z: 99
-        visible: false
-        DragHandler {
-            xAxis.minimum: 0
-            yAxis.minimum: 0
-            xAxis.maximum: voltage_drop.width - draggablePanel.width
-            yAxis.maximum: voltage_drop.height - draggablePanel.height
-        }
-
-        DesignEffect {
-            backgroundBlurRadius: 500
-            backgroundLayer: parent
-            effects: [
-                DesignDropShadow {}
-            ]
-        }
+        
     }
 //Settings
     GroupBox {

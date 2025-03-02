@@ -12,7 +12,7 @@ Page {
     property bool showRMSA: false
     property bool showRMSB: false
     property bool showRMSC: false
-
+//update graph
     function updateSeries() {
         phase_chart.removeAllSeries()
         var series1 = phase_chart.createSeries(ChartView.SeriesTypeLine,"A",xAxis,yAxis)
@@ -60,11 +60,15 @@ Page {
             rmsTextC.visible = false
         }
     }
-
+//update phasor
     function updatePhasorDiagram() {
         phasorDiagram.phaseAngles = [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
     }
-
+//Popup graph settings
+    GraphPanel {
+        id: graphPanel
+    }
+//chart
     ChartView {
         id: phase_chart
         width: parent.width - 50
@@ -90,45 +94,147 @@ Page {
             titleText: "Amplitude"
         }
 
-        legend.visible: false
+        legend.alignment: Qt.AlignBottom
 
         Component.onCompleted: updateSeries()
-    }
 
-    Text {
-        id: rmsTextA
-        anchors.right: parent.right
-        anchors.rightMargin: 10
-        color: "red"
-        visible: false
-    }
+        Text {
+            id: rmsTextA
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            color: "red"
+            visible: false
+        }
 
-    Text {
-        id: rmsTextB
-        anchors.right: parent.right
-        anchors.rightMargin: 10
-        color: "yellow"
-        visible: false
-    }
+        Text {
+            id: rmsTextB
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            color: "yellow"
+            visible: false
+        }
 
-    Text {
-        id: rmsTextC
-        anchors.right: parent.right
-        anchors.rightMargin: 10
-        color: "blue"
-        visible: false
+        Text {
+            id: rmsTextC
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            color: "blue"
+            visible: false
+        }
     }
-
+//Settings
     GroupBox {
         id: settings
         title: 'Settings'
         anchors.left: parent.left
         anchors.top: phase_chart.bottom
-        anchors.leftMargin: 5
+        anchors.leftMargin: 10
 
         GridLayout {
-            anchors.fill: parent
+            id: grid_settings
             columns: 4
+
+            RowLayout {
+                id: toprow
+                Layout.columnSpan : 4
+                height: 40
+                
+                Label {
+                    Layout.fillWidth: true
+                }
+
+                RoundButton {
+                    id: reset
+                    icon.name: 'Reset'
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    icon.width: 30
+                    icon.height: 30             
+
+                    ToolTip {
+                        text: "Reset"
+                        visible: parent.hovered
+                        x: parent.width
+                        y: parent.height
+                        delay: 500
+                        timeout: 2000
+                    }
+                    
+                    background: Rectangle {
+                        radius: reset.radius
+                        visible: !reset.flat || reset.down || reset.checked || reset.highlighted
+                        color: reset.down ? reset.Universal.baseMediumLowColor :
+                            reset.enabled && (reset.highlighted || reset.checked) ? reset.Universal.accent :
+                                                                                            "transparent"
+
+                        Rectangle {
+                            width: parent.width
+                            height: parent.height
+                            radius: reset.radius
+                            color: "transparent"
+                            visible: enabled && reset.hovered
+                            border.width: 2
+                            border.color: reset.Universal.baseMediumLowColor
+                        }
+                    }
+
+                    onClicked: {
+                        threePhaseSineModel.reset()
+                        freqSlider.value = 50
+                        ampSliderA.value = 230
+                        ampSliderB.value = 230
+                        ampSliderC.value = 230
+                        phaseSliderA.value = 0
+                        phaseSliderB.value = 120
+                        phaseSliderC.value = 240
+                        updateSeries()
+                    }   
+                }
+
+                RoundButton {
+                    id: graph_settings
+                    icon.name: 'Setting'
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    icon.width: 30
+                    icon.height: 30             
+
+                    ToolTip {
+                        text: "Graph Settings"
+                        visible: parent.hovered
+                        x: parent.width
+                        y: parent.height
+                        delay: 500
+                        timeout: 2000
+                    }
+                    
+                    background: Rectangle {
+                        radius: graph_settings.radius
+                        visible: !graph_settings.flat || graph_settings.down || graph_settings.checked || graph_settings.highlighted
+                        color: graph_settings.down ? graph_settings.Universal.baseMediumLowColor :
+                            graph_settings.enabled && (graph_settings.highlighted || graph_settings.checked) ? graph_settings.Universal.accent :
+                                                                                            "transparent"
+
+                        Rectangle {
+                            width: parent.width
+                            height: parent.height
+                            radius: graph_settings.radius
+                            color: "transparent"
+                            visible: enabled && graph_settings.hovered
+                            border.width: 2
+                            border.color: graph_settings.Universal.baseMediumLowColor
+                        }
+                    }
+
+                    onClicked: {
+                        if (graphPanel.visible == false) {
+                        graphPanel.show()
+                        }
+                        else graphPanel.close()
+                    }
+                }
+            }
+            
             Label { 
                 text: "Frequency: "
                 Layout.alignment: Qt.AlignLeft
@@ -371,30 +477,13 @@ Page {
             Label { text: "°" }
         }
     }
-
-    Button {
-        text: "Reset"
-        anchors.top: settings.bottom
-        anchors.topMargin: 10
-        onClicked: {
-            threePhaseSineModel.reset()
-            freqSlider.value = 50
-            ampSliderA.value = 230
-            ampSliderB.value = 230
-            ampSliderC.value = 230
-            phaseSliderA.value = 0
-            phaseSliderB.value = 120
-            phaseSliderC.value = 240
-            updateSeries()
-        }
-    }
-
+//Values
     GroupBox {
-        id: settingsA
+        id: value_all
         title: 'Values'
         anchors.left: settings.right
         anchors.top: phase_chart.bottom
-        anchors.leftMargin: 5
+        anchors.leftMargin: 10
 
         GridLayout {
             anchors.fill: parent
@@ -449,12 +538,13 @@ Page {
             }
         }
     }
-
+//Phasor diagram
     PhasorDiagram {
         id: phasorDiagram
-        width: parent.width
-        height: 200
-        anchors.top: settingsA.bottom
+        width: 300
+        height: 300
+        anchors.top: phase_chart.bottom
+        anchors.left: value_all.right
         anchors.topMargin: 10
         phaseAngles: [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
     }
