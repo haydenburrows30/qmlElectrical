@@ -300,21 +300,12 @@ Page {
                         updateSeries()
                     }  
                 }
+            }
 
-                // CButton {
-                //     id: graph_settings
-                //     icon.name: 'Setting'
-                //     implicitWidth: 40
-                //     implicitHeight: 40
-                //     tooltip_text: "Graph settings"
-
-                //     onClicked: {
-                //         if (graphPanel.visible == false) {
-                //         graphPanel.show()
-                //         }
-                //         else graphPanel.close()
-                //     } 
-                // }
+            WheelHandler {
+                id: wheelHandler
+                property: "value"
+                margin: 0
             }
             
             Label { 
@@ -329,10 +320,9 @@ Page {
                     threePhaseSineModel.setFrequency(value)
                     updateSeries()
                 }
-                WheelHandler {
-                    property: "value"
-                    margin: 0
-                    rotationScale: 1 / 15
+                onHoveredChanged: {
+                    wheelHandler.target = freqSlider
+                    wheelHandler.rotationScale = 1 / 15
                 }
             }
 
@@ -351,26 +341,23 @@ Page {
                 }
             }
             Label { text: "Hz" }
-
-            Label { 
-                    text: "RMSA: "
-                    }
+            Label { text: "RMSA: " }
 
             Slider {
-                    id: ampSliderA
-                    from: 100; to: 280.0; value: 230
-                    stepSize: 1.0
-                    onValueChanged: {
-                        threePhaseSineModel.setAmplitudeA(value * Math.sqrt(2))
-                        updateSeries()
-                    }
-
-                    WheelHandler {
-                        property: "value"
-                        margin: 0
-                        rotationScale: 2 / 15
-                    }
+                id: ampSliderA
+                from: 100; to: 280.0; value: 230
+                stepSize: 1.0
+                onValueChanged: {
+                    threePhaseSineModel.setAmplitudeA(value * Math.sqrt(2))
+                    updateSeries()
                 }
+
+                onHoveredChanged: {
+                    wheelHandler.target = ampSliderA
+                    wheelHandler.rotationScale = 2 / 15
+                }
+            }
+
             TextField { 
                 text: ampSliderA.value.toFixed(0)
                 validator: IntValidator{bottom: 100; top: 400;}
@@ -392,20 +379,20 @@ Page {
                 }
 
             Slider {
-                    id: ampSliderB
-                    from: 100; to: 280.0; value: 230
-                    stepSize: 1.0
-                    onValueChanged: {
-                        threePhaseSineModel.setAmplitudeB(value * Math.sqrt(2))
-                        updateSeries()
-                    }
-
-                    WheelHandler {
-                        property: "value"
-                        margin: 0
-                        rotationScale: 2 / 15
-                    }
+                id: ampSliderB
+                from: 100; to: 280.0; value: 230
+                stepSize: 1.0
+                onValueChanged: {
+                    threePhaseSineModel.setAmplitudeB(value * Math.sqrt(2))
+                    updateSeries()
                 }
+
+                onHoveredChanged: {
+                    wheelHandler.target = ampSliderB
+                    wheelHandler.rotationScale = 2 / 15
+                }
+            }
+
             TextField { 
                 text: ampSliderB.value.toFixed(0)
                 validator: IntValidator{bottom: 100; top: 400;}
@@ -435,10 +422,9 @@ Page {
                     threePhaseSineModel.setAmplitudeC(value * Math.sqrt(2))
                     updateSeries()
                 }
-                WheelHandler {
-                    property: "value"
-                    margin: 0
-                    rotationScale: 2 / 15
+                onHoveredChanged: {
+                    wheelHandler.target = ampSliderC
+                    wheelHandler.rotationScale = 2 / 15
                 }
             }
 
@@ -469,10 +455,9 @@ Page {
                     threePhaseSineModel.setPhaseAngleA(value)
                     updateSeries()
                 }
-                WheelHandler {
-                    property: "value"
-                    margin: 0
-                    rotationScale: 5 / 15
+                onHoveredChanged: {
+                    wheelHandler.target = phaseSliderA
+                    wheelHandler.rotationScale = 5 / 15
                 }
             }
             TextField { 
@@ -500,10 +485,9 @@ Page {
                     threePhaseSineModel.setPhaseAngleB(value)
                     updateSeries()
                 }
-                WheelHandler {
-                    property: "value"
-                    margin: 0
-                    rotationScale: 5 / 15
+                onHoveredChanged: {
+                    wheelHandler.target = phaseSliderB
+                    wheelHandler.rotationScale = 5 / 15
                 }
             }
             TextField { 
@@ -531,10 +515,9 @@ Page {
                     threePhaseSineModel.setPhaseAngleC(value)
                     updateSeries()
                 }
-                WheelHandler {
-                    property: "value"
-                    margin: 0
-                    rotationScale: 5 / 15
+                onHoveredChanged: {
+                    wheelHandler.target = phaseSliderC
+                    wheelHandler.rotationScale = 5 / 15
                 }
             }
             TextField { 
