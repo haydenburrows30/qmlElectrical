@@ -1,32 +1,18 @@
 import QtQuick
-import QtQuick.Window
+import QtQml
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
+import Qt.labs.qmlmodels 1.0
+import QtQuick.Controls.Universal
+import QtCharts
 
-import Calculator 1.0
-import Charging 1.0
+import QtQuick.Studio.DesignEffects
+
+import '../components'
 
 Page {
     id: home
-
-    // MouseArea {
-    //     anchors.fill: parent
-
-    //     onClicked:  {
-    //         sideBar.close()
-    //     }
-    // }
-
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-
-        onClicked: (mouse)=> {
-        if ((mouse.button == Qt.XButton1 |  Qt.ExtraButton1) )
-            console.log("backbutton");
-    }
-    }
 
     GroupBox {
         id: settings
@@ -113,9 +99,28 @@ Page {
         }
     }
 
+        ImageContainer {
+            id: container
+        }
+
+        CButton {
+            id: help
+            anchors.right: charging_current.right
+            anchors.bottom: charging_current.top
+            anchors.bottomMargin: - (help.height - 8)
+            icon.name: "Info"
+            z:5
+            width: 40
+            height:40
+            tooltip_text: "Info"
+            onClicked: {
+                container.show()
+            }
+        }
+
     GroupBox {
         id: charging_current
-        title: 'Charging Current'
+        title: 'Cable Charging Current'
         width: 270
         anchors.top: settings.bottom
         anchors.left: parent.left
@@ -129,8 +134,9 @@ Page {
                 spacing: 10
 
                 Label {
-                    text: "Voltage:"
+                    text: "Voltage (kV):"
                     Layout.preferredWidth: 80
+                    
                 }
 
                 TextField {
@@ -141,14 +147,14 @@ Page {
                     }
                     Layout.preferredWidth: 150
                     Layout.alignment: Qt.AlignRight
-                }
             }
+        }
 
             RowLayout {
                 spacing: 10
 
                 Label {
-                    text: "uF/km:"
+                    text: "uF/km (1ph):"
                     Layout.preferredWidth: 80
                 }
 

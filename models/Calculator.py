@@ -4,6 +4,7 @@ from PySide6.QtCore import *
 from PySide6.QtCharts import *
 
 import numpy as np
+import math
 
 class PowerCalculator(QObject):
     currentCalculated = Signal(float)
@@ -81,7 +82,7 @@ class ChargingCalc(QObject):
 
     def calculateChargingCurrent(self):
         if self._voltage != 0 and self._capacitance != 0:
-            self._chargingCurrent = (2 * 3.14159 * self._frequency * (self._capacitance / 1E6 ) * self._voltage) * self._length
+            self._chargingCurrent = (2 * math.pi * self._frequency * self._capacitance * self._voltage * self._length) / (math.sqrt(3) * 1000)
             self.chargingCurrentCalculated.emit(self._chargingCurrent)
 
     @Property(float, notify=chargingCurrentCalculated)

@@ -213,7 +213,7 @@ Page {
                 }
                 WheelHandler {
                     property: "value"
-                    margin: 10
+                    margin: 0
                     rotationScale: 1 / 15
                 }
             }
@@ -249,8 +249,8 @@ Page {
 
                     WheelHandler {
                         property: "value"
-                        margin: 10
-                        rotationScale: 1 / 15
+                        margin: 0
+                        rotationScale: 2 / 15
                     }
                 }
             TextField { 
@@ -284,8 +284,8 @@ Page {
 
                     WheelHandler {
                         property: "value"
-                        margin: 10
-                        rotationScale: 1 / 15
+                        margin: 0
+                        rotationScale: 2 / 15
                     }
                 }
             TextField { 
@@ -319,8 +319,8 @@ Page {
                 }
                 WheelHandler {
                     property: "value"
-                    margin: 10
-                    rotationScale: 1 / 15
+                    margin: 0
+                    rotationScale: 2 / 15
                 }
             }
 
@@ -353,8 +353,8 @@ Page {
                 }
                 WheelHandler {
                     property: "value"
-                    margin: 10
-                    rotationScale: 1 / 15
+                    margin: 0
+                    rotationScale: 5 / 15
                 }
             }
             TextField { 
@@ -384,8 +384,8 @@ Page {
                 }
                 WheelHandler {
                     property: "value"
-                    margin: 10
-                    rotationScale: 1 / 15
+                    margin: 0
+                    rotationScale: 5 / 15
                 }
             }
             TextField { 
@@ -415,8 +415,8 @@ Page {
                 }
                 WheelHandler {
                     property: "value"
-                    margin: 10
-                    rotationScale: 1 / 15
+                    margin: 0
+                    rotationScale: 5 / 15
                 }
             }
             TextField { 
