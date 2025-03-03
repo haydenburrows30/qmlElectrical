@@ -24,6 +24,26 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: {
+            if (mouse.button === Qt.RightButton)
+                contextMenu.popup()
+        }
+        onPressAndHold: {
+            if (mouse.source === Qt.MouseEventNotSynthesized)
+                contextMenu.popup()
+        }
+
+        Menu {
+            id: contextMenu
+            MenuItem { text: "Cut" }
+            MenuItem { text: "Copy" }
+            MenuItem { text: "Paste" }
+        }
+    }
+
     PythonModel {
         id: pythonModel
     }
@@ -88,8 +108,6 @@ ApplicationWindow {
         transitions: Transition {
             NumberAnimation { properties: "anchors.leftMargin"; easing.type: Easing.InOutQuad; duration: 200  }
         }
-
-        
     }
 
     FileDialog {

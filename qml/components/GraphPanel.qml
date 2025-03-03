@@ -92,6 +92,6 @@ Window {
     //     //     GradientStop { position: 1.0; color: "transparent" }
     //     //     GradientStop { position: 0.2; color: palette.dark }
     //     //     }
-    // }s
+    // }
 
 }

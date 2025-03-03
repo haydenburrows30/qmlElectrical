@@ -9,7 +9,7 @@ import Qt.labs.animation
 import '../components'
 
 Page {
-
+    id: phasePage
     property bool showRMSA: false
     property bool showRMSB: false
     property bool showRMSC: false
@@ -68,7 +68,7 @@ Page {
     }
 
 //Popup graph settings
-    GraphPanel {
+    BarChartPopUp {
         id: graphPanel
     }
 
@@ -127,6 +127,124 @@ Page {
             color: "blue"
             visible: false
         }
+
+        ToolTip {
+            id: id_tooltip
+            contentItem: Text{
+                color: "#21be2b"
+                text: id_tooltip.text
+            }
+            background: Rectangle {
+                border.color: "#21be2b"
+            }
+        }
+
+        Rectangle{
+            id: rectang
+            color: "black"
+            opacity: 0.6
+            visible: false
+        }
+
+        Rectangle{
+            id: linemarkerx
+            y: parent.plotArea.y
+            height: parent.plotArea.height
+            width: 1
+            visible: false
+            border.width: 1
+            color: "red"
+        }
+
+        Rectangle{
+            id: linemarkery
+            x: parent.plotArea.x
+            width: parent.plotArea.width
+            height: 1
+            visible: false
+            border.width: 1
+            color: "red"
+        }
+
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            cursorShape: Qt.CrossCursor
+            hoverEnabled: true
+            acceptedButtons: Qt.AllButtons
+
+            onPressed: {
+                var point = Qt.point(mouseX, mouseY)
+                rectang.x = point.x
+                rectang.y = point.y
+                rectang.visible = true
+            }
+
+            onClicked: (mouse)=> {
+                var point = Qt.point(mouseX, mouseY)
+
+                if (mouse.button == Qt.LeftButton) {
+                    var cp = phase_chart.mapToValue(point,phase_chart.series(0))
+                    var text = qsTr("x: %1 ms, y: %2 V").arg(cp.x.toFixed(1)).arg(cp.y.toFixed(1))
+
+                    id_tooltip.x = point.x
+                    id_tooltip.y = point.y - id_tooltip.height
+                    id_tooltip.text = text
+                    id_tooltip.delay = 500
+                    id_tooltip.timeout = 10000
+                    id_tooltip.visible = true
+                    graphPanel.visible = false
+                } else if (mouse.button == Qt.RightButton) {
+                    graphPanel.x = point.x
+                    graphPanel.y = point.y
+                    graphPanel.visible = true                          
+                }
+            }
+
+            onMouseXChanged: {
+                var point = Qt.point(mouseX, mouseY)
+                rectang.width = point.x - rectang.x
+                linemarkerx.visible = true
+                linemarkerx.x = mouseX - linemarkerx.width/2
+
+                var theValue = phase_chart.mapToValue(Qt.point(mouseX, mouseY), phase_chart.series(0))
+
+                currentxyposition.text = "x: " + theValue.x.toFixed(1) + " y: " + theValue.y.toFixed(1)
+            }
+
+            onMouseYChanged: {
+                var point = Qt.point(mouseX, mouseY)
+                rectang.height = point.y - rectang.y
+
+                var theValue = phase_chart.mapToValue(Qt.point(mouseX, mouseY), phase_chart.series(0))
+
+                linemarkery.visible = true
+                linemarkery.y = mouseY - linemarkery.height/2
+
+            }
+
+            onReleased: {
+                phase_chart.zoomIn(Qt.rect(rectang.x, rectang.y, rectang.width, rectang.height))
+                rectang.visible = false
+            }
+
+            onDoubleClicked: { 
+                phase_chart.zoomReset()
+                yAxis.min = -400
+                yAxis.max = 400
+                xAxis.min = 0
+                xAxis.max = 1000
+            }
+
+            onPositionChanged: {
+                id_tooltip.visible = false
+            }
+
+            onExited: {
+                linemarkery.visible = false
+                linemarkerx.visible = false
+            }
+        }
     }
 
 //Phasor diagram
@@ -183,20 +301,20 @@ Page {
                     }  
                 }
 
-                CButton {
-                    id: graph_settings
-                    icon.name: 'Setting'
-                    implicitWidth: 40
-                    implicitHeight: 40
-                    tooltip_text: "Graph settings"
+                // CButton {
+                //     id: graph_settings
+                //     icon.name: 'Setting'
+                //     implicitWidth: 40
+                //     implicitHeight: 40
+                //     tooltip_text: "Graph settings"
 
-                    onClicked: {
-                        if (graphPanel.visible == false) {
-                        graphPanel.show()
-                        }
-                        else graphPanel.close()
-                    } 
-                }
+                //     onClicked: {
+                //         if (graphPanel.visible == false) {
+                //         graphPanel.show()
+                //         }
+                //         else graphPanel.close()
+                //     } 
+                // }
             }
             
             Label { 
@@ -495,6 +613,11 @@ Page {
 
             Label {
                 text: threePhaseSineModel.rmsCA.toFixed(0)
+            }
+
+            Label {
+                id: currentxyposition
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
             }
         }
     }
