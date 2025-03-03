@@ -37,15 +37,15 @@ TableView {
                 id: comboBox
                 implicitWidth: 100
                 implicitHeight: 50
-                flat: true
+                // flat: true
                 model: pythonModel ? pythonModel.cable_types : []
 
-                background: Rectangle {
-                    implicitWidth: 120
-                    implicitHeight: 40
-                    color: palette.base
-                    radius: 2
-                }
+                // background: Rectangle {
+                //     implicitWidth: 120
+                //     implicitHeight: 40
+                //     color: palette.base
+                //     radius: 2
+                // }
 
                 currentIndex: {
                     var modelData = TableView.view.model ? TableView.view.model.data(TableView.view.index(row, column)).toString() : ""
@@ -121,25 +121,37 @@ TableView {
         DelegateChoice {
             roleValue: "button1"
             delegate: Button {
-                text: "Chart Main"
+                icon.name: "LightBar"
+                icon.width: 30
+                icon.height: 30
                 onClicked: {
                     rowvalue = row
                     pythonModel.update_chart(row)
                     updateBarChartMain()
                 }
+
+                AToolTip {
+                        text: "Add to main chart"
+                    }
             }
         }
 
         DelegateChoice {
             roleValue: "button2"
             delegate: Button {
-                text: "Chart Popup"
+                icon.name: "DarkBar"
+                icon.width: 30
+                icon.height: 30
                 onClicked: {
                     rowvalue = row
                     pythonModel.update_chart(row)
                     updateBarChartPopUp()
                     draggablePanel.visible = true
                 }
+
+                AToolTip {
+                        text: "Add to popup chart"
+                    }
             }
         }
 

@@ -28,7 +28,9 @@ Page {
             let example = draggablePanel.barChart.barSeries.append(entry.cable, [entry.percentage_drop])
 
             example.labelFont = Qt.font({pointSize: 12});
-            example.labelColor = "black"
+            if (toolBar.toggle) {
+            example.labelColor = "white"
+            } else example.labelColor = "black"
 
             // Track the highest voltage drop to set the Y-axis max value
             if (entry.percentage_drop > maxPercentVoltageDrop) {
@@ -56,7 +58,10 @@ Page {
             let example = barChart.barSeries.append(entry.cable, [entry.percentage_drop])
 
             example.labelFont = Qt.font({pointSize: 12});
-            example.labelColor = "black"
+
+            if (toolBar.toggle) {
+            example.labelColor = "white"
+            } else example.labelColor = "black"
 
             if (entry.percentage_drop > maxPercentVoltageDrop) {
                 maxPercentVoltageDrop = entry.percentage_drop
@@ -119,8 +124,8 @@ Page {
                         pythonModel.powerFactor = value
                         pythonModel.calculateResistance(tableView.currentRow)
                     }
-                    ToolTip {
-                        text: "Power Factor"
+                    AToolTip {
+                        text: "Select row to change power Factor"
                     }
                 }
 
@@ -137,7 +142,7 @@ Page {
         id: table
         title: 'Table'
         height: 180
-        width: 915
+        width: 818
         anchors {
             left: settings.right
             top: parent.top
@@ -161,7 +166,7 @@ Page {
                     table.height = table.height + 51
                 }
 
-                ToolTip {
+                AToolTip {
                     text: "Add Row"
                 }
             }
@@ -176,24 +181,22 @@ Page {
                 }
                  Layout.fillWidth: true
 
-                 ToolTip {
+                 AToolTip {
                     text: "Remove Row"
                 }
             }
             Button {
                 text: qsTr("Clear Rows")
+                Layout.fillWidth: true
                 onClicked: {
                     rect.height = 85
                     table.height = 180
                     pythonModel.clearAllRows()
                     draggablePanel.barChart.barSeries.clear()
                     barChart.barSeries.clear()
-                    // pythonModel.load_csv_file("cable_data.csv")
-
                 }
-                Layout.fillWidth: true
-
-                ToolTip {
+                
+                AToolTip {
                     text: "Clear all rows"
                 }
             }
@@ -201,7 +204,8 @@ Page {
                 text: qsTr("Load CSV")
                 onClicked: fileDialog.open()
                 Layout.fillWidth: true
-                ToolTip {
+
+                AToolTip {
                     text: "Load csv"
                 }
             }
@@ -214,7 +218,7 @@ Page {
             width: parent.width
             height: 85
 
-            color: toolBar.toggle ? palette.base : palette.dark
+            color: toolBar.toggle ? Qt.darker(palette.base,2) : palette.dark
 
             HorizontalHeaderView {
                 id: horizontalHeader

@@ -98,7 +98,7 @@ ApplicationWindow {
         nameFilters: ["CSV Files (*.csv)"]
         onAccepted: {
             if (fileDialog.selectedFile) {
-                pythonModel.load_csv_file(fileDialog.selectedFile.toString().replace("file:///", ""))
+                pythonModel.load_csv_file(fileDialog.selectedFile.toString().replace("file://", ""))
             }
         }
     }

@@ -23,6 +23,8 @@
 </qresource>
 
 <qresource>
+    <file>icons/gallery/24x24/LightBar.svg</file>
+    <file>icons/gallery/24x24/DarkBar.svg</file>
     <file>icons/gallery/24x24/Calculator.svg</file>
     <file>icons/gallery/24x24/Close.svg</file>
     <file>icons/gallery/24x24/Dark.svg</file>
