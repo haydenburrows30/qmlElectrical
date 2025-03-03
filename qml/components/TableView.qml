@@ -70,7 +70,7 @@ TableView {
         DelegateChoice {
             roleValue: "number"
             delegate: Rectangle {
-                implicitWidth: 120
+                implicitWidth: 95
                 implicitHeight: 50
                 color: current ? palette.dark : palette.base
 
@@ -107,7 +107,7 @@ TableView {
         DelegateChoice {
             roleValue: "result"
             delegate: Rectangle {
-                implicitWidth: 120
+                implicitWidth: 95
                 implicitHeight: 50
                 color: TableView.view.model && parseFloat(TableView.view.model.data(TableView.view.index(row, 6))) > pythonModel.voltageDropThreshold ? "red" : palette.base
 
@@ -143,28 +143,28 @@ TableView {
             }
         }
 
-        DelegateChoice {
-            roleValue: "length"
-            delegate: TextField {
-                implicitWidth: 100
-                implicitHeight: 50
-                text: display
+        // DelegateChoice {
+        //     roleValue: "length"
+        //     delegate: TextField {
+        //         implicitWidth: 100
+        //         implicitHeight: 50
+        //         text: display
 
-                onTextChanged: {
-                    if (text !== display) {
-                        if (TableView.view.model) {
-                            TableView.view.model.setData(TableView.view.index(row, column), text)
-                            display = text
-                        }
-                    }
-                    pythonModel.calculateResistance(row)
-                }
+        //         onTextChanged: {
+        //             if (text !== display) {
+        //                 if (TableView.view.model) {
+        //                     TableView.view.model.setData(TableView.view.index(row, column), text)
+        //                     display = text
+        //                 }
+        //             }
+        //             pythonModel.calculateResistance(row)
+        //         }
 
-                TableView.onCommit: {
-                    display = text
-                    focus = false
-                }
-            }
-        }
+        //         TableView.onCommit: {
+        //             display = text
+        //             focus = false
+        //         }
+        //     }
+        // }
     }
 }

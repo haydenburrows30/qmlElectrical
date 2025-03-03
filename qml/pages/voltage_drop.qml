@@ -136,11 +136,12 @@ Page {
     GroupBox {
         id: table
         title: 'Table'
-        width: 960
         height: 180
+        width: 915
         anchors {
             left: settings.right
             top: parent.top
+            // right: parent.right
             leftMargin: 20
             topMargin: 10
         }
@@ -210,7 +211,7 @@ Page {
             id: rect
             anchors.top: buttons.bottom
             anchors.topMargin: 10
-            width: 930
+            width: parent.width
             height: 85
 
             color: toolBar.toggle ? palette.base : palette.dark

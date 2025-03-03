@@ -24,9 +24,7 @@ Page {
         width: 40
         height:40
         tooltip_text: "Info"
-        onClicked: {
-            power_image.show()
-        }
+        onClicked: power_image.visible ? power_image.close() : power_image.show()
     }
 
     ImageContainer {
@@ -134,9 +132,7 @@ Page {
             width: 40
             height:40
             tooltip_text: "Info"
-            onClicked: {
-                ccc_image.show()
-            }
+            onClicked: ccc_image.visible ? ccc_image.close() : ccc_image.show()
         }
 
     GroupBox {
@@ -250,9 +246,7 @@ Page {
         width: 40
         height:40
         tooltip_text: "Info"
-        onClicked: {
-            impedance_image.show()
-        }
+        onClicked: impedance_image.visible ? impedance_image.close() : impedance_image.show()
     }
 
     ImageContainer {

@@ -15,7 +15,7 @@ class PythonModel(QAbstractTableModel):
         self._data = [
             [1, "10", "0", "415", "5", "100", "", "", ""]
         ]
-        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)", "Action","Action2"]
+        self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "V Drop(%)", "Chart","Chart"]
         self.cable_data = CableData()
         self._voltageDropThreshold = 5.0
         self._powerFactor = 0.9

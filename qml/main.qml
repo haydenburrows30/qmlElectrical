@@ -20,8 +20,8 @@ import 'components'
 ApplicationWindow {
     id: window
    
-    minimumWidth: 1200
-    minimumHeight: 800
+    minimumWidth: 1280
+    minimumHeight: 860
     visible: true
 
     PythonModel {

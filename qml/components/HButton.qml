@@ -7,14 +7,24 @@ import QtQuick.Layouts
 Button {
     id: control
 
-    icon.name: icon_name
+    // icon.name: "Setting" //icon_name
 
-    property var icon_name : ""
+    text: ""
+
+    icon.width: 80
+    icon.height: 80
+
+    display: AbstractButton.TextUnderIcon
+
     property string tooltip_text: ""
 
     property color back : Qt.lighter(palette.accent,1.5)
     property color fore : Qt.lighter(palette.accent,1.5)
-    
+
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    Layout.alignment: Qt.AlignHCenter
+
     background: Rectangle {
         visible: !control.flat || control.down || control.checked || control.highlighted
         color: control.down ? control.Universal.baseMediumLowColor :
@@ -30,6 +40,4 @@ Button {
             border.color: control.Universal.baseMediumLowColor
         }
     }
-
-    // onClicked: {toolTip.hide()}
 }
