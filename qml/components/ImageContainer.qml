@@ -10,12 +10,16 @@ import QtCharts
 import QtQuick.Studio.DesignEffects
 
 
+
 Window {
+
+    property alias source : image.source
+
     width:image.width
     height: image.height
     Image {
         id: image
-        source: "../../media/ccc.png"
+        source: source
         
     }
 }

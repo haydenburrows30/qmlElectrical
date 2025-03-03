@@ -90,32 +90,32 @@ class ChargingCalc(QObject):
         return self._chargingCurrent
     
 class FaultCurrentCalculator(QObject):
-    faultCurrentCalculated = Signal(float)
+    impedanceCalculated = Signal(float)
 
     def __init__(self):
         super().__init__()
-        self._voltage = 0.0
+        self._resistance = 0.0
+        self._reactance = 0.0
         self._impedance = 0.0
-        self._faultCurrent = 0.0
 
     @Slot(float)
-    def setVoltage(self, voltage):
-        self._voltage = voltage
-        self.calculateFaultCurrent()
+    def setResistance(self, resistance):
+        self._resistance = resistance
+        self.calculateImpedance()
 
     @Slot(float)
-    def setImpedance(self, impedance):
-        self._impedance = impedance
-        self.calculateFaultCurrent()
+    def setReactance(self, reactance):
+        self._reactance = reactance
+        self.calculateImpedance()
 
-    def calculateFaultCurrent(self):
-        if self._voltage != 0 and self._impedance != 0:
-            self._faultCurrent = self._voltage / self._impedance
-            self.faultCurrentCalculated.emit(self._faultCurrent)
+    def calculateImpedance(self):
+        if self._resistance != 0 and self._reactance != 0:
+            self._impedance =  math.sqrt(math.pow(self._resistance,2) + math.pow(self._reactance,2))
+            self.impedanceCalculated.emit(self._impedance)
 
-    @Property(float, notify=faultCurrentCalculated)
-    def faultCurrent(self):
-        return self._faultCurrent
+    @Property(float, notify=impedanceCalculated)
+    def impedance(self):
+        return self._impedance
     
 class SineWaveModel(QObject):
     dataChanged = Signal()

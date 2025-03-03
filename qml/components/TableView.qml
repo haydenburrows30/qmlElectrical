@@ -28,13 +28,6 @@ TableView {
     columnSpacing: 1
     rowSpacing: 1
 
-    // onCurrentRowChanged: {
-    //     if (lineChart.count > tableView.currentRow && tableView.currentRow !== -1) {
-    //     lineChart.series(tableView.currentRow).color = "red"
-    //     // console.log (tableView.currentRow,lineChart.count)
-    //     }
-    // }
-
     delegate: DelegateChooser {
         role: "roleValue"
 
@@ -50,7 +43,6 @@ TableView {
                 background: Rectangle {
                     implicitWidth: 120
                     implicitHeight: 40
-                    // border.width: comboBox.visualFocus ? 2 : 1
                     color: palette.base
                     radius: 2
                 }
@@ -152,16 +144,6 @@ TableView {
         }
 
         DelegateChoice {
-            roleValue: "resistance"
-            delegate: TextField {
-                implicitWidth: 100
-                implicitHeight: 50
-                text: display
-                readOnly: true
-            }
-        }
-
-        DelegateChoice {
             roleValue: "length"
             delegate: TextField {
                 implicitWidth: 100
@@ -175,6 +157,7 @@ TableView {
                             display = text
                         }
                     }
+                    pythonModel.calculateResistance(row)
                 }
 
                 TableView.onCommit: {

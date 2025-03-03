@@ -13,7 +13,7 @@ class PythonModel(QAbstractTableModel):
     def __init__(self, csv_file="cable_data.csv"):
         super().__init__()
         self._data = [
-            [1, "10", "0", "415", "5", "100", "", "",""]
+            [1, "10", "0", "415", "5", "100", "", "", ""]
         ]
         self._headers = ["Cable Type", "Lots", "Current (A)", "Voltage (V)", "Power (kVA)", "Length (m)", "Voltage Drop(%)", "Action","Action2"]
         self.cable_data = CableData()
@@ -105,6 +105,7 @@ class PythonModel(QAbstractTableModel):
         self.beginResetModel()
         self._data.clear()
         self._data = [[1, "10", "0", "415", "5", "100", "", "", ""]]
+        
         self.endResetModel()
 
     @Slot(int)
@@ -191,5 +192,4 @@ class PythonModel(QAbstractTableModel):
 
     @Property("QVariantList")
     def chart_data_qml(self):
-        # print(self.chart_data)
         return self.chart_data

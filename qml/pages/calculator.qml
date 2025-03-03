@@ -14,8 +14,28 @@ import '../components'
 Page {
     id: home
 
+    CButton {
+        id: help_3
+        anchors.right: power_current.right
+        anchors.bottom: power_current.top
+        anchors.bottomMargin: - (help_3.height - 8)
+        icon.name: "Info"
+        z:5
+        width: 40
+        height:40
+        tooltip_text: "Info"
+        onClicked: {
+            power_image.show()
+        }
+    }
+
+    ImageContainer {
+        id: power_image
+        source: "../../media/powercalc.png"
+    }
+
     GroupBox {
-        id: settings
+        id: power_current
         title: 'Power -> Current'
         width: 270
         anchors.top: parent.top
@@ -100,21 +120,22 @@ Page {
     }
 
         ImageContainer {
-            id: container
+            id: ccc_image
+            source: "../../media/ccc.png"
         }
 
         CButton {
-            id: help
+            id: help_1
             anchors.right: charging_current.right
             anchors.bottom: charging_current.top
-            anchors.bottomMargin: - (help.height - 8)
+            anchors.bottomMargin: - (help_1.height - 8)
             icon.name: "Info"
             z:5
             width: 40
             height:40
             tooltip_text: "Info"
             onClicked: {
-                container.show()
+                ccc_image.show()
             }
         }
 
@@ -122,7 +143,7 @@ Page {
         id: charging_current
         title: 'Cable Charging Current'
         width: 270
-        anchors.top: settings.bottom
+        anchors.top: power_current.bottom
         anchors.left: parent.left
         anchors.topMargin: 10
         anchors.leftMargin: 10
@@ -219,9 +240,29 @@ Page {
         }
     }
 
+    CButton {
+        id: help_2
+        anchors.right: fault_current.right
+        anchors.bottom: fault_current.top
+        anchors.bottomMargin: - (help_2.height - 8)
+        icon.name: "Info"
+        z:5
+        width: 40
+        height:40
+        tooltip_text: "Info"
+        onClicked: {
+            impedance_image.show()
+        }
+    }
+
+    ImageContainer {
+        id: impedance_image
+        source: "../../media/Formel-Impedanz.gif"
+    }
+
     GroupBox {
         id: fault_current
-        title: 'Fault Current'
+        title: 'Impedance'
         width: 270
         anchors.top: charging_current.bottom
         anchors.left: parent.left
@@ -235,18 +276,35 @@ Page {
                 spacing: 10
 
                 Label {
-                    text: "Voltage:"
-                    Layout.preferredWidth: 80
+                    text: "Resistance(Ω):"
+                    Layout.preferredWidth: 100
                 }
 
                 TextField {
-                    id: faultVoltageInput
-                    placeholderText: "Enter Voltage"
+                    id: rInput
+                    placeholderText: "Enter Resistance"
                     onTextChanged: {
-                        faultCalc.setVoltage(parseFloat(text))
+                        faultCalc.setResistance(parseFloat(text))
                     }
-                    Layout.preferredWidth: 150
+                    Layout.preferredWidth: 130
                     Layout.alignment: Qt.AlignRight
+                }
+            }
+
+            RowLayout {
+                spacing: 10
+
+                Label {
+                    text: "Reactance (Ω):"
+                    Layout.preferredWidth: 100
+                }
+
+                TextField {
+                    id: reactanceInput
+                    Layout.preferredWidth: 130
+                    Layout.alignment: Qt.AlignRight
+                    placeholderText: "Enter Reactance"
+                    onTextChanged: faultCalc.setReactance(parseFloat(text))
                 }
             }
 
@@ -255,30 +313,13 @@ Page {
 
                 Label {
                     text: "Impedance (Ω):"
-                    Layout.preferredWidth: 80
-                }
-
-                TextField {
-                    id: impedanceInput
-                    Layout.preferredWidth: 150
-                    Layout.alignment: Qt.AlignRight
-                    placeholderText: "Enter Impedance"
-                    onTextChanged: faultCalc.setImpedance(parseFloat(text))
-                }
-            }
-
-            RowLayout {
-                spacing: 10
-
-                Label {
-                    text: "Fault Current:"
-                    Layout.preferredWidth: 80
+                    Layout.preferredWidth: 100
                 }
 
                 Text {
-                    id: faultCurrentOutput
-                    text: faultCalc.faultCurrent.toFixed(2) + "A"
-                    Layout.preferredWidth: 150
+                    id: impedanceOutput
+                    text: faultCalc.impedance.toFixed(2) + "A"
+                    Layout.preferredWidth: 130
                     Layout.alignment: Qt.AlignRight
                 }
             }

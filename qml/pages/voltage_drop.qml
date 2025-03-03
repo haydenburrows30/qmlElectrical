@@ -13,45 +13,6 @@ import '../components'
     
 Page {
     id: voltage_drop
-//Popup Window
-    DialogOnTop {
-        id: chart
-        visible:false
-    }
-
-    // function updateChart() {
-
-    //     // see if the object is empty
-    //     if (Object.values(tableView.rowsadded).includes(tableView.rowvalue)) {
-    //         console.log("clear rows to show new graph")
-    //         }
-    //     else {
-    //         let maxPercentVoltageDrop = 0
-    //         //create series with rowvalue as the name
-
-    //         let series = lineChart.createSeries(ChartView.SeriesTypeScatter,tableView.rowvalue,lineChart.axisx,lineChart.axisy)
-
-    //         for (let i = 0; i < pythonModel.chart_data_qml.length; i++) {
-    //             let entry = pythonModel.chart_data_qml[i]
-
-    //             lineChart.series(Object.keys(tableView.rowsadded).length).append(i, [entry.percentage_drop])
-
-    //             if (entry.percentage_drop > maxPercentVoltageDrop) {
-    //                 maxPercentVoltageDrop = entry.percentage_drop
-    //             }
-    //         }
-    //         series.style = Qt.NoPen
-    //         series.width = 5
-    //         series.selectedColor = "red"
-
-    //         let noseries = lineChart.count
-    //         // create an object with linechart_series:row_number
-    //         tableView.rowsadded[noseries] = tableView.rowvalue
-
-    //         lineChart.axisy.max = maxPercentVoltageDrop * 1.4  // Add 20% buffer for visibility
-    //         lineChart.axisy.min = 0
-    //     }
-    // }
 
     function updateBarChartPopUp() {
         
@@ -111,7 +72,6 @@ Page {
 //Popup Menu
     BarChartPopUp {
         id: draggablePanel
-        
     }
 //Settings
     GroupBox {
@@ -209,7 +169,6 @@ Page {
                 onClicked: {
                     if (pythonModel.rowCount() > 1 && tableView.currentRow > 0) {
                         pythonModel.removeRows(tableView.currentRow)
-                        // lineChart.removeSeries(lineChart.series(tableView.currentRow +1));
                         rect.height = rect.height - 51
                         table.height = table.height - 51
                     }
@@ -226,10 +185,10 @@ Page {
                     rect.height = 85
                     table.height = 180
                     pythonModel.clearAllRows()
-                    // lineChart.removeAllSeries()
                     draggablePanel.barChart.barSeries.clear()
                     barChart.barSeries.clear()
-                    tableView.rowsadded = []
+                    // pythonModel.load_csv_file("cable_data.csv")
+
                 }
                 Layout.fillWidth: true
 
@@ -302,15 +261,8 @@ Page {
             }
         }
     }
-//LineChart/BarChart
-    // LineChart {
-    //     id: lineChart
-    //     anchors.top: table.bottom
-    //     anchors.bottom: parent.bottom
-    //     anchors.left: settings.right
-    //     width: table.width
-    //     currentrow: tableView.currentRow
-    // }
+
+//BarChart
     BarChart {
         id: barChart
         anchors.top: table.bottom
