@@ -117,6 +117,12 @@ Drawer {
                     tooltip: "Wave"
                     icon: "Wave"
                 }
+                ListElement {
+                    title: "Phasor"
+                    source: "../pages/phasor.qml"
+                    tooltip: "Wave"
+                    icon: "Wave"
+                }
             }
 
             footer:
