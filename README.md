@@ -15,8 +15,8 @@ Icons used in the program: https://www.figma.com/community/file/9442287509038538
 
 # Installation
 
-'''
+```
 pip install -r requirements.txt
 
 pip install git+https://github.com/engineerjoe440/ElectricPy.git
-'''
+```
