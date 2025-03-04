@@ -12,8 +12,9 @@ import Calculator 1.0
 import Charging 1.0
 import Fault 1.0
 import Sine 1.0
-
-// import "../scripts/MaterialDesignRegular.js" as MD
+import RFreq 1.0
+import ConvCalc 1.0
+import RLC 1.0
 
 import 'components'
 
@@ -44,10 +45,17 @@ ApplicationWindow {
         id: threePhaseSineModel
     }
 
-    // FontLoader {
-    //     id: iconFont
-    //     source: "../fonts/MaterialIcons-Regular.ttf"
-    // }
+    ResonantFreq {
+        id: resonantFreq
+    }
+
+    ConversionCalc {
+        id: conversionCalc
+    }
+
+    SeriesRLCChart {
+        id: seriesRLCChart
+    }
 
     ToolBar{
         id: toolBar
