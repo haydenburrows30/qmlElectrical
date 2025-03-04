@@ -15,6 +15,7 @@ import Sine 1.0
 import RFreq 1.0
 import ConvCalc 1.0
 import RLC 1.0
+import PPlot 1.0
 
 import 'components'
 
@@ -55,6 +56,10 @@ ApplicationWindow {
 
     SeriesRLCChart {
         id: seriesRLCChart
+    }
+
+    PhasorPlot {
+        id: phasorPlot
     }
 
     ToolBar{

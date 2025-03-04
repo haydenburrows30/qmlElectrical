@@ -1,13 +1,26 @@
-from PySide6.QtCore import Slot, Signal, Property, QObject
+# Force matplotlib to use Qt backend
+import matplotlib
+matplotlib.use('Qt5Agg')
 
+from PySide6.QtCore import Slot, Signal, Property, QObject
 from PySide6.QtCore import *
 from PySide6.QtCharts import *
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QApplication
+from PySide6.QtQuick import QQuickPaintedItem
+from PySide6.QtGui import QPainter, QPen, QColor
+from PySide6.QtCore import Qt
+
+# Matplotlib imports after backend selection
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 import numpy as np
 import math
 import electricpy as ep
 from electricpy import conversions
 from electricpy.visu import SeriesRLC
+from electricpy.visu import phasorplot
 
 class ResonantFreq(QObject):
     '''
@@ -261,3 +274,82 @@ class SeriesRLCChart(QObject):
     @Property(float, notify=resonantFreqChanged)
     def resonantFreq(self):
         return self._resonant_freq
+
+class PhasorPlot(QQuickPaintedItem):
+    magnitudeChanged = Signal()
+    angleChanged = Signal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._magnitude = 1.0
+        self._angle = 0.0
+        # Enable antialiasing
+        self.setAntialiasing(True)
+
+    def paint(self, painter: QPainter):
+        # Clear background
+        painter.fillRect(self.boundingRect(), QColor('white'))
+        
+        # Calculate center point (origin of the phasor)
+        center_x = self.width() / 2
+        center_y = self.height() / 2
+        
+        # Calculate scale (use 80% of the smallest dimension)
+        scale = min(self.width(), self.height()) * 0.4
+        
+        # Calculate end point of phasor
+        angle_rad = np.deg2rad(self._angle)
+        end_x = center_x + scale * self._magnitude * np.cos(angle_rad)
+        end_y = center_y - scale * self._magnitude * np.sin(angle_rad)
+        
+        # Draw reference circle
+        painter.setPen(QPen(QColor('lightgray'), 1))
+        painter.drawEllipse(center_x - scale, center_y - scale, scale * 2, scale * 2)
+        
+        # Draw axes
+        painter.setPen(QPen(QColor('gray'), 1))
+        painter.drawLine(center_x - scale, center_y, center_x + scale, center_y)  # X-axis
+        painter.drawLine(center_x, center_y - scale, center_x, center_y + scale)  # Y-axis
+        
+        # Draw phasor
+        painter.setPen(QPen(QColor('red'), 2))
+        painter.drawLine(center_x, center_y, end_x, end_y)
+        
+        # Draw end point
+        painter.setPen(QPen(QColor('red'), 4))
+        painter.drawPoint(end_x, end_y)
+        
+        # Draw magnitude and angle text
+        painter.setPen(QPen(QColor('black'), 1))
+        painter.drawText(10, 20, f"Magnitude: {self._magnitude:.2f}")
+        painter.drawText(10, 40, f"Angle: {self._angle:.1f}°")
+
+    @Property(float, notify=magnitudeChanged)
+    def magnitude(self):
+        return self._magnitude
+
+    @magnitude.setter
+    def magnitude(self, value):
+        if self._magnitude != value:
+            self._magnitude = value
+            self.magnitudeChanged.emit()
+            self.update()
+
+    @Property(float, notify=angleChanged)
+    def angle(self):
+        return self._angle
+
+    @angle.setter
+    def angle(self, value):
+        if self._angle != value:
+            self._angle = value
+            self.angleChanged.emit()
+            self.update()
+
+    @Slot(float)
+    def setMagnitude(self, magnitude):
+        self.magnitude = magnitude
+
+    @Slot(float)
+    def setAngle(self, angle):
+        self.angle = angle

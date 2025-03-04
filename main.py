@@ -9,7 +9,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from models.PythonModel import PythonModel
 from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc
 from models.ThreePhase import ThreePhaseSineWaveModel
-from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart
+from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
@@ -34,6 +34,7 @@ if __name__ == "__main__":
     resonant_freq = ResonantFreq()
     conversion_calc = ConversionCalculator()
     series_LC_chart = SeriesRLCChart()
+    phasorPlotter = PhasorPlot()
     
     qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
     qmlRegisterType(ChargingCalc, "Charging", 1, 0, "ChargingCalc")
@@ -42,11 +43,11 @@ if __name__ == "__main__":
     qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")
     qmlRegisterType(ResonantFreq, "RFreq", 1, 0, "ResonantFreq")
     qmlRegisterType(ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc") 
-    qmlRegisterType(SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart") 
+    qmlRegisterType(SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart")
+    qmlRegisterType(PhasorPlot, "PPlot", 1, 0, "PhasorPlot") 
 
     engine.load(os.path.join(CURRENT_DIR, "qml", "main.qml"))
     if not engine.rootObjects():
         sys.exit(-1)
     sys.exit(app.exec())
-    
-    
+
