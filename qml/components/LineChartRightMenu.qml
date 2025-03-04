@@ -9,26 +9,9 @@ import QtCharts
 
 import QtQuick.Studio.DesignEffects
 
-Rectangle {
+Menu {
     id: myWindow
-    x: Math.round((window.width - width) / 2)
-    y: Math.round(window.height / 6)
-    width: 200
-    height: 200
-    z: 99
-    visible: false
-
-    CButton {
-        id: close
-        icon_name: "Close"
-        tooltip_text: "Close"
-        anchors.top: parent.top
-        anchors.right: parent.right
-
-        onClicked: { 
-            myWindow.visible = false
-        }
-    }
+    width: 100
 
     GridLayout {
         anchors.centerIn: parent
@@ -80,11 +63,6 @@ Rectangle {
                 text: "Show/hide C chart line"
             }
         }
-    }
-
-    DragHandler {
-        id: handler
-        onActiveChanged: if (active) myWindow.startSystemMove()
     }
 
     Rectangle {

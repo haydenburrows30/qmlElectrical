@@ -37,15 +37,8 @@ TableView {
                 id: comboBox
                 implicitWidth: 100
                 implicitHeight: 50
-                // flat: true
-                model: pythonModel ? pythonModel.cable_types : []
 
-                // background: Rectangle {
-                //     implicitWidth: 120
-                //     implicitHeight: 40
-                //     color: palette.base
-                //     radius: 2
-                // }
+                model: pythonModel ? pythonModel.cable_types : []
 
                 currentIndex: {
                     var modelData = TableView.view.model ? TableView.view.model.data(TableView.view.index(row, column)).toString() : ""

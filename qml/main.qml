@@ -13,7 +13,7 @@ import Charging 1.0
 import Fault 1.0
 import Sine 1.0
 
-import "../scripts/MaterialDesignRegular.js" as MD
+// import "../scripts/MaterialDesignRegular.js" as MD
 
 import 'components'
 
@@ -23,26 +23,6 @@ ApplicationWindow {
     minimumWidth: 1280
     minimumHeight: 860
     visible: true
-
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: {
-            if (mouse.button === Qt.RightButton)
-                contextMenu.popup()
-        }
-        onPressAndHold: {
-            if (mouse.source === Qt.MouseEventNotSynthesized)
-                contextMenu.popup()
-        }
-
-        Menu {
-            id: contextMenu
-            MenuItem { text: "Cut" }
-            MenuItem { text: "Copy" }
-            MenuItem { text: "Paste" }
-        }
-    }
 
     PythonModel {
         id: pythonModel
@@ -64,10 +44,10 @@ ApplicationWindow {
         id: threePhaseSineModel
     }
 
-    FontLoader {
-        id: iconFont
-        source: "../fonts/MaterialIcons-Regular.ttf"
-    }
+    // FontLoader {
+    //     id: iconFont
+    //     source: "../fonts/MaterialIcons-Regular.ttf"
+    // }
 
     ToolBar{
         id: toolBar

@@ -9,7 +9,7 @@ import Qt.labs.animation
 import '../components'
 
 //|21/function|71/function|75/PopUp|
-//|80/Chart|255/Phasor|266/Settings|544Values|
+//|80/Chart|255/Phasor|266/Settings|544/Values|
 //|610/End|
 
 Page {
@@ -72,9 +72,9 @@ Page {
         phasorDiagram.phaseAngles = [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
     }
 
-//Popup graph settings
-    BarChartPopUp {
-        id: graphPanel
+//PopUp
+    LineChartRightMenu{
+        id: lineChartRightMenu
     }
 
 //chart
@@ -131,6 +131,16 @@ Page {
             anchors.rightMargin: 10
             color: "blue"
             visible: false
+        }
+
+            
+        Label {
+            id: currentxyposition
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 50
+            anchors.bottomMargin: 50
+
         }
 
         ToolTip {
@@ -198,11 +208,8 @@ Page {
                     id_tooltip.delay = 500
                     id_tooltip.timeout = 10000
                     id_tooltip.visible = true
-                    graphPanel.visible = false
                 } else if (mouse.button == Qt.RightButton) {
-                    graphPanel.x = point.x
-                    graphPanel.y = point.y
-                    graphPanel.visible = true                          
+                    lineChartRightMenu.popup()
                 }
             }
 
@@ -248,6 +255,11 @@ Page {
             onExited: {
                 linemarkery.visible = false
                 linemarkerx.visible = false
+                currentxyposition.visible = false
+            }
+
+            onEntered: {
+                currentxyposition.visible = true
             }
         }
     }
@@ -599,11 +611,6 @@ Page {
 
             Label {
                 text: threePhaseSineModel.rmsCA.toFixed(0)
-            }
-
-            Label {
-                id: currentxyposition
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
             }
         }
     }
