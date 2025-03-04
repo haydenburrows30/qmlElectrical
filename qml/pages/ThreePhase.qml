@@ -8,6 +8,10 @@ import Qt.labs.animation
 
 import '../components'
 
+//|21/function|71/function|75/PopUp|
+//|80/Chart|255/Phasor|266/Settings|544Values|
+//|610/End|
+
 Page {
     id: phasePage
     property bool showRMSA: false
@@ -62,6 +66,7 @@ Page {
             rmsTextC.visible = false
         }
     }
+
 //update phasor
     function updatePhasorDiagram() {
         phasorDiagram.phaseAngles = [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
@@ -248,7 +253,6 @@ Page {
     }
 
 //Phasor diagram
-
     PhasorDiagram {
         id: phasorDiagram
         width: 300
@@ -260,7 +264,6 @@ Page {
     }
 
 //Settings
-
     GroupBox {
         id: settings
         title: 'Settings'
@@ -537,8 +540,8 @@ Page {
             Label { text: "°" }
         }
     }
-//Values
 
+//Values
     GroupBox {
         id: value_all
         title: 'Values'

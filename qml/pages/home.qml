@@ -6,6 +6,9 @@ import QtQuick.Layouts
 
 import '../components'
 
+//|15/GridLayout{21/Button|44/Button|45/Button|56/Button}
+//|67/End|
+
 Page {
     id: home
 

@@ -10,6 +10,10 @@ import QtCharts
 import QtQuick.Studio.DesignEffects
 
 import '../components'
+
+//|21/function|51/function|82/Dialog|
+//|86/Settings|145/Table|275/Chart|
+//|283/End|
     
 Page {
     id: voltage_drop
@@ -78,6 +82,7 @@ Page {
     DialogOnTop {
         id: draggablePanel
     }
+
 //Settings
     GroupBox {
         id: settings

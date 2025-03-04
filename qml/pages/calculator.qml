@@ -11,9 +11,16 @@ import QtQuick.Studio.DesignEffects
 
 import '../components'
 
+
+//|22/Button|36/Image|41/Content|
+//|127/Button|140/Image|145/Content|
+//|247/Button|260/Image|265/Content|
+//|331/End|
+
 Page {
     id: home
 
+// Power->current info
     CButton {
         id: help_3
         anchors.right: power_current.right
@@ -117,23 +124,24 @@ Page {
         }
     }
 
-        ImageContainer {
-            id: ccc_image
-            source: "../../media/ccc.png"
-        }
+// Charging current info
+    CButton {
+        id: help_1
+        anchors.right: charging_current.right
+        anchors.bottom: charging_current.top
+        anchors.bottomMargin: - (help_1.height - 8)
+        icon.name: "Info"
+        z:5
+        width: 40
+        height:40
+        tooltip_text: "Info"
+        onClicked: ccc_image.visible ? ccc_image.close() : ccc_image.show()
+    }
 
-        CButton {
-            id: help_1
-            anchors.right: charging_current.right
-            anchors.bottom: charging_current.top
-            anchors.bottomMargin: - (help_1.height - 8)
-            icon.name: "Info"
-            z:5
-            width: 40
-            height:40
-            tooltip_text: "Info"
-            onClicked: ccc_image.visible ? ccc_image.close() : ccc_image.show()
-        }
+    ImageContainer {
+        id: ccc_image
+        source: "../../media/ccc.png"
+    }
 
     GroupBox {
         id: charging_current
@@ -236,6 +244,7 @@ Page {
         }
     }
 
+// Impedance info
     CButton {
         id: help_2
         anchors.right: fault_current.right
