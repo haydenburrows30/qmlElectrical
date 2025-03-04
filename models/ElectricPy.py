@@ -1,19 +1,9 @@
-# Force matplotlib to use Qt backend
-import matplotlib
-matplotlib.use('Qt5Agg')
-
 from PySide6.QtCore import Slot, Signal, Property, QObject
 from PySide6.QtCore import *
 from PySide6.QtCharts import *
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QApplication
 from PySide6.QtQuick import QQuickPaintedItem
 from PySide6.QtGui import QPainter, QPen, QColor
 from PySide6.QtCore import Qt
-
-# Matplotlib imports after backend selection
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 
 import numpy as np
 import math
@@ -147,7 +137,7 @@ class SeriesRLCChart(QObject):
         self._capacitance = capacitance
         self.generateChartData()
 
-    @Slot(float, float)  # Change to accept two float values
+    @Slot(float, float)
     def setFrequencyRange(self, start, end):
         """Set frequency range with separate start and end values"""
         if start >= 0 and end > start:
@@ -174,7 +164,7 @@ class SeriesRLCChart(QObject):
         """Update axis ranges based on data and resonant frequency"""
         if self._chart_data:
             max_y = max(point[1] for point in self._chart_data)
-            self._axis_y_max = max_y * 1.1  # Add 10% margin
+            self._axis_y_max = max_y * 1.1
             self._axis_y_min = 0
             
             # Center around resonant frequency

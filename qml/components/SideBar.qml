@@ -114,13 +114,13 @@ Drawer {
                 ListElement {
                     title: "Three Phase"
                     source: "../pages/ThreePhase.qml"
-                    tooltip: "Wave"
+                    tooltip: "Three Phase"
                     icon: "Wave"
                 }
                 ListElement {
                     title: "Phasor"
                     source: "../pages/phasor.qml"
-                    tooltip: "Wave"
+                    tooltip: "RLC"
                     icon: "Wave"
                 }
             }

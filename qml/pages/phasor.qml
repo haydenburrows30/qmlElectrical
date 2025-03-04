@@ -11,7 +11,6 @@ import QtQuick.Studio.DesignEffects
 
 import '../components'
 
-
 //|22/Button|36/Image|41/Content|
 //|127/Button|140/Image|145/Content|
 //|247/Button|260/Image|265/Content|
@@ -198,7 +197,9 @@ Page {
                 Component.onCompleted: {
                     // Create series programmatically
                     var gainSeries = createSeries(ChartView.SeriesTypeLine, "Gain", axisX, axisY)
-                    gainSeries.useOpenGL = true
+                    // gainSeries.useOpenGL = true
+                    gainSeries.color = "blue"
+                    gainSeries.width = 2
                     
                     var resonantSeries = createSeries(ChartView.SeriesTypeLine, "Resonant Frequency", axisX, axisY)
                     resonantSeries.color = "red"

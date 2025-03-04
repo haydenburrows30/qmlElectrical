@@ -63,5 +63,16 @@ Page {
 				sideBar.change(3)
 			}
 		}
+
+		HButton {
+			icon.name: "Wave"
+			text: "RLC"
+			back: Qt.lighter(palette.accent,1.5)
+			fore: Qt.lighter(palette.accent,1.0)
+			onClicked: {
+				stackView.push("../pages/phasor.qml")
+				sideBar.change(4)
+			}
+		}
 	}
 }
