@@ -11,18 +11,27 @@ import QtQuick.Studio.DesignEffects
 
 Menu {
     id: myWindow
-    width: 100
+    width: 120
 
     GridLayout {
-        anchors.centerIn: parent
+        // anchors.centerIn: parent
+        
         columns: 2
         Label { 
             text: "RMSA: "
+            Layout.leftMargin: 10
+            Layout.topMargin: 10
+            Layout.preferredWidth: 30
+            Layout.alignment: Qt.AlignLeft
             }
 
         CheckBox {
             id: checkbox_a
             checked: false
+            Layout.topMargin: 10
+            Layout.preferredWidth: 10
+            Layout.alignment: Qt.AlignLeft
+
             onCheckedChanged: {
                 showRMSA = checked
                 updateSeries()
@@ -35,10 +44,16 @@ Menu {
 
         Label { 
             text: "RMSB: "
+            Layout.leftMargin: 10
+            Layout.preferredWidth: 30
+            Layout.alignment: Qt.AlignLeft
             }
             
         CheckBox {
             checked: false
+            Layout.preferredWidth: 10
+            Layout.alignment: Qt.AlignLeft
+
             onCheckedChanged: {
                 showRMSB = checked
                 updateSeries()
@@ -51,10 +66,18 @@ Menu {
 
         Label { 
             text: "RMSC: "
+            Layout.leftMargin: 10
+            Layout.bottomMargin: 10
+            Layout.preferredWidth: 30
+            Layout.alignment: Qt.AlignLeft
             }
             
         CheckBox {
             checked: false
+            Layout.bottomMargin: 10
+            Layout.preferredWidth: 10
+            Layout.alignment: Qt.AlignLeft
+
             onCheckedChanged: {
                 showRMSC = checked
                 updateSeries()
@@ -65,11 +88,11 @@ Menu {
         }
     }
 
-    Rectangle {
-        id: background
-        color: "#45d9d9d9"
-        border.color: "#ededed"
-        border.width: 1
-        anchors.fill: parent
-    }
+    // Rectangle {
+    //     id: background
+    //     color: "#45d9d9d9"
+    //     border.color: "#ededed"
+    //     border.width: 1
+    //     anchors.fill: parent
+    // }
 }

@@ -278,6 +278,7 @@ Page {
         anchors.top: table.bottom
         anchors.bottom: parent.bottom
         anchors.left: settings.right
+        anchors.leftMargin: 20
         width: table.width
     }
 }
