@@ -75,7 +75,7 @@ Page {
     }
 
 //Popup Menu
-    BarChartPopUp {
+    DialogOnTop {
         id: draggablePanel
     }
 //Settings

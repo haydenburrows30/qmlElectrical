@@ -11,25 +11,23 @@ import QtQuick.Studio.DesignEffects
 
 import '../components'
 
-import Python 1.0
-
 Window {
     id: myWindow
 
     property var barChart: barChart
+    visible: false
 
     width: 300
     height: 300
 
-    flags:  Qt.Window | Qt.WindowSystemMenuHint
-            | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint
-            | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint
+    flags:  Qt.Window //| Qt.WindowSystemMenuHint
+            //| Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint
+            //| Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint
 
-
-    visible: true
     modality: Qt.NonModal // no need for this as it is the default value
 
     BarChart {
+        anchors.fill: parent
         id: barChart
     }
 
