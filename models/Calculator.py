@@ -1,4 +1,5 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject
+from models.calculators.BaseCalculator import BaseCalculator
 
 from PySide6.QtCore import *
 from PySide6.QtCharts import *
@@ -6,7 +7,7 @@ from PySide6.QtCharts import *
 import numpy as np
 import math
 
-class PowerCalculator(QObject):
+class PowerCalculator(BaseCalculator):
     currentCalculated = Signal(float)
     series_appended = Signal()
 
@@ -49,7 +50,16 @@ class PowerCalculator(QObject):
         self.series_name = series_name
         self.series_appended.emit()
 
-class ChargingCalc(QObject):
+    def reset(self):
+        self._voltage = 0.0
+        self._current = 0.0
+        self._power_factor = 1.0
+        self.dataChanged.emit()
+        
+    def calculate(self):
+        self.calculatePower()
+
+class ChargingCalc(BaseCalculator):
     chargingCurrentCalculated = Signal(float)
 
     def __init__(self):
@@ -88,8 +98,17 @@ class ChargingCalc(QObject):
     @Property(float, notify=chargingCurrentCalculated)
     def chargingCurrent(self):
         return self._chargingCurrent
+
+    def reset(self):
+        self._voltage = 0.0
+        self._capacitance = 0.0
+        self._frequency = 50.0
+        self.dataChanged.emit()
+        
+    def calculate(self):
+        self.calculateChargingCurrent()
     
-class FaultCurrentCalculator(QObject):
+class FaultCurrentCalculator(BaseCalculator):
     impedanceCalculated = Signal(float)
 
     def __init__(self):
@@ -116,6 +135,14 @@ class FaultCurrentCalculator(QObject):
     @Property(float, notify=impedanceCalculated)
     def impedance(self):
         return self._impedance
+
+    def reset(self):
+        self._voltage = 0.0
+        self._impedance = 0.0
+        self.dataChanged.emit()
+        
+    def calculate(self):
+        self.calculateFault()
     
 class SineWaveModel(QObject):
     dataChanged = Signal()

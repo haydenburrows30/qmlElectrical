@@ -26,6 +26,9 @@ class ThreePhaseSineWaveModel(QObject):
         self._phase_angle_a = 0.0
         self._phase_angle_b = 120.0
         self._phase_angle_c = 240.0
+        self._cache = {}
+        self._cache_key = None
+        self._time_period = 1.0  # 1 second to show 50 cycles of 50Hz
         self.update_wave()
         
     @Slot(QXYSeries,QXYSeries,QXYSeries)
@@ -33,46 +36,96 @@ class ThreePhaseSineWaveModel(QObject):
         seriesA.clear();seriesB.clear();seriesC.clear()
 
         pointsA,pointsB,pointsC = [],[],[]
-
-        for i in range(0,len(self._y_values_a)):
+        
+        # Scale x-axis to milliseconds
+        time_points = np.linspace(0, 1000, len(self._y_values_a))  # 0 to 1000ms
+        
+        for i in range(len(self._y_values_a)):
             yA,yB,yC = self._y_values_a[i],self._y_values_b[i],self._y_values_c[i]
+            x = time_points[i]  # Use time in milliseconds for x-axis
 
-            pointsA.append(QPointF(i, yA))
-            pointsB.append(QPointF(i, yB))
-            pointsC.append(QPointF(i, yC))
+            pointsA.append(QPointF(x, yA))
+            pointsB.append(QPointF(x, yB))
+            pointsC.append(QPointF(x, yC))
 
         seriesA.replace(pointsA)
         seriesB.replace(pointsB)
         seriesC.replace(pointsC)
     
-    def update_wave(self):
-        t = np.linspace(0, 2 * np.pi * self._x_scale, self._sample_rate)
-        y_a = self._y_scale * self._amplitudeA * np.sin(self._frequency * t + np.radians(self._phase_angle_a))
-        y_b = self._y_scale * self._amplitudeB * np.sin(self._frequency * t + np.radians(self._phase_angle_b))
-        y_c = self._y_scale * self._amplitudeC * np.sin(self._frequency * t + np.radians(self._phase_angle_c))
+    def _get_cache_key(self):
+        """Generate a cache key based on current parameters"""
+        return (
+            self._frequency,
+            self._amplitudeA,
+            self._amplitudeB,
+            self._amplitudeC,
+            self._phase_angle_a,
+            self._phase_angle_b,
+            self._phase_angle_c,
+            self._x_scale,
+            self._y_scale,
+            self._sample_rate
+        )
 
-        # Apply downsampling dynamically if the sample rate is too high
-        max_points = 10000  # Limit the number of points plotted
+    def _calculate_waves_vectorized(self, t):
+        """Vectorized calculation of all three phases at once"""
+        angles = np.array([self._phase_angle_a, self._phase_angle_b, self._phase_angle_c])
+        amplitudes = np.array([self._amplitudeA, self._amplitudeB, self._amplitudeC])
+        
+        # Calculate angular frequency (ω = 2πf)
+        omega = 2 * np.pi * self._frequency
+        
+        # Broadcasting to calculate all phases at once
+        # Use time-based calculation instead of direct phase
+        phase_terms = omega * t[:, np.newaxis] + np.radians(angles)
+        waves = self._y_scale * (amplitudes * np.sin(phase_terms))
+        
+        return waves[:, 0], waves[:, 1], waves[:, 2]
+
+    def update_wave(self):
+        cache_key = self._get_cache_key()
+        
+        # Return cached values if parameters haven't changed
+        if cache_key == self._cache_key and self._cache:
+            return
+            
+        # Create time array based on actual time period
+        t = np.linspace(0, self._time_period, self._sample_rate)
+        y_a, y_b, y_c = self._calculate_waves_vectorized(t)
+        
+        # Apply downsampling if needed
+        max_points = 10000
         if len(y_a) > max_points:
             indices = np.linspace(0, len(y_a) - 1, max_points, dtype=int)
-            self._y_values_a = y_a[indices].tolist()
-            self._y_values_b = y_b[indices].tolist()
-            self._y_values_c = y_c[indices].tolist()
-        else:
-            self._y_values_a = y_a.tolist()
-            self._y_values_b = y_b.tolist()
-            self._y_values_c = y_c.tolist()
-
-        self._rms_a = np.sqrt(np.mean(np.square(self._y_values_a)))
-        self._rms_b = np.sqrt(np.mean(np.square(self._y_values_b)))
-        self._rms_c = np.sqrt(np.mean(np.square(self._y_values_c)))
-        self._peak_a = abs(min(self._y_values_a)) + max(self._y_values_a)
-        self._peak_b = abs(min(self._y_values_b)) + max(self._y_values_b)
-        self._peak_c = abs(min(self._y_values_c)) + max(self._y_values_c)
-        self._rms_ab = np.sqrt(np.mean(np.square(np.array(self._y_values_a) - np.array(self._y_values_b))))
-        self._rms_bc = np.sqrt(np.mean(np.square(np.array(self._y_values_b) - np.array(self._y_values_c))))
-        self._rms_ca = np.sqrt(np.mean(np.square(np.array(self._y_values_c) - np.array(self._y_values_a))))
-       
+            y_a = y_a[indices]
+            y_b = y_b[indices]
+            y_c = y_c[indices]
+        
+        # Calculate RMS and peak values using vectorized operations
+        y_values = np.vstack((y_a, y_b, y_c))
+        rms_values = np.sqrt(np.mean(np.square(y_values), axis=1))
+        peak_values = np.max(np.abs(y_values), axis=1)
+        
+        # Calculate line-to-line RMS values
+        rms_ab = np.sqrt(np.mean(np.square(y_a - y_b)))
+        rms_bc = np.sqrt(np.mean(np.square(y_b - y_c)))
+        rms_ca = np.sqrt(np.mean(np.square(y_c - y_a)))
+        
+        # Update cache
+        self._cache = {
+            'y_values': (y_a.tolist(), y_b.tolist(), y_c.tolist()),
+            'rms_values': rms_values,
+            'peak_values': peak_values,
+            'line_rms': (rms_ab, rms_bc, rms_ca)
+        }
+        self._cache_key = cache_key
+        
+        # Update instance variables
+        self._y_values_a, self._y_values_b, self._y_values_c = self._cache['y_values']
+        self._rms_a, self._rms_b, self._rms_c = self._cache['rms_values']
+        self._peak_a, self._peak_b, self._peak_c = self._cache['peak_values']
+        self._rms_ab, self._rms_bc, self._rms_ca = self._cache['line_rms']
+        
         self.dataChanged.emit()
     
     @Property(list, notify=dataChanged)
@@ -139,28 +192,33 @@ class ThreePhaseSineWaveModel(QObject):
     def setFrequency(self, freq):
         if abs(self._frequency - freq) > 1:  # Ignore tiny changes
             self._frequency = freq
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
     
     @Slot(float)
     def setAmplitudeA(self, amp):
         if abs(self._amplitudeA - amp) > 1:  # Ignore tiny changes
             self._amplitudeA = amp
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
     @Slot(float)
     def setAmplitudeB(self, amp):
         if abs(self._amplitudeB - amp) > 1:  # Ignore tiny changes
             self._amplitudeB = amp
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
     @Slot(float)
     def setAmplitudeC(self, amp):
         if abs(self._amplitudeC - amp) > 1:  # Ignore tiny changes
             self._amplitudeC = amp
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
 
     @Slot(float)
     def setPhaseAngleA(self, angle):
         if abs(self._phase_angle_a - angle) > 1:  # Ignore tiny changes
             self._phase_angle_a = angle
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
             self.dataChanged.emit()
 
@@ -168,6 +226,7 @@ class ThreePhaseSineWaveModel(QObject):
     def setPhaseAngleB(self, angle):
         if abs(self._phase_angle_b - angle) > 1:  # Ignore tiny changes
             self._phase_angle_b = angle
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
             self.dataChanged.emit()
 
@@ -175,6 +234,7 @@ class ThreePhaseSineWaveModel(QObject):
     def setPhaseAngleC(self, angle):
         if abs(self._phase_angle_c - angle) > 1:  # Ignore tiny changes
             self._phase_angle_c = angle
+            self._cache_key = None  # Invalidate cache
             self.update_wave()
             self.dataChanged.emit()
 

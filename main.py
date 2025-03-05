@@ -14,6 +14,10 @@ from models.PythonModel import PythonModel
 from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
+from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
+from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
+from services.container import Container
+from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
@@ -26,18 +30,30 @@ class AppConfig:
     icon_path: str = "icons/gallery/24x24/Wave_dark.ico"
 
 class Application:
-    def __init__(self, config: Optional[AppConfig] = None):
+    def __init__(self, container: Container, config: Optional[AppConfig] = None):
         self.config = config or AppConfig()
-        self.setup_logging()
+        self.container = container
+        
+        # Create QApplication first
         self.app = QApplication(sys.argv)
-        self.engine = QQmlApplicationEngine()
+        
+        # Resolve dependencies
+        self.logger = container.resolve(ILogger)
+        self.calculator_factory = container.resolve(ICalculatorFactory)
+        self.qml_engine = container.resolve(IQmlEngine)
+        self.model_factory = container.resolve(IModelFactory)
+        
+        # Initialize QML engine with QApplication
+        self.qml_engine.initialize(self.app)
+        
+        self.setup()
+        
+    def setup(self):
+        self.logger.setup(level=logging.INFO)
         self.setup_app()
         self.load_models()
         self.register_qml_types()
         self.load_qml()
-
-    def setup_logging(self):
-        logging.basicConfig(level=logging.INFO)
 
     def setup_app(self):
         QQuickStyle.setStyle(self.config.style)
@@ -47,36 +63,51 @@ class Application:
         QIcon.setThemeName("gallery")
 
     def load_models(self):
-        csv_path = "cable_data.csv"
-        self.voltage_model = PythonModel(csv_path)
-        self.power_calculator = PowerCalculator()
-        self.fault_current_calculator = FaultCurrentCalculator()
-        self.sine_wave = ThreePhaseSineWaveModel()
-        self.resonant_freq = ResonantFreq()
-        self.conversion_calc = ConversionCalculator()
-        self.series_LC_chart = SeriesRLCChart()
-        self.phasorPlotter = PhasorPlot()
+        self.voltage_model = self.model_factory.create_model("voltage", csv_path="cable_data.csv")
+        self.power_calculator = self.calculator_factory.create_calculator("power")
+        self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
+        self.sine_wave = self.model_factory.create_model("three_phase")
+        self.resonant_freq = self.model_factory.create_model("resonant_freq")
+        self.conversion_calc = self.model_factory.create_model("conversion_calc")
+        self.series_LC_chart = self.model_factory.create_model("series_rlc_chart")
+        self.phasorPlotter = self.model_factory.create_model("phasor_plot")
 
     def register_qml_types(self):
-        qmlRegisterType(PythonModel, "Python", 1, 0, "PythonModel")
-        qmlRegisterType(ChargingCalc, "Charging", 1, 0, "ChargingCalc")
-        qmlRegisterType(PowerCalculator, "Calculator", 1, 0, "PowerCalculator")
-        qmlRegisterType(FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator")
-        qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")
-        qmlRegisterType(ResonantFreq, "RFreq", 1, 0, "ResonantFreq")
-        qmlRegisterType(ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc")
-        qmlRegisterType(SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart")
-        qmlRegisterType(PhasorPlot, "PPlot", 1, 0, "PhasorPlot")
+        for type_info in self.get_qml_types():
+            self.qml_engine.register_type(*type_info)
+    
+    def get_qml_types(self):
+        return [
+            (PythonModel, "Python", 1, 0, "PythonModel"),
+            (ChargingCalc, "Charging", 1, 0, "ChargingCalc"),
+            (PowerCalculator, "Calculator", 1, 0, "PowerCalculator"),
+            (FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator"),
+            (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
+            (ResonantFreq, "RFreq", 1, 0, "ResonantFreq"),
+            (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc"),
+            (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
+            (PhasorPlot, "PPlot", 1, 0, "PhasorPlot")
+        ]
 
     def load_qml(self):
-        self.engine.load(os.path.join(CURRENT_DIR, "qml", "main.qml"))
-        if not self.engine.rootObjects():
-            sys.exit(-1)
-
+        self.qml_engine.load_qml(os.path.join(CURRENT_DIR, "qml", "main.qml"))
+        
     def run(self):
         sys.exit(self.app.exec())
 
+def setup_container() -> Container:
+    container = Container()
+    
+    # Register services
+    container.register(ILogger, DefaultLogger)
+    container.register(ICalculatorFactory, ConcreteCalculatorFactory)
+    container.register(IQmlEngine, QmlEngineWrapper)
+    container.register(IModelFactory, ModelFactory)
+    
+    return container
+
 if __name__ == "__main__":
-    app = Application()
+    container = setup_container()
+    app = Application(container)
     app.run()
 
