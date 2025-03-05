@@ -65,7 +65,7 @@ Page {
 		}
 
 		HButton {
-			icon.name: "Wave"
+			icon.name: "RLC"
 			text: "RLC"
 			back: Qt.lighter(palette.accent,1.5)
 			fore: Qt.lighter(palette.accent,1.0)

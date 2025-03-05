@@ -121,7 +121,7 @@ Drawer {
                     title: "Phasor"
                     source: "../pages/phasor.qml"
                     tooltip: "RLC"
-                    icon: "Wave"
+                    icon: "RLC"
                 }
             }
 
