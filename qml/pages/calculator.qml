@@ -9,7 +9,7 @@ import QtCharts
 
 import QtQuick.Studio.DesignEffects
 
-import '../components'
+import "../components"
 
 
 //|22/Button|36/Image|41/Content|

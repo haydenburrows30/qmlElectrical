@@ -1,74 +1,126 @@
 import QtQuick
+import QtQml
 import QtQuick.Controls
+import QtQuick.Dialogs
 import QtQuick.Layouts
+import Qt.labs.qmlmodels 1.0
+import QtQuick.Controls.Universal
+import QtCharts
 
-ColumnLayout {
+import QtQuick.Studio.DesignEffects
+
+import "../components"
+
+WaveCard {
+    id: root
     property var model
-    
-    GroupBox {
-        title: "Wave Controls"
-        Layout.fillWidth: true
-        
-        GridLayout {
-            columns: 4
-            rowSpacing: 10
-            columnSpacing: 10
+    title: "Wave Controls"
+
+    GridLayout {
+        anchors.fill: parent
+        anchors.margins: 10
+        columns: 4
+        rowSpacing: 16
+        columnSpacing: 20
+
+        Button {
+            Layout.columnSpan: 4
+            Layout.alignment: Qt.AlignRight
+            icon.name: "Reset"
             
-            Label { text: "Frequency (Hz)" }
-            SpinBox {
-                value: 50
+            onClicked: {
+                model.reset()
+                freqSlider.value = 50
+                phaseRepeater.itemAt(0).resetPhase()
+                phaseRepeater.itemAt(1).resetPhase()
+                phaseRepeater.itemAt(2).resetPhase()
+            }
+        }
+
+        ColumnLayout {
+            Layout.columnSpan: 4
+            spacing: 8
+
+            Label {
+                text: "Frequency"
+                font.pixelSize: 14
+            }
+
+            Slider {
+                id: freqSlider
+                Layout.fillWidth: true
                 from: 1
-                to: 400
-                onValueChanged: model.setFrequency(value)
+                to: 100
+                value: 50
+                stepSize: 1
+                onValueChanged: function() {
+                    if (!model) return;
+                    model.setFrequency(freqSlider.value)
+                }
+
+                background: Rectangle {
+                    x: parent.leftPadding
+                    y: parent.topPadding + parent.availableHeight / 2 - height / 2
+                    width: parent.availableWidth
+                    height: 4
+                    radius: 2
+                    color: toolBar.toggle ? "#404040" : "#e0e0e0"
+
+                    Rectangle {
+                        width: parent.width * parent.visualPosition
+                        height: parent.height
+                        color: "#2196F3"
+                        radius: 2
+                    }
+                }
+
+                handle: Rectangle {
+                    x: parent.leftPadding + parent.visualPosition * (parent.availableWidth - width)
+                    y: parent.topPadding + parent.availableHeight / 2 - height / 2
+                    width: 20
+                    height: 20
+                    radius: 10
+                    color: parent.pressed ? "#1976D2" : "#2196F3"
+                    border.color: "#1976D2"
+
+                    Behavior on color {
+                        ColorAnimation { duration: 100 }
+                    }
+                }
             }
-            
-            Label { text: "Amplitude A (V)" }
-            SpinBox {
-                value: 230
-                from: 0
-                to: 1000
-                onValueChanged: model.setAmplitudeA(value * Math.SQRT2)
+
+            Label {
+                text: freqSlider.value.toFixed(1) + " Hz"
+                font.pixelSize: 12
+                color: toolBar.toggle ? "#b0b0b0" : "#606060"
             }
+        }
+
+        // Phase Controls
+        Repeater {
+            id: phaseRepeater
+            model: [
+                {phase: "A", defaultAngle: 0},
+                {phase: "B", defaultAngle: 120},
+                {phase: "C", defaultAngle: 240}
+            ]
             
-            Label { text: "Phase A (°)" }
-            SpinBox {
-                value: 0
-                from: -360
-                to: 360
-                onValueChanged: model.setPhaseAngleA(value)
-            }
-            
-            // Similar controls for phases B and C
-            Label { text: "Amplitude B (V)" }
-            SpinBox {
-                value: 230
-                from: 0
-                to: 1000
-                onValueChanged: model.setAmplitudeB(value * Math.SQRT2)
-            }
-            
-            Label { text: "Phase B (°)" }
-            SpinBox {
-                value: 120
-                from: -360
-                to: 360
-                onValueChanged: model.setPhaseAngleB(value)
-            }
-            
-            Label { text: "Amplitude C (V)" }
-            SpinBox {
-                value: 230
-                from: 0
-                to: 1000
-                onValueChanged: model.setAmplitudeC(value * Math.SQRT2)
-            }
-            
-            Label { text: "Phase C (°)" }
-            SpinBox {
-                value: 240
-                from: -360
-                to: 360
-                onValueChanged: model.setPhaseAngleC(value)
+            delegate: PhaseControl {
+                Layout.columnSpan: 1
+                phase: modelData.phase
+                defaultAngle: modelData.defaultAngle
+                defaultAmplitude: 230
+                
+                onAmplitudeChanged: function(value) {
+                    if (phase === "A") root.model.setAmplitudeA(value)
+                    else if (phase === "B") root.model.setAmplitudeB(value)
+                    else root.model.setAmplitudeC(value)
+                }
+                onAngleChanged: function(value) {
+                    if (phase === "A") root.model.setPhaseAngleA(value)
+                    else if (phase === "B") root.model.setPhaseAngleB(value)
+                    else root.model.setPhaseAngleC(value)
+                }
             }
         }
     }

@@ -11,11 +11,6 @@ import QtQuick.Studio.DesignEffects
 
 import '../components'
 
-//|22/Button|36/Image|41/Content|
-//|127/Button|140/Image|145/Content|
-//|247/Button|260/Image|265/Content|
-//|331/End|
-
 Page {
     id: phasor
 

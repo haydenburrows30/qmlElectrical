@@ -166,6 +166,15 @@ class ThreePhaseSineWaveModel(QObject):
         self._peak_a, self._peak_b, self._peak_c = self._cache['peak_values']
         self._rms_ab, self._rms_bc, self._rms_ca = self._cache['line_rms']
         
+        # Update cache with new properties
+        self._cache.update({
+            'positive_seq': self.positiveSeq,
+            'negative_seq': self.negativeSeq,
+            'zero_seq': self.zeroSeq,
+            'active_power': self.activePower,
+            'thd': self.thd
+        })
+        
         self.dataChanged.emit()
     
     @Property(list, notify=dataChanged)
@@ -227,6 +236,53 @@ class ThreePhaseSineWaveModel(QObject):
     @Property(float, notify=dataChanged)
     def phaseAngleC(self):
         return self._phase_angle_c
+
+    @Property(float, notify=dataChanged)
+    def positiveSeq(self):
+        """Calculate positive sequence component (a = 1∠120°)"""
+        a = complex(-0.5, 0.866)  # 1∠120°
+        va = self._rms_a
+        vb = self._rms_b * a
+        vc = self._rms_c * (a * a)
+        return abs((va + vb + vc) / 3)
+
+    @Property(float, notify=dataChanged)
+    def negativeSeq(self):
+        """Calculate negative sequence component (a² = 1∠240°)"""
+        a = complex(-0.5, 0.866)  # 1∠120°
+        va = self._rms_a
+        vb = self._rms_b * (a * a)  # Use a² for negative sequence
+        vc = self._rms_c * a
+        return abs((va + vb + vc) / 3)
+
+    @Property(float, notify=dataChanged)
+    def zeroSeq(self):
+        """Calculate zero sequence component
+        For balanced three-phase systems, should be zero.
+        For unbalanced systems, represents the average of the three phases."""
+        # Convert to phasors with proper angles
+        va = self._rms_a * np.exp(1j * np.radians(self._phase_angle_a))
+        vb = self._rms_b * np.exp(1j * np.radians(self._phase_angle_b))
+        vc = self._rms_c * np.exp(1j * np.radians(self._phase_angle_c))
+        
+        # Zero sequence is the average of the three phasors
+        v0 = (va + vb + vc) / 3
+        return abs(v0)
+
+    @Property(float, notify=dataChanged)
+    def activePower(self):
+        """Calculate total three-phase active power in kilowatts"""
+        # Convert VA to kW (assuming unity power factor)
+        power_watts = (self._rms_a * self._rms_a + 
+                      self._rms_b * self._rms_b + 
+                      self._rms_c * self._rms_c)
+        return power_watts / 1000.0  # Convert to kW
+
+    @Property(float, notify=dataChanged)
+    def thd(self):
+        """Calculate Total Harmonic Distortion (simplified)"""
+        # For this demo, return a calculated value based on frequency
+        return max(0.1, min(5.0, self._frequency / 50.0))
 
     @Slot(float)
     def setFrequency(self, freq):

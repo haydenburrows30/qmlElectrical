@@ -69,6 +69,16 @@ class Application:
         # Initialize QML engine with QApplication
         self.qml_engine.initialize(self.app)
         
+        # Add component directory to import path
+        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR, "qml"))
+        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR, "qml/components"))
+        
+        # Add this before loading QML
+        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR))
+        
+        # Register the SineWaveModel type explicitly
+        qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")
+        
         self.setup()
         
     def setup(self):
@@ -112,7 +122,6 @@ class Application:
             (ChargingCalc, "Charging", 1, 0, "ChargingCalc"),
             (PowerCalculator, "Calculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator"),
-            (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
             (ResonantFreq, "RFreq", 1, 0, "ResonantFreq"),
             (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),

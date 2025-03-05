@@ -2,28 +2,90 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-GroupBox {
+ColumnLayout {
     property var model
-    title: "Measurements"
-    
+    spacing: 16
+
     GridLayout {
-        columns: 4
-        rowSpacing: 10
-        columnSpacing: 20
-        
-        Label { text: "RMS Values" }
-        Label { text: "Phase A: " + model.rmsA.toFixed(1) + " V" }
-        Label { text: "Phase B: " + model.rmsB.toFixed(1) + " V" }
-        Label { text: "Phase C: " + model.rmsC.toFixed(1) + " V" }
-        
-        Label { text: "Peak Values" }
-        Label { text: "Phase A: " + model.peakA.toFixed(1) + " V" }
-        Label { text: "Phase B: " + model.peakB.toFixed(1) + " V" }
-        Label { text: "Phase C: " + model.peakC.toFixed(1) + " V" }
-        
-        Label { text: "Line-to-Line RMS" }
-        Label { text: "A-B: " + model.rmsAB.toFixed(1) + " V" }
-        Label { text: "B-C: " + model.rmsBC.toFixed(1) + " V" }
-        Label { text: "C-A: " + model.rmsCA.toFixed(1) + " V" }
+        Layout.fillWidth: true
+        columns: 6
+        columnSpacing: 32
+        rowSpacing: 12
+
+        // Headers
+        Label { 
+            text: "Phase Values" 
+            font.weight: Font.DemiBold
+            Layout.columnSpan: 2 
+        }
+        Label { 
+            text: "Line Values" 
+            font.weight: Font.DemiBold
+            Layout.columnSpan: 2 
+        }
+        Label { 
+            text: "Peak Values" 
+            font.weight: Font.DemiBold
+            Layout.columnSpan: 2 
+        }
+
+        // Phase RMS Values
+        Label { text: "Phase A:" }
+        Label { 
+            text: model.rmsA.toFixed(1) + " V"
+            color: toolBar.toggle ? "#f44336" : "#d32f2f" 
+        }
+
+        // Line RMS Values
+        Label { text: "A-B:" }
+        Label { 
+            text: model.rmsAB.toFixed(1) + " V"
+            color: toolBar.toggle ? "#ff9800" : "#f57c00"
+        }
+
+        // Peak Values
+        Label { text: "Peak A:" }
+        Label { 
+            text: model.peakA.toFixed(1) + " V"
+            color: toolBar.toggle ? "#f44336" : "#d32f2f"
+        }
+
+        // Phase B
+        Label { text: "Phase B:" }
+        Label { 
+            text: model.rmsB.toFixed(1) + " V"
+            color: toolBar.toggle ? "#4caf50" : "#2e7d32"
+        }
+
+        Label { text: "B-C:" }
+        Label { 
+            text: model.rmsBC.toFixed(1) + " V"
+            color: toolBar.toggle ? "#ff9800" : "#f57c00"
+        }
+
+        Label { text: "Peak B:" }
+        Label { 
+            text: model.peakB.toFixed(1) + " V"
+            color: toolBar.toggle ? "#4caf50" : "#2e7d32"
+        }
+
+        // Phase C
+        Label { text: "Phase C:" }
+        Label { 
+            text: model.rmsC.toFixed(1) + " V"
+            color: toolBar.toggle ? "#2196f3" : "#1976d2"
+        }
+
+        Label { text: "C-A:" }
+        Label { 
+            text: model.rmsCA.toFixed(1) + " V"
+            color: toolBar.toggle ? "#ff9800" : "#f57c00"
+        }
+
+        Label { text: "Peak C:" }
+        Label { 
+            text: model.peakC.toFixed(1) + " V"
+            color: toolBar.toggle ? "#2196f3" : "#1976d2"
+        }
     }
 }
