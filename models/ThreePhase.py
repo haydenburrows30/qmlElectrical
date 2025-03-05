@@ -6,9 +6,25 @@ from PySide6.QtCharts import *
 import numpy as np
 
 class ThreePhaseSineWaveModel(QObject):
+    """Three-phase sine wave generator and calculator.
+
+    This class generates and manages three-phase electrical waveforms with configurable
+    frequency, amplitude, and phase angles. It provides real-time calculations of RMS
+    and peak values, with optimized caching for performance.
+
+    Signals:
+        dataChanged: Emitted when any waveform parameters are updated
+
+    Properties:
+        frequency (float): Wave frequency in Hz
+        amplitudeA/B/C (float): Peak amplitude for each phase
+        phaseAngleA/B/C (float): Phase angles in degrees
+    """
+
     dataChanged = Signal()
     
     def __init__(self):
+        """Initialize the three-phase sine wave model with default values."""
         super().__init__()
         self._frequency = 50
         self._amplitudeA = 230 * np.sqrt(2)
@@ -33,6 +49,13 @@ class ThreePhaseSineWaveModel(QObject):
         
     @Slot(QXYSeries,QXYSeries,QXYSeries)
     def fill_series(self, seriesA,seriesB,seriesC):
+        """Fill QXYSeries with calculated wave data for plotting.
+        
+        Args:
+            seriesA: Series for phase A
+            seriesB: Series for phase B
+            seriesC: Series for phase C
+        """
         seriesA.clear();seriesB.clear();seriesC.clear()
 
         pointsA,pointsB,pointsC = [],[],[]
@@ -52,8 +75,12 @@ class ThreePhaseSineWaveModel(QObject):
         seriesB.replace(pointsB)
         seriesC.replace(pointsC)
     
-    def _get_cache_key(self):
-        """Generate a cache key based on current parameters"""
+    def _get_cache_key(self) -> tuple:
+        """Generate a unique cache key based on current wave parameters.
+        
+        Returns:
+            tuple: Collection of parameters that affect wave calculation
+        """
         return (
             self._frequency,
             self._amplitudeA,
@@ -67,8 +94,15 @@ class ThreePhaseSineWaveModel(QObject):
             self._sample_rate
         )
 
-    def _calculate_waves_vectorized(self, t):
-        """Vectorized calculation of all three phases at once"""
+    def _calculate_waves_vectorized(self, t: np.ndarray) -> tuple:
+        """Calculate all three phase waves using vectorized operations.
+        
+        Args:
+            t: Time array for wave calculation
+            
+        Returns:
+            tuple: Three numpy arrays containing wave values for each phase
+        """
         angles = np.array([self._phase_angle_a, self._phase_angle_b, self._phase_angle_c])
         amplitudes = np.array([self._amplitudeA, self._amplitudeB, self._amplitudeC])
         
@@ -83,6 +117,12 @@ class ThreePhaseSineWaveModel(QObject):
         return waves[:, 0], waves[:, 1], waves[:, 2]
 
     def update_wave(self):
+        """Update wave calculations if parameters have changed.
+        
+        Performs vectorized calculations of wave values and updates all
+        derived measurements (RMS, peak values, etc.). Uses caching to
+        avoid recalculation when parameters haven't changed.
+        """
         cache_key = self._get_cache_key()
         
         # Return cached values if parameters haven't changed

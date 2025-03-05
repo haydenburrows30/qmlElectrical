@@ -8,6 +8,18 @@ import numpy as np
 import math
 
 class PowerCalculator(BaseCalculator):
+    """Calculator for power-related calculations.
+    
+    Features:
+    - Single and three-phase power calculations
+    - Current calculation based on power and voltage
+    - Power factor support
+    
+    Signals:
+        currentCalculated: Emitted when current calculation completes
+        series_appended: Emitted when new data series is added
+    """
+    
     currentCalculated = Signal(float)
     series_appended = Signal()
 
@@ -20,6 +32,11 @@ class PowerCalculator(BaseCalculator):
 
     @Slot(float)
     def setKva(self, kva):
+        """Set apparent power in kVA.
+        
+        Args:
+            kva: Apparent power value
+        """
         self._kva = kva
         self.calculateCurrent()
 
@@ -60,6 +77,16 @@ class PowerCalculator(BaseCalculator):
         self.calculatePower()
 
 class ChargingCalc(BaseCalculator):
+    """Calculator for capacitive charging current.
+    
+    Features:
+    - Charging current calculation for cables
+    - Frequency dependent calculations
+    - Length scaling support
+    
+    Signals:
+        chargingCurrentCalculated: Emitted when calculation completes
+    """
     chargingCurrentCalculated = Signal(float)
 
     def __init__(self):
@@ -109,6 +136,16 @@ class ChargingCalc(BaseCalculator):
         self.calculateChargingCurrent()
     
 class FaultCurrentCalculator(BaseCalculator):
+    """Calculator for fault current analysis.
+    
+    Features:
+    - Impedance calculations
+    - Fault current estimation
+    - Complex number support
+    
+    Signals:
+        impedanceCalculated: Emitted when impedance calculation completes
+    """
     impedanceCalculated = Signal(float)
 
     def __init__(self):

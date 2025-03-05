@@ -170,3 +170,27 @@ Solution:
 - v1.0: Initial release
 - v1.1: Added RLC simulation
 - v1.2: Enhanced phasor plotting
+
+# QML Components
+
+## Three Phase Visualization
+
+### WaveControls
+Controls for adjusting wave parameters:
+- Frequency (1-400 Hz)
+- Amplitude (0-1000V) for each phase
+- Phase angles (-360° to 360°)
+
+### WaveChart
+Real-time waveform visualization:
+- Displays all three phases
+- Time-based X-axis (0-1000ms)
+- Voltage-based Y-axis (-400V to 400V)
+- Color-coded phases (Red: A, Green: B, Blue: C)
+
+### Measurements
+Displays calculated values:
+- RMS values for each phase
+- Peak values for each phase
+- Line-to-line RMS voltages
+```

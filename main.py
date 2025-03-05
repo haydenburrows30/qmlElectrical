@@ -24,13 +24,36 @@ import rc_resources as rc_resources
 
 @dataclass
 class AppConfig:
+    """Application configuration settings.
+    
+    Attributes:
+        style (str): Qt Quick style to use
+        app_name (str): Name of the application
+        org_name (str): Organization name
+        icon_path (str): Path to application icon
+    """
     style: str = "Universal"
     app_name: str = "Electrical"
     org_name: str = "QtProject"
     icon_path: str = "icons/gallery/24x24/Wave_dark.ico"
 
 class Application:
+    """Main application class implementing dependency injection and component management.
+    
+    This class serves as the primary application controller, managing:
+    - Dependency injection
+    - Model initialization
+    - QML registration
+    - Application lifecycle
+    """
+    
     def __init__(self, container: Container, config: Optional[AppConfig] = None):
+        """Initialize application with dependency container and configuration.
+        
+        Args:
+            container: Dependency injection container
+            config: Optional application configuration
+        """
         self.config = config or AppConfig()
         self.container = container
         
@@ -49,6 +72,7 @@ class Application:
         self.setup()
         
     def setup(self):
+        """Configure application components and initialize subsystems."""
         self.logger.setup(level=logging.INFO)
         self.setup_app()
         self.load_models()
@@ -63,6 +87,7 @@ class Application:
         QIcon.setThemeName("gallery")
 
     def load_models(self):
+        """Initialize and configure application models using factories."""
         self.voltage_model = self.model_factory.create_model("voltage", csv_path="cable_data.csv")
         self.power_calculator = self.calculator_factory.create_calculator("power")
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
@@ -77,6 +102,11 @@ class Application:
             self.qml_engine.register_type(*type_info)
     
     def get_qml_types(self):
+        """Get list of QML types to register.
+        
+        Returns:
+            list: Tuples of (class, uri, major, minor, name) for QML registration
+        """
         return [
             (PythonModel, "Python", 1, 0, "PythonModel"),
             (ChargingCalc, "Charging", 1, 0, "ChargingCalc"),
@@ -96,6 +126,11 @@ class Application:
         sys.exit(self.app.exec())
 
 def setup_container() -> Container:
+    """Create and configure the dependency injection container.
+    
+    Returns:
+        Container: Configured dependency injection container
+    """
     container = Container()
     
     # Register services

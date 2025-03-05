@@ -7,20 +7,41 @@ from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
 
 class DefaultLogger(ILogger):
+    """Default logging implementation using Python's logging module."""
+    
     def setup(self, level: str) -> None:
+        """Configure the logging system.
+        
+        Args:
+            level: Logging level to use
+        """
         logging.basicConfig(level=level)
 
 class QmlEngineWrapper(IQmlEngine):
+    """Wrapper for QQmlApplicationEngine providing initialization control."""
+    
     def __init__(self, app=None):
         self.app = app
         self.engine = None
         
     def initialize(self, app):
-        """Initialize engine with QApplication instance"""
+        """Initialize the QML engine with a QApplication instance.
+        
+        Args:
+            app: QApplication instance
+        """
         self.app = app
         self.engine = QQmlApplicationEngine()
         
     def load_qml(self, path: str) -> None:
+        """Load QML file at specified path.
+        
+        Args:
+            path: Path to QML file
+            
+        Raises:
+            RuntimeError: If engine not initialized
+        """
         if not self.engine:
             raise RuntimeError("QML Engine not initialized. Call initialize() first")
         self.engine.load(path)
@@ -29,7 +50,25 @@ class QmlEngineWrapper(IQmlEngine):
         qmlRegisterType(type_class, uri, major, minor, name)
 
 class ModelFactory(IModelFactory):
+    """Factory for creating model instances.
+    
+    Manages creation of various model types with support for
+    configuration parameters.
+    """
+    
     def create_model(self, model_type: str, **kwargs) -> Any:
+        """Create a model instance of specified type.
+        
+        Args:
+            model_type: Type of model to create
+            **kwargs: Configuration parameters for model
+            
+        Returns:
+            Created model instance
+            
+        Raises:
+            ValueError: If model_type is unknown
+        """
         model_map = {
             "voltage": lambda: PythonModel(kwargs.get('csv_path')),
             "three_phase": ThreePhaseSineWaveModel,
