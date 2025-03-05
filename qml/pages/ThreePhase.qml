@@ -273,6 +273,26 @@ Page {
         anchors.right: parent.right
         anchors.topMargin: 10
         phaseAngles: [threePhaseSineModel.phaseAngleA, threePhaseSineModel.phaseAngleB, threePhaseSineModel.phaseAngleC]
+
+        onAngleChanged: (index, angle) => {
+            // Update the corresponding slider and model
+            switch(index) {
+                case 0:
+                    phaseSliderA.value = angle
+                    threePhaseSineModel.setPhaseAngleA(angle)
+                    break
+                case 1:
+                    phaseSliderB.value = angle
+                    threePhaseSineModel.setPhaseAngleB(angle)
+                    break
+                case 2:
+                    phaseSliderC.value = angle
+                    threePhaseSineModel.setPhaseAngleC(angle)
+                    break
+            }
+            updateSeries()
+            updatePhasorDiagram()
+        }
     }
 
 //Settings
@@ -313,6 +333,7 @@ Page {
                         phaseSliderB.value = 120
                         phaseSliderC.value = 240
                         updateSeries()
+                        updatePhasorDiagram()
                     }  
                 }
             }
@@ -469,6 +490,7 @@ Page {
                 onValueChanged: {
                     threePhaseSineModel.setPhaseAngleA(value)
                     updateSeries()
+                    updatePhasorDiagram()
                 }
                 onHoveredChanged: {
                     wheelHandler.target = phaseSliderA
@@ -499,6 +521,7 @@ Page {
                 onValueChanged: {
                     threePhaseSineModel.setPhaseAngleB(value)
                     updateSeries()
+                    updatePhasorDiagram()
                 }
                 onHoveredChanged: {
                     wheelHandler.target = phaseSliderB
@@ -529,6 +552,7 @@ Page {
                 onValueChanged: {
                     threePhaseSineModel.setPhaseAngleC(value)
                     updateSeries()
+                    updatePhasorDiagram()
                 }
                 onHoveredChanged: {
                     wheelHandler.target = phaseSliderC
