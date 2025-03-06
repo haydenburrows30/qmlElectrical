@@ -104,6 +104,67 @@ SpinBox {
 }
 ```
 
+## Voltage Drop Calculator
+
+### Properties
+- `model: VoltageDropMV` - Voltage drop calculator model
+
+### Input Controls
+```qml
+// System Configuration
+ComboBox {
+    model: voltageDropMV.voltageOptions  // ["230V", "415V"]
+}
+
+CheckBox {
+    text: "ADMD (neutral)"
+    enabled: voltage === "415V"
+    onCheckedChanged: voltageDropMV.setADMDEnabled(checked)
+}
+
+// Load Configuration
+TextField {
+    placeholderText: "Enter kVA"
+    onTextChanged: {
+        let kva = parseFloat(text) || 0
+        voltageDropMV.calculateTotalLoad(kva, houses)
+    }
+}
+
+TextField {
+    placeholderText: "Number of houses"
+    onTextChanged: {
+        let houses = parseInt(text) || 1
+        voltageDropMV.setNumberOfHouses(houses)
+    }
+}
+```
+
+### Results Display
+```qml
+Label {
+    text: "Total Adjusted Load: " + 
+          (kvaPerHouse * houses * 
+           voltageDropMV.diversityFactor).toFixed(1) + " kVA"
+}
+
+Text {
+    text: Number(voltageDropMV.current).toFixed(1) + " A"
+}
+
+Label {
+    text: "Voltage Drop: " + 
+          voltageDropMV.voltageDrop.toFixed(2) + " V"
+}
+```
+
+### Best Practices
+- Use number validation for inputs
+- Handle voltage system changes
+- Update calculations on diversity changes
+- Monitor cable current ratings
+- Check voltage drop limits
+
 ## Layout Guidelines
 
 ### Grid Layout

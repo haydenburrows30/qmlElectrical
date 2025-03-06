@@ -41,6 +41,7 @@ Page {
                     Layout.minimumWidth: 300
 
                     info: "../../media/powercalc.png"
+                    righticon: "Info"
 
                     ColumnLayout {
                         anchors.fill: parent

@@ -12,7 +12,8 @@ import QtQuick.Studio.DesignEffects
 import '../components'
 
 import VDropMV 1.0
-    
+import Results 1.0  // Add this import
+
 Page {
     id: root
     padding: 0
@@ -22,6 +23,10 @@ Page {
 
     VoltageDropMV {
         id: voltageDropMV
+    }
+
+    ResultsManager {
+        id: resultsManager
     }
 
     background: Rectangle {
@@ -41,13 +46,11 @@ Page {
                 id: mainLayout
                 width: scrollView.width
 
-                 ColumnLayout {
-
+                ColumnLayout {
                     WaveCard {
                         title: "Cable Selection"
-                        Layout.minimumHeight: 520
+                        Layout.minimumHeight: 560
                         Layout.minimumWidth: 400
-
                         showInfo: false
 
                         GridLayout {
@@ -91,7 +94,7 @@ Page {
                             ComboBox {
                                 id: conductorSelect
                                 model: voltageDropMV.conductorTypes
-                                currentIndex: 0
+                                currentIndex: 1
                                 onCurrentTextChanged: {
                                     if (currentText) {
                                         console.log("Selecting conductor:", currentText)
@@ -105,7 +108,7 @@ Page {
                             ComboBox {
                                 id: coreTypeSelect
                                 model: voltageDropMV.coreConfigurations
-                                currentIndex: 0
+                                currentIndex: 1
                                 onCurrentTextChanged: {
                                     if (currentText) {
                                         console.log("Selecting core type:", currentText)
@@ -119,7 +122,7 @@ Page {
                             ComboBox {
                                 id: cableSelect
                                 model: voltageDropMV.availableCables
-                                currentIndex: 0  // Set default selection
+                                currentIndex: 13  // Set default selection
                                 onCurrentTextChanged: {
                                     if (currentText) {
                                         console.log("Selecting cable:", currentText)
@@ -137,14 +140,17 @@ Page {
 
                             Label { text: "Length (m):" }
                             TextField {
+                                id: lengthInput  // Add ID
                                 placeholderText: "Enter length"
-                                onTextChanged: voltageDropMV.setLength(parseFloat(text))
+                                onTextChanged: voltageDropMV.setLength(parseFloat(text) || 0)
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0 }
                             }
 
                             Label { text: "Installation Method:" }
                             ComboBox {
+                                id: installationMethodCombo  // Add ID
+                                currentIndex: 6
                                 model: voltageDropMV.installationMethods
                                 onCurrentTextChanged: voltageDropMV.setInstallationMethod(currentText)
                                 Layout.fillWidth: true
@@ -152,16 +158,18 @@ Page {
 
                             Label { text: "Temperature (°C):" }
                             TextField {
-                                text: "75"
-                                onTextChanged: voltageDropMV.setTemperature(parseFloat(text))
+                                id: temperatureInput  // Add ID
+                                text: "25"
+                                onTextChanged: voltageDropMV.setTemperature(parseFloat(text) || 75)
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0; top: 120 }
                             }
 
                             Label { text: "Grouping Factor:" }
                             TextField {
+                                id: groupingFactorInput  // Add ID
                                 text: "1.0"
-                                onTextChanged: voltageDropMV.setGroupingFactor(parseFloat(text))
+                                onTextChanged: voltageDropMV.setGroupingFactor(parseFloat(text) || 1.0)
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0; top: 2 }
                             }
@@ -195,13 +203,40 @@ Page {
                                 validator: IntValidator { bottom: 1 }
                             }
 
-                            
+                            Button {
+                                text: "Reset"
+                                icon.name: "Reset"
+                                Layout.fillWidth: true
+                                // Layout.rowSpan: 2
+                                onClicked: {
+                                    voltageSelect.currentIndex = 1  // 415V
+                                    conductorSelect.currentIndex = 1  // Al
+                                    coreTypeSelect.currentIndex = 1  // 3C+E
+                                    cableSelect.currentIndex = 13
+                                    currentInput.text = "0"
+                                    lengthInput.text = "0"
+                                    temperatureInput.text = "25"
+                                    groupingFactorInput.text = "1.0"
+                                    kvaPerHouseInput.text = "7"
+                                    numberOfHousesInput.text = "1"
+                                    admdCheckBox.checked = false
+                                    installationMethodCombo.currentIndex = 5  // "D1 - Underground direct buried"
+
+                                    // Reset results table and calculations
+                                    totalLoadText.text = "0.0"
+                                    dropValue.text = "0.00 V"
+                                    dropPercent.text = "0.00%"
+                                    
+                                    // Reset model state
+                                    voltageDropMV.reset()
+                                }
+                            }
                         }
                     }
 
                     WaveCard {
                         title: "Results"
-                        Layout.minimumHeight: 280
+                        Layout.minimumHeight: 330
                         Layout.minimumWidth:400
                         showInfo: false
 
@@ -209,15 +244,6 @@ Page {
                             anchors.fill: parent
                             columns: 2
                             rowSpacing: 18
-
-                            // Label {
-                            //     text: "Total Adjusted Load: " + 
-                            //         ((parseFloat(kvaPerHouseInput.text) || 0) * 
-                            //         (parseInt(numberOfHousesInput.text) || 0) * 
-                            //         voltageDropMV.diversityFactor).toFixed(1) + " kVA"
-                            //     font.pixelSize: 16
-                            //     font.weight: Font.Medium
-                            // }
 
                             Label { text: "Voltage Drop: " }
 
@@ -280,107 +306,297 @@ Page {
                                     Behavior on width { NumberAnimation { duration: 200 } }
                                 }
                             }
-                        }
-                    }
-                }
 
-                WaveCard {
-                    title: "Cable Size Comparison"
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                            RowLayout {
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                                Layout.topMargin: 10
+                                spacing: 10
 
-                    showInfo: false
+                                Button {
+                                    text: "Save Results"
+                                    icon.name: "Save"
+                                    enabled: root.currentVoltageDropValue > 0
+                                    onClicked: voltageDropMV.saveCurrentCalculation()
+                                }
 
-                    ColumnLayout {
-                        anchors.fill: parent
+                                Button {
+                                    text: "Show Details"
+                                    icon.name: "Info"
+                                    enabled: root.currentVoltageDropValue > 0
+                                    onClicked: resultsPopup.open()
+                                }
 
-                        // Header row
-                        Rectangle {
-                            Layout.fillWidth: true
-                            height: 40
-                            color: toolBar.toggle ? "#424242" : "#e0e0e0"
-
-                            Row {
-                                anchors.fill: parent
-                                
-                                Repeater {
-                                    model: [
-                                        "Size (mm²)", 
-                                        "Material", 
-                                        "Cores", 
-                                        "mV/A/m", 
-                                        "Rating (A)", 
-                                        "V-Drop (V)", 
-                                        "Drop %", 
-                                        "Status"
-                                    ]
-                                    
-                                    Rectangle {
-                                        width: getColumnWidth(index)
-                                        height: parent.height
-                                        color: "transparent"
-                                        
-                                        Label {
-                                            anchors.fill: parent
-                                            anchors.margins: 8
-                                            text: modelData
-                                            font.bold: true
-                                            horizontalAlignment: Text.AlignLeft
-                                            verticalAlignment: Text.AlignVCenter
-                                            elide: Text.ElideRight
-                                            color: toolBar.toggle ? "#ffffff" : "#000000"
+                                Connections {
+                                    target: voltageDropMV
+                                    function onSaveStatusChanged(success, message) {
+                                        if (success) {
+                                            saveSuccess.messageText = message
+                                            saveSuccess.open()
+                                        } else {
+                                            saveError.messageText = message
+                                            saveError.open()
                                         }
                                     }
                                 }
                             }
                         }
+                    }
 
-                        // Table content
-                        TableView {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            clip: true
-                            model: voltageDropMV.tableModel
+                }
 
-                            delegate: Rectangle {
-                                implicitWidth: getColumnWidth(column)
-                                implicitHeight: 40
-                                color: {
-                                    if (column === 7) {  // Status column
-                                        switch(model.display) {
-                                            case "SEVERE": return "#ffebee"  // Red background
-                                            case "WARNING": return "#fff3e0"  // Orange background
-                                            case "SUBMAIN": return "#e3f2fd"  // Blue background
-                                            case "OK": return "#e8f5e9"      // Green background
-                                            default: return "transparent"
+                ColumnLayout {
+
+                    WaveCard {
+                        title: "Cable Size Comparison"
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        showInfo: false
+
+                        ColumnLayout {
+                            anchors.fill: parent
+
+                            // Header row
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 40
+                                color: toolBar.toggle ? "#424242" : "#e0e0e0"
+
+                                Row {
+                                    anchors.fill: parent
+                                    
+                                    Repeater {
+                                        model: [
+                                            "Size (mm²)", 
+                                            "Material", 
+                                            "Cores", 
+                                            "mV/A/m", 
+                                            "Rating (A)", 
+                                            "V-Drop (V)", 
+                                            "Drop %", 
+                                            "Status"
+                                        ]
+                                        
+                                        Rectangle {
+                                            width: getColumnWidth(index)
+                                            height: parent.height
+                                            color: "transparent"
+                                            
+                                            Label {
+                                                anchors.fill: parent
+                                                anchors.margins: 8
+                                                text: modelData
+                                                font.bold: true
+                                                horizontalAlignment: Text.AlignLeft
+                                                verticalAlignment: Text.AlignVCenter
+                                                elide: Text.ElideRight
+                                                color: toolBar.toggle ? "#ffffff" : "#000000"
+                                            }
                                         }
                                     }
-                                    return row % 2 ? (toolBar.toggle ? "#2d2d2d" : "#f5f5f5") 
-                                                 : (toolBar.toggle ? "#1d1d1d" : "#ffffff")
                                 }
+                            }
 
-                                Text {
-                                    anchors.fill: parent
-                                    anchors.margins: 8
-                                    text: model.display
+                            // Table content
+                            TableView {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                clip: true
+                                model: voltageDropMV.tableModel
+
+                                delegate: Rectangle {
+                                    implicitWidth: getColumnWidth(column)
+                                    implicitHeight: 40
                                     color: {
                                         if (column === 7) {  // Status column
                                             switch(model.display) {
-                                                case "SEVERE": return "#c62828"  // Dark red
-                                                case "WARNING": return "#ef6c00"  // Dark orange
-                                                case "SUBMAIN": return "#1565c0"  // Dark blue
-                                                case "OK": return "#2e7d32"      // Dark green
-                                                default: return toolBar.toggle ? "#ffffff" : "#000000"
+                                                case "SEVERE": return "#ffebee"  // Red background
+                                                case "WARNING": return "#fff3e0"  // Orange background
+                                                case "SUBMAIN": return "#e3f2fd"  // Blue background
+                                                case "OK": return "#e8f5e9"      // Green background
+                                                default: return "transparent"
                                             }
                                         }
-                                        return toolBar.toggle ? "#ffffff" : "#000000"
+                                        return row % 2 ? (toolBar.toggle ? "#2d2d2d" : "#f5f5f5") 
+                                                    : (toolBar.toggle ? "#1d1d1d" : "#ffffff")
                                     }
-                                    font.bold: column === 7  // Status column
-                                    verticalAlignment: Text.AlignVCenter
+
+                                    Text {
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        text: model.display
+                                        color: {
+                                            if (column === 7) {  // Status column
+                                                switch(model.display) {
+                                                    case "SEVERE": return "#c62828"  // Dark red
+                                                    case "WARNING": return "#ef6c00"  // Dark orange
+                                                    case "SUBMAIN": return "#1565c0"  // Dark blue
+                                                    case "OK": return "#2e7d32"      // Dark green
+                                                    default: return toolBar.toggle ? "#ffffff" : "#000000"
+                                                }
+                                            }
+                                            return toolBar.toggle ? "#ffffff" : "#000000"
+                                        }
+                                        font.bold: column === 7  // Status column
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
                                 }
                             }
                         }
                     }
+
+
+                    // Update SavedResults card with resultsManager property
+                    SavedResults {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: 300
+                        resultsManager: resultsManager  // Pass the instance
+                    }
+
+                    // Add detailed results popup
+                    Popup {
+                        id: resultsPopup
+                        modal: true
+                        focus: true
+                        anchors.centerIn: Overlay.overlay
+                        width: 600
+                        height: 400
+
+                        ScrollView {
+                            anchors.fill: parent
+                            clip: true
+
+                            ColumnLayout {
+                                width: parent.width
+                                spacing: 20
+
+                                Label {
+                                    text: "Calculation Results"
+                                    font.bold: true
+                                    font.pixelSize: 16
+                                }
+
+                                GridLayout {
+                                    columns: 2
+                                    columnSpacing: 20
+                                    rowSpacing: 10
+                                    Layout.fillWidth: true
+
+                                    // System Configuration
+                                    Label { text: "System Configuration"; font.bold: true; Layout.columnSpan: 2 }
+                                    Label { text: "Voltage System:" }
+                                    Label { text: voltageDropMV.selectedVoltage }
+                                    Label { text: "ADMD Status:" }
+                                    Label { text: voltageDropMV.admdEnabled ? "Enabled (1.5×)" : "Disabled" }
+
+                                    // Load Details
+                                    Label { text: "Load Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
+                                    Label { text: "KVA per House:" }
+                                    Label { text: (voltageDropMV.totalKva / voltageDropMV.numberOfHouses).toFixed(1) + " kVA" }
+                                    Label { text: "Number of Houses:" }
+                                    Label { text: voltageDropMV.numberOfHouses }
+                                    Label { text: "Diversity Factor:" }
+                                    Label { text: voltageDropMV.diversityFactor.toFixed(3) }
+                                    Label { text: "Total Load:" }
+                                    Label { text: voltageDropMV.totalKva.toFixed(1) + " kVA" }
+                                    Label { text: "Current:" }
+                                    Label { text: voltageDropMV.current.toFixed(1) + " A" }
+
+                                    // Cable Details
+                                    Label { text: "Cable Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
+                                    Label { text: "Cable Size:" }
+                                    Label { text: cableSelect.currentText + " mm²" }
+                                    Label { text: "Material:" }
+                                    Label { text: voltageDropMV.conductorMaterial }
+                                    Label { text: "Configuration:" }
+                                    Label { text: voltageDropMV.coreType }
+                                    Label { text: "Length:" }
+                                    Label { text: lengthInput.text + " m" }
+                                    Label { text: "Installation:" }
+                                    Label { text: installationMethodCombo.currentText }
+                                    Label { text: "Temperature:" }
+                                    Label { text: temperatureInput.text + " °C" }
+                                    Label { text: "Grouping Factor:" }
+                                    Label { text: groupingFactorInput.text }
+
+                                    // Results
+                                    Label { text: "Results"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
+                                    Label { text: "Voltage Drop:" }
+                                    Label { 
+                                        text: root.currentVoltageDropValue.toFixed(2) + " V"
+                                        color: dropPercent.percentage > 5 ? "red" : "green"
+                                    }
+                                    Label { text: "Drop Percentage:" }
+                                    Label { 
+                                        text: dropPercent.percentage.toFixed(2) + "%"
+                                        color: dropPercent.percentage > 5 ? "red" : "green"
+                                    }
+                                }
+
+                                Button {
+                                    text: "Close"
+                                    Layout.alignment: Qt.AlignHCenter
+                                    onClicked: resultsPopup.close()
+                                }
+                            }
+                        }
+                    }
+
+                    // Update message popups
+                    Popup {
+                        id: saveSuccess
+                        modal: true
+                        focus: true
+                        anchors.centerIn: Overlay.overlay
+                        width: 400
+                        height: 100
+                        
+                        property string messageText: ""
+
+                        contentItem: ColumnLayout {
+                            Label {
+                                text: saveSuccess.messageText
+                                wrapMode: Text.WordWrap
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignHCenter
+                            }
+                            Button {
+                                text: "OK"
+                                Layout.alignment: Qt.AlignHCenter
+                                onClicked: saveSuccess.close()
+                            }
+                        }
+                    }
+
+                    Popup {
+                        id: saveError
+                        modal: true
+                        focus: true
+                        anchors.centerIn: Overlay.overlay
+                        width: 400
+                        height: 100
+                        
+                        property string messageText: ""
+
+                        contentItem: ColumnLayout {
+                            Label {
+                                text: saveError.messageText
+                                wrapMode: Text.WordWrap
+                                color: "red"
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignHCenter
+                            }
+                            Button {
+                                text: "OK"
+                                Layout.alignment: Qt.AlignHCenter
+                                onClicked: saveError.close()
+                            }
+                        }
+                    }
+
+
+
                 }
             }
         }

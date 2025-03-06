@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot, Signal, Property, QObject, QAbstractTableModel,
 import pandas as pd
 import numpy as np
 import math
+import os
 
 class VoltageDropTableModel(QAbstractTableModel):
     def __init__(self, parent=None):
@@ -76,6 +77,10 @@ class VoltageDropMVCalculator(QObject):
     diversityFactorChanged = Signal()  # Add new signal
     totalLoadChanged = Signal(float)  # Add new signal
     currentChanged = Signal(float)  # Add new signal
+    saveSuccess = Signal(bool)
+    saveStatusChanged = Signal(bool, str)  # Add new signal with status and message
+    numberOfHousesChanged = Signal(int)  # Add new signal
+    admdEnabledChanged = Signal(bool)    # Add new signal
 
     def __init__(self):
         super().__init__()
@@ -85,7 +90,7 @@ class VoltageDropMVCalculator(QObject):
         self._selected_cable = None
         self._voltage_drop = 0.0
         self._temperature = 25  # Default temp in °C
-        self._installation_method = "Standard"
+        self._installation_method = "D1 - Underground direct buried"
         self._grouping_factor = 1.0
         self._available_cables = []  # Add property storage
         self._installation_methods = [
@@ -123,6 +128,7 @@ class VoltageDropMVCalculator(QObject):
         self._total_kva = 0.0
         self._admd_enabled = False
         self._admd_factor = 1.5  # ADMD factor for neutral calculations
+        self._calculation_results = []  # Store calculation history
 
     def _load_all_cable_data(self):
         """Load all cable data variants."""
@@ -164,7 +170,7 @@ class VoltageDropMVCalculator(QObject):
             # Select first cable as default
             if self._available_cables:
                 self._selected_cable = self._cable_data.iloc[0]
-                print(f"Selected default cable: {self._selected_cable['size']}")
+                # print(f"Selected default cable: {self._selected_cable['size']}")
             self.cablesChanged.emit()
         except Exception as e:
             print(f"Error loading cable data: {e}")
@@ -178,7 +184,7 @@ class VoltageDropMVCalculator(QObject):
             # Rename columns to match expected names
             df.columns = ['houses', 'factor']
             self._diversity_factors = df
-            print("Loaded diversity factors:", self._diversity_factors)
+            # print("Loaded diversity factors:", self._diversity_factors)
         except Exception as e:
             print(f"Error loading diversity factors: {e}")
             self._diversity_factors = pd.DataFrame({'houses': [1], 'factor': [1.0]})
@@ -314,10 +320,11 @@ class VoltageDropMVCalculator(QObject):
     @Slot(int)
     def setNumberOfHouses(self, num_houses):
         """Set number of houses and update diversity factor."""
-        if num_houses > 0:
+        if num_houses > 0 and self._num_houses != num_houses:
             self._num_houses = num_houses
             self._diversity_factor = self._get_diversity_factor(num_houses)
             print(f"Updated houses to {num_houses}, diversity factor: {self._diversity_factor}")
+            self.numberOfHousesChanged.emit(num_houses)  # Emit signal
             self.diversityFactorChanged.emit()
             # Recalculate if we have a total kVA value
             if self._total_kva > 0:
@@ -346,9 +353,10 @@ class VoltageDropMVCalculator(QObject):
         if self._admd_enabled != enabled:
             self._admd_enabled = enabled
             self._calculate_voltage_drop()
+            self.admdEnabledChanged.emit(enabled)  # Emit signal
             print(f"ADMD {'enabled' if enabled else 'disabled'}")
 
-    @Property(bool)
+    @Property(bool, notify=admdEnabledChanged)  # Update property decorator
     def admdEnabled(self):
         """Get ADMD enabled state."""
         return self._admd_enabled
@@ -368,7 +376,7 @@ class VoltageDropMVCalculator(QObject):
         """Get current diversity factor."""
         return self._diversity_factor
 
-    @Property(int)
+    @Property(int, notify=numberOfHousesChanged)  # Update property decorator
     def numberOfHouses(self):
         """Get current number of houses."""
         return self._num_houses
@@ -410,6 +418,82 @@ class VoltageDropMVCalculator(QObject):
             print(f"Error calculating total load: {e}")
             return 0.0
 
+    @Slot()
+    def reset(self):
+        """Reset calculator to default values."""
+        # Reset core valuess
+        self._current = 0.0
+        self._length = 0.0
+        self._temperature = 25
+        self._installation_method = "D1 - Underground direct buried"
+        self._grouping_factor = 1.0
+        self._conductor_material = "Al"
+        self._core_type = "3C+E"
+        self._selected_voltage = "415V"
+        self._voltage = 415.0
+        self._num_houses = 1
+        self._total_kva = 0.0
+        self._admd_enabled = False
+        self._voltage_drop = 0.0
+        
+        # Clear table data
+        if self._table_model:
+            self._table_model.update_data([])
+        
+        # Emit all signals
+        self.dataChanged.emit()
+        self.currentChanged.emit(self._current)
+        self.conductorChanged.emit()
+        self.coreTypeChanged.emit()
+        self.selectedVoltageChanged.emit()
+        self.totalLoadChanged.emit(self._total_kva)
+        self.voltageDropCalculated.emit(self._voltage_drop)
+        self.tableDataChanged.emit()
+
+    @Slot()
+    def saveCurrentCalculation(self):
+        """Save current calculation results."""
+        try:
+            if self._selected_cable is None or self._voltage_drop == 0:
+                self.saveStatusChanged.emit(False, "No calculation to save")
+                return
+
+            timestamp = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+            result = {
+                'timestamp': timestamp,
+                'voltage_system': self._selected_voltage,
+                'kva_per_house': self._total_kva / self._num_houses if self._num_houses > 0 else self._total_kva,
+                'num_houses': self._num_houses,
+                'diversity_factor': self._diversity_factor,
+                'total_kva': self._total_kva,
+                'current': self._current,
+                'cable_size': float(self._selected_cable['size'].iloc[0]) if isinstance(self._selected_cable['size'], pd.Series) else float(self._selected_cable['size']),
+                'conductor': self._conductor_material,
+                'core_type': self._core_type,
+                'length': self._length,
+                'voltage_drop': self._voltage_drop,
+                'drop_percent': (self._voltage_drop / self._voltage) * 100,
+                'admd_enabled': self._admd_enabled
+            }
+            
+            # Ensure the directory exists
+            os.makedirs('results', exist_ok=True)
+            
+            # Save to CSV in results directory
+            filepath = 'results/calculations_history.csv'
+            df = pd.DataFrame([result])
+            file_exists = os.path.isfile(filepath)
+            df.to_csv(filepath, mode='a', header=not file_exists, index=False)
+            
+            success_msg = f"Calculation saved to {filepath}"
+            print(success_msg)
+            self.saveStatusChanged.emit(True, success_msg)
+            
+        except Exception as e:
+            error_msg = f"Error saving calculation: {e}"
+            print(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+
     def _calculate_voltage_drop(self):
         """Calculate voltage drop using mV/A/m method."""
         try:
@@ -418,7 +502,7 @@ class VoltageDropMVCalculator(QObject):
 
             # Apply ADMD factor if enabled and using 415V
             admd_multiplier = self._admd_factor if (self._admd_enabled and self._voltage > 230) else 1.0
-            print(f"ADMD multiplier: {admd_multiplier}, enabled: {self._admd_enabled}, voltage: {self._voltage}")
+            # print(f"ADMD multiplier: {admd_multiplier}, enabled: {self._admd_enabled}, voltage: {self._voltage}")
 
             table_data = []
             for _, cable in self._cable_data.iterrows():
@@ -470,7 +554,7 @@ class VoltageDropMVCalculator(QObject):
                     self._get_temperature_factor() * 
                     self._get_installation_factor() * 
                     self._grouping_factor *
-                    admd_multiplier /  # Apply ADMD factor here too
+                    admd_multiplier /
                     1000.0
                 )
                 self.voltageDropCalculated.emit(self._voltage_drop)

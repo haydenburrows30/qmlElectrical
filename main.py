@@ -16,6 +16,7 @@ from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.VoltageDropMV import VoltageDropMVCalculator
+from models.ResultsManager import ResultsManager
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
@@ -80,6 +81,9 @@ class Application:
         # Register the SineWaveModel type explicitly
         qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")
         
+        # Create and register ResultsManager
+        self.results_manager = ResultsManager()
+        
         self.setup()
         
     def setup(self):
@@ -128,7 +132,8 @@ class Application:
             (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
             (PhasorPlot, "PPlot", 1, 0, "PhasorPlot"),
-            (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV")
+            (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV"),
+            (ResultsManager, "Results", 1, 0, "ResultsManager")
         ]
 
     def load_qml(self):

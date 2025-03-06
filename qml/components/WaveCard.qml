@@ -16,6 +16,7 @@ Pane {
     property string title: ""
     default property alias content: container.children
     property alias info: image.source
+    property string righticon: "Info"
     property bool showInfo: true
 
     padding: 8
@@ -40,7 +41,7 @@ Pane {
 
             CButton {
                 id: help
-                icon.name: "Info"
+                icon.name: righticon
                 visible: showInfo
                 width: 40
                 height:40
@@ -48,7 +49,7 @@ Pane {
                 onClicked: {
                     if (info > "") {
                         image.visible ? image.close() : image.show()
-                    } 
+                    }
                 }
             }
         }
