@@ -5,6 +5,7 @@ from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.PythonModel import PythonModel
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
+from models.VoltageDropMV import VoltageDropMVCalculator
 
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
@@ -75,7 +76,8 @@ class ModelFactory(IModelFactory):
             "resonant_freq": ResonantFreq,
             "conversion_calc": ConversionCalculator,
             "series_rlc_chart": SeriesRLCChart,
-            "phasor_plot": PhasorPlot
+            "phasor_plot": PhasorPlot,
+            "voltage_drop": VoltageDropMVCalculator
         }
         
         if model_type not in model_map:

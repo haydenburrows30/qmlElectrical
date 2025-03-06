@@ -4,11 +4,11 @@
     <file>qml/main.qml</file>
 
     <!-- Pages -->
-    <file>qml/pages/home.qml</file>
-    <file>qml/pages/voltage_drop.qml</file>
-    <file>qml/pages/calculator.qml</file>
+    <file>qml/pages/Home.qml</file>
+    <file>qml/pages/VoltageDrop.qml</file>
+    <file>qml/pages/Calculator.qml</file>
     <file>qml/pages/ThreePhase.qml</file>
-    <file>qml/pages/phasor.qml</file>
+    <file>qml/pages/Phasor.qml</file>
 
     <!-- Core Components -->
     <file>qml/components/AToolTip.qml</file>

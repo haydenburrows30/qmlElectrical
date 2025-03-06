@@ -15,6 +15,7 @@ from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingC
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
+from models.VoltageDropMV import VoltageDropMVCalculator
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
@@ -98,7 +99,7 @@ class Application:
 
     def load_models(self):
         """Initialize and configure application models using factories."""
-        self.voltage_model = self.model_factory.create_model("voltage", csv_path="cable_data.csv")
+        self.voltage_model = self.model_factory.create_model("voltage", csv_path="data/cable_data.csv")
         self.power_calculator = self.calculator_factory.create_calculator("power")
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
         self.sine_wave = self.model_factory.create_model("three_phase")
@@ -106,6 +107,7 @@ class Application:
         self.conversion_calc = self.model_factory.create_model("conversion_calc")
         self.series_LC_chart = self.model_factory.create_model("series_rlc_chart")
         self.phasorPlotter = self.model_factory.create_model("phasor_plot")
+        self.voltage_drop = self.model_factory.create_model("voltage_drop")
 
     def register_qml_types(self):
         for type_info in self.get_qml_types():
@@ -125,7 +127,8 @@ class Application:
             (ResonantFreq, "RFreq", 1, 0, "ResonantFreq"),
             (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
-            (PhasorPlot, "PPlot", 1, 0, "PhasorPlot")
+            (PhasorPlot, "PPlot", 1, 0, "PhasorPlot"),
+            (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV")
         ]
 
     def load_qml(self):

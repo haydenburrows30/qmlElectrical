@@ -63,6 +63,14 @@ ApplicationWindow {
         id: phasorPlot
     }
 
+    SineWaveModel {
+        id: sineModel
+    }
+
+    VoltageDropMV {
+        id: voltageDropMV
+    }
+
     ToolBar{
         id: toolBar
         width: parent.width
@@ -88,7 +96,7 @@ ApplicationWindow {
             leftMargin: 0
             right: parent.right
         }
-        Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/home.qml"),StackView.Immediate)
+        Component.onCompleted: stackView.push(Qt.resolvedUrl("pages/Home.qml"),StackView.Immediate)
 
         states: [State {
             name: "closed"; when: sideBar.hide

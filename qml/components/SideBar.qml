@@ -95,19 +95,19 @@ Drawer {
             model: ListModel {
                 ListElement {
                     title: "Home"
-                    source: "../pages/home.qml"
+                    source: "../pages/Home.qml"
                     tooltip: "Home"
                     icon: "Home"
                     }
                 ListElement {
                     title: "Voltage Drop"
-                    source: "../pages/voltage_drop.qml"
+                    source: "../pages/VoltageDrop.qml"
                     tooltip: "Voltage Drop"
                     icon: "Voltage Drop"
                 }
                 ListElement {
                     title: "Calculator"
-                    source: "../pages/calculator.qml"
+                    source: "../pages/Calculator.qml"
                     tooltip: "Calculator"
                     icon: "Calculator"
                 }
@@ -119,7 +119,13 @@ Drawer {
                 }
                 ListElement {
                     title: "Phasor"
-                    source: "../pages/phasor.qml"
+                    source: "../pages/Phasor.qml"
+                    tooltip: "RLC"
+                    icon: "RLC"
+                }
+                ListElement {
+                    title: "Phasor"
+                    source: "../pages/VoltageDropMV.qml"
                     tooltip: "RLC"
                     icon: "RLC"
                 }

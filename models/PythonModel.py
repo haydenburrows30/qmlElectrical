@@ -10,7 +10,7 @@ class PythonModel(QAbstractTableModel):
     csvLoaded = Signal()
     chartDataChanged = Signal()
 
-    def __init__(self, csv_file="cable_data.csv"):
+    def __init__(self, csv_file="data/cable_data.csv"):
         super().__init__()
         self._data = [
             [1, "10", "0", "415", "5", "100", "", "", ""]

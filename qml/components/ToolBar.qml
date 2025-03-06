@@ -8,10 +8,9 @@ ToolBar {
     id:toolBar
     property bool toggle : action.checked
 
-    // background: Rectangle {
-    //     implicitHeight: 60
-    //     opacity: 0
-    // }
+    background: Rectangle {
+        color: toolBar.toggle ? "black" : "white"
+    }
 
     signal mySignal()
 

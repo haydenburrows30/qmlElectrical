@@ -15,18 +15,42 @@ Pane {
     id: card
     property string title: ""
     default property alias content: container.children
+    property alias info: image.source
+    property bool showInfo: true
 
-    padding: 16
+    padding: 8
+
+    ImageContainer {
+        id: image
+    }
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 12
+        spacing: 2
 
-        Label {
-            text: title
-            font.pixelSize: 16
-            font.weight: Font.Medium
-            visible: title !== ""
+        RowLayout {
+            Layout.minimumHeight: 40
+            Label {
+                text: title
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                visible: title !== ""
+                Layout.fillWidth: true
+            }
+
+            CButton {
+                id: help
+                icon.name: "Info"
+                visible: showInfo
+                width: 40
+                height:40
+                tooltip_text: "Info"
+                onClicked: {
+                    if (info > "") {
+                        image.visible ? image.close() : image.show()
+                    } 
+                }
+            }
         }
 
         Item {
