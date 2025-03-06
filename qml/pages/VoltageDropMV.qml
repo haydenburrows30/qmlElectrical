@@ -274,6 +274,7 @@ Page {
                                 text: "10.0"
                                 font.bold: true
                                 Layout.fillWidth: true
+                                color: toolBar.toggle ? "#ffffff" : "#000000"
 
                                 Connections {
                                     target: voltageDropMV
