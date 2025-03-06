@@ -351,47 +351,52 @@ Page {
                         title: "Cable Size Comparison"
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-
                         showInfo: false
 
                         ColumnLayout {
                             anchors.fill: parent
 
-                            // Header row
-                            Rectangle {
+                            // Header row that syncs with table
+                            Item {
                                 Layout.fillWidth: true
                                 height: 40
-                                color: toolBar.toggle ? "#424242" : "#e0e0e0"
+                                clip: true
 
-                                Row {
-                                    anchors.fill: parent
+                                Rectangle {
+                                    width: tableView.width
+                                    height: parent.height
+                                    color: toolBar.toggle ? "#424242" : "#e0e0e0"
+                                    x: -tableView.contentX  // Sync with table horizontal scroll
                                     
-                                    Repeater {
-                                        model: [
-                                            "Size (mm²)", 
-                                            "Material", 
-                                            "Cores", 
-                                            "mV/A/m", 
-                                            "Rating (A)", 
-                                            "V-Drop (V)", 
-                                            "Drop %", 
-                                            "Status"
-                                        ]
-                                        
-                                        Rectangle {
-                                            width: getColumnWidth(index)
-                                            height: parent.height
-                                            color: "transparent"
+                                    Row {
+                                        anchors.fill: parent
+                                        Repeater {
+                                            model: [
+                                                "Size (mm²)", 
+                                                "Material", 
+                                                "Cores", 
+                                                "mV/A/m", 
+                                                "Rating (A)", 
+                                                "V-Drop (V)", 
+                                                "Drop %", 
+                                                "Status"
+                                            ]
                                             
-                                            Label {
-                                                anchors.fill: parent
-                                                anchors.margins: 8
-                                                text: modelData
-                                                font.bold: true
-                                                horizontalAlignment: Text.AlignLeft
-                                                verticalAlignment: Text.AlignVCenter
-                                                elide: Text.ElideRight
-                                                color: toolBar.toggle ? "#ffffff" : "#000000"
+                                            Rectangle {
+                                                width: getColumnWidth(index)
+                                                height: parent.height
+                                                color: "transparent"
+                                                
+                                                Label {
+                                                    anchors.fill: parent
+                                                    anchors.margins: 8
+                                                    text: modelData
+                                                    font.bold: true
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    verticalAlignment: Text.AlignVCenter
+                                                    elide: Text.ElideRight
+                                                    color: toolBar.toggle ? "#ffffff" : "#000000"
+                                                }
                                             }
                                         }
                                     }
@@ -399,53 +404,79 @@ Page {
                             }
 
                             // Table content
-                            TableView {
+                            ScrollView {
+                                id: tableScrollView
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                                ScrollBar.vertical.policy: ScrollBar.AsNeeded
                                 clip: true
-                                model: voltageDropMV.tableModel
 
-                                delegate: Rectangle {
-                                    implicitWidth: getColumnWidth(column)
-                                    implicitHeight: 40
-                                    color: {
-                                        if (column === 7) {  // Status column
-                                            switch(model.display) {
-                                                case "SEVERE": return "#ffebee"  // Red background
-                                                case "WARNING": return "#fff3e0"  // Orange background
-                                                case "SUBMAIN": return "#e3f2fd"  // Blue background
-                                                case "OK": return "#e8f5e9"      // Green background
-                                                default: return "transparent"
+                                TableView {
+                                    id: tableView
+                                    anchors.fill: parent
+                                    model: voltageDropMV.tableModel
+                                    boundsMovement: Flickable.StopAtBounds
+
+                                    // Remove the sync code since we're using x binding now
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        acceptedButtons: Qt.NoButton
+                                        propagateComposedEvents: true
+                                        
+                                        // Change the wheel handler to explicitly define the parameter
+                                        onWheel: function(wheelEvent) {
+                                            if (wheelEvent.modifiers & Qt.ControlModifier) {
+                                                wheelEvent.accepted = false;
+                                            } else {
+                                                var delta = wheelEvent.angleDelta.y / 120;
+                                                parent.contentY -= delta * 40;
+                                                wheelEvent.accepted = true;
                                             }
                                         }
-                                        return row % 2 ? (toolBar.toggle ? "#2d2d2d" : "#f5f5f5") 
-                                                    : (toolBar.toggle ? "#1d1d1d" : "#ffffff")
                                     }
 
-                                    Text {
-                                        anchors.fill: parent
-                                        anchors.margins: 8
-                                        text: model.display
+                                    delegate: Rectangle {
+                                        implicitWidth: getColumnWidth(column)
+                                        implicitHeight: 40
                                         color: {
                                             if (column === 7) {  // Status column
                                                 switch(model.display) {
-                                                    case "SEVERE": return "#c62828"  // Dark red
-                                                    case "WARNING": return "#ef6c00"  // Dark orange
-                                                    case "SUBMAIN": return "#1565c0"  // Dark blue
-                                                    case "OK": return "#2e7d32"      // Dark green
-                                                    default: return toolBar.toggle ? "#ffffff" : "#000000"
+                                                    case "SEVERE": return "#ffebee"  // Red background
+                                                    case "WARNING": return "#fff3e0"  // Orange background
+                                                    case "SUBMAIN": return "#e3f2fd"  // Blue background
+                                                    case "OK": return "#e8f5e9"      // Green background
+                                                    default: return "transparent"
                                                 }
                                             }
-                                            return toolBar.toggle ? "#ffffff" : "#000000"
+                                            return row % 2 ? (toolBar.toggle ? "#2d2d2d" : "#f5f5f5") 
+                                                        : (toolBar.toggle ? "#1d1d1d" : "#ffffff")
                                         }
-                                        font.bold: column === 7  // Status column
-                                        verticalAlignment: Text.AlignVCenter
+
+                                        Text {
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            text: model.display
+                                            color: {
+                                                if (column === 7) {  // Status column
+                                                    switch(model.display) {
+                                                        case "SEVERE": return "#c62828"  // Dark red
+                                                        case "WARNING": return "#ef6c00"  // Dark orange
+                                                        case "SUBMAIN": return "#1565c0"  // Dark blue
+                                                        case "OK": return "#2e7d32"      // Dark green
+                                                        default: return toolBar.toggle ? "#ffffff" : "#000000"
+                                                    }
+                                                }
+                                                return toolBar.toggle ? "#ffffff" : "#000000"
+                                            }
+                                            font.bold: column === 7  // Status column
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-
 
                     // Update SavedResults card with resultsManager property
                     SavedResults {
@@ -493,15 +524,21 @@ Page {
                                     // Load Details
                                     Label { text: "Load Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
                                     Label { text: "KVA per House:" }
-                                    Label { text: (voltageDropMV.totalKva / voltageDropMV.numberOfHouses).toFixed(1) + " kVA" }
+                                    Label { 
+                                        text: {
+                                            const totalKva = voltageDropMV.totalKva || 0
+                                            const houses = voltageDropMV.numberOfHouses || 1
+                                            return (totalKva / houses).toFixed(1) + " kVA"
+                                        }
+                                    }
                                     Label { text: "Number of Houses:" }
-                                    Label { text: voltageDropMV.numberOfHouses }
+                                    Label { text: voltageDropMV.numberOfHouses || 1 }
                                     Label { text: "Diversity Factor:" }
-                                    Label { text: voltageDropMV.diversityFactor.toFixed(3) }
+                                    Label { text: (voltageDropMV.diversityFactor || 1.0).toFixed(3) }
                                     Label { text: "Total Load:" }
-                                    Label { text: voltageDropMV.totalKva.toFixed(1) + " kVA" }
+                                    Label { text: (voltageDropMV.totalKva || 0).toFixed(1) + " kVA" }
                                     Label { text: "Current:" }
-                                    Label { text: voltageDropMV.current.toFixed(1) + " A" }
+                                    Label { text: (voltageDropMV.current || 0).toFixed(1) + " A" }
 
                                     // Cable Details
                                     Label { text: "Cable Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }

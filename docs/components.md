@@ -58,6 +58,31 @@ Features:
 - Error checking
 - Chart visualization
 
+## Voltage Drop Calculator Components
+
+### SavedResults
+Component for displaying and managing saved calculation history:
+- Table view of all calculations
+- Clear all functionality
+- Refresh capability
+- Dark/light theme support
+
+Example usage:
+```qml
+SavedResults {
+    Layout.fillWidth: true
+    Layout.minimumHeight: 300
+    resultsManager: resultsManager  // Pass manager instance
+}
+```
+
+### Results Actions
+Available operations:
+- Save current calculation
+- Clear all results
+- Refresh view
+- View calculation details
+
 ## Component Integration
 
 ### Signal Flow
@@ -193,4 +218,3 @@ Displays calculated values:
 - RMS values for each phase
 - Peak values for each phase
 - Line-to-line RMS voltages
-```

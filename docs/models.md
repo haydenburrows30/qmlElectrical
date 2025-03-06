@@ -87,3 +87,39 @@ calculator.setNumberOfHouses(20)  # Apply diversity
 calculator.setLength(200)  # Set cable length
 calculator.setADMDEnabled(True)  # Enable neutral calculations
 ```
+
+## ResultsManager
+Manages saved voltage drop calculation results with table view support.
+
+### Features
+- CSV-based storage and retrieval
+- Table model for QML display
+- Auto-formatting of results
+- Persistence between sessions
+
+### Properties
+- `tableModel`: QAbstractTableModel for QML TableView
+- Supports columns:
+  - Date/Time
+  - System Voltage
+  - Load (kVA)
+  - Houses
+  - Cable Details
+  - Length
+  - Current
+  - Voltage Drop
+  - Drop Percentage
+
+### Methods
+```python
+refresh_results()  # Reload from CSV
+clear_all_results()  # Clear all saved data
+removeResult(index)  # Remove single result
+```
+
+### Storage Format
+```csv
+timestamp,voltage_system,kva_per_house,num_houses,diversity_factor,
+total_kva,current,cable_size,conductor,core_type,length,
+voltage_drop,drop_percent,admd_enabled
+```

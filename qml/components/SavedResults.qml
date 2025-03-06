@@ -23,6 +23,33 @@ WaveCard {
                 icon.name: "Reset"
                 onClicked: resultsManager.refresh_results()
             }
+
+            Button {
+                text: "Clear All"
+                icon.name: "Delete"
+                onClicked: confirmClearDialog.open()
+            }
+        }
+
+        // Add confirmation dialog
+        Dialog {
+            id: confirmClearDialog
+            title: "Clear All Results"
+            modal: true
+            standardButtons: Dialog.Yes | Dialog.No
+            anchors.centerIn: Overlay.overlay
+            width: 300
+
+            Label {
+                text: "Are you sure you want to delete all saved results?\nThis action cannot be undone."
+                wrapMode: Text.WordWrap
+                width: parent.width
+            }
+
+            onAccepted: {
+                resultsManager.clear_all_results()
+                resultsManager.refresh_results()
+            }
         }
 
         Rectangle {

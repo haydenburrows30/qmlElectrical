@@ -165,6 +165,35 @@ Label {
 - Monitor cable current ratings
 - Check voltage drop limits
 
+## SavedResults
+Component for displaying voltage drop calculation history.
+
+### Properties
+- `resultsManager: ResultsManager` - Required property for results management
+
+### Methods
+None (uses ResultsManager methods)
+
+### Example Usage
+```qml
+SavedResults {
+    resultsManager: resultsManager
+    Layout.fillWidth: true
+    Layout.minimumHeight: 300
+}
+
+// Clear all results with confirmation
+Dialog {
+    title: "Clear All Results"
+    standardButtons: Dialog.Yes | Dialog.No
+    
+    onAccepted: {
+        resultsManager.clear_all_results()
+        resultsManager.refresh_results()
+    }
+}
+```
+
 ## Layout Guidelines
 
 ### Grid Layout

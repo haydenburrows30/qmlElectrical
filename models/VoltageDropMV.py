@@ -228,6 +228,11 @@ class VoltageDropMVCalculator(QObject):
             print(f"Error calculating diversity factor: {e}")
             return 1.0
 
+    @Property(float, notify=totalLoadChanged)
+    def totalKva(self):
+        """Get total KVA value."""
+        return self._total_kva
+
     @Property(float, notify=currentChanged)
     def current(self):
         """Get the current value in amperes."""
