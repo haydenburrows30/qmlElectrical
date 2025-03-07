@@ -53,6 +53,7 @@
 
     <!-- Configuration -->
     <file>qtquickcontrols2.conf</file>
+    <file>qml/components/qmldir</file>
 
     <!-- Fonts -->
     <file>fonts/MaterialIcons-Regular.ttf</file>

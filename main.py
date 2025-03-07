@@ -49,34 +49,38 @@ class Application:
     - Application lifecycle
     """
     
-    def __init__(self, container: Container, config: Optional[AppConfig] = None):
+    def __init__(self, container: Optional[Container] = None):
         """Initialize application with dependency container and configuration.
         
         Args:
             container: Dependency injection container
             config: Optional application configuration
         """
-        self.config = config or AppConfig()
-        self.container = container
+        self.config = AppConfig()
+        self.container = container or Container()
         
         # Create QApplication first
         self.app = QApplication(sys.argv)
         
         # Resolve dependencies
-        self.logger = container.resolve(ILogger)
-        self.calculator_factory = container.resolve(ICalculatorFactory)
-        self.qml_engine = container.resolve(IQmlEngine)
-        self.model_factory = container.resolve(IModelFactory)
+        self.logger = self.container.resolve(ILogger)
+        self.calculator_factory = self.container.resolve(ICalculatorFactory)
+        self.qml_engine = self.container.resolve(IQmlEngine)
+        self.model_factory = self.container.resolve(IModelFactory)
         
         # Initialize QML engine with QApplication
         self.qml_engine.initialize(self.app)
         
-        # Add component directory to import path
-        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR, "qml"))
-        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR, "qml/components"))
+        # Add import paths in correct order
+        self.qml_engine.engine.addImportPath(os.path.dirname(CURRENT_DIR))  # Root path
+        self.qml_engine.engine.addImportPath(CURRENT_DIR)  # Project path
         
-        # Add this before loading QML
-        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR))
+        # Add explicit paths for components
+        components_path = os.path.join(CURRENT_DIR, "qml", "components")
+        self.qml_engine.engine.addImportPath(os.path.dirname(components_path))
+        
+        # Clear QML cache (optional, but can help with registration issues)
+        self.qml_engine.engine.clearComponentCache()
         
         # Register the SineWaveModel type explicitly
         qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")

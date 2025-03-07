@@ -4,3 +4,7 @@ WaveControls 1.0 WaveControls.qml
 WaveChart 1.0 WaveChart.qml
 PhasorView 1.0 PhasorView.qml
 Measurements 1.0 Measurements.qml
+PhaseTable 1.0 PhaseTable.qml
+PowerTriangle 1.0 PowerTriangle.qml
+PhasorDiagram 1.0 PhasorDiagram.qml
+SavedResults 1.0 SavedResults.qml

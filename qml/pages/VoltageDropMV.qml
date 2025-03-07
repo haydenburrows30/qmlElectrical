@@ -9,7 +9,7 @@ import QtCharts
 
 import QtQuick.Studio.DesignEffects
 
-import '../components'
+import components 1.0
 
 import VDropMV 1.0
 import Results 1.0  // Add this import
@@ -318,7 +318,24 @@ Page {
                                     text: "Save Results"
                                     icon.name: "Save"
                                     enabled: root.currentVoltageDropValue > 0
-                                    onClicked: voltageDropMV.saveCurrentCalculation()
+                                    onClicked: {
+                                        // Save current calculation
+                                        resultsManager.save_calculation({
+                                            "voltage_system": voltageSelect.currentText,
+                                            "kva_per_house": parseFloat(kvaPerHouseInput.text),
+                                            "num_houses": parseInt(numberOfHousesInput.text),
+                                            "diversity_factor": voltageDropMV.diversityFactor,
+                                            "total_kva": parseFloat(totalLoadText.text),
+                                            "current": parseFloat(currentInput.text),
+                                            "cable_size": cableSelect.currentText,
+                                            "conductor": conductorSelect.currentText,
+                                            "core_type": coreTypeSelect.currentText,
+                                            "length": parseFloat(lengthInput.text),
+                                            "voltage_drop": root.currentVoltageDropValue,
+                                            "drop_percent": dropPercent.percentage,
+                                            "admd_enabled": admdCheckBox.checked
+                                        });
+                                    }
                                 }
 
                                 Button {
@@ -651,6 +668,29 @@ Page {
             case 6: return 100  // Drop %
             case 7: return 100  // Status
             default: return 100
+        }
+    }
+
+    function calculateVoltageDropMV() {
+        // ...existing calculation code...
+
+        if (result.isValid) {
+            // Save calculation to history
+            resultsManager.save_calculation({
+                "voltage_system": systemComboBox.currentText,
+                "kva_per_house": kvaPerHouseSpinBox.value,
+                "num_houses": numHousesSpinBox.value,
+                "diversity_factor": diversityFactorSpinBox.value,
+                "total_kva": totalKVA,
+                "current": current,
+                "cable_size": cableComboBox.currentValue,
+                "conductor": conductorComboBox.currentText,
+                "core_type": coreComboBox.currentText,
+                "length": lengthSpinBox.value,
+                "voltage_drop": vDrop,
+                "drop_percent": dropPercent,
+                "admd_enabled": admdCheckbox.checked
+            });
         }
     }
 }

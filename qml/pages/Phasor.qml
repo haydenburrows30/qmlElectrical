@@ -154,7 +154,7 @@ Page {
                                 Layout.fillWidth:  true
                                 
                             }
-                            Text {
+                            Label {
                                 text: seriesRLCChart.resonantFreq.toFixed(2) + " Hz"
                                 Layout.preferredWidth: 150
                                 Layout.alignment: Qt.AlignHCenter

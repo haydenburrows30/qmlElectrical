@@ -4,8 +4,7 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
 import Sine 1.0
-
-import "../components"
+import components 1.0
 
 Page {
     id: root
@@ -30,67 +29,147 @@ Page {
                 spacing: 5
 
                 ColumnLayout {
-                    WaveControls {
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 280
-                        model: sineModel
-                    }
-
-                    WaveCard {
-                        title: "Waveform"
-                        Layout.fillWidth: true
-                        Layout.minimumWidth: 800
-                        Layout.minimumHeight: 400
-                        showInfo: false
-                        
-                        WaveChart {
-                            anchors.fill: parent
+                    RowLayout {
+                        WaveControls {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 400
+                            Layout.minimumWidth: 700
                             model: sineModel
                         }
-                    }
-                }
 
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    WaveCard {
-                        title: "Measurements & Analysis"
-                        Layout.minimumHeight: 280
-                        Layout.minimumWidth: 530
-                        showInfo: false
+                        WaveCard {
+                            title: "Measurements"
+                            Layout.minimumHeight: 400
+                            Layout.minimumWidth: 550
+                            showInfo: false
 
-                        ColumnLayout {
-                            anchors.fill: parent
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 10
 
-                            Measurements {
-                                Layout.fillWidth: true
-                                model: sineModel
+                                PhaseTable {
+                                    Layout.fillWidth: true
+                                    model: sineModel
+                                }
+
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 1
+                                    color: toolBar.toggle ? "#404040" : "#e0e0e0"
+                                }
+
+                                GridLayout {
+                                    columns: 2
+                                    columnSpacing: 20
+                                    Layout.fillWidth: true
+                                    Layout.topMargin: 10
+
+                                    Label { text: "Line-to-Line RMS"; font.bold: true }
+                                    Label { text: "Voltage (V)"; font.bold: true }
+
+                                    Label { text: "VAB" }
+                                    Label { text: sineModel.rmsAB.toFixed(1) }
+
+                                    Label { text: "VBC" }
+                                    Label { text: sineModel.rmsBC.toFixed(1) }
+
+                                    Label { text: "VCA" }
+                                    Label { text: sineModel.rmsCA.toFixed(1) }
+
+                                    Item { Layout.columnSpan: 2; Layout.preferredHeight: 10 }
+
+                                    Label { text: "Average Power Factor"; font.bold: true }
+                                    Label { 
+                                        text: sineModel.averagePowerFactor.toFixed(3)
+                                        font.bold: true 
+                                    }
+                                }
                             }
                         }
-                    }
-                    
-                    WaveCard {
-                        title: "Phasor Diagram"
-                        Layout.minimumWidth: 530
-                        Layout.fillHeight: true
-                        showInfo: false
-                        
-                        PhasorDiagram {
-                            anchors.fill: parent
-                            phaseAngles: [
-                                sineModel.phaseAngleA,
-                                sineModel.phaseAngleB,
-                                sineModel.phaseAngleC
-                            ]
-                            onAngleChanged: function(index, angle) {
-                                switch(index) {
-                                    case 0: sineModel.setPhaseAngleA(angle); break;
-                                    case 1: sineModel.setPhaseAngleB(angle); break;
-                                    case 2: sineModel.setPhaseAngleC(angle); break;
+
+                        WaveCard {
+                            title: "Power Analysis"
+                            Layout.minimumHeight: 400
+                            Layout.minimumWidth: 300
+                            showInfo: false
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+
+                                PowerTriangle {
+                                    Layout.fillWidth: true
+                                    // Layout.fillHeight: true
+                                    Layout.minimumHeight: 200
+                                    Layout.minimumWidth: 250
+                                    // Layout.fillHeight: true
+                                    activePower: sineModel.activePower
+                                    reactivePower: sineModel.reactivePower
+                                    apparentPower: sineModel.apparentPower
+                                    powerFactor: sineModel.averagePowerFactor
+                                }
+
+                                GridLayout {
+                                    columns: 2
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 100
+                                    // Layout.fillHeight: true
+                                    
+                                    Label { text: "Total Apparent Power (S):" }
+                                    Label { text: sineModel.apparentPower.toFixed(2) + " kVA" }
+                                    
+                                    Label { text: "Total Active Power (P):" }
+                                    Label { text: sineModel.activePower.toFixed(2) + " kW" }
+                                    
+                                    Label { text: "Total Reactive Power (Q):" }
+                                    Label { text: sineModel.reactivePower.toFixed(2) + " kVAR" }
+                                    
+                                    Label { text: "System Power Factor:" }
+                                    Label { text: sineModel.averagePowerFactor.toFixed(3) }
                                 }
                             }
                         }
                     }
-                }
+
+                    RowLayout {
+                        WaveCard {
+                            title: "Waveform"
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 500
+                            Layout.minimumHeight: 400
+                            showInfo: false
+                            
+                            WaveChart {
+                                anchors.fill: parent
+                                model: sineModel
+                            }
+                        }
+
+                        WaveCard {
+                            title: "Phasor Diagram"
+                            Layout.minimumWidth: 530
+                            Layout.fillHeight: true
+                            showInfo: false
+                            
+                            PhasorDiagram {
+                                anchors.fill: parent
+                                phaseAngles: [
+                                    sineModel.phaseAngleA,
+                                    sineModel.phaseAngleB,
+                                    sineModel.phaseAngleC
+                                ]
+                                onAngleChanged: function(index, angle) {
+                                    switch(index) {
+                                        case 0: sineModel.setPhaseAngleA(angle); break;
+                                        case 1: sineModel.setPhaseAngleB(angle); break;
+                                        case 2: sineModel.setPhaseAngleC(angle); break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }                
             }
         }
     }

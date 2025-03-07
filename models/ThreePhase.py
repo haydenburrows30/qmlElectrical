@@ -45,6 +45,15 @@ class ThreePhaseSineWaveModel(QObject):
         self._cache = {}
         self._cache_key = None
         self._time_period = 1.0  # 1 second to show 50 cycles of 50Hz
+        self._current_angle_a = 30.0  # Default 30° lag
+        self._current_angle_b = 30.0
+        self._current_angle_c = 30.0
+        self._apparent_power = 0.0
+        self._reactive_power = 0.0
+        # Add current magnitudes (default 1A per phase)
+        self._currentA = 1.0
+        self._currentB = 1.0
+        self._currentC = 1.0
         self.update_wave()
         
     @Slot(QXYSeries,QXYSeries,QXYSeries)
@@ -271,18 +280,47 @@ class ThreePhaseSineWaveModel(QObject):
 
     @Property(float, notify=dataChanged)
     def activePower(self):
-        """Calculate total three-phase active power in kilowatts"""
-        # Convert VA to kW (assuming unity power factor)
-        power_watts = (self._rms_a * self._rms_a + 
-                      self._rms_b * self._rms_b + 
-                      self._rms_c * self._rms_c)
-        return power_watts / 1000.0  # Convert to kW
+        """Calculate total active power (P = VI cos(φ)) in kW
+        φ is the angle between voltage and current"""
+        power_a = self._rms_a * self._currentA * np.cos(np.radians(self._current_angle_a - self._phase_angle_a))
+        power_b = self._rms_b * self._currentB * np.cos(np.radians(self._current_angle_b - self._phase_angle_b))
+        power_c = self._rms_c * self._currentC * np.cos(np.radians(self._current_angle_c - self._phase_angle_c))
+        return (power_a + power_b + power_c) / 1000.0
+
+    @Property(float, notify=dataChanged)
+    def reactivePower(self):
+        """Calculate total reactive power (Q = VI sin(φ)) in kVAR
+        φ is the angle between voltage and current"""
+        power_a = self._rms_a * self._currentA * np.sin(np.radians(self._current_angle_a - self._phase_angle_a))
+        power_b = self._rms_b * self._currentB * np.sin(np.radians(self._current_angle_b - self._phase_angle_b))
+        power_c = self._rms_c * self._currentC * np.sin(np.radians(self._current_angle_c - self._phase_angle_c))
+        return (power_a + power_b + power_c) / 1000.0
 
     @Property(float, notify=dataChanged)
     def thd(self):
         """Calculate Total Harmonic Distortion (simplified)"""
         # For this demo, return a calculated value based on frequency
         return max(0.1, min(5.0, self._frequency / 50.0))
+
+    @Property(float, notify=dataChanged)
+    def powerFactorA(self):
+        """Calculate power factor for phase A using angle difference"""
+        return abs(np.cos(np.radians(self._current_angle_a - self._phase_angle_a)))
+
+    @Property(float, notify=dataChanged)
+    def powerFactorB(self):
+        """Calculate power factor for phase B using angle difference"""
+        return abs(np.cos(np.radians(self._current_angle_b - self._phase_angle_b)))
+
+    @Property(float, notify=dataChanged)
+    def powerFactorC(self):
+        """Calculate power factor for phase C using angle difference"""
+        return abs(np.cos(np.radians(self._current_angle_c - self._phase_angle_c)))
+
+    @Property(float, notify=dataChanged)
+    def averagePowerFactor(self):
+        """Calculate average power factor"""
+        return (self.powerFactorA + self.powerFactorB + self.powerFactorC) / 3.0
 
     @Slot(float)
     def setFrequency(self, freq):
@@ -333,6 +371,80 @@ class ThreePhaseSineWaveModel(QObject):
             self._cache_key = None  # Invalidate cache
             self.update_wave()
             self.dataChanged.emit()
+
+    @Slot(float)
+    def setCurrentAngleA(self, angle):
+        if self._current_angle_a != angle:
+            self._current_angle_a = angle
+            self._cache_key = None
+            self.update_wave()
+
+    @Slot(float)
+    def setCurrentAngleB(self, angle):
+        if self._current_angle_b != angle:
+            self._current_angle_b = angle
+            self._cache_key = None
+            self.update_wave()
+
+    @Slot(float)
+    def setCurrentAngleC(self, angle):
+        if self._current_angle_c != angle:
+            self._current_angle_c = angle
+            self._cache_key = None
+            self.update_wave()
+
+    @Property(float, notify=dataChanged)
+    def apparentPower(self):
+        """Calculate total apparent power (S = VI) in kVA"""
+        power_a = self._rms_a * self._currentA
+        power_b = self._rms_b * self._currentB
+        power_c = self._rms_c * self._currentC
+        return (power_a + power_b + power_c) / 1000.0
+
+    @Slot(float)
+    def setCurrentA(self, current):
+        if self._currentA != current:
+            self._currentA = current
+            self._cache_key = None
+            self.update_wave()
+
+    @Slot(float)
+    def setCurrentB(self, current):
+        if self._currentB != current:
+            self._currentB = current
+            self._cache_key = None
+            self.update_wave()
+
+    @Slot(float)
+    def setCurrentC(self, current):
+        if self._currentC != current:
+            self._currentC = current
+            self._cache_key = None
+            self.update_wave()
+
+    @Property(float, constant=True)
+    def currentA(self):
+        return self._currentA
+
+    @Property(float, constant=True)
+    def currentB(self):
+        return self._currentB
+
+    @Property(float, constant=True)
+    def currentC(self):
+        return self._currentC
+
+    @Property(float, constant=True)
+    def currentAngleA(self):
+        return self._current_angle_a
+
+    @Property(float, constant=True)
+    def currentAngleB(self):
+        return self._current_angle_b
+
+    @Property(float, constant=True)
+    def currentAngleC(self):
+        return self._current_angle_c
 
     @Slot()
     def reset(self):
