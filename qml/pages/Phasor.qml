@@ -50,6 +50,10 @@ Page {
         
         Flickable {
             contentHeight: mainLayout.height
+            bottomMargin : 5
+            leftMargin : 5
+            rightMargin : 5
+            topMargin : 5
 
             RowLayout {
                 id: mainLayout

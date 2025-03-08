@@ -51,9 +51,9 @@ class ThreePhaseSineWaveModel(QObject):
         self._apparent_power = 0.0
         self._reactive_power = 0.0
         # Add current magnitudes (default 1A per phase)
-        self._currentA = 1.0
-        self._currentB = 1.0
-        self._currentC = 1.0
+        self._currentA = 100.0
+        self._currentB = 100.0
+        self._currentC = 100.0
         self.update_wave()
         
     @Slot(QXYSeries,QXYSeries,QXYSeries)

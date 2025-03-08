@@ -17,16 +17,23 @@ ColumnLayout {
     property color phaseColor: phase === "A" ? "#f44336" : phase === "B" ? "#4caf50" : "#2196f3"
     property real defaultAngle: 0
     property real defaultAmplitude: 230
+    property real defaultAngle1: 30
+    property real defaultAmplitude1: 100
+    property int minWidth: 110
     
     signal amplitudeChanged(real value)
+    signal amplitudeChanged1(real value)
     signal angleChanged(real value)
+    signal angleChanged1(real value)
 
     function resetPhase() {
         amplitudeSpinBox.value = defaultAmplitude
         angleSpinBox.value = defaultAngle
+        amplitudeSpinBox1.value = defaultAmplitude1
+        angleSpinBox1.value = defaultAngle1
     }
 
-    spacing: 16
+    spacing: 8
 
     Label {
         text: "Phase " + phase
@@ -35,22 +42,22 @@ ColumnLayout {
         color: phaseColor
     }
 
-    ColumnLayout {
+    RowLayout {
         spacing: 8
 
-        RowLayout {
+        ColumnLayout {
             spacing: 12
             Label { 
                 text: "Amplitude"
-                Layout.preferredWidth: 80
+                Layout.minimumWidth: minWidth
             }
             
             SpinBox {
                 id: amplitudeSpinBox
-                Layout.fillWidth: true
+                Layout.minimumWidth: minWidth
                 from: 0
                 to: 1000
-                value: defaultAmplitude
+                value: phase === "A" ? sineModel.rmsA : phase === "B" ? sineModel.rmsB : phase === "C" ? sineModel.rmsC : defaultAmplitude
                 editable: true
                 stepSize: 1
                 
@@ -58,40 +65,79 @@ ColumnLayout {
                     amplitudeChanged(value * Math.SQRT2)
                 }
             }
-
-            // Label {
-            //     text: (amplitudeSpinBox.value * Math.SQRT2).toFixed(0) + " V(peak)"
-            //     Layout.preferredWidth: 120
-            //     horizontalAlignment: Text.AlignRight
-            // }
         }
-
-        RowLayout {
+        ColumnLayout {
             spacing: 12
             Label { 
                 text: "Angle" 
-                Layout.preferredWidth: 80
+                Layout.minimumWidth: minWidth
             }
             
             SpinBox {
                 id: angleSpinBox
-                Layout.fillWidth: true
+                // Layout.fillWidth: true
+                Layout.minimumWidth: minWidth
                 from: -360
                 to: 360
-                value: defaultAngle
+                value: phase === "A" ? sineModel.phaseAngleA : phase === "B" ? sineModel.phaseAngleB : phase === "C" ? sineModel.phaseAngleC : defaultAngle
+                editable: true
+                stepSize: 1
+
+                property int decimals: 1
+
+                onValueChanged: function() {
+                    if (phase === "A") {
+                        sineModel.setPhaseAngleA(angleSpinBox.value)
+                    } else if (phase === "B") {
+                        sineModel.setPhaseAngleB(angleSpinBox.value)
+                    } else if (phase === "C") {
+                        sineModel.setPhaseAngleC(angleSpinBox.value)
+                    }
+                }
+            }
+        }
+        ColumnLayout {
+            spacing: 12
+            Label { 
+                text: "Magnitude" 
+                Layout.minimumWidth: minWidth
+            }
+            
+            SpinBox {
+                id: amplitudeSpinBox1
+                Layout.minimumWidth: minWidth
+                from: 0
+                to: 1000
+                value: phase === "A" ? sineModel.currentA : phase === "B" ? sineModel.currentB : phase === "C" ? sineModel.currentC : defaultAmplitude1
                 editable: true
                 stepSize: 1
                 
                 onValueModified: {
-                    angleChanged(value)
+                    amplitudeChanged1(value * Math.SQRT2)
                 }
             }
-
-            // Label {
-            //     text: angleSpinBox.value + "°"
-            //     Layout.preferredWidth: 60
-            //     horizontalAlignment: Text.AlignRight
-            // }
+        }
+        ColumnLayout {
+            spacing: 12
+            Label { 
+                text: "Angle" 
+                Layout.minimumWidth: minWidth
+            }
+            
+            SpinBox {
+                id: angleSpinBox1
+                // Layout.fillWidth: true
+                Layout.minimumWidth: minWidth
+                from: -360
+                to: 360
+                value: phase === "A" ? sineModel.currentAngleA : phase === "B" ? sineModel.currentAngleB : phase === "C" ? sineModel.currentAngleC : defaultAngle1
+                editable: true
+                stepSize: 1
+                
+                onValueModified: {
+                    angleChanged1(value)
+                }
+            }
         }
     }
 

@@ -6,6 +6,8 @@ import Qt5Compat.GraphicalEffects
 import Sine 1.0
 import components 1.0
 
+import "../components"
+
 Page {
     id: root
 
@@ -21,6 +23,10 @@ Page {
         Flickable {
             contentWidth: parent.width
             contentHeight: mainLayout.height
+            bottomMargin : 5
+            leftMargin : 5
+            rightMargin : 5
+            topMargin : 5
             
             RowLayout {
                 id: mainLayout
@@ -31,16 +37,15 @@ Page {
                 ColumnLayout {
                     RowLayout {
                         WaveControls {
-                            Layout.fillWidth: true
-                            Layout.minimumHeight: 400
-                            Layout.minimumWidth: 700
-                            model: sineModel
+                            // Layout.fillWidth: true
+                            Layout.minimumHeight: 460
+                            Layout.minimumWidth: 500
                         }
 
                         WaveCard {
                             title: "Measurements"
-                            Layout.minimumHeight: 400
-                            Layout.minimumWidth: 550
+                            Layout.minimumHeight: 460
+                            Layout.minimumWidth: 370
                             showInfo: false
 
                             ColumnLayout {
@@ -90,8 +95,9 @@ Page {
 
                         WaveCard {
                             title: "Power Analysis"
-                            Layout.minimumHeight: 400
-                            Layout.minimumWidth: 300
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 460
+                            Layout.minimumWidth: 400
                             showInfo: false
 
                             ColumnLayout {
@@ -100,10 +106,8 @@ Page {
 
                                 PowerTriangle {
                                     Layout.fillWidth: true
-                                    // Layout.fillHeight: true
                                     Layout.minimumHeight: 200
                                     Layout.minimumWidth: 250
-                                    // Layout.fillHeight: true
                                     activePower: sineModel.activePower
                                     reactivePower: sineModel.reactivePower
                                     apparentPower: sineModel.apparentPower
@@ -114,7 +118,6 @@ Page {
                                     columns: 2
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 100
-                                    // Layout.fillHeight: true
                                     
                                     Label { text: "Total Apparent Power (S):" }
                                     Label { text: sineModel.apparentPower.toFixed(2) + " kVA" }
@@ -135,8 +138,7 @@ Page {
                     RowLayout {
                         WaveCard {
                             title: "Waveform"
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 500
+                            Layout.minimumWidth: 620
                             Layout.minimumHeight: 400
                             showInfo: false
                             
@@ -168,7 +170,7 @@ Page {
                                 }
                             }
                         }
-                    }
+                    }                   
                 }                
             }
         }

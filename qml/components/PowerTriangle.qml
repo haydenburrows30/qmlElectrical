@@ -11,7 +11,7 @@ Rectangle {
     property real reactivePower: 0
     property real apparentPower: 0
     property real powerFactor: 0
-    property real triangleScale: 1.0
+    property real triangleScale: 5
 
     // Container for triangle and labels
     Item {
@@ -33,9 +33,9 @@ Rectangle {
         // Triangle shape
         Shape {
             id: triangle
-            // anchors.centerIn: parent
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            anchors.centerIn: parent
+            // anchors.right: parent.right
+            // anchors.bottom: parent.bottom
 
             ShapePath {
                 strokeWidth: 2

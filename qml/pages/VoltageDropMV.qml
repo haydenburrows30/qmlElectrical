@@ -41,6 +41,10 @@ Page {
         Flickable {
             contentWidth: parent.width
             contentHeight: mainLayout.height
+            bottomMargin : 5
+            leftMargin : 5
+            rightMargin : 5
+            topMargin : 5
 
             RowLayout {
                 id: mainLayout
@@ -233,7 +237,6 @@ Page {
                             }
                         }
                     }
-
                     WaveCard {
                         title: "Results"
                         Layout.minimumHeight: 330
@@ -360,11 +363,9 @@ Page {
                             }
                         }
                     }
-
                 }
 
                 ColumnLayout {
-
                     WaveCard {
                         title: "Cable Size Comparison"
                         Layout.fillWidth: true
@@ -495,14 +496,12 @@ Page {
                             }
                         }
                     }
-
                     // Update SavedResults card with resultsManager property
                     SavedResults {
                         Layout.fillWidth: true
                         Layout.minimumHeight: 300
                         resultsManager: resultsManager  // Pass the instance
                     }
-
                     // Add detailed results popup
                     Popup {
                         id: resultsPopup
@@ -597,7 +596,6 @@ Page {
                             }
                         }
                     }
-
                     // Update message popups
                     Popup {
                         id: saveSuccess
@@ -623,7 +621,6 @@ Page {
                             }
                         }
                     }
-
                     Popup {
                         id: saveError
                         modal: true
@@ -649,9 +646,6 @@ Page {
                             }
                         }
                     }
-
-
-
                 }
             }
         }
