@@ -145,6 +145,8 @@ Page {
                             title: "Waveform"
                             Layout.minimumWidth: 620
                             Layout.minimumHeight: 400
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                             showInfo: false
                             
                             WaveChart {

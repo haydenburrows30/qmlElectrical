@@ -10,7 +10,6 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.PythonModel import PythonModel
 from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
@@ -113,7 +112,6 @@ class Application:
 
     def load_models(self):
         """Initialize and configure application models using factories."""
-        self.voltage_model = self.model_factory.create_model("voltage", csv_path="data/cable_data.csv")
         self.power_calculator = self.calculator_factory.create_calculator("power")
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
         self.sine_wave = self.model_factory.create_model("three_phase")
@@ -134,7 +132,6 @@ class Application:
             list: Tuples of (class, uri, major, minor, name) for QML registration
         """
         return [
-            (PythonModel, "Python", 1, 0, "PythonModel"),
             (ChargingCalc, "Charging", 1, 0, "ChargingCalc"),
             (PowerCalculator, "Calculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator"),
@@ -144,7 +141,7 @@ class Application:
             (PhasorPlot, "PPlot", 1, 0, "PhasorPlot"),
             (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
-            (ImageSaver, "ImageSaver", 1, 0, "ImageSaver")  # Add this line
+            (ImageSaver, "ImageSaver", 1, 0, "ImageSaver")
             # Removed RealTimeChart from here since we're using setContextProperty
         ]
 

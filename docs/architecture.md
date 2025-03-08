@@ -25,7 +25,7 @@ The application uses a modular architecture with QML for UI and Python for backe
 │   │   ├── VoltageDropMV.qml
 │   │   ├── Calculator.qml
 │   │   ├── ThreePhase.qml
-│   │   ├── Phasor.qml
+│   │   ├── RLC.qml
 │   │   └── RealTime.qml
 │   ├── components/
 │   │   ├── WaveCard.qml

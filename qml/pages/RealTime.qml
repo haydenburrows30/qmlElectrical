@@ -8,8 +8,17 @@ import '../components'
 
 Page {
     id: home
+    
+    // Track when page becomes visible
+    onVisibleChanged: {
+        if (rtChart && rtChart.visible) {
+            rtChart.isActive = visible
+        }
+    }
 
-	RealTimeChart{
-		anchors.fill: parent
-	}
+    RealTimeChart {
+        id: rtChart
+        anchors.fill: parent
+        isActive: home.visible  // Initialize with current visibility
+    }
 }

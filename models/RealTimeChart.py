@@ -12,7 +12,8 @@ class RealTimeChart(QObject):
         self._pause_time = 0  # Store time when paused
         self._elapsed_time = 0  # Track total elapsed time
         self._frequency = 0.5  # Base frequency for waves
-        self._is_running = True  # Add running state
+        self._is_running = False  # Start in inactive state until page is active
+        self._is_active = False  # Track if component is active/visible
 
     @Property(bool, notify=runningChanged)
     def isRunning(self):
@@ -41,10 +42,25 @@ class RealTimeChart(QObject):
         self._is_running = True
         self.resetChart.emit()
         self.runningChanged.emit(self._is_running)
+        
+    @Slot(bool)
+    def activate(self, active):
+        """Activate or deactivate chart updates when page visibility changes"""
+        self._is_active = active
+        if active:
+            # Reset the start time and chart when becoming active
+            self._start_time = QDateTime.currentDateTime().toMSecsSinceEpoch() / 1000.0
+            self._is_running = True
+            self.resetChart.emit()
+            self.runningChanged.emit(self._is_running)
+        else:
+            # Stop running when page is inactive
+            self._is_running = False
+            self.runningChanged.emit(self._is_running)
 
     @Slot()
     def update(self):
-        if not self._is_running:
+        if not self._is_running or not self._is_active:
             return False
         try:
             current_time = QDateTime.currentDateTime().toMSecsSinceEpoch() / 1000.0

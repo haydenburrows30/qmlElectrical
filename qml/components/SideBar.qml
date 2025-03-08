@@ -118,22 +118,16 @@ Drawer {
                     icon: "Wave"
                 }
                 ListElement {
-                    title: "Phasor"
-                    source: "../pages/Phasor.qml"
-                    tooltip: "RLC"
-                    icon: "RLC"
-                }
-                ListElement {
-                    title: "Phasor"
-                    source: "../pages/VoltageDropMV.qml"
+                    title: "RLC"
+                    source: "../pages/RLC.qml"
                     tooltip: "RLC"
                     icon: "RLC"
                 }
                 ListElement {
                     title: "Real Time"
                     source: "../pages/RealTime.qml"
-                    tooltip: "RLC"
-                    icon: "RLC"
+                    tooltip: "Real Time"
+                    icon: "Wave"
                 }
             }
 

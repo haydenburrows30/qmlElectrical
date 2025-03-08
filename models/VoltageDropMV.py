@@ -81,6 +81,9 @@ class VoltageDropMVCalculator(QObject):
     saveStatusChanged = Signal(bool, str)  # Add new signal with status and message
     numberOfHousesChanged = Signal(int)  # Add new signal
     admdEnabledChanged = Signal(bool)    # Add new signal
+    fuseSizeChanged = Signal(str)  # Add new signal for fuse size changes
+    conductorRatingChanged = Signal(float)  # Add new signal for conductor rating changes
+    combinedRatingChanged = Signal(str)  # Add new signal for combined rating info
 
     def __init__(self):
         super().__init__()
@@ -129,6 +132,11 @@ class VoltageDropMVCalculator(QObject):
         self._admd_enabled = False
         self._admd_factor = 1.5  # ADMD factor for neutral calculations
         self._calculation_results = []  # Store calculation history
+        self._fuse_sizes_data = None
+        self._current_fuse_size = "N/A"
+        self._conductor_rating = 0.0
+        self._combined_rating_info = "N/A"
+        self._load_fuse_sizes_data()
 
     def _load_all_cable_data(self):
         """Load all cable data variants."""
@@ -228,6 +236,74 @@ class VoltageDropMVCalculator(QObject):
             print(f"Error calculating diversity factor: {e}")
             return 1.0
 
+    def _load_fuse_sizes_data(self):
+        """Load network fuse size data from CSV."""
+        try:
+            self._fuse_sizes_data = pd.read_csv("data/network_fuse_sizes.csv")
+            print(f"Loaded {len(self._fuse_sizes_data)} fuse size entries")
+        except Exception as e:
+            print(f"Error loading fuse size data: {e}")
+            self._fuse_sizes_data = pd.DataFrame(columns=["Material", "Size (mm2)", "Network Fuse Size (A)"])
+
+    def _update_fuse_size(self):
+        """Update fuse size based on current cable selection."""
+        if self._fuse_sizes_data is None or self._selected_cable is None:
+            self._current_fuse_size = "N/A"
+            self._combined_rating_info = "N/A"
+            self.fuseSizeChanged.emit(self._current_fuse_size)
+            self.combinedRatingChanged.emit(self._combined_rating_info)
+            return
+            
+        try:
+            # Get current size and material
+            if isinstance(self._selected_cable['size'], pd.Series):
+                cable_size = float(self._selected_cable['size'].iloc[0])
+            else:
+                cable_size = float(self._selected_cable['size'])
+                
+            # Get conductor rating
+            if isinstance(self._selected_cable['max_current'], pd.Series):
+                self._conductor_rating = float(self._selected_cable['max_current'].iloc[0])
+            else:
+                self._conductor_rating = float(self._selected_cable['max_current'])
+            
+            self.conductorRatingChanged.emit(self._conductor_rating)
+            
+            # Look up the fuse size
+            match = self._fuse_sizes_data[
+                (self._fuse_sizes_data['Material'] == self._conductor_material) & 
+                (self._fuse_sizes_data['Size (mm2)'] == cable_size)
+            ]
+            
+            if not match.empty:
+                fuse_size = f"{match.iloc[0]['Network Fuse Size (A)']} A"
+                self._current_fuse_size = fuse_size
+                print(f"Found fuse size {fuse_size} for {self._conductor_material} {cable_size} mm²")
+            else:
+                self._current_fuse_size = "Not specified"
+                print(f"No matching fuse size for {self._conductor_material} {cable_size} mm²")
+                
+            # Create combined rating info
+            if self._current_fuse_size != "N/A" and self._current_fuse_size != "Not specified" and self._conductor_rating > 0:
+                self._combined_rating_info = f"{self._current_fuse_size} / {self._conductor_rating:.0f} A"
+            elif self._conductor_rating > 0:
+                if self._current_fuse_size == "Not specified":
+                    self._combined_rating_info = f"No fuse / {self._conductor_rating:.0f} A"
+                else:
+                    self._combined_rating_info = f"{self._conductor_rating:.0f} A"
+            else:
+                self._combined_rating_info = "N/A"
+                
+            self.fuseSizeChanged.emit(self._current_fuse_size)
+            self.combinedRatingChanged.emit(self._combined_rating_info)
+            
+        except Exception as e:
+            print(f"Error updating fuse size and rating: {e}")
+            self._current_fuse_size = "Error"
+            self._combined_rating_info = "Error"
+            self.fuseSizeChanged.emit(self._current_fuse_size)
+            self.combinedRatingChanged.emit(self._combined_rating_info)
+
     @Property(float, notify=totalLoadChanged)
     def totalKva(self):
         """Get total KVA value."""
@@ -262,6 +338,7 @@ class VoltageDropMVCalculator(QObject):
                     self._selected_cable = cable_data.iloc[0]
                     print(f"Selected cable: {cable_size}, mV/A/m: {self._selected_cable['mv_per_am']}")
                     self._calculate_voltage_drop()
+                    self._update_fuse_size()  # Add this line
                 else:
                     print(f"Cable size {cable_size} not found in data")
             except ValueError:
@@ -292,6 +369,7 @@ class VoltageDropMVCalculator(QObject):
             self._conductor_material = material
             self._update_current_cable_data()
             self.conductorChanged.emit()
+            self._update_fuse_size()  # Add this line
 
     @Slot(str)
     def setCoreType(self, core_type):
@@ -440,6 +518,9 @@ class VoltageDropMVCalculator(QObject):
         self._total_kva = 0.0
         self._admd_enabled = False
         self._voltage_drop = 0.0
+        self._current_fuse_size = "N/A"
+        self._conductor_rating = 0.0
+        self._combined_rating_info = "N/A"
         
         # Clear table data
         if self._table_model:
@@ -454,6 +535,9 @@ class VoltageDropMVCalculator(QObject):
         self.totalLoadChanged.emit(self._total_kva)
         self.voltageDropCalculated.emit(self._voltage_drop)
         self.tableDataChanged.emit()
+        self.fuseSizeChanged.emit(self._current_fuse_size)
+        self.conductorRatingChanged.emit(self._conductor_rating)
+        self.combinedRatingChanged.emit(self._combined_rating_info)
 
     @Slot()
     def saveCurrentCalculation(self):
@@ -563,6 +647,9 @@ class VoltageDropMVCalculator(QObject):
                     1000.0
                 )
                 self.voltageDropCalculated.emit(self._voltage_drop)
+                
+                # Always update fuse size after a calculation
+                self._update_fuse_size()
             
         except Exception as e:
             print(f"Error calculating voltage drops: {e}")
@@ -633,3 +720,18 @@ class VoltageDropMVCalculator(QObject):
     @Property(QObject, notify=tableDataChanged)
     def tableModel(self):
         return self._table_model
+
+    @Property(str, notify=fuseSizeChanged)
+    def networkFuseSize(self):
+        """Get current network fuse size."""
+        return self._current_fuse_size
+        
+    @Property(float, notify=conductorRatingChanged)
+    def conductorRating(self):
+        """Get current conductor rating in amperes."""
+        return self._conductor_rating
+        
+    @Property(str, notify=combinedRatingChanged)
+    def combinedRatingInfo(self):
+        """Get combined fuse size and conductor rating information."""
+        return self._combined_rating_info

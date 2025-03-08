@@ -7,3 +7,110 @@
 2025-03-09 00:13:00,357 - ResultsManager - INFO - Loaded 1 results from CSV
 2025-03-09 00:13:11,713 - ResultsManager - INFO - Loaded 1 results from CSV
 2025-03-09 00:13:44,983 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:25:49,173 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:27:34,986 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:27:57,471 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:31:40,525 - PythonModel - WARNING - Row 0: Voltage Drop = 5.34% exceeds the threshold of 5.0%
+2025-03-09 10:31:50,651 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,752 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,768 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,774 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,783 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,799 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,806 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,817 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,822 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,830 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,838 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,846 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,862 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,892 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,924 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,948 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,954 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:50,978 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,137 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,145 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,150 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,160 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,166 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,174 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,182 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,190 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,198 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,206 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:51,216 - PythonModel - ERROR - Invalid row index in calculateResistance: -1
+2025-03-09 10:31:53,362 - PythonModel - WARNING - Row 0: Voltage Drop = 6.31% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,370 - PythonModel - WARNING - Row 0: Voltage Drop = 6.24% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,379 - PythonModel - WARNING - Row 0: Voltage Drop = 6.17% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,386 - PythonModel - WARNING - Row 0: Voltage Drop = 6.11% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,395 - PythonModel - WARNING - Row 0: Voltage Drop = 6.08% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,400 - PythonModel - WARNING - Row 0: Voltage Drop = 6.05% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,408 - PythonModel - WARNING - Row 0: Voltage Drop = 6.00% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,416 - PythonModel - WARNING - Row 0: Voltage Drop = 5.97% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,424 - PythonModel - WARNING - Row 0: Voltage Drop = 5.94% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,432 - PythonModel - WARNING - Row 0: Voltage Drop = 5.89% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,440 - PythonModel - WARNING - Row 0: Voltage Drop = 5.84% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,448 - PythonModel - WARNING - Row 0: Voltage Drop = 5.77% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,457 - PythonModel - WARNING - Row 0: Voltage Drop = 5.73% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,465 - PythonModel - WARNING - Row 0: Voltage Drop = 5.68% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,473 - PythonModel - WARNING - Row 0: Voltage Drop = 5.64% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,481 - PythonModel - WARNING - Row 0: Voltage Drop = 5.62% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,486 - PythonModel - WARNING - Row 0: Voltage Drop = 5.58% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,494 - PythonModel - WARNING - Row 0: Voltage Drop = 5.56% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,502 - PythonModel - WARNING - Row 0: Voltage Drop = 5.53% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,510 - PythonModel - WARNING - Row 0: Voltage Drop = 5.49% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,519 - PythonModel - WARNING - Row 0: Voltage Drop = 5.47% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,526 - PythonModel - WARNING - Row 0: Voltage Drop = 5.43% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,535 - PythonModel - WARNING - Row 0: Voltage Drop = 5.39% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,551 - PythonModel - WARNING - Row 0: Voltage Drop = 5.36% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,572 - PythonModel - WARNING - Row 0: Voltage Drop = 5.34% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,596 - PythonModel - WARNING - Row 0: Voltage Drop = 5.32% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,620 - PythonModel - WARNING - Row 0: Voltage Drop = 5.29% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,628 - PythonModel - WARNING - Row 0: Voltage Drop = 5.27% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,636 - PythonModel - WARNING - Row 0: Voltage Drop = 5.24% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,644 - PythonModel - WARNING - Row 0: Voltage Drop = 5.22% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,653 - PythonModel - WARNING - Row 0: Voltage Drop = 5.19% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,660 - PythonModel - WARNING - Row 0: Voltage Drop = 5.15% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,667 - PythonModel - WARNING - Row 0: Voltage Drop = 5.07% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,975 - PythonModel - WARNING - Row 0: Voltage Drop = 5.24% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,981 - PythonModel - WARNING - Row 0: Voltage Drop = 5.39% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,988 - PythonModel - WARNING - Row 0: Voltage Drop = 5.53% exceeds the threshold of 5.0%
+2025-03-09 10:31:53,996 - PythonModel - WARNING - Row 0: Voltage Drop = 5.68% exceeds the threshold of 5.0%
+2025-03-09 10:31:54,005 - PythonModel - WARNING - Row 0: Voltage Drop = 5.82% exceeds the threshold of 5.0%
+2025-03-09 10:31:54,013 - PythonModel - WARNING - Row 0: Voltage Drop = 5.87% exceeds the threshold of 5.0%
+2025-03-09 10:31:54,021 - PythonModel - WARNING - Row 0: Voltage Drop = 5.92% exceeds the threshold of 5.0%
+2025-03-09 10:31:54,029 - PythonModel - WARNING - Row 0: Voltage Drop = 5.94% exceeds the threshold of 5.0%
+2025-03-09 10:31:54,037 - PythonModel - WARNING - Row 0: Voltage Drop = 5.97% exceeds the threshold of 5.0%
+2025-03-09 10:39:40,780 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:41:50,996 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:42:10,446 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:42:12,552 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:45:52,402 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:46:46,704 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 10:46:52,134 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 10:46:52,134 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-09 10:48:22,616 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 10:51:49,285 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 10:51:51,350 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 10:55:52,581 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 10:55:59,609 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 10:56:21,488 - ResultsManager - INFO - Loaded 3 results from CSV
+2025-03-09 10:56:21,488 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-09 11:07:32,674 - ResultsManager - INFO - Loaded 3 results from CSV
+2025-03-09 11:07:35,799 - ResultsManager - INFO - Loaded 3 results from CSV
+2025-03-09 11:10:01,312 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:20:53,994 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:21:19,142 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:21:22,330 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:21:47,083 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 11:21:47,083 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-09 11:21:50,872 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 11:26:56,682 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:27:01,974 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:27:33,837 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-09 11:27:33,837 - ResultsManager - INFO - Saved new calculation for Al 300mm² cable
+2025-03-09 11:29:15,714 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:29:24,099 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:29:54,589 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-09 11:30:04,606 - ResultsManager - INFO - Loaded 0 results from CSV

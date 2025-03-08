@@ -24,6 +24,17 @@ ChartView {
     property real trackerX: 0
     property var trackerValues: []
 
+    // Add property to track if chart is active
+    property bool isActive: false
+    
+    onIsActiveChanged: {
+        if (isActive) {
+            realTimeChart.activate(true)
+        } else {
+            realTimeChart.activate(false)
+        }
+    }
+
     // Move buttons to front and exclude from MouseArea
     Row {
         id: controlButtons
@@ -112,7 +123,7 @@ ChartView {
     
     Timer {
         interval: 100
-        running: true
+        running: chartView.isActive  // Only run when chart is active
         repeat: true
         onTriggered: realTimeChart.update()
     }

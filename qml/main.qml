@@ -8,7 +8,6 @@ import Qt.labs.qmlmodels 1.0
 
 import QtQuick.Studio.DesignEffects
 
-import Python 1.0
 import Calculator 1.0
 import Charging 1.0
 import Fault 1.0
@@ -26,10 +25,6 @@ ApplicationWindow {
     minimumWidth: 1280
     minimumHeight: 860
     visible: true
-
-    PythonModel {
-        id: pythonModel
-    }
 
     PowerCalculator {
         id: powerCalculator
@@ -109,17 +104,6 @@ ApplicationWindow {
 
         transitions: Transition {
             NumberAnimation { properties: "anchors.leftMargin"; easing.type: Easing.InOutQuad; duration: 200  }
-        }
-    }
-
-    FileDialog {
-        id: fileDialog
-        title: "Select CSV File"
-        nameFilters: ["CSV Files (*.csv)"]
-        onAccepted: {
-            if (fileDialog.selectedFile) {
-                pythonModel.load_csv_file(fileDialog.selectedFile.toString().replace("file://", ""))
-            }
         }
     }
 

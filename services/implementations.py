@@ -2,7 +2,6 @@ import logging
 from typing import Any
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from .interfaces import ILogger, IQmlEngine, IModelFactory
-from models.PythonModel import PythonModel
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
 from models.VoltageDropMV import VoltageDropMVCalculator
@@ -71,7 +70,6 @@ class ModelFactory(IModelFactory):
             ValueError: If model_type is unknown
         """
         model_map = {
-            "voltage": lambda: PythonModel(kwargs.get('csv_path')),
             "three_phase": ThreePhaseSineWaveModel,
             "resonant_freq": ResonantFreq,
             "conversion_calc": ConversionCalculator,

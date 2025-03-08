@@ -8,8 +8,7 @@
     <file>qml/pages/VoltageDrop.qml</file>
     <file>qml/pages/Calculator.qml</file>
     <file>qml/pages/ThreePhase.qml</file>
-    <file>qml/pages/Phasor.qml</file>
-    <file>qml/pages/VoltageDropMV.qml</file>
+    <file>qml/pages/RLC.qml</file>
 
     <!-- Core Components -->
     <file>qml/components/AToolTip.qml</file>
@@ -22,7 +21,6 @@
     <file>qml/components/PhasorDiagram.qml</file>
     <file>qml/components/Settings.qml</file>
     <file>qml/components/SideBar.qml</file>
-    <file>qml/components/TableView.qml</file>
     <file>qml/components/ToolBar.qml</file>
 
     <!-- Three Phase Components -->

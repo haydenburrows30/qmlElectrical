@@ -67,19 +67,8 @@ Page {
 			back: Qt.lighter(palette.accent,1.5)
 			fore: Qt.lighter(palette.accent,1.0)
 			onClicked: {
-				stackView.push("../pages/Phasor.qml")
+				stackView.push("../pages/RLC.qml")
 				sideBar.change(4)
-			}
-		}
-
-		HButton {
-			icon.name: "Voltage Drop"
-			text: "Orion Voltage Drop"
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
-			onClicked: {
-				stackView.push("../pages/VoltageDropMV.qml")
-				sideBar.change(5)
 			}
 		}
 
@@ -90,7 +79,7 @@ Page {
 			fore: Qt.lighter(palette.accent,1.0)
 			onClicked: {
 				stackView.push("../pages/RealTime.qml")
-				sideBar.change(6)
+				sideBar.change(5)
 			}
 		}
 
