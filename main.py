@@ -17,6 +17,7 @@ from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.VoltageDropMV import VoltageDropMVCalculator
 from models.ResultsManager import ResultsManager
+from models.RealTimeChart import RealTimeChart
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
@@ -87,6 +88,10 @@ class Application:
         
         # Create and register ResultsManager
         self.results_manager = ResultsManager()
+
+        # Create single instance and register it
+        self.realtime_chart = RealTimeChart()
+        self.qml_engine.engine.rootContext().setContextProperty("realTimeChart", self.realtime_chart)
         
         self.setup()
         
@@ -138,6 +143,7 @@ class Application:
             (PhasorPlot, "PPlot", 1, 0, "PhasorPlot"),
             (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV"),
             (ResultsManager, "Results", 1, 0, "ResultsManager")
+            # Removed RealTimeChart from here since we're using setContextProperty
         ]
 
     def load_qml(self):

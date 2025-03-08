@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
-    property var model
     spacing: 10
 
     GridLayout {
@@ -20,20 +19,20 @@ ColumnLayout {
 
         // Phase A
         Label { text: "A"; color: "#f44336" }
-        Label { text: model.rmsA.toFixed(1) }
-        Label { text: model.powerFactorA.toFixed(3) }
-        Label { text: (model.rmsA * model.currentA * model.powerFactorA / 1000).toFixed(2) }
+        Label { text: sineModel.rmsA.toFixed(1) }
+        Label { text: sineModel.powerFactorA.toFixed(3) }
+        Label { text: (sineModel.rmsA * sineModel.currentA * sineModel.powerFactorA / 1000).toFixed(2) }
 
         // Phase B
         Label { text: "B"; color: "#4caf50" }
-        Label { text: model.rmsB.toFixed(1) }
-        Label { text: model.powerFactorB.toFixed(3) }
-        Label { text: (model.rmsB * model.currentB * model.powerFactorB / 1000).toFixed(2) }
+        Label { text: sineModel.rmsB.toFixed(1) }
+        Label { text: sineModel.powerFactorB.toFixed(3) }
+        Label { text: (sineModel.rmsB * sineModel.currentB * sineModel.powerFactorB / 1000).toFixed(2) }
 
         // Phase C
         Label { text: "C"; color: "#2196f3" }
-        Label { text: model.rmsC.toFixed(1) }
-        Label { text: model.powerFactorC.toFixed(3) }
-        Label { text: (model.rmsC * model.currentC * model.powerFactorC / 1000).toFixed(2) }
+        Label { text: sineModel.rmsC.toFixed(1) }
+        Label { text: sineModel.powerFactorC.toFixed(3) }
+        Label { text: (sineModel.rmsC * sineModel.currentC * sineModel.powerFactorC / 1000).toFixed(2) }
     }
 }

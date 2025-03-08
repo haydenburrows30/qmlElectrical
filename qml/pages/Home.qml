@@ -82,5 +82,18 @@ Page {
 				sideBar.change(5)
 			}
 		}
+
+		HButton {
+			icon.name: "Real"
+			text: "Real Time Chart"
+			back: Qt.lighter(palette.accent,1.5)
+			fore: Qt.lighter(palette.accent,1.0)
+			onClicked: {
+				stackView.push("../pages/RealTime.qml")
+				sideBar.change(6)
+			}
+		}
+
+		
 	}
 }

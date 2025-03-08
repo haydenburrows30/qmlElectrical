@@ -27,10 +27,46 @@ ColumnLayout {
     signal angleChanged1(real value)
 
     function resetPhase() {
-        amplitudeSpinBox.value = defaultAmplitude
-        angleSpinBox.value = defaultAngle
-        amplitudeSpinBox1.value = defaultAmplitude1
-        angleSpinBox1.value = defaultAngle1
+        if (phase === "A") {
+            // Reset voltage
+            sineModel.setAmplitudeA(325.27)  // 230V RMS
+            sineModel.setPhaseAngleA(0)
+            // Reset current
+            sineModel.setCurrentA(100)
+            sineModel.setCurrentAngleA(0)
+        } else if (phase === "B") {
+            sineModel.setAmplitudeB(325.27)
+            sineModel.setPhaseAngleB(-120)
+            sineModel.setCurrentB(100)
+            sineModel.setCurrentAngleB(-120)
+        } else {
+            sineModel.setAmplitudeC(325.27)
+            sineModel.setPhaseAngleC(120)
+            sineModel.setCurrentC(100)
+            sineModel.setCurrentAngleC(120)
+        }
+    }
+
+    Connections {
+        target: sineModel
+        function onDataChanged() {
+            if (phase === "A") {
+                amplitudeSpinBox.value = sineModel.rmsA
+                angleSpinBox.value = sineModel.phaseAngleA
+                amplitudeSpinBox1.value = sineModel.currentA
+                angleSpinBox1.value = sineModel.currentAngleA
+            } else if (phase === "B") {
+                amplitudeSpinBox.value = sineModel.rmsB
+                angleSpinBox.value = sineModel.phaseAngleB
+                amplitudeSpinBox1.value = sineModel.currentB
+                angleSpinBox1.value = sineModel.currentAngleB
+            } else {
+                amplitudeSpinBox.value = sineModel.rmsC
+                angleSpinBox.value = sineModel.phaseAngleC
+                amplitudeSpinBox1.value = sineModel.currentC
+                angleSpinBox1.value = sineModel.currentAngleC
+            }
+        }
     }
 
     spacing: 8

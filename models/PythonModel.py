@@ -1,6 +1,4 @@
 from PySide6.QtCore import QAbstractTableModel, Qt, Slot, Signal, Property
-from PySide6.QtGui import QKeyEvent
-from PySide6.QtWidgets import QApplication
 from .ResistanceCalculator import ResistanceCalculator 
 from .CableData import CableData
 

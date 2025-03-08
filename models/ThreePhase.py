@@ -27,10 +27,25 @@ class ThreePhaseSineWaveModel(QObject):
         """Initialize the three-phase sine wave model with default values."""
         super().__init__()
         self._frequency = 50
-        self._amplitudeA = 230 * np.sqrt(2)
-        self._amplitudeB = 230 * np.sqrt(2)
-        self._amplitudeC = 230 * np.sqrt(2)
-
+        self._amplitudeA = 325.27  # 230V RMS
+        self._amplitudeB = 325.27
+        self._amplitudeC = 325.27
+        
+        # Voltage phase angles
+        self._phase_angle_a = 0
+        self._phase_angle_b = -120
+        self._phase_angle_c = 120
+        
+        # Current values
+        self._currentA = 100.0
+        self._currentB = 100.0
+        self._currentC = 100.0
+        
+        # Current phase angles (all 30° lag)
+        self._current_angle_a = 30.0
+        self._current_angle_b = -90.0  # -120° + 30°
+        self._current_angle_c = 150.0  # 120° + 30°
+        
         self._y_scale = 1.0
         self._x_scale = 1.0
         self._sample_rate = 1000
@@ -39,21 +54,11 @@ class ThreePhaseSineWaveModel(QObject):
         self._rms_a = 0.0; self._rms_b = 0.0; self._rms_c = 0.0
         self._peak_a = 0.0; self._peak_b = 0.0; self._peak_c = 0.0
         self._rms_ab = 0.0; self._rms_bc = 0.0; self._rms_ca = 0.0
-        self._phase_angle_a = 0.0
-        self._phase_angle_b = 120.0
-        self._phase_angle_c = 240.0
         self._cache = {}
         self._cache_key = None
         self._time_period = 1.0  # 1 second to show 50 cycles of 50Hz
-        self._current_angle_a = 30.0  # Default 30° lag
-        self._current_angle_b = 30.0
-        self._current_angle_c = 30.0
         self._apparent_power = 0.0
         self._reactive_power = 0.0
-        # Add current magnitudes (default 1A per phase)
-        self._currentA = 100.0
-        self._currentB = 100.0
-        self._currentC = 100.0
         self.update_wave()
         
     @Slot(QXYSeries,QXYSeries,QXYSeries)
@@ -188,6 +193,7 @@ class ThreePhaseSineWaveModel(QObject):
     
     @Property(list, notify=dataChanged)
     def yValuesA(self):
+        print("yValuesA")
         return self._y_values_a
     
     @Property(list, notify=dataChanged)
@@ -422,38 +428,100 @@ class ThreePhaseSineWaveModel(QObject):
             self._cache_key = None
             self.update_wave()
 
-    @Property(float, constant=True)
+    @Property(float, notify=dataChanged)
     def currentA(self):
         return self._currentA
 
-    @Property(float, constant=True)
+    @Property(float, notify=dataChanged)
     def currentB(self):
         return self._currentB
 
-    @Property(float, constant=True)
+    @Property(float, notify=dataChanged)
     def currentC(self):
         return self._currentC
 
-    @Property(float, constant=True)
+    @Property(float, notify=dataChanged)
     def currentAngleA(self):
         return self._current_angle_a
 
-    @Property(float, constant=True)
+    @Property(float, notify=dataChanged)
     def currentAngleB(self):
         return self._current_angle_b
 
-    @Property(float, constant=True)
+    @Property(float, notify=dataChanged)
     def currentAngleC(self):
         return self._current_angle_c
 
     @Slot()
     def reset(self):
+        """Reset all values to defaults."""
+        # Set default values
         self._frequency = 50
-        self._amplitudeA = 230 * np.sqrt(2)
-        self._amplitudeB = 230 * np.sqrt(2)
-        self._amplitudeC = 230 * np.sqrt(2)
-        self._phase_angle_a = 0.0
-        self._phase_angle_b = 120.0
-        self._phase_angle_c = 240.0
+        self._amplitudeA = 325.27  # 230V RMS
+        self._amplitudeB = 325.27
+        self._amplitudeC = 325.27
+        
+        # Reset voltage phase angles
+        self._phase_angle_a = 0
+        self._phase_angle_b = -120
+        self._phase_angle_c = 120
+        
+        # Reset current magnitudes
+        self._currentA = 100
+        self._currentB = 100
+        self._currentC = 100
+        
+        # Reset current phase angles (all 30° lag)
+        self._current_angle_a = 30.0
+        self._current_angle_b = -90.0  # -120° + 30°
+        self._current_angle_c = 150.0  # 120° + 30°
+        
+        # Reset other properties
+        self._cache_key = None
+        self._y_scale = 1.0
+        self._x_scale = 1.0
+        self._sample_rate = 1000
+        
+        # Force update all values
         self.update_wave()
+        # Emit change signal after all values are updated
         self.dataChanged.emit()
+
+    @Slot(float, result=list)
+    def calculate_values_at(self, t_ms):
+        """Calculate voltage values for all phases at a specific time point."""
+        # Convert milliseconds to seconds
+        t = float(t_ms) / 1000.0
+        
+        # Calculate angular frequency
+        omega = 2 * np.pi * self._frequency
+        
+        # Calculate values for each phase and convert to native Python floats
+        phase_a = float(self._amplitudeA * np.sin(omega * t + np.radians(self._phase_angle_a)))
+        phase_b = float(self._amplitudeB * np.sin(omega * t + np.radians(self._phase_angle_b)))
+        phase_c = float(self._amplitudeC * np.sin(omega * t + np.radians(self._phase_angle_c)))
+        
+        return [phase_a, phase_b, phase_c]
+
+    @Slot(float, float, result=list)
+    def get_data_range(self, start_ms, end_ms):
+        """Get wave data for a specific time range in milliseconds."""
+        num_points = 1000
+        # Ensure proper float conversion
+        start_s = float(start_ms) / 1000.0
+        end_s = float(end_ms) / 1000.0
+        
+        # Generate time points with precise spacing
+        t = np.linspace(start_s, end_s, num_points)
+        omega = 2 * np.pi * self._frequency
+        
+        # Calculate waves
+        phase_a = self._amplitudeA * np.sin(omega * t + np.radians(self._phase_angle_a))
+        phase_b = self._amplitudeB * np.sin(omega * t + np.radians(self._phase_angle_b))
+        phase_c = self._amplitudeC * np.sin(omega * t + np.radians(self._phase_angle_c))
+        
+        # Convert time back to milliseconds for QML
+        time_ms = t * 1000.0
+        
+        # Convert all numpy arrays to Python lists
+        return [time_ms.tolist(), phase_a.tolist(), phase_b.tolist(), phase_c.tolist()]

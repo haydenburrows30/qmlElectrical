@@ -37,9 +37,10 @@ Page {
                 ColumnLayout {
                     RowLayout {
                         WaveControls {
-                            // Layout.fillWidth: true
+                            id: waveControls
                             Layout.minimumHeight: 460
                             Layout.minimumWidth: 500
+                            onRequestAutoScale: waveChart.autoScale()  // Handle the signal
                         }
 
                         WaveCard {
@@ -55,7 +56,6 @@ Page {
 
                                 PhaseTable {
                                     Layout.fillWidth: true
-                                    model: sineModel
                                 }
 
                                 Rectangle {
@@ -108,10 +108,6 @@ Page {
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 200
                                     Layout.minimumWidth: 250
-                                    activePower: sineModel.activePower
-                                    reactivePower: sineModel.reactivePower
-                                    apparentPower: sineModel.apparentPower
-                                    powerFactor: sineModel.averagePowerFactor
                                 }
 
                                 GridLayout {
@@ -143,14 +139,15 @@ Page {
                             showInfo: false
                             
                             WaveChart {
+                                id: waveChart  // Add ID to reference from signal handler
                                 anchors.fill: parent
-                                model: sineModel
                             }
                         }
 
                         WaveCard {
                             title: "Phasor Diagram"
                             Layout.minimumWidth: 530
+                            Layout.minimumHeight: 530
                             Layout.fillHeight: true
                             showInfo: false
                             

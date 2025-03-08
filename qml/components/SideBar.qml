@@ -129,6 +129,12 @@ Drawer {
                     tooltip: "RLC"
                     icon: "RLC"
                 }
+                ListElement {
+                    title: "Real Time"
+                    source: "../pages/RealTime.qml"
+                    tooltip: "RLC"
+                    icon: "RLC"
+                }
             }
 
             footer:

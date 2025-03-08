@@ -13,9 +13,13 @@ import "../components"
 
 WaveCard {
     id: root
-    // property var model
     title: "Wave Controls"
     showInfo: false
+    property var model
+    property var phaseControls: []
+    
+    signal requestAutoScale()  // Add new signal
+
     ColumnLayout {
         Label {
             text: "Frequency"
@@ -76,11 +80,12 @@ WaveCard {
                 icon.name: "Reset"
                 
                 onClicked: {
-                    sineModel.reset()
+                    sineModel.reset()  // This will reset all values including power
                     freqSlider.value = 50
-                    phaseRepeater.itemAt(0).resetPhase()
-                    phaseRepeater.itemAt(1).resetPhase()
-                    phaseRepeater.itemAt(2).resetPhase()
+                    for (let control of phaseControls) {
+                        control.resetPhase()
+                    }
+                    requestAutoScale()  // Emit signal when reset is clicked
                 }
             }
         }

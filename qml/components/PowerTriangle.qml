@@ -7,11 +7,20 @@ import components 1.0
 Rectangle {
     id: root
     color: "transparent"
-    property real activePower: 0
-    property real reactivePower: 0
-    property real apparentPower: 0
-    property real powerFactor: 0
-    property real triangleScale: 5
+    
+    // Bind power values directly to the model
+    property real activePower: sineModel.activePower
+    property real reactivePower: sineModel.reactivePower
+    property real apparentPower: sineModel.apparentPower
+    property real powerFactor: sineModel.averagePowerFactor
+    
+    // Scaling properties
+    property real triangleScale: 100
+    property real minPowerValue: 0.1
+    property real maxPowerValue: 2000
+    property real minScale: 400
+    property real padding: 10
+    property real labelPadding: 40
 
     // Container for triangle and labels
     Item {
