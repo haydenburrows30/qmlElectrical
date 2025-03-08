@@ -11,11 +11,25 @@ import QtQuick.Studio.DesignEffects
 
 import "../components"
 
+import Sine 1.0
+
 Page {
     id: home
 
+    // Required property for models that should be registered in main.py
+    property var sineWaveModel
+    property var powerTriangleModel  
+    property var impedanceVectorModel
+
     background: Rectangle {
         color: toolBar.toggle ? "#1a1a1a" : "#f5f5f5"
+    }
+    
+    // Create a local instance of SineWaveModel if not provided from outside
+    Component.onCompleted: {
+        if (!sineWaveModel) {
+            console.warn("sineWaveModel not provided, visualizations might not work correctly")
+        }
     }
 
     ScrollView {
@@ -41,7 +55,7 @@ Page {
                 WaveCard {
                     id: power_current
                     title: 'Power -> Current'
-                    Layout.minimumHeight: 200
+                    Layout.minimumHeight: 400  // Increased height for visualization
                     Layout.minimumWidth: 300
 
                     info: "../../media/powercalc.png"
@@ -49,6 +63,25 @@ Page {
 
                     ColumnLayout {
                         anchors.fill: parent
+
+                        // Power triangle visualization
+                        PowerTriangleViz {
+                            id: powerTriangleViz
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 150
+                            apparentPower: parseFloat(kvaInput.text || "0")
+                            powerFactor: 0.8  // Default power factor
+                            
+                            // Update the power triangle model based on input
+                            onApparentPowerChanged: {
+                                if (powerTriangleModel) {
+                                    powerTriangleModel.setApparentPower(apparentPower)
+                                    realPower = powerTriangleModel.realPower
+                                    reactivePower = powerTriangleModel.reactivePower
+                                    phaseAngle = powerTriangleModel.phaseAngle
+                                }
+                            }
+                        }
 
                         RowLayout {
                             spacing: 10
@@ -127,12 +160,23 @@ Page {
                     id: charging_current
                     title: 'Cable Charging Current'
                     Layout.minimumWidth: 300
-                    Layout.minimumHeight: 250
+                    Layout.minimumHeight: 380  // Increased for visualization
 
                     info: "../../media/ccc.png"
 
                     ColumnLayout {
                         anchors.fill: parent
+
+                        ChargingCurrentViz {
+                            id: chargingCurrentViz
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 150
+                            voltage: parseFloat(voltage_input.text || "0") 
+                            capacitance: parseFloat(capacitanceInput.text || "0")
+                            frequency: parseFloat(frequencyInput.text || "50")
+                            length: parseFloat(lengthInput.text || "1")
+                            current: chargingCalc.chargingCurrent
+                        }
 
                         RowLayout {
                             spacing: 10
@@ -227,12 +271,38 @@ Page {
                     id: fault_current
                     title: 'Impedance'
                     Layout.minimumWidth: 300
-                    Layout.minimumHeight: 180
+                    Layout.minimumHeight: 380  // Increased height for visualization
 
                     info: "../../media/Formel-Impedanz.gif"
 
                     ColumnLayout {
                         anchors.fill: parent
+
+                        // Impedance vector visualization
+                        ImpedanceVectorViz {
+                            id: impedanceViz
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 200
+                            resistance: parseFloat(rInput.text || "3")
+                            reactance: parseFloat(reactanceInput.text || "4")
+                            
+                            // Update the impedance vector model based on input
+                            onResistanceChanged: {
+                                if (impedanceVectorModel) {
+                                    impedanceVectorModel.setResistance(resistance)
+                                    impedance = impedanceVectorModel.impedance
+                                    phaseAngle = impedanceVectorModel.phaseAngle
+                                }
+                            }
+                            
+                            onReactanceChanged: {
+                                if (impedanceVectorModel) {
+                                    impedanceVectorModel.setReactance(reactance)
+                                    impedance = impedanceVectorModel.impedance
+                                    phaseAngle = impedanceVectorModel.phaseAngle
+                                }
+                            }
+                        }
 
                         RowLayout {
                             spacing: 10
@@ -292,12 +362,46 @@ Page {
                     id: electricPy
                     title: 'Frequency'
                     Layout.minimumWidth: 300
-                    Layout.minimumHeight: 180
+                    Layout.minimumHeight: 380  // Increased height for visualization
 
                     info: "../../media/FormelXC.gif"
 
                     ColumnLayout {
                         anchors.fill: parent
+
+                        // Sine wave visualization
+                        SineWaveViz {
+                            id: sineWaveViz
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 200
+                            frequency: resonantFreq ? resonantFreq.frequency : 0
+                            
+                            // Initialize with default values
+                            Component.onCompleted: {
+                                if (sineWaveModel) {
+                                    amplitude = 330;
+                                    frequency = parseFloat(freqOutput.text.replace("Hz", "") || "0");
+                                    sineWaveModel.setFrequency(frequency);
+                                    yValues = sineWaveModel.yValues;
+                                    rms = sineWaveModel.rms;
+                                    peak = sineWaveModel.peak;
+                                }
+                            }
+                            
+                            // Connect to frequency changes
+                            Connections {
+                                target: resonantFreq
+                                function onFrequencyCalculated() {
+                                    if (sineWaveModel) {
+                                        sineWaveModel.setFrequency(resonantFreq.frequency);
+                                        sineWaveViz.frequency = resonantFreq.frequency;
+                                        sineWaveViz.yValues = sineWaveModel.yValues;
+                                        sineWaveViz.rms = sineWaveModel.rms;
+                                        sineWaveViz.peak = sineWaveModel.peak;
+                                    }
+                                }
+                            }
+                        }
 
                         RowLayout {
                             spacing: 10

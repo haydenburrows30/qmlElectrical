@@ -235,3 +235,213 @@ class SineWaveModel(QObject):
         if abs(self._amplitude - amp) > 1:  # Ignore tiny changes
             self._amplitude = amp
             self.update_wave()
+
+class ResonantFrequencyCalculator(BaseCalculator):
+    """Calculator for resonant frequency.
+    
+    Features:
+    - LC resonant frequency calculation
+    - Capacitance and inductance based calculations
+    
+    Signals:
+        frequencyCalculated: Emitted when frequency calculation completes
+    """
+    frequencyCalculated = Signal(float)
+
+    def __init__(self):
+        super().__init__()
+        self._capacitance = 0.0  # in microfarads
+        self._inductance = 0.0   # in millihenries
+        self._frequency = 0.0    # in Hz
+
+    @Slot(float)
+    def setCapacitance(self, capacitance):
+        self._capacitance = capacitance
+        self.calculateFrequency()
+
+    @Slot(float)
+    def setInductance(self, inductance):
+        self._inductance = inductance
+        self.calculateFrequency()
+
+    def calculateFrequency(self):
+        if self._capacitance > 0 and self._inductance > 0:
+            # Convert from μF to F and mH to H
+            c_farads = self._capacitance * 1e-6
+            l_henries = self._inductance * 1e-3
+            self._frequency = 1 / (2 * math.pi * math.sqrt(l_henries * c_farads))
+            self.frequencyCalculated.emit(self._frequency)
+
+    @Property(float, notify=frequencyCalculated)
+    def frequency(self):
+        return self._frequency
+
+    def reset(self):
+        self._capacitance = 0.0
+        self._inductance = 0.0
+        self._frequency = 0.0
+        self.dataChanged.emit()
+        
+    def calculate(self):
+        self.calculateFrequency()
+
+class ConversionCalculator(BaseCalculator):
+    """Calculator for various electrical and mechanical unit conversions.
+    
+    Features:
+    - Power conversions (watts, dBm, horsepower)
+    - Frequency conversions (Hz, RPM, rad/s)
+    
+    Signals:
+        resultCalculated: Emitted when conversion calculation completes
+    """
+    resultCalculated = Signal(float)
+
+    def __init__(self):
+        super().__init__()
+        self._input_value = 0.0
+        self._conversion_type = "watts_to_dbmw"
+        self._result = 0.0
+
+    @Slot(float)
+    def setInputValue(self, value):
+        self._input_value = value
+        self.calculateResult()
+
+    @Slot(str)
+    def setConversionType(self, conversion_type):
+        self._conversion_type = conversion_type
+        self.calculateResult()
+
+    def calculateResult(self):
+        if self._input_value != 0:
+            if self._conversion_type == "watts_to_dbmw":
+                self._result = 10 * math.log10(self._input_value * 1000)
+            elif self._conversion_type == "dbmw_to_watts":
+                self._result = math.pow(10, self._input_value / 10) / 1000
+            elif self._conversion_type == "rad_to_hz":
+                self._result = self._input_value / (2 * math.pi)
+            elif self._conversion_type == "hp_to_watts":
+                self._result = self._input_value * 746
+            elif self._conversion_type == "rpm_to_hz":
+                self._result = self._input_value / 60
+            elif self._conversion_type == "radians_to_hz":
+                self._result = self._input_value / (2 * math.pi)
+            elif self._conversion_type == "hz_to_rpm":
+                self._result = self._input_value * 60
+            elif self._conversion_type == "watts_to_hp":
+                self._result = self._input_value / 746
+            self.resultCalculated.emit(self._result)
+
+    @Property(float, notify=resultCalculated)
+    def result(self):
+        return self._result
+
+    def reset(self):
+        self._input_value = 0.0
+        self._result = 0.0
+        self.dataChanged.emit()
+        
+    def calculate(self):
+        self.calculateResult()
+
+class PowerTriangleModel(QObject):
+    dataChanged = Signal()
+    
+    def __init__(self):
+        super().__init__()
+        self._apparent_power = 100.0  # S (kVA)
+        self._power_factor = 0.8      # cos(φ)
+        self._real_power = 0.0        # P (kW)
+        self._reactive_power = 0.0    # Q (kVAr)
+        self._phase_angle = 0.0       # φ (degrees)
+        self.update_values()
+    
+    def update_values(self):
+        self._phase_angle = math.degrees(math.acos(self._power_factor))
+        self._real_power = self._apparent_power * self._power_factor
+        self._reactive_power = self._apparent_power * math.sin(math.radians(self._phase_angle))
+        self.dataChanged.emit()
+        
+    @Property(float, notify=dataChanged)
+    def apparentPower(self):
+        return self._apparent_power
+        
+    @Property(float, notify=dataChanged)
+    def powerFactor(self):
+        return self._power_factor
+        
+    @Property(float, notify=dataChanged)
+    def realPower(self):
+        return self._real_power
+        
+    @Property(float, notify=dataChanged)
+    def reactivePower(self):
+        return self._reactive_power
+        
+    @Property(float, notify=dataChanged)
+    def phaseAngle(self):
+        return self._phase_angle
+    
+    @Slot(float)
+    def setApparentPower(self, value):
+        if abs(self._apparent_power - value) > 0.1:
+            self._apparent_power = value
+            self.update_values()
+            
+    @Slot(float)
+    def setPowerFactor(self, value):
+        if value > 0 and value <= 1 and abs(self._power_factor - value) > 0.01:
+            self._power_factor = value
+            self.update_values()
+            
+    @Slot(float)
+    def setRealPower(self, value):
+        if abs(self._real_power - value) > 0.1:
+            self._real_power = value
+            self._power_factor = self._real_power / self._apparent_power if self._apparent_power > 0 else 0
+            self.update_values()
+
+class ImpedanceVectorModel(QObject):
+    dataChanged = Signal()
+    
+    def __init__(self):
+        super().__init__()
+        self._resistance = 3.0    # R (ohms)
+        self._reactance = 4.0     # X (ohms)
+        self._impedance = 0.0     # Z (ohms)
+        self._phase_angle = 0.0   # θ (degrees)
+        self.update_values()
+    
+    def update_values(self):
+        self._impedance = math.sqrt(self._resistance**2 + self._reactance**2)
+        self._phase_angle = math.degrees(math.atan2(self._reactance, self._resistance))
+        self.dataChanged.emit()
+        
+    @Property(float, notify=dataChanged)
+    def resistance(self):
+        return self._resistance
+        
+    @Property(float, notify=dataChanged)
+    def reactance(self):
+        return self._reactance
+        
+    @Property(float, notify=dataChanged)
+    def impedance(self):
+        return self._impedance
+        
+    @Property(float, notify=dataChanged)
+    def phaseAngle(self):
+        return self._phase_angle
+    
+    @Slot(float)
+    def setResistance(self, value):
+        if abs(self._resistance - value) > 0.01:
+            self._resistance = value
+            self.update_values()
+            
+    @Slot(float)
+    def setReactance(self, value):
+        if abs(self._reactance - value) > 0.01:
+            self._reactance = value
+            self.update_values()

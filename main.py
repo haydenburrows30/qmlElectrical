@@ -5,22 +5,23 @@ from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass
 
-from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide6.QtQml import qmlRegisterType
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc
+from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc, SineWaveModel,ResonantFrequencyCalculator,ConversionCalculator
 from models.ThreePhase import ThreePhaseSineWaveModel
-from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
+from models.ElectricPy import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.VoltageDropMV import VoltageDropMVCalculator
 from models.ResultsManager import ResultsManager
-from models.ImageSaver import ImageSaver  # Add this import
+from models.ImageSaver import ImageSaver
 from models.RealTimeChart import RealTimeChart
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
@@ -118,7 +119,6 @@ class Application:
         self.resonant_freq = self.model_factory.create_model("resonant_freq")
         self.conversion_calc = self.model_factory.create_model("conversion_calc")
         self.series_LC_chart = self.model_factory.create_model("series_rlc_chart")
-        self.phasorPlotter = self.model_factory.create_model("phasor_plot")
         self.voltage_drop = self.model_factory.create_model("voltage_drop")
 
     def register_qml_types(self):
@@ -135,14 +135,14 @@ class Application:
             (ChargingCalc, "Charging", 1, 0, "ChargingCalc"),
             (PowerCalculator, "Calculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator"),
-            (ResonantFreq, "RFreq", 1, 0, "ResonantFreq"),
+            (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFreq"),
             (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
-            (PhasorPlot, "PPlot", 1, 0, "PhasorPlot"),
             (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
             (ImageSaver, "ImageSaver", 1, 0, "ImageSaver")
-            # Removed RealTimeChart from here since we're using setContextProperty
+            # (SineWaveModel, "ImageSaver", 1, 0, "ImageSaver")
+            
         ]
 
     def load_qml(self):

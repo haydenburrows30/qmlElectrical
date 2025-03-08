@@ -3,8 +3,9 @@ from typing import Any
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.ThreePhase import ThreePhaseSineWaveModel
-from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart, PhasorPlot
+from models.ElectricPy import SeriesRLCChart
 from models.VoltageDropMV import VoltageDropMVCalculator
+from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator
 
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
@@ -71,10 +72,9 @@ class ModelFactory(IModelFactory):
         """
         model_map = {
             "three_phase": ThreePhaseSineWaveModel,
-            "resonant_freq": ResonantFreq,
+            "resonant_freq": ResonantFrequencyCalculator,
             "conversion_calc": ConversionCalculator,
             "series_rlc_chart": SeriesRLCChart,
-            "phasor_plot": PhasorPlot,
             "voltage_drop": VoltageDropMVCalculator
         }
         

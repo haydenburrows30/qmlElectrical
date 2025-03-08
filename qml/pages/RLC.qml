@@ -309,69 +309,6 @@ Page {
                         }
                     }
                 }
-
-                ColumnLayout {
-                    Layout.alignment: Qt.AlignTop
-                    WaveCard {
-                        id: phasorPlot
-                        title: 'Phasor Plot'
-                        Layout.minimumHeight: 450
-                        Layout.minimumWidth: 450
-
-                        showInfo: false
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: 5
-
-                            GridLayout {
-                                columns: 4
-                                Layout.fillWidth: true
-                                rowSpacing: 10
-                                columnSpacing: 20
-
-                                Label { text: "Magnitude:" }
-                                TextField {
-                                    id: magnitudeInput
-                                    text: "1.0"
-                                    onTextChanged: {
-                                        let val = parseFloat(text)
-                                        if (!isNaN(val)) {
-                                            phasorPlotter.setMagnitude(val)
-                                        }
-                                    }
-                                    Layout.preferredWidth: 100
-                                }
-
-                                Label { text: "Angle (°):" }
-                                TextField {
-                                    id: angleInput
-                                    text: "0"
-                                    onTextChanged: {
-                                        let val = parseFloat(text)
-                                        if (!isNaN(val)) {
-                                            phasorPlotter.setAngle(val)
-                                        }
-                                    }
-                                    Layout.preferredWidth: 100
-                                }
-                            }
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                Layout.minimumHeight: 300
-                                Layout.minimumWidth: 300
-
-                                PhasorDisplay {
-                                    id: phasorPlotter
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
