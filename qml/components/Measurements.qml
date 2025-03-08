@@ -28,113 +28,123 @@ Item {
 
             Label { text: "A"; color: "red" }
             Label { text: model.rmsA.toFixed(1) }
+            
+            // Fixed SpinBox for Current A
             SpinBox {
                 id: currentSpinA
                 from: 0
                 to: 1000
-                value: (model && model.currentA ? model.currentA * 10 : 10)
+                value: model ? model.currentA : 10
                 stepSize: 1
                 editable: true
-                onValueModified: if (model) model.setCurrentA(value / 10)
-                
-                property int decimals: 1
-                validator: DoubleValidator {
-                    bottom: Math.min(currentSpinA.from, currentSpinA.to)
-                    top:  Math.max(currentSpinA.from, currentSpinA.to)
+                onValueModified: {
+                    if (model) {
+                        model.setCurrentA(value)
+                    }
                 }
                 
                 textFromValue: function(value, locale) {
-                    return Number(value / 10).toLocaleString(locale, 'f', decimals)
+                    return Number(value).toLocaleString(locale, 'f', 1)
                 }
 
                 valueFromText: function(text, locale) {
-                    return Number.fromLocaleString(locale, text) * 10
+                    return Number.fromLocaleString(locale, text)
                 }
             }
+            
             Label { text: model.powerFactorA.toFixed(3) }
+            
             SpinBox {
                 from: -90
                 to: 90
-                value: (model && model.currentAngleA ? model.currentAngleA : 30)
+                value: model && model.currentAngleA ? model.currentAngleA : 30
                 stepSize: 1
                 editable: true
                 onValueModified: if (model) model.setCurrentAngleA(value)
             }
+            
             Label { 
                 text: (model.rmsA * model.currentA * model.powerFactorA / 1000).toFixed(2) 
             }
 
-            Label { text: "B"; color: "yellow" }
+            Label { text: "B"; color: "green" }
             Label { text: model.rmsB.toFixed(1) }
+            
+            // Fixed SpinBox for Current B
             SpinBox {
                 id: currentSpinB
                 from: 0
                 to: 1000
-                value: (model && model.currentB ? model.currentB * 10 : 10)
+                value: model ? model.currentB : 10
                 stepSize: 1
                 editable: true
-                onValueModified: if (model) model.setCurrentB(value / 10)
-                
-                property int decimals: 1
-                validator: DoubleValidator {
-                    bottom: Math.min(currentSpinB.from, currentSpinB.to)
-                    top:  Math.max(currentSpinB.from, currentSpinB.to)
+                onValueModified: {
+                    if (model) {
+                        model.setCurrentB(value)
+                    }
                 }
                 
                 textFromValue: function(value, locale) {
-                    return Number(value / 10).toLocaleString(locale, 'f', decimals)
+                    return Number(value).toLocaleString(locale, 'f', 1)
                 }
 
                 valueFromText: function(text, locale) {
-                    return Number.fromLocaleString(locale, text) * 10
+                    return Number.fromLocaleString(locale, text)
                 }
             }
+            
             Label { text: model.powerFactorB.toFixed(3) }
+            
             SpinBox {
                 from: -90
                 to: 90
-                value: model.currentAngleB
+                value: model && model.currentAngleB ? model.currentAngleB : -90
                 stepSize: 1
                 editable: true
-                onValueModified: model.setCurrentAngleB(value)
+                onValueModified: if (model) model.setCurrentAngleB(value)
             }
+            
             Label { 
                 text: (model.rmsB * model.currentB * model.powerFactorB / 1000).toFixed(2) 
             }
 
             Label { text: "C"; color: "blue" }
             Label { text: model.rmsC.toFixed(1) }
+            
+            // Fixed SpinBox for Current C
             SpinBox {
                 id: currentSpinC
                 from: 0
                 to: 1000
-                value: (model && model.currentC ? model.currentC * 10 : 10)
+                value: model ? model.currentC : 10
                 stepSize: 1
                 editable: true
-                onValueModified: if (model) model.setCurrentC(value / 10)
-                
-                property int decimals: 1
-                validator: DoubleValidator {
-                    bottom: Math.min(currentSpinC.from, currentSpinC.to)
-                    top:  Math.max(currentSpinC.from, currentSpinC.to)
+                onValueModified: {
+                    if (model) {
+                        model.setCurrentC(value)
+                    }
                 }
                 
                 textFromValue: function(value, locale) {
-                    return Number(value / 10).toLocaleString(locale, 'f', decimals)
+                    return Number(value).toLocaleString(locale, 'f', 1)
                 }
 
                 valueFromText: function(text, locale) {
-                    return Number.fromLocaleString(locale, text) * 10
+                    return Number.fromLocaleString(locale, text)
                 }
             }
+            
             Label { text: model.powerFactorC.toFixed(3) }
+            
             SpinBox {
                 from: -90
                 to: 90
-                value: model.currentAngleC
+                value: model && model.currentAngleC ? model.currentAngleC : 150
                 stepSize: 1
-                onValueModified: model.setCurrentAngleC(value)
+                editable: true
+                onValueModified: if (model) model.setCurrentAngleC(value)
             }
+            
             Label { 
                 text: (model.rmsC * model.currentC * model.powerFactorC / 1000).toFixed(2) 
             }

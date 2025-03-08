@@ -144,12 +144,25 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
                 from: 0
                 to: 1000
-                value: phase === "A" ? sineModel.currentA : phase === "B" ? sineModel.currentB : phase === "C" ? sineModel.currentC : defaultAmplitude1
+                // Fix the value binding to directly use the current value without scaling
+                value: phase === "A" ? sineModel.currentA : 
+                       phase === "B" ? sineModel.currentB : 
+                       phase === "C" ? sineModel.currentC : defaultAmplitude1
                 editable: true
                 stepSize: 1
                 
                 onValueModified: {
-                    amplitudeChanged1(value * Math.SQRT2)
+                    // Pass the actual value without any multiplication
+                    amplitudeChanged1(value)
+                }
+                
+                // Define the formatter to handle the proper display of values
+                textFromValue: function(value, locale) {
+                    return Number(value).toLocaleString(locale, 'f', 1)
+                }
+
+                valueFromText: function(text, locale) {
+                    return Number.fromLocaleString(locale, text)
                 }
             }
         }

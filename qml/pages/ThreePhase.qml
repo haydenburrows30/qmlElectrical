@@ -153,16 +153,41 @@ Page {
                             
                             PhasorDiagram {
                                 anchors.fill: parent
+                                // Update to include both voltage and current phasors
                                 phaseAngles: [
                                     sineModel.phaseAngleA,
                                     sineModel.phaseAngleB,
                                     sineModel.phaseAngleC
                                 ]
+                                // Add current phasor angles
+                                currentPhaseAngles: [
+                                    sineModel.currentAngleA,
+                                    sineModel.currentAngleB,
+                                    sineModel.currentAngleC
+                                ]
+                                // Add current magnitudes to scale the current phasors properly
+                                currentMagnitudes: [
+                                    sineModel.currentA / 100, // Scale down for visibility
+                                    sineModel.currentB / 100,
+                                    sineModel.currentC / 100
+                                ]
+                                showCurrentPhasors: true // Flag to enable current phasors
+                                
+                                // Handle voltage angle changes
                                 onAngleChanged: function(index, angle) {
                                     switch(index) {
                                         case 0: sineModel.setPhaseAngleA(angle); break;
                                         case 1: sineModel.setPhaseAngleB(angle); break;
                                         case 2: sineModel.setPhaseAngleC(angle); break;
+                                    }
+                                }
+                                
+                                // Handle current angle changes
+                                onCurrentAngleChanged: function(index, angle) {
+                                    switch(index) {
+                                        case 0: sineModel.setCurrentAngleA(angle); break;
+                                        case 1: sineModel.setCurrentAngleB(angle); break;
+                                        case 2: sineModel.setCurrentAngleC(angle); break;
                                     }
                                 }
                             }

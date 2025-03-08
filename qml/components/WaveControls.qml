@@ -117,9 +117,10 @@ WaveCard {
                     else sineModel.setPhaseAngleC(value)
                 }
                 onAmplitudeChanged1: function(value) {
-                    if (phase === "A") sineModel.setCurrentA(value / 10)
-                    else if (phase === "B") sineModel.setCurrentB(value / 10)
-                    else sineModel.setCurrentC(value / 10)
+                    // Update to directly use the value without dividing by 10
+                    if (phase === "A") sineModel.setCurrentA(value)
+                    else if (phase === "B") sineModel.setCurrentB(value)
+                    else sineModel.setCurrentC(value)
                 }
                 onAngleChanged1: function(value) {
                     if (phase === "A") sineModel.setCurrentAngleA(value)
