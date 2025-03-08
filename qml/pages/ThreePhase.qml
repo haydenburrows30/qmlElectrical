@@ -104,10 +104,19 @@ Page {
                                 anchors.fill: parent
                                 anchors.margins: 10
 
-                                PowerTriangle {
+                                Item {
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 200
                                     Layout.minimumWidth: 250
+
+                                    PowerTriangle {
+                                        anchors.fill: parent
+                                        activePower: sineModel.activePower
+                                        reactivePower: sineModel.reactivePower
+                                        apparentPower: sineModel.apparentPower
+                                        powerFactor: sineModel.averagePowerFactor
+                                        triangleScale: 100
+                                    }
                                 }
 
                                 GridLayout {

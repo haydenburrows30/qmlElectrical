@@ -32,6 +32,9 @@ Rectangle {
         property real baseLength: activePower * triangleScale
         property real triangleHeight: reactivePower * triangleScale
         property real maxSize: Math.min(width * 1, height * 1)
+
+        // Calculate hypotenuse length using Pythagorean theorem
+        property real hypotenuseLength: Math.sqrt(baseLength * baseLength + triangleHeight * triangleHeight)
         
         // Scale factor to fit triangle within container
         property real scaleFactor: Math.min(
@@ -43,8 +46,6 @@ Rectangle {
         Shape {
             id: triangle
             anchors.centerIn: parent
-            // anchors.right: parent.right
-            // anchors.bottom: parent.bottom
 
             ShapePath {
                 strokeWidth: 2
@@ -91,14 +92,91 @@ Rectangle {
             anchors.rightMargin: 10
             text: "Q = " + reactivePower.toFixed(1) + " kVAR"
         }
-        
-        Text {
-            id: apparentPowerLabel
-            anchors.horizontalCenter: triangle.horizontalCenter
-            anchors.bottom: triangle.verticalCenter
-            anchors.bottomMargin: triangleContainer.height * 0.1
-            text: "S = " + apparentPower.toFixed(1) + " kVA"
-            rotation: -Math.atan2(triangleContainer.triangleHeight, triangleContainer.baseLength) * 180 / Math.PI
+
+        // Direct Text element approach for apparent power label
+        Item {
+            id: apparentPowerLabelContainer
+            anchors.fill: parent
+            
+            // Calculate midpoint of hypotenuse
+            property real centerX: width / 2
+            property real centerY: height / 2
+            property real scaledHeight: triangleContainer.triangleHeight * triangleContainer.scaleFactor
+            property real scaledBase: triangleContainer.baseLength * triangleContainer.scaleFactor
+            property real startX: centerX
+            property real startY: centerY - scaledHeight
+            property real endX: centerX + scaledBase
+            property real endY: centerY
+            property real midX: (startX + endX) / 2
+            property real midY: (startY + endY) / 2
+            
+            // Calculate angle in radians then convert to degrees
+            property real angleRadians: Math.atan2(startY - endY, endX - startX)
+            property real angleDegrees: angleRadians * 180 / Math.PI
+            
+            Text {
+                id: apparentPowerText
+                text: "S = " + apparentPower.toFixed(1) + " kVA"
+                anchors.centerIn: parent
+                
+                // Position at midpoint of hypotenuse
+                x: parent.midX - width/2 - parent.centerX
+                y: parent.midY - height/2 - parent.centerY - 15 // Offset above line
+                
+                // Apply rotation to align with hypotenuse
+                transformOrigin: Item.Center
+                rotation: parent.angleDegrees
+                
+                color: toolBar.toggle ? "#ffffff" : "#000000"
+                visible: false // Hide this, used as reference
+            }
+            
+            // Draw using Canvas for perfect alignment
+            Canvas {
+                id: apparentPowerCanvas
+                anchors.fill: parent
+                property string powerText: "S = " + apparentPower.toFixed(1) + " kVA"
+                
+                onPaint: {
+                    var ctx = getContext("2d");
+                    ctx.reset();
+                    
+                    // Get coordinates
+                    var centerX = width / 2;
+                    var centerY = height / 2;
+                    var scaledHeight = triangleContainer.triangleHeight * triangleContainer.scaleFactor;
+                    var scaledBase = triangleContainer.baseLength * triangleContainer.scaleFactor;
+                    
+                    var startX = centerX;
+                    var startY = centerY - scaledHeight;
+                    var endX = centerX + scaledBase;
+                    var endY = centerY;
+                    
+                    var midX = (startX + endX) / 2;
+                    var midY = (startY + endY) / 2;
+                    
+                    // Calculate the angle for text alignment - key fix here!
+                    var angleForLine = Math.atan2(startY - endY, endX - startX);
+                    
+                    // Key fix: We need to align text along the hypotenuse, not perpendicular to it
+                    // For text to be parallel to the line, we rotate by the same angle
+                    
+                    ctx.save();
+                    ctx.translate(midX, midY - 10); // Position slightly above line
+                    ctx.rotate(angleForLine); // Use the exact same angle as the line
+                    
+                    // Set text properties
+                    ctx.font = "14px sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = toolBar.toggle ? "#ffffff" : "#000000";
+                    
+                    // Draw text at origin (which is now at midpoint of hypotenuse)
+                    ctx.fillText(powerText, 0, 0);
+                    
+                    ctx.restore();
+                }
+            }
         }
 
         Text {
@@ -139,4 +217,11 @@ Rectangle {
             font.italic: true
         }
     }
+    
+    // Update the canvas when the triangle values change
+    onActivePowerChanged: apparentPowerCanvas.requestPaint()
+    onReactivePowerChanged: apparentPowerCanvas.requestPaint()
+    onApparentPowerChanged: apparentPowerCanvas.requestPaint()
+    onWidthChanged: apparentPowerCanvas.requestPaint()
+    onHeightChanged: apparentPowerCanvas.requestPaint()
 }
