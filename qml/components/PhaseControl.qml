@@ -111,7 +111,6 @@ ColumnLayout {
             
             SpinBox {
                 id: angleSpinBox
-                // Layout.fillWidth: true
                 Layout.minimumWidth: minWidth
                 from: -360
                 to: 360
@@ -175,7 +174,6 @@ ColumnLayout {
             
             SpinBox {
                 id: angleSpinBox1
-                // Layout.fillWidth: true
                 Layout.minimumWidth: minWidth
                 from: -360
                 to: 360
