@@ -17,6 +17,7 @@ from models.ElectricPy import ResonantFreq, ConversionCalculator, SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.VoltageDropMV import VoltageDropMVCalculator
 from models.ResultsManager import ResultsManager
+from models.ImageSaver import ImageSaver  # Add this import
 from models.RealTimeChart import RealTimeChart
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
@@ -142,7 +143,8 @@ class Application:
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
             (PhasorPlot, "PPlot", 1, 0, "PhasorPlot"),
             (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV"),
-            (ResultsManager, "Results", 1, 0, "ResultsManager")
+            (ResultsManager, "Results", 1, 0, "ResultsManager"),
+            (ImageSaver, "ImageSaver", 1, 0, "ImageSaver")  # Add this line
             # Removed RealTimeChart from here since we're using setContextProperty
         ]
 
