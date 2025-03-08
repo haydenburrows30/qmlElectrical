@@ -2,6 +2,32 @@ import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtCharts 2.0
     
+/*
+  Chart Zoom and Pan Component
+  
+  Features:
+  - Pinch to zoom with touch gestures
+  - Mouse wheel zoom
+  - Click and drag to pan
+  - Double click to reset view
+  
+  Usage:
+  1. Mouse Controls:
+     - Click and drag: Pan the chart
+     - Mouse wheel: Zoom in/out
+     - Double click: Reset zoom/pan
+     
+  2. Touch Controls:
+     - Pinch gesture: Zoom in/out
+     - Drag with one finger: Pan
+     - Double tap: Reset zoom/pan
+     
+  3. Zoom Behavior:
+     - Zoom preserves aspect ratio based on pinch angle
+     - Horizontal zoom follows X-axis finger movement
+     - Vertical zoom follows Y-axis finger movement
+*/
+
 Window {
     visible: true
     width: 640
@@ -79,9 +105,8 @@ Window {
            }
 
            Item {
-               // A virtual item to receive drag signals from the MouseArea.
-               // When x or y properties are changed by the MouseArea's
-               // drag signals, the ChartView is scrolled accordingly.
+               // Virtual item for drag handling
+               // Changes to x/y properties are converted to chart scroll operations
                id: dragTarget
 
                property real oldX : x

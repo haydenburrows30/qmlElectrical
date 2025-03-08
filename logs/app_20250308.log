@@ -1,0 +1,7 @@
+2025-03-08 21:23:02,927 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-08 21:23:11,584 - PythonModel - WARNING - Row 0: Voltage Drop = 5.34% exceeds the threshold of 5.0%
+2025-03-08 21:23:25,906 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-08 21:23:34,224 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-08 21:23:34,224 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-08 21:23:38,213 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-08 21:24:14,991 - ResultsManager - INFO - Loaded 0 results from CSV

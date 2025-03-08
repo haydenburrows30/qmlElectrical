@@ -1,220 +1,145 @@
 # Application Components Documentation
 
 ## Overview
-This application provides various electrical engineering calculations and visualizations through a Qt/QML interface with Python backend.
+The application consists of multiple QML components and Python backend models organized into a modular structure.
 
 ## Core Components
 
-### ThreePhase Module
-The ThreePhaseSineWaveModel provides real-time simulation of three-phase electrical systems.
+### User Interface Components
+- `WaveCard` - Base container component with title and optional info icon
+- `WaveControls` - Controls for three-phase wave parameters
+- `WaveChart` - Real-time waveform visualization
+- `PhaseTable` - Displays three-phase measurements
+- `PowerTriangle` - Power triangle visualization
+- `PhasorDiagram` - Interactive phasor diagram
+- `SavedResults` - Display saved calculation results
 
-Key features:
-- Interactive sine wave visualization
-- Adjustable frequency, amplitude, and phase angles
-- RMS and peak value calculations
-- Line-to-line voltage calculations
-
-```python
-# Example usage:
-model = ThreePhaseSineWaveModel()
-model.setFrequency(50)  # Set to 50Hz
-model.setAmplitudeA(325.27)  # 230V RMS * √2
-```
-
-### ElectricPy Module
-
-#### ResonantFreq
-Calculates resonant frequency for LC circuits:
-- Input: Capacitance (μF) and Inductance (mH)
-- Output: Resonant frequency in Hz
-- Real-time updates
-
-#### SeriesRLCChart
-Interactive visualization of RLC circuit frequency response:
-- Magnitude vs. frequency plot
-- Automatic scaling
-- Zoom and pan capabilities
-- Resonance point highlighting
-
-#### PhasorPlot
-Real-time phasor diagram visualization:
-- Adjustable magnitude and angle
-- Interactive rotation
-- Grid and reference circle
-- Angle markers
-
-### Python Models
-
-#### PythonModel (Cable Calculator)
-Handles cable calculations and data management:
-- Voltage drop calculations
-- Multiple cable types support
-- CSV data import
-- Batch calculations
-
-Features:
-- Dynamic table view
-- Real-time updates
-- Error checking
-- Chart visualization
-
-## Voltage Drop Calculator Components
-
-### SavedResults
-Component for displaying and managing saved calculation history:
-- Table view of all calculations
-- Clear all functionality
-- Refresh capability
-- Dark/light theme support
-
-Example usage:
-```qml
-SavedResults {
-    Layout.fillWidth: true
-    Layout.minimumHeight: 300
-    resultsManager: resultsManager  // Pass manager instance
-}
-```
-
-### Results Actions
-Available operations:
-- Save current calculation
-- Clear all results
-- Refresh view
-- View calculation details
-
-## Component Integration
-
-### Signal Flow
-1. User Interface (QML) → Input signals
-2. Python backend → Calculations
-3. Model updates → QML view updates
-
-### Data Flow Example
-```mermaid
-graph LR
-    A[User Input] --> B[Python Model]
-    B --> C[Calculations]
-    C --> D[Signal Emission]
-    D --> E[QML Update]
-    E --> F[Visual Feedback]
-```
+### Pages
+- `Home` - Main navigation dashboard
+- `VoltageDrop` - LV voltage drop calculator
+- `VoltageDropMV` - MV voltage drop calculator  
+- `Calculator` - General electrical calculations
+- `ThreePhase` - Three-phase wave simulator
+- `Phasor` - RLC and phasor analysis
+- `RealTime` - Real-time data visualization
 
 ## Application Structure
-
 ```
-qmlTableView/
-├── main.py              # Application entry point
-├── models/              # Python backend models
-│   ├── ElectricPy.py   # Electrical calculations
-│   ├── ThreePhase.py   # Three-phase simulations
-│   └── PythonModel.py  # Cable calculations
-├── qml/                 # QML interface files
-│   └── components/     
-└── docs/               # Documentation
+qmltest/
+├── qml/
+│   ├── pages/           # Main page components
+│   └── components/      # Reusable UI components
+├── models/             # Python backend models
+│   ├── calculator/     # Calculation modules
+│   └── visualization/  # Data visualization 
+└── docs/              # Documentation
 ```
 
 ## Common Operations
 
-### Adding a New Component
-1. Create Python model class
-2. Register type in main.py
-3. Create QML interface
-4. Connect signals and slots
-
-```python
-# Register new component
-qmlRegisterType(NewComponent, "Module", 1, 0, "QMLName")
+### Component Integration
+1. Create component QML file in components/
+2. Add component to qmldir module
+3. Import in pages using:
+```qml
+import components 1.0
 ```
 
 ### Data Exchange
-Models expose properties and methods to QML:
+Models expose properties to QML:
 ```python
 @Property(float, notify=dataChanged)
 def value(self):
     return self._value
+```
 
-@value.setter
-def value(self, new_value):
-    self._value = new_value
-    self.dataChanged.emit()
+### Page Navigation
+```qml
+stackView.push("pages/NewPage.qml")
 ```
 
 ## Best Practices
 
-1. Signal Handling
-   - Use proper typing for signals
-   - Emit signals only when necessary
-   - Handle edge cases
-
-2. Performance
-   - Minimize unnecessary updates
-   - Use appropriate data structures
-   - Batch operations when possible
-
+1. Use WaveCard for consistent container styling
+2. Follow naming conventions:
+   - Components: PascalCase
+   - Properties: camelCase
+   - IDs: camelCase
+   
 3. Error Handling
-   - Validate inputs
-   - Provide meaningful error messages
-   - Maintain stable state
+   - Validate user input
+   - Provide feedback through tooltips
+   - Handle edge cases gracefully
 
-## Common Issues and Solutions
-
-### Issue: Slow Updates
-Solution: 
-- Use batch updates
-- Implement data caching
-- Optimize calculations
-
-### Issue: Memory Leaks
-Solution:
-- Properly disconnect signals
-- Clean up resources
-- Use weak references
+4. Performance
+   - Use clip: true on scrollable areas
+   - Avoid binding loops
+   - Batch updates when possible
 
 ## Testing
+### Component Testing
+```qml
+import QtTest 1.0
+TestCase {
+    name: "ComponentTests"
+    
+    WaveCard {
+        id: testCard
+    }
+    
+    function test_example() {
+        compare(testCard.title, "")
+        testCard.title = "Test"
+        compare(testCard.title, "Test")
+    }
+}
+```
 
-### Unit Tests
-- Test calculations
-- Validate signal emissions
-- Check edge cases
+### Integration Testing
+- Use QtTest for QML component testing
+- Implement Python unit tests for backend logic
+- Test data flow between QML and Python
 
-### Integration Tests
-- Test QML-Python interaction
-- Verify data flow
-- Check component integration
+## Component Details
 
-## Contributing
+### WaveCard
+- Properties:
+  - title: string
+  - showInfo: bool
+  - info: string
+  - Layout properties
 
-1. Follow PEP 8 style guide
-2. Document new features
-3. Add unit tests
-4. Update documentation
+### WaveControls  
+- Features:
+  - Frequency control
+  - Amplitude adjustment
+  - Phase angle settings
+  - Auto-scale option
 
-## Version History
+### Signals & Slots
+Example connection:
+```qml
+WaveControls {
+    onValueChanged: waveChart.updateDisplay()
+}
+```
 
-- v1.0: Initial release
-- v1.1: Added RLC simulation
-- v1.2: Enhanced phasor plotting
+## Error Handling
+1. Input Validation
+```qml
+TextField {
+    validator: DoubleValidator {
+        bottom: 0.0
+        top: 1000.0
+        decimals: 2
+    }
+}
+```
 
-# QML Components
-
-## Three Phase Visualization
-
-### WaveControls
-Controls for adjusting wave parameters:
-- Frequency (1-400 Hz)
-- Amplitude (0-1000V) for each phase
-- Phase angles (-360° to 360°)
-
-### WaveChart
-Real-time waveform visualization:
-- Displays all three phases
-- Time-based X-axis (0-1000ms)
-- Voltage-based Y-axis (-400V to 400V)
-- Color-coded phases (Red: A, Green: B, Blue: C)
-
-### Measurements
-Displays calculated values:
-- RMS values for each phase
-- Peak values for each phase
-- Line-to-line RMS voltages
+2. Error Messages
+```qml
+ToolTip {
+    visible: parent.error
+    text: parent.errorMessage
+}
+```

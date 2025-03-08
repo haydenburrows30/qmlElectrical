@@ -1,6 +1,11 @@
 from PySide6.QtCore import QAbstractTableModel, Qt, Slot, Signal, Property
 from .ResistanceCalculator import ResistanceCalculator 
 from .CableData import CableData
+import logging
+from .logger import setup_logger
+
+# Set up logger for this module
+logger = setup_logger("PythonModel")
 
 class PythonModel(QAbstractTableModel):
     dataChangedSignal = Signal()
@@ -20,12 +25,20 @@ class PythonModel(QAbstractTableModel):
         self._current = 0
         self.chart_data = []
 
+        # Try to load CSV file, log error if it fails
         if csv_file:
-            self.load_csv_file(csv_file)
+            try:
+                self.load_csv_file(csv_file)
+            except Exception as e:
+                logger.error(f"Failed to load initial CSV file {csv_file}: {str(e)}")
 
     @Slot(str)
     def load_csv_file(self, file_path):
-        if file_path:
+        if not file_path:
+            logger.warning("Empty file path provided to load_csv_file")
+            return
+            
+        try:
             self.cable_data.load_csv(file_path)
             self.csvLoaded.emit()
 
@@ -33,6 +46,8 @@ class PythonModel(QAbstractTableModel):
             cable_types = self.cable_data.get_cable_types()
             if cable_types:
                 self.cable_type = cable_types[0]
+        except Exception as e:
+            logger.error(f"Error loading CSV file {file_path}: {str(e)}")
 
     def rowCount(self, parent=None):
         return len(self._data)
@@ -108,25 +123,34 @@ class PythonModel(QAbstractTableModel):
 
     @Slot(int)
     def calculateResistance(self, row):
-        lots = float(self._data[row][1])
-        base_current = float(self._data[row][2])
-        voltage = float(self._data[row][3])
-        power = float(self._data[row][4])
-        length = float(self._data[row][5])
+        try:
+            if row < 0 or row >= len(self._data):
+                logger.error(f"Invalid row index in calculateResistance: {row}")
+                return
+                
+            lots = float(self._data[row][1])
+            base_current = float(self._data[row][2])
+            voltage = float(self._data[row][3])
+            power = float(self._data[row][4])
+            length = float(self._data[row][5])
 
-        cable_type = self._data[row][0]
+            cable_type = self._data[row][0]
 
-        cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
+            cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-        calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots, base_current)
-        voltage_drop = calculator.calculate_voltage_drop()
+            calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots, base_current)
+            voltage_drop = calculator.calculate_voltage_drop()
 
-        formatted_voltage_drop = f"{voltage_drop:.2f}"
+            formatted_voltage_drop = f"{voltage_drop:.2f}"
 
-        self.setData(self.index(row, 6), formatted_voltage_drop, Qt.ItemDataRole.EditRole) 
+            self.setData(self.index(row, 6), formatted_voltage_drop, Qt.ItemDataRole.EditRole) 
 
-        # if voltage_drop > self._voltageDropThreshold:
-        #     print(f"Row {row}: Voltage Drop = {formatted_voltage_drop}% exceeds the threshold of {self._voltageDropThreshold}%")
+            # Log high voltage drops for monitoring
+            if voltage_drop > self._voltageDropThreshold:
+                logger.warning(f"Row {row}: Voltage Drop = {formatted_voltage_drop}% exceeds the threshold of {self._voltageDropThreshold}%")
+                
+        except Exception as e:
+            logger.error(f"Error calculating resistance for row {row}: {str(e)}")
 
     def printTableView(self):
         for row in range(self.rowCount()):
@@ -168,25 +192,33 @@ class PythonModel(QAbstractTableModel):
             self.dataChangedSignal.emit()
 
     @Slot(int)
-    def update_chart(self,row):
+    def update_chart(self, row):
         """Calculate voltage drop for all cable types and update chart data."""
-        self.chart_data.clear()
-        for cable_type in self.cable_data.get_cable_types():
-            cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
+        try:
+            if row < 0 or row >= len(self._data):
+                logging.error(f"Invalid row index: {row}")
+                return
+                
+            self.chart_data.clear()
+            for cable_type in self.cable_data.get_cable_types():
+                cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-            lots = float(self._data[row][1])
-            base_current = float(self._data[row][2])
-            voltage = float(self._data[row][3])
-            power = float(self._data[row][4])
-            length = float(self._data[row][5])
+                lots = float(self._data[row][1])
+                base_current = float(self._data[row][2])
+                voltage = float(self._data[row][3])
+                power = float(self._data[row][4])
+                length = float(self._data[row][5])
 
-            cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
+                cable_resistance, reactance = self.cable_data.get_resistance_reactance(cable_type)
 
-            calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots, base_current)
-            voltage_drop = calculator.calculate_voltage_drop()
+                calculator = ResistanceCalculator(voltage, length, power, cable_resistance, reactance, self._powerFactor, lots, base_current)
+                voltage_drop = calculator.calculate_voltage_drop()
 
-            self.chart_data.append({"cable": cable_type, "percentage_drop": voltage_drop})
-        self.chartDataChanged.emit()
+                self.chart_data.append({"cable": cable_type, "percentage_drop": voltage_drop})
+            self.chartDataChanged.emit()
+        except Exception as e:
+            logging.error(f"Error in update_chart: {str(e)}")
+            # Optionally emit error signal to notify UI
 
     @Property("QVariantList")
     def chart_data_qml(self):
