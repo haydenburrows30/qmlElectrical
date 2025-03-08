@@ -152,38 +152,38 @@ ChartView {
         z: 1001
     }
 
-    PinchArea{
+    PinchArea {
         id: pa
         anchors.fill: parent
         property real currentPinchScaleX: 1
         property real currentPinchScaleY: 1
-        property real pinchStartX : 0
-        property real pinchStartY : 0
+        property real pinchStartX: 0
+        property real pinchStartY: 0
 
-        onPinchStarted: {
-            pinchStartX = pinch.center.x;
-            pinchStartY = pinch.center.y;
+        onPinchStarted: function(event) {
+            pinchStartX = event.center.x
+            pinchStartY = event.center.y
         }
 
-        onPinchUpdated: {
-            chartView.zoomReset();
+        onPinchUpdated: function(event) {
+            chartView.zoomReset()
 
-            var center_x = pinchStartX + (pinchStartX - pinch.center.x);
-            var center_y = pinchStartY + (pinchStartY - pinch.center.y);
+            var center_x = pinchStartX + (pinchStartX - event.center.x)
+            var center_y = pinchStartY + (pinchStartY - event.center.y)
 
-            var scaleX = currentPinchScaleX * (1 + (pinch.scale - 1) * Math.abs(Math.cos(pinch.angle * Math.PI / 180)));
-            var scaleY = currentPinchScaleY * (1 + (pinch.scale - 1) * Math.abs(Math.sin(pinch.angle * Math.PI / 180)));
+            var scaleX = currentPinchScaleX * (1 + (event.scale - 1) * Math.abs(Math.cos(event.angle * Math.PI / 180)))
+            var scaleY = currentPinchScaleY * (1 + (event.scale - 1) * Math.abs(Math.sin(event.angle * Math.PI / 180)))
 
-            var width_zoom = height / scaleX;
-            var height_zoom = width / scaleY;
+            var width_zoom = height / scaleX
+            var height_zoom = width / scaleY
 
-            var r = Qt.rect(center_x - width_zoom / 2, center_y - height_zoom / 2, width_zoom, height_zoom);
-            chartView.zoomIn(r);
+            var r = Qt.rect(center_x - width_zoom / 2, center_y - height_zoom / 2, width_zoom, height_zoom)
+            chartView.zoomIn(r)
         }
 
-        onPinchFinished: {
-            currentPinchScaleX = currentPinchScaleX * (1 + (pinch.scale - 1) * Math.abs(Math.cos(pinch.angle * Math.PI / 180)));
-            currentPinchScaleY = currentPinchScaleY * (1 + (pinch.scale - 1) * Math.abs(Math.sin(pinch.angle * Math.PI / 180)));
+        onPinchFinished: function(event) {
+            currentPinchScaleX = currentPinchScaleX * (1 + (event.scale - 1) * Math.abs(Math.cos(event.angle * Math.PI / 180)))
+            currentPinchScaleY = currentPinchScaleY * (1 + (event.scale - 1) * Math.abs(Math.sin(event.angle * Math.PI / 180)))
         }
 
         MouseArea{
