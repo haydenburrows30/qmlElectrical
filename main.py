@@ -10,13 +10,12 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalc, SineWaveModel,ResonantFrequencyCalculator,ConversionCalculator
+from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineWaveModel,ResonantFrequencyCalculator,ConversionCalculator
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
-from models.VoltageDropMV import VoltageDropMVCalculator
+from models.VoltageDrop import VoltageDrop
 from models.ResultsManager import ResultsManager
-from models.ImageSaver import ImageSaver
 from models.RealTimeChart import RealTimeChart
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
@@ -60,37 +59,27 @@ class Application:
         """
         self.config = AppConfig()
         self.container = container or Container()
-        
-        # Create QApplication first
+
         self.app = QApplication(sys.argv)
-        
-        # Resolve dependencies
+
         self.logger = self.container.resolve(ILogger)
         self.calculator_factory = self.container.resolve(ICalculatorFactory)
         self.qml_engine = self.container.resolve(IQmlEngine)
         self.model_factory = self.container.resolve(IModelFactory)
-        
-        # Initialize QML engine with QApplication
+
         self.qml_engine.initialize(self.app)
         
-        # Add import paths in correct order
-        self.qml_engine.engine.addImportPath(os.path.dirname(CURRENT_DIR))  # Root path
-        self.qml_engine.engine.addImportPath(CURRENT_DIR)  # Project path
-        
-        # Add explicit paths for components
+        self.qml_engine.engine.addImportPath(os.path.dirname(CURRENT_DIR))
+        self.qml_engine.engine.addImportPath(CURRENT_DIR)
+
         components_path = os.path.join(CURRENT_DIR, "qml", "components")
         self.qml_engine.engine.addImportPath(os.path.dirname(components_path))
-        
-        # Clear QML cache (optional, but can help with registration issues)
+
         self.qml_engine.engine.clearComponentCache()
         
         # Register the SineWaveModel type explicitly
         qmlRegisterType(ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")
-        
-        # Create and register ResultsManager
-        self.results_manager = ResultsManager()
 
-        # Create single instance and register it
         self.realtime_chart = RealTimeChart()
         self.qml_engine.engine.rootContext().setContextProperty("realTimeChart", self.realtime_chart)
         
@@ -120,6 +109,7 @@ class Application:
         self.conversion_calc = self.model_factory.create_model("conversion_calc")
         self.series_LC_chart = self.model_factory.create_model("series_rlc_chart")
         self.voltage_drop = self.model_factory.create_model("voltage_drop")
+        self.results_manager = self.model_factory.create_model("results_manager")
 
     def register_qml_types(self):
         for type_info in self.get_qml_types():
@@ -132,17 +122,14 @@ class Application:
             list: Tuples of (class, uri, major, minor, name) for QML registration
         """
         return [
-            (ChargingCalc, "Charging", 1, 0, "ChargingCalc"),
+            (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "Calculator", 1, 0, "PowerCalculator"),
-            (FaultCurrentCalculator, "Fault", 1, 0, "FaultCalculator"),
-            (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFreq"),
-            (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalc"),
+            (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
+            (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFrequencyCalculator"),
+            (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalculator"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
-            (VoltageDropMVCalculator,"VDropMV", 1, 0, "VoltageDropMV"),
-            (ResultsManager, "Results", 1, 0, "ResultsManager"),
-            (ImageSaver, "ImageSaver", 1, 0, "ImageSaver")
-            # (SineWaveModel, "ImageSaver", 1, 0, "ImageSaver")
-            
+            (VoltageDrop,"VDrop", 1, 0, "VoltageDrop"),
+            (ResultsManager, "Results", 1, 0, "ResultsManager")
         ]
 
     def load_qml(self):

@@ -11,44 +11,19 @@ import QtQuick.Studio.DesignEffects
 
 import components 1.0
 
-import VDropMV 1.0
-import Results 1.0  // Add this import
-import ImageSaver 1.0  // Add this import for ImageSaver
 Page {
     id: root
     padding: 0
     
     // Move model to top level and create explicit binding
-    property real currentVoltageDropValue: voltageDropMV.voltageDrop || 0
+    property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
     
     // Add connections to ensure property updates when signal is emitted
     Connections {
-        target: voltageDropMV
+        target: voltageDrop
         function onVoltageDropCalculated(value) {
             console.log("Voltage drop updated:", value)
             root.currentVoltageDropValue = value
-        }
-    }
-
-    VoltageDropMV {
-        id: voltageDropMV
-    }
-
-    ResultsManager {
-        id: resultsManager
-    }
-
-    ImageSaver {
-        id: imageSaver
-        
-        onSaveComplete: function(success, message) {
-            if (success) {
-                imageSaveSuccess.messageText = message;
-                imageSaveSuccess.open();
-            } else {
-                imageSaveError.messageText = message;
-                imageSaveError.open();
-            }
         }
     }
 
@@ -90,12 +65,12 @@ Page {
                             RowLayout {
                                 ComboBox {
                                     id: voltageSelect
-                                    model: voltageDropMV.voltageOptions
-                                    currentIndex: voltageDropMV.selectedVoltage === "230V" ? 0 : 1
+                                    model: voltageDrop.voltageOptions
+                                    currentIndex: voltageDrop.selectedVoltage === "230V" ? 0 : 1
                                     onCurrentTextChanged: {
                                         if (currentText) {
                                             console.log("Selecting voltage:", currentText)
-                                            voltageDropMV.setSelectedVoltage(currentText)
+                                            voltageDrop.setSelectedVoltage(currentText)
                                             // Disable ADMD checkbox for 230V
                                             admdCheckBox.enabled = (currentText === "415V")
                                             if (currentText !== "415V") {
@@ -110,7 +85,7 @@ Page {
                                     id: admdCheckBox
                                     text: "ADMD (neutral)"
                                     enabled: voltageSelect.currentText === "415V"
-                                    onCheckedChanged: voltageDropMV.setADMDEnabled(checked)
+                                    onCheckedChanged: voltageDrop.setADMDEnabled(checked)
                                     ToolTip.visible: hovered
                                     ToolTip.text: "Apply 1.5 factor for neutral calculations"
                                 }
@@ -120,12 +95,12 @@ Page {
                             Label { text: "Conductor:" }
                             ComboBox {
                                 id: conductorSelect
-                                model: voltageDropMV.conductorTypes
+                                model: voltageDrop.conductorTypes
                                 currentIndex: 1
                                 onCurrentTextChanged: {
                                     if (currentText) {
                                         console.log("Selecting conductor:", currentText)
-                                        voltageDropMV.setConductorMaterial(currentText)
+                                        voltageDrop.setConductorMaterial(currentText)
                                     }
                                 }
                                 Layout.fillWidth: true
@@ -134,12 +109,12 @@ Page {
                             Label { text: "Cable Type:" }
                             ComboBox {
                                 id: coreTypeSelect
-                                model: voltageDropMV.coreConfigurations
+                                model: voltageDrop.coreConfigurations
                                 currentIndex: 1
                                 onCurrentTextChanged: {
                                     if (currentText) {
                                         console.log("Selecting core type:", currentText)
-                                        voltageDropMV.setCoreType(currentText)
+                                        voltageDrop.setCoreType(currentText)
                                     }
                                 }
                                 Layout.fillWidth: true
@@ -148,18 +123,18 @@ Page {
                             Label { text: "Cable Size:" }
                             ComboBox {
                                 id: cableSelect
-                                model: voltageDropMV.availableCables
+                                model: voltageDrop.availableCables
                                 currentIndex: 13  // Set default selection
                                 onCurrentTextChanged: {
                                     if (currentText) {
                                         console.log("Selecting cable:", currentText)
-                                        voltageDropMV.selectCable(currentText)
+                                        voltageDrop.selectCable(currentText)
                                     }
                                 }
                                 Component.onCompleted: {
                                     if (currentText) {
                                         console.log("Initial cable selection:", currentText)
-                                        voltageDropMV.selectCable(currentText)
+                                        voltageDrop.selectCable(currentText)
                                     }
                                 }
                                 Layout.fillWidth: true
@@ -169,7 +144,7 @@ Page {
                             TextField {
                                 id: lengthInput  // Add ID
                                 placeholderText: "Enter length"
-                                onTextChanged: voltageDropMV.setLength(parseFloat(text) || 0)
+                                onTextChanged: voltageDrop.setLength(parseFloat(text) || 0)
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0 }
                             }
@@ -178,8 +153,8 @@ Page {
                             ComboBox {
                                 id: installationMethodCombo  // Add ID
                                 currentIndex: 6
-                                model: voltageDropMV.installationMethods
-                                onCurrentTextChanged: voltageDropMV.setInstallationMethod(currentText)
+                                model: voltageDrop.installationMethods
+                                onCurrentTextChanged: voltageDrop.setInstallationMethod(currentText)
                                 Layout.fillWidth: true
                             }
 
@@ -187,7 +162,7 @@ Page {
                             TextField {
                                 id: temperatureInput  // Add ID
                                 text: "25"
-                                onTextChanged: voltageDropMV.setTemperature(parseFloat(text) || 75)
+                                onTextChanged: voltageDrop.setTemperature(parseFloat(text) || 75)
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0; top: 120 }
                             }
@@ -196,7 +171,7 @@ Page {
                             TextField {
                                 id: groupingFactorInput  // Add ID
                                 text: "1.0"
-                                onTextChanged: voltageDropMV.setGroupingFactor(parseFloat(text) || 1.0)
+                                onTextChanged: voltageDrop.setGroupingFactor(parseFloat(text) || 1.0)
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0; top: 2 }
                             }
@@ -209,7 +184,7 @@ Page {
                                 onTextChanged: {
                                     let kva = parseFloat(text) || 0
                                     let houses = parseInt(numberOfHousesInput.text) || 0
-                                    voltageDropMV.calculateTotalLoad(kva, houses)
+                                    voltageDrop.calculateTotalLoad(kva, houses)
                                 }
                                 Layout.fillWidth: true
                                 validator: DoubleValidator { bottom: 0 }
@@ -223,8 +198,8 @@ Page {
                                 onTextChanged: {
                                     let houses = parseInt(text) || 1
                                     let kva = parseFloat(kvaPerHouseInput.text) || 0
-                                    voltageDropMV.setNumberOfHouses(houses)
-                                    voltageDropMV.calculateTotalLoad(kva, houses)
+                                    voltageDrop.setNumberOfHouses(houses)
+                                    voltageDrop.calculateTotalLoad(kva, houses)
                                 }
                                 Layout.fillWidth: true
                                 validator: IntValidator { bottom: 1 }
@@ -253,20 +228,20 @@ Page {
                                     totalLoadText.text = "0.0"
                                     
                                     // Reset model state
-                                    voltageDropMV.reset()
+                                    voltageDrop.reset()
                                     
                                     // Force property reevaluation
-                                    root.currentVoltageDropValue = voltageDropMV.voltageDrop || 0
+                                    root.currentVoltageDropValue = voltageDro.voltageDrop || 0
 
                                     // Make sure the UI updates by accessing the properties
                                     // This forces the getters to be called
-                                    console.log("After reset - voltage drop:", voltageDropMV.voltageDrop)
-                                    console.log("After reset - current:", voltageDropMV.current)
-                                    console.log("After reset - fuse size:", voltageDropMV.networkFuseSize)
-                                    console.log("After reset - combined rating:", voltageDropMV.combinedRatingInfo)
+                                    console.log("After reset - voltage drop:", voltageDrop.voltageDrop)
+                                    console.log("After reset - current:", voltageDrop.current)
+                                    console.log("After reset - fuse size:", voltageDrop.networkFuseSize)
+                                    console.log("After reset - combined rating:", voltageDrop.combinedRatingInfo)
                                     
                                     // Explicitly update the fuse size display
-                                    networkFuseSizeText.text = voltageDropMV.combinedRatingInfo
+                                    networkFuseSizeText.text = voltageDrop.combinedRatingInfo
                                 }
                             }
                         }
@@ -294,7 +269,7 @@ Page {
 
                             Label {
                                 id: dropPercent
-                                property real percentage: root.currentVoltageDropValue / (parseFloat(voltageDropMV.selectedVoltage.slice(0, -1)) || 1) * 100
+                                property real percentage: root.currentVoltageDropValue / (parseFloat(voltageDrop.selectedVoltage.slice(0, -1)) || 1) * 100
                                 text: percentage.toFixed(2) + "%"
                                 color: percentage > 5 ? "red" : "green"
                             }
@@ -302,21 +277,21 @@ Page {
                             Label { text: "Diversity Factor Applied: " }
 
                             Label {
-                                text:  voltageDropMV.diversityFactor.toFixed(2)
+                                text:  voltageDrop.diversityFactor.toFixed(2)
                             }
 
                             // Update Network Fuse Size display to show combined information
                             Label { text: "Network Fuse / Rating:" }
                             Text {
                                 id: networkFuseSizeText
-                                text: voltageDropMV.combinedRatingInfo || "N/A"
+                                text: voltageDrop.combinedRatingInfo || "N/A"
                                 color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
                                        "blue" : (text === "Error" ? "red" : toolBar.toggle ? "#ffffff" : "#000000")
                                 font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
                                 Layout.fillWidth: true
                                 
                                 Connections {
-                                    target: voltageDropMV
+                                    target: voltageDrop
                                     function onCombinedRatingChanged(value) {
                                         networkFuseSizeText.text = value
                                     }
@@ -332,7 +307,7 @@ Page {
                                 color: toolBar.toggle ? "#ffffff" : "#000000"
 
                                 Connections {
-                                    target: voltageDropMV
+                                    target: voltageDrop
                                     function onTotalLoadChanged(value) {
                                         totalLoadText.text = value.toFixed(1)
                                     }
@@ -342,7 +317,7 @@ Page {
                             Label { text: "Current (A):" }
                             Text {
                                 id: currentInput
-                                text: Number(voltageDropMV.current).toFixed(1)
+                                text: Number(voltageDrop.current).toFixed(1)
                                 font.bold: true
                                 color: toolBar.toggle ? "#ffffff" : "#000000"
                                 Layout.fillWidth: true
@@ -350,7 +325,7 @@ Page {
                                 
                                 // Add connection to update when current changes
                                 Connections {
-                                    target: voltageDropMV
+                                    target: voltageDrop
                                     function onCurrentChanged(value) {
                                         currentInput.text = value.toFixed(1)
                                     }
@@ -363,10 +338,10 @@ Page {
                                 radius: 4
 
                                 Rectangle {
-                                    width: parent.width * Math.min((root.currentVoltageDropValue / voltageDropMV.selectedVoltage.slice(0, -1) * 100) / 10, 1)
+                                    width: parent.width * Math.min((root.currentVoltageDropValue / voltageDrop.selectedVoltage.slice(0, -1) * 100) / 10, 1)
                                     height: parent.height
                                     radius: 4
-                                    color: (root.currentVoltageDropValue / voltageDropMV.selectedVoltage.slice(0, -1) * 100) > 5 ? "red" : "green"
+                                    color: (root.currentVoltageDropValue / voltageDrop.selectedVoltage.slice(0, -1) * 100) > 5 ? "red" : "green"
                                     Behavior on width { NumberAnimation { duration: 200 } }
                                 }
                             }
@@ -387,7 +362,7 @@ Page {
                                             "voltage_system": voltageSelect.currentText,
                                             "kva_per_house": parseFloat(kvaPerHouseInput.text),
                                             "num_houses": parseInt(numberOfHousesInput.text),
-                                            "diversity_factor": voltageDropMV.diversityFactor,
+                                            "diversity_factor": voltageDrop.diversityFactor,
                                             "total_kva": parseFloat(totalLoadText.text),
                                             "current": parseFloat(currentInput.text),
                                             "cable_size": cableSelect.currentText,
@@ -418,7 +393,7 @@ Page {
                                 }
 
                                 Connections {
-                                    target: voltageDropMV
+                                    target: voltageDrop
                                     function onSaveStatusChanged(success, message) {
                                         if (success) {
                                             saveSuccess.messageText = message
@@ -503,7 +478,7 @@ Page {
                                 TableView {
                                     id: tableView
                                     anchors.fill: parent
-                                    model: voltageDropMV.tableModel
+                                    model: voltageDrop.tableModel
                                     boundsMovement: Flickable.StopAtBounds
 
                                     // Remove the sync code since we're using x binding now
@@ -569,7 +544,6 @@ Page {
                     SavedResults {
                         Layout.fillWidth: true
                         Layout.minimumHeight: 300
-                        resultsManager: resultsManager  // Pass the instance
                     }
                     // Add detailed results popup
                     Popup {
@@ -603,37 +577,37 @@ Page {
                                     // System Configuration
                                     Label { text: "System Configuration"; font.bold: true; Layout.columnSpan: 2 }
                                     Label { text: "Voltage System:" }
-                                    Label { text: voltageDropMV.selectedVoltage }
+                                    Label { text: voltageDrop.selectedVoltage }
                                     Label { text: "ADMD Status:" }
-                                    Label { text: voltageDropMV.admdEnabled ? "Enabled (1.5×)" : "Disabled" }
+                                    Label { text: voltageDrop.admdEnabled ? "Enabled (1.5×)" : "Disabled" }
 
                                     // Load Details
                                     Label { text: "Load Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
                                     Label { text: "KVA per House:" }
                                     Label { 
                                         text: {
-                                            const totalKva = voltageDropMV.totalKva || 0
-                                            const houses = voltageDropMV.numberOfHouses || 1
+                                            const totalKva = voltageDrop.totalKva || 0
+                                            const houses = voltageDrop.numberOfHouses || 1
                                             return (totalKva / houses).toFixed(1) + " kVA"
                                         }
                                     }
                                     Label { text: "Number of Houses:" }
-                                    Label { text: voltageDropMV.numberOfHouses || 1 }
+                                    Label { text: voltageDrop.numberOfHouses || 1 }
                                     Label { text: "Diversity Factor:" }
-                                    Label { text: (voltageDropMV.diversityFactor || 1.0).toFixed(3) }
+                                    Label { text: (voltageDrop.diversityFactor || 1.0).toFixed(3) }
                                     Label { text: "Total Load:" }
-                                    Label { text: (voltageDropMV.totalKva || 0).toFixed(1) + " kVA" }
+                                    Label { text: (voltageDrop.totalKva || 0).toFixed(1) + " kVA" }
                                     Label { text: "Current:" }
-                                    Label { text: (voltageDropMV.current || 0).toFixed(1) + " A" }
+                                    Label { text: (voltageDrop.current || 0).toFixed(1) + " A" }
 
                                     // Cable Details
                                     Label { text: "Cable Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
                                     Label { text: "Cable Size:" }
                                     Label { text: cableSelect.currentText + " mm²" }
                                     Label { text: "Material:" }
-                                    Label { text: voltageDropMV.conductorMaterial }
+                                    Label { text: voltageDrop.conductorMaterial }
                                     Label { text: "Configuration:" }
-                                    Label { text: voltageDropMV.coreType }
+                                    Label { text: voltageDrop.coreType }
                                     Label { text: "Length:" }
                                     Label { text: lengthInput.text + " m" }
                                     Label { text: "Installation:" }
@@ -647,7 +621,7 @@ Page {
                                     Label { text: "Results"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
                                     Label { text: "Network Fuse / Rating:" }
                                     Label {
-                                        text: voltageDropMV.combinedRatingInfo 
+                                        text: voltageDrop.combinedRatingInfo 
                                         color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
                                                "blue" : (text === "Error" ? "red" : toolBar.toggle ? "#ffffff" : "#000000")
                                         font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
@@ -985,30 +959,6 @@ Page {
                     onClicked: chartPopup.close()
                 }
                 
-                Button {
-                    text: "Save As Image"
-                    onClicked: {
-                        try {
-                            // Use a more robust grabbing method
-                            chartView.grabToImage(function(result) {
-                                if (result && result.width > 0 && result.height > 0) {
-                                    console.log("Successfully grabbed image: " + result.width + "x" + result.height);
-                                    chartPopup.savedImage = result;
-                                    saveImageDialog.open();
-                                } else {
-                                    console.error("Failed to grab image - result is null or empty");
-                                    imageSaveError.messageText = "Failed to capture chart image";
-                                    imageSaveError.open();
-                                }
-                            }, Qt.size(chartView.width, chartView.height));
-                        } catch (err) {
-                            console.error("Error grabbing image:", err);
-                            imageSaveError.messageText = "Error grabbing chart image: " + err.toString();
-                            imageSaveError.open();
-                        }
-                    }
-                }
-                
                 // Add button to reset zoom
                 Button {
                     text: "Reset View"
@@ -1033,102 +983,6 @@ Page {
                 }
             }
         }
-        
-        property var savedImage: null
-        
-        FileDialog {
-            id: saveImageDialog
-            title: "Save Chart Image"
-            fileMode: FileDialog.SaveFile
-            nameFilters: ["Image files (*.png)"]
-            
-            onAccepted: {
-                if (chartPopup.savedImage) {
-                    try {
-                        // Improved path handling for Linux
-                        let filePath = saveImageDialog.selectedFile.toString();
-                        console.log("Original selected path:", filePath);
-                        
-                        // Remove URL prefix from file path
-                        if (filePath.startsWith("file:///")) {
-                            filePath = filePath.substring(7);
-                        } else if (filePath.startsWith("file:/")) {
-                            filePath = filePath.substring(5);
-                        }
-                        
-                        // Ensure filename ends with .png
-                        if (!filePath.toLowerCase().endsWith(".png")) {
-                            filePath += ".png";
-                        }
-                        
-                        console.log("Attempting to save chart image to:", filePath);
-                        
-                        // Use our helper function to save the image
-                        saveChartImage(chartPopup.savedImage, filePath);
-                        
-                    } catch (err) {
-                        console.error("Error in save process:", err);
-                        imageSaveError.messageText = "Error: " + err.toString();
-                        imageSaveError.open();
-                    }
-                } else {
-                    console.error("No image data to save");
-                    imageSaveError.messageText = "No image data available to save";
-                    imageSaveError.open();
-                }
-            }
-        }
-    }
-
-    // Add feedback popups for image saving
-    Popup {
-        id: imageSaveSuccess
-        modal: true
-        focus: true
-        anchors.centerIn: Overlay.overlay
-        width: 400  // Increased width
-        height: 150 // Increased height
-        
-        property string messageText: "Chart image saved successfully"
-
-        contentItem: ColumnLayout {
-            Label {
-                text: imageSaveSuccess.messageText
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: imageSaveSuccess.close()
-            }
-        }
-    }
-    Popup {
-        id: imageSaveError
-        modal: true
-        focus: true
-        anchors.centerIn: Overlay.overlay
-        width: 400
-        height: 120
-        
-        property string messageText: "Failed to save image"
-        
-        contentItem: ColumnLayout {
-            Label {
-                text: imageSaveError.messageText
-                wrapMode: Text.WordWrap
-                color: "red"
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: imageSaveError.close()
-            }
-        }
     }
 
     function getColumnWidth(column) {
@@ -1145,7 +999,7 @@ Page {
         }
     }
 
-    function calculateVoltageDropMV() {
+    function calculateVoltageDrop() {
         // ...existing calculation code...
 
         if (result.isValid) {
@@ -1312,28 +1166,6 @@ Page {
             thresholdLine.append(10, 5)
             
             chartView.title = "Cable " + cableSelect.currentText + " mm²"
-        }
-    }
-
-    // Add this function to improve save reliability
-    function saveChartImage(image, filePath) {
-        try {
-            // Try the ResultsManager approach first
-            let success = resultsManager.save_qimage(image, filePath);
-            
-            if (success) {
-                console.log("Successfully saved image to: " + filePath);
-                imageSaveSuccess.messageText = "Chart image saved to: " + filePath;
-                imageSaveSuccess.open();
-            } else {
-                console.log("Primary save method failed, trying fallback...");
-                // Use the fallback method
-                imageSaver.saveImage(image, filePath);
-            }
-        } catch (err) {
-            console.error("Error in saveChartImage:", err);
-            imageSaveError.messageText = "Error: " + err.toString();
-            imageSaveError.open();
         }
     }
 }

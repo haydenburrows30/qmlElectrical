@@ -1,34 +1,41 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <!-- Main QML Files -->
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource prefix="/">
+    <!-- QML Files -->
     <file>qml/main.qml</file>
-
-    <!-- Pages -->
     <file>qml/pages/Home.qml</file>
     <file>qml/pages/VoltageDrop.qml</file>
     <file>qml/pages/Calculator.qml</file>
     <file>qml/pages/ThreePhase.qml</file>
     <file>qml/pages/RLC.qml</file>
+    <file>qml/pages/RealTime.qml</file>
 
-    <!-- Core Components -->
-    <file>qml/components/AToolTip.qml</file>
+    <!-- Components -->
+    <file>qml/components/qmldir</file>
+    <file>qml/components/WaveCard.qml</file>
+    <file>qml/components/WaveControls.qml</file>
+    <file>qml/components/WaveChart.qml</file>
+    <file>qml/components/PhasorView.qml</file>
+    <file>qml/components/Measurements.qml</file>
+    <file>qml/components/PhaseTable.qml</file>
+    <file>qml/components/PowerTriangle.qml</file>
+    <file>qml/components/PowerTriangleViz.qml</file>
+    <file>qml/components/PhasorDiagram.qml</file>
+    <file>qml/components/SavedResults.qml</file>
     <file>qml/components/BarChart.qml</file>
     <file>qml/components/CButton.qml</file>
     <file>qml/components/CToolTip.qml</file>
+    <file>qml/components/CustomBorderRect.qml</file>
     <file>qml/components/DarkLightButton.qml</file>
     <file>qml/components/HButton.qml</file>
     <file>qml/components/ImageContainer.qml</file>
-    <file>qml/components/PhasorDiagram.qml</file>
     <file>qml/components/Settings.qml</file>
     <file>qml/components/SideBar.qml</file>
     <file>qml/components/ToolBar.qml</file>
-
-    <!-- Three Phase Components -->
-    <file>qml/components/WaveCard.qml</file>
-    <file>qml/components/WaveChart.qml</file>
-    <file>qml/components/WaveControls.qml</file>
-    <file>qml/components/PhaseControl.qml</file>
-    <file>qml/components/Measurements.qml</file>
+    <file>qml/components/RealTimeChart.qml</file>
+    <file>qml/components/ChargingCurrentViz.qml</file>
+    <file>qml/components/ImpedanceVectorViz.qml</file>
+    <file>qml/components/SineWaveViz.qml</file>
 
     <!-- Icons -->
     <file>icons/gallery/24x24/LightBar.svg</file>
@@ -49,23 +56,20 @@
     <file>icons/gallery/24x24/Wave_dark.ico</file>
     <file>icons/gallery/index.theme</file>
 
-    <!-- Configuration -->
-    <file>qtquickcontrols2.conf</file>
-    <file>qml/components/qmldir</file>
-
-    <!-- Fonts -->
-    <file>fonts/MaterialIcons-Regular.ttf</file>
-    <file>fonts/MaterialIconsOutlined-Regular.otf</file>
-    <file>fonts/MaterialIconsRound-Regular.otf</file>
-    <file>fonts/MaterialIconsSharp-Regular.otf</file>
-    <file>fonts/MaterialIconsTwoTone-Regular.otf</file>
-
-    <!-- Data -->
+    <!-- Data Files -->
     <file>data/cable_data_mv.csv</file>
     <file>data/cable_data_cu_1c.csv</file>
     <file>data/cable_data_cu_3c.csv</file>
     <file>data/cable_data_al_1c.csv</file>
     <file>data/cable_data_al_3c.csv</file>
     <file>data/diversity_factor.csv</file>
+
+    <!-- Models -->
+    <file>models/VoltageDrop.py</file>
+    <file>models/ElectricPy.py</file>
+    <file>models/ThreePhase.py</file>
+
+    <!-- Configuration -->
+    <file>qtquickcontrols2.conf</file>
 </qresource>
 </RCC>

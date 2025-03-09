@@ -17,7 +17,6 @@ The application consists of multiple QML components and Python backend models or
 ### Pages
 - `Home` - Main navigation dashboard
 - `VoltageDrop` - LV voltage drop calculator
-- `VoltageDropMV` - MV voltage drop calculator  
 - `Calculator` - General electrical calculations
 - `ThreePhase` - Three-phase wave simulator
 - `Phasor` - RLC and phasor analysis

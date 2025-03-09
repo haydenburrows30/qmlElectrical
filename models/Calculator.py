@@ -76,7 +76,7 @@ class PowerCalculator(BaseCalculator):
     def calculate(self):
         self.calculatePower()
 
-class ChargingCalc(BaseCalculator):
+class ChargingCalculator(BaseCalculator):
     """Calculator for capacitive charging current.
     
     Features:

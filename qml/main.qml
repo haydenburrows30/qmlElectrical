@@ -15,6 +15,8 @@ import Sine 1.0
 import RFreq 1.0
 import ConvCalc 1.0
 import RLC 1.0
+import VDrop 1.0
+import Results 1.0
 
 import 'components'
 
@@ -25,41 +27,17 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
-    PowerCalculator {
-        id: powerCalculator
-    }
+    //calculator models
+    PowerCalculator {id: powerCalculator}
+    ChargingCalculator {id: chargingCalc}
+    FaultCurrentCalculator {id: faultCalc}
+    ResonantFrequencyCalculator {id: resonantFreq}
+    ConversionCalculator {id: conversionCalc}
 
-    ChargingCalc {
-        id: chargingCalc
-    }
-
-    FaultCalculator {
-        id: faultCalc
-    }
-
-    SineWaveModel {
-        id: threePhaseSineModel
-    }
-
-    ResonantFreq {
-        id: resonantFreq
-    }
-
-    ConversionCalc {
-        id: conversionCalc
-    }
-
-    SeriesRLCChart {
-        id: seriesRLCChart
-    }
-
-    SineWaveModel {
-        id: sineModel
-    }
-
-    VoltageDropMV {
-        id: voltageDropMV
-    }
+    SeriesRLCChart {id: seriesRLCChart}
+    SineWaveModel {id: sineModel}
+    VoltageDrop {id: voltageDrop}
+    ResultsManager {id: resultsManager}
 
     ToolBar{
         id: toolBar
@@ -73,9 +51,7 @@ ApplicationWindow {
         height: window.height - toolBar.height
     }
 
-    Settings {
-        id: settings
-    }
+    Settings {id: settings}
 
     StackView {
         id: stackView

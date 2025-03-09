@@ -53,7 +53,7 @@ class VoltageDropTableModel(QAbstractTableModel):
         self._data = data
         self.endResetModel()
 
-class VoltageDropMVCalculator(QObject):
+class VoltageDrop(QObject):
     """
     Voltage drop calculator using mV/A/m method according to AS/NZS 3008.
     

@@ -7,7 +7,6 @@ import '../components'
 WaveCard {
     id: root
     title: "Calculation History"
-    property var resultsManager
 
     ColumnLayout {
         anchors.fill: parent

@@ -35,8 +35,8 @@ Factory pattern implementation:
 - Type-safe calculator creation
 - Default calculator registration
 
-## VoltageDropMVCalculator
-MV cable voltage drop calculator with diversity and ADMD support.
+## VoltageDropCalculator
+Cable voltage drop calculator with diversity and ADMD support.
 
 ### Features
 - Load-based calculations with diversity factors
@@ -81,7 +81,7 @@ size,mv_per_am,max_current
 
 ### Usage Example
 ```python
-calculator = VoltageDropMVCalculator()
+calculator = VoltageDropCalculator()
 calculator.setTotalKVA(100)  # Set total load
 calculator.setNumberOfHouses(20)  # Apply diversity
 calculator.setLength(200)  # Set cable length

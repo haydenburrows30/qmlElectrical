@@ -4,8 +4,9 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
-from models.VoltageDropMV import VoltageDropMVCalculator
+from models.VoltageDrop import VoltageDrop
 from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator
+from models.ResultsManager import ResultsManager
 
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
@@ -75,7 +76,8 @@ class ModelFactory(IModelFactory):
             "resonant_freq": ResonantFrequencyCalculator,
             "conversion_calc": ConversionCalculator,
             "series_rlc_chart": SeriesRLCChart,
-            "voltage_drop": VoltageDropMVCalculator
+            "voltage_drop": VoltageDrop,
+            "results_manager": ResultsManager
         }
         
         if model_type not in model_map:

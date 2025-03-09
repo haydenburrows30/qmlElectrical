@@ -22,7 +22,6 @@ The application uses a modular architecture with QML for UI and Python for backe
 │   ├── pages/
 │   │   ├── Home.qml
 │   │   ├── VoltageDrop.qml
-│   │   ├── VoltageDropMV.qml
 │   │   ├── Calculator.qml
 │   │   ├── ThreePhase.qml
 │   │   ├── RLC.qml

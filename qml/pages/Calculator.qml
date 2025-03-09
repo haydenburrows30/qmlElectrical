@@ -11,8 +11,6 @@ import QtQuick.Studio.DesignEffects
 
 import "../components"
 
-import Sine 1.0
-
 Page {
     id: home
 
