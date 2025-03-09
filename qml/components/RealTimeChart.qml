@@ -18,6 +18,8 @@ ChartView {
     antialiasing: true
     legend.visible: true
 
+    theme: Universal.theme
+
     // only one instance of RealTimeChart.  its not declared in main.qml
 
     RealTimeChart {id: realTimeChart}

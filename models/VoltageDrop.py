@@ -1,8 +1,15 @@
-from PySide6.QtCore import Slot, Signal, Property, QObject, QAbstractTableModel, Qt
+from PySide6.QtCore import Slot, Signal, Property, QObject, QAbstractTableModel, Qt, QUrl
 import pandas as pd
 import numpy as np
 import math
 import os
+# Add imports for PDF generation
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
 
 class VoltageDropTableModel(QAbstractTableModel):
     def __init__(self, parent=None):
@@ -84,6 +91,12 @@ class VoltageDrop(QObject):
     fuseSizeChanged = Signal(str)  # Add new signal for fuse size changes
     conductorRatingChanged = Signal(float)  # Add new signal for conductor rating changes
     combinedRatingChanged = Signal(str)  # Add new signal for combined rating info
+    chartSaved = Signal(bool, str)  # Add signal for chart save status
+    grabRequested = Signal(str, float)  # Signal with filepath and scale factors
+    tableExportStatusChanged = Signal(bool, str)  # Add new signal for table export status
+    # Add new signal for PDF export status
+    pdfExportStatusChanged = Signal(bool, str)
+    tablePdfExportStatusChanged = Signal(bool, str)  # Add new signal for table PDF export
 
     def __init__(self):
         super().__init__()
@@ -582,6 +595,366 @@ class VoltageDrop(QObject):
             error_msg = f"Error saving calculation: {e}"
             print(error_msg)
             self.saveStatusChanged.emit(False, error_msg)
+
+    @Slot(str, float)
+    def saveChart(self, filepath, scale=2.0):
+        """Save chart as image with optional scale factor - identical to ElectricPy approach"""
+        try:
+            # Convert QUrl to local file path
+            if isinstance(filepath, QUrl):
+                filepath = filepath.toLocalFile()
+            elif filepath.startswith('file:///'):
+                filepath = QUrl(filepath).toLocalFile()
+            
+            print(f"Saving voltage drop chart to: {filepath} with scale {scale}")
+            self.grabRequested.emit(filepath, scale)
+            return True
+        except Exception as e:
+            print(f"Error saving chart: {e}")
+            return False
+
+    @Slot(str)
+    def exportTableData(self, filepath):
+        """Save the cable size comparison table data to a CSV file."""
+        try:
+            # Convert QUrl to local file path if needed
+            if isinstance(filepath, QUrl):
+                filepath = filepath.toLocalFile()
+            elif filepath.startswith('file:///'):
+                filepath = QUrl(filepath).toLocalFile()
+            
+            print(f"Saving cable comparison table to: {filepath}")
+            
+            # Ensure we have data to save
+            if not hasattr(self, '_table_model') or self._table_model is None:
+                self.tableExportStatusChanged.emit(False, "No table data to export")
+                return False
+                
+            # Extract data from the table model
+            rows = self._table_model._data
+            if not rows:
+                self.tableExportStatusChanged.emit(False, "Table contains no data to export")
+                return False
+                
+            # Create DataFrame with column headers
+            headers = ['Size (mm²)', 'Material', 'Cores', 'mV/A/m', 'Rating (A)', 
+                       'Voltage Drop (V)', 'Drop (%)', 'Status']
+            df = pd.DataFrame(rows, columns=headers)
+            
+            # Add metadata as header comments
+            with open(filepath, 'w') as f:
+                f.write(f"# Cable Size Comparison - {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"# System Voltage: {self._selected_voltage}\n")
+                f.write(f"# Current: {self._current:.1f} A\n")
+                f.write(f"# Length: {self._length:.1f} m\n")
+                f.write(f"# Installation Method: {self._installation_method}\n")
+                f.write(f"# Temperature: {self._temperature:.1f} °C\n")
+                f.write(f"# Grouping Factor: {self._grouping_factor:.2f}\n")
+                f.write(f"# ADMD Enabled: {'Yes' if self._admd_enabled else 'No'}\n")
+                f.write(f"# Diversity Factor: {self._diversity_factor:.3f}\n\n")
+            
+            # Append the DataFrame to the file
+            df.to_csv(filepath, mode='a', index=False)
+            
+            success_msg = f"Table data saved to {filepath}"
+            print(success_msg)
+            self.tableExportStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error exporting table data: {e}"
+            print(error_msg)
+            self.tableExportStatusChanged.emit(False, error_msg)
+            return False
+
+    @Slot(str)
+    def exportTableToPDF(self, filepath):
+        """Export cable comparison table to PDF format.
+        
+        Args:
+            filepath: Path to save the PDF file
+        """
+        try:
+            # Convert QUrl to local file path if needed
+            if isinstance(filepath, QUrl):
+                filepath = filepath.toLocalFile()
+            elif filepath.startswith('file:///'):
+                filepath = QUrl(filepath).toLocalFile()
+                
+            print(f"Exporting table to PDF: {filepath}")
+            
+            # Ensure we have data to save
+            if not hasattr(self, '_table_model') or self._table_model is None:
+                self.tablePdfExportStatusChanged.emit(False, "No table data to export to PDF")
+                return False
+                
+            # Extract data from the table model
+            rows = self._table_model._data
+            if not rows:
+                self.tablePdfExportStatusChanged.emit(False, "Table contains no data to export to PDF")
+                return False
+            
+            # Create PDF document
+            doc = SimpleDocTemplate(
+                filepath,
+                pagesize=A4,
+                rightMargin=36,  # Narrower margins for table
+                leftMargin=36,
+                topMargin=36,
+                bottomMargin=36
+            )
+            
+            # Get styles
+            styles = getSampleStyleSheet()
+            title_style = styles["Title"]
+            heading_style = styles["Heading2"]
+            normal_style = styles["Normal"]
+            
+            # Create contents
+            elements = []
+            
+            # Add title
+            elements.append(Paragraph("Cable Size Comparison", title_style))
+            elements.append(Spacer(1, 0.25 * inch))
+            
+            # Add metadata
+            metadata = [
+                ["System Voltage:", self._selected_voltage],
+                ["Current:", f"{self._current:.1f} A"],
+                ["Length:", f"{self._length:.1f} m"],
+                ["Installation Method:", self._installation_method],
+                ["Temperature:", f"{self._temperature:.1f} °C"],
+                ["Grouping Factor:", f"{self._grouping_factor:.2f}"],
+                ["ADMD Enabled:", "Yes" if self._admd_enabled else "No"],
+                ["Diversity Factor:", f"{self._diversity_factor:.3f}"]
+            ]
+            
+            meta_table = Table(metadata, colWidths=[2*inch, 4*inch])
+            meta_table.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(meta_table)
+            elements.append(Spacer(1, 0.25 * inch))
+            
+            # Prepare table data with headers
+            headers = ['Size (mm²)', 'Material', 'Cores', 'mV/A/m', 'Rating (A)', 
+                      'V-Drop (V)', 'Drop (%)', 'Status']
+            
+            table_data = [headers]  # Start with headers
+            
+            # Format the data properly for the table
+            for row in rows:
+                formatted_row = []
+                for i, item in enumerate(row):
+                    if isinstance(item, float):
+                        if i == 6:  # Drop percentage column
+                            formatted_row.append(f"{item:.1f}%")
+                        else:
+                            formatted_row.append(f"{item:.1f}")
+                    else:
+                        formatted_row.append(str(item))
+                table_data.append(formatted_row)
+            
+            # Create the table
+            col_widths = [0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch]
+            table = Table(table_data, colWidths=col_widths, repeatRows=1)
+            
+            # Apply table styles
+            table_style = [
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]
+            
+            # Add special formatting for the status column
+            for i in range(1, len(table_data)):
+                status = table_data[i][7]  # Status column
+                if status == "SEVERE":
+                    table_style.append(('BACKGROUND', (7, i), (7, i), colors.mistyrose))
+                    table_style.append(('TEXTCOLOR', (7, i), (7, i), colors.darkred))
+                elif status == "WARNING":
+                    table_style.append(('BACKGROUND', (7, i), (7, i), colors.linen))
+                    table_style.append(('TEXTCOLOR', (7, i), (7, i), colors.darkorange))
+                elif status == "SUBMAIN":
+                    table_style.append(('BACKGROUND', (7, i), (7, i), colors.aliceblue))
+                    table_style.append(('TEXTCOLOR', (7, i), (7, i), colors.blue))
+                elif status == "OK":
+                    table_style.append(('BACKGROUND', (7, i), (7, i), colors.mintcream))
+                    table_style.append(('TEXTCOLOR', (7, i), (7, i), colors.darkgreen))
+                
+                # Alternate row colors for better readability
+                if i % 2 == 0:
+                    table_style.append(('BACKGROUND', (0, i), (6, i), colors.whitesmoke))
+            
+            table.setStyle(TableStyle(table_style))
+            
+            elements.append(table)
+            
+            # Add timestamp
+            elements.append(Spacer(1, 0.5 * inch))
+            timestamp = f"Generated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            elements.append(Paragraph(timestamp, normal_style))
+            
+            # Build the PDF
+            doc.build(elements)
+            
+            success_msg = f"Table exported to PDF: {filepath}"
+            print(success_msg)
+            self.tablePdfExportStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error exporting table to PDF: {e}"
+            print(error_msg)
+            self.tablePdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    @Slot(str, dict)
+    def exportDetailsToPDF(self, filepath, details):
+        """Export voltage drop calculation details to PDF format.
+        
+        Args:
+            filepath: Path to save the PDF file
+            details: Dictionary containing calculation details
+        """
+        try:
+            # Convert QUrl to local file path if needed
+            if isinstance(filepath, QUrl):
+                filepath = filepath.toLocalFile()
+            elif filepath.startswith('file:///'):
+                filepath = QUrl(filepath).toLocalFile()
+                
+            print(f"Exporting details to PDF: {filepath}")
+            
+            # Create PDF document
+            doc = SimpleDocTemplate(
+                filepath,
+                pagesize=A4,
+                rightMargin=72,
+                leftMargin=72,
+                topMargin=72,
+                bottomMargin=72
+            )
+            
+            # Get styles
+            styles = getSampleStyleSheet()
+            title_style = styles["Title"]
+            heading_style = styles["Heading2"]
+            normal_style = styles["Normal"]
+            
+            # Create contents
+            elements = []
+            
+            # Title
+            elements.append(Paragraph("Voltage Drop Calculation Results", title_style))
+            elements.append(Spacer(1, 0.25 * inch))
+            
+            # System configuration
+            elements.append(Paragraph("System Configuration", heading_style))
+            system_data = [
+                ["Voltage System:", details.get("voltage_system", "")],
+                ["ADMD Status:", "Enabled (1.5×)" if details.get("admd_enabled", False) else "Disabled"]
+            ]
+            system_table = Table(system_data, colWidths=[2*inch, 3*inch])
+            system_table.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(system_table)
+            elements.append(Spacer(1, 0.25 * inch))
+            
+            # Load details
+            elements.append(Paragraph("Load Details", heading_style))
+            load_data = [
+                ["KVA per House:", f"{details.get('kva_per_house', 0):.1f} kVA"],
+                ["Number of Houses:", str(details.get("num_houses", 1))],
+                ["Diversity Factor:", f"{details.get('diversity_factor', 1.0):.3f}"],
+                ["Total Load:", f"{details.get('total_kva', 0):.1f} kVA"],
+                ["Current:", f"{details.get('current', 0):.1f} A"]
+            ]
+            load_table = Table(load_data, colWidths=[2*inch, 3*inch])
+            load_table.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(load_table)
+            elements.append(Spacer(1, 0.25 * inch))
+            
+            # Cable details
+            elements.append(Paragraph("Cable Details", heading_style))
+            cable_data = [
+                ["Cable Size:", f"{details.get('cable_size', '')} mm²"],
+                ["Material:", details.get("conductor_material", "")],
+                ["Configuration:", details.get("core_type", "")],
+                ["Length:", f"{details.get('length', 0)} m"],
+                ["Installation:", details.get("installation_method", "")],
+                ["Temperature:", f"{details.get('temperature', 25)} °C"],
+                ["Grouping Factor:", details.get("grouping_factor", "1.0")]
+            ]
+            cable_table = Table(cable_data, colWidths=[2*inch, 3*inch])
+            cable_table.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(cable_table)
+            elements.append(Spacer(1, 0.25 * inch))
+            
+            # Results
+            elements.append(Paragraph("Results", heading_style))
+            
+            # Handle special coloring for voltage drop results
+            voltage_drop = details.get("voltage_drop", 0)
+            drop_percent = details.get("drop_percent", 0)
+            drop_color = colors.red if drop_percent > 5 else colors.green
+            
+            results_data = [
+                ["Network Fuse / Rating:", details.get("combined_rating_info", "N/A")],
+                ["Voltage Drop:", f"{voltage_drop:.2f} V"],
+                ["Drop Percentage:", f"{drop_percent:.2f}%"]
+            ]
+            results_table = Table(results_data, colWidths=[2*inch, 3*inch])
+            results_table.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey),
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('PADDING', (0, 0), (-1, -1), 6),
+                ('TEXTCOLOR', (1, 1), (1, 2), drop_color),  # Color the voltage drop and percentage
+            ]))
+            elements.append(results_table)
+            
+            # Add timestamp
+            elements.append(Spacer(1, 0.5 * inch))
+            timestamp = f"Generated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            elements.append(Paragraph(timestamp, normal_style))
+            
+            # Build the PDF
+            doc.build(elements)
+            
+            success_msg = f"Details exported to PDF: {filepath}"
+            print(success_msg)
+            self.pdfExportStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error exporting details to PDF: {e}"
+            print(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
 
     def _calculate_voltage_drop(self):
         """Calculate voltage drop using mV/A/m method."""

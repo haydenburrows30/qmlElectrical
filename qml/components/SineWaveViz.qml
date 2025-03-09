@@ -13,7 +13,10 @@ Item {
 
     Canvas {
         id: canvas
-        anchors.fill: parent
+        anchors.centerIn: parent
+
+        width: 300
+        height: 250
         
         onPaint: {
             var ctx = getContext("2d");

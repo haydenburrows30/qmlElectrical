@@ -16,6 +16,7 @@ class SeriesRLCChart(QObject):
     resonantFreqChanged = Signal(float)
     axisRangeChanged = Signal()  # Add new signal
     formattedDataChanged = Signal(list)  # Add new signal
+    grabRequested = Signal(str, float)  # Change signal definition to include scale
 
     def __init__(self):
         super().__init__()
@@ -31,7 +32,7 @@ class SeriesRLCChart(QObject):
         self._axis_x_min = 0
         self._axis_x_max = 100
         self._axis_y_min = 0
-        self._axis_y_max = 1
+        self._axis_y_max = None  # Change to None for initial state check
         self._formatted_points = []
         self.generateChartData()
 
@@ -54,8 +55,9 @@ class SeriesRLCChart(QObject):
     def setFrequencyRange(self, start, end):
         """Set frequency range with separate start and end values"""
         if start >= 0 and end > start:
-            self._frequency_range = (float(start), float(end))
-            self.generateChartData()
+            self._axis_x_min = float(start)  # Update X axis minimum
+            self._axis_x_max = float(end)    # Update X axis maximum
+            self.axisRangeChanged.emit()     # Emit signal for axis change
 
     @Property(float, notify=axisRangeChanged)
     def axisXMin(self):
@@ -102,8 +104,8 @@ class SeriesRLCChart(QObject):
                 self.resonantFreqChanged.emit(self._resonant_freq)
 
                 # Create frequency points with extra density around resonance
-                f_start = max(1, self._frequency_range[0])
-                f_end = self._frequency_range[1]
+                f_start = max(1, 0)
+                f_end = self._resonant_freq * 3
                 
                 # Create three ranges of points: before, around, and after resonance
                 f1 = np.linspace(f_start, self._resonant_freq * 0.9, 200)
@@ -131,15 +133,19 @@ class SeriesRLCChart(QObject):
                     self._formatted_points = [{"x": p[0], "y": p[1]} for p in valid_points]
                     max_gain = max(p[1] for p in valid_points)
                     
+                    # Always update Y axis scale
+                    self._axis_y_max = max_gain * 1.1
+                    self._axis_y_min = 0
+                    
                     # Create resonant line points
                     self._resonant_line = [
                         {"x": float(self._resonant_freq), "y": float(0)},
                         {"x": float(self._resonant_freq), "y": float(max_gain * 1.2)}
                     ]
                     
-                    self.updateAxisRanges()
                     self.formattedDataChanged.emit([self._formatted_points, self._resonant_line])
                     self.chartDataChanged.emit()
+                    self.axisRangeChanged.emit()  # Ensure axis range is updated
                     
             except Exception as e:
                 print(f"Error generating chart data: {e}")
@@ -166,9 +172,21 @@ class SeriesRLCChart(QObject):
     @Slot()
     def resetZoom(self):
         """Reset to default zoom level"""
-        self._axis_x_min = self._frequency_range[0]
-        self._axis_x_max = self._frequency_range[1]
-        self.updateAxisRanges()
+        self._axis_x_min = 0
+        self._axis_x_max = 100
+        self._axis_y_min = 0
+        max_y = max(point[1] for point in self._chart_data) if self._chart_data else 1
+        self._axis_y_max = max_y * 1.1
+        self.axisRangeChanged.emit()
+
+    @Slot()
+    def resetValues(self):
+        """Reset all values to defaults"""
+        self._resistance = 10.0
+        self._inductance = 0.1
+        self._capacitance = 101.3e-6
+        self.generateChartData()
+        self.resetZoom()  # Call resetZoom after generating new data
 
     @Property(list, notify=chartDataChanged)
     def chartData(self):
@@ -177,3 +195,20 @@ class SeriesRLCChart(QObject):
     @Property(float, notify=resonantFreqChanged)
     def resonantFreq(self):
         return self._resonant_freq
+
+    @Slot(str, float)
+    def saveChart(self, filepath, scale=2.0):
+        """Save chart as image with optional scale factor"""
+        try:
+            # Convert QUrl to local file path
+            if isinstance(filepath, QUrl):
+                filepath = filepath.toLocalFile()
+            elif filepath.startswith('file:///'):
+                filepath = QUrl(filepath).toLocalFile()
+            
+            print(f"Saving chart to: {filepath} with scale {scale}")
+            self.grabRequested.emit(filepath, scale)
+            return True
+        except Exception as e:
+            print(f"Error saving chart: {e}")
+            return False

@@ -30,7 +30,7 @@ Pane {
         spacing: 2
 
         RowLayout {
-            Layout.minimumHeight: 40
+            Layout.minimumHeight: 30
             Label {
                 text: title
                 font.pixelSize: 16
@@ -43,8 +43,8 @@ Pane {
                 id: help
                 icon.name: righticon
                 visible: showInfo
-                width: 40
-                height:40
+                width: 30
+                height:30
                 tooltip_text: "Info"
                 onClicked: {
                     if (info > "") {

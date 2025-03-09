@@ -146,13 +146,14 @@ class FaultCurrentCalculator(BaseCalculator):
     Signals:
         impedanceCalculated: Emitted when impedance calculation completes
     """
-    impedanceCalculated = Signal(float)
+    impedanceCalculated = Signal(float, float)
 
     def __init__(self):
         super().__init__()
         self._resistance = 0.0
         self._reactance = 0.0
         self._impedance = 0.0
+        self._phase_angle = 0.0
 
     @Slot(float)
     def setResistance(self, resistance):
@@ -167,19 +168,24 @@ class FaultCurrentCalculator(BaseCalculator):
     def calculateImpedance(self):
         if self._resistance != 0 and self._reactance != 0:
             self._impedance =  math.sqrt(math.pow(self._resistance,2) + math.pow(self._reactance,2))
-            self.impedanceCalculated.emit(self._impedance)
+            self._phase_angle = math.degrees(math.atan2(self._reactance, self._resistance))
+            self.impedanceCalculated.emit(self._impedance, self._phase_angle)
 
     @Property(float, notify=impedanceCalculated)
     def impedance(self):
         return self._impedance
+    
+    @Property(float, notify=impedanceCalculated)
+    def phaseAngle(self):
+        return self._phase_angle
 
-    def reset(self):
-        self._voltage = 0.0
-        self._impedance = 0.0
-        self.dataChanged.emit()
+    # def reset(self):
+    #     self._voltage = 0.0
+    #     self._impedance = 0.0
+    #     self.dataChanged.emit()
         
-    def calculate(self):
-        self.calculateFault()
+    # def calculate(self):
+    #     self.calculateFault()
 
 class ResonantFrequencyCalculator(BaseCalculator):
     """Calculator for resonant frequency.
@@ -345,50 +351,6 @@ class PowerTriangleModel(QObject):
         if abs(self._real_power - value) > 0.1:
             self._real_power = value
             self._power_factor = self._real_power / self._apparent_power if self._apparent_power > 0 else 0
-            self.update_values()
-
-class ImpedanceVectorModel(QObject):
-    dataChanged = Signal()
-    
-    def __init__(self):
-        super().__init__()
-        self._resistance = 3.0    # R (ohms)
-        self._reactance = 4.0     # X (ohms)
-        self._impedance = 0.0     # Z (ohms)
-        self._phase_angle = 0.0   # θ (degrees)
-        self.update_values()
-    
-    def update_values(self):
-        self._impedance = math.sqrt(self._resistance**2 + self._reactance**2)
-        self._phase_angle = math.degrees(math.atan2(self._reactance, self._resistance))
-        self.dataChanged.emit()
-        
-    @Property(float, notify=dataChanged)
-    def resistance(self):
-        return self._resistance
-        
-    @Property(float, notify=dataChanged)
-    def reactance(self):
-        return self._reactance
-        
-    @Property(float, notify=dataChanged)
-    def impedance(self):
-        return self._impedance
-        
-    @Property(float, notify=dataChanged)
-    def phaseAngle(self):
-        return self._phase_angle
-    
-    @Slot(float)
-    def setResistance(self, value):
-        if abs(self._resistance - value) > 0.01:
-            self._resistance = value
-            self.update_values()
-            
-    @Slot(float)
-    def setReactance(self, value):
-        if abs(self._reactance - value) > 0.01:
-            self._reactance = value
             self.update_values()
 
 class SineCalculator(QObject):

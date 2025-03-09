@@ -8,3 +8,7 @@ PhaseTable 1.0 PhaseTable.qml
 PowerTriangle 1.0 PowerTriangle.qml
 PhasorDiagram 1.0 PhasorDiagram.qml
 SavedResults 1.0 SavedResults.qml
+VoltageDropChart 1.0 VoltageDropChart.qml
+VoltageDropDetails 1.0 VoltageDropDetails.qml
+CableSelectionSettings 1.0 CableSelectionSettings.qml
+VoltageDropResults 1.0 VoltageDropResults.qml

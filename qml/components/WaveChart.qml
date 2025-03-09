@@ -7,6 +7,8 @@ ChartView {
     antialiasing: true
     legend.visible: false
 
+    theme: Universal.theme
+
     property bool showRmsA: false
     property bool showRmsB: false
     property bool showRmsC: false

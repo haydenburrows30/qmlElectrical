@@ -55,197 +55,45 @@ Page {
                         Layout.minimumWidth: 400
                         showInfo: false
 
-                        GridLayout {
+                        CableSelectionSettings {
+                            id: cableSettings
                             anchors.fill: parent
-                            columns: 2
-                            columnSpacing: 16
-                            rowSpacing: 16
+                            
+                            onResetRequested: {
+                                voltageSelect.currentIndex = 1  // 415V
+                                conductorSelect.currentIndex = 1  // Al
+                                coreTypeSelect.currentIndex = 1  // 3C+E
+                                cableSelect.currentIndex = 13
+                                currentInput.text = "0"
+                                lengthInput.text = "0"
+                                temperatureInput.text = "25"
+                                groupingFactorInput.text = "1.0"
+                                kvaPerHouseInput.text = "7"
+                                numberOfHousesInput.text = "1"
+                                admdCheckBox.checked = false
+                                installationMethodCombo.currentIndex = 5  // "D1 - Underground direct buried"
 
-                            Label { text: "System Voltage:" }
-                            RowLayout {
-                                ComboBox {
-                                    id: voltageSelect
-                                    model: voltageDrop.voltageOptions
-                                    currentIndex: voltageDrop.selectedVoltage === "230V" ? 0 : 1
-                                    onCurrentTextChanged: {
-                                        if (currentText) {
-                                            console.log("Selecting voltage:", currentText)
-                                            voltageDrop.setSelectedVoltage(currentText)
-                                            // Disable ADMD checkbox for 230V
-                                            admdCheckBox.enabled = (currentText === "415V")
-                                            if (currentText !== "415V") {
-                                                admdCheckBox.checked = false
-                                            }
-                                        }
-                                    }
-                                    Layout.fillWidth: true
-                                }
+                                // Reset results table and calculations
+                                totalLoadText.text = "0.0"
                                 
-                                CheckBox {
-                                    id: admdCheckBox
-                                    text: "ADMD (neutral)"
-                                    enabled: voltageSelect.currentText === "415V"
-                                    onCheckedChanged: voltageDrop.setADMDEnabled(checked)
-                                    ToolTip.visible: hovered
-                                    ToolTip.text: "Apply 1.5 factor for neutral calculations"
-                                }
-                                Layout.fillWidth: true
-                            }
+                                // Reset model state
+                                voltageDrop.reset()
+                                
+                                // Force property reevaluation
+                                root.currentVoltageDropValue = voltageDrop.voltageDrop || 0
 
-                            Label { text: "Conductor:" }
-                            ComboBox {
-                                id: conductorSelect
-                                model: voltageDrop.conductorTypes
-                                currentIndex: 1
-                                onCurrentTextChanged: {
-                                    if (currentText) {
-                                        console.log("Selecting conductor:", currentText)
-                                        voltageDrop.setConductorMaterial(currentText)
-                                    }
-                                }
-                                Layout.fillWidth: true
-                            }
-
-                            Label { text: "Cable Type:" }
-                            ComboBox {
-                                id: coreTypeSelect
-                                model: voltageDrop.coreConfigurations
-                                currentIndex: 1
-                                onCurrentTextChanged: {
-                                    if (currentText) {
-                                        console.log("Selecting core type:", currentText)
-                                        voltageDrop.setCoreType(currentText)
-                                    }
-                                }
-                                Layout.fillWidth: true
-                            }
-
-                            Label { text: "Cable Size:" }
-                            ComboBox {
-                                id: cableSelect
-                                model: voltageDrop.availableCables
-                                currentIndex: 13  // Set default selection
-                                onCurrentTextChanged: {
-                                    if (currentText) {
-                                        console.log("Selecting cable:", currentText)
-                                        voltageDrop.selectCable(currentText)
-                                    }
-                                }
-                                Component.onCompleted: {
-                                    if (currentText) {
-                                        console.log("Initial cable selection:", currentText)
-                                        voltageDrop.selectCable(currentText)
-                                    }
-                                }
-                                Layout.fillWidth: true
-                            }
-
-                            Label { text: "Length (m):" }
-                            TextField {
-                                id: lengthInput  // Add ID
-                                placeholderText: "Enter length"
-                                onTextChanged: voltageDrop.setLength(parseFloat(text) || 0)
-                                Layout.fillWidth: true
-                                validator: DoubleValidator { bottom: 0 }
-                            }
-
-                            Label { text: "Installation Method:" }
-                            ComboBox {
-                                id: installationMethodCombo  // Add ID
-                                currentIndex: 6
-                                model: voltageDrop.installationMethods
-                                onCurrentTextChanged: voltageDrop.setInstallationMethod(currentText)
-                                Layout.fillWidth: true
-                            }
-
-                            Label { text: "Temperature (°C):" }
-                            TextField {
-                                id: temperatureInput  // Add ID
-                                text: "25"
-                                onTextChanged: voltageDrop.setTemperature(parseFloat(text) || 75)
-                                Layout.fillWidth: true
-                                validator: DoubleValidator { bottom: 0; top: 120 }
-                            }
-
-                            Label { text: "Grouping Factor:" }
-                            TextField {
-                                id: groupingFactorInput  // Add ID
-                                text: "1.0"
-                                onTextChanged: voltageDrop.setGroupingFactor(parseFloat(text) || 1.0)
-                                Layout.fillWidth: true
-                                validator: DoubleValidator { bottom: 0; top: 2 }
-                            }
-
-                            Label { text: "KVA per House:" }
-                            TextField {
-                                id: kvaPerHouseInput
-                                placeholderText: "Enter kVA"
-                                text: "7"  // Default 10kVA per house
-                                onTextChanged: {
-                                    let kva = parseFloat(text) || 0
-                                    let houses = parseInt(numberOfHousesInput.text) || 0
-                                    voltageDrop.calculateTotalLoad(kva, houses)
-                                }
-                                Layout.fillWidth: true
-                                validator: DoubleValidator { bottom: 0 }
-                            }
-
-                            Label { text: "Number of Houses:" }
-                            TextField {
-                                id: numberOfHousesInput
-                                placeholderText: "Enter number"
-                                text: "1"  // Default 1 house
-                                onTextChanged: {
-                                    let houses = parseInt(text) || 1
-                                    let kva = parseFloat(kvaPerHouseInput.text) || 0
-                                    voltageDrop.setNumberOfHouses(houses)
-                                    voltageDrop.calculateTotalLoad(kva, houses)
-                                }
-                                Layout.fillWidth: true
-                                validator: IntValidator { bottom: 1 }
-                            }
-
-                            Button {
-                                text: "Reset"
-                                icon.name: "Reset"
-                                Layout.fillWidth: true
-                                // Layout.rowSpan: 2
-                                onClicked: {
-                                    voltageSelect.currentIndex = 1  // 415V
-                                    conductorSelect.currentIndex = 1  // Al
-                                    coreTypeSelect.currentIndex = 1  // 3C+E
-                                    cableSelect.currentIndex = 13
-                                    currentInput.text = "0"
-                                    lengthInput.text = "0"
-                                    temperatureInput.text = "25"
-                                    groupingFactorInput.text = "1.0"
-                                    kvaPerHouseInput.text = "7"
-                                    numberOfHousesInput.text = "1"
-                                    admdCheckBox.checked = false
-                                    installationMethodCombo.currentIndex = 5  // "D1 - Underground direct buried"
-
-                                    // Reset results table and calculations
-                                    totalLoadText.text = "0.0"
-                                    
-                                    // Reset model state
-                                    voltageDrop.reset()
-                                    
-                                    // Force property reevaluation
-                                    root.currentVoltageDropValue = voltageDro.voltageDrop || 0
-
-                                    // Make sure the UI updates by accessing the properties
-                                    // This forces the getters to be called
-                                    console.log("After reset - voltage drop:", voltageDrop.voltageDrop)
-                                    console.log("After reset - current:", voltageDrop.current)
-                                    console.log("After reset - fuse size:", voltageDrop.networkFuseSize)
-                                    console.log("After reset - combined rating:", voltageDrop.combinedRatingInfo)
-                                    
-                                    // Explicitly update the fuse size display
-                                    networkFuseSizeText.text = voltageDrop.combinedRatingInfo
-                                }
+                                // Make sure the UI updates by accessing the properties
+                                console.log("After reset - voltage drop:", voltageDrop.voltageDrop)
+                                console.log("After reset - current:", voltageDrop.current)
+                                console.log("After reset - fuse size:", voltageDrop.networkFuseSize)
+                                console.log("After reset - combined rating:", voltageDrop.combinedRatingInfo)
+                                
+                                // Explicitly update the fuse size display
+                                networkFuseSizeText.text = voltageDrop.combinedRatingInfo
                             }
                         }
                     }
+                    
                     WaveCard {
                         title: "Results"
                         Layout.minimumHeight: 330
@@ -357,21 +205,21 @@ Page {
                                     icon.name: "Save"
                                     enabled: root.currentVoltageDropValue > 0
                                     onClicked: {
-                                        // Save current calculation
+                                        // Fix the references to use cableSettings component properties instead
                                         resultsManager.save_calculation({
-                                            "voltage_system": voltageSelect.currentText,
-                                            "kva_per_house": parseFloat(kvaPerHouseInput.text),
-                                            "num_houses": parseInt(numberOfHousesInput.text),
+                                            "voltage_system": cableSettings.voltageSelect.currentText,
+                                            "kva_per_house": parseFloat(cableSettings.kvaPerHouseInput.text),
+                                            "num_houses": parseInt(cableSettings.numberOfHousesInput.text),
                                             "diversity_factor": voltageDrop.diversityFactor,
                                             "total_kva": parseFloat(totalLoadText.text),
                                             "current": parseFloat(currentInput.text),
-                                            "cable_size": cableSelect.currentText,
-                                            "conductor": conductorSelect.currentText,
-                                            "core_type": coreTypeSelect.currentText,
-                                            "length": parseFloat(lengthInput.text),
+                                            "cable_size": cableSettings.cableSelect.currentText,
+                                            "conductor": cableSettings.conductorSelect.currentText,
+                                            "core_type": cableSettings.coreTypeSelect.currentText,
+                                            "length": parseFloat(cableSettings.lengthInput.text),
                                             "voltage_drop": root.currentVoltageDropValue,
                                             "drop_percent": dropPercent.percentage,
-                                            "admd_enabled": admdCheckBox.checked
+                                            "admd_enabled": cableSettings.admdCheckBox.checked
                                         });
                                     }
                                 }
@@ -380,7 +228,27 @@ Page {
                                     text: "Show Details"
                                     icon.name: "Info"
                                     enabled: root.currentVoltageDropValue > 0
-                                    onClicked: resultsPopup.open()
+                                    onClicked: {
+                                        // Pass all required data to the details popup
+                                        detailsPopup.voltageSystem = voltageDrop.selectedVoltage
+                                        detailsPopup.admdEnabled = voltageDrop.admdEnabled
+                                        detailsPopup.kvaPerHouse = voltageDrop.totalKva / voltageDrop.numberOfHouses
+                                        detailsPopup.numHouses = voltageDrop.numberOfHouses
+                                        detailsPopup.diversityFactor = voltageDrop.diversityFactor
+                                        detailsPopup.totalKva = voltageDrop.totalKva
+                                        detailsPopup.current = parseFloat(currentInput.text)
+                                        detailsPopup.cableSize = cableSettings.cableSelect.currentText
+                                        detailsPopup.conductorMaterial = voltageDrop.conductorMaterial
+                                        detailsPopup.coreType = voltageDrop.coreType
+                                        detailsPopup.length = cableSettings.lengthInput.text
+                                        detailsPopup.installationMethod = cableSettings.installationMethodCombo.currentText
+                                        detailsPopup.temperature = cableSettings.temperatureInput.text
+                                        detailsPopup.groupingFactor = cableSettings.groupingFactorInput.text
+                                        detailsPopup.combinedRatingInfo = voltageDrop.combinedRatingInfo
+                                        detailsPopup.voltageDropValue = root.currentVoltageDropValue
+                                        detailsPopup.dropPercentage = dropPercent.percentage
+                                        detailsPopup.open()
+                                    }
                                 }
                 
                                 Button {
@@ -481,24 +349,57 @@ Page {
                                     model: voltageDrop.tableModel
                                     boundsMovement: Flickable.StopAtBounds
 
-                                    // Remove the sync code since we're using x binding now
+                                    // Fix table interaction - replace existing MouseArea implementation
                                     MouseArea {
+                                        z: -1  // Place behind TableView so delegates can still receive events
                                         anchors.fill: parent
-                                        acceptedButtons: Qt.NoButton
-                                        propagateComposedEvents: true
+                                        acceptedButtons: Qt.LeftButton | Qt.RightButton
                                         
-                                        // Change the wheel handler to explicitly define the parameter
                                         onWheel: function(wheelEvent) {
-                                            if (wheelEvent.modifiers & Qt.ControlModifier) {
-                                                wheelEvent.accepted = false;
+                                            if (wheelEvent.modifiers & Qt.ShiftModifier) {
+                                                // Shift+wheel for horizontal scrolling
+                                                tableView.contentX -= wheelEvent.angleDelta.y
+                                                wheelEvent.accepted = true
                                             } else {
-                                                var delta = wheelEvent.angleDelta.y / 120;
-                                                parent.contentY -= delta * 40;
-                                                wheelEvent.accepted = true;
+                                                // Regular wheel for vertical scrolling
+                                                tableView.contentY -= wheelEvent.angleDelta.y
+                                                wheelEvent.accepted = true
+                                            }
+                                        }
+
+                                        onClicked: function(mouse) {
+                                            if (mouse.button === Qt.RightButton) {
+                                                tableContextMenu.popup()
                                             }
                                         }
                                     }
 
+                                    // Add missing context menu for the table
+                                    Menu {
+                                        id: tableContextMenu
+                                        
+                                        MenuItem {
+                                            text: "Export as CSV"
+                                            onTriggered: tableExportDialog.open()
+                                        }
+                                        
+                                        MenuItem {
+                                            text: "Export as PDF"
+                                            onTriggered: tablePdfExportDialog.open()
+                                        }
+                                        
+                                        MenuSeparator {}
+                                        
+                                        MenuItem {
+                                            text: "Reset Scroll Position"
+                                            onTriggered: {
+                                                tableView.contentX = 0
+                                                tableView.contentY = 0
+                                            }
+                                        }
+                                    }
+
+                                    // Standard delegate implementation for table cells
                                     delegate: Rectangle {
                                         implicitWidth: getColumnWidth(column)
                                         implicitHeight: 40
@@ -538,6 +439,38 @@ Page {
                                     }
                                 }
                             }
+
+                            // Add button to save table data
+                            Button {
+                                text: "Export Table"
+                                icon.name: "document-save"
+                                // Fix the line that's causing the error by using a safer approach to check for table data
+                                enabled: voltageDrop.tableModel && voltageDrop.tableModel.rowCount() > 0
+                                Layout.alignment: Qt.AlignRight
+                                Layout.margins: 5
+                                
+                                // Replace with menu for export options
+                                onClicked: tableExportMenu.popup()
+                                
+                                ToolTip.visible: hovered
+                                ToolTip.text: "Export cable comparison data"
+                                
+                                // Add menu for export options
+                                Menu {
+                                    id: tableExportMenu
+                                    title: "Export Format"
+                                    
+                                    MenuItem {
+                                        text: "Export as CSV"
+                                        onTriggered: tableExportDialog.open()
+                                    }
+                                    
+                                    MenuItem {
+                                        text: "Export as PDF"
+                                        onTriggered: tablePdfExportDialog.open()
+                                    }
+                                }
+                            }
                         }
                     }
                     // Update SavedResults card with resultsManager property
@@ -545,163 +478,12 @@ Page {
                         Layout.fillWidth: true
                         Layout.minimumHeight: 300
                     }
-                    // Add detailed results popup
-                    Popup {
-                        id: resultsPopup
-                        modal: true
-                        focus: true
-                        anchors.centerIn: Overlay.overlay
-                        width: 600
-                        height: 400
-
-                        ScrollView {
-                            anchors.fill: parent
-                            clip: true
-
-                            ColumnLayout {
-                                width: parent.width
-                                spacing: 20
-
-                                Label {
-                                    text: "Calculation Results"
-                                    font.bold: true
-                                    font.pixelSize: 16
-                                }
-
-                                GridLayout {
-                                    columns: 2
-                                    columnSpacing: 20
-                                    rowSpacing: 10
-                                    Layout.fillWidth: true
-
-                                    // System Configuration
-                                    Label { text: "System Configuration"; font.bold: true; Layout.columnSpan: 2 }
-                                    Label { text: "Voltage System:" }
-                                    Label { text: voltageDrop.selectedVoltage }
-                                    Label { text: "ADMD Status:" }
-                                    Label { text: voltageDrop.admdEnabled ? "Enabled (1.5×)" : "Disabled" }
-
-                                    // Load Details
-                                    Label { text: "Load Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
-                                    Label { text: "KVA per House:" }
-                                    Label { 
-                                        text: {
-                                            const totalKva = voltageDrop.totalKva || 0
-                                            const houses = voltageDrop.numberOfHouses || 1
-                                            return (totalKva / houses).toFixed(1) + " kVA"
-                                        }
-                                    }
-                                    Label { text: "Number of Houses:" }
-                                    Label { text: voltageDrop.numberOfHouses || 1 }
-                                    Label { text: "Diversity Factor:" }
-                                    Label { text: (voltageDrop.diversityFactor || 1.0).toFixed(3) }
-                                    Label { text: "Total Load:" }
-                                    Label { text: (voltageDrop.totalKva || 0).toFixed(1) + " kVA" }
-                                    Label { text: "Current:" }
-                                    Label { text: (voltageDrop.current || 0).toFixed(1) + " A" }
-
-                                    // Cable Details
-                                    Label { text: "Cable Details"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
-                                    Label { text: "Cable Size:" }
-                                    Label { text: cableSelect.currentText + " mm²" }
-                                    Label { text: "Material:" }
-                                    Label { text: voltageDrop.conductorMaterial }
-                                    Label { text: "Configuration:" }
-                                    Label { text: voltageDrop.coreType }
-                                    Label { text: "Length:" }
-                                    Label { text: lengthInput.text + " m" }
-                                    Label { text: "Installation:" }
-                                    Label { text: installationMethodCombo.currentText }
-                                    Label { text: "Temperature:" }
-                                    Label { text: temperatureInput.text + " °C" }
-                                    Label { text: "Grouping Factor:" }
-                                    Label { text: groupingFactorInput.text }
-
-                                    // Results
-                                    Label { text: "Results"; font.bold: true; Layout.columnSpan: 2; Layout.topMargin: 10 }
-                                    Label { text: "Network Fuse / Rating:" }
-                                    Label {
-                                        text: voltageDrop.combinedRatingInfo 
-                                        color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
-                                               "blue" : (text === "Error" ? "red" : toolBar.toggle ? "#ffffff" : "#000000")
-                                        font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
-                                    }
-                                    Label { text: "Voltage Drop:" }
-                                    Label { 
-                                        text: root.currentVoltageDropValue.toFixed(2) + " V"
-                                        color: dropPercent.percentage > 5 ? "red" : "green"
-                                    }
-                                    Label { text: "Drop Percentage:" }
-                                    Label { 
-                                        text: dropPercent.percentage.toFixed(2) + "%"
-                                        color: dropPercent.percentage > 5 ? "red" : "green"
-                                    }
-                                }
-
-                                Button {
-                                    text: "Close"
-                                    Layout.alignment: Qt.AlignHCenter
-                                    onClicked: resultsPopup.close()
-                                }
-                            }
-                        }
-                    }
-                    // Update message popups
-                    Popup {
-                        id: saveSuccess
-                        modal: true
-                        focus: true
-                        anchors.centerIn: Overlay.overlay
-                        width: 400
-                        height: 100
-                        
-                        property string messageText: ""
-
-                        contentItem: ColumnLayout {
-                            Label {
-                                text: saveSuccess.messageText
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignHCenter
-                            }
-                            Button {
-                                text: "OK"
-                                Layout.alignment: Qt.AlignHCenter
-                                onClicked: saveSuccess.close()
-                            }
-                        }
-                    }
-                    Popup {
-                        id: saveError
-                        modal: true
-                        focus: true
-                        anchors.centerIn: Overlay.overlay
-                        width: 400
-                        height: 100
-                        
-                        property string messageText: ""
-
-                        contentItem: ColumnLayout {
-                            Label {
-                                text: saveError.messageText
-                                wrapMode: Text.WordWrap
-                                color: "red"
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignHCenter
-                            }
-                            Button {
-                                text: "OK"
-                                Layout.alignment: Qt.AlignHCenter
-                                onClicked: saveError.close()
-                            }
-                        }
-                    }
                 }
             }
         }
     }
 
-    // Enhanced chart popup with improved visualization and error fixes
+    // Popup containing the VoltageDropChart component
     Popup {
         id: chartPopup
         modal: true
@@ -712,276 +494,196 @@ Page {
         
         // Call this when the popup is about to show
         onAboutToShow: {
-            // First clear any existing data to avoid triggering the problematic method
-            if (dropPercentSeries) dropPercentSeries.clear()
-            if (comparisonSeries) comparisonSeries.clear()
-            if (thresholdLine) thresholdLine.clear()
-            
-            // Use a timeout to ensure UI is ready before we try to update the chart
-            chartUpdateTimer.start()
+            chartComponent.percentage = dropPercent.percentage
+            chartComponent.cableSize = cableSettings.cableSelect.currentText
+            chartComponent.currentValue = parseFloat(currentInput.text) 
+            chartComponent.updateChart()
         }
         
-        Timer {
-            id: chartUpdateTimer
-            interval: 100
-            onTriggered: enhancedChartUpdate()
-        }
-        
-        // Store comparison points
-        property var comparisonPoints: []
-        property bool showAllCables: false
-        
-        ColumnLayout {
+        // Use the new component for the chart
+        VoltageDropChart {
+            id: chartComponent
             anchors.fill: parent
-            spacing: 10
             
+            // Connect signals
+            onCloseRequested: chartPopup.close()
+            onSaveRequested: chartSaveDialog.open()
+        }
+    }
+    
+    // Add ComboBox for chart resolution (hidden)
+    ComboBox {
+        id: resolutionComboBox
+        model: ["1x", "2x", "4x"]
+        property var scaleValues: [1.0, 2.0, 4.0]
+        property real scaleFactor: scaleValues[currentIndex]
+        visible: false
+    }
+    
+    // Add FileDialog for saving chart
+    FileDialog {
+        id: chartSaveDialog
+        title: "Save Chart"
+        nameFilters: ["PNG files (*.png)", "All files (*)"]
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "png"
+        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
+        
+        // Generate default filename with timestamp
+        currentFile: {
+            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            return "voltage_drop_chart_" + timestamp + ".png"
+        }
+        
+        onAccepted: {
+            voltageDrop.saveChart(selectedFile, resolutionComboBox.scaleFactor)
+        }
+    }
+    
+    // Add FileDialog for exporting table data
+    FileDialog {
+        id: tableExportDialog
+        title: "Export Table Data"
+        nameFilters: ["CSV files (*.csv)", "All files (*)"]
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "csv"
+        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
+        
+        // Generate default filename with timestamp
+        currentFile: {
+            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            return "cable_comparison_" + timestamp + ".csv"
+        }
+        
+        onAccepted: {
+            voltageDrop.exportTableData(selectedFile)
+        }
+    }
+
+    // Add FileDialog for exporting table to PDF
+    FileDialog {
+        id: tablePdfExportDialog
+        title: "Export Table as PDF"
+        nameFilters: ["PDF files (*.pdf)", "All files (*)"]
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "pdf"
+        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
+        
+        // Generate default filename with timestamp
+        currentFile: {
+            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            return "cable_comparison_" + timestamp + ".pdf"
+        }
+        
+        onAccepted: {
+            voltageDrop.exportTableToPDF(selectedFile)
+        }
+    }
+    
+    // Add connections for chart and export handling
+    Connections {
+        target: voltageDrop
+        function onGrabRequested(filepath, scale) {
+            console.log("Grabbing image to:", filepath, "with scale:", scale)
+            chartComponent.grabChartImage(function(result) {
+                if (result) {
+                    var saved = result.saveToFile(filepath)
+                    if (saved) {
+                        saveSuccess.messageText = "Chart saved successfully"
+                        saveSuccess.open()
+                    } else {
+                        saveError.messageText = "Failed to save chart"
+                        saveError.open()
+                    }
+                } else {
+                    saveError.messageText = "Failed to grab chart image"
+                    saveError.open()
+                }
+            }, scale)
+        }
+        
+        function onTableExportStatusChanged(success, message) {
+            if (success) {
+                saveSuccess.messageText = message
+                saveSuccess.open()
+            } else {
+                saveError.messageText = message
+                saveError.open()
+            }
+        }
+
+        function onTablePdfExportStatusChanged(success, message) {
+            if (success) {
+                saveSuccess.messageText = message
+                saveSuccess.open()
+            } else {
+                saveError.messageText = message
+                saveError.open()
+            }
+        }
+    }
+
+    // Add general success and error message popups
+    Popup {
+        id: saveSuccess
+        modal: true
+        focus: true
+        anchors.centerIn: Overlay.overlay
+        width: 400
+        height: 100
+        
+        property string messageText: ""
+
+        contentItem: ColumnLayout {
             Label {
-                text: "Voltage Drop Comparison by Cable Size"
-                font.pixelSize: 16
-                font.bold: true
-                Layout.alignment: Qt.AlignHCenter
-                color: toolBar.toggle ? "#ffffff" : "#000000"
-            }
-            
-            // Enhanced chart with better visualization
-            ChartView {
-                id: chartView
+                text: saveSuccess.messageText
+                wrapMode: Text.WordWrap
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                antialiasing: true
-                legend.visible: true
-                theme: Universal.theme
-                
-                // Set the chart background color explicitly to avoid theme issues
-                backgroundColor: toolBar.toggle ? "#2d2d2d" : "#ffffff"
-                
-                ValueAxis {
-                    id: axisY
-                    min: 0
-                    max: 10
-                    tickCount: 11
-                    titleText: "Voltage Drop (%)"
-                    labelsColor: toolBar.toggle ? "#ffffff" : "#000000"
-                    gridVisible: true
-                }
-                
-                CategoryAxis {
-                    id: axisX
-                    min: 0
-                    max: 18
-                    labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
-                    titleText: "Cable Size (mm²)"
-                    labelsColor: toolBar.toggle ? "#ffffff" : "#000000"
-                    
-                    // Show only common sizes to avoid crowding
-                    CategoryRange {
-                        label: "1.5"
-                        endValue: 0
-                    }
-                    CategoryRange {
-                        label: "4"
-                        endValue: 2
-                    }
-                    CategoryRange {
-                        label: "10"
-                        endValue: 4
-                    }
-                    CategoryRange {
-                        label: "25"
-                        endValue: 6
-                    }
-                    CategoryRange {
-                        label: "50"
-                        endValue: 8
-                    }
-                    CategoryRange {
-                        label: "95"
-                        endValue: 10
-                    }
-                    CategoryRange {
-                        label: "150"
-                        endValue: 12
-                    }
-                    CategoryRange {
-                        label: "240"
-                        endValue: 14
-                    }
-                    CategoryRange {
-                        label: "400"
-                        endValue: 16
-                    }
-                    CategoryRange {
-                        label: "630"
-                        endValue: 18
-                    }
-                }
-                
-                LineSeries {
-                    id: thresholdLine
-                    name: "5% Limit"
-                    color: "red"
-                    width: 2
-                    style: Qt.DashLine
-                    axisX: axisX
-                    axisY: axisY
-                }
-                
-                ScatterSeries {
-                    id: dropPercentSeries
-                    name: "Current Cable"
-                    color: dropPercent.percentage > 5 ? "red" : "green"
-                    markerSize: 15
-                    markerShape: ScatterSeries.MarkerShapeRectangle
-                    borderColor: "white"
-                    borderWidth: 2
-                    axisX: axisX
-                    axisY: axisY
-                    
-                    // Add tooltip for the point using a safer approach
-                    onClicked: function(point) {
-                        pointTooltip.text = cableSelect.currentText + "mm² - " + 
-                                           dropPercent.percentage.toFixed(2) + "%\n" +
-                                           "Current: " + currentInput.text + "A"
-                        pointTooltip.x = point.x + 10
-                        pointTooltip.y = point.y - 30
-                        pointTooltip.visible = true
-                    }
-                }
-                
-                ScatterSeries {
-                    id: comparisonSeries
-                    name: "Comparison Cables"
-                    color: "blue"
-                    markerSize: 10
-                    markerShape: ScatterSeries.MarkerShapeCircle
-                    axisX: axisX
-                    axisY: axisY
-                    
-                    // Add tooltip for the comparison points with safer approach
-                    onClicked: function(point) {
-                        try {
-                            // Find the point data
-                            for (let i = 0; i < chartPopup.comparisonPoints.length; i++) {
-                                let cp = chartPopup.comparisonPoints[i]
-                                if (Math.abs(cp.x - point.x) < 0.1 && Math.abs(cp.y - point.y) < 0.1) {
-                                    pointTooltip.text = cp.cableSize + "mm² - " + 
-                                                      cp.dropPercent.toFixed(2) + "%\n" +
-                                                      cp.status
-                                    pointTooltip.x = point.x + 10
-                                    pointTooltip.y = point.y - 30
-                                    pointTooltip.visible = true
-                                    break
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Error in comparison point tooltip:", e)
-                        }
-                    }
-                }
-                
-                // Add a visual line series to show trend
-                LineSeries {
-                    id: trendLine
-                    name: "Trend"
-                    color: "#80808080"  // Semi-transparent gray
-                    width: 2
-                    axisX: axisX
-                    axisY: axisY
-                }
-                
-                // Show a tooltip when points are clicked
-                Rectangle {
-                    id: pointTooltip
-                    color: toolBar.toggle ? "#404040" : "#f0f0f0"
-                    border.color: toolBar.toggle ? "#909090" : "#a0a0a0"
-                    border.width: 1
-                    width: tooltipText.width + 16
-                    height: tooltipText.height + 8
-                    radius: 4
-                    visible: false
-                    z: 100  // Ensure tooltip appears above other elements
-                    
-                    Text {
-                        id: tooltipText
-                        anchors.centerIn: parent
-                        text: ""  // Initialize with empty text
-                        color: toolBar.toggle ? "#ffffff" : "#000000"
-                    }
-                    
-                    // Close tooltip when clicked anywhere else
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: pointTooltip.visible = false
-                    }
-                    
-                    // Auto-hide after 3 seconds
-                    Timer {
-                        running: pointTooltip.visible
-                        interval: 3000
-                        onTriggered: pointTooltip.visible = false
-                    }
-                }
-                
-                // Add a MouseArea to the ChartView to hide tooltips
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    z: -1  // Place behind the series to allow them to receive clicks
-                    propagateComposedEvents: true
-                    onClicked: {
-                        // Only handle clicks that weren't handled by series
-                        if (!mouse.accepted) {
-                            pointTooltip.visible = false
-                            mouse.accepted = true
-                        }
-                    }
-                }
-            }
-            
-            // Add checkbox to show all cable sizes
-            CheckBox {
-                id: showAllCheckbox
-                text: "Show Comparison with All Cable Sizes"
-                checked: chartPopup.showAllCables
-                onCheckedChanged: {
-                    chartPopup.showAllCables = checked
-                    enhancedChartUpdate()
-                }
                 Layout.alignment: Qt.AlignHCenter
             }
-            
-            RowLayout {
+            Button {
+                text: "OK"
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 20
-                
-                Button {
-                    text: "Close"
-                    onClicked: chartPopup.close()
-                }
-                
-                // Add button to reset zoom
-                Button {
-                    text: "Reset View"
-                    onClicked: {
-                        axisX.min = 0
-                        axisX.max = 18
-                        
-                        // Find the max value for y-axis
-                        let maxY = 10
-                        for (let i = 0; i < chartPopup.comparisonPoints.length; i++) {
-                            if (chartPopup.comparisonPoints[i].dropPercent > maxY) {
-                                maxY = chartPopup.comparisonPoints[i].dropPercent * 1.1
-                            }
-                        }
-                        
-                        if (dropPercent.percentage > maxY) {
-                            maxY = dropPercent.percentage * 1.1
-                        }
-                        
-                        axisY.max = Math.max(Math.ceil(maxY), 10) // At least show up to 10%
-                    }
-                }
+                onClicked: saveSuccess.close()
             }
+        }
+    }
+    
+    Popup {
+        id: saveError
+        modal: true
+        focus: true
+        anchors.centerIn: Overlay.overlay
+        width: 400
+        height: 100
+        
+        property string messageText: ""
+
+        contentItem: ColumnLayout {
+            Label {
+                text: saveError.messageText
+                wrapMode: Text.WordWrap
+                color: "red"
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: saveError.close()
+            }
+        }
+    }
+
+    // Add connections for PDF export handling
+    Connections {
+        target: voltageDrop
+        
+        // ...existing connection handlers...
+        
+        function onPdfExportStatusChanged(success, message) {
+            // Forward the PDF export status to the popup
+            detailsPopup.pdfSaveResult(success, message)
         }
     }
 
@@ -999,173 +701,101 @@ Page {
         }
     }
 
-    function calculateVoltageDrop() {
-        // ...existing calculation code...
-
-        if (result.isValid) {
-            // Save calculation to history
-            resultsManager.save_calculation({
-                "voltage_system": systemComboBox.currentText,
-                "kva_per_house": kvaPerHouseSpinBox.value,
-                "num_houses": numHousesSpinBox.value,
-                "diversity_factor": diversityFactorSpinBox.value,
-                "total_kva": totalKVA,
+    // Replace the detailed results popup with the new component
+    VoltageDropDetails {
+        id: detailsPopup
+        anchors.centerIn: Overlay.overlay
+        
+        onCloseRequested: detailsPopup.close()
+        
+        // Add handler for PDF save request
+        onSaveToPdfRequested: function(filepath) {
+            // Create details object with all the data needed for the PDF
+            const details = {
+                "voltage_system": voltageSystem,
+                "admd_enabled": admdEnabled,
+                "kva_per_house": kvaPerHouse,
+                "num_houses": numHouses,
+                "diversity_factor": diversityFactor,
+                "total_kva": totalKva,
                 "current": current,
-                "cable_size": cableComboBox.currentValue,
-                "conductor": conductorComboBox.currentText,
-                "core_type": coreComboBox.currentText,
-                "length": lengthSpinBox.value,
-                "voltage_drop": vDrop,
-                "drop_percent": dropPercent,
-                "admd_enabled": admdCheckbox.checked
-            });
+                "cable_size": cableSize,
+                "conductor_material": conductorMaterial,
+                "core_type": coreType,
+                "length": length,
+                "installation_method": installationMethod,
+                "temperature": temperature,
+                "grouping_factor": groupingFactor,
+                "combined_rating_info": combinedRatingInfo,
+                "voltage_drop": voltageDropValue,
+                "drop_percent": dropPercentage
+            }
+            
+            // Call the Python method to generate PDF
+            voltageDrop.exportDetailsToPDF(filepath, details)
+        }
+        
+        // Display result messages
+        onPdfSaveResult: function(success, message) {
+            if (success) {
+                pdfSaveSuccess.messageText = message
+                pdfSaveSuccess.open()
+            } else {
+                pdfSaveError.messageText = message
+                pdfSaveError.open()
+            }
         }
     }
 
-    // Enhanced chart update function with multiple points and better visualization
-    function enhancedChartUpdate() {
-        console.log("Updating chart with enhanced approach")
-        try {
-            // Known cable sizes in order - used for x-axis positioning
-            const knownSizes = ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", 
-                                "120", "150", "185", "240", "300", "400", "500", "630"]
-            
-            // Clear existing data
-            dropPercentSeries.clear()
-            comparisonSeries.clear()
-            thresholdLine.clear()
-            trendLine.clear()
-            chartPopup.comparisonPoints = []
-            
-            // Draw the 5% threshold line
-            thresholdLine.append(0, 5)
-            thresholdLine.append(knownSizes.length - 1, 5)
-            
-            // Find the index of the current cable size
-            const selectedCable = cableSelect.currentText
-            const cableIndex = knownSizes.indexOf(selectedCable)
-            const xPosition = cableIndex >= 0 ? cableIndex : 10 // Default to middle if not found
-            
-            // Get the current cable's voltage drop
-            const currentDropValue = dropPercent.percentage
-            
-            // Add the current point (make it stand out)
-            dropPercentSeries.append(xPosition, currentDropValue)
-            
-            // Create a trend line and comparison points if checkbox is checked
-            if (chartPopup.showAllCables) {
-                // Extract data from the table if possible
-                let comparisonData = []
-                
-                // Iterate through knownSizes and find values in the table
-                for (let i = 0; i < knownSizes.length; i++) {
-                    const cableSize = knownSizes[i]
-                    
-                    // Skip the current cable size - it's already displayed differently
-                    if (cableSize === selectedCable) {
-                        continue
-                    }
-                    
-                    // Try to get the voltage drop percentage for this cable size from the UI
-                    // We'll estimate it using an exponential function:
-                    // v_drop ∝ 1/A where A is cross-sectional areaortional to cable cross-section
-                    // v_drop ∝ 1/A where A is cross-sectional area
-                    
-                    const currentArea = parseFloat(selectedCable)
-                    const compareArea = parseFloat(cableSize)
-                    
-                    if (currentArea > 0 && compareArea > 0) {
-                        // Estimate drop percentage using inverse proportion with adjustment
-                        // for larger cables which don't follow a perfect inverse relationship
-                        let adjustmentFactor = 0.85 // Less than 1 for a more conservative estimate
-                        let estimatedDrop = currentDropValue * (currentArea / compareArea) * adjustmentFactor
-                        
-                        // Add some randomness to make it look more realistic (+/- 5%)
-                        const randomFactor = 0.95 + Math.random() * 0.1
-                        estimatedDrop *= randomFactor
-                        
-                        // Determine status
-                        let status = "OK"
-                        if (estimatedDrop > 7) {
-                            status = "SEVERE"
-                        } else if (estimatedDrop > 5) {
-                            status = "WARNING"
-                        } else if (estimatedDrop > 2) {
-                            status = "SUBMAIN"
-                        }
-                        
-                        // Add to comparison data
-                        comparisonData.push({
-                            cableSize: cableSize,
-                            dropPercent: estimatedDrop,
-                            xPos: i,
-                            status: status
-                        })
-                        
-                        // Add to comparisonPoints for tooltips
-                        chartPopup.comparisonPoints.push({
-                            cableSize: cableSize,
-                            dropPercent: estimatedDrop,
-                            x: i,
-                            y: estimatedDrop,
-                            status: status
-                        })
-                        
-                        // Add point to the comparison series
-                        comparisonSeries.append(i, estimatedDrop)
-                        
-                        // Add point to trend line
-                        trendLine.append(i, estimatedDrop)
-                    }
-                }
-                
-                // Add the current point to the trend line
-                trendLine.append(xPosition, currentDropValue)
-                
-                // Sort trend line points by X coordinate
-                let trendPoints = []
-                for (let i = 0; i < trendLine.count; i++) {
-                    trendPoints.push({
-                        x: trendLine.at(i).x,
-                        y: trendLine.at(i).y
-                    })
-                }
-                
-                // Sort the trend points by x-coordinate
-                trendPoints.sort(function(a, b) {
-                    return a.x - b.x
-                })
-                
-                // Recreate trend line with sorted points
-                trendLine.clear()
-                for (let i = 0; i < trendPoints.length; i++) {
-                    trendLine.append(trendPoints[i].x, trendPoints[i].y)
-                }
+    // Add message popups for PDF export
+    Popup {
+        id: pdfSaveSuccess
+        modal: true
+        focus: true
+        anchors.centerIn: Overlay.overlay
+        width: 400
+        height: 100
+        
+        property string messageText: ""
+
+        contentItem: ColumnLayout {
+            Label {
+                text: pdfSaveSuccess.messageText
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
             }
-            
-            // Set chart title with more info
-            const pctText = currentDropValue > 5 ? "OVER LIMIT" : "WITHIN LIMIT"
-            const lengthText = lengthInput.text ? lengthInput.text + "m" : "0m"
-            const currentText = currentInput.text ? currentInput.text + "A" : "0A"
-            
-            chartView.title = selectedCable + " mm² - " + 
-                            currentDropValue.toFixed(2) + "% - " + 
-                            lengthText + " - " + 
-                            currentText + " (" + pctText + ")"
-            
-            console.log("Enhanced chart updated successfully")
-        } catch (err) {
-            console.error("Enhanced chart error: " + err)
-            
-            // Add fallback visualization if the enhanced one fails
-            dropPercentSeries.clear()
-            dropPercentSeries.append(5, dropPercent.percentage)
-            
-            thresholdLine.clear()
-            thresholdLine.append(0, 5)
-            thresholdLine.append(10, 5)
-            
-            chartView.title = "Cable " + cableSelect.currentText + " mm²"
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: pdfSaveSuccess.close()
+            }
+        }
+    }
+    
+    Popup {
+        id: pdfSaveError
+        modal: true
+        focus: true
+        anchors.centerIn: Overlay.overlay
+        width: 400
+        height: 100
+        
+        property string messageText: ""
+
+        contentItem: ColumnLayout {
+            Label {
+                text: pdfSaveError.messageText
+                wrapMode: Text.WordWrap
+                color: "red"
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: pdfSaveError.close()
+            }
         }
     }
 }
