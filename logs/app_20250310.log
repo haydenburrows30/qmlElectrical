@@ -1,0 +1,7 @@
+2025-03-10 07:34:10,710 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-10 07:34:10,710 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-10 07:34:10,710 - config - INFO - Configuration loaded successfully
+2025-03-10 07:34:10,796 - ResultsManager - INFO - Loaded 3 results from CSV
+2025-03-10 07:34:10,860 - ResultsManager - INFO - Loaded 3 results from CSV
+2025-03-10 07:34:40,571 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 07:34:40,571 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
