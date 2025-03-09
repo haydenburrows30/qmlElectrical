@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Type, Dict
-from ..Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator
+from ..Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, ResonantFrequencyCalculator, ConversionCalculator
 from .BaseCalculator import BaseCalculator
 
 class CalculatorFactory(ABC):
@@ -42,7 +42,9 @@ class ConcreteCalculatorFactory(CalculatorFactory):
         self._calculators.update({
             "power": PowerCalculator,
             "fault": FaultCurrentCalculator,
-            "charging": ChargingCalculator
+            "charging": ChargingCalculator,
+            "resonant": ResonantFrequencyCalculator,
+            "conversion": ConversionCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

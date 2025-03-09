@@ -180,61 +180,6 @@ class FaultCurrentCalculator(BaseCalculator):
         
     def calculate(self):
         self.calculateFault()
-    
-class SineWaveModel(QObject):
-    dataChanged = Signal()
-    
-    def __init__(self):
-        super().__init__()
-        self._frequency = 1
-        self._amplitude = 330
-        self._y_scale = 1.0
-        self._x_scale = 1.0
-        self._sample_rate = 100
-        self._y_values = []
-        self._rms = 0.0
-        self._peak = 0.0
-        self.update_wave()
-    
-    def update_wave(self):
-        t = np.linspace(0, 2 * np.pi * self._x_scale, self._sample_rate)
-        y = self._y_scale * self._amplitude * np.sin(self._frequency * t)
-
-        # Apply downsampling dynamically if the sample rate is too high
-        max_points = 500  # Limit the number of points plotted
-        if len(y) > max_points:
-            indices = np.linspace(0, len(y) - 1, max_points, dtype=int)
-            self._y_values = y[indices].tolist()
-        else:
-            self._y_values = y.tolist()
-
-        self._rms = np.sqrt(np.mean(np.square(self._y_values)))
-        self._peak = max(abs(min(self._y_values)), max(self._y_values))
-        self.dataChanged.emit()
-    
-    @Property(list, notify=dataChanged)
-    def yValues(self):
-        return self._y_values
-    
-    @Property(float, notify=dataChanged)
-    def rms(self):
-        return self._rms
-    
-    @Property(float, notify=dataChanged)
-    def peak(self):
-        return self._peak
-
-    @Slot(float)
-    def setFrequency(self, freq):
-        if abs(self._frequency - freq) > 0.1:  # Ignore tiny changes
-            self._frequency = freq
-            self.update_wave()
-    
-    @Slot(float)
-    def setAmplitude(self, amp):
-        if abs(self._amplitude - amp) > 1:  # Ignore tiny changes
-            self._amplitude = amp
-            self.update_wave()
 
 class ResonantFrequencyCalculator(BaseCalculator):
     """Calculator for resonant frequency.
@@ -445,3 +390,58 @@ class ImpedanceVectorModel(QObject):
         if abs(self._reactance - value) > 0.01:
             self._reactance = value
             self.update_values()
+
+class SineCalculator(QObject):
+    dataChanged = Signal()
+    
+    def __init__(self):
+        super().__init__()
+        self._frequency = 1
+        self._amplitude = 330
+        self._y_scale = 1.0
+        self._x_scale = 1.0
+        self._sample_rate = 100
+        self._y_values = []
+        self._rms = 0.0
+        self._peak = 0.0
+        self.update_wave()
+    
+    def update_wave(self):
+        t = np.linspace(0, 2 * np.pi * self._x_scale, self._sample_rate)
+        y = self._y_scale * self._amplitude * np.sin(self._frequency * t)
+
+        # Apply downsampling dynamically if the sample rate is too high
+        max_points = 500  # Limit the number of points plotted
+        if len(y) > max_points:
+            indices = np.linspace(0, len(y) - 1, max_points, dtype=int)
+            self._y_values = y[indices].tolist()
+        else:
+            self._y_values = y.tolist()
+
+        self._rms = np.sqrt(np.mean(np.square(self._y_values)))
+        self._peak = max(abs(min(self._y_values)), max(self._y_values))
+        self.dataChanged.emit()
+    
+    @Property(list, notify=dataChanged)
+    def yValues(self):
+        return self._y_values
+    
+    @Property(float, notify=dataChanged)
+    def rms(self):
+        return self._rms
+    
+    @Property(float, notify=dataChanged)
+    def peak(self):
+        return self._peak
+
+    @Slot(float)
+    def setFrequency(self, freq):
+        if abs(self._frequency - freq) > 0.1:  # Ignore tiny changes
+            self._frequency = freq
+            self.update_wave()
+    
+    @Slot(float)
+    def setAmplitude(self, amp):
+        if abs(self._amplitude - amp) > 1:  # Ignore tiny changes
+            self._amplitude = amp
+            self.update_wave()

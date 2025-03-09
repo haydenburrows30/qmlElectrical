@@ -1,0 +1,10 @@
+{
+    "voltage_drop_threshold": 5.0,
+    "power_factor": 0.9,
+    "default_sample_count": 100,
+    "default_cable_data_file": "/home/hayden/Documents/qmltest/data/cable_data.csv",
+    "results_file": "/home/hayden/Documents/qmltest/results/calculations_history.csv",
+    "dark_mode": false,
+    "show_tooltips": true,
+    "decimal_precision": 2
+}

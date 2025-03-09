@@ -8,7 +8,7 @@ import Qt.labs.qmlmodels 1.0
 
 import QtQuick.Studio.DesignEffects
 
-import Calculator 1.0
+import PCalculator 1.0
 import Charging 1.0
 import Fault 1.0
 import Sine 1.0
@@ -17,6 +17,7 @@ import ConvCalc 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
+import SineCalc 1.0
 
 import 'components'
 
@@ -33,6 +34,7 @@ ApplicationWindow {
     FaultCurrentCalculator {id: faultCalc}
     ResonantFrequencyCalculator {id: resonantFreq}
     ConversionCalculator {id: conversionCalc}
+    SineCalculator {id: sineCalc}
 
     SeriesRLCChart {id: seriesRLCChart}
     SineWaveModel {id: sineModel}

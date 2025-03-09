@@ -5,8 +5,9 @@ from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.VoltageDrop import VoltageDrop
-from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator
+from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator, SineCalculator
 from models.ResultsManager import ResultsManager
+from models.RealTimeChart import RealTimeChart
 
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
@@ -77,7 +78,9 @@ class ModelFactory(IModelFactory):
             "conversion_calc": ConversionCalculator,
             "series_rlc_chart": SeriesRLCChart,
             "voltage_drop": VoltageDrop,
-            "results_manager": ResultsManager
+            "results_manager": ResultsManager,
+            "sine_calc": SineCalculator,
+            "realtime_chart": RealTimeChart
         }
         
         if model_type not in model_map:

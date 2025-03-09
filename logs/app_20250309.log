@@ -183,3 +183,77 @@
 2025-03-09 13:36:26,008 - ResultsManager - INFO - Loaded 2 results from CSV
 2025-03-09 13:37:26,746 - ResultsManager - INFO - Loaded 2 results from CSV
 2025-03-09 13:37:26,873 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 13:39:09,279 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 13:39:09,375 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 13:49:13,857 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 13:49:13,984 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 13:53:40,234 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 13:53:40,358 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:00:48,718 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:00:48,824 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:02:20,371 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:02:20,494 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:04:04,214 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:04:04,332 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:09:39,290 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:09:56,791 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:10:14,330 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:10:14,452 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:14:28,799 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:14:28,865 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:18:39,147 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:18:39,226 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:19:18,767 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:19:18,841 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:19:49,495 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:19:49,574 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:20:02,065 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:20:02,133 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:20:47,224 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:20:47,294 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:21:59,661 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:21:59,724 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:22:25,837 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:22:25,902 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:24:12,847 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:24:12,927 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:24:51,469 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:24:51,542 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:25:02,868 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:25:02,937 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:29:28,938 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:30:36,038 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:30:36,114 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:30:59,090 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:30:59,177 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:32:10,888 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:32:10,985 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:38:07,526 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:38:07,590 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:39:09,693 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:39:09,759 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:44:39,813 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:44:39,879 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:47:45,622 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:47:45,694 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:48:36,800 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:48:36,882 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:50:26,247 - config - INFO - Loading configuration module
+2025-03-09 14:50:26,247 - config - INFO - Initializing configuration system
+2025-03-09 14:50:26,247 - config - INFO - Creating default config file at /home/hayden/Documents/qmltest/config.json
+2025-03-09 14:50:26,248 - config - INFO - Successfully created config file
+2025-03-09 14:51:51,475 - config - INFO - Loading configuration module
+2025-03-09 14:51:51,476 - config - INFO - Initializing configuration system
+2025-03-09 14:51:51,579 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:51:51,645 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:52:38,235 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-09 14:52:38,235 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-09 14:52:38,235 - config - INFO - Configuration loaded successfully
+2025-03-09 14:52:38,325 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 14:52:38,395 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 15:24:26,869 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-09 15:24:26,869 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-09 15:24:26,869 - config - INFO - Configuration loaded successfully
+2025-03-09 15:24:26,963 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 15:24:27,035 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-09 15:25:04,317 - ResultsManager - INFO - Loaded 2 results from CSV

@@ -14,20 +14,11 @@ import "../components"
 Page {
     id: home
 
-    // Required property for models that should be registered in main.py
-    property var sineWaveModel
-    property var powerTriangleModel  
+    property var powerTriangleModel
     property var impedanceVectorModel
 
     background: Rectangle {
         color: toolBar.toggle ? "#1a1a1a" : "#f5f5f5"
-    }
-    
-    // Create a local instance of SineWaveModel if not provided from outside
-    Component.onCompleted: {
-        if (!sineWaveModel) {
-            console.warn("sineWaveModel not provided, visualizations might not work correctly")
-        }
     }
 
     ScrollView {
@@ -53,7 +44,7 @@ Page {
                 WaveCard {
                     id: power_current
                     title: 'Power -> Current'
-                    Layout.minimumHeight: 400  // Increased height for visualization
+                    Layout.minimumHeight: 400
                     Layout.minimumWidth: 300
 
                     info: "../../media/powercalc.png"
@@ -158,7 +149,7 @@ Page {
                     id: charging_current
                     title: 'Cable Charging Current'
                     Layout.minimumWidth: 300
-                    Layout.minimumHeight: 380  // Increased for visualization
+                    Layout.minimumHeight: 380
 
                     info: "../../media/ccc.png"
 
@@ -269,7 +260,7 @@ Page {
                     id: fault_current
                     title: 'Impedance'
                     Layout.minimumWidth: 300
-                    Layout.minimumHeight: 380  // Increased height for visualization
+                    Layout.minimumHeight: 380
 
                     info: "../../media/Formel-Impedanz.gif"
 
@@ -360,7 +351,7 @@ Page {
                     id: electricPy
                     title: 'Frequency'
                     Layout.minimumWidth: 300
-                    Layout.minimumHeight: 380  // Increased height for visualization
+                    Layout.minimumHeight: 380
 
                     info: "../../media/FormelXC.gif"
 
@@ -376,13 +367,13 @@ Page {
                             
                             // Initialize with default values
                             Component.onCompleted: {
-                                if (sineWaveModel) {
+                                if (sineCalc) {
                                     amplitude = 330;
                                     frequency = parseFloat(freqOutput.text.replace("Hz", "") || "0");
-                                    sineWaveModel.setFrequency(frequency);
-                                    yValues = sineWaveModel.yValues;
-                                    rms = sineWaveModel.rms;
-                                    peak = sineWaveModel.peak;
+                                    sineCalc.setFrequency(frequency);
+                                    yValues = sineCalc.yValues;
+                                    rms = sineCalc.rms;
+                                    peak = sineCalc.peak;
                                 }
                             }
                             
@@ -390,12 +381,12 @@ Page {
                             Connections {
                                 target: resonantFreq
                                 function onFrequencyCalculated() {
-                                    if (sineWaveModel) {
-                                        sineWaveModel.setFrequency(resonantFreq.frequency);
+                                    if (sineCalc) {
+                                        sineCalc.setFrequency(resonantFreq.frequency);
                                         sineWaveViz.frequency = resonantFreq.frequency;
-                                        sineWaveViz.yValues = sineWaveModel.yValues;
-                                        sineWaveViz.rms = sineWaveModel.rms;
-                                        sineWaveViz.peak = sineWaveModel.peak;
+                                        sineWaveViz.yValues = sineCalc.yValues;
+                                        sineWaveViz.rms = sineCalc.rms;
+                                        sineWaveViz.peak = sineCalc.peak;
                                     }
                                 }
                             }

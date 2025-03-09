@@ -1,3 +1,1 @@
 timestamp,voltage_system,kva_per_house,num_houses,diversity_factor,total_kva,current,cable_size,conductor,core_type,length,voltage_drop,drop_percent,admd_enabled
-2025-03-09 13:33:03,415V,7.0,14,1.21,118.6,165.0,185,Al,3C+E,34.0,2.4273744670509734,0.5849095101327646,False
-2025-03-09 13:33:06,415V,7.0,14,1.21,118.6,165.0,185,Al,3C+E,34.0,2.4273744670509734,0.5849095101327646,False

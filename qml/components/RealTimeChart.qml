@@ -11,10 +11,16 @@ import QtQuick.Studio.DesignEffects
 
 import "../components"
 
+import RealTimeChart 1.0
+
 ChartView {
     id: chartView
     antialiasing: true
     legend.visible: true
+
+    // only one instance of RealTimeChart.  its not declared in main.qml
+
+    RealTimeChart {id: realTimeChart}
     
     property real viewPortStart: 0
     property real viewPortWidth: 30  // 30 seconds view
