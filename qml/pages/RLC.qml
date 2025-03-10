@@ -178,6 +178,7 @@ Page {
                             text: "Reset All Values"
                             Layout.columnSpan: 2
                             Layout.fillWidth: true
+                            icon.name: "view-refresh"
                             onClicked: {
                                 seriesRLCChart.resetValues()
                                 resistanceInput.text = "10"

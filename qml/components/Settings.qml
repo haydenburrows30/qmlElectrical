@@ -6,6 +6,8 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
+import "../components"
+
 Dialog {
     id: settingsDialog
     x: Math.round((window.width - width) / 2)
@@ -30,6 +32,12 @@ Dialog {
         settingsDialog.close()
     }
 
+    // Component loader for the icon browser
+    Component {
+        id: iconBrowserComponent
+        IconBrowser {}
+    }
+
     ColumnLayout {
         id: settingsColumn
         spacing: 20
@@ -46,6 +54,20 @@ Dialog {
                 model: ['Regular', 'Round', 'Sharp', 'Outlined', 'Two Tone']
                 flat: true
                 Layout.fillWidth: true
+            }
+        }
+
+        Button {
+            text: "Icon Browser"
+            icon.name: "preferences-desktop-theme"
+            Layout.alignment: Qt.AlignRight
+            Layout.margins: 5
+            ToolTip.visible: hovered
+            ToolTip.text: "Browse available icons"
+                                        
+            onClicked: {
+                var browser = iconBrowserComponent.createObject(settingsDialog)
+                browser.open()
             }
         }
     }

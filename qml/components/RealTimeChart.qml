@@ -57,11 +57,13 @@ ChartView {
         Button {
             text: realTimeChart.isRunning ? "Pause" : "Resume"
             onClicked: realTimeChart.toggleRunning()
+            
         }
 
         Button {
             text: "Restart"
             onClicked: realTimeChart.restart()
+            icon.name: "view-refresh"
         }
     }
 

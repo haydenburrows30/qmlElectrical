@@ -5,3 +5,150 @@
 2025-03-10 07:34:10,860 - ResultsManager - INFO - Loaded 3 results from CSV
 2025-03-10 07:34:40,571 - ResultsManager - INFO - Loaded 4 results from CSV
 2025-03-10 07:34:40,571 - ResultsManager - INFO - Saved new calculation for Al 185mmÂ² cable
+2025-03-10 07:57:42,407 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 07:57:42,407 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 07:57:42,407 - config - INFO - Configuration loaded successfully
+2025-03-10 07:57:42,518 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 07:57:42,798 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 08:10:05,806 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 08:10:05,806 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 08:10:05,806 - config - INFO - Configuration loaded successfully
+2025-03-10 08:10:05,893 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 08:10:06,153 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 09:38:45,977 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 09:38:45,977 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 09:38:45,977 - config - INFO - Configuration loaded successfully
+2025-03-10 09:38:46,137 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 09:38:46,471 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:02:27,531 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 10:02:27,531 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 10:02:27,531 - config - INFO - Configuration loaded successfully
+2025-03-10 10:02:27,633 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:02:27,907 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:06:38,966 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 10:06:38,966 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 10:06:38,966 - config - INFO - Configuration loaded successfully
+2025-03-10 10:06:39,035 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:06:39,221 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:06:58,627 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 10:06:58,627 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 10:06:58,627 - config - INFO - Configuration loaded successfully
+2025-03-10 10:06:58,682 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:06:58,878 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-10 10:18:32,573 - ResultsManager - INFO - Loaded 5 results from CSV
+2025-03-10 10:18:32,574 - ResultsManager - INFO - Saved new calculation for Al 300mm² cable
+2025-03-10 12:24:06,413 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:24:06,413 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:24:06,413 - config - INFO - Configuration loaded successfully
+2025-03-10 12:24:06,532 - ResultsManager - INFO - Loaded 5 results from CSV
+2025-03-10 12:24:06,871 - ResultsManager - INFO - Loaded 5 results from CSV
+2025-03-10 12:26:44,514 - ResultsManager - INFO - Loaded 6 results from CSV
+2025-03-10 12:26:44,515 - ResultsManager - INFO - Saved new calculation for Al 300mm² cable
+2025-03-10 12:26:47,766 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 12:26:47,766 - ResultsManager - INFO - Saved new calculation for Al 300mm² cable
+2025-03-10 12:29:03,820 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:29:03,820 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:29:03,820 - config - INFO - Configuration loaded successfully
+2025-03-10 12:29:03,947 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 12:29:04,252 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 12:29:32,174 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 12:30:25,063 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:30:25,063 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:30:25,063 - config - INFO - Configuration loaded successfully
+2025-03-10 12:30:25,124 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:30:25,319 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:31:36,947 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:31:36,947 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:31:36,947 - config - INFO - Configuration loaded successfully
+2025-03-10 12:31:37,005 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:31:37,222 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:32:27,165 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:32:27,165 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:32:27,165 - config - INFO - Configuration loaded successfully
+2025-03-10 12:32:27,218 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:32:27,415 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:34:10,076 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:34:10,076 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:34:10,076 - config - INFO - Configuration loaded successfully
+2025-03-10 12:34:10,208 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:34:10,549 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:34:37,761 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:34:37,761 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:34:37,761 - config - INFO - Configuration loaded successfully
+2025-03-10 12:34:37,822 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:34:38,029 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:35:00,712 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:35:00,712 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:35:00,712 - config - INFO - Configuration loaded successfully
+2025-03-10 12:35:00,762 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:35:00,970 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:35:26,974 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:35:26,974 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:35:26,984 - config - INFO - Configuration loaded successfully
+2025-03-10 12:35:27,044 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:35:27,247 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:35:46,419 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:35:46,419 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:35:46,420 - config - INFO - Configuration loaded successfully
+2025-03-10 12:35:46,460 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:35:46,653 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:37:31,191 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:37:31,191 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:37:31,191 - config - INFO - Configuration loaded successfully
+2025-03-10 12:37:31,251 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:37:31,442 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:38:01,468 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:38:01,468 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:38:01,468 - config - INFO - Configuration loaded successfully
+2025-03-10 12:38:01,522 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:38:01,720 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:38:49,081 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:38:49,081 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:38:49,081 - config - INFO - Configuration loaded successfully
+2025-03-10 12:38:49,209 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:38:49,513 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:40:03,708 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:40:03,708 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:40:03,708 - config - INFO - Configuration loaded successfully
+2025-03-10 12:40:03,767 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:40:03,979 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:46:33,100 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:46:33,100 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:46:33,100 - config - INFO - Configuration loaded successfully
+2025-03-10 12:46:33,228 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:46:33,547 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:48:20,335 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 12:48:20,335 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 12:48:20,335 - config - INFO - Configuration loaded successfully
+2025-03-10 12:48:20,395 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 12:48:20,582 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:01:00,957 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 13:01:00,957 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 13:01:00,957 - config - INFO - Configuration loaded successfully
+2025-03-10 13:01:01,060 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:01:01,398 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:01:32,125 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 13:01:32,125 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 13:01:32,125 - config - INFO - Configuration loaded successfully
+2025-03-10 13:01:32,172 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:01:32,415 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:04:41,872 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 13:04:41,872 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 13:04:41,872 - config - INFO - Configuration loaded successfully
+2025-03-10 13:04:42,010 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:04:42,339 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:17:24,548 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 13:17:24,548 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 13:17:24,548 - config - INFO - Configuration loaded successfully
+2025-03-10 13:17:24,668 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:17:24,993 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:19:42,645 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 13:19:42,645 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 13:19:42,645 - config - INFO - Configuration loaded successfully
+2025-03-10 13:19:42,698 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:19:42,911 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:20:31,459 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-10 13:20:31,459 - config - INFO - Initializing configuration system from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView\config.json
+2025-03-10 13:20:31,459 - config - INFO - Configuration loaded successfully
+2025-03-10 13:20:31,504 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-10 13:20:31,695 - ResultsManager - INFO - Loaded 0 results from CSV

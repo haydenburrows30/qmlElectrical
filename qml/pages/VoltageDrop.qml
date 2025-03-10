@@ -96,7 +96,7 @@ Page {
                     
                     WaveCard {
                         title: "Results"
-                        Layout.minimumHeight: 330
+                        Layout.minimumHeight: 350
                         Layout.minimumWidth:400
                         showInfo: false
 
@@ -199,11 +199,14 @@ Page {
                                 Layout.fillWidth: true
                                 Layout.topMargin: 10
                                 spacing: 10
+                                uniformCellSizes: true
 
                                 Button {
                                     text: "Save Results"
-                                    icon.name: "Save"
+                                    icon.name: "document-save"
                                     enabled: root.currentVoltageDropValue > 0
+                                    Layout.fillWidth: true
+
                                     onClicked: {
                                         // Fix the references to use cableSettings component properties instead
                                         resultsManager.save_calculation({
@@ -225,9 +228,10 @@ Page {
                                 }
 
                                 Button {
-                                    text: "Show Details"
+                                    text: "Details"
                                     icon.name: "Info"
                                     enabled: root.currentVoltageDropValue > 0
+                                    Layout.fillWidth: true
                                     onClicked: {
                                         // Pass all required data to the details popup
                                         detailsPopup.voltageSystem = voltageDrop.selectedVoltage
@@ -255,6 +259,7 @@ Page {
                                     text: "View Chart"
                                     icon.name: "Chart"
                                     enabled: root.currentVoltageDropValue > 0
+                                    Layout.fillWidth: true
                                     onClicked: {
                                         chartPopup.open()
                                     }
@@ -630,7 +635,7 @@ Page {
         focus: true
         anchors.centerIn: Overlay.overlay
         width: 400
-        height: 100
+        height: 200
         
         property string messageText: ""
 
@@ -655,7 +660,7 @@ Page {
         focus: true
         anchors.centerIn: Overlay.overlay
         width: 400
-        height: 100
+        height: 200
         
         property string messageText: ""
 
@@ -754,7 +759,7 @@ Page {
         focus: true
         anchors.centerIn: Overlay.overlay
         width: 400
-        height: 100
+        height: 200
         
         property string messageText: ""
 
@@ -779,7 +784,7 @@ Page {
         focus: true
         anchors.centerIn: Overlay.overlay
         width: 400
-        height: 100
+        height: 200
         
         property string messageText: ""
 
