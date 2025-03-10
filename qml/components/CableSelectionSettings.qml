@@ -23,6 +23,45 @@ GridLayout {
     property alias numberOfHousesInput: numberOfHousesInput
     
     signal resetRequested()
+    signal resetCompleted()
+
+    function resetAllValues() {
+        // First set UI controls to default values
+        voltageSelect.currentIndex = 1  // 415V
+        conductorSelect.currentIndex = 1  // Al
+        coreTypeSelect.currentIndex = 1  // 3C+E
+        cableSelect.currentIndex = 13
+        lengthInput.text = "0"
+        temperatureInput.text = "25"
+        groupingFactorInput.text = "1.0"
+        kvaPerHouseInput.text = "7"
+        numberOfHousesInput.text = "1"
+        admdCheckBox.checked = false
+        installationMethodCombo.currentIndex = 5  // "D1 - Underground direct buried"
+        
+        // Now explicitly update the model with these values to ensure calculations are updated
+        voltageDrop.setSelectedVoltage(voltageSelect.currentText)
+        voltageDrop.setConductorMaterial(conductorSelect.currentText)
+        voltageDrop.setCoreType(coreTypeSelect.currentText)
+        voltageDrop.selectCable(cableSelect.currentText)
+        voltageDrop.setLength(parseFloat(lengthInput.text) || 0)
+        voltageDrop.setInstallationMethod(installationMethodCombo.currentText)
+        voltageDrop.setTemperature(parseFloat(temperatureInput.text) || 25)
+        voltageDrop.setGroupingFactor(parseFloat(groupingFactorInput.text) || 1.0)
+        voltageDrop.setADMDEnabled(admdCheckBox.checked)
+        
+        // Calculate total load using default values
+        let kva = parseFloat(kvaPerHouseInput.text) || 7
+        let houses = parseInt(numberOfHousesInput.text) || 1
+        voltageDrop.setNumberOfHouses(houses)
+        voltageDrop.calculateTotalLoad(kva, houses)
+        
+        // Trigger an explicit recalculation
+        voltageDrop.reset()
+        
+        // Signal that reset is complete
+        resetCompleted()
+    }
 
     Label { text: "System Voltage:" }
     RowLayout {
@@ -172,6 +211,9 @@ GridLayout {
         text: "Reset"
         icon.name: "Reset"
         Layout.fillWidth: true
-        onClicked: resetRequested()
+        onClicked: {
+            resetAllValues()
+            resetRequested()  // Signal to parent that a reset was performed
+        }
     }
 }
