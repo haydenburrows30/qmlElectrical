@@ -127,7 +127,7 @@ Rectangle {
                 transformOrigin: Item.Center
                 rotation: parent.angleDegrees
                 
-                color: toolBar.toggle ? "#ffffff" : "#000000"
+                color: sideBar.toggle1 ? "#ffffff" : "#000000"
                 visible: false // Hide this, used as reference
             }
             
@@ -169,7 +169,7 @@ Rectangle {
                     ctx.font = "14px sans-serif";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
-                    ctx.fillStyle = toolBar.toggle ? "#ffffff" : "#000000";
+                    ctx.fillStyle = sideBar.toggle1 ? "#ffffff" : "#000000";
                     
                     // Draw text at origin (which is now at midpoint of hypotenuse)
                     ctx.fillText(powerText, 0, 0);

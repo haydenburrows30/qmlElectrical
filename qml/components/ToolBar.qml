@@ -6,10 +6,14 @@ import QtQuick.Layouts
 
 ToolBar {
     id:toolBar
-    property bool toggle : action.checked
+    // property bool toggle : action.checked
+
+    // background: Rectangle {
+    //     color: toolBar.toggle ? "black" : "white"
+    // }
 
     background: Rectangle {
-        color: toolBar.toggle ? "black" : "white"
+        color: "transparent"
     }
 
     signal mySignal()
@@ -26,27 +30,27 @@ ToolBar {
             }
         }
 
-        Label {
-            text: "Electrical Calculators"
-            elide: Label.ElideRight
-            horizontalAlignment: Qt.AlignHCenter
-            verticalAlignment: Qt.AlignVCenter
-            Layout.fillWidth: true
-            Layout.leftMargin: menu.width
-        }
+        // Label {
+        //     text: "Electrical Calculators"
+        //     elide: Label.ElideRight
+        //     horizontalAlignment: Qt.AlignHCenter
+        //     verticalAlignment: Qt.AlignVCenter
+        //     Layout.fillWidth: true
+        //     Layout.leftMargin: menu.width
+        // }
 
-        DarkLightButton {
-            id: action
-            icon_name1: "Dark"
-            icon_name2: "Light"
-            mode_1: "Light Mode"
-            mode_2: "Dark Mode"
-        }
+        // DarkLightButton {
+        //     id: action
+        //     icon_name1: "Dark"
+        //     icon_name2: "Light"
+        //     mode_1: "Light Mode"
+        //     mode_2: "Dark Mode"
+        // }
 
-        CButton {
-            icon_name: "Setting"
-            tooltip_text: "Settings"
-            onClicked: { settings.open() }
-        }
+        // CButton {
+        //     icon_name: "Setting"
+        //     tooltip_text: "Settings"
+        //     onClicked: { settings.open() }
+        // }
     }
 }

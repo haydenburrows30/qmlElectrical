@@ -34,7 +34,7 @@ Item {
             font.pixelSize: 16
             font.bold: true
             Layout.alignment: Qt.AlignHCenter
-            color: toolBar.toggle ? "#ffffff" : "#000000"
+            color: sideBar.toggle1 ? "#ffffff" : "#000000"
         }
         
         // Enhanced chart with better visualization
@@ -47,7 +47,7 @@ Item {
             theme: Universal.theme
             
             // Set the chart background color explicitly to avoid theme issues
-            backgroundColor: toolBar.toggle ? "#2d2d2d" : "#ffffff"
+            backgroundColor: sideBar.toggle1 ? "#2d2d2d" : "#ffffff"
             
             ValueAxis {
                 id: axisY
@@ -55,7 +55,7 @@ Item {
                 max: 10
                 tickCount: 11
                 titleText: "Voltage Drop (%)"
-                labelsColor: toolBar.toggle ? "#ffffff" : "#000000"
+                labelsColor: sideBar.toggle1 ? "#ffffff" : "#000000"
                 gridVisible: true
             }
             
@@ -65,7 +65,7 @@ Item {
                 max: 18
                 labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
                 titleText: "Cable Size (mm²)"
-                labelsColor: toolBar.toggle ? "#ffffff" : "#000000"
+                labelsColor: sideBar.toggle1 ? "#ffffff" : "#000000"
                 
                 // Show only common sizes to avoid crowding
                 CategoryRange {
@@ -186,8 +186,8 @@ Item {
             // Show a tooltip when points are clicked
             Rectangle {
                 id: pointTooltip
-                color: toolBar.toggle ? "#404040" : "#f0f0f0"
-                border.color: toolBar.toggle ? "#909090" : "#a0a0a0"
+                color: sideBar.toggle1 ? "#404040" : "#f0f0f0"
+                border.color: sideBar.toggle1 ? "#909090" : "#a0a0a0"
                 border.width: 1
                 width: tooltipText.width + 16
                 height: tooltipText.height + 8
@@ -199,7 +199,7 @@ Item {
                     id: tooltipText
                     anchors.centerIn: parent
                     text: ""  // Initialize with empty text
-                    color: toolBar.toggle ? "#ffffff" : "#000000"
+                    color: sideBar.toggle1 ? "#ffffff" : "#000000"
                 }
                 
                 // Close tooltip when clicked anywhere else

@@ -12,7 +12,7 @@ Page {
     id: root
 
     background: Rectangle {
-        color: toolBar.toggle ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
     ScrollView {
@@ -61,7 +61,7 @@ Page {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     height: 1
-                                    color: toolBar.toggle ? "#404040" : "#e0e0e0"
+                                    color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
                                 }
 
                                 GridLayout {

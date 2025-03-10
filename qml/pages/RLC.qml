@@ -16,7 +16,7 @@ Page {
     id: phasor
 
     background: Rectangle {
-        color: toolBar.toggle ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
     Connections {

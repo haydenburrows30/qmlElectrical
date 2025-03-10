@@ -40,16 +40,16 @@ ApplicationWindow {
     VoltageDrop {id: voltageDrop}
     ResultsManager {id: resultsManager}
 
-    ToolBar{
-        id: toolBar
-        width: parent.width
-        onMySignal: sideBar.react()
-    }
+    // ToolBar{
+    //     id: toolBar
+    //     width: parent.width
+    //     onMySignal: sideBar.react()
+    // }
     
     SideBar {
         id: sideBar
-        y: toolBar.height
-        height: window.height - toolBar.height
+        // y: toolBar.height
+        height: window.height // - toolBar.height
     }
 
     Settings {id: settings}
@@ -57,7 +57,7 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors {
-            top: toolBar.bottom
+            top: parent.top // toolBar.bottom
             bottom: parent.bottom
             left: parent.left
             leftMargin: 0
@@ -79,6 +79,6 @@ ApplicationWindow {
         }
     }
 
-    Universal.theme: toolBar.toggle ? Universal.Dark : Universal.Light
-    Universal.accent: toolBar.toggle ? Universal.Red : Universal.Cyan
+    Universal.theme: sideBar.toggle1 ? Universal.Dark : Universal.Light
+    Universal.accent: sideBar.toggle1 ? Universal.Red : Universal.Cyan
 }

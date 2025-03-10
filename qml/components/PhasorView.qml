@@ -27,7 +27,7 @@ Item {
         }
 
         function drawGrid(ctx) {
-            ctx.strokeStyle = toolBar.toggle ? "#404040" : "#e0e0e0";
+            ctx.strokeStyle = sideBar.toggle1 ? "#404040" : "#e0e0e0";
             ctx.lineWidth = 1;
             
             // Draw circles

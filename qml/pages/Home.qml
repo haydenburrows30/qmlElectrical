@@ -73,7 +73,7 @@ Page {
 		}
 
 		HButton {
-			icon.name: "Real"
+			icon.name: "RealTime"
 			text: "Real Time Chart"
 			back: Qt.lighter(palette.accent,1.5)
 			fore: Qt.lighter(palette.accent,1.0)

@@ -12,6 +12,10 @@ Drawer {
     property int hide: 0
     property int show: 0
 
+    property bool toggle1 : false
+
+    signal mySignal()
+
     onAboutToHide: {
         show = 0
         hide = 1
@@ -72,6 +76,7 @@ Drawer {
                 ItemDelegate {
                     implicitHeight: 60
                     implicitWidth: 60
+                    
 
                     highlighted: ListView.isCurrentItem
 
@@ -127,32 +132,50 @@ Drawer {
                     title: "Real Time"
                     source: "../pages/RealTime.qml"
                     tooltip: "Real Time"
-                    icon: "Wave"
+                    icon: "RealTime"
                 }
             }
 
             footer:
-                ItemDelegate {
-                    id: footerdel
-                    highlighted: listView.currentIndex == -1
-                    implicitHeight: 60
-                    implicitWidth: 60
+                ColumnLayout {
+                    DarkLightButton {
+                        id: action
+                        icon_name1: "Dark"
+                        icon_name2: "Light"
+                        mode_1: "Light Mode"
+                        mode_2: "Dark Mode"
+                        implicitHeight: 60
+                        implicitWidth: 60
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                    CToolTip {
-                        id: toolTip
-                        text: "Settings"
-                        width: 110
+                        onClicked: {
+                            action.checked ? toggle1 = true : toggle1= false
+                        }
                     }
-                    
-                    icon.name: 'Setting'
-                    icon.width: 30
-                    icon.height: 30
 
-                    onClicked: {
-                        settings.open()
-                        listView.currentIndex = -1
+                    ItemDelegate {
+                        id: footerdel
+                        highlighted: listView.currentIndex == -1
+                        implicitHeight: 60
+                        implicitWidth: 60
+
+                        CToolTip {
+                            id: toolTip
+                            text: "Settings"
+                            width: 110
+                        }
+                        
+                        icon.name: 'Setting'
+                        icon.width: 30
+                        icon.height: 30
+
+                        onClicked: {
+                            settings.open()
+                            listView.currentIndex = -1
+                        }
                     }
                 }
+                
         }
     }
 }

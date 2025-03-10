@@ -14,7 +14,7 @@ ToolTip {
     contentItem: Text {
         text: control.text
         font: control.font
-        color: toolBar.toggle ? "white": "black"
+        color: sideBar.toggle1? "white": "black"
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
     }
@@ -22,7 +22,7 @@ ToolTip {
     background: CustomBorderRect{
                     width : 110
                     height: 60
-                    color: toolBar.toggle ? Qt.darker(palette.dark,5): palette.light
+                    color: sideBar.toggle1 ? Qt.darker(palette.dark,5): palette.light
 
                     lBorderwidth: 5
                     rBorderwidth: 1

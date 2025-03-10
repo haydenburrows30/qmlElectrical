@@ -47,7 +47,7 @@ Item {
             var radius = Math.min(centerX, centerY) - 20
 
             // Draw reference circles with theme support
-            ctx.strokeStyle = toolBar.toggle ? "#404040" : "#e0e0e0"
+            ctx.strokeStyle = sideBar.toggle1 ? "#404040" : "#e0e0e0"
             ctx.lineWidth = 1
             
             // Use for loop instead of forEach
@@ -97,7 +97,7 @@ Item {
                     ctx.strokeStyle = colors[i]
                     ctx.lineWidth = 3
                     ctx.shadowColor = colors[i]
-                    ctx.shadowBlur = toolBar.toggle ? 8 : 4
+                    ctx.shadowBlur = sideBar.toggle1 ? 8 : 4
                     ctx.beginPath()
                     ctx.moveTo(centerX, centerY)
                     ctx.lineTo(x, y)
@@ -126,7 +126,7 @@ Item {
                         ctx.strokeStyle = currentColors[j]
                         ctx.lineWidth = 2
                         ctx.shadowColor = currentColors[j]
-                        ctx.shadowBlur = toolBar.toggle ? 6 : 3
+                        ctx.shadowBlur = sideBar.toggle1 ? 6 : 3
                         
                         // Set dashed line style
                         ctx.setLineDash([5, 3])
@@ -290,7 +290,7 @@ Item {
             y: parent.height/2 + Math.sin(-index * 30 * Math.PI / 180) * 
                (parent.height/2 - 30) - height/2
             font.pixelSize: 12
-            color: toolBar.toggle ? "#b0b0b0" : "#606060"
+            color: sideBar.toggle1 ? "#b0b0b0" : "#606060"
         }
     }
 
@@ -312,7 +312,7 @@ Item {
             Text {
                 text: "Voltage"
                 font.pixelSize: 12
-                color: toolBar.toggle ? "#ffffff" : "#000000"
+                color: sideBar.toggle1 ? "#ffffff" : "#000000"
             }
         }
         
@@ -327,7 +327,7 @@ Item {
             Text {
                 text: "Current"
                 font.pixelSize: 12
-                color: toolBar.toggle ? "#ffffff" : "#000000"
+                color: sideBar.toggle1 ? "#ffffff" : "#000000"
             }
         }
     }

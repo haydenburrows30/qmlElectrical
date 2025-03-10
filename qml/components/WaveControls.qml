@@ -44,7 +44,7 @@ WaveCard {
                     width: parent.availableWidth
                     height: 4
                     radius: 2
-                    color: toolBar.toggle ? "#404040" : "#e0e0e0"
+                    color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
 
                     Rectangle {
                         width: parent.width * parent.visualPosition
@@ -72,7 +72,7 @@ WaveCard {
             Label {
                 text: freqSlider.value.toFixed(1) + " Hz"
                 font.pixelSize: 12
-                color: toolBar.toggle ? "#b0b0b0" : "#606060"
+                color: sideBar.toggle1 ? "#b0b0b0" : "#606060"
             }
 
             Button {

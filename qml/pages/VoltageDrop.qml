@@ -28,7 +28,7 @@ Page {
     }
 
     background: Rectangle {
-        color: toolBar.toggle ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
     ScrollView {
@@ -134,7 +134,7 @@ Page {
                                 id: networkFuseSizeText
                                 text: voltageDrop.combinedRatingInfo || "N/A"
                                 color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
-                                       "blue" : (text === "Error" ? "red" : toolBar.toggle ? "#ffffff" : "#000000")
+                                       "blue" : (text === "Error" ? "red" : sideBar.toggle1 ? "#ffffff" : "#000000")
                                 font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
                                 Layout.fillWidth: true
                                 
@@ -152,7 +152,7 @@ Page {
                                 text: "10.0"
                                 font.bold: true
                                 Layout.fillWidth: true
-                                color: toolBar.toggle ? "#ffffff" : "#000000"
+                                color: sideBar.toggle1 ? "#ffffff" : "#000000"
 
                                 Connections {
                                     target: voltageDrop
@@ -167,7 +167,7 @@ Page {
                                 id: currentInput
                                 text: Number(voltageDrop.current).toFixed(1)
                                 font.bold: true
-                                color: toolBar.toggle ? "#ffffff" : "#000000"
+                                color: sideBar.toggle1 ? "#ffffff" : "#000000"
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
                                 
@@ -301,7 +301,7 @@ Page {
                                 Rectangle {
                                     width: tableView.width
                                     height: parent.height
-                                    color: toolBar.toggle ? "#424242" : "#e0e0e0"
+                                    color: sideBar.toggle1 ? "#424242" : "#e0e0e0"
                                     x: -tableView.contentX  // Sync with table horizontal scroll
                                     
                                     Row {
@@ -331,7 +331,7 @@ Page {
                                                     horizontalAlignment: Text.AlignHCenter
                                                     verticalAlignment: Text.AlignVCenter
                                                     elide: Text.ElideRight
-                                                    color: toolBar.toggle ? "#ffffff" : "#000000"
+                                                    color: sideBar.toggle1 ? "#ffffff" : "#000000"
                                                 }
                                             }
                                         }
@@ -418,8 +418,8 @@ Page {
                                                     default: return "transparent"
                                                 }
                                             }
-                                            return row % 2 ? (toolBar.toggle ? "#2d2d2d" : "#f5f5f5") 
-                                                        : (toolBar.toggle ? "#1d1d1d" : "#ffffff")
+                                            return row % 2 ? (sideBar.toggle1 ? "#2d2d2d" : "#f5f5f5") 
+                                                        : (sideBar.toggle1 ? "#1d1d1d" : "#ffffff")
                                         }
 
                                         Text {
@@ -433,10 +433,10 @@ Page {
                                                         case "WARNING": return "#ef6c00"  // Dark orange
                                                         case "SUBMAIN": return "#1565c0"  // Dark blue
                                                         case "OK": return "#2e7d32"      // Dark green
-                                                        default: return toolBar.toggle ? "#ffffff" : "#000000"
+                                                        default: return sideBar.toggle1 ? "#ffffff" : "#000000"
                                                     }
                                                 }
-                                                return toolBar.toggle ? "#ffffff" : "#000000"
+                                                return sideBar.toggle1 ? "#ffffff" : "#000000"
                                             }
                                             font.bold: column === 7  // Status column
                                             verticalAlignment: Text.AlignVCenter

@@ -52,7 +52,7 @@ GridLayout {
         id: networkFuseSizeText
         text: combinedRatingInfo || "N/A"
         color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
-               "blue" : (text === "Error" ? "red" : toolBar.toggle ? "#ffffff" : "#000000")
+               "blue" : (text === "Error" ? "red" : sideBar.toggle1 ? "#ffffff" : "#000000")
         font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
         Layout.fillWidth: true
     }
@@ -63,7 +63,7 @@ GridLayout {
         text: totalLoad.toFixed(1)
         font.bold: true
         Layout.fillWidth: true
-        color: toolBar.toggle ? "#ffffff" : "#000000"
+        color: sideBar.toggle1 ? "#ffffff" : "#000000"
     }
 
     Label { text: "Current (A):" }
@@ -71,7 +71,7 @@ GridLayout {
         id: currentText
         text: current.toFixed(1)
         font.bold: true
-        color: toolBar.toggle ? "#ffffff" : "#000000"
+        color: sideBar.toggle1 ? "#ffffff" : "#000000"
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
     }
