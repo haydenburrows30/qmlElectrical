@@ -40,7 +40,7 @@ Page {
                             id: waveControls
                             Layout.minimumHeight: 460
                             Layout.minimumWidth: 500
-                            onRequestAutoScale: waveChart.autoScale()  // Handle the signal
+                            onRequestAutoScale: waveChart.autoScale()
                         }
 
                         WaveCard {
@@ -150,7 +150,7 @@ Page {
                             showInfo: false
                             
                             WaveChart {
-                                id: waveChart  // Add ID to reference from signal handler
+                                id: waveChart
                                 anchors.fill: parent
                             }
                         }

@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import math
 import os
+import json  # Add this import
 # Add imports for PDF generation
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
@@ -617,7 +618,35 @@ class VoltageDrop(QObject):
     def exportTableData(self, filepath):
         """Save the cable size comparison table data to a CSV file."""
         try:
-            # Convert QUrl to local file path if needed
+            # Show file dialog if filepath is empty or None
+            if not filepath:
+                from PySide6.QtWidgets import QFileDialog
+                import os
+                
+                # Get absolute path to results directory
+                results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'results'))
+                os.makedirs(results_dir, exist_ok=True)
+                
+                # Create default filename with timestamp
+                timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+                default_filename = f"cable_comparison_{timestamp}.csv"
+                default_path = os.path.join(results_dir, default_filename)
+                
+                # Use QFileDialog with explicit default filename
+                dialog = QFileDialog()
+                dialog.setFileMode(QFileDialog.AnyFile)
+                dialog.setAcceptMode(QFileDialog.AcceptSave)
+                dialog.setDefaultSuffix("csv")
+                dialog.setNameFilter("CSV files (*.csv)")
+                dialog.selectFile(default_path)
+                
+                if dialog.exec() == QFileDialog.Accepted:
+                    filepath = dialog.selectedFiles()[0]
+                else:
+                    self.tableExportStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Continue with existing code...
             if isinstance(filepath, QUrl):
                 filepath = filepath.toLocalFile()
             elif filepath.startswith('file:///'):
@@ -669,13 +698,37 @@ class VoltageDrop(QObject):
 
     @Slot(str)
     def exportTableToPDF(self, filepath):
-        """Export cable comparison table to PDF format.
-        
-        Args:
-            filepath: Path to save the PDF file
-        """
+        """Export cable comparison table to PDF format."""
         try:
-            # Convert QUrl to local file path if needed
+            # Show file dialog if filepath is empty or None
+            if not filepath:
+                from PySide6.QtWidgets import QFileDialog
+                import os
+                
+                # Get absolute path to results directory
+                results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'results'))
+                os.makedirs(results_dir, exist_ok=True)
+                
+                # Create default filename with timestamp
+                timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+                default_filename = f"cable_comparison_{timestamp}.pdf"
+                default_path = os.path.join(results_dir, default_filename)
+                
+                # Use QFileDialog with explicit default filename
+                dialog = QFileDialog()
+                dialog.setFileMode(QFileDialog.AnyFile)
+                dialog.setAcceptMode(QFileDialog.AcceptSave)
+                dialog.setDefaultSuffix("pdf")
+                dialog.setNameFilter("PDF files (*.pdf)")
+                dialog.selectFile(default_path)
+                
+                if dialog.exec() == QFileDialog.Accepted:
+                    filepath = dialog.selectedFiles()[0]
+                else:
+                    self.tablePdfExportStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Convert QUrl if needed
             if isinstance(filepath, QUrl):
                 filepath = filepath.toLocalFile()
             elif filepath.startswith('file:///'):
@@ -820,14 +873,37 @@ class VoltageDrop(QObject):
 
     @Slot(str, dict)
     def exportDetailsToPDF(self, filepath, details):
-        """Export voltage drop calculation details to PDF format.
-        
-        Args:
-            filepath: Path to save the PDF file
-            details: Dictionary containing calculation details
-        """
+        """Export voltage drop calculation details to PDF format."""
         try:
-            # Convert QUrl to local file path if needed
+            # Show file dialog if filepath is empty or None
+            if not filepath:
+                from PySide6.QtWidgets import QFileDialog
+                import os
+                
+                # Get absolute path to results directory
+                results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'results'))
+                os.makedirs(results_dir, exist_ok=True)
+                
+                # Create default filename with timestamp
+                timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+                default_filename = f"voltage_drop_details_{timestamp}.pdf"
+                default_path = os.path.join(results_dir, default_filename)
+                
+                # Use QFileDialog with an explicit default filename
+                dialog = QFileDialog()
+                dialog.setFileMode(QFileDialog.AnyFile)
+                dialog.setAcceptMode(QFileDialog.AcceptSave)
+                dialog.setDefaultSuffix("pdf")
+                dialog.setNameFilter("PDF files (*.pdf)")
+                dialog.selectFile(default_path)
+                
+                if dialog.exec() == QFileDialog.Accepted:
+                    filepath = dialog.selectedFiles()[0]
+                else:
+                    self.pdfExportStatusChanged.emit(False, "Export cancelled")
+                    return False
+
+            # Continue with existing code...
             if isinstance(filepath, QUrl):
                 filepath = filepath.toLocalFile()
             elif filepath.startswith('file:///'):
@@ -1108,3 +1184,121 @@ class VoltageDrop(QObject):
     def combinedRatingInfo(self):
         """Get combined fuse size and conductor rating information."""
         return self._combined_rating_info
+
+    @Slot(str)
+    def exportChartDataCSV(self, data_json):
+        """Export chart data as CSV."""
+        try:
+            data = json.loads(data_json)
+            filepath = None  # Initialize filepath variable
+            
+            # Show file dialog
+            from PySide6.QtWidgets import QFileDialog
+            import os
+            
+            results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'results'))
+            os.makedirs(results_dir, exist_ok=True)
+            
+            timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+            default_filename = f"voltage_drop_chart_{timestamp}.csv"
+            default_path = os.path.join(results_dir, default_filename)
+            
+            dialog = QFileDialog()
+            dialog.setFileMode(QFileDialog.AnyFile)
+            dialog.setAcceptMode(QFileDialog.AcceptSave)
+            dialog.setDefaultSuffix("csv")
+            dialog.setNameFilter("CSV files (*.csv)")
+            dialog.selectFile(default_path)
+            
+            if dialog.exec() == QFileDialog.Accepted:
+                filepath = dialog.selectedFiles()[0]
+            else:
+                self.tableExportStatusChanged.emit(False, "Export cancelled")
+                return False
+
+            # Continue only if we have a filepath
+            if filepath:
+                # Convert QUrl if needed
+                if isinstance(filepath, QUrl):
+                    filepath = filepath.toLocalFile()
+                elif filepath.startswith('file:///'):
+                    filepath = QUrl(filepath).toLocalFile()
+
+                # Create DataFrame and save
+                rows = []
+                rows.append({
+                    'cable_size': data['currentPoint']['cableSize'],
+                    'drop_percentage': data['currentPoint']['dropPercentage'],
+                    'current': data['currentPoint']['current'],
+                    'type': 'current'
+                })
+                
+                for point in data['comparisonPoints']:
+                    rows.append({
+                        'cable_size': point['cableSize'],
+                        'drop_percentage': point['dropPercent'],
+                        'status': point['status'],
+                        'type': 'comparison'
+                    })
+                    
+                df = pd.DataFrame(rows)
+                df.to_csv(filepath, index=False)
+                self.tableExportStatusChanged.emit(True, f"Chart data exported to {filepath}")
+                return True
+            
+        except Exception as e:
+            self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
+            return False
+
+    @Slot(str)
+    def exportChartDataJSON(self, data_json):
+        """Export chart data as JSON."""
+        try:
+            data = json.loads(data_json)
+            
+            # Show file dialog if filepath is empty or None
+            from PySide6.QtWidgets import QFileDialog
+            import os
+            
+            # Get absolute path to results directory
+            results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'results'))
+            os.makedirs(results_dir, exist_ok=True)
+            
+            # Create default filename with timestamp
+            timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+            default_filename = f"voltage_drop_chart_{timestamp}.json"
+            default_path = os.path.join(results_dir, default_filename)
+            
+            dialog = QFileDialog()
+            dialog.setFileMode(QFileDialog.AnyFile)
+            dialog.setAcceptMode(QFileDialog.AcceptSave)
+            dialog.setDefaultSuffix("json")
+            dialog.setNameFilter("JSON files (*.json)")
+            dialog.selectFile(default_path)
+            
+            if dialog.exec() == QFileDialog.Accepted:
+                filepath = dialog.selectedFiles()[0]
+                
+                # Convert QUrl if needed
+                if isinstance(filepath, QUrl):
+                    filepath = filepath.toLocalFile()
+                elif filepath.startswith('file:///'):
+                    filepath = QUrl(filepath).toLocalFile()
+                
+                # Save the data
+                with open(filepath, 'w') as f:
+                    json.dump(data, f, indent=2)
+                
+                success_msg = f"Chart data exported to {filepath}"
+                print(success_msg)
+                self.tableExportStatusChanged.emit(True, success_msg)
+                return True
+            else:
+                self.tableExportStatusChanged.emit(False, "Export cancelled")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting chart data: {e}"
+            print(error_msg)
+            self.tableExportStatusChanged.emit(False, error_msg)
+            return False

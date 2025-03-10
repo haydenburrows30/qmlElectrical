@@ -22,8 +22,8 @@ Item {
     // Signal when chart should be closed
     signal closeRequested()
     
-    // Signal for save chart request
-    signal saveRequested()
+    // Update signal to include scale
+    signal saveRequested(real scale)
     
     ColumnLayout {
         anchors.fill: parent
@@ -37,6 +37,58 @@ Item {
             color: sideBar.toggle1 ? "#ffffff" : "#000000"
         }
         
+        // Add series visibility controls
+        Row {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 10
+            
+            CheckBox {
+                id: thresholdCheck
+                text: "Show 5% Limit"
+                checked: true
+                onCheckedChanged: thresholdLine.visible = checked
+            }
+            
+            CheckBox {
+                id: currentCableCheck
+                text: "Show Current Cable"
+                checked: true
+                onCheckedChanged: dropPercentSeries.visible = checked
+            }
+            
+            CheckBox {
+                id: comparisonCheck
+                text: "Show Comparison Points"
+                checked: true
+                onCheckedChanged: {
+                    comparisonSeries.visible = checked
+                    trendLine.visible = checked && showAllCheckbox.checked
+                }
+            }
+        }
+
+        // Add axis customization
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 20
+            
+            TextField {
+                id: xAxisTitle
+                placeholderText: "X-Axis Title"
+                text: "Cable Size (mm²)"
+                onTextChanged: axisX.titleText = text
+                Layout.preferredWidth: 150
+            }
+            
+            TextField {
+                id: yAxisTitle
+                placeholderText: "Y-Axis Title"
+                text: "Voltage Drop (%)"
+                onTextChanged: axisY.titleText = text
+                Layout.preferredWidth: 150
+            }
+        }
+
         // Enhanced chart with better visualization
         ChartView {
             id: chartView
@@ -57,6 +109,12 @@ Item {
                 titleText: "Voltage Drop (%)"
                 labelsColor: sideBar.toggle1 ? "#ffffff" : "#000000"
                 gridVisible: true
+                labelFormat: "%.1f"  // Add format
+                minorGridVisible: true  // Show minor grid lines
+                minorTickCount: 1    // Add minor ticks between major ticks
+                gridLineColor: sideBar.toggle1 ? "#404040" : "#e0e0e0"  // Add grid line color
+                labelsVisible: true   // Explicitly show labels
+                lineVisible: true     // Show axis line
             }
             
             CategoryAxis {
@@ -66,6 +124,10 @@ Item {
                 labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
                 titleText: "Cable Size (mm²)"
                 labelsColor: sideBar.toggle1 ? "#ffffff" : "#000000"
+                gridVisible: true
+                labelsVisible: true   // Explicitly show labels
+                lineVisible: true     // Show axis line
+                gridLineColor: sideBar.toggle1 ? "#404040" : "#e0e0e0"  // Add grid line color
                 
                 // Show only common sizes to avoid crowding
                 CategoryRange {
@@ -262,38 +324,42 @@ Item {
                 }
             }
 
+            // Update context menu to include data export
             Menu {
                 id: chartContextMenu
                 title: "Chart Options"
                 
                 Menu {
-                    title: "Resolution"
+                    title: "Save Chart"
                     
                     MenuItem {
-                        text: "1x"
-                        checkable: true
-                        checked: resolutionComboBox ? resolutionComboBox.currentIndex === 0 : false
-                        onTriggered: resolutionComboBox.currentIndex = 0
+                        text: "Standard Quality (1x)"
+                        onTriggered: chartComponent.saveRequested(1.0)
                     }
                     
                     MenuItem {
-                        text: "2x"
-                        checkable: true
-                        checked: resolutionComboBox ? resolutionComboBox.currentIndex === 1 : false
-                        onTriggered: resolutionComboBox.currentIndex = 1
+                        text: "High Quality (2x)"
+                        onTriggered: chartComponent.saveRequested(2.0)
                     }
                     
                     MenuItem {
-                        text: "4x"
-                        checkable: true
-                        checked: resolutionComboBox ? resolutionComboBox.currentIndex === 2 : false
-                        onTriggered: resolutionComboBox.currentIndex = 2
+                        text: "Ultra Quality (4x)"
+                        onTriggered: chartComponent.saveRequested(4.0)
                     }
                 }
                 
-                MenuItem {
-                    text: "Save Chart"
-                    onTriggered: chartComponent.saveRequested()
+                Menu {
+                    title: "Export Data"
+                    
+                    MenuItem {
+                        text: "Export as CSV"
+                        onTriggered: exportChartData("csv")
+                    }
+                    
+                    MenuItem {
+                        text: "Export as JSON"
+                        onTriggered: exportChartData("json")
+                    }
                 }
                 
                 MenuSeparator {}
@@ -301,6 +367,14 @@ Item {
                 MenuItem {
                     text: "Reset View"
                     onTriggered: resetView()
+                }
+                
+                MenuItem {
+                    text: "Reset Axis Labels"
+                    onTriggered: {
+                        xAxisTitle.text = "Cable Size (mm²)"
+                        yAxisTitle.text = "Voltage Drop (%)"
+                    }
                 }
             }
             
@@ -556,5 +630,23 @@ Item {
     // Public method to grab the chart image for saving
     function grabChartImage(callback, scale) {
         chartView.grabToImage(callback, Qt.size(chartView.width * scale, chartView.height * scale))
+    }
+
+    // Add function to export chart data
+    function exportChartData(format) {
+        let data = {
+            currentPoint: {
+                cableSize: chartComponent.cableSize,
+                dropPercentage: chartComponent.percentage,
+                current: chartComponent.currentValue
+            },
+            comparisonPoints: chartComponent.comparisonPoints
+        }
+        
+        if (format === "csv") {
+            voltageDrop.exportChartDataCSV(JSON.stringify(data))
+        } else {
+            voltageDrop.exportChartDataJSON(JSON.stringify(data))
+        }
     }
 }

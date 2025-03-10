@@ -31,6 +31,21 @@ Page {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
+
+    function getColumnWidth(column) {
+        switch(column) {
+            case 0: return 100  // Size
+            case 1: return 100  // Material
+            case 2: return 100  // Cores
+            case 3: return 100  // mV/A/m
+            case 4: return 120  // Rating
+            case 5: return 120  // V-Drop
+            case 6: return 100  // Drop %
+            case 7: return 100  // Status
+            default: return 100
+        }
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -385,12 +400,18 @@ Page {
                                         
                                         MenuItem {
                                             text: "Export as CSV"
-                                            onTriggered: tableExportDialog.open()
+                                            onTriggered: {
+                                                loadingIndicator.visible = true
+                                                voltageDrop.exportTableData(null)  // Pass null to trigger Python file dialog
+                                            }
                                         }
-                                        
+
                                         MenuItem {
                                             text: "Export as PDF"
-                                            onTriggered: tablePdfExportDialog.open()
+                                            onTriggered: {
+                                                loadingIndicator.visible = true
+                                                voltageDrop.exportTableToPDF(null)  // Pass null to trigger Python file dialog
+                                            }
                                         }
                                         
                                         MenuSeparator {}
@@ -455,26 +476,10 @@ Page {
                                 Layout.margins: 5
                                 
                                 // Replace with menu for export options
-                                onClicked: tableExportMenu.popup()
+                                onClicked: exportFormatMenu.popup()
                                 
                                 ToolTip.visible: hovered
                                 ToolTip.text: "Export cable comparison data"
-                                
-                                // Add menu for export options
-                                Menu {
-                                    id: tableExportMenu
-                                    title: "Export Format"
-                                    
-                                    MenuItem {
-                                        text: "Export as CSV"
-                                        onTriggered: tableExportDialog.open()
-                                    }
-                                    
-                                    MenuItem {
-                                        text: "Export as PDF"
-                                        onTriggered: tablePdfExportDialog.open()
-                                    }
-                                }
                             }
                         }
                     }
@@ -495,7 +500,7 @@ Page {
         focus: true
         anchors.centerIn: Overlay.overlay
         width: 700
-        height: 500
+        height: 700
         
         // Call this when the popup is about to show
         onAboutToShow: {
@@ -512,295 +517,220 @@ Page {
             
             // Connect signals
             onCloseRequested: chartPopup.close()
-            onSaveRequested: chartSaveDialog.open()
+            onSaveRequested: function(scale) {  // Add scale parameter here
+                exportFileDialog.setup("Save Chart", "PNG files (*.png)", "png", 
+                                      "voltage_drop_chart", exportFileDialog.chartExport)
+                exportFileDialog.currentScale = scale  // Add this line to use the scale
+                exportFileDialog.open()
+            }
         }
     }
     
-    // Add ComboBox for chart resolution (hidden)
-    ComboBox {
-        id: resolutionComboBox
-        model: ["1x", "2x", "4x"]
-        property var scaleValues: [1.0, 2.0, 4.0]
-        property real scaleFactor: scaleValues[currentIndex]
-        visible: false
-    }
-    
-    // Add FileDialog for saving chart
-    FileDialog {
-        id: chartSaveDialog
-        title: "Save Chart"
-        nameFilters: ["PNG files (*.png)", "All files (*)"]
-        fileMode: FileDialog.SaveFile
-        defaultSuffix: "png"
-        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
+    // Consolidated message popup for success/error messages
+    Popup {
+        id: messagePopup
+        modal: true
+        focus: true
+        anchors.centerIn: Overlay.overlay
+        width: 400
+        height: 200
         
-        // Generate default filename with timestamp
-        currentFile: {
-            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-            return "voltage_drop_chart_" + timestamp + ".png"
+        property string messageText: ""
+        property bool isError: false
+        
+        function showSuccess(message) {
+            messageText = message
+            isError = false
+            open()
         }
         
-        onAccepted: {
-            voltageDrop.saveChart(selectedFile, resolutionComboBox.scaleFactor)
+        function showError(message) {
+            messageText = message
+            isError = true
+            open()
         }
-    }
-    
-    // Add FileDialog for exporting table data
-    FileDialog {
-        id: tableExportDialog
-        title: "Export Table Data"
-        nameFilters: ["CSV files (*.csv)", "All files (*)"]
-        fileMode: FileDialog.SaveFile
-        defaultSuffix: "csv"
-        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
-        
-        // Generate default filename with timestamp
-        currentFile: {
-            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-            return "cable_comparison_" + timestamp + ".csv"
-        }
-        
-        onAccepted: {
-            voltageDrop.exportTableData(selectedFile)
-        }
-    }
 
-    // Add FileDialog for exporting table to PDF
-    FileDialog {
-        id: tablePdfExportDialog
-        title: "Export Table as PDF"
-        nameFilters: ["PDF files (*.pdf)", "All files (*)"]
-        fileMode: FileDialog.SaveFile
-        defaultSuffix: "pdf"
-        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
-        
-        // Generate default filename with timestamp
-        currentFile: {
-            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-            return "cable_comparison_" + timestamp + ".pdf"
-        }
-        
-        onAccepted: {
-            voltageDrop.exportTableToPDF(selectedFile)
+        contentItem: ColumnLayout {
+            Label {
+                text: messagePopup.messageText
+                wrapMode: Text.WordWrap
+                color: messagePopup.isError ? "red" : (sideBar.toggle1 ? "#ffffff" : "#000000")
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: messagePopup.close()
+            }
         }
     }
     
-    // Add connections for chart and export handling
+    // Consolidated FileDialog for all export operations
+    FileDialog {
+        id: exportFileDialog
+        title: "Export"
+        fileMode: FileDialog.SaveFile
+        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
+        
+        // Export types enum - fix property names to start with lowercase
+        readonly property int chartExport: 0
+        readonly property int tableCsvExport: 1
+        
+        property int exportType: chartExport
+        property real currentScale: 2.0  // Add this property if not already present
+        property var details: null  // Add property to store details object
+        
+        function setup(dialogTitle, filters, suffix, baseFilename, type) {
+            title = dialogTitle
+            nameFilters = [filters, "All files (*)"]
+            defaultSuffix = suffix
+            exportType = type
+            
+            // Generate default filename with timestamp
+            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            currentFile = baseFilename + "_" + timestamp + "." + suffix
+        }
+        
+        onAccepted: {
+            switch(exportType) {
+                case chartExport:
+                    voltageDrop.saveChart(selectedFile, currentScale)  // Use currentScale instead of resolutionComboBox
+                    break
+                case tableCsvExport:
+                    voltageDrop.exportTableData(selectedFile)
+                    break
+            }
+        }
+    }
+    
+    // Consolidated connections for export and message handling
     Connections {
         target: voltageDrop
+        
         function onGrabRequested(filepath, scale) {
+            loadingIndicator.visible = true
             console.log("Grabbing image to:", filepath, "with scale:", scale)
             chartComponent.grabChartImage(function(result) {
+                loadingIndicator.visible = false
                 if (result) {
                     var saved = result.saveToFile(filepath)
                     if (saved) {
-                        saveSuccess.messageText = "Chart saved successfully"
-                        saveSuccess.open()
+                        messagePopup.showSuccess("Chart saved successfully")
                     } else {
-                        saveError.messageText = "Failed to save chart"
-                        saveError.open()
+                        messagePopup.showError("Failed to save chart")
                     }
                 } else {
-                    saveError.messageText = "Failed to grab chart image"
-                    saveError.open()
+                    messagePopup.showError("Failed to grab chart image")
                 }
             }, scale)
         }
         
+        // Unified handlers for different export operations using messagePopup
         function onTableExportStatusChanged(success, message) {
+            loadingIndicator.visible = false
             if (success) {
-                saveSuccess.messageText = message
-                saveSuccess.open()
+                messagePopup.showSuccess(message)
             } else {
-                saveError.messageText = message
-                saveError.open()
+                messagePopup.showError(message)
             }
         }
 
         function onTablePdfExportStatusChanged(success, message) {
+            loadingIndicator.visible = false
             if (success) {
-                saveSuccess.messageText = message
-                saveSuccess.open()
+                messagePopup.showSuccess(message)
             } else {
-                saveError.messageText = message
-                saveError.open()
+                messagePopup.showError(message)
             }
         }
-    }
-
-    // Add general success and error message popups
-    Popup {
-        id: saveSuccess
-        modal: true
-        focus: true
-        anchors.centerIn: Overlay.overlay
-        width: 400
-        height: 200
         
-        property string messageText: ""
-
-        contentItem: ColumnLayout {
-            Label {
-                text: saveSuccess.messageText
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
+        function onPdfExportStatusChanged(success, message) {
+            loadingIndicator.visible = false
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: saveSuccess.close()
+        }
+        
+        function onSaveStatusChanged(success, message) {
+            loadingIndicator.visible = false
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }
     
-    Popup {
-        id: saveError
-        modal: true
-        focus: true
-        anchors.centerIn: Overlay.overlay
-        width: 400
-        height: 200
+    // Update table export menu items
+    Menu {
+        id: exportFormatMenu // Changed from tableExportMenu to avoid duplicate ID
+        title: "Export Format"
         
-        property string messageText: ""
-
-        contentItem: ColumnLayout {
-            Label {
-                text: saveError.messageText
-                wrapMode: Text.WordWrap
-                color: "red"
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
+        MenuItem {
+            text: "Export as CSV"
+            onTriggered: {
+                loadingIndicator.visible = true
+                voltageDrop.exportTableData(null)  // Pass null to trigger Python file dialog
             }
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: saveError.close()
+        }
+
+        MenuItem {
+            text: "Export as PDF"
+            onTriggered: {
+                loadingIndicator.visible = true
+                voltageDrop.exportTableToPDF(null)  // Pass null to trigger Python file dialog
             }
         }
     }
-
-    // Add connections for PDF export handling
-    Connections {
-        target: voltageDrop
-        
-        // ...existing connection handlers...
-        
-        function onPdfExportStatusChanged(success, message) {
-            // Forward the PDF export status to the popup
-            detailsPopup.pdfSaveResult(success, message)
-        }
-    }
-
-    function getColumnWidth(column) {
-        switch(column) {
-            case 0: return 100  // Size
-            case 1: return 100  // Material
-            case 2: return 100  // Cores
-            case 3: return 100  // mV/A/m
-            case 4: return 120  // Rating
-            case 5: return 120  // V-Drop
-            case 6: return 100  // Drop %
-            case 7: return 100  // Status
-            default: return 100
-        }
-    }
-
-    // Replace the detailed results popup with the new component
+    
+    // Update VoltageDropDetails connections
     VoltageDropDetails {
         id: detailsPopup
         anchors.centerIn: Overlay.overlay
         
         onCloseRequested: detailsPopup.close()
         
-        // Add handler for PDF save request
-        onSaveToPdfRequested: function(filepath) {
-            // Create details object with all the data needed for the PDF
-            const details = {
-                "voltage_system": voltageSystem,
-                "admd_enabled": admdEnabled,
-                "kva_per_house": kvaPerHouse,
-                "num_houses": numHouses,
-                "diversity_factor": diversityFactor,
-                "total_kva": totalKva,
-                "current": current,
-                "cable_size": cableSize,
-                "conductor_material": conductorMaterial,
-                "core_type": coreType,
-                "length": length,
-                "installation_method": installationMethod,
-                "temperature": temperature,
-                "grouping_factor": groupingFactor,
-                "combined_rating_info": combinedRatingInfo,
-                "voltage_drop": voltageDropValue,
-                "drop_percent": dropPercentage
-            }
-            
-            // Call the Python method to generate PDF
-            voltageDrop.exportDetailsToPDF(filepath, details)
-        }
-        
-        // Display result messages
-        onPdfSaveResult: function(success, message) {
-            if (success) {
-                pdfSaveSuccess.messageText = message
-                pdfSaveSuccess.open()
-            } else {
-                pdfSaveError.messageText = message
-                pdfSaveError.open()
-            }
+        // Modified handler to only pass data without opening QML FileDialog
+        onSaveToPdfRequested: {
+            loadingIndicator.visible = true
+            voltageDrop.exportDetailsToPDF(null, {
+                "voltage_system": detailsPopup.voltageSystem,
+                "admd_enabled": detailsPopup.admdEnabled,
+                "kva_per_house": detailsPopup.kvaPerHouse,
+                "num_houses": detailsPopup.numHouses,
+                "diversity_factor": detailsPopup.diversityFactor,
+                "total_kva": detailsPopup.totalKva,
+                "current": detailsPopup.current,
+                "cable_size": detailsPopup.cableSize,
+                "conductor_material": detailsPopup.conductorMaterial,
+                "core_type": detailsPopup.coreType,
+                "length": detailsPopup.length,
+                "installation_method": detailsPopup.installationMethod,
+                "temperature": detailsPopup.temperature,
+                "grouping_factor": detailsPopup.groupingFactor,
+                "combined_rating_info": detailsPopup.combinedRatingInfo,
+                "voltage_drop": detailsPopup.voltageDropValue,
+                "drop_percent": detailsPopup.dropPercentage
+            })
         }
     }
 
-    // Add message popups for PDF export
-    Popup {
-        id: pdfSaveSuccess
-        modal: true
-        focus: true
-        anchors.centerIn: Overlay.overlay
-        width: 400
-        height: 200
+    // Add BusyIndicator for loading states
+    BusyIndicator {
+        id: loadingIndicator
+        anchors.centerIn: parent
+        visible: false
+        running: visible
+        z: 999
         
-        property string messageText: ""
-
-        contentItem: ColumnLayout {
-            Label {
-                text: pdfSaveSuccess.messageText
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: pdfSaveSuccess.close()
-            }
-        }
-    }
-    
-    Popup {
-        id: pdfSaveError
-        modal: true
-        focus: true
-        anchors.centerIn: Overlay.overlay
-        width: 400
-        height: 200
-        
-        property string messageText: ""
-
-        contentItem: ColumnLayout {
-            Label {
-                text: pdfSaveError.messageText
-                wrapMode: Text.WordWrap
-                color: "red"
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: pdfSaveError.close()
-            }
+        // Add semi-transparent background
+        Rectangle {
+            anchors.fill: parent
+            color: "#80000000"
+            visible: parent.visible
         }
     }
 }

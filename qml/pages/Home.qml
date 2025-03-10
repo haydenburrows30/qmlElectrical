@@ -10,8 +10,6 @@ Page {
     id: home
 
 	GridLayout {
-		height: 400
-		width: 400
 		anchors.centerIn: parent
 		columns: 2
 
@@ -82,7 +80,5 @@ Page {
 				sideBar.change(5)
 			}
 		}
-
-		
 	}
 }

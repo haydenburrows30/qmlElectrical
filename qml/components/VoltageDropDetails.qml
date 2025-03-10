@@ -33,8 +33,8 @@ Popup {
     // Signal to close the popup
     signal closeRequested()
     
-    // Signal for saving details to PDF
-    signal saveToPdfRequested(string filepath)
+    // Signal for saving details to PDF - remove filepath parameter
+    signal saveToPdfRequested()
     
     // Signal for notifying PDF save results
     signal pdfSaveResult(bool success, string message)
@@ -131,7 +131,7 @@ Popup {
                 Button {
                     text: "Save to PDF"
                     icon.name: "document-save"
-                    onClicked: pdfSaveDialog.open()
+                    onClicked: detailsPopup.saveToPdfRequested()  // Just emit signal, no dialog
                 }
                 
                 Button {
@@ -139,26 +139,6 @@ Popup {
                     onClicked: detailsPopup.closeRequested()
                 }
             }
-        }
-    }
-    
-    // Add FileDialog for saving PDF
-    FileDialog {
-        id: pdfSaveDialog
-        title: "Save Details as PDF"
-        nameFilters: ["PDF files (*.pdf)", "All files (*)"]
-        fileMode: FileDialog.SaveFile
-        defaultSuffix: "pdf"
-        currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
-        
-        // Generate default filename with timestamp
-        currentFile: {
-            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-            return "voltage_drop_details_" + timestamp + ".pdf"
-        }
-        
-        onAccepted: {
-            detailsPopup.saveToPdfRequested(selectedFile)
         }
     }
 }

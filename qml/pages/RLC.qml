@@ -81,7 +81,18 @@ Page {
                             id: resistanceInput
                             placeholderText: "Enter Resistance"
                             text: "10"  // Default value
-                            onTextChanged: seriesRLCChart.setResistance(parseFloat(text))
+                            validator: DoubleValidator {
+                                bottom: 0.0001
+                                decimals: 4
+                                notation: DoubleValidator.ScientificNotation
+                            }
+                            onTextChanged: {
+                                if (!acceptableInput) {
+                                    messagePopup.showError("Invalid resistance value")
+                                    return
+                                }
+                                seriesRLCChart.setResistance(parseFloat(text))
+                            }
                             Layout.preferredWidth: 150
                             Layout.alignment: Qt.AlignRight
                         }
@@ -95,7 +106,18 @@ Page {
                             id: inductanceInput1
                             placeholderText: "Enter Inductance"
                             text: "0.1"  // Default value
-                            onTextChanged: seriesRLCChart.setInductance(parseFloat(text))
+                            validator: DoubleValidator {
+                                bottom: 0.0001
+                                decimals: 4
+                                notation: DoubleValidator.ScientificNotation
+                            }
+                            onTextChanged: {
+                                if (!acceptableInput) {
+                                    messagePopup.showError("Invalid inductance value")
+                                    return
+                                }
+                                seriesRLCChart.setInductance(parseFloat(text))
+                            }
                             Layout.preferredWidth: 150
                             Layout.alignment: Qt.AlignRight
                         }
@@ -109,7 +131,18 @@ Page {
                             id: capacitanceInput1
                             placeholderText: "Enter Capacitance"
                             text: "0.0001013"  // 101.3µF
-                            onTextChanged: seriesRLCChart.setCapacitance(parseFloat(text))
+                            validator: DoubleValidator {
+                                bottom: 0.0001
+                                decimals: 6
+                                notation: DoubleValidator.ScientificNotation
+                            }
+                            onTextChanged: {
+                                if (!acceptableInput) {
+                                    messagePopup.showError("Invalid capacitance value")
+                                    return
+                                }
+                                seriesRLCChart.setCapacitance(parseFloat(text))
+                            }
                             Layout.preferredWidth: 150
                             Layout.alignment: Qt.AlignRight
                         }
@@ -127,10 +160,22 @@ Page {
                                 placeholderText: "Min"
                                 text: "0"
                                 onTextChanged: {
-                                    var min = Number(text);
-                                    var max = Number(maxFreqInput.text);
-                                    if (!isNaN(min) && !isNaN(max) && min >= 0 && max > min) {
-                                        seriesRLCChart.setFrequencyRange(min, max);
+                                    if (!acceptableInput) {
+                                        messagePopup.showError("Invalid minimum frequency")
+                                        return
+                                    }
+                                    var min = Number(text)
+                                    var max = Number(maxFreqInput.text)
+                                    if (!isNaN(min) && !isNaN(max)) {
+                                        if (min < 0) {
+                                            messagePopup.showError("Minimum frequency cannot be negative")
+                                            return
+                                        }
+                                        if (max <= min) {
+                                            messagePopup.showError("Maximum frequency must be greater than minimum")
+                                            return
+                                        }
+                                        seriesRLCChart.setFrequencyRange(min, max)
                                     }
                                 }
                                 validator: DoubleValidator {
@@ -148,10 +193,10 @@ Page {
                                 placeholderText: "Max"
                                 text: "100"
                                 onTextChanged: {
-                                    var min = Number(minFreqInput.text);
-                                    var max = Number(text);
+                                    var min = Number(minFreqInput.text)
+                                    var max = Number(text)
                                     if (!isNaN(min) && !isNaN(max) && min >= 0 && max > min) {
-                                        seriesRLCChart.setFrequencyRange(min, max);
+                                        seriesRLCChart.setFrequencyRange(min, max)
                                     }
                                 }
                                 validator: DoubleValidator {
@@ -178,7 +223,6 @@ Page {
                             text: "Reset All Values"
                             Layout.columnSpan: 2
                             Layout.fillWidth: true
-                            icon.name: "view-refresh"
                             onClicked: {
                                 seriesRLCChart.resetValues()
                                 resistanceInput.text = "10"
@@ -240,34 +284,31 @@ Page {
                                 title: "Chart Options"
                                 
                                 Menu {
-                                    id: resolutionMenu
-                                    title: "Resolution"
+                                    title: "Save Chart"
                                     
                                     MenuItem {
-                                        text: "1x"
-                                        checkable: true
-                                        checked: resolutionComboBox.currentIndex === 0
-                                        onTriggered: resolutionComboBox.currentIndex = 0
+                                        text: "Standard Quality (1x)"
+                                        onTriggered: {
+                                            saveDialog.currentScale = 1.0
+                                            saveDialog.open()
+                                        }
                                     }
                                     
                                     MenuItem {
-                                        text: "2x"
-                                        checkable: true
-                                        checked: resolutionComboBox.currentIndex === 1
-                                        onTriggered: resolutionComboBox.currentIndex = 1
+                                        text: "High Quality (2x)"
+                                        onTriggered: {
+                                            saveDialog.currentScale = 2.0
+                                            saveDialog.open()
+                                        }
                                     }
                                     
                                     MenuItem {
-                                        text: "4x"
-                                        checkable: true
-                                        checked: resolutionComboBox.currentIndex === 2
-                                        onTriggered: resolutionComboBox.currentIndex = 2
+                                        text: "Ultra Quality (4x)"
+                                        onTriggered: {
+                                            saveDialog.currentScale = 4.0
+                                            saveDialog.open()
+                                        }
                                     }
-                                }
-                                
-                                MenuItem {
-                                    text: "Save Chart (" + resolutionComboBox.model[resolutionComboBox.currentIndex] + ")"
-                                    onTriggered: saveDialog.open()
                                 }
                                 
                                 MenuSeparator {}
@@ -336,30 +377,6 @@ Page {
         }
     }
 
-    // Hide the bottom controls since we now have context menu
-    RowLayout {
-        id: saveControls
-        visible: false  // Hide these controls, using context menu instead
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: 10
-        spacing: 10
-        
-        ComboBox {
-            id: resolutionComboBox
-            model: ["1x", "2x", "4x"]
-            property var scaleValues: [1.0, 2.0, 4.0]
-            property real scaleFactor: scaleValues[currentIndex]
-            Layout.preferredWidth: 100
-        }
-        
-        Button {
-            text: "Save Chart"
-            icon.name: "document-save"
-            onClicked: saveDialog.open()
-        }
-    }
-
     FileDialog {
         id: saveDialog
         title: "Save Chart"
@@ -368,6 +385,9 @@ Page {
         defaultSuffix: "png"
         currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
         
+        // Add property to track the selected scale
+        property real currentScale: 2.0
+        
         // Generate default filename with timestamp
         currentFile: {
             let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
@@ -375,19 +395,84 @@ Page {
         }
         
         onAccepted: {
-            seriesRLCChart.saveChart(selectedFile, resolutionComboBox.scaleFactor)  // Update to use scaleFactor
+            // Use the selected scale factor
+            seriesRLCChart.saveChart(selectedFile, currentScale)
         }
     }
 
     Connections {
         target: seriesRLCChart
         function onGrabRequested(filepath, scale) {
+            loadingIndicator.visible = true
             console.log("Grabbing image to:", filepath, "with scale:", scale)
             rlcChartView.grabToImage(function(result) {
+                loadingIndicator.visible = false
                 if (result) {
-                    result.saveToFile(filepath)
+                    var saved = result.saveToFile(filepath)
+                    if (saved) {
+                        messagePopup.showSuccess("Chart saved successfully")
+                    } else {
+                        messagePopup.showError("Failed to save chart")
+                    }
+                } else {
+                    messagePopup.showError("Failed to grab chart image")
                 }
             }, Qt.size(rlcChartView.width * scale, rlcChartView.height * scale))
+        }
+    }
+
+    // Add message popup for feedback
+    Popup {
+        id: messagePopup
+        modal: true
+        focus: true
+        anchors.centerIn: Overlay.overlay
+        width: 400
+        height: 200
+        
+        property string messageText: ""
+        property bool isError: false
+        
+        function showSuccess(message) {
+            messageText = message
+            isError = false
+            open()
+        }
+        
+        function showError(message) {
+            messageText = message
+            isError = true
+            open()
+        }
+
+        contentItem: ColumnLayout {
+            Label {
+                text: messagePopup.messageText
+                wrapMode: Text.WordWrap
+                color: messagePopup.isError ? "red" : (sideBar.toggle1 ? "#ffffff" : "#000000")
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: messagePopup.close()
+            }
+        }
+    }
+
+    // Add loading indicator
+    BusyIndicator {
+        id: loadingIndicator
+        anchors.centerIn: parent
+        visible: false
+        running: visible
+        z: 999
+        
+        Rectangle {
+            anchors.fill: parent
+            color: "#80000000"
+            visible: parent.visible
         }
     }
 }

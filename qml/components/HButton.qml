@@ -6,13 +6,12 @@ import QtQuick.Layouts
 
 Button {
     id: control
-
-    // icon.name: "Setting" //icon_name
-
     text: ""
 
     icon.width: 80
     icon.height: 80
+    Layout.minimumWidth: 200
+    Layout.minimumHeight: 200
 
     display: AbstractButton.TextUnderIcon
 
@@ -20,10 +19,6 @@ Button {
 
     property color back : Qt.lighter(palette.accent,1.5)
     property color fore : Qt.lighter(palette.accent,1.5)
-
-    Layout.fillWidth: true
-    Layout.fillHeight: true
-    Layout.alignment: Qt.AlignHCenter
 
     background: Rectangle {
         visible: !control.flat || control.down || control.checked || control.highlighted

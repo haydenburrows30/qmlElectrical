@@ -27,7 +27,6 @@ Page {
         clip: true
         
         Flickable {
-            // contentWidth: parent.width
             contentHeight: mainLayout.height
             bottomMargin : 5
             leftMargin : 5
