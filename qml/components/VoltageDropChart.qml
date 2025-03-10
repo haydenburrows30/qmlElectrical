@@ -334,17 +334,17 @@ Item {
                     
                     MenuItem {
                         text: "Standard Quality (1x)"
-                        onTriggered: chartComponent.saveRequested(1.0)
+                        onTriggered: voltageDrop.saveChart(null, 1.0)
                     }
                     
                     MenuItem {
                         text: "High Quality (2x)"
-                        onTriggered: chartComponent.saveRequested(2.0)
+                        onTriggered: voltageDrop.saveChart(null, 2.0)
                     }
                     
                     MenuItem {
                         text: "Ultra Quality (4x)"
-                        onTriggered: chartComponent.saveRequested(4.0)
+                        onTriggered: voltageDrop.saveChart(null, 4.0)
                     }
                 }
                 
@@ -648,5 +648,11 @@ Item {
         } else {
             voltageDrop.exportChartDataJSON(JSON.stringify(data))
         }
+    }
+
+    // Connect signals
+    onCloseRequested: chartPopup.close()
+    onSaveRequested: function(scale) {
+        voltageDrop.saveChart(null, scale)
     }
 }

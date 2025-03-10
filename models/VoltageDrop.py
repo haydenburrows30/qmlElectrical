@@ -599,17 +599,46 @@ class VoltageDrop(QObject):
 
     @Slot(str, float)
     def saveChart(self, filepath, scale=2.0):
-        """Save chart as image with optional scale factor - identical to ElectricPy approach"""
+        """Save chart as image with optional scale factor."""
         try:
-            # Convert QUrl to local file path
+            # Show file dialog if filepath is empty or None
+            if not filepath:
+                from PySide6.QtWidgets import QFileDialog
+                import os
+                
+                # Get absolute path to results directory
+                results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'results'))
+                os.makedirs(results_dir, exist_ok=True)
+                
+                # Create default filename with timestamp
+                timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+                default_filename = f"voltage_drop_chart_{timestamp}.png"
+                default_path = os.path.join(results_dir, default_filename)
+                
+                # Use QFileDialog
+                dialog = QFileDialog()
+                dialog.setFileMode(QFileDialog.AnyFile)
+                dialog.setAcceptMode(QFileDialog.AcceptSave)
+                dialog.setDefaultSuffix("png")
+                dialog.setNameFilter("PNG files (*.png)")
+                dialog.selectFile(default_path)
+                
+                if dialog.exec() == QFileDialog.Accepted:
+                    filepath = dialog.selectedFiles()[0]
+                    print(f"Selected filepath: {filepath}")  # Debug print
+                else:
+                    return False
+
+            # Convert QUrl if needed
             if isinstance(filepath, QUrl):
                 filepath = filepath.toLocalFile()
             elif filepath.startswith('file:///'):
                 filepath = QUrl(filepath).toLocalFile()
             
-            print(f"Saving voltage drop chart to: {filepath} with scale {scale}")
+            print(f"Final filepath for saving: {filepath}")  # Debug print
             self.grabRequested.emit(filepath, scale)
             return True
+            
         except Exception as e:
             print(f"Error saving chart: {e}")
             return False

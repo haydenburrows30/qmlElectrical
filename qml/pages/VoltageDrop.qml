@@ -587,9 +587,11 @@ Page {
             defaultSuffix = suffix
             exportType = type
             
-            // Generate default filename with timestamp
-            let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            // Simple timestamp for filename
+            let now = new Date()
+            let timestamp = now.toISOString().split('.')[0].replace(/[:\-]/g, '')
             currentFile = baseFilename + "_" + timestamp + "." + suffix
+            console.log(currentFile)
         }
         
         onAccepted: {
