@@ -31,13 +31,13 @@ RoundButton {
         visible: !control.flat || control.down || control.checked || control.highlighted
         color: control.down ? control.Universal.baseMediumLowColor :
             control.enabled && (control.highlighted || control.checked) ? control.Universal.accent :
-                                                                            "transparent"
+                                                                            "white"
 
         Rectangle {
             width: parent.width
             height: parent.height
             radius: control.radius
-            color: "transparent"
+            color: "white" //"transparent"
             visible: enabled && control.hovered
             border.width: 2
             border.color: control.Universal.baseMediumLowColor

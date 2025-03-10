@@ -40,6 +40,20 @@ ApplicationWindow {
     VoltageDrop {id: voltageDrop}
     ResultsManager {id: resultsManager}
 
+    CButton {
+        id: menu
+        icon_name: "Menu"
+        width: sideBar.width
+        height: 60
+        z:99
+        anchors.top: parent.top
+        anchors.left: parent.left
+        tooltip_text: sideBar.open_closed ? "Close Menu":"Open Menu"
+        onClicked: { 
+            sideBar.react()
+        }
+    }
+
     // ToolBar{
     //     id: toolBar
     //     width: parent.width
@@ -48,8 +62,8 @@ ApplicationWindow {
     
     SideBar {
         id: sideBar
-        // y: toolBar.height
-        height: window.height // - toolBar.height
+        y: menu.height
+        height: window.height - menu.height
     }
 
     Settings {id: settings}
@@ -57,7 +71,7 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors {
-            top: parent.top // toolBar.bottom
+            top: parent.top//menu.bottom
             bottom: parent.bottom
             left: parent.left
             leftMargin: 0
