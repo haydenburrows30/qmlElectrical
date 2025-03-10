@@ -1,133 +1,117 @@
 # Application Architecture
 
 ## Overview
-The application uses a modular architecture with QML for UI and Python for backend calculations.
+This application is designed for performing electrical calculations, particularly voltage drop calculations for cable sizing. It follows a modular architecture with clear separation between UI components and calculation logic.
 
 ## Core Components
+1. **User Interface Layer**
+   - Modular QML components
+   - Responsive layouts
+   - Theme support (light/dark)
 
-### UI Layer (QML)
-- Pages: Main application views
-- Components: Reusable UI elements
-- Models: Data models exposed to QML
+2. **Calculation Logic**
+   - Python-based calculation models
+   - Data binding to UI through QML properties and signals
 
-### Business Layer (Python)
-- Calculators: Electrical calculations
-- Models: Data management
-- Services: Application services
+3. **Data Management**
+   - Persistence of user preferences
+   - Saving and loading results
 
 ## Directory Structure
 ```
-/qmltest/
+/home/hayden/Documents/qmltest/
 ├── qml/
-│   ├── pages/
-│   │   ├── Home.qml
-│   │   ├── VoltageDrop.qml
-│   │   ├── Calculator.qml
-│   │   ├── ThreePhase.qml
-│   │   ├── RLC.qml
-│   │   └── RealTime.qml
-│   ├── components/
-│   │   ├── WaveCard.qml
-│   │   ├── WaveControls.qml
-│   │   ├── WaveChart.qml
-│   │   ├── PhaseTable.qml
-│   │   ├── PowerTriangle.qml
-│   │   ├── PhasorDiagram.qml
-│   │   └── SavedResults.qml
-│   └── main.qml
-├── models/
-│   ├── calculator/
-│   │   ├── voltage_drop.py
-│   │   └── three_phase.py
-│   └── visualization/
-│       └── wave_generator.py
-└── resources/
-    ├── icons/
-    └── images/
+│   ├── main.qml               # Application entry point
+│   ├── pages/                 # Application pages
+│   │   ├── VoltageDrop.qml    # Main calculator page
+│   │   └── ...
+│   └── components/            # Reusable UI components
+│       ├── WaveCard.qml       # Card container
+│       ├── ResultsPanel.qml   # Results display
+│       ├── ComparisonTable.qml # Table component
+│       ├── ChartPopup.qml     # Chart popup
+│       ├── MessagePopup.qml   # Message dialog
+│       ├── LoadingIndicator.qml # Loading indicator
+│       ├── ExportFileDialog.qml # File export dialog
+│       ├── ExportFormatMenu.qml # Export format menu
+│       └── ...
+├── src/                       # Python source code
+├── docs/                      # Documentation
+└── resources/                 # Images and icons
 ```
 
 ## Key Features
-- Three-phase visualization
-- Voltage drop calculations
-- Power calculations
-- Real-time data display
-- Dark/light theme support
+- **Component-Based UI**: Modular components for better maintenance
+- **Responsive Design**: Adapts to different screen sizes
+- **Dark/Light Theme**: Customizable appearance
+- **Export Options**: Multiple formats (PDF, CSV, PNG)
+- **Visual Feedback**: Charts and tables for data visualization
+- **Input Validation**: Prevents invalid calculations
+- **Error Handling**: Informative error messages
 
 ## Data Flow
-1. User input via QML
-2. Data passed to Python models
-3. Calculations performed
-4. Results updated in UI
-5. Optional persistence to storage
+1. **User Input**
+   - CableSelectionSettings captures user input
+   - Input validation occurs at the UI level
+
+2. **Calculation**
+   - Validated data is passed to Python voltageDrop model
+   - Calculations performed and results returned via properties/signals
+
+3. **Display**
+   - ResultsPanel shows calculation results
+   - ComparisonTable shows cable size comparisons
+   - Charts visualize the voltage drop
+
+4. **Persistence**
+   - ResultsManager handles saving calculations
+   - Settings stored in application config
 
 ## Design Patterns
-- MVVM architecture
-- Factory pattern for calculators
-- Observer pattern for updates
-- Strategy pattern for calculations
+- **MVVM Architecture**: Separation of UI (View) from calculations (ViewModel)
+- **Component Pattern**: Reusable, self-contained UI elements
+- **Observer Pattern**: Signal/slot connections for updates
+- **Factory Pattern**: Component creation standardization
+- **Command Pattern**: For export operations
 
-## Future Considerations
-- Component testing
-- Performance optimization
-- Additional calculators
-- Mobile support
+## Component Interaction
+1. **Parent-Child Communication**
+   - Direct property binding
+   - Method calls on child objects
+   - Signal connections
+
+2. **Sibling Communication**
+   - Through parent as mediator
+   - Through shared model objects
+
+3. **Model-View Communication**
+   - Property bindings
+   - Signal/handler connections
+   - Direct method calls
 
 ## Technical Details
 
-### Dependencies
-- Qt 6.2+
-- Python 3.8+
-- PySide6
-- NumPy/SciPy for calculations
+### UI Components
+All UI components have been extracted into independent files for better maintainability:
+- **MessagePopup**: Unified message display
+- **LoadingIndicator**: Application-wide loading state
+- **ExportFileDialog**: File export dialog with multiple format support
+- **ExportFormatMenu**: Menu for selecting export format
+- **ComparisonTable**: Table display with export capabilities
+- **ResultsPanel**: Results display with action buttons
+- **ChartPopup**: Chart display with save capabilities
+- **CableSelectionSettings**: Input form with reset functionality
 
-### Build System
-```bash
-cmake_minimum_required(VERSION 3.16)
-project(QmlElectrical VERSION 1.0)
-set(CMAKE_CXX_STANDARD 17)
-```
+### Signal Flow
+The application uses a signal-based approach for updating UI elements:
+1. User input changes trigger model updates via direct method calls
+2. Model emits signals when calculations are complete
+3. UI components respond to signals to update their display
+4. Action buttons emit signals handled by the parent page
 
-### Performance Optimization
-1. Data Models
-- Use QAbstractListModel for large datasets
-- Implement data pagination
-- Lazy loading for complex calculations
-
-2. Resource Management
-- Bundle resources using Qt Resource System
-- Implement image caching
-- Optimize SVG assets
-
-## Deployment
-
-### Desktop
-1. Build Requirements:
-- Qt development tools
-- Python development environment
-- Build tools (CMake, ninja)
-
-2. Distribution:
-- Create standalone executable
-- Bundle Python interpreter
-- Include required DLLs/shared libraries
-
-### Configuration
-```ini
-[Controls]
-Style=Material
-
-[Material]
-Theme=Dark
-Accent=Teal
-Primary=BlueGrey
-```
-
-## Security Considerations
-1. Input Sanitization
-2. File Access Controls
-3. Error Logging
-
-## Monitoring
-1. Performance Metrics
-2. Error Tracking
-3. Usage Analytics
+### Export System
+The export system uses a unified approach:
+1. User requests export via UI
+2. ExportFileDialog configures based on export type
+3. Selected path passed to appropriate handler
+4. Process feedback shown through LoadingIndicator and MessagePopup

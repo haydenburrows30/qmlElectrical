@@ -1,144 +1,168 @@
 # Application Components Documentation
 
 ## Overview
-The application consists of multiple QML components and Python backend models organized into a modular structure.
+This document describes the UI components used in the application, their responsibilities, and interactions.
+The application follows a modular design pattern where components are broken down into reusable units.
 
 ## Core Components
 
-### User Interface Components
-- `WaveCard` - Base container component with title and optional info icon
-- `WaveControls` - Controls for three-phase wave parameters
-- `WaveChart` - Real-time waveform visualization
-- `PhaseTable` - Displays three-phase measurements
-- `PowerTriangle` - Power triangle visualization
-- `PhasorDiagram` - Interactive phasor diagram
-- `SavedResults` - Display saved calculation results
-
 ### Pages
-- `Home` - Main navigation dashboard
-- `VoltageDrop` - LV voltage drop calculator
-- `Calculator` - General electrical calculations
-- `ThreePhase` - Three-phase wave simulator
-- `Phasor` - RLC and phasor analysis
-- `RealTime` - Real-time data visualization
+- **VoltageDrop**: Main page for voltage drop calculations
+- **Settings**: Application settings
+- **About**: Information about the application
 
-## Application Structure
-```
-qmltest/
-├── qml/
-│   ├── pages/           # Main page components
-│   └── components/      # Reusable UI components
-├── models/             # Python backend models
-│   ├── calculator/     # Calculation modules
-│   └── visualization/  # Data visualization 
-└── docs/              # Documentation
-```
+### UI Components
+- **WaveCard**: Container with title and optional info button
+- **CableSelectionSettings**: Cable and installation parameter inputs
+- **ResultsPanel**: Displays calculation results with actions
+- **ComparisonTable**: Shows cable comparison data in table format
+- **ChartPopup**: Displays voltage drop charts
+- **MessagePopup**: Shows success/error messages
+- **LoadingIndicator**: Shows loading state during operations
+- **ExportFileDialog**: Handles file exports with various formats
+- **ExportFormatMenu**: Menu for selecting export format
+- **VoltageDropDetails**: Detailed calculation information popup
+- **SavedResults**: Display and management of saved calculations
 
-## Common Operations
+## Component Relationships
+1. **VoltageDrop Page**
+   - Contains CableSelectionSettings for input
+   - Contains ResultsPanel for displaying results
+   - Contains ComparisonTable for cable comparisons
+   - Uses MessagePopup, LoadingIndicator for feedback
+   - Uses ChartPopup for visualizations
 
-### Component Integration
-1. Create component QML file in components/
-2. Add component to qmldir module
-3. Import in pages using:
-```qml
-import components 1.0
-```
+2. **Popup Components**
+   - ChartPopup: Shows voltage drop chart
+   - VoltageDropDetails: Shows detailed calculation info
 
-### Data Exchange
-Models expose properties to QML:
-```python
-@Property(float, notify=dataChanged)
-def value(self):
-    return self._value
-```
+3. **Utility Components**
+   - ExportFileDialog: File save operations
+   - ExportFormatMenu: Format selection
+   - MessagePopup: User feedback
+   - LoadingIndicator: Operation status
 
-### Page Navigation
-```qml
-stackView.push("pages/NewPage.qml")
-```
-
-## Best Practices
-
-1. Use WaveCard for consistent container styling
-2. Follow naming conventions:
-   - Components: PascalCase
-   - Properties: camelCase
-   - IDs: camelCase
-   
-3. Error Handling
-   - Validate user input
-   - Provide feedback through tooltips
-   - Handle edge cases gracefully
-
-4. Performance
-   - Use clip: true on scrollable areas
-   - Avoid binding loops
-   - Batch updates when possible
-
-## Testing
-### Component Testing
-```qml
-import QtTest 1.0
-TestCase {
-    name: "ComponentTests"
-    
-    WaveCard {
-        id: testCard
-    }
-    
-    function test_example() {
-        compare(testCard.title, "")
-        testCard.title = "Test"
-        compare(testCard.title, "Test")
-    }
-}
-```
-
-### Integration Testing
-- Use QtTest for QML component testing
-- Implement Python unit tests for backend logic
-- Test data flow between QML and Python
+## Signal Flow
+1. User interacts with CableSelectionSettings
+2. Changes trigger voltageDrop model updates
+3. voltageDrop emits signals on calculation completion
+4. UI components update based on new values
+5. User can export/save via action buttons
 
 ## Component Details
 
 ### WaveCard
-- Properties:
+- **Properties**:
   - title: string
   - showInfo: bool
   - info: string
   - Layout properties
 
-### WaveControls  
-- Features:
-  - Frequency control
-  - Amplitude adjustment
-  - Phase angle settings
-  - Auto-scale option
+### CableSelectionSettings
+- **Properties**:
+  - Aliases to all input controls
+- **Methods**:
+  - resetAllValues(): Resets all fields to defaults
+- **Signals**:
+  - resetRequested(): Emitted when reset button is clicked
+  - resetCompleted(): Emitted after reset is complete
 
-### Signals & Slots
-Example connection:
-```qml
-WaveControls {
-    onValueChanged: waveChart.updateDisplay()
-}
-```
+### ResultsPanel
+- **Properties**:
+  - voltageDropValue: Current voltage drop
+  - selectedVoltage: Selected voltage system
+  - diversityFactor: Current diversity factor
+  - combinedRatingInfo: Rating information
+  - totalLoad: Total load in kVA
+  - current: Current in amperes
+  - darkMode: UI theme indicator
+  - dropPercentage: Calculated percentage drop
+- **Signals**:
+  - saveResultsClicked(): Save button clicked
+  - viewDetailsClicked(): Details button clicked
+  - viewChartClicked(): Chart button clicked
+
+### ComparisonTable
+- **Properties**:
+  - tableModel: Model with cable comparison data
+  - headerLabels: Column headers
+  - darkMode: UI theme indicator
+- **Methods**:
+  - getColumnWidth(column): Returns width for specific column
+- **Signals**:
+  - onExportRequest(format): Export request with format
+
+### ChartPopup
+- **Properties**:
+  - percentage: Voltage drop percentage
+  - cableSize: Selected cable size
+  - currentValue: Current in amperes
+  - chartComponent: Access to inner chart component
+- **Methods**:
+  - prepareChart(): Prepare chart before showing
+  - grabImage(callback, scale): Grab chart image with scaling
+- **Signals**:
+  - saveRequested(scale): Chart save requested with scale
+
+### MessagePopup
+- **Properties**:
+  - messageText: Text to display
+  - isError: Error or success indicator
+- **Methods**:
+  - showSuccess(message): Show success message
+  - showError(message): Show error message
+
+### LoadingIndicator
+- **Properties**:
+  - Covers entire parent area when visible
+- **Methods**:
+  - show(): Show the indicator
+  - hide(): Hide the indicator
+
+### ExportFileDialog
+- **Properties**:
+  - exportType: Type of export (chart, CSV, PDF)
+  - currentScale: Scale for image exports
+  - handler: Callback handler
+  - details: Additional export details
+- **Methods**:
+  - setup(title, filters, suffix, baseFilename, type, callback): Configure dialog
+
+### ExportFormatMenu
+- **Properties**:
+  - onCsvExport: Handler for CSV export
+  - onPdfExport: Handler for PDF export
+- **Menu items**:
+  - Export as CSV
+  - Export as PDF
 
 ## Error Handling
-1. Input Validation
-```qml
-TextField {
-    validator: DoubleValidator {
-        bottom: 0.0
-        top: 1000.0
-        decimals: 2
-    }
-}
-```
+1. **Input Validation**
+   ```qml
+   TextField {
+       validator: DoubleValidator {
+           bottom: 0.0
+           top: 1000.0
+           decimals: 2
+       }
+   }
+   ```
 
-2. Error Messages
-```qml
-ToolTip {
-    visible: parent.error
-    text: parent.errorMessage
-}
-```
+2. **Error Messages**
+   ```qml
+   messagePopup.showError("Operation failed: " + errorMessage)
+   ```
+
+3. **Operation Feedback**
+   ```qml
+   loadingIndicator.show()
+   // ...perform operation
+   loadingIndicator.hide()
+   ```
+
+## Best Practices
+1. **Component Encapsulation**: Components should have well-defined interfaces and responsibilities
+2. **Signal-Based Communication**: Use signals and handlers for component communication
+3. **Property Binding**: Use declarative bindings for reactive updates
+4. **Theme Consistency**: Respect darkMode property for consistent theming
+5. **Error Handling**: Use the MessagePopup for user feedback

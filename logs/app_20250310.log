@@ -823,3 +823,13 @@
 2025-03-10 21:10:18,195 - ResultsManager - INFO - Loaded 2 results from CSV
 2025-03-10 21:10:22,111 - ResultsManager - INFO - Loaded 1 results from CSV
 2025-03-10 21:10:22,111 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-10 21:52:00,221 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-10 21:52:00,221 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-10 21:52:00,221 - config - INFO - Configuration loaded successfully
+2025-03-10 21:52:00,318 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 21:52:00,390 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 21:53:12,711 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-10 21:53:12,711 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-10 21:53:12,712 - config - INFO - Configuration loaded successfully
+2025-03-10 21:53:12,817 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-10 21:53:12,889 - ResultsManager - INFO - Loaded 1 results from CSV
