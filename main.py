@@ -36,6 +36,15 @@ from models.relay_coordination import RelayCoordinationCalculator
 from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
 
+# Import ChargingCalculator
+from models.ChargingCalculator import ChargingCalculator
+
+# Import SineCalculator
+from models.sine_calculator import SineCalculator
+
+# Import BatteryCalculator
+from models.battery_calculator import BatteryCalculator
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
@@ -121,16 +130,8 @@ class Application:
         self.realtime_chart = self.model_factory.create_model("realtime_chart")
 
     def register_qml_types(self):
-        for type_info in self.get_qml_types():
-            self.qml_engine.register_type(*type_info)
-    
-    def get_qml_types(self):
-        """Get list of QML types to register.
-        
-        Returns:
-            list: Tuples of (class, uri, major, minor, name) for QML registration
-        """
-        return [
+        """Get list of QML types to register."""
+        qml_types = [
             (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
@@ -139,8 +140,8 @@ class Application:
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
             (MotorCalculator, "Motor", 1, 0, "MotorCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
-            (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrection"),
-            (CableAmpacityCalculator, "CableAmpacity", 1, 0, "CableAmpacity"),
+            (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrectionCalculator"),  # Fixed type name
+            (CableAmpacityCalculator, "CableAmpacity", 1, 0, "AmpacityCalculator"),  # Changed registered name
             (ProtectionRelayCalculator, "ProtectionRelay", 1, 0, "ProtectionRelayCalculator"),
             (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
@@ -153,8 +154,11 @@ class Application:
             (SineCalculator, "SineCalc", 1, 0, "SineCalculator"),
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
             (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
-            (VoltageDropCalculator, "VoltageDrop", 1, 0, "VoltageDropCalculator")
+            (VoltageDropCalculator, "VoltageDrop", 1, 0, "VoltageDropCalculator"),
+            (BatteryCalculator, "Battery", 1, 0, "BatteryCalculator")
         ]
+        for type_info in qml_types:
+            self.qml_engine.register_type(*type_info)
 
     def load_qml(self):
         self.qml_engine.load_qml(os.path.join(CURRENT_DIR, "qml", "main.qml"))

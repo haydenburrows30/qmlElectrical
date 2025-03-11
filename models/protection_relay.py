@@ -1,5 +1,6 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
+import numpy as np
 
 class ProtectionRelayCalculator(QObject):
     """Calculator for protection relay coordination"""

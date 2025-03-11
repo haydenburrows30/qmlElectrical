@@ -8,15 +8,24 @@ class HarmonicAnalysisCalculator(QObject):
     fundamentalChanged = Signal()
     harmonicsChanged = Signal()
     calculationsComplete = Signal()
+    thdChanged = Signal()
+    crestFactorChanged = Signal()  # Add new signal
+    waveformChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._fundamental = 100.0  # Fundamental amplitude
+        self._fundamentalMagnitude = 100.0
+        self._fundamentalAngle = 0.0
         self._harmonics = [0.0] * 15  # Up to 15th harmonic
+        self._harmonics_dict = {}  # Dict to store harmonic orders and their values
         self._thd = 0.0
+        self._cf = 0.0
         self._individual_distortion = [0.0] * 15
         self._waveform_points = []
+        self._waveform = []
         self._spectrum_points = []
+        self._spectrum = []
         
         self._calculate()
 
@@ -44,6 +53,29 @@ class HarmonicAnalysisCalculator(QObject):
         
         self._waveform_points = list(zip(t, waveform))
         
+        # Calculate waveform, spectrum, THD and CF
+        t = np.linspace(0, 2*np.pi, 1000)
+        wave = np.zeros_like(t)
+        
+        # Sum all harmonics
+        for order, (mag, angle) in self._harmonics_dict.items():
+            wave += mag * np.sin(order * t + np.deg2rad(angle))
+            
+        self._waveform = wave.tolist()
+        
+        # Calculate THD
+        fundamental = self._harmonics_dict.get(1, (100, 0))[0]
+        harmonics = np.array([mag for order, (mag, _) in self._harmonics_dict.items() if order > 1])
+        self._thd = np.sqrt(np.sum(harmonics**2)) / fundamental * 100
+        
+        # Calculate CF with check for zero
+        if len(wave) and np.mean(wave**2) > 0:
+            self._cf = np.max(np.abs(wave)) / np.sqrt(np.mean(wave**2))
+        else:
+            self._cf = 0.0
+        
+        self.crestFactorChanged.emit()  # Emit signal after calculation
+        self.waveformChanged.emit()
         self.calculationsComplete.emit()
 
     # Properties and setters...
@@ -66,6 +98,11 @@ class HarmonicAnalysisCalculator(QObject):
     def thd(self):
         return self._thd
 
+    @Property(float, notify=crestFactorChanged)  # Add notify signal
+    def crestFactor(self):
+        """Get Crest Factor."""
+        return self._cf
+
     @Property(list, notify=calculationsComplete)
     def individualDistortion(self):
         return self._individual_distortion
@@ -73,6 +110,16 @@ class HarmonicAnalysisCalculator(QObject):
     @Property(list, notify=calculationsComplete)
     def waveformPoints(self):
         return self._waveform_points
+
+    @Property(list)
+    def waveform(self):
+        """Get time-domain waveform points."""
+        return self._waveform
+        
+    @Property(list)
+    def spectrum(self):
+        """Get frequency spectrum points."""
+        return self._spectrum
 
     @Slot(float)
     def setFundamental(self, value):
@@ -85,6 +132,12 @@ class HarmonicAnalysisCalculator(QObject):
             self._harmonics[index] = amplitude
             self.harmonicsChanged.emit()
             self._calculate()
+
+    @Slot(int, float, float)
+    def setHarmonic(self, order, magnitude, angle):
+        """Set magnitude and angle for a harmonic order."""
+        self._harmonics_dict[order] = (magnitude, angle)
+        self._calculate()
 
     @Slot(list)
     def setAllHarmonics(self, harmonics):

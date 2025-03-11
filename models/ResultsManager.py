@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Optional
 import logging
 from .logger import setup_logger
 
-# Set up logger for this module
+# Set up logger for this module - moved to module level
 logger = setup_logger("ResultsManager")
 
 # Constants

@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 
-class PowerFactorCorrectionCalculator(QObject):
+class PowerFactorCorrectionCalculator(QObject):  # Changed name back to match factory import
     """Calculator for power factor correction capacitor sizing"""
 
     activePowerChanged = Signal()

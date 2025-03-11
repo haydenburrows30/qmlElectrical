@@ -3,163 +3,104 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../../components"
+import InstrumentTransformer 1.0
 
 WaveCard {
     id: instrumentTransformerCard
-    title: 'CT/VT Calculator'
+    title: 'Instrument Transformer Calculator'
     Layout.minimumWidth: 600
-    Layout.minimumHeight: 300
+    Layout.minimumHeight: 350
 
-    info: ""
+    property InstrumentTransformerCalculator calculator: InstrumentTransformerCalculator {}
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
+        spacing: 10
 
-        // CT Settings Column
-        ColumnLayout {
-            Layout.alignment: Qt.AlignTop
-            Layout.minimumWidth: 250
+        // CT Section
+        GroupBox {
+            title: "Current Transformer"
+            Layout.fillWidth: true
 
-            Label {
-                text: "Current Transformer (CT)"
-                font.bold: true
-            }
+            GridLayout {
+                columns: 2
+                rowSpacing: 10
+                columnSpacing: 15
 
-            RowLayout {
-                Label {
-                    text: "CT Ratio:"
-                    Layout.preferredWidth: 100
-                }
+                Label { text: "CT Ratio:" }
                 ComboBox {
                     id: ctRatio
-                    model: instrumentTransformer.standardCtRatios
-                    onCurrentTextChanged: instrumentTransformer.setCtRatio(currentText)
-                    Layout.preferredWidth: 120
+                    model: calculator.standardCtRatios
+                    onCurrentTextChanged: calculator.setCtRatio(currentText)
+                    Layout.fillWidth: true
                 }
-            }
 
-            RowLayout {
-                Label {
-                    text: "Burden (VA):"
-                    Layout.preferredWidth: 100
-                }
+                Label { text: "Burden (VA):" }
                 SpinBox {
                     id: ctBurden
-                    from: 1
-                    to: 100
+                    from: 3  // Changed to integer
+                    to: 30
                     value: 15
-                    onValueChanged: instrumentTransformer.setBurden(value)
-                    Layout.preferredWidth: 120
+                    stepSize: 3  // Changed to integer
+                    onValueChanged: calculator.burden = value
+                    Layout.fillWidth: true
                 }
-            }
 
-            // Results
-            GroupBox {
-                title: "CT Results"
-                Layout.fillWidth: true
-
-                ColumnLayout {
-                    spacing: 5
-                    width: parent.width
-
-                    RowLayout {
-                        Label {
-                            text: "Knee Point:"
-                            Layout.preferredWidth: 100
-                        }
-                        Text {
-                            text: instrumentTransformer.kneePointVoltage.toFixed(1) + "V"
-                            Layout.preferredWidth: 120
-                            color: "blue"
-                        }
-                    }
-
-                    RowLayout {
-                        Label {
-                            text: "Max Fault:"
-                            Layout.preferredWidth: 100
-                        }
-                        Text {
-                            text: instrumentTransformer.maxFaultCurrent.toFixed(0) + "A"
-                            Layout.preferredWidth: 120
-                            color: "red"
-                        }
-                    }
+                Label { text: "Accuracy Class:" }
+                ComboBox {
+                    model: ["0.1", "0.2", "0.5", "1.0"]
+                    Layout.fillWidth: true
                 }
             }
         }
 
-        // VT Settings Column
-        ColumnLayout {
-            Layout.alignment: Qt.AlignTop
-            Layout.minimumWidth: 250
+        // VT Section
+        GroupBox {
+            title: "Voltage Transformer"
+            Layout.fillWidth: true
 
-            Label {
-                text: "Voltage Transformer (VT)"
-                font.bold: true
-            }
+            GridLayout {
+                columns: 2
+                rowSpacing: 10
+                columnSpacing: 15
 
-            RowLayout {
-                Label {
-                    text: "VT Ratio:"
-                    Layout.preferredWidth: 100
-                }
+                Label { text: "VT Ratio:" }
                 ComboBox {
                     id: vtRatio
-                    model: instrumentTransformer.standardVtRatios
-                    onCurrentTextChanged: instrumentTransformer.setVtRatio(currentText)
-                    Layout.preferredWidth: 120
-                }
-            }
-
-            // VT Results
-            GroupBox {
-                title: "VT Results"
-                Layout.fillWidth: true
-
-                ColumnLayout {
-                    spacing: 5
-                    width: parent.width
-
-                    RowLayout {
-                        Label {
-                            text: "Burden Factor:"
-                            Layout.preferredWidth: 100
-                        }
-                        Text {
-                            text: "0.8"
-                            Layout.preferredWidth: 120
-                            color: "blue"
-                        }
-                    }
-
-                    RowLayout {
-                        Label {
-                            text: "Accuracy Class:"
-                            Layout.preferredWidth: 100
-                        }
-                        ComboBox {
-                            id: accuracyClass
-                            model: ["0.2", "0.5", "1.0", "3.0"]
-                            Layout.preferredWidth: 120
-                        }
-                    }
+                    model: calculator.standardVtRatios
+                    onCurrentTextChanged: calculator.setVtRatio(currentText)
+                    Layout.fillWidth: true
                 }
             }
         }
 
-        // Visualization
-        Rectangle {
+        // Results Section
+        GroupBox {
+            title: "Results"
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: "transparent"
 
-            Image {
-                // source: "../../../media/ct_vt_diagram.png"
-                anchors.centerIn: parent
-                width: parent.width * 0.8
-                height: parent.height * 0.8
-                fillMode: Image.PreserveAspectFit
+            GridLayout {
+                columns: 2
+                rowSpacing: 5
+                columnSpacing: 10
+
+                Label { text: "CT Knee Point:" }
+                Label { 
+                    text: calculator.kneePointVoltage.toFixed(1) + " V"
+                    font.bold: true 
+                }
+
+                Label { text: "Maximum Fault Current:" }
+                Label { 
+                    text: calculator.maxFaultCurrent.toFixed(1) + " A"
+                    font.bold: true 
+                }
+
+                Label { text: "Minimum CT Burden:" }
+                Label { 
+                    text: calculator.minAccuracyBurden.toFixed(2) + " Ω"
+                    font.bold: true 
+                }
             }
         }
     }

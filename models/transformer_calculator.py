@@ -1,4 +1,5 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
+import math
 
 class TransformerCalculator(QObject):
     """Calculator for transformer voltage/current relationships"""
@@ -8,6 +9,8 @@ class TransformerCalculator(QObject):
     primaryCurrentChanged = Signal()
     secondaryCurrentChanged = Signal()
     turnsRatioChanged = Signal()
+    powerRatingChanged = Signal()
+    efficiencyChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -16,54 +19,39 @@ class TransformerCalculator(QObject):
         self._primary_current = 0.0
         self._secondary_current = 0.0
         self._turns_ratio = 0.0
-
-    def _calculate(self):
-        """Calculate transformer parameters based on inputs"""
-        # Prevent division by zero
-        if self._primary_voltage <= 0 or self._secondary_voltage <= 0:
-            return
-
-        # Calculate turns ratio
-        self._turns_ratio = self._primary_voltage / self._secondary_voltage
-        
-        # Calculate secondary current using conservation of power
-        # P = V * I therefore: I2 = I1 * V1 / V2
-        self._secondary_current = self._primary_current * self._turns_ratio
-        
-        # Emit signals to notify QML of changes
-        self.secondaryCurrentChanged.emit()
-        self.turnsRatioChanged.emit()
+        self._power_rating = 0.0
+        self._efficiency = 95.0  # Typical efficiency
 
     @Property(float, notify=primaryVoltageChanged)
     def primaryVoltage(self):
         return self._primary_voltage
-    
+
     @primaryVoltage.setter
-    def primaryVoltage(self, voltage):
-        if self._primary_voltage != voltage and voltage >= 0:
-            self._primary_voltage = voltage
+    def primaryVoltage(self, value):
+        if self._primary_voltage != value and value >= 0:
+            self._primary_voltage = value
             self.primaryVoltageChanged.emit()
             self._calculate()
 
     @Property(float, notify=secondaryVoltageChanged)
     def secondaryVoltage(self):
         return self._secondary_voltage
-    
+
     @secondaryVoltage.setter
-    def secondaryVoltage(self, voltage):
-        if self._secondary_voltage != voltage and voltage >= 0:
-            self._secondary_voltage = voltage
+    def secondaryVoltage(self, value):
+        if self._secondary_voltage != value and value >= 0:
+            self._secondary_voltage = value
             self.secondaryVoltageChanged.emit()
             self._calculate()
 
     @Property(float, notify=primaryCurrentChanged)
     def primaryCurrent(self):
         return self._primary_current
-    
+
     @primaryCurrent.setter
-    def primaryCurrent(self, current):
-        if self._primary_current != current and current >= 0:
-            self._primary_current = current
+    def primaryCurrent(self, value):
+        if self._primary_current != value and value >= 0:
+            self._primary_current = value
             self.primaryCurrentChanged.emit()
             self._calculate()
 
@@ -74,6 +62,35 @@ class TransformerCalculator(QObject):
     @Property(float, notify=turnsRatioChanged)
     def turnsRatio(self):
         return self._turns_ratio
+
+    @Property(float, notify=powerRatingChanged)
+    def powerRating(self):
+        return self._power_rating
+
+    @Property(float, notify=efficiencyChanged)
+    def efficiency(self):
+        return self._efficiency
+
+    def _calculate(self):
+        """Calculate transformer parameters based on inputs"""
+        try:
+            # Calculate turns ratio
+            if self._primary_voltage > 0 and self._secondary_voltage > 0:
+                self._turns_ratio = self._primary_voltage / self._secondary_voltage
+                
+                # Calculate secondary current based on power conservation
+                if self._primary_current > 0:
+                    self._secondary_current = self._primary_current * self._turns_ratio
+                
+                # Calculate power rating
+                self._power_rating = self._primary_voltage * self._primary_current
+
+            self.turnsRatioChanged.emit()
+            self.secondaryCurrentChanged.emit()
+            self.powerRatingChanged.emit()
+            
+        except Exception as e:
+            print(f"Calculation error: {e}")
 
     # Slots for QML access
     @Slot(float)

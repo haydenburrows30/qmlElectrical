@@ -3,144 +3,126 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../../components"
+import PFCorrection 1.0
 
 WaveCard {
-    id: powerFactorCalculator
+    id: pfCorrectionCard
     title: 'Power Factor Correction'
     Layout.minimumWidth: 600
-    Layout.minimumHeight: 250
+    Layout.minimumHeight: 300
 
-    info: ""
+    property PowerFactorCorrectionCalculator calculator: PowerFactorCorrectionCalculator {}  // Match registered name
 
     RowLayout {
         anchors.fill: parent
+        spacing: 10
 
+        // Input Section
         ColumnLayout {
-            Layout.alignment: Qt.AlignTop
-            Layout.minimumWidth: 300
+            Layout.preferredWidth: 300
 
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "Active Power (kW):"
-                    Layout.preferredWidth: 120
-                }
-                TextField {
-                    id: pfActivePower
-                    placeholderText: "Enter Power"
-                    onTextChanged: pfCorrection.setActivePower(parseFloat(text))
-                    Layout.preferredWidth: 120
+            GroupBox {
+                title: "System Parameters"
+                Layout.fillWidth: true
+
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
+
+                    Label { text: "Active Power (kW):" }
+                    TextField {
+                        id: activePowerInput
+                        placeholderText: "Enter power"
+                        onTextChanged: if(text) calculator.activePower = parseFloat(text)
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Current PF:" }
+                    TextField {
+                        id: currentPFInput
+                        placeholderText: "Enter current PF"
+                        onTextChanged: if(text) calculator.currentPF = parseFloat(text)
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Target PF:" }
+                    TextField {
+                        id: targetPFInput
+                        placeholderText: "Enter target PF"
+                        text: "0.95"
+                        onTextChanged: if(text) calculator.targetPF = parseFloat(text)
+                        Layout.fillWidth: true
+                    }
                 }
             }
 
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "Current PF:"
-                    Layout.preferredWidth: 120
-                }
-                TextField {
-                    id: currentPF
-                    text: "0.8"
-                    onTextChanged: pfCorrection.setCurrentPF(parseFloat(text))
-                    Layout.preferredWidth: 120
-                }
-            }
-
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "Target PF:"
-                    Layout.preferredWidth: 120
-                }
-                TextField {
-                    id: targetPF
-                    text: "0.95"
-                    onTextChanged: pfCorrection.setTargetPF(parseFloat(text))
-                    Layout.preferredWidth: 120
-                }
-            }
-
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "System Voltage:"
-                    Layout.preferredWidth: 120
-                }
-                TextField {
-                    id: systemVoltage
-                    text: "400"
-                    onTextChanged: pfCorrection.setVoltage(parseFloat(text))
-                    Layout.preferredWidth: 120
-                }
-            }
-
+            // Results Section
             GroupBox {
                 title: "Results"
                 Layout.fillWidth: true
 
-                ColumnLayout {
-                    width: parent.width
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 5
+                    columnSpacing: 10
 
-                    RowLayout {
-                        spacing: 10
-                        Label {
-                            text: "Capacitor Size:"
-                            Layout.preferredWidth: 120
-                            font.bold: true
-                        }
-                        Text {
-                            text: pfCorrection.capacitorSize.toFixed(1) + " kVAR"
-                            Layout.preferredWidth: 120
-                            font.bold: true
-                        }
+                    Label { text: "Required Capacitor:" }
+                    Label { 
+                        text: calculator.capacitorSize.toFixed(2) + " kVAR"
+                        font.bold: true 
                     }
 
-                    RowLayout {
-                        spacing: 10
-                        Label {
-                            text: "Capacitance:"
-                            Layout.preferredWidth: 120
-                        }
-                        Text {
-                            text: pfCorrection.capacitance.toFixed(1) + " μF"
-                            Layout.preferredWidth: 120
-                        }
+                    Label { text: "Capacitance Required:" }
+                    Label { 
+                        text: calculator.capacitance.toFixed(2) + " μF"
+                        font.bold: true 
                     }
 
-                    RowLayout {
-                        spacing: 10
-                        Label {
-                            text: "Annual Savings:"
-                            Layout.preferredWidth: 120
-                        }
-                        Text {
-                            text: "$ " + pfCorrection.annualSavings.toFixed(2)
-                            Layout.preferredWidth: 120
-                            color: pfCorrection.annualSavings > 0 ? "green" : "black"
-                        }
+                    Label { text: "Annual Savings:" }
+                    Label { 
+                        text: "$" + calculator.annualSavings.toFixed(2)
+                        font.bold: true 
+                        color: "green"
                     }
                 }
             }
         }
 
         // Power Triangle Visualization
-        ColumnLayout {
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-
-            Image {
-                // source: "../../media/power_triangle_diagram.png"
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                fillMode: Image.PreserveAspectFit
-            }
-
-            Label {
-                text: "Before: PF = " + currentPF.text + "\nAfter: PF = " + targetPF.text
-                horizontalAlignment: Text.AlignHCenter
-                Layout.alignment: Qt.AlignHCenter
-                font.bold: true
+            color: "transparent"
+            
+            Canvas {
+                anchors.fill: parent
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.reset()
+                    
+                    // Draw power triangle
+                    var centerX = width/2
+                    var centerY = height/2
+                    var scale = 100
+                    
+                    var p = calculator.activePower
+                    var pf = calculator.currentPF
+                    var q = p * Math.tan(Math.acos(pf))
+                    var s = p / pf
+                    
+                    // Scale to fit
+                    var maxDim = Math.max(p, q, s)
+                    scale = Math.min(width, height) / (maxDim * 2)
+                    
+                    // Draw triangle
+                    ctx.beginPath()
+                    ctx.moveTo(centerX - p*scale/2, centerY)
+                    ctx.lineTo(centerX + p*scale/2, centerY)
+                    ctx.lineTo(centerX + p*scale/2, centerY - q*scale)
+                    ctx.closePath()
+                    ctx.stroke()
+                }
             }
         }
     }

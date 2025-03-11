@@ -45,101 +45,83 @@ Page {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
-    ScrollView {
-        id: scrollView
+    ColumnLayout {
         anchors.fill: parent
-        clip: true
-        
-        Flickable {
-            contentHeight: mainLayout.height
-            bottomMargin : 5
-            leftMargin : 5
-            rightMargin : 5
-            topMargin : 5
-            
-            ColumnLayout {
-                id: mainLayout
-                width: scrollView.width
-                anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: 5
+        spacing: 5
 
-                PowerCurrentCalculator {
-                    id: powerCalculator
-                    // info: "../../media/powercalc.png"
-                }
+        Rectangle {
+            Layout.fillWidth: true
+            height: 40
+            color: sideBar.toggle1 ? "#2a2a2a" : "#e5e5e5"
 
-                ConversionCalculator {
-                    id: conversionCalc
-                }
+            ScrollView {
+                id: scrollView
+                anchors.fill: parent
+                ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+                clip: true
 
-                ChargingCurrentCalculator {
-                    id: chargingCurrentCalc
-                    // info: "../../media/ccc.png"
-                }
+                Row {
+                    spacing: 2
 
-                ImpedanceCalculator {
-                    id: impedanceCalc
-                    // info: "../../media/impedance_formula.png"
-                }
-
-                FrequencyCalculator {
-                    id: frequencyCalc
-                    // info: "../../media/resonant_frequency.png"
-                }
-
-                SineCalculator {
-                    id: sineCalc
-                }
-
-                // TransformerCalculator {
-                //     id: transformerCalc
-                // }
-
-                VoltageDropCalculator {
-                    id: voltageDropCalc
-                    // info: "../../media/voltage_drop.png"
-                }
-
-                MotorStartingCalculator {
-                    id: motorCalc
-                    // info: "../../media/motor_formula.png"
-                }
-
-                PowerFactorCorrection {
-                    id: pfCalculator
-                    // info: "../../media/pf_correction_formula.png"
-                }
-
-                CableAmpacityCalculator {
-                    id: cableAmpacity
-                    // info: "../../media/cable_ampacity_formula.png"
-                }
-
-                // ProtectionRelayCalculator {
-                //     id: protectionRelayCalc
-                // }
-
-                HarmonicAnalyzer {
-                    id: harmonicAnalysisCalc
-                    // info: "../../media/thd_formula.png"
-                }
-
-                InstrumentTransformerCalculator {
-                    id: instrumentTransformerCalc
-                    // info: "../../media/ct_vt_formula.png"
-                }
-
-                RelayCoordination {
-                    id: relayCoordination
-                    // info: "../../media/relay_coordination.png"
-                }
-
-                DiscriminationAnalyzer {
-                    id: discriminationAnalyzerCalc
-                    // info: "../../media/discrimination.png"
+                    Repeater {
+                        model: ["Power Calculator", "Conversion Calculator", 
+                               "Charging Current", "Impedance Calculator", 
+                               "Frequency Calculator", "Sine Calculator",
+                               "Transformer Calculator", "PF Correction",
+                               "Cable Ampacity", "Motor Calculator",
+                               "Protection Relay", "Instrument Transformer",
+                               "Harmonics Analysis", "Relay Coordination",
+                               "Voltage Drop", "Battery Calculator"]  // Added Battery Calculator
+                        
+                        Button {
+                            required property int index
+                            required property string modelData
+                            
+                            height: 40
+                            width: 120  // Made buttons slightly narrower
+                            text: modelData
+                            
+                            background: Rectangle {
+                                color: calculatorLoader.source.toString().includes(getCalculatorSource(index)) ? 
+                                      (sideBar.toggle1 ? "#404040" : "#d0d0d0") : 
+                                      (sideBar.toggle1 ? "#2a2a2a" : "#e5e5e5")
+                            }
+                            
+                            onClicked: calculatorLoader.setSource(getCalculatorSource(index))
+                        }
+                    }
                 }
             }
+        }
+
+        Loader {
+            id: calculatorLoader
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            source: "../components/calculators/PowerCurrentCalculator.qml"
+        }
+    }
+
+    function getCalculatorSource(index) {
+        switch (index) {
+            case 0: return "../components/calculators/PowerCurrentCalculator.qml"
+            case 1: return "../components/calculators/ConversionCalculator.qml"
+            case 2: return "../components/calculators/ChargingCurrentCalculator.qml"
+            case 3: return "../components/calculators/ImpedanceCalculator.qml"
+            case 4: return "../components/calculators/FrequencyCalculator.qml"
+            case 5: return "../components/calculators/SineCalculator.qml"
+            case 6: return "../components/calculators/TransformerCalculator.qml"
+            case 7: return "../components/calculators/PowerFactorCorrection.qml"
+            case 8: return "../components/calculators/CableAmpacityCalculator.qml"
+            case 9: return "../components/calculators/MotorCalculator.qml"
+            case 10: return "../components/calculators/ProtectionRelayCalculator.qml"
+            case 11: return "../components/calculators/InstrumentTransformerCalculator.qml"
+            case 12: return "../components/calculators/HarmonicsAnalyzer.qml"
+            case 13: return "../components/calculators/RelayCoordination.qml"
+            case 14: return "../components/calculators/VoltageDropCalculator.qml"  // Added new case
+            case 15: return "../components/calculators/BatteryCalculator.qml"  // Added new case
+            default: return "../components/calculators/PowerCurrentCalculator.qml"
         }
     }
 }

@@ -6,105 +6,62 @@ import "../../components"
 import RFreq 1.0  // Import the ResonantFrequencyCalculator namespace
 
 WaveCard {
-    id: electricPy
-    title: 'Frequency'
+    id: frequencyCalculator
+    title: "Resonant Frequency Calculator"
     Layout.minimumWidth: 600
-    Layout.minimumHeight: 250
+    Layout.minimumHeight: 200
 
-    info: ""
-
-    // Create a local instance of the calculator
+    // Create instance of calculator
     property ResonantFrequencyCalculator calculator: ResonantFrequencyCalculator {}
 
     RowLayout {
         anchors.fill: parent
+        spacing: 10
 
         ColumnLayout {
             Layout.alignment: Qt.AlignTop
+            Layout.minimumWidth: 300
 
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "Capacitance(uF):"
-                    Layout.preferredWidth: 110
-                }
-                TextField {
-                    id: cInput
-                    placeholderText: "Enter Capacitance"
-                    onTextChanged: {
-                        if (text && calculator) {
-                            calculator.setCapacitance(parseFloat(text))
-                        }
-                    }
-                    Layout.preferredWidth: 120
-                    Layout.alignment: Qt.AlignRight
-                }
-            }
+            GridLayout {
+                columns: 2
+                rowSpacing: 10
+                columnSpacing: 10
 
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "Inductance (mH):"
-                    Layout.preferredWidth: 110
-                }
+                Label { text: "Inductance (H):" }
                 TextField {
                     id: inductanceInput
-                    Layout.preferredWidth: 120
-                    Layout.alignment: Qt.AlignRight
-                    placeholderText: "Enter Inductance"
-                    onTextChanged: {
-                        if (text && calculator) {
-                            calculator.setInductance(parseFloat(text))
-                        }
+                    placeholderText: "Enter inductance"
+                    onTextChanged: if(text) {
+                        calculator.inductance = parseFloat(text)
+                    }
+                }
+
+                Label { text: "Capacitance (μF):" }
+                TextField {
+                    id: capacitanceInput
+                    placeholderText: "Enter capacitance"
+                    onTextChanged: if(text) {
+                        calculator.capacitance = parseFloat(text)
                     }
                 }
             }
 
-            RowLayout {
-                spacing: 10
-                Label {
-                    text: "Frequency (Hz):"
-                    Layout.preferredWidth: 110
-                }
-                Text {
-                    id: freqOutput
-                    text: calculator && !isNaN(calculator.frequency) ? 
-                          calculator.frequency.toFixed(2) + "Hz" : "0.00Hz"
-                    Layout.preferredWidth: 120
-                    Layout.alignment: Qt.AlignRight
-                }
-            }
-        }
-
-        SineWaveViz {
-            id: sineWaveViz
-            Layout.fillWidth: true
-            Layout.minimumHeight: 200
-            Layout.minimumWidth: 200
-            Layout.topMargin: -50
-            frequency: calculator && !isNaN(calculator.frequency) ? calculator.frequency : 0
-            
-            Component.onCompleted: {
-                if (sineCalc) {
-                    amplitude = 330;
-                    frequency = calculator && !isNaN(calculator.frequency) ? 
-                                calculator.frequency : 0;
-                    sineCalc.setFrequency(frequency);
-                    yValues = sineCalc.yValues;
-                    rms = sineCalc.rms;
-                    peak = sineCalc.peak;
-                }
-            }
-            
-            Connections {
-                target: calculator
-                function onFrequencyCalculated(freq) {
-                    if (sineCalc) {
-                        sineCalc.setFrequency(freq);
-                        sineWaveViz.frequency = freq;
-                        sineWaveViz.yValues = sineCalc.yValues;
-                        sineWaveViz.rms = sineCalc.rms;
-                        sineWaveViz.peak = sineCalc.peak;
+            GroupBox {
+                title: "Results"
+                Layout.fillWidth: true
+                
+                ColumnLayout {
+                    Label { 
+                        text: "Resonant Frequency: " + 
+                              (calculator && calculator.resonantFrequency ? 
+                               calculator.resonantFrequency.toFixed(2) + " Hz" : 
+                               "0.00 Hz")
+                    }
+                    Label { 
+                        text: "Angular Frequency: " + 
+                              (calculator && calculator.angularFrequency ? 
+                               calculator.angularFrequency.toFixed(2) + " rad/s" : 
+                               "0.00 rad/s") 
                     }
                 }
             }

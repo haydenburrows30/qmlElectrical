@@ -33,7 +33,7 @@ WaveCard {
                     Layout.preferredWidth: 150
                     Layout.alignment: Qt.AlignRight
                     placeholderText: "Enter Voltage"
-                    onTextChanged: chargingCurrentCalc.setVoltage(parseFloat(text))
+                    onTextChanged: calculator.voltage = parseFloat(text)
                 }
             }
 
@@ -48,7 +48,7 @@ WaveCard {
                     Layout.preferredWidth: 150
                     Layout.alignment: Qt.AlignRight
                     placeholderText: "Enter Capacitance"
-                    onTextChanged: chargingCurrentCalc.setCapacitance(parseFloat(text))
+                    onTextChanged: calculator.capacitance = parseFloat(text)
                 }
             }
 
@@ -63,7 +63,7 @@ WaveCard {
                     Layout.preferredWidth: 150
                     Layout.alignment: Qt.AlignRight
                     placeholderText: "Enter Frequency"
-                    onTextChanged: chargingCurrentCalc.setFrequency(parseFloat(text))
+                    onTextChanged: calculator.frequency = parseFloat(text)
                 }
             }
 
@@ -78,7 +78,7 @@ WaveCard {
                     Layout.preferredWidth: 150
                     Layout.alignment: Qt.AlignRight
                     placeholderText: "Enter Length"
-                    onTextChanged: chargingCurrentCalc.setLength(parseFloat(text))
+                    onTextChanged: calculator.length = parseFloat(text)
                 }
             }
 
