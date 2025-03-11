@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator, ResonantFrequencyCalculator
+from models.Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator, ResonantFrequencyCalculator
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
@@ -107,6 +107,7 @@ class Application:
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
         self.resonant_freq = self.calculator_factory.create_calculator("resonant")
         self.charging_calc = self.calculator_factory.create_calculator("charging")
+        self.conversion_calculator = self.calculator_factory.create_calculator("conversion")
 
         self.transformer_calculator = self.calculator_factory.create_calculator("transformer")
         self.voltage_drop_calculator = self.calculator_factory.create_calculator("voltage_drop")
@@ -153,7 +154,8 @@ class Application:
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
             (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
             (VoltageDropCalculator, "VoltageDrop", 1, 0, "VoltageDropCalculator"),
-            (BatteryCalculator, "Battery", 1, 0, "BatteryCalculator")
+            (BatteryCalculator, "Battery", 1, 0, "BatteryCalculator"),
+            (ConversionCalculator, "Conversion", 1, 0, "ConversionCalculator")
         ]
         for type_info in qml_types:
             self.qml_engine.register_type(*type_info)

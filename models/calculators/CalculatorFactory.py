@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Type, Dict
-from ..Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, ResonantFrequencyCalculator
+from ..Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, ResonantFrequencyCalculator
 from .BaseCalculator import BaseCalculator
 from ..transformer_calculator import TransformerCalculator
 from ..motor_calculator import MotorCalculator
@@ -65,7 +65,8 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "relay_coordination": RelayCoordinationCalculator,
             "overcurrent_curves": OvercurrentCurvesCalculator,
             "discrimination_analyzer": DiscriminationAnalyzer,
-            "voltage_drop": VoltageDropCalculator
+            "voltage_drop": VoltageDropCalculator,
+            "conversion": ConversionCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

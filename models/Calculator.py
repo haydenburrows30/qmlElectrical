@@ -265,6 +265,47 @@ class ConversionCalculator(BaseCalculator):
         self.calculateResult()
 
     def calculateResult(self):
+        """Calculate various electrical engineering conversions.
+
+        Power & Energy Conversions:
+        - Watts to dBmW: $P_{dBm} = 10 \log_{10}(P_W \cdot 1000)$
+        - dBmW to Watts: $P_W = 10^{P_{dBm}/10} / 1000$
+        - HP to Watts: $P_W = P_{HP} \cdot 746$
+        - kW to MVA: $S_{MVA} = P_{kW}/1000$
+        - Joules to kWh: $E_{kWh} = E_J/3600000$
+
+        Frequency & Angular:
+        - Rad/s to Hz: $f = \omega/(2\pi)$
+        - RPM to Hz: $f = N/60$
+        - Hz to RPM: $N = f \cdot 60$
+
+        Three-Phase Relationships:
+        - Line-Phase Voltage: $V_{ph} = V_L/\sqrt{3}$
+        - Phase-Line Voltage: $V_L = V_{ph} \cdot \sqrt{3}$
+        - Line-Phase Current: $I_{ph} = I_L/\sqrt{3}$
+        - Phase-Line Current: $I_L = I_{ph} \cdot \sqrt{3}$
+
+        Power Factor:
+        - VA to W: $P = S \cdot \cos\phi$
+        - W to VA: $S = P/\cos\phi$
+        - kVA to kW: $P_{kW} = S_{kVA} \cdot \cos\phi$
+        - kW to kVA: $S_{kVA} = P_{kW}/\cos\phi$
+
+        Per Unit System:
+        - Base Impedance: $Z_{base} = \\frac{kV_{base}^2}{MVA_{base}}$
+        - Per Unit Value: $Z_{pu} = Z_{actual}/Z_{base}$
+        - Impedance Base Change: $Z_{new} = Z_{old} \cdot \\frac{MVA_{old}}{MVA_{new}}$
+
+        Sequence Components:
+        - Positive Sequence: $\\vec{V_a} = V_1 \\angle 0°$
+        - Negative Sequence: $\\vec{V_a} = V_2 \\angle 0°$
+
+        Fault Calculations:
+        - Symmetrical to Phase: $I_{ph} = I_{sym} \cdot \sqrt{3}$
+
+        Reactance Frequency:
+        - 50Hz to 60Hz: $X_{60} = X_{50} \cdot \\frac{60}{50}$
+        """
         if self._input_value != 0:
             if self._conversion_type == "watts_to_dbmw":
                 self._result = 10 * math.log10(self._input_value * 1000)
@@ -282,6 +323,123 @@ class ConversionCalculator(BaseCalculator):
                 self._result = self._input_value * 60
             elif self._conversion_type == "watts_to_hp":
                 self._result = self._input_value / 746
+            # New conversions
+            elif self._conversion_type == "kw_to_mva":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "mva_to_kw":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "joules_to_kwh":
+                self._result = self._input_value / 3600000
+            elif self._conversion_type == "kwh_to_joules":
+                self._result = self._input_value * 3600000
+            elif self._conversion_type == "celsius_to_fahrenheit":
+                self._result = (self._input_value * 9/5) + 32
+            elif self._conversion_type == "fahrenheit_to_celsius":
+                self._result = (self._input_value - 32) * 5/9
+            elif self._conversion_type == "kv_to_v":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "v_to_kv":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "mh_to_h":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "h_to_mh":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "uf_to_f":
+                self._result = self._input_value / 1000000
+            elif self._conversion_type == "f_to_uf":
+                self._result = self._input_value * 1000000
+            # Additional conversions
+            elif self._conversion_type == "kvar_to_var":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "var_to_kvar":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "mvar_to_var":
+                self._result = self._input_value * 1000000
+            elif self._conversion_type == "var_to_mvar":
+                self._result = self._input_value / 1000000
+            elif self._conversion_type == "ma_to_a":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "a_to_ma":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "ka_to_a":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "a_to_ka":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "ohm_to_kohm":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "kohm_to_ohm":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "mohm_to_ohm":
+                self._result = self._input_value * 1000000
+            elif self._conversion_type == "ohm_to_mohm":
+                self._result = self._input_value / 1000000
+            # Complex conversions
+            elif self._conversion_type == "kva_to_kw_pf":
+                # Convert kVA to kW given 0.8 power factor
+                self._result = self._input_value * 0.8
+            elif self._conversion_type == "kw_to_kva_pf":
+                # Convert kW to kVA given 0.8 power factor
+                self._result = self._input_value / 0.8
+            elif self._conversion_type == "line_to_phase_voltage":
+                # Convert line voltage to phase voltage (3-phase)
+                self._result = self._input_value / math.sqrt(3)
+            elif self._conversion_type == "phase_to_line_voltage":
+                # Convert phase voltage to line voltage (3-phase)
+                self._result = self._input_value * math.sqrt(3)
+            elif self._conversion_type == "line_to_phase_current":
+                # Convert line current to phase current (3-phase delta)
+                self._result = self._input_value / math.sqrt(3)
+            elif self._conversion_type == "phase_to_line_current":
+                # Convert phase current to line current (3-phase delta)
+                self._result = self._input_value * math.sqrt(3)
+            elif self._conversion_type == "kwh_to_mwh":
+                self._result = self._input_value / 1000
+            elif self._conversion_type == "mwh_to_kwh":
+                self._result = self._input_value * 1000
+            elif self._conversion_type == "va_to_w_pf":
+                # VA to W with 0.8 power factor
+                self._result = self._input_value * 0.8
+            elif self._conversion_type == "w_to_va_pf":
+                # W to VA with 0.8 power factor
+                self._result = self._input_value / 0.8
+            # Advanced power system conversions
+            elif self._conversion_type == "impedance_base_change":
+                # Convert impedance to new base MVA (assuming old base is 100 MVA)
+                new_base_mva = self._input_value
+                old_base_mva = 100
+                self._result = old_base_mva / new_base_mva  # Base impedance ratio
+            elif self._conversion_type == "sequence_pos_to_abc":
+                # Convert positive sequence to phase values (magnitude only)
+                # A = 1∠0°, B = 1∠-120°, C = 1∠120°
+                magnitude = self._input_value
+                self._result = magnitude  # A phase magnitude
+            elif self._conversion_type == "sequence_neg_to_abc":
+                # Convert negative sequence to phase values (magnitude only)
+                # A = 1∠0°, B = 1∠120°, C = 1∠-120°
+                magnitude = self._input_value
+                self._result = magnitude  # A phase magnitude
+            elif self._conversion_type == "per_unit_voltage":
+                # Convert voltage to per unit (base voltage 11kV)
+                base_voltage = 11000
+                self._result = self._input_value / base_voltage
+            elif self._conversion_type == "actual_to_per_unit_z":
+                # Convert actual impedance to per unit (base 100MVA, 11kV)
+                base_mva = 100
+                base_kv = 11
+                base_z = (base_kv * base_kv * 1000) / base_mva  # in ohms
+                self._result = self._input_value / base_z
+            elif self._conversion_type == "sym_to_phase_fault":
+                # Convert symmetrical fault current to phase values
+                sym_current = self._input_value
+                self._result = sym_current * math.sqrt(3)  # Line current
+            elif self._conversion_type == "power_three_to_single":
+                # Convert 3-phase power to per-phase
+                total_power = self._input_value
+                self._result = total_power / 3
+            elif self._conversion_type == "reactance_freq_change":
+                # Convert reactance at 50Hz to 60Hzs
+                x_at_50hz = self._input_value
+                self._result = x_at_50hz * (60/50)
             self.resultCalculated.emit(self._result)
 
     @Property(float, notify=resultCalculated)

@@ -1657,3 +1657,103 @@
 2025-03-11 23:11:13,408 - config - INFO - Configuration loaded successfully
 2025-03-11 23:11:13,492 - ResultsManager - INFO - Loaded 1 results from CSV
 2025-03-11 23:11:13,545 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:18:20,161 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:18:20,161 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:18:20,161 - config - INFO - Configuration loaded successfully
+2025-03-11 23:18:20,240 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:18:20,299 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:19:14,161 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:19:14,161 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:19:14,161 - config - INFO - Configuration loaded successfully
+2025-03-11 23:19:14,233 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:19:14,300 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:19:37,001 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:19:37,001 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:19:37,001 - config - INFO - Configuration loaded successfully
+2025-03-11 23:19:37,069 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:19:37,122 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:20:08,927 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:20:08,927 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:20:08,927 - config - INFO - Configuration loaded successfully
+2025-03-11 23:20:09,000 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:20:09,053 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:20:34,777 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:20:34,778 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:20:34,778 - config - INFO - Configuration loaded successfully
+2025-03-11 23:20:34,857 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:20:34,917 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:22:35,629 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:22:35,630 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:22:35,630 - config - INFO - Configuration loaded successfully
+2025-03-11 23:22:35,702 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:22:35,759 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:23:13,704 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:23:13,704 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:23:13,704 - config - INFO - Configuration loaded successfully
+2025-03-11 23:23:13,774 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:23:13,838 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:24:48,853 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:24:48,853 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:24:48,853 - config - INFO - Configuration loaded successfully
+2025-03-11 23:24:48,924 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:24:48,991 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:25:21,737 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:25:21,737 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:25:21,738 - config - INFO - Configuration loaded successfully
+2025-03-11 23:25:21,811 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:25:21,883 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:26:40,784 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:26:40,784 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:26:40,784 - config - INFO - Configuration loaded successfully
+2025-03-11 23:26:40,867 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:26:40,923 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:28:10,385 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:28:10,385 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:28:10,385 - config - INFO - Configuration loaded successfully
+2025-03-11 23:28:10,463 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:28:10,524 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:28:48,685 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:28:48,685 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:28:48,685 - config - INFO - Configuration loaded successfully
+2025-03-11 23:28:48,766 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:28:48,824 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:31:37,540 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:31:37,540 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:31:37,540 - config - INFO - Configuration loaded successfully
+2025-03-11 23:31:37,613 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:31:37,672 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:35:58,694 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:35:58,694 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:35:58,694 - config - INFO - Configuration loaded successfully
+2025-03-11 23:35:58,772 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:35:58,825 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:39:04,367 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:39:04,367 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:39:04,367 - config - INFO - Configuration loaded successfully
+2025-03-11 23:39:04,441 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:39:04,493 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:40:16,551 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:40:16,551 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:40:16,551 - config - INFO - Configuration loaded successfully
+2025-03-11 23:40:16,634 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:40:16,691 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:41:40,551 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:41:40,551 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:41:40,551 - config - INFO - Configuration loaded successfully
+2025-03-11 23:41:40,629 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:41:40,680 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:42:57,333 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:42:57,333 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:42:57,333 - config - INFO - Configuration loaded successfully
+2025-03-11 23:42:57,415 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:42:57,484 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:43:18,492 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:43:18,492 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:43:18,492 - config - INFO - Configuration loaded successfully
+2025-03-11 23:43:18,564 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:43:18,617 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:43:51,260 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-11 23:43:51,260 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-11 23:43:51,260 - config - INFO - Configuration loaded successfully
+2025-03-11 23:43:51,338 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-11 23:43:51,398 - ResultsManager - INFO - Loaded 1 results from CSV

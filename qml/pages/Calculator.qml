@@ -23,7 +23,7 @@ import RLC 1.0
 import VDrop 1.0
 import Results 1.0
 import SineCalc 1.0
-// import Transformer 1.0
+import Conversion 1.0
 import CableAmpacity 1.0
 import ProtectionRelay 1.0
 import InstrumentTransformer 1.0
@@ -214,6 +214,14 @@ Page {
                         text: "Sine Calculator"
                         onClicked: {
                             calculatorLoader.setSource("../components/calculators/SineCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Unit Converter"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/UnitConverter.qml")
                             calculatorMenu.close()
                         }
                     }
