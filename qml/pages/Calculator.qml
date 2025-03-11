@@ -54,43 +54,21 @@ Page {
             height: 40
             color: sideBar.toggle1 ? "#2a2a2a" : "#e5e5e5"
 
-            ScrollView {
-                id: scrollView
+            RowLayout {
                 anchors.fill: parent
-                ScrollBar.horizontal.policy: ScrollBar.AsNeeded
-                ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-                clip: true
+                anchors.margins: 5
+                spacing: 10
 
-                Row {
-                    spacing: 2
+                Label {
+                    text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                }
 
-                    Repeater {
-                        model: ["Power Calculator", "Conversion Calculator", 
-                               "Charging Current", "Impedance Calculator", 
-                               "Frequency Calculator", "Sine Calculator",
-                               "Transformer Calculator", "PF Correction",
-                               "Cable Ampacity", "Motor Calculator",
-                               "Protection Relay", "Instrument Transformer",
-                               "Harmonics Analysis", "Relay Coordination",
-                               "Voltage Drop", "Battery Calculator"]  // Added Battery Calculator
-                        
-                        Button {
-                            required property int index
-                            required property string modelData
-                            
-                            height: 40
-                            width: 120  // Made buttons slightly narrower
-                            text: modelData
-                            
-                            background: Rectangle {
-                                color: calculatorLoader.source.toString().includes(getCalculatorSource(index)) ? 
-                                      (sideBar.toggle1 ? "#404040" : "#d0d0d0") : 
-                                      (sideBar.toggle1 ? "#2a2a2a" : "#e5e5e5")
-                            }
-                            
-                            onClicked: calculatorLoader.setSource(getCalculatorSource(index))
-                        }
-                    }
+                Button {
+                    text: "Select Calculator"
+                    icon.name: "menu"
+                    onClicked: calculatorMenu.open()
                 }
             }
         }
@@ -103,25 +81,137 @@ Page {
         }
     }
 
-    function getCalculatorSource(index) {
-        switch (index) {
-            case 0: return "../components/calculators/PowerCurrentCalculator.qml"
-            case 1: return "../components/calculators/ConversionCalculator.qml"
-            case 2: return "../components/calculators/ChargingCurrentCalculator.qml"
-            case 3: return "../components/calculators/ImpedanceCalculator.qml"
-            case 4: return "../components/calculators/FrequencyCalculator.qml"
-            case 5: return "../components/calculators/SineCalculator.qml"
-            case 6: return "../components/calculators/TransformerCalculator.qml"
-            case 7: return "../components/calculators/PowerFactorCorrection.qml"
-            case 8: return "../components/calculators/CableAmpacityCalculator.qml"
-            case 9: return "../components/calculators/MotorCalculator.qml"
-            case 10: return "../components/calculators/ProtectionRelayCalculator.qml"
-            case 11: return "../components/calculators/InstrumentTransformerCalculator.qml"
-            case 12: return "../components/calculators/HarmonicsAnalyzer.qml"
-            case 13: return "../components/calculators/RelayCoordination.qml"
-            case 14: return "../components/calculators/VoltageDropCalculator.qml"  // Added new case
-            case 15: return "../components/calculators/BatteryCalculator.qml"  // Added new case
-            default: return "../components/calculators/PowerCurrentCalculator.qml"
+    Popup {
+        id: calculatorMenu
+        width: 600
+        height: 400
+        anchors.centerIn: parent
+        modal: true
+        
+        background: Rectangle {
+            color: sideBar.toggle1 ? "#2a2a2a" : "#ffffff"
+            border.color: sideBar.toggle1 ? "#404040" : "#d0d0d0"
+            radius: 5
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+
+            Label {
+                text: "Select Calculator"
+                font.pixelSize: 16
+                font.bold: true
+            }
+
+            ScrollView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                GridLayout {
+                    width: parent.width
+                    columns: 1
+                    rowSpacing: 10
+                    columnSpacing: 10
+
+                    CalcButton {
+                        text: "Power Calculator"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/PowerCurrentCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "PF Correction"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/PowerFactorCorrection.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Harmonics Analysis"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/HarmonicsAnalyzer.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Voltage Drop"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/VoltageDropCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Cable Ampacity"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/CableAmpacityCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Charging Current"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/ChargingCurrentCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Protection Relay"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/ProtectionRelayCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Relay Coordination"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/RelayCoordination.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Instrument Transformer"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/InstrumentTransformerCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Unit Conversion"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/ConversionCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Impedance Calculator"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/ImpedanceCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Battery Calculator"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/BatteryCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+                }
+            }
         }
     }
 }
