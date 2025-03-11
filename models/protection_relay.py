@@ -37,26 +37,27 @@ class ProtectionRelayCalculator(QObject):
         if self._pickup_current <= 0:
             return
             
-        # Calculate multiple of pickup
-        M = self._fault_current / self._pickup_current
-        
         # Get curve constants
         constants = self._curve_constants.get(self._curve_type, 
                                            self._curve_constants["IEC Standard Inverse"])
         
-        # Calculate operating time
+        # Calculate operating time for fault current
+        M = self._fault_current / self._pickup_current
         if M > 1:
             self._operating_time = (constants["a"] * self._time_dial) / ((M ** constants["b"]) - 1)
         else:
             self._operating_time = float('inf')
             
-        # Calculate time-current curve points
-        multiples = [1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20]
+        # Generate curve points with more resolution
         self._curve_points = []
+        current = self._pickup_current * 1.1  # Start just above pickup
         
-        for m in multiples:
-            t = (constants["a"] * self._time_dial) / ((m ** constants["b"]) - 1)
-            self._curve_points.append({"current": m * self._pickup_current, "time": t})
+        while current <= 10000:
+            m = current / self._pickup_current
+            if m > 1:
+                t = (constants["a"] * self._time_dial) / ((m ** constants["b"]) - 1)
+                self._curve_points.append({"current": current, "time": t})
+            current *= 1.1  # Logarithmic steps
         
         self.calculationsComplete.emit()
 

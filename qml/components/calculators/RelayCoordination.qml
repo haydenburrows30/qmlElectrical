@@ -115,6 +115,7 @@ WaveCard {
 
         // Right Panel - Time-Current Curves
         ChartView {
+            id: tcChart  // Add ID to reference the ChartView
             SplitView.fillWidth: true
             antialiasing: true
             legend.visible: true
@@ -135,29 +136,28 @@ WaveCard {
                 titleText: "Time (s)"
             }
 
-            // Replace the Repeater with direct LineSeries creation
-            LineSeries {
-                name: "Primary Relay"
-                axisX: currentAxis
-                axisY: timeAxis
-                
-                // Sample points to show curve shape
-                XYPoint { x: 100; y: 1.0 }
-                XYPoint { x: 200; y: 0.5 }
-                XYPoint { x: 500; y: 0.2 }
-                XYPoint { x: 1000; y: 0.1 }
-            }
-            
-            LineSeries {
-                name: "Backup Relay"
-                axisX: currentAxis
-                axisY: timeAxis
-                
-                // Sample points to show curve shape
-                XYPoint { x: 100; y: 2.0 }
-                XYPoint { x: 200; y: 1.0 }
-                XYPoint { x: 500; y: 0.4 }
-                XYPoint { x: 1000; y: 0.2 }
+            Connections {
+                target: calculator
+                function onRelaysChanged() {
+                    // Clear existing series
+                    while (tcChart.count > 0) {
+                        tcChart.removeSeries(tcChart.series(0))
+                    }
+
+                    // Add new series for each relay
+                    var relays = calculator.relays
+                    relays.forEach(function(relay, index) {
+                        var series = tcChart.createSeries(ChartView.SeriesTypeLine, relay.name, currentAxis, timeAxis)
+
+                        // Generate curve points
+                        var current = 10
+                        while (current <= 10000) {
+                            var time = calculator.calculateOperatingTime(index, current)
+                            series.append(current, time)
+                            current *= 1.2  // Logarithmic steps
+                        }
+                    })
+                }
             }
         }
     }

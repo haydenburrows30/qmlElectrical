@@ -29,7 +29,7 @@ WaveCard {
                 ComboBox {
                     id: ctRatio
                     model: calculator.standardCtRatios
-                    onCurrentTextChanged: calculator.setCtRatio(currentText)
+                    onCurrentTextChanged: if (currentText) calculator.setCtRatio(currentText)
                     Layout.fillWidth: true
                 }
 
@@ -46,7 +46,9 @@ WaveCard {
 
                 Label { text: "Accuracy Class:" }
                 ComboBox {
+                    id: accuracyClass
                     model: ["0.1", "0.2", "0.5", "1.0"]
+                    onCurrentTextChanged: if (currentText) calculator.accuracyClass = currentText
                     Layout.fillWidth: true
                 }
             }
@@ -66,7 +68,7 @@ WaveCard {
                 ComboBox {
                     id: vtRatio
                     model: calculator.standardVtRatios
-                    onCurrentTextChanged: calculator.setVtRatio(currentText)
+                    onCurrentTextChanged: if (currentText) calculator.setVtRatio(currentText)
                     Layout.fillWidth: true
                 }
             }
@@ -84,19 +86,19 @@ WaveCard {
 
                 Label { text: "CT Knee Point:" }
                 Label { 
-                    text: calculator.kneePointVoltage.toFixed(1) + " V"
+                    text: isFinite(calculator.kneePointVoltage) ? calculator.kneePointVoltage.toFixed(1) + " V" : "0.0 V"
                     font.bold: true 
                 }
 
                 Label { text: "Maximum Fault Current:" }
                 Label { 
-                    text: calculator.maxFaultCurrent.toFixed(1) + " A"
+                    text: isFinite(calculator.maxFaultCurrent) ? calculator.maxFaultCurrent.toFixed(1) + " A" : "0.0 A"
                     font.bold: true 
                 }
 
                 Label { text: "Minimum CT Burden:" }
                 Label { 
-                    text: calculator.minAccuracyBurden.toFixed(2) + " Ω"
+                    text: isFinite(calculator.minAccuracyBurden) ? calculator.minAccuracyBurden.toFixed(2) + " Ω" : "0.0 Ω"
                     font.bold: true 
                 }
             }

@@ -140,8 +140,8 @@ class Application:
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
             (MotorCalculator, "Motor", 1, 0, "MotorCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
-            (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrectionCalculator"),  # Fixed type name
-            (CableAmpacityCalculator, "CableAmpacity", 1, 0, "AmpacityCalculator"),  # Changed registered name
+            (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrectionCalculator"),
+            (CableAmpacityCalculator, "CableAmpacity", 1, 0, "AmpacityCalculator"),
             (ProtectionRelayCalculator, "ProtectionRelay", 1, 0, "ProtectionRelayCalculator"),
             (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),

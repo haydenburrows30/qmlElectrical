@@ -24,7 +24,7 @@ import RLC 1.0
 import VDrop 1.0
 import Results 1.0
 import SineCalc 1.0
-import Transformer 1.0
+// import Transformer 1.0
 import CableAmpacity 1.0
 import ProtectionRelay 1.0
 import InstrumentTransformer 1.0

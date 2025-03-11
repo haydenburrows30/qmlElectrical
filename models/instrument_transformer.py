@@ -11,8 +11,8 @@ class InstrumentTransformerCalculator(QObject):
     burdenChanged = Signal()
     accuracyChanged = Signal()
     calculationsComplete = Signal()
-    standardCtRatiosChanged = Signal()  # Add new signal
-    standardVtRatiosChanged = Signal()  # Add new signal
+    standardCtRatiosChanged = Signal()
+    standardVtRatiosChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -25,40 +25,76 @@ class InstrumentTransformerCalculator(QObject):
         self._ct_ratio = 20.0
         self._vt_ratio = 100.0
         self._knee_point_voltage = 0.0
-        self._alf = 20.0  # Accuracy Limit Factor
+        self._alf = 20.0
         
-        # Standard CT ratios
         self._standard_ct_ratios = [
             "5/5", "10/5", "15/5", "20/5", "25/5", "30/5", "40/5", "50/5",
             "60/5", "75/5", "100/5", "150/5", "200/5", "300/5", "400/5",
             "500/5", "600/5", "800/5", "1000/5", "1200/5", "1500/5", "2000/5"
         ]
         
-        # Standard VT ratios
         self._standard_vt_ratios = [
             "11000/110", "22000/110", "33000/110", "66000/110",
             "110000/110", "132000/110", "220000/110", "400000/110"
         ]
         
+        self._accuracy_factors = {
+            "0.1": 1.5,  # Higher factor for better accuracy
+            "0.2": 1.3,
+            "0.5": 1.2,
+            "1.0": 1.1
+        }
+        
         self._calculate()
 
+    @Property(float, notify=primaryVoltageChanged)
+    def primaryVoltage(self):
+        return self._primary_voltage
+
+    @primaryVoltage.setter
+    def primaryVoltage(self, value):
+        if value > 0:
+            self._primary_voltage = value
+            self.primaryVoltageChanged.emit()
+            self._calculate()
+
+    @Property(str, notify=accuracyChanged)
+    def accuracyClass(self):
+        return self._accuracy_class
+
+    @accuracyClass.setter
+    def accuracyClass(self, value):
+        if self._accuracy_class != value:
+            self._accuracy_class = value
+            self.accuracyChanged.emit()
+            self._calculate()
+
     def _calculate(self):
-        # Calculate CT parameters
-        self._ct_ratio = self._primary_current / self._secondary_current
-        
-        # Calculate knee point voltage (typical 2x nominal voltage)
-        self._knee_point_voltage = 2.0 * self._secondary_current * math.sqrt(self._burden_va)
-        
-        # Calculate VT parameters
-        self._vt_ratio = self._primary_voltage / self._secondary_voltage
-        
-        # Calculate maximum fault current (using ALF)
-        self._max_fault_current = self._primary_current * self._alf
-        
-        # Calculate minimum CT accuracy burden
-        self._min_accuracy_burden = (self._secondary_current ** 2) * 0.25  # Typical 0.25 ohm
-        
-        self.calculationsComplete.emit()
+        """Calculate transformer parameters based on inputs"""
+        try:
+            if self._primary_current > 0 and self._secondary_current > 0:
+                # Get accuracy factor
+                accuracy_factor = self._accuracy_factors.get(self._accuracy_class, 1.2)
+                
+                # CT calculations with accuracy consideration
+                self._ct_ratio = self._primary_current / self._secondary_current
+                self._knee_point_voltage = 2.0 * self._secondary_current * math.sqrt(self._burden_va) * accuracy_factor
+                self._max_fault_current = self._primary_current * self._alf
+                self._min_accuracy_burden = (self._burden_va / (self._secondary_current ** 2)) * accuracy_factor
+                
+                # VT affects calculations
+                if self._primary_voltage > 0 and self._secondary_voltage > 0:
+                    vt_ratio = self._primary_voltage / self._secondary_voltage
+                    self._knee_point_voltage *= (1 + (vt_ratio / 1000))
+                    self._min_accuracy_burden *= (1 + (vt_ratio / 10000))
+            
+            self.calculationsComplete.emit()
+            
+        except Exception as e:
+            print(f"Calculation error: {e}")
+            self._knee_point_voltage = 0.0
+            self._max_fault_current = 0.0
+            self._min_accuracy_burden = 0.0
 
     @Property(list, notify=standardCtRatiosChanged)
     def standardCtRatios(self):
@@ -101,8 +137,6 @@ class InstrumentTransformerCalculator(QObject):
     @Property(float, notify=calculationsComplete)
     def minAccuracyBurden(self):
         return self._min_accuracy_burden
-
-    # Add other properties and slots as needed...
 
     @Slot(str)
     def setCtRatio(self, ratio):

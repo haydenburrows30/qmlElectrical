@@ -3,26 +3,22 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../../components"
+
 import Transformer 1.0
 
 WaveCard {
     id: transformerCard
     title: 'Transformer Calculator'
 
-    property TransformerCalculator calculator: TransformerCalculator {
-        onPrimaryVoltageChanged: secondaryCurrent.text = calculator.secondaryCurrent.toFixed(2)
-        onPrimaryCurrentChanged: secondaryCurrent.text = calculator.secondaryCurrent.toFixed(2)
-        onSecondaryVoltageChanged: secondaryCurrent.text = calculator.secondaryCurrent.toFixed(2)
-    }
+    property TransformerCalculator calculator: TransformerCalculator {}
 
     ColumnLayout {
-        // anchors.fill: parent
+        anchors.centerIn: parent
         spacing: 10
 
         // Primary Side
         GroupBox {
             title: "Primary Side"
-            // Layout.fillWidth: true
 
             GridLayout {
                 columns: 2
@@ -32,17 +28,18 @@ WaveCard {
                 Label { text: "Voltage (V):" }
                 TextField {
                     id: primaryVoltage
+                    Layout.minimumWidth: 150
                     placeholderText: "Enter voltage"
-                    onTextChanged: if(text) calculator.primaryVoltage = parseFloat(text)
-                    Layout.fillWidth: true
+                    onTextChanged: calculator.primaryVoltage = parseFloat(text)
                 }
 
                 Label { text: "Current (A):" }
                 TextField {
                     id: primaryCurrent
+                    Layout.minimumWidth: 150
                     placeholderText: "Enter current"
-                    onTextChanged: if(text) calculator.primaryCurrent = parseFloat(text)
-                    Layout.fillWidth: true
+                    onTextChanged: calculator.primaryCurrent = parseFloat(text)
+
                 }
             }
         }
@@ -50,7 +47,6 @@ WaveCard {
         // Secondary Side
         GroupBox {
             title: "Secondary Side"
-            // Layout.fillWidth: true
 
             GridLayout {
                 columns: 2
@@ -61,14 +57,14 @@ WaveCard {
                 TextField {
                     id: secondaryVoltage
                     placeholderText: "Enter voltage"
-                    onTextChanged: if(text) calculator.setPrimaryVoltage(parseFloat(text))
-                    Layout.fillWidth: true
+                    onTextChanged: if(text) calculator.secondaryVoltage = parseFloat(text)  // Fix: Use correct property
+                    Layout.minimumWidth: 150
                 }
 
                 Label { text: "Current (A):" }
                 Text {
                     id: secondaryCurrent
-                    Layout.fillWidth: true
+                    Layout.minimumWidth: 150
                     text: calculator.secondaryCurrent.toFixed(2)
                 }
             }
@@ -77,10 +73,10 @@ WaveCard {
         // Results
         GroupBox {
             title: "Results"
-            // Layout.fillWidth: true
+            Layout.fillWidth: true
+            
 
             ColumnLayout {
-                Layout.fillWidth: true
                 spacing: 5
 
                 Label { 

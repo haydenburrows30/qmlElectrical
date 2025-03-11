@@ -84,16 +84,40 @@ WaveCard {
 
                 ValueAxis {
                     id: axisY
-                    min: -1.5
-                    max: 1.5
+                    min: -200
+                    max: 200
                     titleText: "Magnitude (pu)"
                 }
 
                 LineSeries {
+                    id: waveformSeries
                     name: "Combined Waveform"
                     axisX: axisX
                     axisY: axisY
-                    XYPoint { x: 0; y: 0 }  // Initial point
+                }
+
+                // Update waveform when it changes - optimize updates
+                Connections {
+                    target: calculator
+                    function onWaveformChanged() {
+                        waveformSeries.clear()
+                        var points = calculator.waveform
+                        var maxY = 0
+                        
+                        // Find maximum magnitude for scaling
+                        for (var i = 0; i < points.length; i++) {
+                            maxY = Math.max(maxY, Math.abs(points[i]))
+                        }
+                        
+                        // Set axis range with 20% padding
+                        axisY.min = -Math.ceil(maxY * 1.2)
+                        axisY.max = Math.ceil(maxY * 1.2)
+                        
+                        // Plot points
+                        for (var i = 0; i < points.length; i++) {
+                            waveformSeries.append(i * (360/points.length), points[i])
+                        }
+                    }
                 }
             }
 
@@ -104,15 +128,49 @@ WaveCard {
                 Layout.fillHeight: true
                 antialiasing: true
 
+                ValueAxis {
+                    id: spectrumAxisY
+                    min: 0
+                    max: 120  // Allow for harmonics up to 120% of fundamental
+                    titleText: "Magnitude (%)"
+                }
+
+                BarCategoryAxis {
+                    id: spectrumAxisX
+                    categories: ["1st", "3rd", "5th", "7th", "11th", "13th"]
+                }
+
                 BarSeries {
-                    axisX: BarCategoryAxis {
-                        categories: ["1st", "3rd", "5th", "7th", "11th", "13th"]
+                    id: harmonicSeries
+                    axisX: spectrumAxisX
+                    axisY: spectrumAxisY
+                    
+                    // Remove the BarSet as a child item and handle it in Connections
+                }
+
+                // Optimize spectrum updates
+                Connections {
+                    target: calculator
+                    function onHarmonicsChanged() {
+                        harmonicSeries.clear()
+                        var data = calculator.individualDistortion
+                        var maxY = 0
+                        
+                        // Find maximum magnitude for scaling
+                        for (var i = 0; i < data.length; i++) {
+                            maxY = Math.max(maxY, data[i])
+                        }
+                        
+                        // Set axis range with 20% padding
+                        spectrumAxisY.max = Math.ceil(maxY * 1.2)
+                        
+                        harmonicSeries.append("Magnitude", data)
                     }
-                    axisY: ValueAxis {
-                        min: 0
-                        max: 100
-                        titleText: "Magnitude (%)"
-                    }
+                }
+
+                // Initialize with default values
+                Component.onCompleted: {
+                    harmonicSeries.append("Magnitude", calculator.individualDistortion)
                 }
             }
         }

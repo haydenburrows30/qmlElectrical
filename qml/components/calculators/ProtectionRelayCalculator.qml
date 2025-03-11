@@ -85,6 +85,7 @@ WaveCard {
 
         // Time-Current Curve Chart
         ChartView {
+            id: relayChart
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 600
@@ -109,12 +110,22 @@ WaveCard {
             }
 
             LineSeries {
+                id: tripCurve
                 name: "Trip Curve"
                 axisX: currentAxis
                 axisY: timeAxis
-                
-                // Points are updated by the calculator
-                XYPoint { x: relay.pickupCurrent; y: relay.operatingTime }
+            }
+
+            // Add connection to update curve when calculations complete
+            Connections {
+                target: relay
+                function onCalculationsComplete() {
+                    tripCurve.clear()
+                    var points = relay.curvePoints
+                    for (var i = 0; i < points.length; i++) {
+                        tripCurve.append(points[i].current, points[i].time)
+                    }
+                }
             }
         }
     }

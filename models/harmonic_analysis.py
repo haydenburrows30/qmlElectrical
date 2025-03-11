@@ -30,51 +30,54 @@ class HarmonicAnalysisCalculator(QObject):
         self._calculate()
 
     def _calculate(self):
-        if self._fundamental <= 0:
-            return
+        try:
+            # Update harmonics array from dictionary input
+            harmonics = [0.0] * 15  # Reset array
+            harmonics[0] = self._fundamental  # Set fundamental
             
-        # Calculate THD
-        sum_squares = sum(h * h for h in self._harmonics)
-        self._thd = math.sqrt(sum_squares) / self._fundamental * 100.0
-        
-        # Calculate individual harmonic distortion
-        self._individual_distortion = [
-            (h / self._fundamental * 100.0) if self._fundamental > 0 else 0.0
-            for h in self._harmonics
-        ]
-        
-        # Generate waveform points
-        t = np.linspace(0, 0.04, 1000)  # Two cycles of 50Hz
-        waveform = self._fundamental * np.sin(2 * np.pi * 50 * t)
-        
-        for n, amplitude in enumerate(self._harmonics, 2):
-            if amplitude > 0:
-                waveform += amplitude * np.sin(2 * np.pi * 50 * n * t)
-        
-        self._waveform_points = list(zip(t, waveform))
-        
-        # Calculate waveform, spectrum, THD and CF
-        t = np.linspace(0, 2*np.pi, 1000)
-        wave = np.zeros_like(t)
-        
-        # Sum all harmonics
-        for order, (mag, angle) in self._harmonics_dict.items():
-            wave += mag * np.sin(order * t + np.deg2rad(angle))
+            # Map harmonic orders to correct indices
+            for order, (magnitude, _) in self._harmonics_dict.items():
+                if 1 <= order < len(harmonics):
+                    harmonics[order-1] = magnitude
             
-        self._waveform = wave.tolist()
-        
-        # Calculate THD
-        fundamental = self._harmonics_dict.get(1, (100, 0))[0]
-        harmonics = np.array([mag for order, (mag, _) in self._harmonics_dict.items() if order > 1])
-        self._thd = np.sqrt(np.sum(harmonics**2)) / fundamental * 100
-        
-        # Calculate CF with check for zero
-        if len(wave) and np.mean(wave**2) > 0:
-            self._cf = np.max(np.abs(wave)) / np.sqrt(np.mean(wave**2))
-        else:
-            self._cf = 0.0
-        
-        self.crestFactorChanged.emit()  # Emit signal after calculation
+            self._harmonics = harmonics
+            
+            # Calculate THD using only actual harmonics (excluding fundamental)
+            if self._fundamental > 0:
+                harmonics_sum = sum(h * h for h in harmonics[1:])
+                self._thd = math.sqrt(harmonics_sum) / self._fundamental * 100.0
+            
+            # Calculate individual distortion for display harmonics [1,3,5,7,11,13]
+            display_orders = [1, 3, 5, 7, 11, 13]
+            self._individual_distortion = [
+                (harmonics[order-1] / self._fundamental * 100.0)
+                for order in display_orders
+            ]
+            
+            # Generate waveform
+            t = np.linspace(0, 4*np.pi, 500)
+            wave = self._fundamental * np.sin(t)
+            
+            for n, amplitude in enumerate(harmonics[1:], 2):
+                if amplitude > 0:
+                    wave += amplitude * np.sin(n * t)
+            
+            self._waveform = wave.tolist()
+            
+            # Calculate crest factor
+            if wave.size:
+                rms = np.sqrt(np.mean(wave**2))
+                if rms > 0:
+                    self._cf = np.max(np.abs(wave)) / rms
+            
+            self.batchUpdate()
+            
+        except Exception as e:
+            print(f"Calculation error: {e}")
+
+    def batchUpdate(self):
+        """Emit all signals at once to reduce update frequency"""
+        self.harmonicsChanged.emit()
         self.waveformChanged.emit()
         self.calculationsComplete.emit()
 
@@ -134,10 +137,12 @@ class HarmonicAnalysisCalculator(QObject):
             self._calculate()
 
     @Slot(int, float, float)
-    def setHarmonic(self, order, magnitude, angle):
+    def setHarmonic(self, order, magnitude, angle=0):
         """Set magnitude and angle for a harmonic order."""
-        self._harmonics_dict[order] = (magnitude, angle)
-        self._calculate()
+        if order > 0 and order <= len(self._harmonics):
+            self._harmonics_dict[order] = (magnitude, angle)
+            print(f"Setting harmonic {order} to magnitude {magnitude}")  # Debug print
+            self._calculate()
 
     @Slot(list)
     def setAllHarmonics(self, harmonics):

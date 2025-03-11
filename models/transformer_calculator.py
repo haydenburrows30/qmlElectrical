@@ -74,13 +74,13 @@ class TransformerCalculator(QObject):
     def _calculate(self):
         """Calculate transformer parameters based on inputs"""
         try:
-            # Calculate turns ratio
+            # Calculate turns ratio if both voltages are available
             if self._primary_voltage > 0 and self._secondary_voltage > 0:
                 self._turns_ratio = self._primary_voltage / self._secondary_voltage
                 
                 # Calculate secondary current based on power conservation
                 if self._primary_current > 0:
-                    self._secondary_current = self._primary_current * self._turns_ratio
+                    self._secondary_current = (self._primary_current * self._primary_voltage) / self._secondary_voltage
                 
                 # Calculate power rating
                 self._power_rating = self._primary_voltage * self._primary_current
@@ -93,10 +93,6 @@ class TransformerCalculator(QObject):
             print(f"Calculation error: {e}")
 
     # Slots for QML access
-    @Slot(float)
-    def setPrimaryVoltage(self, voltage):
-        self.primaryVoltage = voltage
-
     @Slot(float)
     def setSecondaryVoltage(self, voltage):
         self.secondaryVoltage = voltage

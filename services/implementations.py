@@ -8,7 +8,7 @@ from models.VoltageDrop import VoltageDrop
 from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator, SineCalculator
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart
-from models.transformer_calculator import TransformerCalculator
+# from models.transformer_calculator import TransformerCalculator
 from models.motor_calculator import MotorCalculator
 from models.voltage_drop_calculator import VoltageDropCalculator
 from models.power_factor_correction import PowerFactorCorrectionCalculator
@@ -90,7 +90,7 @@ class ModelFactory(IModelFactory):
             "series_rlc_chart": SeriesRLCChart,
             "voltage_drop": VoltageDrop,
             "results_manager": ResultsManager,
-            "transformer_calc": TransformerCalculator,
+            # "transformer_calc": TransformerCalculator,
             "voltage_drop_calc": VoltageDropCalculator,
             "motor_calc": MotorCalculator,
             "pf_correction": PowerFactorCorrectionCalculator,
