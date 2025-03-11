@@ -8,13 +8,11 @@ import InstrumentTransformer 1.0
 WaveCard {
     id: instrumentTransformerCard
     title: 'Instrument Transformer Calculator'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 350
 
     property InstrumentTransformerCalculator calculator: InstrumentTransformerCalculator {}
 
     ColumnLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
         spacing: 10
 
         // CT Section

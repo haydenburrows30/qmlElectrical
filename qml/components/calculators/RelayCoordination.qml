@@ -9,8 +9,6 @@ import RelayCoordination 1.0
 WaveCard {
     id: coordinationCard
     title: 'Relay Coordination'
-    Layout.minimumWidth: 800
-    Layout.minimumHeight: 500
 
     property RelayCoordinationCalculator calculator: RelayCoordinationCalculator {}
 

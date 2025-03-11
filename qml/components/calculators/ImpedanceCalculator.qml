@@ -8,17 +8,14 @@ import Fault 1.0  // Import the correct namespace for the fault current calculat
 WaveCard {
     id: fault_current
     title: 'Impedance'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 250
 
     // Create a local instance of our calculator
     property FaultCurrentCalculator calculator: FaultCurrentCalculator {}
 
     RowLayout {
-        anchors.fill: parent
-
+        anchors.centerIn: parent
+        
         ColumnLayout {
-            Layout.alignment: Qt.AlignTop
 
             RowLayout {
                 spacing: 5
@@ -77,9 +74,8 @@ WaveCard {
 
         ImpedanceVectorViz {
             id: impedanceViz
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.topMargin: -50
+            Layout.minimumWidth: 300
+            Layout.minimumHeight: 300
             resistance: parseFloat(rInput.text || "3")
             reactance: parseFloat(reactanceInput.text || "4")
             impedance: calculator && !isNaN(calculator.impedance) ? 

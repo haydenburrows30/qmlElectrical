@@ -9,16 +9,13 @@ import HarmonicAnalysis 1.0
 WaveCard {
     id: harmonicsCard
     title: 'Harmonics Analysis'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 400
 
     property HarmonicAnalysisCalculator calculator: HarmonicAnalysisCalculator {}
 
     RowLayout {
-        anchors.fill: parent
         spacing: 10
+        anchors.centerIn: parent
 
-        // Left Panel - Inputs
         ColumnLayout {
             Layout.preferredWidth: 300
 
@@ -66,8 +63,10 @@ WaveCard {
 
         // Right Panel - Visualizations
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            // Layout.fillWidth: true
+            // Layout.fillHeight: true
+            Layout.preferredWidth: 600
+            Layout.preferredHeight: 600
 
             // Waveform Chart
             ChartView {

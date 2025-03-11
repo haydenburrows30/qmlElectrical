@@ -17,7 +17,6 @@ WaveCard {
         anchors.fill: parent
         spacing: 10
 
-        // Left panel - inputs
         ColumnLayout {
             Layout.preferredWidth: 350
             spacing: 10

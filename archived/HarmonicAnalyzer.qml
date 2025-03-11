@@ -9,15 +9,12 @@ import HarmonicAnalysis 1.0
 WaveCard {
     id: harmonicAnalyzerCard
     title: 'Harmonic Analysis'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 300
 
     property HarmonicAnalysisCalculator calculator: HarmonicAnalysisCalculator {}
 
     RowLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
 
-        // Input controls
         ColumnLayout {
             Layout.alignment: Qt.AlignTop
             Layout.minimumWidth: 300

@@ -8,19 +8,16 @@ import Charging 1.0  // Import the Charging namespace for our calculator
 WaveCard {
     id: charging_current
     title: 'Cable Charging Current'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 230
-
-    info: ""
 
     // Create a local instance of our calculator
     property ChargingCalculator calculator: ChargingCalculator {}
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
 
         ColumnLayout {
-            Layout.alignment: Qt.AlignTop
+            Layout.minimumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
             
             RowLayout {
                 spacing: 10
@@ -102,7 +99,8 @@ WaveCard {
         ChargingCurrentViz {
             id: chargingCurrentViz
             Layout.fillWidth: true
-            Layout.minimumHeight: 150
+            Layout.minimumHeight: 300
+            Layout.minimumWidth: 300
             voltage: parseFloat(voltage_input.text || "0") 
             capacitance: parseFloat(capacitanceInput.text || "0")
             frequency: parseFloat(frequencyInput.text || "50")

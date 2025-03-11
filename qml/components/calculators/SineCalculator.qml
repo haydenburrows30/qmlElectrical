@@ -17,7 +17,6 @@ WaveCard {
         anchors.fill: parent
 
         ColumnLayout {
-            Layout.alignment: Qt.AlignTop
 
             RowLayout {
                 spacing: 10
@@ -49,7 +48,6 @@ WaveCard {
 
             GroupBox {
                 title: "Results"
-                Layout.fillWidth: true
                 
                 ColumnLayout {
                     Label { text: "RMS Value: " + (calculator.rms).toFixed(1) + " V" }
@@ -59,38 +57,34 @@ WaveCard {
         }
 
         // Waveform visualization
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: "transparent"
-
-            Canvas {
-                id: waveCanvas
-                anchors.fill: parent
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.reset()
-                    
-                    var yValues = calculator.yValues
-                    if (!yValues || yValues.length === 0) return
-                    
-                    var width = waveCanvas.width
-                    var height = waveCanvas.height
-                    var yCenter = height/2
-                    
-                    ctx.strokeStyle = "blue"
-                    ctx.lineWidth = 2
-                    ctx.beginPath()
-                    
-                    for (var i = 0; i < yValues.length; i++) {
-                        var x = (i/yValues.length) * width
-                        var y = yCenter + yValues[i]
-                        if (i === 0) ctx.moveTo(x, y)
-                        else ctx.lineTo(x, y)
-                    }
-                    
-                    ctx.stroke()
+        Canvas {
+            id: waveCanvas
+            // anchors.fill: parent
+            Layout.minimumWidth: 500
+            Layout.minimumHeight: 500
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.reset()
+                
+                var yValues = calculator.yValues
+                if (!yValues || yValues.length === 0) return
+                
+                var width = waveCanvas.width
+                var height = waveCanvas.height
+                var yCenter = height/2
+                
+                ctx.strokeStyle = "blue"
+                ctx.lineWidth = 2
+                ctx.beginPath()
+                
+                for (var i = 0; i < yValues.length; i++) {
+                    var x = (i/yValues.length) * width
+                    var y = yCenter + yValues[i]
+                    if (i === 0) ctx.moveTo(x, y)
+                    else ctx.lineTo(x, y)
                 }
+                
+                ctx.stroke()
             }
         }
     }

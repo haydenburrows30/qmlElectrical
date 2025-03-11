@@ -9,16 +9,13 @@ import ProtectionRelay 1.0
 WaveCard {
     id: protectionRelayCard
     title: 'Protection Relay Calculator'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 400
 
     property ProtectionRelayCalculator relay: ProtectionRelayCalculator {}
 
     RowLayout {
-        anchors.fill: parent
         spacing: 10
+        anchors.centerIn: parent
 
-        // Input Panel
         ColumnLayout {
             Layout.preferredWidth: 300
 
@@ -90,6 +87,9 @@ WaveCard {
         ChartView {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.minimumWidth: 600
+            Layout.minimumHeight: 600
+
             antialiasing: true
             
             LogValueAxis {

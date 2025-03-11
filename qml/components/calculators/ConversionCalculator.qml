@@ -14,6 +14,7 @@ WaveCard {
     property ConversionCalculator calculator: ConversionCalculator {}
 
     ColumnLayout {
+                anchors.centerIn: parent
 
         RowLayout {
             spacing: 10

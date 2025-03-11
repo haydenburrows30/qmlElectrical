@@ -8,18 +8,15 @@ import PFCorrection 1.0
 WaveCard {
     id: pfCorrectionCard
     title: 'Power Factor Correction'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 300
-
     property PowerFactorCorrectionCalculator calculator: PowerFactorCorrectionCalculator {}  // Match registered name
 
     RowLayout {
-        anchors.fill: parent
         spacing: 10
+        anchors.centerIn: parent
 
         // Input Section
         ColumnLayout {
-            Layout.preferredWidth: 300
+            Layout.minimumWidth: 300
 
             GroupBox {
                 title: "System Parameters"
@@ -90,39 +87,36 @@ WaveCard {
         }
 
         // Power Triangle Visualization
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: "transparent"
             
-            Canvas {
-                anchors.fill: parent
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.reset()
-                    
-                    // Draw power triangle
-                    var centerX = width/2
-                    var centerY = height/2
-                    var scale = 100
-                    
-                    var p = calculator.activePower
-                    var pf = calculator.currentPF
-                    var q = p * Math.tan(Math.acos(pf))
-                    var s = p / pf
-                    
-                    // Scale to fit
-                    var maxDim = Math.max(p, q, s)
-                    scale = Math.min(width, height) / (maxDim * 2)
-                    
-                    // Draw triangle
-                    ctx.beginPath()
-                    ctx.moveTo(centerX - p*scale/2, centerY)
-                    ctx.lineTo(centerX + p*scale/2, centerY)
-                    ctx.lineTo(centerX + p*scale/2, centerY - q*scale)
-                    ctx.closePath()
-                    ctx.stroke()
-                }
+        Canvas {
+            Layout.minimumHeight: 300
+            Layout.minimumWidth: 300
+
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.reset()
+                
+                // Draw power triangle
+                var centerX = width/2
+                var centerY = height/2
+                var scale = 100
+                
+                var p = calculator.activePower
+                var pf = calculator.currentPF
+                var q = p * Math.tan(Math.acos(pf))
+                var s = p / pf
+                
+                // Scale to fit
+                var maxDim = Math.max(p, q, s)
+                scale = Math.min(width, height) / (maxDim * 2)
+                
+                // Draw triangle
+                ctx.beginPath()
+                ctx.moveTo(centerX - p*scale/2, centerY)
+                ctx.lineTo(centerX + p*scale/2, centerY)
+                ctx.lineTo(centerX + p*scale/2, centerY - q*scale)
+                ctx.closePath()
+                ctx.stroke()
             }
         }
     }

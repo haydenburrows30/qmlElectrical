@@ -111,7 +111,7 @@ Page {
 
                 GridLayout {
                     width: parent.width
-                    columns: 1
+                    columns: 2
                     rowSpacing: 10
                     columnSpacing: 10
 
@@ -207,6 +207,22 @@ Page {
                         text: "Battery Calculator"
                         onClicked: {
                             calculatorLoader.setSource("../components/calculators/BatteryCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Transformer Calculator"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/TransformerCalculator.qml")
+                            calculatorMenu.close()
+                        }
+                    }
+
+                    CalcButton {
+                        text: "Sine Calculator"
+                        onClicked: {
+                            calculatorLoader.setSource("../components/calculators/SineCalculator.qml")
                             calculatorMenu.close()
                         }
                     }

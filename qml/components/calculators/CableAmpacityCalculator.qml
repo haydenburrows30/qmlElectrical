@@ -8,14 +8,12 @@ import CableAmpacity 1.0
 WaveCard {
     id: cableAmpacityCard
     title: 'Cable Ampacity Calculator'
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 300
 
     property AmpacityCalculator calculator: AmpacityCalculator {}  // Changed type name to match registration
 
     ColumnLayout {
-        anchors.fill: parent
         spacing: 10
+        anchors.centerIn: parent
 
         GridLayout {
             columns: 2
@@ -27,7 +25,6 @@ WaveCard {
                 id: cableSizeCombo
                 model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
                 onCurrentTextChanged: calculator.cableSize = parseFloat(currentText)
-                Layout.fillWidth: true
             }
 
             Label { text: "Insulation Type:" }
@@ -35,7 +32,6 @@ WaveCard {
                 id: insulationCombo
                 model: ["PVC", "XLPE"]
                 onCurrentTextChanged: calculator.insulationType = currentText
-                Layout.fillWidth: true
             }
 
             Label { text: "Installation Method:" }
@@ -43,7 +39,6 @@ WaveCard {
                 id: installMethodCombo
                 model: ["Conduit", "Tray", "Direct Buried", "Free Air", "Wall Surface"]
                 onCurrentTextChanged: calculator.installMethod = currentText
-                Layout.fillWidth: true
             }
 
             Label { text: "Ambient Temperature (°C):" }
@@ -54,7 +49,6 @@ WaveCard {
                 value: 30
                 stepSize: 5
                 onValueChanged: calculator.ambientTemp = value
-                Layout.fillWidth: true
             }
 
             Label { text: "Number of Circuits:" }
@@ -64,7 +58,6 @@ WaveCard {
                 to: 20
                 value: 1
                 onValueChanged: calculator.groupingNumber = value
-                Layout.fillWidth: true
             }
 
             Label { text: "Conductor Material:" }
@@ -78,7 +71,6 @@ WaveCard {
 
         GroupBox {
             title: "Results"
-            Layout.fillWidth: true
 
             GridLayout {
                 columns: 2

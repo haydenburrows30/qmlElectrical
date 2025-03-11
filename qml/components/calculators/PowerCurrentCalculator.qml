@@ -18,6 +18,7 @@ WaveCard {
     property PowerCalculator calculator: PowerCalculator {}
 
     ColumnLayout {
+        anchors.centerIn: parent
         RowLayout {
             spacing: 10
             Label {

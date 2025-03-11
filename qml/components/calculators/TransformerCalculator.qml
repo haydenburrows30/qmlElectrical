@@ -8,8 +8,6 @@ import Transformer 1.0
 WaveCard {
     id: transformerCard
     title: 'Transformer Calculator'
-    Layout.fillWidth: true
-    Layout.fillHeight: true
 
     property TransformerCalculator calculator: TransformerCalculator {
         onPrimaryVoltageChanged: secondaryCurrent.text = calculator.secondaryCurrent.toFixed(2)
@@ -18,13 +16,13 @@ WaveCard {
     }
 
     ColumnLayout {
-        anchors.fill: parent
+        // anchors.fill: parent
         spacing: 10
 
         // Primary Side
         GroupBox {
             title: "Primary Side"
-            Layout.fillWidth: true
+            // Layout.fillWidth: true
 
             GridLayout {
                 columns: 2
@@ -52,7 +50,7 @@ WaveCard {
         // Secondary Side
         GroupBox {
             title: "Secondary Side"
-            Layout.fillWidth: true
+            // Layout.fillWidth: true
 
             GridLayout {
                 columns: 2
@@ -79,7 +77,7 @@ WaveCard {
         // Results
         GroupBox {
             title: "Results"
-            Layout.fillWidth: true
+            // Layout.fillWidth: true
 
             ColumnLayout {
                 Layout.fillWidth: true
