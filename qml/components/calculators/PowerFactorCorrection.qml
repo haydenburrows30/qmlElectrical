@@ -86,9 +86,9 @@ WaveCard {
             }
         }
 
-        // Power Triangle Visualization
-            
+        // Power Triangle Visualization    
         Canvas {
+            id: powerTriangle  // Add ID to reference the Canvas
             Layout.minimumHeight: 300
             Layout.minimumWidth: 300
 
@@ -96,27 +96,64 @@ WaveCard {
                 var ctx = getContext("2d")
                 ctx.reset()
                 
-                // Draw power triangle
-                var centerX = width/2
-                var centerY = height/2
-                var scale = 100
+                // Get values with safety checks
+                var p = calculator.activePower || 0
+                var pf = calculator.currentPF || 0
                 
-                var p = calculator.activePower
-                var pf = calculator.currentPF
+                // Prevent division by zero and invalid PF
+                if (p <= 0 || pf <= 0 || pf >= 1) return
+                
+                // Calculate triangle dimensions
                 var q = p * Math.tan(Math.acos(pf))
                 var s = p / pf
                 
-                // Scale to fit
+                // Set up scaling
+                var margin = 40
                 var maxDim = Math.max(p, q, s)
-                scale = Math.min(width, height) / (maxDim * 2)
+                var scale = (Math.min(width, height) - 2 * margin) / maxDim
                 
-                // Draw triangle
+                // Center the triangle
+                var centerX = width/2
+                var centerY = height/2
+                
+                // Draw triangle with thicker lines
+                ctx.strokeStyle = "#2196F3"
+                ctx.lineWidth = 2
                 ctx.beginPath()
                 ctx.moveTo(centerX - p*scale/2, centerY)
                 ctx.lineTo(centerX + p*scale/2, centerY)
                 ctx.lineTo(centerX + p*scale/2, centerY - q*scale)
                 ctx.closePath()
                 ctx.stroke()
+                
+                // Add labels
+                ctx.fillStyle = "black"
+                ctx.font = "12px sans-serif"
+                ctx.textAlign = "center"
+                
+                // Active Power (P)
+                ctx.fillText(p.toFixed(1) + " kW", centerX, centerY + 20)
+                
+                // Reactive Power (Q)
+                ctx.fillText(q.toFixed(1) + " kVAR", 
+                    centerX + p*scale/2 + 20, 
+                    centerY - q*scale/2)
+                
+                // Apparent Power (S)
+                ctx.fillText(s.toFixed(1) + " kVA",
+                    centerX, centerY - q*scale - 20)
+                
+                // Power Factor Angle
+                ctx.fillText("φ = " + (Math.acos(pf) * 180/Math.PI).toFixed(1) + "°",
+                    centerX + p*scale/4,
+                    centerY - q*scale/4)
+            }
+
+            // Request repaint when values change
+            Connections {
+                target: calculator
+                function onActivePowerChanged() { powerTriangle.requestPaint() }
+                function onCurrentPFChanged() { powerTriangle.requestPaint() }
             }
         }
     }
