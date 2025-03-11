@@ -2,6 +2,17 @@ from abc import ABC, abstractmethod
 from typing import Type, Dict
 from ..Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, ResonantFrequencyCalculator, ConversionCalculator
 from .BaseCalculator import BaseCalculator
+from ..transformer_calculator import TransformerCalculator
+from ..motor_calculator import MotorCalculator
+from ..power_factor_correction import PowerFactorCorrectionCalculator
+from ..cable_ampacity import CableAmpacityCalculator
+from ..protection_relay import ProtectionRelayCalculator
+from ..harmonic_analysis import HarmonicAnalysisCalculator
+from ..instrument_transformer import InstrumentTransformerCalculator
+from ..relay_coordination import RelayCoordinationCalculator
+from ..overcurrent_curves import OvercurrentCurvesCalculator
+from ..discrimination_analyzer import DiscriminationAnalyzer
+from ..voltage_drop_calculator import VoltageDropCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -44,7 +55,18 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "fault": FaultCurrentCalculator,
             "charging": ChargingCalculator,
             "resonant": ResonantFrequencyCalculator,
-            "conversion": ConversionCalculator
+            "conversion": ConversionCalculator,
+            "transformer": TransformerCalculator,
+            "motor": MotorCalculator,
+            "pf_correction": PowerFactorCorrectionCalculator,
+            "cable_ampacity": CableAmpacityCalculator,
+            "protection_relay": ProtectionRelayCalculator,
+            "harmonic_analysis": HarmonicAnalysisCalculator,
+            "instrument_transformer": InstrumentTransformerCalculator,
+            "relay_coordination": RelayCoordinationCalculator,
+            "overcurrent_curves": OvercurrentCurvesCalculator,
+            "discrimination_analyzer": DiscriminationAnalyzer,
+            "voltage_drop": VoltageDropCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

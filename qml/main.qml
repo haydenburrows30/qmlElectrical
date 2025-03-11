@@ -5,6 +5,8 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Qt.labs.qmlmodels 1.0
 
+import QtQuick.Controls.Universal
+
 import QtQuick.Studio.DesignEffects
 
 import PCalculator 1.0
@@ -19,6 +21,7 @@ import Results 1.0
 import SineCalc 1.0
 
 import 'components'
+import 'components/calculators'
 
 ApplicationWindow {
     id: window
@@ -26,14 +29,6 @@ ApplicationWindow {
     minimumWidth: 1280
     minimumHeight: 860
     visible: true
-
-    //calculator models
-    PowerCalculator {id: powerCalculator}
-    ChargingCalculator {id: chargingCalc}
-    FaultCurrentCalculator {id: faultCalc}
-    ResonantFrequencyCalculator {id: resonantFreq}
-    ConversionCalculator {id: conversionCalc}
-    SineCalculator {id: sineCalc}
 
     SeriesRLCChart {id: seriesRLCChart}
     SineWaveModel {id: sineModel}

@@ -21,6 +21,21 @@ from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
 from models.config import app_config
 
+# Add these imports
+from models.transformer_calculator import TransformerCalculator
+from models.voltage_drop_calculator import VoltageDropCalculator
+from models.motor_calculator import MotorCalculator
+from models.power_factor_correction import PowerFactorCorrectionCalculator
+from models.cable_ampacity import CableAmpacityCalculator
+from models.protection_relay import ProtectionRelayCalculator
+from models.harmonic_analysis import HarmonicAnalysisCalculator
+from models.instrument_transformer import InstrumentTransformerCalculator
+
+# New imports for protection system calculators
+from models.relay_coordination import RelayCoordinationCalculator
+from models.overcurrent_curves import OvercurrentCurvesCalculator
+from models.discrimination_analyzer import DiscriminationAnalyzer
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import rc_resources as rc_resources
@@ -85,6 +100,18 @@ class Application:
         self.conversion_calc = self.calculator_factory.create_calculator("conversion")
         self.charging_calc = self.calculator_factory.create_calculator("charging")
 
+        self.transformer_calculator = self.calculator_factory.create_calculator("transformer")
+        self.voltage_drop_calculator = self.calculator_factory.create_calculator("voltage_drop")
+        self.motor_calculator = self.calculator_factory.create_calculator("motor")
+        self.pf_correction_calculator = self.calculator_factory.create_calculator("pf_correction")
+        self.cable_ampacity_calculator = self.calculator_factory.create_calculator("cable_ampacity")
+        self.protection_relay_calculator = self.calculator_factory.create_calculator("protection_relay")
+        self.harmonic_analysis_calculator = self.calculator_factory.create_calculator("harmonic_analysis")
+        self.instrument_transformer_calculator = self.calculator_factory.create_calculator("instrument_transformer")
+        self.relay_coordination = self.calculator_factory.create_calculator("relay_coordination")
+        self.overcurrent_curves = self.calculator_factory.create_calculator("overcurrent_curves")
+        self.discrimination_analyzer = self.calculator_factory.create_calculator("discrimination_analyzer")
+
         # Create and configure other models
         self.sine_calc = self.model_factory.create_model("sine_calc")
         self.sine_wave = self.model_factory.create_model("three_phase")
@@ -109,12 +136,24 @@ class Application:
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
             (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFrequencyCalculator"),
             (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalculator"),
+            (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
+            (MotorCalculator, "Motor", 1, 0, "MotorCalculator"),
+            (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
+            (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrection"),
+            (CableAmpacityCalculator, "CableAmpacity", 1, 0, "CableAmpacity"),
+            (ProtectionRelayCalculator, "ProtectionRelay", 1, 0, "ProtectionRelayCalculator"),
+            (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
+            (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
+            (RelayCoordinationCalculator, "RelayCoordination", 1, 0, "RelayCoordinationCalculator"),
+            (OvercurrentCurvesCalculator, "OvercurrentCurves", 1, 0, "OvercurrentCurvesCalculator"),
+            (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
             (VoltageDrop,"VDrop", 1, 0, "VoltageDrop"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
             (SineCalculator, "SineCalc", 1, 0, "SineCalculator"),
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
-            (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel")
+            (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
+            (VoltageDropCalculator, "VoltageDrop", 1, 0, "VoltageDropCalculator")
         ]
 
     def load_qml(self):
@@ -139,8 +178,11 @@ def setup_container() -> Container:
     
     return container
 
-if __name__ == "__main__":
+def main():
     container = setup_container()
     app = Application(container)
     app.run()
+
+if __name__ == "__main__":
+    main()
 

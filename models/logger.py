@@ -1,38 +1,43 @@
 import logging
 import os
-from datetime import datetime
 
-def setup_logger(name="qmltest", level=logging.INFO):
-    """Configure application-wide logging system.
+def setup_logger(name):
+    """Configure and return a logger with the given name.
+    
+    This function ensures each logger is only set up once to prevent duplicate logging.
     
     Args:
-        name: Logger name
-        level: Logging level (default: INFO)
-    
-    Returns:
-        Logger instance
-    """
-    # Create logs directory if it doesn't exist
-    log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
-    os.makedirs(log_dir, exist_ok=True)
-    
-    # Set up log file with timestamp
-    log_file = os.path.join(log_dir, f'app_{datetime.now().strftime("%Y%m%d")}.log')
-    
-    # Configure logger
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    
-    # Add file handler if not already added
-    if not logger.handlers:
-        file_handler = logging.FileHandler(log_file)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        name: Name of the logger
         
-        # Also add console handler for development
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
+    Returns:
+        logging.Logger: Configured logger
+    """
+    logger = logging.getLogger(name)
+    
+    # Return existing logger if it's already been set up
+    if logger.handlers:
+        return logger
+    
+    # Create logs directory if it doesn't exist
+    os.makedirs('logs', exist_ok=True)
+    
+    # Set log level
+    logger.setLevel(logging.INFO)
+    
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    # Create console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    
+    # Create file handler
+    file_handler = logging.FileHandler('logs/app.log')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    
+    # Prevent propagation to root logger to avoid duplicate logs
+    logger.propagate = False
     
     return logger

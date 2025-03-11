@@ -8,6 +8,17 @@ from models.VoltageDrop import VoltageDrop
 from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator, SineCalculator
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart
+from models.transformer_calculator import TransformerCalculator
+from models.motor_calculator import MotorCalculator
+from models.voltage_drop_calculator import VoltageDropCalculator
+from models.power_factor_correction import PowerFactorCorrectionCalculator
+from models.cable_ampacity import CableAmpacityCalculator
+from models.protection_relay import ProtectionRelayCalculator
+from models.harmonic_analysis import HarmonicAnalysisCalculator
+from models.instrument_transformer import InstrumentTransformerCalculator
+from models.relay_coordination import RelayCoordinationCalculator
+from models.overcurrent_curves import OvercurrentCurvesCalculator
+from models.discrimination_analyzer import DiscriminationAnalyzer
 
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
@@ -79,8 +90,19 @@ class ModelFactory(IModelFactory):
             "series_rlc_chart": SeriesRLCChart,
             "voltage_drop": VoltageDrop,
             "results_manager": ResultsManager,
+            "transformer_calc": TransformerCalculator,
+            "voltage_drop_calc": VoltageDropCalculator,
+            "motor_calc": MotorCalculator,
+            "pf_correction": PowerFactorCorrectionCalculator,
+            "cable_ampacity": CableAmpacityCalculator,
             "sine_calc": SineCalculator,
-            "realtime_chart": RealTimeChart
+            "realtime_chart": RealTimeChart,
+            "protection_relay": ProtectionRelayCalculator,
+            "harmonic_analysis": HarmonicAnalysisCalculator,
+            "instrument_transformer": InstrumentTransformerCalculator,
+            "relay_coordination": RelayCoordinationCalculator,
+            "overcurrent_curves": OvercurrentCurvesCalculator,
+            "discrimination_analyzer": DiscriminationAnalyzer
         }
         
         if model_type not in model_map:

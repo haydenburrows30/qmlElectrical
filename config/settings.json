@@ -1,0 +1,6 @@
+{
+    "style": "Material",
+    "app_name": "QML Electrical Calculator",
+    "org_name": "ElectricalTools",
+    "icon_path": "icons/app_icon.png"
+}

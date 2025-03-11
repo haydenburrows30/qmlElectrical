@@ -147,23 +147,31 @@ Rectangle {
                     var scaledHeight = triangleContainer.triangleHeight * triangleContainer.scaleFactor;
                     var scaledBase = triangleContainer.baseLength * triangleContainer.scaleFactor;
                     
+                    // Start is the top vertex of the triangle
                     var startX = centerX;
                     var startY = centerY - scaledHeight;
+                    // End is the right vertex of the triangle
                     var endX = centerX + scaledBase;
                     var endY = centerY;
                     
+                    // Find midpoint of the hypotenuse
                     var midX = (startX + endX) / 2;
                     var midY = (startY + endY) / 2;
                     
-                    // Calculate the angle for text alignment - key fix here!
-                    var angleForLine = Math.atan2(startY - endY, endX - startX);
+                    // Calculate the slope of the hypotenuse
+                    var angle = Math.atan2(endY - startY, endX - startX);
                     
-                    // Key fix: We need to align text along the hypotenuse, not perpendicular to it
-                    // For text to be parallel to the line, we rotate by the same angle
+                    // Calculate perpendicular offset for text placement
+                    // Reduced from 10 to 5 for closer positioning to the hypotenuse
+                    var offsetDistance = 5;
+                    var offsetX = -Math.sin(angle) * offsetDistance;
+                    var offsetY = Math.cos(angle) * offsetDistance;
                     
                     ctx.save();
-                    ctx.translate(midX, midY - 10); // Position slightly above line
-                    ctx.rotate(angleForLine); // Use the exact same angle as the line
+                    // Position at midpoint of hypotenuse with reduced offset
+                    ctx.translate(midX + offsetX, midY + offsetY);
+                    // Rotate to align with hypotenuse
+                    ctx.rotate(angle);
                     
                     // Set text properties
                     ctx.font = "14px sans-serif";
@@ -171,7 +179,7 @@ Rectangle {
                     ctx.textBaseline = "middle";
                     ctx.fillStyle = sideBar.toggle1 ? "#ffffff" : "#000000";
                     
-                    // Draw text at origin (which is now at midpoint of hypotenuse)
+                    // Draw text aligned with the hypotenuse
                     ctx.fillText(powerText, 0, 0);
                     
                     ctx.restore();
