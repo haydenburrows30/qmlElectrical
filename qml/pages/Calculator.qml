@@ -19,7 +19,6 @@ import Charging 1.0
 import Fault 1.0
 import Sine 1.0
 import RFreq 1.0
-import ConvCalc 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
@@ -183,14 +182,6 @@ Page {
                         text: "Instrument Transformer"
                         onClicked: {
                             calculatorLoader.setSource("../components/calculators/InstrumentTransformerCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Unit Conversion"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/ConversionCalculator.qml")
                             calculatorMenu.close()
                         }
                     }

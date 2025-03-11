@@ -5,7 +5,7 @@ from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.VoltageDrop import VoltageDrop
-from models.Calculator import ConversionCalculator, ResonantFrequencyCalculator, SineCalculator
+from models.Calculator import ResonantFrequencyCalculator, SineCalculator
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart
 # from models.transformer_calculator import TransformerCalculator
@@ -86,11 +86,9 @@ class ModelFactory(IModelFactory):
         model_map = {
             "three_phase": ThreePhaseSineWaveModel,
             "resonant_freq": ResonantFrequencyCalculator,
-            "conversion_calc": ConversionCalculator,
             "series_rlc_chart": SeriesRLCChart,
             "voltage_drop": VoltageDrop,
             "results_manager": ResultsManager,
-            # "transformer_calc": TransformerCalculator,
             "voltage_drop_calc": VoltageDropCalculator,
             "motor_calc": MotorCalculator,
             "pf_correction": PowerFactorCorrectionCalculator,

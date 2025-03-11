@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator, ResonantFrequencyCalculator, ConversionCalculator
+from models.Calculator import PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator, ResonantFrequencyCalculator
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
@@ -106,7 +106,6 @@ class Application:
         self.power_calculator = self.calculator_factory.create_calculator("power")
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
         self.resonant_freq = self.calculator_factory.create_calculator("resonant")
-        self.conversion_calc = self.calculator_factory.create_calculator("conversion")
         self.charging_calc = self.calculator_factory.create_calculator("charging")
 
         self.transformer_calculator = self.calculator_factory.create_calculator("transformer")
@@ -136,7 +135,6 @@ class Application:
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
             (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFrequencyCalculator"),
-            (ConversionCalculator, "ConvCalc", 1, 0, "ConversionCalculator"),
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
             (MotorCalculator, "Motor", 1, 0, "MotorCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
