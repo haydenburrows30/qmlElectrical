@@ -58,175 +58,28 @@ Page {
                 anchors.margins: 5
                 spacing: 10
 
+                CalcButton {
+                    text: "Menu"
+                    Layout.maximumWidth: 100
+                    onClicked: {
+                        calculatorLoader.setSource("../components/CalculatorMenu.qml")
+                    }
+                }
+
                 Label {
                     text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
                     elide: Text.ElideRight
                     Layout.fillWidth: true
-                }
-
-                Button {
-                    text: "Select Calculator"
-                    icon.name: "menu"
-                    onClicked: calculatorMenu.open()
                 }
             }
         }
 
         Loader {
             id: calculatorLoader
+            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
             Layout.fillHeight: true
-            source: "../components/calculators/PowerCurrentCalculator.qml"
-        }
-    }
-
-    Popup {
-        id: calculatorMenu
-        width: 600
-        height: 400
-        anchors.centerIn: parent
-        modal: true
-        
-        background: Rectangle {
-            color: sideBar.toggle1 ? "#2a2a2a" : "#ffffff"
-            border.color: sideBar.toggle1 ? "#404040" : "#d0d0d0"
-            radius: 5
-        }
-
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-
-            Label {
-                text: "Select Calculator"
-                font.pixelSize: 16
-                font.bold: true
-            }
-
-            ScrollView {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                GridLayout {
-                    width: parent.width
-                    columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
-
-                    CalcButton {
-                        text: "Power Calculator"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/PowerCurrentCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "PF Correction"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/PowerFactorCorrection.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Harmonics Analysis"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/HarmonicsAnalyzer.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Voltage Drop"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/VoltageDropCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Cable Ampacity"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/CableAmpacityCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Charging Current"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/ChargingCurrentCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Protection Relay"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/ProtectionRelayCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Relay Coordination"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/RelayCoordination.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Instrument Transformer"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/InstrumentTransformerCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Impedance Calculator"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/ImpedanceCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Battery Calculator"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/BatteryCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Transformer Calculator"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/TransformerCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Sine Calculator"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/SineCalculator.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-
-                    CalcButton {
-                        text: "Unit Converter"
-                        onClicked: {
-                            calculatorLoader.setSource("../components/calculators/UnitConverter.qml")
-                            calculatorMenu.close()
-                        }
-                    }
-                }
-            }
+            source: "../components/CalculatorMenu.qml"
         }
     }
 }
