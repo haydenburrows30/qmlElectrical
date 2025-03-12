@@ -28,26 +28,28 @@ import DiscriminationAnalyzer 1.0
 import OvercurrentCurves 1.0
 import HarmonicAnalysis 1.0
 import PFCorrection 1.0
+import Battery 1.0
 
 Page {
     id: home
 
     property var calculatorList: [
         "../components/CalculatorMenu.qml",
-        "../components/calculators/UnitConverter.qml",
-        "../components/calculators/PowerCurrentCalculator.qml",
-        "../components/calculators/ImpedanceCalculator.qml",
+        "../components/calculators/BatteryCalculator.qml",
+        "../components/calculators/CableAmpacityCalculator.qml",
         "../components/calculators/ChargingCurrentCalculator.qml",
         "../components/calculators/DiscriminationAnalyzer.qml",
         "../components/calculators/FrequencyCalculator.qml",
-        "../components/calculators/VoltageDropCalculator.qml",
-        "../components/calculators/CableAmpacityCalculator.qml",
-        "../components/calculators/ProtectionRelayCalculator.qml",
-        "../components/calculators/InstrumentTransformerCalculator.qml",
-        "../components/calculators/RelayCoordination.qml",
         "../components/calculators/HarmonicsAnalyzer.qml",
+        "../components/calculators/ImpedanceCalculator.qml",
+        "../components/calculators/InstrumentTransformerCalculator.qml",
+        "../components/calculators/MotorStartingCalculator.qml",
         "../components/calculators/PowerFactorCorrection.qml",
-        "../components/calculators/MotorStartingCalculator.qml"
+        "../components/calculators/ProtectionRelayCalculator.qml",
+        "../components/calculators/RelayCoordination.qml",
+        "../components/calculators/TransformerCalculator.qml",
+        "../components/calculators/UnitConverter.qml",
+        "../components/calculators/VoltageDropCalculator.qml"
     ]
     property int currentCalculatorIndex: 0
 

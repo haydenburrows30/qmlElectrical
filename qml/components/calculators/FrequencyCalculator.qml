@@ -8,20 +8,14 @@ import Freq 1.0
 WaveCard {
     id: frequencyCalculator
     title: "Resonant Frequency Calculator"
-    Layout.minimumWidth: 600
-    Layout.minimumHeight: 200
 
-    // Create instance of calculator
     property FrequencyCalculator calculator: FrequencyCalculator {}
 
     RowLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
         spacing: 10
 
         ColumnLayout {
-            Layout.alignment: Qt.AlignTop
-            Layout.minimumWidth: 300
-
             GridLayout {
                 columns: 2
                 rowSpacing: 10
@@ -31,6 +25,7 @@ WaveCard {
                 TextField {
                     id: inductanceInput
                     placeholderText: "Enter inductance"
+                    Layout.minimumWidth: 150
                     onTextChanged: if(text) {
                         calculator.inductance = parseFloat(text)
                     }
@@ -40,6 +35,7 @@ WaveCard {
                 TextField {
                     id: capacitanceInput
                     placeholderText: "Enter capacitance"
+                    Layout.minimumWidth: 150
                     onTextChanged: if(text) {
                         calculator.capacitance = parseFloat(text)
                     }
@@ -48,21 +44,25 @@ WaveCard {
 
             GroupBox {
                 title: "Results"
-                Layout.fillWidth: true
-                
-                ColumnLayout {
-                    Label { 
-                        text: "Resonant Frequency: " + 
-                              (calculator && calculator.resonantFrequency ? 
+                Layout.minimumWidth: 300
+
+                 GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
+
+                    Label { text: "Resonant Frequency: " }
+                    Label { text:  (calculator && calculator.resonantFrequency ? 
                                calculator.resonantFrequency.toFixed(2) + " Hz" : 
                                "0.00 Hz")
                     }
-                    Label { 
-                        text: "Angular Frequency: " + 
-                              (calculator && calculator.angularFrequency ? 
+
+                    Label { text: "Angular Frequency: "}
+                    Label { text: (calculator && calculator.angularFrequency ? 
                                calculator.angularFrequency.toFixed(2) + " rad/s" : 
                                "0.00 rad/s") 
                     }
+
                 }
             }
         }
