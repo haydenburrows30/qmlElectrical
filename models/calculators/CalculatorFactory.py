@@ -13,6 +13,7 @@ from ..overcurrent_curves import OvercurrentCurvesCalculator
 from ..discrimination_analyzer import DiscriminationAnalyzer
 from ..voltage_drop_calculator import VoltageDropCalculator
 from ..machine_calculator import MachineCalculator
+from ..earthing_calculator import EarthingCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -65,7 +66,8 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "discrimination_analyzer": DiscriminationAnalyzer,
             "voltage_drop": VoltageDropCalculator,
             "conversion": ConversionCalculator,
-            "machine": MachineCalculator
+            "machine": MachineCalculator,
+            "earthing": EarthingCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

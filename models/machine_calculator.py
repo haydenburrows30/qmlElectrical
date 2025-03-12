@@ -17,7 +17,12 @@ class MachineCalculator(QObject):
     torqueChanged = Signal()
     slipChanged = Signal()
     resultsCalculated = Signal()
-    
+    temperatureRiseChanged = Signal()
+    temperatureClassChanged = Signal()
+    coolingMethodChanged = Signal()
+    coolingMethodsChanged = Signal()  # Add new signal
+    temperatureClassesChanged = Signal()  # Add new signal
+
     def __init__(self, parent=None):
         super().__init__(parent)
         # Initialize properties
@@ -36,6 +41,18 @@ class MachineCalculator(QObject):
         # Derived values
         self._torque = 0.0
         self._losses = 0.0
+        
+        # Add new properties
+        self._temperature_rise = 0.0
+        self._temperature_class = "F"  # B, F, H classes
+        self._cooling_method = "TEFC"  # TEFC, ODP, TENV
+        self._ambient_temp = 40.0
+        self._temperature_classes = {
+            "B": 130,
+            "F": 155,
+            "H": 180
+        }
+        self._cooling_methods = ["TEFC", "ODP", "TENV"]
         
         # Calculate initial values
         self._calculate()
@@ -72,6 +89,54 @@ class MachineCalculator(QObject):
             
             # Torque calculation (N·m)
             self._torque = 9550 * self._rated_power / self._rotational_speed
+            
+            # Calculate temperature rise based on losses and cooling
+            cooling_factor = {
+                "TEFC": 1.0,
+                "ODP": 1.2,
+                "TENV": 0.8
+            }[self._cooling_method]
+            
+            # Improved temperature rise calculation considering machine size
+            thermal_mass = self._rated_power * 50  # Larger machines have more thermal mass
+            self._temperature_rise = (self._losses * 1000 * cooling_factor) / (10 + thermal_mass)
+            self.temperatureRiseChanged.emit()
+            
+            # Check if temperature rise exceeds class limit and adjust efficiency
+            max_allowed_rise = self._temperature_classes[self._temperature_class] - self._ambient_temp
+            if self._temperature_rise > max_allowed_rise:
+                temp_exceed_ratio = self._temperature_rise / max_allowed_rise
+                new_efficiency = self._efficiency * (1 - 0.05 * temp_exceed_ratio)
+                
+                # Only update if efficiency would actually change
+                if abs(new_efficiency - self._efficiency) > 0.0001:
+                    self._efficiency = new_efficiency
+                    self.efficiencyChanged.emit()
+                    
+                    # Recalculate power and losses with new efficiency
+                    if self._machine_type.endswith("Motor"):
+                        input_power = self._rated_voltage * self._rated_current * math.sqrt(3) * self._power_factor / 1000
+                        self._rated_power = input_power * self._efficiency
+                        self._losses = input_power - self._rated_power
+                    else:
+                        self._losses = self._rated_power * (1 - self._efficiency)
+                    
+                    self.ratedPowerChanged.emit()
+                    self.lossesChanged.emit()
+            
+            # Calculate detailed torque characteristics
+            if self._machine_type == "Induction Motor":
+                self._starting_torque = self._torque * 1.5
+                self._breakdown_torque = self._torque * 2.5
+                self._pullup_torque = self._torque * 1.8
+            elif self._machine_type == "Synchronous Motor":
+                self._starting_torque = self._torque * 1.0
+                self._breakdown_torque = self._torque * 2.0
+                self._pullup_torque = self._torque * 1.2
+            else:  # DC Motors
+                self._starting_torque = self._torque * 1.6
+                self._breakdown_torque = self._torque * 1.6
+                self._pullup_torque = self._torque * 1.6
             
             # Emit signals
             self.lossesChanged.emit()
@@ -206,6 +271,72 @@ class MachineCalculator(QObject):
     def machineTypes(self):
         return self._machine_types
     
+    @Property(float, notify=temperatureRiseChanged)
+    def temperatureRise(self):
+        return self._temperature_rise
+    
+    @Property(str, notify=temperatureClassChanged)
+    def temperatureClass(self):
+        return self._temperature_class
+    
+    @temperatureClass.setter
+    def temperatureClass(self, value):
+        if value in self._temperature_classes and value != self._temperature_class:
+            old_class = self._temperature_class
+            self._temperature_class = value
+            self.temperatureClassChanged.emit()
+            
+            # Recalculate efficiency based on temperature class
+            old_max_temp = self._temperature_classes[old_class]
+            new_max_temp = self._temperature_classes[value]
+            
+            # If moving to a lower temperature class
+            if new_max_temp < old_max_temp and self._temperature_rise > (new_max_temp - self._ambient_temp):
+                # Calculate efficiency derating
+                allowed_rise = new_max_temp - self._ambient_temp
+                temp_exceed_ratio = self._temperature_rise / allowed_rise
+                efficiency_derating = 1 - 0.05 * temp_exceed_ratio
+                
+                # Update efficiency if it would change
+                new_efficiency = self._efficiency * efficiency_derating
+                if new_efficiency != self._efficiency:
+                    self._efficiency = new_efficiency
+                    self.efficiencyChanged.emit()
+            
+            # Recalculate all dependent values
+            self._calculate()
+    
+    @Property(str)
+    def coolingMethod(self):
+        return self._cooling_method
+    
+    @coolingMethod.setter
+    def coolingMethod(self, value):
+        if value in self._cooling_methods:
+            self._cooling_method = value
+            self.coolingMethodChanged.emit()
+            self._calculate()
+    
+    @Property(list, notify=coolingMethodsChanged)  # Add notify signal
+    def coolingMethods(self):
+        return self._cooling_methods
+    
+    @Property(list, notify=temperatureClassesChanged)
+    def temperatureClasses(self):
+        return list(self._temperature_classes.keys())
+    
+    @Property(float)
+    def startingTorque(self):
+        return self._starting_torque
+    
+    @Property(float)
+    def breakdownTorque(self):
+        return self._breakdown_torque
+    
+    @Property(float)
+    def pullupTorque(self):
+        return self._pullup_torque
+    
     # QML slots
     @Slot(str)
     def setMachineType(self, machine_type):
@@ -242,6 +373,14 @@ class MachineCalculator(QObject):
     @Slot(float)
     def setRotationalSpeed(self, rpm):
         self.rotationalSpeed = rpm
+    
+    @Slot(str)
+    def setTemperatureClass(self, temp_class):
+        self.temperatureClass = temp_class
+    
+    @Slot(str)
+    def setCoolingMethod(self, method):
+        self.coolingMethod = method
     
     @Slot()
     def calculate(self):

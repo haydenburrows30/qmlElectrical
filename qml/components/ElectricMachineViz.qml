@@ -12,6 +12,7 @@ Item {
     property real speedRPM: 1450
     property real torque: 33
     property real slip: 0.033
+    property real temperatureRise: 75.0
     
     // Theme properties
     property bool darkMode: Universal.theme === Universal.Dark
@@ -27,6 +28,7 @@ Item {
     onSpeedRPMChanged: canvas.requestPaint()
     onTorqueChanged: canvas.requestPaint()
     onSlipChanged: canvas.requestPaint()
+    onTemperatureRiseChanged: canvas.requestPaint()
 
     Canvas {
         id: canvas
@@ -291,29 +293,35 @@ Item {
             ctx.beginPath();
             
             if (machineType === "Induction Motor") {
-                // Induction motor curve - starting torque, pull-up, breakdown, rated
-                ctx.moveTo(originX, originY - height * 0.6);  // Starting torque
+                // Draw more detailed characteristic curve
+                ctx.moveTo(originX, originY - height * 0.6);  // Starting torque point
                 
-                // Pull-up and breakdown torque
-                ctx.quadraticCurveTo(
-                    originX + width * 0.3, originY - height * 0.5,
-                    originX + width * 0.7, originY - height * 0.95
+                // Pull-up region
+                ctx.bezierCurveTo(
+                    originX + width * 0.2, originY - height * 0.5,  // Control point 1
+                    originX + width * 0.3, originY - height * 0.7,  // Control point 2
+                    originX + width * 0.4, originY - height * 0.7   // Pull-up point
                 );
                 
-                // Rated point and beyond
-                ctx.quadraticCurveTo(
-                    originX + width * 0.85, originY - height * 0.65,
-                    originX + width, originY - height * 0.1
+                // Breakdown region
+                ctx.bezierCurveTo(
+                    originX + width * 0.5, originY - height * 0.7,  // Control point 1
+                    originX + width * 0.6, originY - height * 0.95, // Control point 2
+                    originX + width * 0.7, originY - height * 0.95  // Breakdown point
                 );
                 
-                // Mark the rated point
-                var ratedX = originX + width * 0.8;
-                var ratedY = originY - height * 0.7;
-                ctx.fillStyle = "#FF6600";
-                ctx.beginPath();
-                ctx.arc(ratedX, ratedY, 5, 0, 2 * Math.PI);
-                ctx.fill();
+                // Operating region
+                ctx.bezierCurveTo(
+                    originX + width * 0.8, originY - height * 0.95, // Control point 1
+                    originX + width * 0.85, originY - height * 0.7, // Control point 2
+                    originX + width * 0.95, originY - height * 0.1  // End point
+                );
                 
+                // Draw operating points
+                drawOperatingPoint(ctx, originX, originY - height * 0.6, "Starting");
+                drawOperatingPoint(ctx, originX + width * 0.4, originY - height * 0.7, "Pull-up");
+                drawOperatingPoint(ctx, originX + width * 0.7, originY - height * 0.95, "Breakdown");
+                drawOperatingPoint(ctx, originX + width * 0.8, originY - height * 0.7, "Rated");
             } else if (machineType === "DC Motor" || machineType === "DC Generator") {
                 // DC motor/generator - linear speed-torque relationship
                 ctx.moveTo(originX, originY - height * 0.9);
@@ -343,6 +351,48 @@ Item {
             }
             
             ctx.stroke();
+            
+            // Add temperature indicator
+            var tempGradient = ctx.createLinearGradient(x + width + 10, y, x + width + 30, y);
+            tempGradient.addColorStop(0, "#00ff00");
+            tempGradient.addColorStop(0.5, "#ffff00");
+            tempGradient.addColorStop(1, "#ff0000");
+            
+            ctx.fillStyle = tempGradient;
+            ctx.fillRect(x + width + 10, y, 20, height);
+            
+            // Temperature marker
+            var tempHeight = (1 - temperatureRise / 150) * height;
+            ctx.fillStyle = "#000000";
+            ctx.beginPath();
+            ctx.moveTo(x + width + 5, y + tempHeight);
+            ctx.lineTo(x + width + 35, y + tempHeight);
+            ctx.stroke();
+            
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "left";
+            ctx.fillText(temperatureRise.toFixed(1) + "°C", x + width + 40, y + tempHeight);
+
+            // Add temperature warning if over limit
+            if (temperatureRise > 80) {
+                ctx.fillStyle = "#FF0000";
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillText("⚠️ Temperature Limit Exceeded", 
+                           x + width/2, y - 20);
+                ctx.fillText("Efficiency Derated", 
+                           x + width/2, y - 40);
+            }
+        }
+        
+        function drawOperatingPoint(ctx, x, y, label) {
+            ctx.fillStyle = "#FF6600";
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "right";
+            ctx.fillText(label, x - 10, y);
         }
     }
 }

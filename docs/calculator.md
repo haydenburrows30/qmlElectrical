@@ -1,6 +1,4 @@
-Power Systems Calculators
-Short Circuit Calculator
-
+Short Circuit Calculator:
 Calculate fault currents in power systems:
 Include three-phase, single-phase-to-ground, phase-to-phase, and double-phase-to-ground faults
 Visualize fault current magnitude and direction
@@ -22,12 +20,6 @@ Arc Flash Calculator:
 Calculate incident energy levels and protection boundaries
 Visualize arc flash boundary zones
 
-Electrical Machines Calculators:
-Induction Motor Slip Calculator
-Calculate slip, efficiency, and torque at different loads
-Show torque-speed characteristics
-Include temperature rise estimation
-
 Generator Synchronization Calculator:
 Calculate synchronizing power and torque
 Determine critical clearing time
@@ -41,11 +33,6 @@ Determine motor starting requirements
 Equipment Design Calculators:
 Busbar Design Calculator
 Calculate short circuit forces between busbars
-
-Earthing System Calculator:
-Calculate grid resistance and potential rise
-Determine touch and step voltages
-Include mesh design optimization
 
 Power Quality Calculators:
 Harmonic Analysis Calculator

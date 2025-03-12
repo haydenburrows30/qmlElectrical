@@ -45,7 +45,7 @@ WaveCard {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
-                    Layout.fillWidth: true
+                    
 
                     Label { text: "Rated Voltage (V):" }
                     TextField {
@@ -126,6 +126,42 @@ WaveCard {
                 }
             }
 
+            // Thermal Parameters
+            GroupBox {
+                title: "Thermal Parameters"
+                
+
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 15
+
+                    Label { text: "Temperature Class:" }
+                    ComboBox {
+                        id: tempClassCombo
+                        model: calculator.temperatureClasses
+                        onCurrentTextChanged: if(currentText) calculator.setTemperatureClass(currentText)
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Cooling Method:" }
+                    ComboBox {
+                        id: coolingMethodCombo
+                        model: calculator.coolingMethods
+                        onCurrentTextChanged: if(currentText) calculator.setCoolingMethod(currentText)
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Temperature Rise:" }
+                    Label {
+                        text: calculator.temperatureRise.toFixed(1) + " °C"
+                        color: calculator.temperatureRise > 80 ? 
+                               Universal.theme === Universal.Dark ? "#FF8080" : "red" :
+                               Universal.foreground
+                    }
+                }
+            }
+
             // Results Section
             GroupBox {
                 title: "Results"
@@ -139,6 +175,14 @@ WaveCard {
                     Label { 
                         text: calculator.ratedPower.toFixed(2) + " kW"
                         color: Universal.foreground
+                    }
+                    
+                    Label { text: "Power with Derating:" }
+                    Label { 
+                        text: (calculator.ratedPower * calculator.efficiency).toFixed(2) + " kW"
+                        color: calculator.temperatureRise > 80 ? 
+                               Universal.theme === Universal.Dark ? "#FF8080" : "red" :
+                               Universal.foreground
                     }
 
                     Label { text: "Torque:" }
@@ -181,6 +225,7 @@ WaveCard {
                 speedRPM: calculator.rotationalSpeed
                 torque: calculator.torque
                 slip: calculator.slip
+                temperatureRise: calculator.temperatureRise  // Add this binding
                 
                 darkMode: Universal.theme === Universal.Dark
                 textColor: machineCard.textColor
