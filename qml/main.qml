@@ -3,17 +3,12 @@ import QtCore
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt.labs.qmlmodels 1.0
-
 import QtQuick.Controls.Universal
-
-import QtQuick.Studio.DesignEffects
 
 import PCalculator 1.0
 import Charging 1.0
 import Fault 1.0
 import Sine 1.0
-// import RFreq 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
@@ -65,7 +60,7 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors {
-            top: parent.top//menu.bottom
+            top: parent.top //menu.bottom
             bottom: parent.bottom
             left: parent.left
             leftMargin: 0

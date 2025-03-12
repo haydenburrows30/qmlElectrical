@@ -54,8 +54,6 @@ The application follows a modular design pattern where components are broken dow
 ### WaveCard
 - **Properties**:
   - title: string
-  - showInfo: bool
-  - info: string
   - Layout properties
 
 ### CableSelectionSettings

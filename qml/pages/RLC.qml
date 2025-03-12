@@ -66,8 +66,6 @@ Page {
                     Layout.minimumHeight: 700
                     Layout.minimumWidth: 330
                     Layout.fillHeight: true
-
-                    showInfo: false
                     
                     GridLayout {
                         columns: 2
@@ -239,8 +237,6 @@ Page {
                     title: 'Series RLC Chart'
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-
-                    showInfo: false
 
                     ColumnLayout {
                         anchors.fill: parent

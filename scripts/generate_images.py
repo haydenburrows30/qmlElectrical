@@ -17,8 +17,8 @@ def check_and_install_dependencies():
 def generate_all_images():
     """Generate all formula and diagram images for the application."""
     # Import after ensuring dependencies are installed
-    from generate_formula_images import main as generate_formulas
-    from generate_diagram_images import main as generate_diagrams
+    from scripts.generate_formula_images import main as generate_formulas
+    from scripts.generate_diagram_images import main as generate_diagrams
     
     # Create media directory if it doesn't exist
     os.makedirs('media', exist_ok=True)

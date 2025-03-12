@@ -70,11 +70,9 @@ Page {
 
         RowLayout {
             anchors.margins: 5
-            // uniformCellSizes : true
             Layout.fillWidth: true
             spacing: 10
 
-            // Add Previous button
             CalcButton {
                 text: "←"
                 Layout.maximumWidth: 40
@@ -85,31 +83,29 @@ Page {
                 }
             }
 
-            // CalcButton {
-            //     text: "Menu"
-            //     Layout.maximumWidth: 100
-            //     Layout.alignment: Qt.AlignRight
-            //     Layout.fillWidth: true
-            //     onClicked: {
-            //         currentCalculatorIndex = 0
-            //         calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
-            //     }
-            // }
-
-            Label {
-                Layout.minimumWidth: 200
+            CalcButton {
+                text: calculatorLoader.source.toString().split("/").pop().replace(".qml", "")
+                Layout.preferredWidth: 200
                 Layout.fillWidth: true
-                horizontalAlignment : Text.AlignHCenter
-
-                text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
+                onClicked: {
+                    currentCalculatorIndex = 0
+                    calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
+                }
             }
+
+            // Label {
+            //     Layout.minimumWidth: 200
+            //     Layout.fillWidth: true
+            //     horizontalAlignment : Text.AlignHCenter
+
+            //     text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
+            // }
 
             // Add Next button
             CalcButton {
                 text: "→"
                 Layout.maximumWidth: 40
                 Layout.alignment: Qt.AlignRight
-
                 onClicked: {
                     currentCalculatorIndex = (currentCalculatorIndex + 1) % calculatorList.length
                     calculatorLoader.setSource(calculatorList[currentCalculatorIndex])

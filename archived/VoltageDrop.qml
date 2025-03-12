@@ -104,8 +104,6 @@ Page {
                     Layout.minimumHeight: 200
                     Layout.minimumWidth: 300
                     Layout.alignment: Qt.AlignTop
-
-                    showInfo: false
                     
                     ColumnLayout {
                         id: columnLayout
@@ -160,8 +158,6 @@ Page {
                         title: 'Table'
                         Layout.minimumHeight: 200
                         Layout.minimumWidth: 810
-
-                        showInfo: false
                         
                         RowLayout {
                             id: buttons
@@ -285,8 +281,6 @@ Page {
                         Layout.minimumHeight: 500
                         // Layout.minimumWidth: 800
                         Layout.fillWidth: true
-
-                        showInfo: false
 
                         BarChart {
                             id: barChart

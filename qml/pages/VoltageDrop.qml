@@ -54,32 +54,25 @@ Page {
                         title: "Cable Selection"
                         Layout.minimumHeight: 560
                         Layout.minimumWidth: 400
-                        showInfo: false
 
                         CableSelectionSettings {
                             id: cableSettings
                             anchors.fill: parent
-                            
-                            // Connect to the resetRequested signal
+
                             onResetRequested: {
-                                // No need to do anything here - the component will handle resetting itself
                                 console.log("Reset requested")
                             }
-                            
-                            // Connect to the new resetCompleted signal
+
                             onResetCompleted: {
                                 console.log("Reset completed, updating UI")
-                                
-                                // Force property reevaluation
+
                                 root.currentVoltageDropValue = voltageDrop.voltageDrop || 0
 
-                                // Log the changes
                                 console.log("After reset - voltage drop:", voltageDrop.voltageDrop)
                                 console.log("After reset - current:", voltageDrop.current)
                                 console.log("After reset - fuse size:", voltageDrop.networkFuseSize)
                                 console.log("After reset - combined rating:", voltageDrop.combinedRatingInfo)
-                                
-                                // Update result component properties
+
                                 resultsPanel.combinedRatingInfo = voltageDrop.combinedRatingInfo || "N/A"
                                 resultsPanel.totalLoad = voltageDrop.totalKva || 0.0
                                 resultsPanel.current = voltageDrop.current || 0.0
@@ -91,7 +84,6 @@ Page {
                         title: "Results"
                         Layout.minimumHeight: 350
                         Layout.minimumWidth: 400
-                        showInfo: false
 
                         ResultsPanel {
                             id: resultsPanel
@@ -101,7 +93,6 @@ Page {
                             selectedVoltage: voltageDrop.selectedVoltage
                             diversityFactor: voltageDrop.diversityFactor
                             combinedRatingInfo: voltageDrop.combinedRatingInfo || "N/A"
-                            // Update these properties to use direct access to voltageDrop
                             totalLoad: voltageDrop.totalKva || 0.0
                             current: voltageDrop.current || 0.0
                             
@@ -124,7 +115,6 @@ Page {
                             }
                             
                             onViewDetailsClicked: {
-                                // Pass all required data to the details popup
                                 detailsPopup.voltageSystem = voltageDrop.selectedVoltage
                                 detailsPopup.admdEnabled = voltageDrop.admdEnabled
                                 detailsPopup.kvaPerHouse = voltageDrop.totalKva / voltageDrop.numberOfHouses
@@ -161,9 +151,7 @@ Page {
                         title: "Cable Size Comparison"
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        showInfo: false
 
-                        // Replace with ComparisonTable component
                         ComparisonTable {
                             id: comparisonTable
                             anchors.fill: parent
@@ -193,7 +181,6 @@ Page {
         }
     }
 
-    // Replace with ChartPopup component
     ChartPopup {
         id: chartPopup
         
@@ -205,15 +192,13 @@ Page {
         }
     }
     
-    // Keep imported components
     MessagePopup {
         id: messagePopup
     }
     
     ExportFileDialog {
         id: exportFileDialog
-        
-        // Setup handler function after importing
+
         function handleExport(selectedFile) {
             switch(exportType) {
                 case chartExport:
@@ -255,15 +240,13 @@ Page {
     LoadingIndicator {
         id: loadingIndicator
     }
-    
-    // Keep connections to voltageDrop
+
     Connections {
         target: voltageDrop
         
         function onGrabRequested(filepath, scale) {
             loadingIndicator.show()
             console.log("Grabbing image to:", filepath, "with scale:", scale)
-            // Use the convenience method from ChartPopup instead
             chartPopup.grabImage(function(result) {
                 loadingIndicator.hide()
                 if (result) {
@@ -278,8 +261,7 @@ Page {
                 }
             }, scale)
         }
-        
-        // Update event handlers to use new component methods
+
         function onTableExportStatusChanged(success, message) {
             loadingIndicator.hide()
             if (success) {
@@ -316,15 +298,13 @@ Page {
             }
         }
     }
-    
-    // Keep VoltageDropDetails
+
     VoltageDropDetails {
         id: detailsPopup
         anchors.centerIn: Overlay.overlay
         
         onCloseRequested: detailsPopup.close()
-        
-        // Modified handler to only pass data without opening QML FileDialog
+
         onSaveToPdfRequested: {
             loadingIndicator.show()
             voltageDrop.exportDetailsToPDF(null, {

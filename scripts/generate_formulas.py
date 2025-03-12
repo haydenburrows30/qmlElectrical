@@ -38,24 +38,29 @@ def save_formula(formula, filename, directory):
 
 def main():
     setup_matplotlib()
-    formula_dir = Path("../assets/formulas")
+    formula_dir = Path("assets/formulas")
     formula_dir.mkdir(parents=True, exist_ok=True)
     
     # Dictionary of conversion types and their formulas
     formulas = {
         # Power & Energy
         "watts_to_dbm": r"P_{dBm} = 10 \log_{10}(P_W \cdot 1000)",
+        "dbmw_to_watts": r"P_W = 10^{(P_{dBm}/10)} \cdot 10^{-3}",
         "hp_to_watts": r"P_W = P_{HP} \cdot 746",
+        "watts_to_horsepower": r"P_{HP} = \frac{P_W}{746}",
         "joules_to_kwh": r"E_{kWh} = \frac{E_J}{3600000}",
         
         # Frequency & Angular
         "rad_to_hz": r"f = \frac{\omega}{2\pi}",
+        "radians_to_hz": r"f = \frac{\omega}{2\pi}",
         "rpm_to_hz": r"f = \frac{N}{60}",
+        "hz_to_rpm": r"N = f \cdot 60",
         
         # Three-Phase Relationships
         "line_phase_voltage": r"V_{ph} = \frac{V_L}{\sqrt{3}}",
         "phase_line_voltage": r"V_L = V_{ph} \cdot \sqrt{3}",
         "line_phase_current": r"I_{ph} = \frac{I_L}{\sqrt{3}}",
+        "phase_line_current": r"I_L = I_{ph} \cdot \sqrt{3}",
         
         # Power Factor
         "power_factor": r"P = S \cdot \cos\phi",
@@ -72,6 +77,10 @@ def main():
         
         # Fault Calculations
         "sym_fault": r"I_{ph} = I_{sym} \cdot \sqrt{3}",
+        
+        # Temperature Conversions
+        "celsius_to_fahrenheit": r"T_F = T_C \cdot \frac{9}{5} + 32",
+        "fahrenheit_to_celsius": r"T_C = (T_F - 32) \cdot \frac{5}{9}",
         
         # Other Conversions
         "reactance_freq": r"X_{60} = X_{50} \cdot \frac{60}{50}",

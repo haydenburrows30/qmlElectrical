@@ -14,11 +14,10 @@ import "../components"
 WaveCard {
     id: root
     title: "Wave Controls"
-    showInfo: false
     property var model
     property var phaseControls: []
     
-    signal requestAutoScale()  // Add new signal
+    signal requestAutoScale()
 
     ColumnLayout {
         Label {
@@ -80,12 +79,12 @@ WaveCard {
                 icon.name: "Reset"
                 
                 onClicked: {
-                    sineModel.reset()  // This will reset all values including power
+                    sineModel.reset()  
                     freqSlider.value = 50
                     for (let control of phaseControls) {
                         control.resetPhase()
                     }
-                    requestAutoScale()  // Emit signal when reset is clicked
+                    requestAutoScale()
                 }
             }
         }
@@ -117,7 +116,6 @@ WaveCard {
                     else sineModel.setPhaseAngleC(value)
                 }
                 onAmplitudeChanged1: function(value) {
-                    // Update to directly use the value without dividing by 10
                     if (phase === "A") sineModel.setCurrentA(value)
                     else if (phase === "B") sineModel.setCurrentB(value)
                     else sineModel.setCurrentC(value)

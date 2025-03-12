@@ -47,7 +47,6 @@ Page {
                             title: "Measurements"
                             Layout.minimumHeight: 460
                             Layout.minimumWidth: 370
-                            showInfo: false
 
                             ColumnLayout {
                                 anchors.fill: parent
@@ -98,7 +97,6 @@ Page {
                             Layout.fillWidth: true
                             Layout.minimumHeight: 460
                             Layout.minimumWidth: 400
-                            showInfo: false
 
                             ColumnLayout {
                                 anchors.fill: parent
@@ -147,7 +145,6 @@ Page {
                             Layout.minimumHeight: 400
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            showInfo: false
                             
                             WaveChart {
                                 id: waveChart
@@ -160,7 +157,6 @@ Page {
                             Layout.minimumWidth: 530
                             Layout.minimumHeight: 530
                             Layout.fillHeight: true
-                            showInfo: false
                             
                             PhasorDiagram {
                                 anchors.fill: parent
