@@ -8,7 +8,6 @@ Rectangle {
         id: converter
     }
     
-    // Add property to track which combobox is active
     property string activeComboBox: "conversionType"
 
     RowLayout {
@@ -94,7 +93,6 @@ Rectangle {
         Rectangle {
             Layout.minimumHeight: 200
             Layout.minimumWidth: 400
-            color: "#f5f5f5"
             radius: 5
             border.color: "#cccccc"
 

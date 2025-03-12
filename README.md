@@ -22,5 +22,5 @@ pip install git+https://github.com/engineerjoe440/ElectricPy.git
 ```
 
 ```
-pyside6-rcc resources.qrc -o rc_data/resources.py
+pyside6-rcc resources.qrc -o data/rc_resources.py
 ```

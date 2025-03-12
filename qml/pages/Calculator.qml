@@ -18,7 +18,6 @@ import Sine 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
-// import SineCalc 1.0
 import Conversion 1.0
 import CableAmpacity 1.0
 import ProtectionRelay 1.0
@@ -55,10 +54,6 @@ Page {
 
     property var powerTriangleModel
     property var impedanceVectorModel
-
-    background: Rectangle {
-        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
-    }
 
     ColumnLayout {
         anchors.fill: parent

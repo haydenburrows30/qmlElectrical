@@ -1,5 +1,3 @@
-
-
 Power Systems Calculators
 Short Circuit Calculator
 
@@ -12,30 +10,18 @@ Load Flow Calculator
 Calculate bus voltages, power flows, and losses in a power system
 Include Gauss-Seidel and Newton-Raphson methods
 Visualize power flow with a simple network diagram
-Power Factor Correction Calculator
 
-Calculate required capacitance for power factor improvement
-Show cost savings from improved power factor
-Include visualization of power triangle before and after correction
 Transmission Line Parameters Calculator
 
 Calculate R, L, C parameters of overhead and underground lines
 Include skin effect calculations
 Determine surge impedance loading (SIL) of lines
 
-Protection Systems Calculators
-
-Calculate time-current curves for overcurrent relays
-Determine relay settings for proper discrimination
-Visualize coordination curves with multiple relays
-
-Calculate CT and VT ratios and accuracy class requirements
 Determine knee point voltage and ALF for protection class CTs
 Check CT saturation under fault conditions
 Arc Flash Calculator
 
 Calculate incident energy levels and protection boundaries
-Determine required PPE for working on electrical equipment
 Visualize arc flash boundary zones
 Electrical Machines Calculators
 Induction Motor Slip Calculator
@@ -67,7 +53,6 @@ Include mesh design optimization
 Power Quality Calculators
 Harmonic Analysis Calculator
 
-Calculate THD and individual harmonic distortion
 Determine required filter components
 Visualize harmonic spectrum
 Flicker and Voltage Fluctuation Calculator
@@ -80,15 +65,3 @@ Capacitor Bank Resonance Calculator
 Calculate resonant frequencies with system inductance
 Determine harmonic amplification factors
 Suggest damping solutions
-Battery and UPS Calculators
-Battery Sizing Calculator
-
-Calculate required battery capacity for UPS systems
-Determine battery life and voltage drop during discharge
-Include temperature correction factors
-UPS Runtime Calculator
-
-Calculate UPS runtime based on load and battery capacity
-Determine optimal load percentage
-Include battery aging factors
-Implementation Suggestion

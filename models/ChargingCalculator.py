@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal, Property, Slot, Qt
+from PySide6.QtCore import QObject, Signal, Property
 
 class ChargingCalculator(QObject):
     voltageChanged = Signal()

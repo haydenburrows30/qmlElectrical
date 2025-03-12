@@ -167,7 +167,6 @@ WaveCard {
                         required property int index
                         width: ListView.view.width
                         height: relayInfo.height + 10
-                        color: index % 2 ? "#f0f0f0" : "white"
                         radius: 3
 
                         Column {
@@ -255,7 +254,6 @@ WaveCard {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: 600
-            color: "white"
             border.color: "#cccccc"
             border.width: 1
             radius: 4

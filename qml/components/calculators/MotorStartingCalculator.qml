@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import MotorStarting 1.0  // Import the correct namespace
@@ -8,6 +9,7 @@ import MotorStarting 1.0  // Import the correct namespace
 WaveCard {
     id: motorStartingCard
     title: 'Motor Starting Calculator'
+    color: Universal.background // Override the background color with theme color
     property MotorStartingCalculator calculator: MotorStartingCalculator {}
 
     RowLayout {

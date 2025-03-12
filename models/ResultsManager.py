@@ -2,8 +2,7 @@ from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractTableModel,
 import pandas as pd
 import os
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
-import logging
+from typing import Dict, Any
 from .logger import setup_logger
 
 # Set up logger for this module

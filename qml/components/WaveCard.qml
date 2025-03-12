@@ -1,16 +1,19 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
 
 Rectangle {
-    id: root
-    default property alias content: contentItem.data
-    property string title: ""
-
-    color: "white"
-    border.color: "#cccccc"
+    id: controlRect
+    color: Universal.background // Use theme background instead of hardcoded white
     border.width: 1
+    border.color: Universal.foreground
     radius: 4
+    
+    property string title: ""
+    property bool showSettings: false
+
+    default property alias content: contentItem.data
 
     ColumnLayout {
         anchors.fill: parent
@@ -19,7 +22,7 @@ Rectangle {
 
         Label {
             Layout.fillWidth: true
-            text: root.title
+            text: controlRect.title
             font.bold: true
             font.pixelSize: 16
         }

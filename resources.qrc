@@ -28,7 +28,6 @@
     <file>qml/components/CustomBorderRect.qml</file>
     <file>qml/components/DarkLightButton.qml</file>
     <file>qml/components/HButton.qml</file>
-    <file>qml/components/ImageContainer.qml</file>
     <file>qml/components/Settings.qml</file>
     <file>qml/components/SideBar.qml</file>
     <file>qml/components/ToolBar.qml</file>

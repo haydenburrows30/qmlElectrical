@@ -41,12 +41,6 @@ ApplicationWindow {
             sideBar.react()
         }
     }
-
-    // ToolBar{
-    //     id: toolBar
-    //     width: parent.width
-    //     onMySignal: sideBar.react()
-    // }
     
     SideBar {
         id: sideBar
@@ -59,7 +53,7 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors {
-            top: parent.top //menu.bottom
+            top: parent.top
             bottom: parent.bottom
             left: parent.left
             leftMargin: 0
