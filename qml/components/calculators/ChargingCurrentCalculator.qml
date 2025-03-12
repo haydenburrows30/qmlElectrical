@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import Charging 1.0  // Import the Charging namespace for our calculator
@@ -11,6 +12,9 @@ WaveCard {
 
     // Create a local instance of our calculator
     property ChargingCalculator calculator: ChargingCalculator {}
+    
+    // Helper property for theme colors
+    property color textColor: Universal.foreground
 
     ColumnLayout {
         anchors.fill: parent
@@ -92,20 +96,29 @@ WaveCard {
                           calculator.chargingCurrent.toFixed(2) + "A" : "0.00A"
                     Layout.preferredWidth: 150
                     Layout.alignment: Qt.AlignRight
+                    color: Universal.foreground  // Use theme foreground color
                 }
             }
         }
 
-        ChargingCurrentViz {
-            id: chargingCurrentViz
+        Rectangle {
             Layout.fillWidth: true
             Layout.minimumHeight: 300
             Layout.minimumWidth: 300
-            voltage: parseFloat(voltage_input.text || "0") 
-            capacitance: parseFloat(capacitanceInput.text || "0")
-            frequency: parseFloat(frequencyInput.text || "50")
-            length: parseFloat(lengthInput.text || "1")
-            current: calculator ? calculator.chargingCurrent : 0.0
+            color: Universal.background
+            border.color: Universal.foreground
+            border.width: 1
+            
+            ChargingCurrentViz {
+                id: chargingCurrentViz
+                anchors.fill: parent
+                anchors.margins: 2
+                voltage: parseFloat(voltage_input.text || "0") 
+                capacitance: parseFloat(capacitanceInput.text || "0")
+                frequency: parseFloat(frequencyInput.text || "50")
+                length: parseFloat(lengthInput.text || "1")
+                current: calculator ? calculator.chargingCurrent : 0.0
+            }
         }
     }
 }

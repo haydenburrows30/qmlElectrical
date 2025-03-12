@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import Battery 1.0
@@ -10,6 +11,8 @@ WaveCard {
     title: 'Battery Sizing Calculator'
 
     property BatteryCalculator calculator: BatteryCalculator {}
+    // Helper property for theme colors
+    property color textColor: Universal.foreground
         
     RowLayout {
         anchors.centerIn: parent
@@ -73,6 +76,7 @@ WaveCard {
                             text: dodSlider.value + "%" 
                             horizontalAlignment: Text.AlignHCenter
                             Layout.fillWidth: true
+                            color: Universal.foreground  // Use theme foreground color
                         }
                         
                         Label { text: "Battery Type:" }
@@ -100,26 +104,29 @@ WaveCard {
                         Label { text: "Current Draw:" }
                         Label { 
                             text: calculator.currentDraw.toFixed(2) + " A"
-                            font.bold: true 
+                            font.bold: true
+                            color: Universal.foreground  // Use theme color 
                         }
 
                         Label { text: "Required Capacity:" }
                         Label { 
                             text: calculator.requiredCapacity.toFixed(1) + " Ah"
-                            font.bold: true 
+                            font.bold: true
+                            color: Universal.foreground  // Use theme color
                         }
                         
                         Label { text: "Recommended Capacity:" }
                         Label { 
                             text: calculator.recommendedCapacity.toFixed(1) + " Ah"
                             font.bold: true 
-                            color: "green"
+                            color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
                         }
                         
                         Label { text: "Energy Storage:" }
                         Label { 
                             text: calculator.energyStorage.toFixed(2) + " kWh"
-                            font.bold: true 
+                            font.bold: true
+                            color: Universal.foreground  // Use theme color 
                         }
                     }
                 }
@@ -130,14 +137,18 @@ WaveCard {
             Layout.topMargin: 30
             Layout.minimumHeight: 400
             Layout.minimumWidth: 400
-            color: "transparent"
-            border.color: "gray"
+            color: Universal.background  // Use theme background
+            border.color: Universal.foreground  // Use theme foreground for border
             border.width: 1
             radius: 5
             
             Canvas {
                 id: batteryVizCanvas
                 anchors.fill: parent
+
+                // Track theme changes to trigger repaints
+                property bool darkMode: Universal.theme === Universal.Dark
+                onDarkModeChanged: requestPaint()
 
                 onPaint: {
                     var ctx = getContext("2d");
@@ -155,9 +166,9 @@ WaveCard {
                     var terminalHeight = batteryHeight * 0.2;
                     
                     // Draw battery outline
-                    ctx.strokeStyle = "#555";
+                    ctx.strokeStyle = darkMode ? "#888" : "#555";
                     ctx.lineWidth = 2;
-                    ctx.fillStyle = "#f0f0f0";
+                    ctx.fillStyle = darkMode ? "#333" : "#f0f0f0";
                     ctx.beginPath();
                     ctx.rect(batteryX, batteryY, batteryWidth, batteryHeight);
                     ctx.fill();
@@ -172,14 +183,17 @@ WaveCard {
                     
                     // Draw capacity level
                     var capacity = Math.min(calculator.depthOfDischarge / 100, 0.9);
-                    ctx.fillStyle = capacity > 0.3 ? "#8eff8e" : "#ff8e8e";
+                    // Use theme-appropriate colors for capacity level
+                    ctx.fillStyle = capacity > 0.3 ? 
+                        (darkMode ? "#60C060" : "#8eff8e") : 
+                        (darkMode ? "#C06060" : "#ff8e8e");
                     ctx.beginPath();
                     ctx.rect(batteryX + 10, batteryY + 10, 
                             (batteryWidth - 20) * capacity, batteryHeight - 20);
                     ctx.fill();
                     
                     // Draw indicator lines
-                    ctx.strokeStyle = "#888";
+                    ctx.strokeStyle = darkMode ? "#666" : "#888";
                     ctx.lineWidth = 1;
                     for (var i = 0.25; i <= 0.75; i += 0.25) {
                         ctx.beginPath();
@@ -188,8 +202,8 @@ WaveCard {
                         ctx.stroke();
                     }
                     
-                    // Draw labels
-                    ctx.fillStyle = "black";
+                    // Draw labels - use theme colors
+                    ctx.fillStyle = textColor;
                     ctx.font = "12px sans-serif";
                     ctx.textAlign = "center";
                     ctx.fillText("DoD: " + calculator.depthOfDischarge + "%", 

@@ -1,5 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls.Universal
 
 Item {
     id: root
@@ -11,108 +13,104 @@ Item {
     property color textColor: "black"
     property color gridColor: "#eeeeee"
 
+    // Theme property
+    property bool darkMode: Universal.theme === Universal.Dark
+
+    // Move the darkMode handler here at the Item level
+    onDarkModeChanged: impedanceCanvas.requestPaint()
+
     Canvas {
-        id: canvas
+        id: impedanceCanvas
         // anchors.fill: parent
         anchors.centerIn: parent
         width: 300
         height: 300
+        
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset();
             
-            var margin = 30;
-            var width = canvas.width - 2 * margin;
-            var height = canvas.height - 2 * margin;
-            var centerX = margin + width / 2;
-            var centerY = margin + height / 2;
-            var scale = Math.min(width, height) / 2 / Math.max(8, impedance * 1.2);
+            // Set background to transparent since parent Rectangle handles background
+            ctx.clearRect(0, 0, width, height);
             
-            // Draw grid
-            ctx.strokeStyle = gridColor;
-            ctx.lineWidth = 1;
-            
-            // Horizontal grid lines
-            for (var y = -4; y <= 4; y++) {
-                ctx.beginPath();
-                ctx.moveTo(margin, centerY - y * scale);
-                ctx.lineTo(margin + width, centerY - y * scale);
-                ctx.stroke();
-            }
-            
-            // Vertical grid lines
-            for (var x = -4; x <= 4; x++) {
-                ctx.beginPath();
-                ctx.moveTo(centerX + x * scale, margin);
-                ctx.lineTo(centerX + x * scale, margin + height);
-                ctx.stroke();
-            }
+            // Calculate center and scale
+            var centerX = width / 2;
+            var centerY = height / 2;
+            var maxDimension = Math.max(Math.abs(resistance), Math.abs(reactance), impedance);
+            var scale = (Math.min(width, height) - 40) / (2 * maxDimension);
             
             // Draw axes
-            ctx.strokeStyle = textColor;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = textColor;  // Use the existing property name
             
-            // X-axis (Resistance)
+            // X-axis
             ctx.beginPath();
-            ctx.moveTo(margin, centerY);
-            ctx.lineTo(margin + width, centerY);
+            ctx.moveTo(10, centerY);
+            ctx.lineTo(width - 10, centerY);
             ctx.stroke();
             
-            // Y-axis (Reactance)
+            // Y-axis
             ctx.beginPath();
-            ctx.moveTo(centerX, margin);
-            ctx.lineTo(centerX, margin + height);
+            ctx.moveTo(centerX, height - 10);
+            ctx.lineTo(centerX, 10);
             ctx.stroke();
             
-            // Draw impedance vector
-            ctx.strokeStyle = vectorColor;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX + resistance * scale, centerY - reactance * scale);
-            ctx.stroke();
-            
-            // Draw resistance component
-            ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
+            // Draw resistance (R) vector
+            ctx.strokeStyle = "#ff6666";  // Red for resistance
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.lineTo(centerX + resistance * scale, centerY);
             ctx.stroke();
             
-            // Draw reactance component
-            ctx.strokeStyle = "rgba(0, 128, 255, 0.7)";
+            // Draw reactance (X) vector
+            ctx.strokeStyle = "#6666ff";  // Blue for reactance
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(centerX + resistance * scale, centerY);
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX, centerY - reactance * scale);
+            ctx.stroke();
+            
+            // Draw impedance (Z) vector
+            ctx.strokeStyle = darkMode ? "#90EE90" : "#007700";  // Green for impedance
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
             ctx.lineTo(centerX + resistance * scale, centerY - reactance * scale);
             ctx.stroke();
             
-            // Labels
-            ctx.fillStyle = textColor;
-            ctx.font = "12px sans-serif";
+            // Draw labels
+            ctx.font = "14px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
             
-            // R, X, Z labels
-            ctx.fillText("R = " + resistance.toFixed(2) + " Ω", 
-                        centerX + resistance * scale / 2 - 30, 
+            // R label
+            ctx.fillStyle = "#ff6666";  // Same as R vector
+            ctx.fillText("R = " + resistance.toFixed(2) + "Ω", 
+                        centerX + resistance * scale / 2,
                         centerY + 20);
-                        
-            ctx.fillText("X = " + reactance.toFixed(2) + " Ω", 
-                        centerX + resistance * scale + 5, 
+            
+            // X label
+            ctx.fillStyle = "#6666ff";  // Same as X vector
+            ctx.fillText("X = " + reactance.toFixed(2) + "Ω", 
+                        centerX - 25, 
                         centerY - reactance * scale / 2);
-                        
-            ctx.fillText("Z = " + impedance.toFixed(2) + " Ω, θ = " + phaseAngle.toFixed(1) + "°",
-                        centerX + resistance * scale / 2 - 30, 
+            
+            // Z label
+            ctx.fillStyle = darkMode ? "#90EE90" : "#007700";  // Same as Z vector
+            ctx.fillText("Z = " + impedance.toFixed(2) + "Ω ∠" + phaseAngle.toFixed(1) + "°", 
+                        centerX + resistance * scale / 2,
                         centerY - reactance * scale / 2 - 10);
             
-            // Axis labels
-            ctx.fillText("Resistance (R)", margin + width - 80, centerY - 10);
-            ctx.fillText("Reactance (X)", centerX + 10, margin + 15);
+            // Axes labels
+            ctx.fillStyle = textColor;  // Use the existing property name
+            ctx.fillText("R", width - 15, centerY - 15);
+            ctx.fillText("X", centerX + 15, 15);
         }
     }
 
-    onResistanceChanged: canvas.requestPaint()
-    onReactanceChanged: canvas.requestPaint()
-    onImpedanceChanged: canvas.requestPaint()
-    onPhaseAngleChanged: canvas.requestPaint()
+    onResistanceChanged: impedanceCanvas.requestPaint()
+    onReactanceChanged: impedanceCanvas.requestPaint()
+    onImpedanceChanged: impedanceCanvas.requestPaint()
+    onPhaseAngleChanged: impedanceCanvas.requestPaint()
 }

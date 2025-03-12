@@ -1,5 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls.Universal
 
 Item {
     id: root
@@ -9,19 +11,28 @@ Item {
     property double length: 1.0       // km
     property double current: 0.0      // A
     property color cableColor: "#409eff"
-    property color textColor: "black"
+    property color textColor: Universal.foreground  // Default to theme foreground color
     property color waveColor: "#ff7e00"
+    
+    // Add theme support
+    property bool darkMode: Universal.theme === Universal.Dark
+    
+    // Listen for theme changes
+    onDarkModeChanged: chargingCanvas.requestPaint()
+    
+    // Also listen for textColor changes
+    onTextColorChanged: chargingCanvas.requestPaint()
 
     Canvas {
-        id: canvas
+        id: chargingCanvas
         anchors.fill: parent
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset();
             
             var margin = 20;
-            var width = canvas.width - 2 * margin;
-            var height = canvas.height - 2 * margin;
+            var width = chargingCanvas.width - 2 * margin;  // Use chargingCanvas instead of canvas
+            var height = chargingCanvas.height - 2 * margin;  // Use chargingCanvas instead of canvas
             
             // Draw cable representation
             var cableY = margin + height * 0.3;
@@ -86,8 +97,8 @@ Item {
                 }
             }
             
-            // Draw text information
-            ctx.fillStyle = textColor;
+            // Draw text information - use root.textColor for proper theme support
+            ctx.fillStyle = root.textColor.toString();  // Convert to string for canvas
             ctx.font = "12px sans-serif";
             ctx.fillText("Cable: " + length.toFixed(1) + " km", margin, height + margin - 10);
             ctx.fillText("Capacitance: " + capacitance.toFixed(2) + " μF/km", margin + width * 0.3, height + margin - 10);
@@ -103,9 +114,9 @@ Item {
         }
     }
 
-    onVoltageChanged: canvas.requestPaint()
-    onCapacitanceChanged: canvas.requestPaint()
-    onFrequencyChanged: canvas.requestPaint()
-    onLengthChanged: canvas.requestPaint()
-    onCurrentChanged: canvas.requestPaint()
+    onVoltageChanged: chargingCanvas.requestPaint()
+    onCapacitanceChanged: chargingCanvas.requestPaint()
+    onFrequencyChanged: chargingCanvas.requestPaint()
+    onLengthChanged: chargingCanvas.requestPaint()
+    onCurrentChanged: chargingCanvas.requestPaint()
 }

@@ -13,6 +13,7 @@ class MotorCalculator(QObject):
     startingCurrentChanged = Signal()
     startingTorqueChanged = Signal()
     resultsCalculated = Signal()
+    startingMultiplierChanged = Signal()  # Add new signal for multiplier changes
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -123,6 +124,8 @@ class MotorCalculator(QObject):
         if self._starting_method != value and value in self._starting_methods:
             self._starting_method = value
             self.startingMethodChanged.emit()
+            # Emit the multiplier changed signal since it depends on the method
+            self.startingMultiplierChanged.emit()
             self._calculate()
 
     @Property(float, notify=startingCurrentChanged)
@@ -133,7 +136,7 @@ class MotorCalculator(QObject):
     def startingTorque(self):
         return self._starting_torque
     
-    @Property(float)
+    @Property(float, notify=startingMultiplierChanged)  # Add the notify signal
     def startingMultiplier(self):
         return self._current_multipliers.get(self._starting_method, 6.0)
     

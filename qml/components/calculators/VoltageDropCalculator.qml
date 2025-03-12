@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import "../"
 import "../../components"
 import VoltageDrop 1.0
+import QtQuick.Controls.Universal
 
 WaveCard {
     id: voltageDropCard
@@ -104,6 +105,7 @@ WaveCard {
             border.color: "gray"
             border.width: 1
             radius: 5
+            color: Universal.background
 
             Canvas {
                 id: dropVizCanvas
@@ -114,19 +116,23 @@ WaveCard {
                     var ctx = getContext("2d");
                     ctx.reset();
                     
-                    // Define dimensions
-                    var width = dropVizCanvas.width;
-                    var height = dropVizCanvas.height;
+                    // Define dimensions first before using them
+                    var canvasWidth = dropVizCanvas.width;
+                    var canvasHeight = dropVizCanvas.height;
+                    
+                    // Set background color to match theme
+                    ctx.fillStyle = Universal.background;
+                    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
                     
                     // Calculate values
                     var dropPercentage = calculator.dropPercentage;
                     var dropRatio = Math.min(dropPercentage / 10, 1.0); // Cap at 10%
                     
                     // Draw voltage bar
-                    var barHeight = height * 0.4;
-                    var barY = height * 0.3;
-                    var barWidth = width * 0.8;
-                    var barX = width * 0.1;
+                    var barHeight = canvasHeight * 0.4;
+                    var barY = canvasHeight * 0.3;
+                    var barWidth = canvasWidth * 0.8;
+                    var barX = canvasWidth * 0.1;
                     
                     // Draw source voltage (100%)
                     ctx.fillStyle = "#88c0ff";
@@ -136,16 +142,16 @@ WaveCard {
                     ctx.fillStyle = "#ff8888";
                     ctx.fillRect(barX + barWidth * (1 - dropRatio), barY, barWidth * dropRatio, barHeight);
                     
-                    // Draw separator line
-                    ctx.strokeStyle = "black";
+                    // Draw separator line - use theme color
+                    ctx.strokeStyle = Universal.foreground;
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(barX + barWidth * (1 - dropRatio), barY);
                     ctx.lineTo(barX + barWidth * (1 - dropRatio), barY + barHeight);
                     ctx.stroke();
                     
-                    // Labels
-                    ctx.fillStyle = "black";
+                    // Labels - use theme color for text
+                    ctx.fillStyle = Universal.foreground;
                     ctx.font = "12px sans-serif";
                     ctx.textAlign = "center";
                     

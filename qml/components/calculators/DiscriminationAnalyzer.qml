@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
+import QtQuick.Controls.Universal
 
 import "../"
 import "../../components"
@@ -40,6 +41,7 @@ WaveCard {
                     Text {
                         text: "Minimum Margin: " + marginSlider.value.toFixed(2) + "s"
                         font.bold: true
+                        color: Universal.foreground  // Use theme foreground color
                     }
                     Slider {
                         id: marginSlider
@@ -62,7 +64,9 @@ WaveCard {
                     spacing: 5
                     Text {
                         text: "Relays added: " + calculator.relayCount + " (minimum 2 needed)"
-                        color: calculator.relayCount < 2 ? "red" : "green"
+                        color: calculator.relayCount < 2 ? 
+                               Universal.theme === Universal.Dark ? "#ff8080" : "red" : 
+                               Universal.theme === Universal.Dark ? "#90EE90" : "green"
                         font.bold: true
                     }
                     
@@ -214,7 +218,7 @@ WaveCard {
                         text: "Add at least 2 relays to see discrimination results"
                         visible: calculator.relayCount < 2
                         anchors.centerIn: parent
-                        color: "gray"
+                        color: Universal.foreground  // Use theme foreground color
                     }
 
                     delegate: Column {
@@ -229,6 +233,7 @@ WaveCard {
                                 return resultData.primary + " → " + resultData.backup
                             }
                             font.bold: true
+                            color: Universal.foreground  // Default to theme color
                         }
                         Repeater {
                             model: (resultData && resultData.margins) ? resultData.margins : []
@@ -241,7 +246,9 @@ WaveCard {
                                     return "  " + modelData.fault_current.toFixed(1) + "A: " + 
                                           modelData.margin.toFixed(2) + "s"
                                 }
-                                color: modelData && modelData.coordinated ? "green" : "red"
+                                color: modelData && modelData.coordinated ? 
+                                       Universal.theme === Universal.Dark ? "#90EE90" : "green" : 
+                                       Universal.theme === Universal.Dark ? "#ff8080" : "red"
                             }
                         }
                     }
@@ -276,6 +283,8 @@ WaveCard {
                     height: parent.height - parent.spacing - parent.children[0].height
                     antialiasing: true
                     legend.alignment: Qt.AlignBottom
+
+                    theme: Universal.theme
 
                     ValueAxis {
                         id: marginAxis

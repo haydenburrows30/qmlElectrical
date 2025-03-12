@@ -91,6 +91,8 @@ WaveCard {
             Layout.minimumWidth: 600
             Layout.minimumHeight: 600
 
+            theme: Universal.theme
+
             antialiasing: true
             
             LogValueAxis {

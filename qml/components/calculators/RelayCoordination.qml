@@ -120,6 +120,8 @@ WaveCard {
             antialiasing: true
             legend.visible: true
 
+            theme: Universal.theme
+
             LogValueAxis {
                 id: currentAxis
                 min: 10

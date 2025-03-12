@@ -1,9 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
 import Conversion 1.0
 
 Rectangle {
+    color: Universal.background // Use theme background color
+    
     ConversionCalculator {
         id: converter
     }

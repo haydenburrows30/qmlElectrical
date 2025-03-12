@@ -11,6 +11,21 @@ WaveCard {
     title: 'Motor Starting Calculator'
     color: Universal.background // Override the background color with theme color
     property MotorStartingCalculator calculator: MotorStartingCalculator {}
+    // Add a property to cache the value
+    property real cachedStartingMultiplier: calculator ? calculator.startingMultiplier : 7.0
+    
+    // Update the cached value when needed - only reads from calculator without setting the property
+    function getStartingMultiplier() {
+        return calculator ? calculator.startingMultiplier : 7.0
+    }
+
+    // Connect to the signal to update our cached value when needed
+    Connections {
+        target: calculator
+        function onStartingMultiplierChanged() {
+            cachedStartingMultiplier = calculator.startingMultiplier
+        }
+    }
 
     RowLayout {
         anchors.centerIn: parent
@@ -96,8 +111,8 @@ WaveCard {
                     }
                     
                     Text {
-                        text: !isNaN(calculator.startingCurrent / calculator.startingMultiplier) ? 
-                                (calculator.startingCurrent / calculator.startingMultiplier).toFixed(1) + " A" : "0.0 A"
+                        text: !isNaN(calculator.startingCurrent / getStartingMultiplier()) ? 
+                                (calculator.startingCurrent / getStartingMultiplier()).toFixed(1) + " A" : "0.0 A"
                         Layout.preferredWidth: 150
                         font.bold: true
                     }
@@ -132,7 +147,7 @@ WaveCard {
             Layout.minimumWidth:500
             Layout.fillHeight: true
             color: "transparent"
-            border.color: "gray"
+            border.color: Universal.foreground
             border.width: 1
             
             Canvas {
@@ -140,65 +155,71 @@ WaveCard {
                 anchors.fill: parent
                 anchors.margins: 10
                 
-                property real startingMultiplier: calculator ? calculator.startingMultiplier : 7.0
+                // Use the cached property directly instead of calling function
+                property real startingMultiplier: cachedStartingMultiplier
                 
                 onPaint: {
                     var ctx = getContext("2d");
                     ctx.reset();
                     
-                    var width = motorStartCanvas.width;
-                    var height = motorStartCanvas.height;
+                    // Define dimensions first before using them
+                    var canvasWidth = motorStartCanvas.width;
+                    var canvasHeight = motorStartCanvas.height;
+                    
+                    // Add background fill to match theme
+                    ctx.fillStyle = Universal.background;
+                    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
                     
                     // Draw starting current profile
                     ctx.beginPath();
-                    ctx.moveTo(0, height * 0.1);  // Start at 10% from top
+                    ctx.moveTo(0, canvasHeight * 0.1);  // Start at 10% from top
                     
                     // Draw different profiles based on starting method
                     switch(startingMethod.currentText) {
                         case "DOL":
                             // Direct square wave
-                            ctx.lineTo(width * 0.1, height * 0.1);
-                            ctx.lineTo(width * 0.1, height * 0.9);
-                            ctx.lineTo(width, height * 0.9);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.9);
+                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
                             break;
                             
                         case "Star-Delta":
                             // Two-step start
-                            ctx.lineTo(width * 0.1, height * 0.1);
-                            ctx.lineTo(width * 0.1, height * 0.4);
-                            ctx.lineTo(width * 0.3, height * 0.4);
-                            ctx.lineTo(width * 0.3, height * 0.9);
-                            ctx.lineTo(width, height * 0.9);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.4);
+                            ctx.lineTo(canvasWidth * 0.3, canvasHeight * 0.4);
+                            ctx.lineTo(canvasWidth * 0.3, canvasHeight * 0.9);
+                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
                             break;
                             
                         case "Soft-Starter":
                             // Gradual ramp
-                            ctx.lineTo(width * 0.1, height * 0.1);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
                             ctx.quadraticCurveTo(
-                                width * 0.4, height * 0.4,
-                                width * 0.8, height * 0.9
+                                canvasWidth * 0.4, canvasHeight * 0.4,
+                                canvasWidth * 0.8, canvasHeight * 0.9
                             );
-                            ctx.lineTo(width, height * 0.9);
+                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
                             break;
                             
                         case "VFD":
                             // Controlled ramp
-                            ctx.lineTo(width * 0.1, height * 0.1);
-                            ctx.lineTo(width * 0.1, height * 0.9);
-                            ctx.lineTo(width, height * 0.9);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
+                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.9);
+                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
                             break;
                     }
                     
-                    ctx.strokeStyle = "blue";
+                    ctx.strokeStyle = Universal.foreground;
                     ctx.lineWidth = 2;
                     ctx.stroke();
                     
                     // Add labels
                     ctx.font = "12px sans-serif";
-                    ctx.fillStyle = "black";
-                    ctx.fillText("Time →", width - 40, height - 5);
+                    ctx.fillStyle = Universal.foreground;  // Use theme foreground color
+                    ctx.fillText("Time →", canvasWidth - 40, canvasHeight - 5);
                     ctx.save();
-                    ctx.translate(10, height/2);
+                    ctx.translate(10, canvasHeight/2);
                     ctx.rotate(-Math.PI/2);
                     ctx.fillText("Current →", 0, 0);
                     ctx.restore();
@@ -208,7 +229,7 @@ WaveCard {
             Connections {
                 target: calculator
                 function onResultsCalculated() {
-                    motorStartCanvas.requestPaint();
+                    motorStartCanvas.requestPaint()
                 }
             }
         }

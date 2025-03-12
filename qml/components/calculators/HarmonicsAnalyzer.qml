@@ -75,6 +75,8 @@ WaveCard {
                 Layout.fillHeight: true
                 antialiasing: true
 
+                theme: Universal.theme
+
                 ValueAxis {
                     id: axisX
                     min: 0
@@ -127,6 +129,8 @@ WaveCard {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 antialiasing: true
+
+                theme: Universal.theme
 
                 ValueAxis {
                     id: spectrumAxisY
