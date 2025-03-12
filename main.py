@@ -30,7 +30,6 @@ from models.cable_ampacity import CableAmpacityCalculator
 from models.protection_relay import ProtectionRelayCalculator
 from models.harmonic_analysis import HarmonicAnalysisCalculator
 from models.instrument_transformer import InstrumentTransformerCalculator
-from models.relay_coordination import RelayCoordinationCalculator
 from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
 from models.ChargingCalculator import ChargingCalculator
@@ -106,7 +105,6 @@ class Application:
         self.protection_relay_calculator = self.calculator_factory.create_calculator("protection_relay")
         self.harmonic_analysis_calculator = self.calculator_factory.create_calculator("harmonic_analysis")
         self.instrument_transformer_calculator = self.calculator_factory.create_calculator("instrument_transformer")
-        self.relay_coordination = self.calculator_factory.create_calculator("relay_coordination")
         self.overcurrent_curves = self.calculator_factory.create_calculator("overcurrent_curves")
         self.discrimination_analyzer = self.calculator_factory.create_calculator("discrimination_analyzer")
 
@@ -130,7 +128,6 @@ class Application:
             (ProtectionRelayCalculator, "ProtectionRelay", 1, 0, "ProtectionRelayCalculator"),
             (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
-            (RelayCoordinationCalculator, "RelayCoordination", 1, 0, "RelayCoordinationCalculator"),
             (OvercurrentCurvesCalculator, "OvercurrentCurves", 1, 0, "OvercurrentCurvesCalculator"),
             (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),

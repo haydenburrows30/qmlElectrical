@@ -22,7 +22,6 @@ import Conversion 1.0
 import CableAmpacity 1.0
 import ProtectionRelay 1.0
 import InstrumentTransformer 1.0
-import RelayCoordination 1.0
 import DiscriminationAnalyzer 1.0
 import OvercurrentCurves 1.0
 import HarmonicAnalysis 1.0
@@ -44,7 +43,6 @@ Page {
         "../components/calculators/MotorStartingCalculator.qml",
         "../components/calculators/PowerFactorCorrection.qml",
         "../components/calculators/ProtectionRelayCalculator.qml",
-        "../components/calculators/RelayCoordination.qml",
         "../components/calculators/TransformerCalculator.qml",
         "../components/calculators/UnitConverter.qml",
         "../components/calculators/VoltageDropCalculator.qml"

@@ -9,7 +9,6 @@ from ..cable_ampacity import CableAmpacityCalculator
 from ..protection_relay import ProtectionRelayCalculator
 from ..harmonic_analysis import HarmonicAnalysisCalculator
 from ..instrument_transformer import InstrumentTransformerCalculator
-from ..relay_coordination import RelayCoordinationCalculator
 from ..overcurrent_curves import OvercurrentCurvesCalculator
 from ..discrimination_analyzer import DiscriminationAnalyzer
 from ..voltage_drop_calculator import VoltageDropCalculator
@@ -61,7 +60,6 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "protection_relay": ProtectionRelayCalculator,
             "harmonic_analysis": HarmonicAnalysisCalculator,
             "instrument_transformer": InstrumentTransformerCalculator,
-            "relay_coordination": RelayCoordinationCalculator,
             "overcurrent_curves": OvercurrentCurvesCalculator,
             "discrimination_analyzer": DiscriminationAnalyzer,
             "voltage_drop": VoltageDropCalculator,
