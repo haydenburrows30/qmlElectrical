@@ -33,7 +33,6 @@ from models.instrument_transformer import InstrumentTransformerCalculator
 from models.relay_coordination import RelayCoordinationCalculator
 from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
-from models.resonant_frequency import FrequencyCalculator
 from models.ChargingCalculator import ChargingCalculator
 from models.battery_calculator import BatteryCalculator
 
@@ -124,7 +123,6 @@ class Application:
             (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
-            (FrequencyCalculator, "Freq", 1, 0, "FrequencyCalculator"),
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
             (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrectionCalculator"),

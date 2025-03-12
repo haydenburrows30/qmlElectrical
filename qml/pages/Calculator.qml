@@ -38,7 +38,6 @@ Page {
         "../components/calculators/CableAmpacityCalculator.qml",
         "../components/calculators/ChargingCurrentCalculator.qml",
         "../components/calculators/DiscriminationAnalyzer.qml",
-        "../components/calculators/FrequencyCalculator.qml",
         "../components/calculators/HarmonicsAnalyzer.qml",
         "../components/calculators/ImpedanceCalculator.qml",
         "../components/calculators/InstrumentTransformerCalculator.qml",

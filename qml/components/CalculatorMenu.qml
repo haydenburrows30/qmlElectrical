@@ -28,7 +28,6 @@ Page {
         { name: "PF Correction", source: "../components/calculators/PowerFactorCorrection.qml" },
         { name: "Power Calculator", source: "../components/calculators/PowerCurrentCalculator.qml" },
         { name: "Protection Relay", source: "../components/calculators/ProtectionRelayCalculator.qml" },
-        { name: "Resonant Frequency", source: "../components/calculators/FrequencyCalculator.qml" },
         { name: "Relay Coordination", source: "../components/calculators/RelayCoordination.qml" },
         { name: "Transformer Calculator", source: "../components/calculators/TransformerCalculator.qml" },
         { name: "Unit Converter", source: "../components/calculators/UnitConverter.qml" },

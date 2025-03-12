@@ -13,7 +13,6 @@ from ..relay_coordination import RelayCoordinationCalculator
 from ..overcurrent_curves import OvercurrentCurvesCalculator
 from ..discrimination_analyzer import DiscriminationAnalyzer
 from ..voltage_drop_calculator import VoltageDropCalculator
-from ..resonant_frequency import FrequencyCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -67,7 +66,6 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "discrimination_analyzer": DiscriminationAnalyzer,
             "voltage_drop": VoltageDropCalculator,
             "conversion": ConversionCalculator,
-            "frequency": FrequencyCalculator,
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):
