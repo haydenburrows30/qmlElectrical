@@ -27,6 +27,7 @@ import OvercurrentCurves 1.0
 import HarmonicAnalysis 1.0
 import PFCorrection 1.0
 import Battery 1.0
+import Machine 1.0
 
 Page {
     id: home
@@ -45,7 +46,8 @@ Page {
         "../components/calculators/ProtectionRelayCalculator.qml",
         "../components/calculators/TransformerCalculator.qml",
         "../components/calculators/UnitConverter.qml",
-        "../components/calculators/VoltageDropCalculator.qml"
+        "../components/calculators/VoltageDropCalculator.qml",
+        "../components/calculators/ElectricMachineCalculator.qml"
     ]
     property int currentCalculatorIndex: 0
 
