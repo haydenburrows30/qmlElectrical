@@ -76,7 +76,6 @@ Drawer {
                 ItemDelegate {
                     implicitHeight: 60
                     implicitWidth: 60
-                    
 
                     highlighted: ListView.isCurrentItem
 
@@ -175,7 +174,6 @@ Drawer {
                         }
                     }
                 }
-                
         }
     }
 }

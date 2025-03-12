@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../../components"
-import RFreq 1.0  // Import the ResonantFrequencyCalculator namespace
+import Freq 1.0
 
 WaveCard {
     id: frequencyCalculator
@@ -12,7 +12,7 @@ WaveCard {
     Layout.minimumHeight: 200
 
     // Create instance of calculator
-    property ResonantFrequencyCalculator calculator: ResonantFrequencyCalculator {}
+    property FrequencyCalculator calculator: FrequencyCalculator {}
 
     RowLayout {
         anchors.fill: parent

@@ -35,6 +35,7 @@ from models.instrument_transformer import InstrumentTransformerCalculator
 from models.relay_coordination import RelayCoordinationCalculator
 from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
+from models.resonant_frequency import FrequencyCalculator
 
 # Import ChargingCalculator
 from models.ChargingCalculator import ChargingCalculator
@@ -111,7 +112,7 @@ class Application:
 
         self.transformer_calculator = self.calculator_factory.create_calculator("transformer")
         self.voltage_drop_calculator = self.calculator_factory.create_calculator("voltage_drop")
-        self.motor_calculator = self.calculator_factory.create_calculator("motor")
+        self.motor_calculator = self.calculator_factory.create_calculator("motor_starting")
         self.pf_correction_calculator = self.calculator_factory.create_calculator("pf_correction")
         self.cable_ampacity_calculator = self.calculator_factory.create_calculator("cable_ampacity")
         self.protection_relay_calculator = self.calculator_factory.create_calculator("protection_relay")
@@ -135,9 +136,9 @@ class Application:
             (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
-            (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFrequencyCalculator"),
+            # (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFrequencyCalculator"),
+            (FrequencyCalculator, "Freq", 1, 0, "FrequencyCalculator"),
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
-            (MotorCalculator, "Motor", 1, 0, "MotorCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
             (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrectionCalculator"),
             (CableAmpacityCalculator, "CableAmpacity", 1, 0, "AmpacityCalculator"),

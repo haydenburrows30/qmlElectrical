@@ -11,8 +11,8 @@ WaveCard {
     Layout.minimumHeight: 200
     Layout.minimumWidth: 300
 
-    info: ""
-    righticon: "Info"
+    // info: ""
+    // righticon: "Info"
     
     // Create a local instance of the calculator
     property PowerCalculator calculator: PowerCalculator {}

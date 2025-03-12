@@ -18,7 +18,7 @@ import PCalculator 1.0
 import Charging 1.0
 import Fault 1.0
 import Sine 1.0
-import RFreq 1.0
+// import RFreq 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
@@ -32,10 +32,30 @@ import DiscriminationAnalyzer 1.0
 import OvercurrentCurves 1.0
 import HarmonicAnalysis 1.0
 import PFCorrection 1.0
-import Motor 1.0
 
 Page {
     id: home
+
+    // Add property to store available calculators
+    property var calculatorList: [
+        "../components/CalculatorMenu.qml",
+        "../components/calculators/UnitConverter.qml",
+        "../components/calculators/PowerCurrentCalculator.qml",
+        "../components/calculators/ImpedanceCalculator.qml",
+        "../components/calculators/ChargingCurrentCalculator.qml",
+        "../components/calculators/DiscriminationAnalyzer.qml",
+        "../components/calculators/SineCalculator.qml",
+        "../components/calculators/FrequencyCalculator.qml",
+        "../components/calculators/VoltageDropCalculator.qml",
+        "../components/calculators/CableAmpacityCalculator.qml",
+        "../components/calculators/ProtectionRelayCalculator.qml",
+        "../components/calculators/InstrumentTransformerCalculator.qml",
+        "../components/calculators/RelayCoordination.qml",
+        "../components/calculators/HarmonicsAnalyzer.qml",
+        "../components/calculators/PowerFactorCorrection.qml",
+        "../components/calculators/MotorStartingCalculator.qml"
+    ]
+    property int currentCalculatorIndex: 0
 
     property var powerTriangleModel
     property var impedanceVectorModel
@@ -48,30 +68,53 @@ Page {
         anchors.fill: parent
         spacing: 5
 
-        Rectangle {
+        RowLayout {
+            anchors.margins: 5
+            // uniformCellSizes : true
             Layout.fillWidth: true
-            height: 40
-            color: sideBar.toggle1 ? "#2a2a2a" : "#e5e5e5"
+            spacing: 10
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: 5
-                spacing: 10
-
-                CalcButton {
-                    text: "Menu"
-                    Layout.maximumWidth: 100
-                    onClicked: {
-                        calculatorLoader.setSource("../components/CalculatorMenu.qml")
-                    }
-                }
-
-                Label {
-                    text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
+            // Add Previous button
+            CalcButton {
+                text: "←"
+                Layout.maximumWidth: 40
+                // Layout.alignment: Qt.AlignLeft
+                onClicked: {
+                    currentCalculatorIndex = (currentCalculatorIndex - 1 + calculatorList.length) % calculatorList.length
+                    calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
                 }
             }
+
+            // CalcButton {
+            //     text: "Menu"
+            //     Layout.maximumWidth: 100
+            //     Layout.alignment: Qt.AlignRight
+            //     Layout.fillWidth: true
+            //     onClicked: {
+            //         currentCalculatorIndex = 0
+            //         calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
+            //     }
+            // }
+
+            Label {
+                Layout.minimumWidth: 200
+                Layout.fillWidth: true
+                horizontalAlignment : Text.AlignHCenter
+
+                text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
+            }
+
+            // Add Next button
+            CalcButton {
+                text: "→"
+                Layout.maximumWidth: 40
+                Layout.alignment: Qt.AlignRight
+
+                onClicked: {
+                    currentCalculatorIndex = (currentCalculatorIndex + 1) % calculatorList.length
+                    calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
+                }
+            } 
         }
 
         Loader {

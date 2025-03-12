@@ -96,8 +96,8 @@ Rectangle {
 
         // Right side - formula display
         Rectangle {
-            Layout.minimumHeight: 500
-            Layout.minimumWidth: 500
+            Layout.minimumHeight: 300
+            Layout.minimumWidth: 300
             color: "#f5f5f5"
             radius: 5
             border.color: "#cccccc"
@@ -109,7 +109,7 @@ Rectangle {
                 height: width * 0.6
                 fillMode: Image.PreserveAspectFit
                 source: {
-                    let formulaPath = "/home/hayden/Documents/qmltest/assets/formulas/"
+                    let formulaPath = "../../../assets/formulas/"
                     switch(conversionType.currentText.toLowerCase().replace(/ /g, "_")) {
                         case "watts_to_dbmw": return formulaPath + "watts_to_dbm.png"
                         case "horsepower_to_watts": return formulaPath + "hp_to_watts.png"

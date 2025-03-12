@@ -48,7 +48,7 @@ WaveCard {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.topMargin: -10
                             background: Rectangle {
-                                color: voltageDropCard.background
+                                // color: voltageDropCard.background
                                 anchors.fill: parent
                                 anchors.margins: -2
                             }
@@ -122,7 +122,7 @@ WaveCard {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.topMargin: -10
                             background: Rectangle {
-                                color: voltageDropCard.background
+                                // color: voltageDropCard.background
                                 anchors.fill: parent
                                 anchors.margins: -2
                             }

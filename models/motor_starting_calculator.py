@@ -13,6 +13,7 @@ class MotorCalculator(QObject):
     startingCurrentChanged = Signal()
     startingTorqueChanged = Signal()
     resultsCalculated = Signal()
+    startingMultiplierChanged = Signal()  # Add new signal
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -25,6 +26,8 @@ class MotorCalculator(QObject):
         self._starting_current = 0.0
         self._starting_torque = 0.0
         self._starting_methods = ["DOL", "Star-Delta", "Soft Starter", "VFD"]
+        self._current_multiplier = 6.0  # Default multiplier for DOL
+        self._starting_multiplier = self._current_multipliers["DOL"]  # Cache the multiplier
         
         # Starting current multipliers for different methods
         self._current_multipliers = {
@@ -122,7 +125,9 @@ class MotorCalculator(QObject):
     def startingMethod(self, value):
         if self._starting_method != value and value in self._starting_methods:
             self._starting_method = value
+            self._starting_multiplier = self._current_multipliers.get(value, 6.0)  # Update multiplier
             self.startingMethodChanged.emit()
+            self.startingMultiplierChanged.emit()
             self._calculate()
 
     @Property(float, notify=startingCurrentChanged)
@@ -136,6 +141,10 @@ class MotorCalculator(QObject):
     @Property(list)
     def startingMethods(self):
         return self._starting_methods
+
+    @Property(float, notify=startingMultiplierChanged)
+    def startingMultiplier(self):
+        return self._starting_multiplier
 
     # QML slots
     @Slot(float)

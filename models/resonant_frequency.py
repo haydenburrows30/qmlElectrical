@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Property
 import math
 
-class ResonantFrequencyCalculator(QObject):
+class FrequencyCalculator(QObject):
     resonantFrequencyChanged = Signal()
     angularFrequencyChanged = Signal()
 

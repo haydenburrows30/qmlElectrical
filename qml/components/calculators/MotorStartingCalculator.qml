@@ -11,7 +11,7 @@ WaveCard {
     Layout.minimumWidth: 600
     Layout.minimumHeight: 250
 
-    info: ""
+    // info: ""
     
     // Create a local instance of our calculator
     property MotorStartingCalculator calculator: MotorStartingCalculator {}

@@ -143,6 +143,14 @@ Page {
                     
                 }
             }
+
+             CalcButton {
+                text: "Discrimination Analyzer"
+                onClicked: {
+                    calculatorLoader.setSource("../components/calculators/DiscriminationAnalyzer.qml")
+                    
+                }
+            }
         }
     }
 }

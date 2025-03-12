@@ -90,7 +90,7 @@ class ModelFactory(IModelFactory):
             "voltage_drop": VoltageDrop,
             "results_manager": ResultsManager,
             "voltage_drop_calc": VoltageDropCalculator,
-            "motor_calc": MotorCalculator,
+            # "motor_starting": MotorCalculator,
             "pf_correction": PowerFactorCorrectionCalculator,
             "cable_ampacity": CableAmpacityCalculator,
             "sine_calc": SineCalculator,
