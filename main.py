@@ -9,19 +9,19 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator
+from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
+from services.container import Container
+from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
+from models.config import app_config
+
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.VoltageDrop import VoltageDrop
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart
-from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
-from services.container import Container
-from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
-from models.config import app_config
 
-# Add these imports
+from models.Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.voltage_drop_calculator import VoltageDropCalculator
 from models.motor_calculator import MotorCalculator
@@ -30,20 +30,11 @@ from models.cable_ampacity import CableAmpacityCalculator
 from models.protection_relay import ProtectionRelayCalculator
 from models.harmonic_analysis import HarmonicAnalysisCalculator
 from models.instrument_transformer import InstrumentTransformerCalculator
-
-# New imports for protection system calculators
 from models.relay_coordination import RelayCoordinationCalculator
 from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
 from models.resonant_frequency import FrequencyCalculator
-
-# Import ChargingCalculator
 from models.ChargingCalculator import ChargingCalculator
-
-# Import SineCalculator
-from models.sine_calculator import SineCalculator
-
-# Import BatteryCalculator
 from models.battery_calculator import BatteryCalculator
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -108,7 +99,6 @@ class Application:
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
         self.charging_calc = self.calculator_factory.create_calculator("charging")
         self.conversion_calculator = self.calculator_factory.create_calculator("conversion")
-
         self.transformer_calculator = self.calculator_factory.create_calculator("transformer")
         self.voltage_drop_calculator = self.calculator_factory.create_calculator("voltage_drop")
         self.motor_calculator = self.calculator_factory.create_calculator("motor_starting")
@@ -122,7 +112,6 @@ class Application:
         self.discrimination_analyzer = self.calculator_factory.create_calculator("discrimination_analyzer")
 
         # Create and configure other models
-        self.sine_calc = self.model_factory.create_model("sine_calc")
         self.sine_wave = self.model_factory.create_model("three_phase")
         self.series_LC_chart = self.model_factory.create_model("series_rlc_chart")
         self.voltage_drop = self.model_factory.create_model("voltage_drop")
@@ -149,7 +138,6 @@ class Application:
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
             (VoltageDrop,"VDrop", 1, 0, "VoltageDrop"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
-            (SineCalculator, "SineCalc", 1, 0, "SineCalculator"),
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
             (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
             (VoltageDropCalculator, "VoltageDrop", 1, 0, "VoltageDropCalculator"),

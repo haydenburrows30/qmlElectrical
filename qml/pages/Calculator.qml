@@ -18,7 +18,7 @@ import Sine 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
-import SineCalc 1.0
+// import SineCalc 1.0
 import Conversion 1.0
 import CableAmpacity 1.0
 import ProtectionRelay 1.0

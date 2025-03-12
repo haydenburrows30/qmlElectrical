@@ -8,7 +8,7 @@ import PFCorrection 1.0
 WaveCard {
     id: pfCorrectionCard
     title: 'Power Factor Correction'
-    property PowerFactorCorrectionCalculator calculator: PowerFactorCorrectionCalculator {}  // Match registered name
+    property PowerFactorCorrectionCalculator calculator: PowerFactorCorrectionCalculator {}
 
     RowLayout {
         spacing: 10
@@ -32,7 +32,8 @@ WaveCard {
                         id: activePowerInput
                         placeholderText: "Enter power"
                         onTextChanged: if(text) calculator.activePower = parseFloat(text)
-                        Layout.fillWidth: true
+                        Layout.minimumWidth: 150
+                        // Layout.fillWidth: true
                     }
 
                     Label { text: "Current PF:" }
@@ -40,7 +41,8 @@ WaveCard {
                         id: currentPFInput
                         placeholderText: "Enter current PF"
                         onTextChanged: if(text) calculator.currentPF = parseFloat(text)
-                        Layout.fillWidth: true
+                        Layout.minimumWidth: 150
+                        // Layout.fillWidth: true
                     }
 
                     Label { text: "Target PF:" }
@@ -49,7 +51,8 @@ WaveCard {
                         placeholderText: "Enter target PF"
                         text: "0.95"
                         onTextChanged: if(text) calculator.targetPF = parseFloat(text)
-                        Layout.fillWidth: true
+                        Layout.minimumWidth: 150
+                        // Layout.fillWidth: true
                     }
                 }
             }
@@ -88,7 +91,7 @@ WaveCard {
 
         // Power Triangle Visualization    
         Canvas {
-            id: powerTriangle  // Add ID to reference the Canvas
+            id: powerTriangle
             Layout.minimumHeight: 300
             Layout.minimumWidth: 300
 
@@ -149,7 +152,6 @@ WaveCard {
                     centerY - q*scale/4)
             }
 
-            // Request repaint when values change
             Connections {
                 target: calculator
                 function onActivePowerChanged() { powerTriangle.requestPaint() }

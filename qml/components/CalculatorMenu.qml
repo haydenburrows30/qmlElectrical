@@ -30,7 +30,6 @@ Page {
         { name: "Protection Relay", source: "../components/calculators/ProtectionRelayCalculator.qml" },
         { name: "Resonant Frequency", source: "../components/calculators/FrequencyCalculator.qml" },
         { name: "Relay Coordination", source: "../components/calculators/RelayCoordination.qml" },
-        { name: "Sine Calculator", source: "../components/calculators/SineCalculator.qml" },
         { name: "Transformer Calculator", source: "../components/calculators/TransformerCalculator.qml" },
         { name: "Unit Converter", source: "../components/calculators/UnitConverter.qml" },
         { name: "Voltage Drop", source: "../components/calculators/VoltageDropCalculator.qml" }
