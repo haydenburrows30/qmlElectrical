@@ -32,7 +32,8 @@ Page {
         { name: "Unit Converter", source: "../components/calculators/UnitConverter.qml" },
         { name: "Voltage Drop", source: "../components/calculators/VoltageDropCalculator.qml" },
         { name: "Electric Machine", source: "../components/calculators/ElectricMachineCalculator.qml" },
-        { name: "Earthing Calculator", source: "../components/calculators/EarthingCalculator.qml" }
+        { name: "Earthing Calculator", source: "../components/calculators/EarthingCalculator.qml" },
+        { name: "Transmission Line", source: "../components/calculators/TransmissionLineCalculator.qml" }
     ]
 
     ColumnLayout {

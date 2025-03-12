@@ -36,6 +36,8 @@ from models.ChargingCalculator import ChargingCalculator
 from models.battery_calculator import BatteryCalculator
 from models.machine_calculator import MachineCalculator
 from models.earthing_calculator import EarthingCalculator
+from models.transformer_calculator import TransformerCalculator
+from models.transmission_calculator import TransmissionLineCalculator
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -110,7 +112,8 @@ class Application:
         self.overcurrent_curves = self.calculator_factory.create_calculator("overcurrent_curves")
         self.discrimination_analyzer = self.calculator_factory.create_calculator("discrimination_analyzer")
         self.machine_calculator = self.calculator_factory.create_calculator("machine"),
-        self.earth_calculator = self.calculator_factory.create_calculator("earthing")
+        self.earth_calculator = self.calculator_factory.create_calculator("earthing"),
+        self.transmission_calculator = self.calculator_factory.create_calculator("transmission_line")
 
         # Create and configure other models
         self.sine_wave = self.model_factory.create_model("three_phase")
@@ -143,7 +146,8 @@ class Application:
             (BatteryCalculator, "Battery", 1, 0, "BatteryCalculator"),
             (ConversionCalculator, "Conversion", 1, 0, "ConversionCalculator"),
             (MachineCalculator, "Machine", 1, 0, "MachineCalculator"),
-            (EarthingCalculator, "Earthing", 1, 0, "EarthingCalculator")
+            (EarthingCalculator, "Earthing", 1, 0, "EarthingCalculator"),
+            (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator")
         ]
         for type_info in qml_types:
             self.qml_engine.register_type(*type_info)

@@ -30,7 +30,6 @@
     <file>qml/components/HButton.qml</file>
     <file>qml/components/Settings.qml</file>
     <file>qml/components/SideBar.qml</file>
-    <file>qml/components/ToolBar.qml</file>
     <file>qml/components/RealTimeChart.qml</file>
     <file>qml/components/ChargingCurrentViz.qml</file>
     <file>qml/components/ImpedanceVectorViz.qml</file>
@@ -68,6 +67,7 @@
     <file>models/VoltageDrop.py</file>
     <file>models/ElectricPy.py</file>
     <file>models/ThreePhase.py</file>
+    <file>models/battery_calculator.py</file>
 
     <!-- Configuration -->
     <file>data/qtquickcontrols2.conf</file>

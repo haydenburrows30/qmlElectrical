@@ -1,50 +1,73 @@
+Power System Calculators:
+
 Short Circuit Calculator:
-Calculate fault currents in power systems:
-Include three-phase, single-phase-to-ground, phase-to-phase, and double-phase-to-ground faults
-Visualize fault current magnitude and direction
+- Calculate fault currents in power systems
+- Three-phase, single-phase-to-ground, phase-to-phase faults
+- Double-phase-to-ground faults
+- Fault current magnitude and direction visualization
 
 Load Flow Calculator:
-Calculate bus voltages, power flows, and losses in a power system
-Include Gauss-Seidel and Newton-Raphson methods
-Visualize power flow with a simple network diagram
+- Bus voltages, power flows, and losses calculation
+- Gauss-Seidel and Newton-Raphson methods
+- Network diagram visualization
+- Power factor correction analysis
 
-Transmission Line Parameters Calculator:
-Calculate R, L, C parameters of overhead and underground lines
-Include skin effect calculations
-Determine surge impedance loading (SIL) of lines
+Transmission Line Calculator:
+- R, L, C parameters for overhead and underground lines
+- Skin effect and temperature corrections
+- Bundle conductor configurations
+- Earth return effects
+- Surge impedance loading (SIL)
+- Voltage/current profiles
+- ABCD parameters visualization
 
-Determine knee point voltage and ALF for protection class CTs
-Check CT saturation under fault conditions
+Current Transformer Calculator:
+- Knee point voltage and ALF calculations
+- CT saturation analysis
+- Accuracy class verification
+- Burden calculations
+- Visual burden curve representation
 
 Arc Flash Calculator:
-Calculate incident energy levels and protection boundaries
-Visualize arc flash boundary zones
+- Incident energy levels
+- Protection boundary calculations
+- PPE requirements
+- Boundary zone visualization
 
-Generator Synchronization Calculator:
-Calculate synchronizing power and torque
-Determine critical clearing time
-Include visualization of rotor angle stability
+Generator/Motor Calculators:
+- Speed-torque characteristics
+- Efficiency and losses
+- Temperature rise analysis
+- Starting current calculations
+- Power factor and reactive power
+- Thermal derating visualization
 
-DC Motor/Generator Calculator:
-Calculate speed, torque, and power relationships
-Include armature reaction compensation
-Determine motor starting requirements
+Earthing System Calculator:
+- Grid resistance calculation
+- Touch and step voltages
+- Earth potential rise
+- Conductor sizing
+- Visual grid representation
+- Soil resistivity effects
 
-Equipment Design Calculators:
-Busbar Design Calculator
-Calculate short circuit forces between busbars
+Power Quality Analysis:
+- Harmonic analysis and filtering
+- Flicker calculations (Pst, Plt)
+- Voltage fluctuation assessment
+- Capacitor bank resonance
+- Interactive waveform display
 
-Power Quality Calculators:
-Harmonic Analysis Calculator
-Determine required filter components
-Visualize harmonic spectrum
+Cable Systems:
+- Ampacity calculations
+- Voltage drop analysis
+- Economic sizing
+- Installation method effects
+- Temperature derating
+- Visual cable cross-section
 
-Flicker and Voltage Fluctuation Calculator:
-Calculate flicker severity indices Pst and Plt
-Determine impact of fluctuating loads
-Compare with standards limits
-
-Capacitor Bank Resonance Calculator:s
-Calculate resonant frequencies with system inductance
-Determine harmonic amplification factors
-Suggest damping solutions
+Power Factor Correction:
+- Capacitor bank sizing
+- Annual savings calculation
+- Resonance risk assessment
+- Power triangle visualization
+- Reactive power flow

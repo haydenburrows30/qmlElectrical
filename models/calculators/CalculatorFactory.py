@@ -14,6 +14,7 @@ from ..discrimination_analyzer import DiscriminationAnalyzer
 from ..voltage_drop_calculator import VoltageDropCalculator
 from ..machine_calculator import MachineCalculator
 from ..earthing_calculator import EarthingCalculator
+from ..transmission_calculator import TransmissionLineCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -67,7 +68,8 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "voltage_drop": VoltageDropCalculator,
             "conversion": ConversionCalculator,
             "machine": MachineCalculator,
-            "earthing": EarthingCalculator
+            "earthing": EarthingCalculator,
+            "transmission_line": TransmissionLineCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):
