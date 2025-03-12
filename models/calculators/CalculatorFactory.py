@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Type, Dict
-from ..Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, ResonantFrequencyCalculator
+from ..Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
 from .BaseCalculator import BaseCalculator
 from ..transformer_calculator import TransformerCalculator
 from ..motor_calculator import MotorCalculator
@@ -55,7 +55,6 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "power": PowerCalculator,
             "fault": FaultCurrentCalculator,
             "charging": ChargingCalculator,
-            "resonant": ResonantFrequencyCalculator,
             "transformer": TransformerCalculator,
             "motor_starting": MotorCalculator,
             "pf_correction": PowerFactorCorrectionCalculator,

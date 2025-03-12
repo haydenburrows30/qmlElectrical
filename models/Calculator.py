@@ -179,63 +179,6 @@ class FaultCurrentCalculator(BaseCalculator):
     def phaseAngle(self):
         return self._phase_angle
 
-    # def reset(self):
-    #     self._voltage = 0.0
-    #     self._impedance = 0.0
-    #     self.dataChanged.emit()
-        
-    # def calculate(self):
-    #     self.calculateFault()
-
-class ResonantFrequencyCalculator(BaseCalculator):
-    """Calculator for resonant frequency.
-    
-    Features:
-    - LC resonant frequency calculation
-    - Capacitance and inductance based calculations
-    
-    Signals:
-        frequencyCalculated: Emitted when frequency calculation completes
-    """
-    frequencyCalculated = Signal(float)
-
-    def __init__(self):
-        super().__init__()
-        self._capacitance = 0.0  # in microfarads
-        self._inductance = 0.0   # in millihenries
-        self._frequency = 0.0    # in Hz
-
-    @Slot(float)
-    def setCapacitance(self, capacitance):
-        self._capacitance = capacitance
-        self.calculateFrequency()
-
-    @Slot(float)
-    def setInductance(self, inductance):
-        self._inductance = inductance
-        self.calculateFrequency()
-
-    def calculateFrequency(self):
-        if self._capacitance > 0 and self._inductance > 0:
-            # Convert from μF to F and mH to H
-            c_farads = self._capacitance * 1e-6
-            l_henries = self._inductance * 1e-3
-            self._frequency = 1 / (2 * math.pi * math.sqrt(l_henries * c_farads))
-            self.frequencyCalculated.emit(self._frequency)
-
-    @Property(float, notify=frequencyCalculated)
-    def frequency(self):
-        return self._frequency
-
-    def reset(self):
-        self._capacitance = 0.0
-        self._inductance = 0.0
-        self._frequency = 0.0
-        self.dataChanged.emit()
-        
-    def calculate(self):
-        self.calculateFrequency()
-
 class ConversionCalculator(BaseCalculator):
     """Calculator for various electrical and mechanical unit conversions.
     

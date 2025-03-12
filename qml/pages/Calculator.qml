@@ -3,11 +3,8 @@ import QtQml
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls.Universal
 import QtCharts
-
-import QtQuick.Studio.DesignEffects
 
 import "../components"
 import "../components/calculators"
@@ -18,7 +15,6 @@ import PCalculator 1.0
 import Charging 1.0
 import Fault 1.0
 import Sine 1.0
-// import RFreq 1.0
 import RLC 1.0
 import VDrop 1.0
 import Results 1.0
@@ -36,7 +32,6 @@ import PFCorrection 1.0
 Page {
     id: home
 
-    // Add property to store available calculators
     property var calculatorList: [
         "../components/CalculatorMenu.qml",
         "../components/calculators/UnitConverter.qml",
@@ -44,7 +39,6 @@ Page {
         "../components/calculators/ImpedanceCalculator.qml",
         "../components/calculators/ChargingCurrentCalculator.qml",
         "../components/calculators/DiscriminationAnalyzer.qml",
-        "../components/calculators/SineCalculator.qml",
         "../components/calculators/FrequencyCalculator.qml",
         "../components/calculators/VoltageDropCalculator.qml",
         "../components/calculators/CableAmpacityCalculator.qml",
@@ -76,7 +70,6 @@ Page {
             CalcButton {
                 text: "←"
                 Layout.maximumWidth: 40
-                // Layout.alignment: Qt.AlignLeft
                 onClicked: {
                     currentCalculatorIndex = (currentCalculatorIndex - 1 + calculatorList.length) % calculatorList.length
                     calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
@@ -92,16 +85,6 @@ Page {
                     calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
                 }
             }
-
-            // Label {
-            //     Layout.minimumWidth: 200
-            //     Layout.fillWidth: true
-            //     horizontalAlignment : Text.AlignHCenter
-
-            //     text: "Current: " + (calculatorLoader.source.toString().split("/").pop().replace(".qml", ""))
-            // }
-
-            // Add Next button
             CalcButton {
                 text: "→"
                 Layout.maximumWidth: 40

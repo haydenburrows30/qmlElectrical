@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
 
-from models.Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator, ResonantFrequencyCalculator
+from models.Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, SineCalculator
 from models.ThreePhase import ThreePhaseSineWaveModel
 from models.ElectricPy import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
@@ -48,7 +48,7 @@ from models.battery_calculator import BatteryCalculator
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-import rc_resources as rc_resources
+import data.rc_resources as rc_resources
 
 class Application:
     """Main application class implementing dependency injection and component management.
@@ -106,7 +106,6 @@ class Application:
         # Create and configure calculator models
         self.power_calculator = self.calculator_factory.create_calculator("power")
         self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
-        self.resonant_freq = self.calculator_factory.create_calculator("resonant")
         self.charging_calc = self.calculator_factory.create_calculator("charging")
         self.conversion_calculator = self.calculator_factory.create_calculator("conversion")
 
@@ -136,7 +135,6 @@ class Application:
             (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
             (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
-            # (ResonantFrequencyCalculator, "RFreq", 1, 0, "ResonantFrequencyCalculator"),
             (FrequencyCalculator, "Freq", 1, 0, "FrequencyCalculator"),
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),

@@ -71,6 +71,6 @@
     <file>models/ThreePhase.py</file>
 
     <!-- Configuration -->
-    <file>qtquickcontrols2.conf</file>
+    <file>data/qtquickcontrols2.conf</file>
 </qresource>
 </RCC>
