@@ -68,3 +68,39 @@ class ILogger(ABC):
             level: Logging level
         """
         pass
+
+    @abstractmethod
+    def info(self, message: str) -> None:
+        """Log info message.
+        
+        Args:
+            message: Info message to log
+        """
+        pass
+
+    @abstractmethod
+    def error(self, message: str) -> None:
+        """Log error message.
+        
+        Args:
+            message: Error message to log
+        """
+        pass
+
+    @abstractmethod
+    def debug(self, message: str) -> None:
+        """Log debug message.
+        
+        Args:
+            message: Debug message to log
+        """
+        pass
+
+    @abstractmethod
+    def warning(self, message: str) -> None:
+        """Log warning message.
+        
+        Args:
+            message: Warning message to log
+        """
+        pass

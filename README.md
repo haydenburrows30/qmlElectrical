@@ -1,17 +1,23 @@
-# qmlTableView
+# Electrical Calculator
 
-- Dynamic creation of table rows
-- Addition and deletion of rows
-- Dropdown and textfield inside cells
-- Voltage drop calculation based on resistance and reactance of cable type
+A comprehensive electrical engineering calculator suite built with Python and QML.
 
-Icons used in the program: https://www.figma.com/community/file/944228750903853832
+## Features
 
-![Image](https://github.com/user-attachments/assets/7ec5ebcb-ec7c-4063-8a1f-71dc462468f9)
-![Image](https://github.com/user-attachments/assets/c943cdc3-2fa0-4552-92a5-d06178f0fb15)
-![Image](https://github.com/user-attachments/assets/947751dc-5eb7-489b-a081-1d3925c594d1)
-![Image](https://github.com/user-attachments/assets/cc69bb5f-4784-4c11-be48-f34b132f1684)
+### Main Interface
+![Main Window](docs/screenshots/main_window.png)
 
+### Voltage Drop Calculator
+![Voltage Drop](docs/screenshots/voltage_drop.png)
+
+### Three Phase Analysis
+![Three Phase](docs/screenshots/three_phase.png)
+
+### RLC Calculator
+![RLC](docs/screenshots/rlc.png)
+
+### Real-time Monitoring
+![Real-time](docs/screenshots/realtime.png)
 
 # Installation
 

@@ -11,13 +11,27 @@ from models.RealTimeChart import RealTimeChart
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
     
-    def setup(self, level: str) -> None:
-        """Configure the logging system.
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
         
-        Args:
-            level: Logging level to use
-        """
-        logging.basicConfig(level=level)
+    def setup(self, level=logging.INFO):
+        self.logger.setLevel(level)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+
+    def info(self, message):
+        self.logger.info(message)
+
+    def error(self, message):  # Add error method
+        self.logger.error(message)
+
+    def debug(self, message):  # Add debug method
+        self.logger.debug(message)
+
+    def warning(self, message):  # Add warning method
+        self.logger.warning(message)
 
 class QmlEngineWrapper(IQmlEngine):
     """Wrapper for QQmlApplicationEngine providing initialization control."""

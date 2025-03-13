@@ -113,6 +113,7 @@ ApplicationWindow {
 
     StackView {
         id: stackView
+        objectName: "stackView"  // Add this line to make it findable
         anchors {
             top: parent.top
             bottom: parent.bottom
