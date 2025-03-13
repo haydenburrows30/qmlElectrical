@@ -4,20 +4,6 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 
 ## Features
 
-### Main Interface
-![Main Window](docs/screenshots/main_window.png)
-
-### Voltage Drop Calculator
-![Voltage Drop](docs/screenshots/voltage_drop.png)
-
-### Three Phase Analysis
-![Three Phase](docs/screenshots/three_phase.png)
-
-### RLC Calculator
-![RLC](docs/screenshots/rlc.png)
-
-### Real-time Monitoring
-![Real-time](docs/screenshots/realtime.png)
 
 # Installation
 

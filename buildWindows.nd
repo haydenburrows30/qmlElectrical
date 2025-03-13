@@ -8,4 +8,5 @@ Make sure you're using Python 3.8 or later
 The .exe will be in the dist folder
 Run the exe to test it works before creating the installer
 If it works, you can then create the installer using NSIS
-The direct Windows build should be faster and more reliable than the Wine-based cross-compilation. Let me know if you run into any issues!
+The direct Windows build should be faster and more reliable than the Wine-based cross-compilation. 
+Let me know if you run into any issues!
