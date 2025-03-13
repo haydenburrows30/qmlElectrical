@@ -1,10 +1,11 @@
 import os
 import sys
 import logging
+import asyncio
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any  # Add Any import
 
-from PySide6.QtQml import qmlRegisterType
+from PySide6.QtQml import qmlRegisterType, QQmlApplicationEngine  # Add QQmlApplicationEngine import
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -38,6 +39,9 @@ from models.machine_calculator import MachineCalculator
 from models.earthing_calculator import EarthingCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.transmission_calculator import TransmissionLineCalculator
+
+from services.loading_manager import LoadingManager
+from services.worker_pool import WorkerPool
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -76,15 +80,77 @@ class Application:
 
         self.qml_engine.engine.clearComponentCache()
 
+        self.loading_manager = LoadingManager()
+        self.qml_engine.engine.rootContext().setContextProperty("loadingManager", self.loading_manager)
+
+        self.worker_pool = WorkerPool()
+        self._resource_cache = {}
+
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+
         self.setup()
         
+    async def load_models_async(self):
+        """Load models asynchronously."""
+        self.loading_manager._loading = True
+        self.loading_manager.statusChanged.emit("Loading core models...")
+        
+        async def load_model(name, progress):
+            model = await self.loading_manager.run_in_thread(
+                self.model_factory.create_model, name
+            )
+            self.loading_manager.update_task("models", progress)
+            return model
+            
+        # Load models concurrently
+        [self.sine_wave, self.voltage_drop, self.results_manager] = await asyncio.gather(
+            load_model("three_phase", 0.3),
+            load_model("voltage_drop", 0.6),
+            load_model("results_manager", 1.0)
+        )
+        
+        self.loading_manager._loading = False
+        self.loading_manager.loadingChanged.emit()
+
+    async def preload_resources(self):
+        """Preload commonly used resources in background."""
+        resources = [
+            "cable_data_mv.csv",
+            "protection_curves.json",
+            "motor_starting.csv"
+        ]
+        
+        for resource in resources:
+            path = os.path.join(CURRENT_DIR, "data", resource)
+            if os.path.exists(path):
+                async def load_resource(p):
+                    data = await self.worker_pool.execute(self._load_file, p)
+                    self._resource_cache[p] = data
+                asyncio.create_task(load_resource(path))
+
+    def _load_file(self, path: str) -> Any:
+        """Load file contents (runs in worker process)."""
+        with open(path, 'r') as f:
+            return f.read()
+
     def setup(self):
         """Configure application components and initialize subsystems."""
         self.logger.setup(level=logging.INFO)
         self.setup_app()
-        self.load_models()
+        
+        # Run async operations in the event loop
+        self.loop.run_until_complete(self._setup_async())
+        
         self.register_qml_types()
         self.load_qml()
+
+    async def _setup_async(self):
+        """Run all async initialization tasks."""
+        await asyncio.gather(
+            self.preload_resources(),
+            self.load_models_async()
+        )
 
     def setup_app(self):
         """Configure application using loaded config."""
@@ -96,31 +162,19 @@ class Application:
 
     def load_models(self):
         """Initialize and configure application models using factories."""
-        # Create and configure calculator models
-        self.power_calculator = self.calculator_factory.create_calculator("power")
-        self.fault_current_calculator = self.calculator_factory.create_calculator("fault")
-        self.charging_calc = self.calculator_factory.create_calculator("charging")
-        self.conversion_calculator = self.calculator_factory.create_calculator("conversion")
-        self.transformer_calculator = self.calculator_factory.create_calculator("transformer")
-        self.voltage_drop_calculator = self.calculator_factory.create_calculator("voltage_drop")
-        self.motor_calculator = self.calculator_factory.create_calculator("motor_starting")
-        self.pf_correction_calculator = self.calculator_factory.create_calculator("pf_correction")
-        self.cable_ampacity_calculator = self.calculator_factory.create_calculator("cable_ampacity")
-        self.protection_relay_calculator = self.calculator_factory.create_calculator("protection_relay")
-        self.harmonic_analysis_calculator = self.calculator_factory.create_calculator("harmonic_analysis")
-        self.instrument_transformer_calculator = self.calculator_factory.create_calculator("instrument_transformer")
-        self.overcurrent_curves = self.calculator_factory.create_calculator("overcurrent_curves")
-        self.discrimination_analyzer = self.calculator_factory.create_calculator("discrimination_analyzer")
-        self.machine_calculator = self.calculator_factory.create_calculator("machine"),
-        self.earth_calculator = self.calculator_factory.create_calculator("earthing"),
-        self.transmission_calculator = self.calculator_factory.create_calculator("transmission_line")
-
-        # Create and configure other models
+        # Load core models immediately
         self.sine_wave = self.model_factory.create_model("three_phase")
-        self.series_LC_chart = self.model_factory.create_model("series_rlc_chart")
         self.voltage_drop = self.model_factory.create_model("voltage_drop")
         self.results_manager = self.model_factory.create_model("results_manager")
-        self.realtime_chart = self.model_factory.create_model("realtime_chart")
+
+        # Defer calculator creation until needed
+        self._calculators = {}
+    
+    def get_calculator(self, name):
+        """Lazy load calculators only when requested."""
+        if name not in self._calculators:
+            self._calculators[name] = self.calculator_factory.create_calculator(name)
+        return self._calculators[name]
 
     def register_qml_types(self):
         """Get list of QML types to register."""
@@ -149,6 +203,7 @@ class Application:
             (EarthingCalculator, "Earthing", 1, 0, "EarthingCalculator"),
             (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator")
         ]
+
         for type_info in qml_types:
             self.qml_engine.register_type(*type_info)
 
@@ -156,7 +211,12 @@ class Application:
         self.qml_engine.load_qml(os.path.join(CURRENT_DIR, "qml", "main.qml"))
         
     def run(self):
-        sys.exit(self.app.exec())
+        """Run the application."""
+        try:
+            sys.exit(self.app.exec())
+        finally:
+            self.loop.close()
+            self.worker_pool.shutdown()
 
 def setup_container() -> Container:
     """Create and configure the dependency injection container.
@@ -180,5 +240,8 @@ def main():
     app.run()
 
 if __name__ == "__main__":
-    main()
+    # Remove duplicate app and engine initialization
+    container = setup_container()
+    app = Application(container)
+    app.run()
 

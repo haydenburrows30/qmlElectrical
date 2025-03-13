@@ -5,6 +5,8 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Dict, Any, List, Optional
 import json
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from .logger import setup_logger
 
 # Base paths
@@ -140,18 +142,22 @@ def ensure_config_exists() -> None:
         else:
             logger.error("Failed to create config file")
 
-def initialize_config() -> AppConfig:
-    """Initialize the configuration system."""
-    config_file = ROOT_DIR / 'config.json'
-    logger.info(f"Initializing configuration system from: {config_file}")
-    ensure_config_exists()
-    config = load_config()
-    logger.info("Configuration loaded successfully")
+async def initialize_config() -> AppConfig:
+    """Initialize configuration asynchronously."""
+    loop = asyncio.get_event_loop()
+    executor = ThreadPoolExecutor()
+    
+    # Load config file in background thread
+    config = await loop.run_in_executor(executor, load_config)
+    
+    # Initialize logging in background
+    await loop.run_in_executor(executor, setup_logger)
+    
     return config
 
 # Initialize immediately when module is imported
 logger.info(f"Loading configuration module from: {ROOT_DIR}")
-app_config = initialize_config()
+app_config = asyncio.run(initialize_config())
 
 if __name__ == '__main__':
     print_config_info()

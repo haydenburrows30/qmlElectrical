@@ -23,6 +23,67 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
+    // Add splash screen
+    Popup {
+        id: splashScreen
+        modal: true
+        visible: true
+        closePolicy: Popup.NoAutoClose
+        anchors.centerIn: parent
+        width: 300
+        height: 300
+        
+        background: Rectangle {
+            color: Universal.background
+            radius: 10
+            border.width: 1
+            border.color: Universal.foreground
+            
+            Column {
+                anchors.centerIn: parent
+                spacing: 20
+                
+                // Add app logo/icon here
+                Image {
+                    source: "qrc:/icons/gallery/24x24/Calculator.svg"
+                    width: 64
+                    height: 64
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                BusyIndicator {
+                    running: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                ProgressBar {
+                    width: 200
+                    value: loadingManager.progress
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                Label {
+                    text: loadingManager.loading ? "Loading..." : "Ready!"
+                    color: Universal.foreground
+                    font.pixelSize: 16
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+        }
+    }
+    
+    // Modified timer to close only when loading is complete
+    Timer {
+        interval: 100
+        running: true
+        repeat: true
+        onTriggered: {
+            if (!loadingManager.loading) {
+                splashScreen.close()
+            }
+        }
+    }
+
     SeriesRLCChart {id: seriesRLCChart}
     SineWaveModel {id: sineModel}
     VoltageDrop {id: voltageDrop}
