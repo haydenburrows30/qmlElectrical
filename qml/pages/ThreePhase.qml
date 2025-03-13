@@ -114,6 +114,8 @@ Page {
                                         apparentPower: sineModel.apparentPower
                                         powerFactor: sineModel.averagePowerFactor
                                         triangleScale: 100
+                                        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+                                        textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
                                     }
                                 }
 

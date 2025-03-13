@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
 
 import components 1.0
 
@@ -8,11 +9,12 @@ Rectangle {
     id: root
     color: "transparent"
     
-    // Bind power values directly to the model
+    // Properties
     property real activePower: sineModel.activePower
     property real reactivePower: sineModel.reactivePower
     property real apparentPower: sineModel.apparentPower
     property real powerFactor: sineModel.averagePowerFactor
+    property color textColor: Universal.foreground
     
     // Scaling properties
     property real triangleScale: 100
@@ -26,7 +28,7 @@ Rectangle {
     Item {
         id: triangleContainer
         anchors.fill: parent
-        anchors.margins: 10
+        anchors.margins: 1
 
         // Calculate triangle dimensions
         property real baseLength: activePower * triangleScale
@@ -83,6 +85,7 @@ Rectangle {
             anchors.horizontalCenter: triangle.horizontalCenter
             anchors.topMargin: 10
             text: "P = " + activePower.toFixed(1) + " kW"
+            color: root.textColor
         }
         
         Text {
@@ -91,6 +94,7 @@ Rectangle {
             anchors.verticalCenter: triangle.verticalCenter
             anchors.rightMargin: 10
             text: "Q = " + reactivePower.toFixed(1) + " kVAR"
+            color: root.textColor
         }
 
         // Direct Text element approach for apparent power label
@@ -103,14 +107,12 @@ Rectangle {
             property real centerY: height / 2
             property real scaledHeight: triangleContainer.triangleHeight * triangleContainer.scaleFactor
             property real scaledBase: triangleContainer.baseLength * triangleContainer.scaleFactor
-            property real startX: centerX
+            property real startX: centerX + scaledBase
             property real startY: centerY - scaledHeight
             property real endX: centerX + scaledBase
             property real endY: centerY
             property real midX: (startX + endX) / 2
             property real midY: (startY + endY) / 2
-            
-            // Calculate angle in radians then convert to degrees
             property real angleRadians: Math.atan2(startY - endY, endX - startX)
             property real angleDegrees: angleRadians * 180 / Math.PI
             
@@ -126,9 +128,8 @@ Rectangle {
                 // Apply rotation to align with hypotenuse
                 transformOrigin: Item.Center
                 rotation: parent.angleDegrees
-                
-                color: sideBar.toggle1 ? "#ffffff" : "#000000"
                 visible: false // Hide this, used as reference
+                color: root.textColor
             }
             
             // Draw using Canvas for perfect alignment
@@ -144,12 +145,13 @@ Rectangle {
                     // Get coordinates
                     var centerX = width / 2;
                     var centerY = height / 2;
-                    var scaledHeight = triangleContainer.triangleHeight * triangleContainer.scaleFactor;
                     var scaledBase = triangleContainer.baseLength * triangleContainer.scaleFactor;
+                    var scaledHeight = triangleContainer.triangleHeight * triangleContainer.scaleFactor;
                     
                     // Start is the top vertex of the triangle
                     var startX = centerX;
                     var startY = centerY - scaledHeight;
+                    
                     // End is the right vertex of the triangle
                     var endX = centerX + scaledBase;
                     var endY = centerY;
@@ -162,14 +164,14 @@ Rectangle {
                     var angle = Math.atan2(endY - startY, endX - startX);
                     
                     // Calculate perpendicular offset for text placement
-                    // Reduced from 10 to 5 for closer positioning to the hypotenuse
-                    var offsetDistance = 5;
+                    var offsetDistance = 5; // Reduced from 10 to 5 for closer positioning to the hypotenuse
                     var offsetX = -Math.sin(angle) * offsetDistance;
                     var offsetY = Math.cos(angle) * offsetDistance;
                     
-                    ctx.save();
                     // Position at midpoint of hypotenuse with reduced offset
+                    ctx.save();
                     ctx.translate(midX + offsetX, midY + offsetY);
+                    
                     // Rotate to align with hypotenuse
                     ctx.rotate(angle);
                     
@@ -181,7 +183,6 @@ Rectangle {
                     
                     // Draw text aligned with the hypotenuse
                     ctx.fillText(powerText, 0, 0);
-                    
                     ctx.restore();
                 }
             }
@@ -194,6 +195,7 @@ Rectangle {
             anchors.margins: 10
             text: "PF = " + powerFactor.toFixed(3)
             font.bold: true
+            color: root.textColor
         }
 
         // Angle arc
@@ -223,9 +225,10 @@ Rectangle {
             anchors.margins: 25
             text: "φ = " + (Math.acos(powerFactor) * 180 / Math.PI).toFixed(1) + "°"
             font.italic: true
+            color: root.textColor
         }
     }
-    
+
     // Update the canvas when the triangle values change
     onActivePowerChanged: apparentPowerCanvas.requestPaint()
     onReactivePowerChanged: apparentPowerCanvas.requestPaint()
