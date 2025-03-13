@@ -1429,3 +1429,8 @@
 2025-03-13 21:50:30,299 - config - INFO - Configuration loaded successfully
 2025-03-13 21:50:30,402 - ResultsManager - INFO - Loaded 0 results from CSV
 2025-03-13 21:50:30,472 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-13 21:56:28,266 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-13 21:56:28,266 - config - INFO - Initializing configuration system from: /home/hayden/Documents/qmltest/config.json
+2025-03-13 21:56:28,266 - config - INFO - Configuration loaded successfully
+2025-03-13 21:56:28,367 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-13 21:56:28,428 - ResultsManager - INFO - Loaded 0 results from CSV

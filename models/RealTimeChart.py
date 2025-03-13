@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot, QDateTime
 import numpy as np
 import json
+import os
 
 class WaveType:
     SINE = 0
@@ -22,6 +23,9 @@ class RealTimeChart(QObject):
     amplitudesChanged = Signal('QVariantList')
     offsetsChanged = Signal('QVariantList')
     phasesChanged = Signal('QVariantList')
+
+    # Add root path as class variable
+    ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     def __init__(self):
         super().__init__()
@@ -155,7 +159,8 @@ class RealTimeChart(QObject):
             'phases': self._phases
         }
         try:
-            with open('wave_config.json', 'w') as f:
+            config_path = os.path.join(self.ROOT_PATH, 'data', 'wave_config.json')
+            with open(config_path, 'w') as f:
                 json.dump(config, f)
                 print("Configuration saved successfully")
         except Exception as e:
@@ -165,7 +170,8 @@ class RealTimeChart(QObject):
     def loadConfiguration(self):
         """Load configuration from JSON file"""
         try:
-            with open('wave_config.json', 'r') as f:
+            config_path = os.path.join(self.ROOT_PATH, 'data', 'wave_config.json')
+            with open(config_path, 'r') as f:
                 config = json.load(f)
                 self._wave_types = config['wave_types']
                 self._frequencies = config['frequencies']
