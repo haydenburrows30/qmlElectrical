@@ -2,151 +2,203 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+import "../"
+import "../../components"   
 import Conversion 1.0
 
-Rectangle {
+WaveCard {
     color: Universal.background // Use theme background color
-    
     
     ConversionCalculator {
         id: converter
     }
+
+    Component.onCompleted: {
+        conversionTypeText.color = "blue"
+        conversionTypeText.font.bold = true
+    }
+
+    function rfocusChanged() {
+        if (activeComboBox === "conversionType") {
+            conversionTypeText.color = "blue"
+            conversionTypeText.font.bold = true
+            wHRPMText.color = Universal.foreground
+            wHRPMText.font.bold = false
+            tempText.color = Universal.foreground
+            tempText.font.bold = false
+        } else if (activeComboBox === "wHRPM") {
+            wHRPMText.color = "blue"
+            wHRPMText.font.bold = true
+            conversionTypeText.color = Universal.foreground
+            conversionTypeText.font.bold = false
+            tempText.color = Universal.foreground
+            tempText.font.bold = false
+            
+        } else if (activeComboBox === "temp") {
+            tempText.color = "blue"
+            tempText.font.bold = true
+            conversionTypeText.color = Universal.foreground
+            conversionTypeText.font.bold = false
+            wHRPMText.color = Universal.foreground
+            wHRPMText.font.bold = false
+        }
+    }
     
     property string activeComboBox: "conversionType"
 
-    RowLayout {
+    ColumnLayout {
         anchors.centerIn: parent
-        GridLayout {
-            columns: 3
-                Label {
-                    text: "Voltage"
-                    font.bold: true
-                    font.pixelSize: 16
-                    Layout.row: 0
-                    Layout.column: 0
-                }
 
-                Label {
-                    text: "Frequency"
-                    font.bold: true
-                    font.pixelSize: 16
-                    Layout.row: 1
-                    Layout.column: 0
-                }
-
-                Label {
-                    text: "Temperature"
-                    font.bold: true
-                    font.pixelSize: 16
-                    Layout.row: 2
-                    Layout.column: 0
-                }
-
-                ComboBox {
-                    id: conversionType
-                    Layout.minimumWidth: 200
-                    Layout.row: 0
-                    Layout.column: 1
-                    model: [
-                        "Line to Phase Voltage",
-                        "Phase to Line Voltage",
-                        "Line to Phase Current",
-                        "Phase to Line Current",
-                    ]
-                    onCurrentTextChanged: {
-                        converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
-                        activeComboBox = "conversionType"
+        RowLayout {
+            Layout.fillWidth: true
+            ColumnLayout {
+                RowLayout {
+                    Label {
+                        text: "Voltage"
+                        Layout.minimumWidth: 100
+                        font.bold: true
+                        font.pixelSize: 16
                     }
-                    onActivated: {
-                        activeComboBox = "conversionType"
+
+                    ComboBox {
+                        id: conversionType
+                        Layout.minimumWidth: 200
+                        model: [
+                            "Line to Phase Voltage",
+                            "Phase to Line Voltage",
+                            "Line to Phase Current",
+                            "Phase to Line Current",
+                        ]
+                        onCurrentTextChanged: {
+                            converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
+                            activeComboBox = "conversionType"
+                        }
+                        onActivated: {
+                            activeComboBox = "conversionType"
+                            rfocusChanged()
+                        }
+
+                        contentItem: Text {
+                            id: conversionTypeText
+                            leftPadding: 10
+                            text: conversionType.displayText
+                            font.bold: conversionType.activeFocus
+                            color: conversionType.activeFocus ? "blue" : Universal.foreground
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
+                        }
                     }
                 }
 
-                ComboBox {
-                    id: wHRPM
-                    Layout.minimumWidth: 200
-                    Layout.row: 1
-                    Layout.column: 1
-                    model: [
-                        "Watts to dBmW",
-                        "dBmW to Watts",
-                        "Rad/s to Hz",
-                        "Horsepower to Watts",
-                        "RPM to Hz",
-                        "Radians to Hz",
-                        "Hz to RPM",
-                        "Watts to Horsepower",
-                    ]
-                    onCurrentTextChanged: {
-                        converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
-                        activeComboBox = "wHRPM"
+                RowLayout {
+                    Label {
+                        text: "Frequency"
+                        font.bold: true
+                        font.pixelSize: 16
+                        Layout.minimumWidth: 100
                     }
-                    onActivated: {
-                        activeComboBox = "wHRPM"
+
+                    ComboBox {
+                        id: wHRPM
+                        Layout.minimumWidth: 200
+                        model: [
+                            "Watts to dBmW",
+                            "dBmW to Watts",
+                            "Rad/s to Hz",
+                            "Horsepower to Watts",
+                            "RPM to Hz",
+                            "Radians to Hz",
+                            "Hz to RPM",
+                            "Watts to Horsepower",
+                        ]
+                        onCurrentTextChanged: {
+                            converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
+                            activeComboBox = "wHRPM"
+                        }
+                        onActivated: {
+                            activeComboBox = "wHRPM"
+                            rfocusChanged()
+                        }
+
+                        contentItem: Text {
+                            id: wHRPMText
+                            leftPadding: 10
+
+                            text: wHRPM.displayText
+                            font.bold: wHRPM.activeFocus
+                            color: wHRPM.activeFocus ? "blue" : Universal.foreground
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
+                        }
                     }
                 }
 
-                ComboBox {
-                    id: temp
-                    Layout.minimumWidth: 200
-                    Layout.row: 2
-                    Layout.column: 1
-                    model: [
-                        "Celsius to Fahrenheit",
-                        "Fahrenheit to Celsius"
-                    ]
-                    onCurrentTextChanged: {
-                        converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
-                        activeComboBox = "temp"
+                RowLayout {
+                    Label {
+                        text: "Temperature"
+                        font.bold: true
+                        font.pixelSize: 16
+                        Layout.minimumWidth: 100
                     }
-                    onActivated: {
-                        activeComboBox = "temp"
+
+                    ComboBox {
+                        id: temp
+                        Layout.minimumWidth: 200
+                        model: [
+                            "Celsius to Fahrenheit",
+                            "Fahrenheit to Celsius"
+                        ]
+                        onCurrentTextChanged: {
+                            converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
+                            activeComboBox = "temp"
+                        }
+                        onActivated: {
+                            activeComboBox = "temp"
+                            rfocusChanged()
+                        }
+
+                        contentItem: Text {
+                            id: tempText
+                            leftPadding: 10
+
+                            text: temp.displayText
+                            font.bold: temp.activeFocus
+                            color: temp.activeFocus ? "blue" : Universal.foreground
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
+                        }
                     }
                 }
+            }
 
-                TextField {
-                    Layout.minimumWidth: 200
+            ColumnLayout {
+                TextArea {
+                    id: enterField
                     placeholderText: "Enter value"
-                    Layout.row: 3
-                    Layout.column: 1
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.minimumWidth: 200
+                    Layout.minimumHeight: 100
+                    font.pixelSize: 34
+
                     onTextChanged: {
                         if (text) converter.setInputValue(parseFloat(text))
                     }
-                    validator: DoubleValidator {}
+                    wrapMode: TextEdit.Wrap
                 }
-
-                Label {
-                    text: "Result"
-                    font.bold: true
-                    font.pixelSize: 16
-                    Layout.row: 0
-                    Layout.column: 2
-                }
-
-                Label {
-                    text: converter.result.toFixed(3)
-                    font.pixelSize: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.row: 1
-                    Layout.column: 2
-                }
-
-
-
-            
+            }
         }
 
         Rectangle {
+            id: formulaContainer
+            Layout.maximumWidth: 800
             Layout.minimumHeight: 200
-            Layout.minimumWidth: 400
-            radius: 5
-            border.color: "#cccccc"
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
             Image {
                 id: formulaImage
-                anchors.centerIn: parent
-                width: parent.width * 2
-                height: width
+                anchors.centerIn: formulaContainer
                 fillMode: Image.PreserveAspectFit
                 source: {
                     let formulaPath = "../../../assets/formulas/"
@@ -187,6 +239,52 @@ Rectangle {
                     
                     return ""
                 }
+            }
+        }
+            
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 10
+
+            Label {
+                text: converter.result.toFixed(3)
+                font.pixelSize: 34
+                color: "blue"
+            }
+
+            Label {
+                text: {
+                    if (activeComboBox === "conversionType") {
+                        switch(conversionType.currentText.toLowerCase().replace(/ /g, "_")) {
+                            case "line_to_phase_voltage":
+                            case "phase_to_line_voltage": return "V"
+                            case "line_to_phase_current":
+                            case "phase_to_line_current": return "A"
+                            default: return ""
+                        }
+                    } else if (activeComboBox === "wHRPM") {
+                        switch(wHRPM.currentText.toLowerCase().replace(/ /g, "_")) {
+                            case "watts_to_dbmw": return "dBmW"
+                            case "dbmw_to_watts": return "W"
+                            case "rad/s_to_hz":
+                            case "radians_to_hz":
+                            case "rpm_to_hz": return "Hz"
+                            case "horsepower_to_watts": return "W"
+                            case "hz_to_rpm": return "RPM"
+                            case "watts_to_horsepower": return "HP"
+                            default: return ""
+                        }
+                    } else if (activeComboBox === "temp") {
+                        switch(temp.currentText.toLowerCase().replace(/ /g, "_")) {
+                            case "celsius_to_fahrenheit": return "°F"
+                            case "fahrenheit_to_celsius": return "°C"
+                            default: return ""
+                        }
+                    }
+                    return ""
+                }
+                font.pixelSize: 34
+                color: "blue"
             }
         }
     }
