@@ -68,3 +68,8 @@ The script will automatically:
 - Install Python in Wine
 - Install dependencies in Wine Python
 - Build the Windows executable
+
+```bash
+pip install -r build_requirements.txt
+python build_scripts/windows_build.py
+```
