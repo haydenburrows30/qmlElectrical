@@ -19,29 +19,21 @@ WaveCard {
     }
 
     function rfocusChanged() {
-        if (activeComboBox === "conversionType") {
-            conversionTypeText.color = "blue"
-            conversionTypeText.font.bold = true
-            wHRPMText.color = Universal.foreground
-            wHRPMText.font.bold = false
-            tempText.color = Universal.foreground
-            tempText.font.bold = false
-        } else if (activeComboBox === "wHRPM") {
-            wHRPMText.color = "blue"
-            wHRPMText.font.bold = true
-            conversionTypeText.color = Universal.foreground
-            conversionTypeText.font.bold = false
-            tempText.color = Universal.foreground
-            tempText.font.bold = false
-            
-        } else if (activeComboBox === "temp") {
-            tempText.color = "blue"
-            tempText.font.bold = true
-            conversionTypeText.color = Universal.foreground
-            conversionTypeText.font.bold = false
-            wHRPMText.color = Universal.foreground
-            wHRPMText.font.bold = false
+        const textElements = {
+            'conversionType': conversionTypeText,
+            'wHRPM': wHRPMText,
+            'temp': tempText
         }
+        
+        // Reset all to default
+        Object.values(textElements).forEach(element => {
+            element.color = Universal.foreground
+            element.font.bold = false
+        })
+        
+        // Highlight active one
+        textElements[activeComboBox].color = "blue"
+        textElements[activeComboBox].font.bold = true
     }
     
     property string activeComboBox: "conversionType"
@@ -82,10 +74,7 @@ WaveCard {
                             id: conversionTypeText
                             leftPadding: 10
                             text: conversionType.displayText
-                            font.bold: conversionType.activeFocus
-                            color: conversionType.activeFocus ? "blue" : Universal.foreground
                             verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
                         }
                     }
                 }
@@ -123,12 +112,8 @@ WaveCard {
                         contentItem: Text {
                             id: wHRPMText
                             leftPadding: 10
-
                             text: wHRPM.displayText
-                            font.bold: wHRPM.activeFocus
-                            color: wHRPM.activeFocus ? "blue" : Universal.foreground
                             verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
                         }
                     }
                 }
@@ -160,12 +145,8 @@ WaveCard {
                         contentItem: Text {
                             id: tempText
                             leftPadding: 10
-
                             text: temp.displayText
-                            font.bold: temp.activeFocus
-                            color: temp.activeFocus ? "blue" : Universal.foreground
                             verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
                         }
                     }
                 }
