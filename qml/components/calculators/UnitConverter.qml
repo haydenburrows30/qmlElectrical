@@ -7,6 +7,7 @@ import Conversion 1.0
 Rectangle {
     color: Universal.background // Use theme background color
     
+    
     ConversionCalculator {
         id: converter
     }
@@ -15,82 +16,124 @@ Rectangle {
 
     RowLayout {
         anchors.centerIn: parent
-        anchors.margins: 20
-        spacing: 20
+        GridLayout {
+            columns: 3
+                Label {
+                    text: "Voltage"
+                    font.bold: true
+                    font.pixelSize: 16
+                    Layout.row: 0
+                    Layout.column: 0
+                }
 
-        ColumnLayout {
-            spacing: 20
+                Label {
+                    text: "Frequency"
+                    font.bold: true
+                    font.pixelSize: 16
+                    Layout.row: 1
+                    Layout.column: 0
+                }
 
-            ComboBox {
-                id: conversionType
-                Layout.minimumWidth: 200
-                model: [
-                    "Line to Phase Voltage",
-                    "Phase to Line Voltage",
-                    "Line to Phase Current",
-                    "Phase to Line Current",
-                ]
-                onCurrentTextChanged: {
-                    converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
-                    activeComboBox = "conversionType"
+                Label {
+                    text: "Temperature"
+                    font.bold: true
+                    font.pixelSize: 16
+                    Layout.row: 2
+                    Layout.column: 0
                 }
-                onActivated: {
-                    activeComboBox = "conversionType"
-                }
-            }
 
-            ComboBox {
-                id: wHRPM
-                Layout.minimumWidth: 200
-                model: [
-                    "Watts to dBmW",
-                    "dBmW to Watts",
-                    "Rad/s to Hz",
-                    "Horsepower to Watts",
-                    "RPM to Hz",
-                    "Radians to Hz",
-                    "Hz to RPM",
-                    "Watts to Horsepower",
-                ]
-                onCurrentTextChanged: {
-                    converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
-                    activeComboBox = "wHRPM"
+                ComboBox {
+                    id: conversionType
+                    Layout.minimumWidth: 200
+                    Layout.row: 0
+                    Layout.column: 1
+                    model: [
+                        "Line to Phase Voltage",
+                        "Phase to Line Voltage",
+                        "Line to Phase Current",
+                        "Phase to Line Current",
+                    ]
+                    onCurrentTextChanged: {
+                        converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
+                        activeComboBox = "conversionType"
+                    }
+                    onActivated: {
+                        activeComboBox = "conversionType"
+                    }
                 }
-                onActivated: {
-                    activeComboBox = "wHRPM"
-                }
-            }
 
-            ComboBox {
-                id: temp
-                Layout.minimumWidth: 200
-                model: [
-                    "Celsius to Fahrenheit",
-                    "Fahrenheit to Celsius"
-                ]
-                onCurrentTextChanged: {
-                    converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
-                    activeComboBox = "temp"
+                ComboBox {
+                    id: wHRPM
+                    Layout.minimumWidth: 200
+                    Layout.row: 1
+                    Layout.column: 1
+                    model: [
+                        "Watts to dBmW",
+                        "dBmW to Watts",
+                        "Rad/s to Hz",
+                        "Horsepower to Watts",
+                        "RPM to Hz",
+                        "Radians to Hz",
+                        "Hz to RPM",
+                        "Watts to Horsepower",
+                    ]
+                    onCurrentTextChanged: {
+                        converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
+                        activeComboBox = "wHRPM"
+                    }
+                    onActivated: {
+                        activeComboBox = "wHRPM"
+                    }
                 }
-                onActivated: {
-                    activeComboBox = "temp"
-                }
-            }
 
-            TextField {
-                Layout.minimumWidth: 200
-                placeholderText: "Enter value"
-                onTextChanged: {
-                    if (text) converter.setInputValue(parseFloat(text))
+                ComboBox {
+                    id: temp
+                    Layout.minimumWidth: 200
+                    Layout.row: 2
+                    Layout.column: 1
+                    model: [
+                        "Celsius to Fahrenheit",
+                        "Fahrenheit to Celsius"
+                    ]
+                    onCurrentTextChanged: {
+                        converter.setConversionType(currentText.toLowerCase().replace(/ /g, "_"))
+                        activeComboBox = "temp"
+                    }
+                    onActivated: {
+                        activeComboBox = "temp"
+                    }
                 }
-                validator: DoubleValidator {}
-            }
 
-            Label {
-                text: "Result: " + converter.result.toFixed(3)
-                font.pixelSize: 16
-                horizontalAlignment: Text.AlignHCenter
-            }
+                TextField {
+                    Layout.minimumWidth: 200
+                    placeholderText: "Enter value"
+                    Layout.row: 3
+                    Layout.column: 1
+                    onTextChanged: {
+                        if (text) converter.setInputValue(parseFloat(text))
+                    }
+                    validator: DoubleValidator {}
+                }
+
+                Label {
+                    text: "Result"
+                    font.bold: true
+                    font.pixelSize: 16
+                    Layout.row: 0
+                    Layout.column: 2
+                }
+
+                Label {
+                    text: converter.result.toFixed(3)
+                    font.pixelSize: 16
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.row: 1
+                    Layout.column: 2
+                }
+
+
+
+            
         }
 
         Rectangle {
