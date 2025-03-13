@@ -6,12 +6,8 @@ import QtQuick.Layouts
 
 RoundButton {
     id: control
-
-    // implicitWidth: 50
-    // implicitHeight: 50
     icon.width: 30
     icon.height: 30
-    // Layout.rightMargin: 10
     icon.name: icon_name
 
     property var icon_name : ""
@@ -31,13 +27,13 @@ RoundButton {
         visible: !control.flat || control.down || control.checked || control.highlighted
         color: control.down ? control.Universal.baseMediumLowColor :
             control.enabled && (control.highlighted || control.checked) ? control.Universal.accent :
-                                                                            "white"
+                                                                            "transparent"
 
         Rectangle {
             width: parent.width
             height: parent.height
             radius: control.radius
-            color: "white" //"transparent"
+            color: "transparent"
             visible: enabled && control.hovered
             border.width: 2
             border.color: control.Universal.baseMediumLowColor

@@ -5,9 +5,9 @@ import QtQuick.Controls.Universal
 
 Rectangle {
     id: controlRect
-    color: Universal.background // Use theme background instead of hardcoded white
+    color: Universal.background
     border.width: 1
-    border.color: Universal.foreground
+    border.color: sideBar.toggle1 ? Universal.Dark : "transparent"
     radius: 4
     
     property string title: ""
