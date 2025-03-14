@@ -18,8 +18,8 @@ from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.voltage_drop_orion import VoltageDrop
-from models.ResultsManager import ResultsManager
-from models.RealTimeChart import RealTimeChart
+from models.results_manager import ResultsManager
+from models.real_time_chart import RealTimeChart
 
 from models.calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
 from models.transformer_calculator import TransformerCalculator
@@ -30,7 +30,6 @@ from models.cable_ampacity import CableAmpacityCalculator
 from models.protection_relay import ProtectionRelayCalculator
 from models.harmonic_analysis import HarmonicAnalysisCalculator
 from models.instrument_transformer import InstrumentTransformerCalculator
-from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
 from models.charging_calculator import ChargingCalculator
 from models.battery_calculator import BatteryCalculator
@@ -188,7 +187,6 @@ class Application:
             (ProtectionRelayCalculator, "ProtectionRelay", 1, 0, "ProtectionRelayCalculator"),
             (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
-            (OvercurrentCurvesCalculator, "OvercurrentCurves", 1, 0, "OvercurrentCurvesCalculator"),
             (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
             (VoltageDrop,"VDrop", 1, 0, "VoltageDrop"),

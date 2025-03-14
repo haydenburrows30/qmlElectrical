@@ -23,7 +23,6 @@ import CableAmpacity 1.0
 import ProtectionRelay 1.0
 import InstrumentTransformer 1.0
 import DiscriminationAnalyzer 1.0
-import OvercurrentCurves 1.0
 import HarmonicAnalysis 1.0
 import PFCorrection 1.0
 import Battery 1.0

@@ -5,8 +5,8 @@ from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import SeriesRLCChart
 from models.voltage_drop_orion import VoltageDrop
-from models.ResultsManager import ResultsManager
-from models.RealTimeChart import RealTimeChart
+from models.results_manager import ResultsManager
+from models.real_time_chart import RealTimeChart
 
 class DefaultLogger(ILogger):
     """Default logging implementation using Python's logging module."""
