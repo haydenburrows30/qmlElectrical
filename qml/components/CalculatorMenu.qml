@@ -21,19 +21,19 @@ Page {
         { name: "Cable Ampacity", source: "../components/calculators/CableAmpacityCalculator.qml" },
         { name: "Charging Current", source: "../components/calculators/ChargingCurrentCalculator.qml" },
         { name: "Discrimination Analyzer", source: "../components/calculators/DiscriminationAnalyzer.qml" },
+        { name: "Earthing Calculator", source: "../components/calculators/EarthingCalculator.qml" },
+        { name: "Electric Machine", source: "../components/calculators/ElectricMachineCalculator.qml" },
         { name: "Harmonics Analysis", source: "../components/calculators/HarmonicsAnalyzer.qml" },
         { name: "Impedance Calculator", source: "../components/calculators/ImpedanceCalculator.qml" },
         { name: "Instrument Transformer", source: "../components/calculators/InstrumentTransformerCalculator.qml" },
         { name: "Motor Starting", source: "../components/calculators/MotorStartingCalculator.qml" },
         { name: "PF Correction", source: "../components/calculators/PowerFactorCorrection.qml" },
-        { name: "Power Calculator", source: "../components/calculators/PowerCurrentCalculator.qml" },
+        { name: "Transformer Power", source: "../components/calculators/PowerCurrentCalculator.qml" },
         { name: "Protection Relay", source: "../components/calculators/ProtectionRelayCalculator.qml" },
         { name: "Transformer Calculator", source: "../components/calculators/TransformerCalculator.qml" },
+        { name: "Transmission Line", source: "../components/calculators/TransmissionLineCalculator.qml" },
         { name: "Unit Converter", source: "../components/calculators/UnitConverter.qml" },
-        { name: "Voltage Drop", source: "../components/calculators/VoltageDropCalculator.qml" },
-        { name: "Electric Machine", source: "../components/calculators/ElectricMachineCalculator.qml" },
-        { name: "Earthing Calculator", source: "../components/calculators/EarthingCalculator.qml" },
-        { name: "Transmission Line", source: "../components/calculators/TransmissionLineCalculator.qml" }
+        { name: "Voltage Drop", source: "../components/calculators/VoltageDropCalculator.qml" }
     ]
 
     ColumnLayout {

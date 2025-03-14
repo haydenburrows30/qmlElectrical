@@ -1672,3 +1672,6 @@
 2025-03-13 23:31:00,517 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
 2025-03-13 23:31:00,609 - ResultsManager - INFO - Loaded 0 results from CSV
 2025-03-13 23:31:00,687 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-13 18:27:07,167 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-13 18:27:07,361 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-13 18:27:07,643 - ResultsManager - INFO - Loaded 0 results from CSV

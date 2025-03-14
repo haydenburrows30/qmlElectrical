@@ -38,18 +38,19 @@ Page {
         "../components/calculators/CableAmpacityCalculator.qml",
         "../components/calculators/ChargingCurrentCalculator.qml",
         "../components/calculators/DiscriminationAnalyzer.qml",
+        "../components/calculators/EarthingCalculator.qml",
+        "../components/calculators/ElectricMachineCalculator.qml",
         "../components/calculators/HarmonicsAnalyzer.qml",
         "../components/calculators/ImpedanceCalculator.qml",
         "../components/calculators/InstrumentTransformerCalculator.qml",
         "../components/calculators/MotorStartingCalculator.qml",
+        "../components/calculators/PowerCurrentCalculator.qml",
         "../components/calculators/PowerFactorCorrection.qml",
         "../components/calculators/ProtectionRelayCalculator.qml",
         "../components/calculators/TransformerCalculator.qml",
-        "../components/calculators/UnitConverter.qml",
-        "../components/calculators/VoltageDropCalculator.qml",
-        "../components/calculators/ElectricMachineCalculator.qml",
-        "../components/calculators/EarthingCalculator.qml",
         "../components/calculators/TransmissionLineCalculator.qml",
+        "../components/calculators/UnitConverter.qml",
+        "../components/calculators/VoltageDropCalculator.qml"
     ]
     property int currentCalculatorIndex: 0
 

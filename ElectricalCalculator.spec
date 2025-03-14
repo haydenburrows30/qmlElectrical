@@ -1,31 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
-block_cipher = None
-
-
 a = Analysis(
-    ['main.py'],
+    ['c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\main.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('qml', 'qml'), ('resources', 'resources'), ('data', 'data')],
+    datas=[('c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\qml', 'qml'), ('c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\resources', 'resources'), ('c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\data', 'data')],
     hiddenimports=['PySide6.QtQml', 'PySide6.QtQuick', 'PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets', 'PySide6.QtCharts'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
+    optimize=0,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles,
     a.datas,
     [],
     name='ElectricalCalculator',
