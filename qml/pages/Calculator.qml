@@ -54,9 +54,6 @@ Page {
     ]
     property int currentCalculatorIndex: 0
 
-    property var powerTriangleModel
-    property var impedanceVectorModel
-
     ColumnLayout {
         anchors.fill: parent
         spacing: 5

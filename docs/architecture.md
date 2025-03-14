@@ -115,3 +115,93 @@ The export system uses a unified approach:
 2. ExportFileDialog configures based on export type
 3. Selected path passed to appropriate handler
 4. Process feedback shown through LoadingIndicator and MessagePopup
+
+# System Architecture
+
+## Overview
+```mermaid
+graph TD
+    UI[QML UI Layer] --> |Bindings| VM[ViewModel Layer]
+    VM --> |Commands| Core[Core Services]
+    Core --> |Events| VM
+    Core --> |Async| Calc[Calculator Engine]
+    Core --> |Threading| Work[Worker Pool]
+    Core --> |Storage| Data[Data Layer]
+```
+
+## Core Subsystems
+
+### Application Layer
+- Dependency injection container
+- Component registration
+- Resource management
+- Event coordination
+
+### Calculator Engine
+- Async calculation pipeline
+- Result validation
+- Multi-threading support
+- Progress tracking
+- Error handling
+
+### UI Layer
+- QML/Qt integration
+- MVVM architecture
+- Theme system
+- Component library
+- Event binding
+
+### Data Management
+- Resource caching
+- File I/O handling
+- Export system
+- History tracking
+- State persistence
+
+## Service Architecture
+
+### Core Services
+- ModelFactory: Component instantiation
+- WorkerPool: Thread management
+- LoadingManager: Resource loading
+- ResultsManager: Calculation history
+
+### Calculator Services
+- CalculatorFactory: Calculator instantiation
+- ValidationService: Input validation
+- ConversionService: Unit conversion
+- ExportService: Result export
+
+## Threading Model
+
+### Main Thread
+- UI rendering
+- Event handling
+- State management
+- Resource coordination
+
+### Worker Pool
+- Heavy calculations
+- File I/O operations
+- Resource loading
+- Data processing
+
+## Deployment
+
+### Requirements
+- Python 3.8+
+- Qt 6.x
+- OpenGL support
+- Multi-core CPU
+
+### Performance Considerations
+- Resource preloading
+- Result caching
+- Calculation batching
+- Memory management
+
+## Extension Points
+- Calculator plugins
+- Custom visualizations
+- Export formats
+- Data providers
