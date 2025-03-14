@@ -256,19 +256,23 @@ class ThreePhaseSineWaveModel(QObject):
     def positiveSeq(self):
         """Calculate positive sequence component (a = 1∠120°)"""
         a = complex(-0.5, 0.866)  # 1∠120°
-        va = self._rms_a
-        vb = self._rms_b * a
-        vc = self._rms_c * (a * a)
-        return abs((va + vb + vc) / 3)
+        # Convert voltages to phasors with their respective angles
+        va = self._rms_a * np.exp(1j * np.radians(self._phase_angle_a))
+        vb = self._rms_b * np.exp(1j * np.radians(self._phase_angle_b))
+        vc = self._rms_c * np.exp(1j * np.radians(self._phase_angle_c))
+        # Calculate positive sequence: (Va + aVb + a²Vc)/3
+        return abs((va + a * vb + (a * a) * vc) / 3)
 
     @Property(float, notify=dataChanged)
     def negativeSeq(self):
         """Calculate negative sequence component (a² = 1∠240°)"""
         a = complex(-0.5, 0.866)  # 1∠120°
-        va = self._rms_a
-        vb = self._rms_b * (a * a)  # Use a² for negative sequence
-        vc = self._rms_c * a
-        return abs((va + vb + vc) / 3)
+        # Convert voltages to phasors with their respective angles
+        va = self._rms_a * np.exp(1j * np.radians(self._phase_angle_a))
+        vb = self._rms_b * np.exp(1j * np.radians(self._phase_angle_b))
+        vc = self._rms_c * np.exp(1j * np.radians(self._phase_angle_c))
+        # Calculate negative sequence: (Va + a²Vb + aVc)/3
+        return abs((va + (a * a) * vb + a * vc) / 3)
 
     @Property(float, notify=dataChanged)
     def zeroSeq(self):
@@ -451,6 +455,32 @@ class ThreePhaseSineWaveModel(QObject):
     @Property(float, notify=dataChanged)
     def currentAngleC(self):
         return self._current_angle_c
+
+    @Property(float, notify=dataChanged)
+    def positiveSeqCurrent(self):
+        """Calculate positive sequence component for current"""
+        a = complex(-0.5, 0.866)  # 1∠120°
+        ia = self._currentA * np.exp(1j * np.radians(self._current_angle_a))
+        ib = self._currentB * np.exp(1j * np.radians(self._current_angle_b))
+        ic = self._currentC * np.exp(1j * np.radians(self._current_angle_c))
+        return abs((ia + ib * a + ic * (a * a)) / 3)
+
+    @Property(float, notify=dataChanged)
+    def negativeSeqCurrent(self):
+        """Calculate negative sequence component for current"""
+        a = complex(-0.5, 0.866)  # 1∠120°
+        ia = self._currentA * np.exp(1j * np.radians(self._current_angle_a))
+        ib = self._currentB * np.exp(1j * np.radians(self._current_angle_b))
+        ic = self._currentC * np.exp(1j * np.radians(self._current_angle_c))
+        return abs((ia + ib * (a * a) + ic * a) / 3)
+
+    @Property(float, notify=dataChanged)
+    def zeroSeqCurrent(self):
+        """Calculate zero sequence component for current"""
+        ia = self._currentA * np.exp(1j * np.radians(self._current_angle_a))
+        ib = self._currentB * np.exp(1j * np.radians(self._current_angle_b))
+        ic = self._currentC * np.exp(1j * np.radians(self._current_angle_c))
+        return abs((ia + ib + ic) / 3)
 
     @Slot()
     def reset(self):

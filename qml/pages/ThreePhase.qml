@@ -11,6 +11,9 @@ import "../components"
 Page {
     id: root
 
+    // Add theme-aware text color property
+    property color textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
+
     background: Rectangle {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
@@ -141,6 +144,75 @@ Page {
                     }
 
                     RowLayout {
+                        WaveCard {
+                            title: "Sequence Components"
+                            Layout.minimumWidth: 400
+                            Layout.minimumHeight: 300
+                            
+                            GridLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                columns: 3
+                                rowSpacing: 10
+                                columnSpacing: 15
+                                
+                                // Headers
+                                Label { text: "Component"; font.bold: true }
+                                Label { text: "Voltage"; font.bold: true }
+                                Label { text: "Current"; font.bold: true }
+                                
+                                // Positive Sequence
+                                Label { text: "Positive:" }
+                                Label { 
+                                    text: sineModel.positiveSeq.toFixed(1) + " V" 
+                                    font.bold: true
+                                }
+                                Label { 
+                                    text: sineModel.positiveSeqCurrent.toFixed(1) + " A" 
+                                    font.bold: true
+                                }
+                                
+                                // Negative Sequence
+                                Label { text: "Negative:" }
+                                Label { 
+                                    text: sineModel.negativeSeq.toFixed(1) + " V"
+                                    font.bold: true 
+                                    color: sineModel.negativeSeq > 5 ? "#ff4444" : textColor
+                                }
+                                Label { 
+                                    text: sineModel.negativeSeqCurrent.toFixed(1) + " A"
+                                    font.bold: true
+                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColor
+                                }
+                                
+                                // Zero Sequence
+                                Label { text: "Zero:" }
+                                Label { 
+                                    text: sineModel.zeroSeq.toFixed(1) + " V"
+                                    font.bold: true
+                                    color: sineModel.zeroSeq > 5 ? "#ff4444" : textColor
+                                }
+                                Label { 
+                                    text: sineModel.zeroSeqCurrent.toFixed(1) + " A"
+                                    font.bold: true
+                                    color: sineModel.zeroSeqCurrent > 0.1 ? "#ff4444" : textColor
+                                }
+                                
+                                // Unbalance
+                                Label { text: "Unbalance (%):" }
+                                Label { 
+                                    text: (sineModel.negativeSeq / sineModel.positiveSeq * 100).toFixed(1) + "%"
+                                    font.bold: true
+                                    color: sineModel.negativeSeq / sineModel.positiveSeq > 0.02 ? "#ff4444" : textColor
+                                }
+                                Label { 
+                                    text: (sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent * 100).toFixed(1) + "%"
+                                    font.bold: true
+                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColor
+                                }
+                            }
+                        }
+
                         WaveCard {
                             title: "Waveform"
                             Layout.minimumWidth: 620
