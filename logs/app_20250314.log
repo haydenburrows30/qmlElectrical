@@ -50,3 +50,8 @@
 2025-03-14 20:37:19,665 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
 2025-03-14 20:37:19,755 - ResultsManager - INFO - Loaded 0 results from CSV
 2025-03-14 20:37:19,827 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-14 22:53:28,950 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-14 22:53:29,041 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-14 22:53:29,122 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-14 22:53:36,688 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-14 22:53:36,688 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
