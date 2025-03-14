@@ -20,19 +20,21 @@ WaveCard {
 
         // Left side - inputs and results
         ColumnLayout {
-            Layout.preferredWidth: 300
+            Layout.maximumWidth: 310
             spacing: 10
+            Layout.alignment: Qt.AlignTop
 
             GridLayout {
                 columns: 2
                 rowSpacing: 10
                 columnSpacing: 15
 
-                Label { text: "Cable Size (mm²):" }
+                Label { text: "Cable Size (mm²):" ;Layout.minimumWidth: 180}
                 ComboBox {
                     id: cableSizeCombo
                     model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
                     onCurrentTextChanged: calculator.cableSize = parseFloat(currentText)
+                    Layout.minimumWidth: 100
                 }
 
                 Label { text: "Insulation Type:" }
@@ -40,6 +42,7 @@ WaveCard {
                     id: insulationCombo
                     model: ["PVC", "XLPE"]
                     onCurrentTextChanged: calculator.insulationType = currentText
+                    Layout.fillWidth: true
                 }
 
                 Label { text: "Installation Method:" }
@@ -47,6 +50,7 @@ WaveCard {
                     id: installMethodCombo
                     model: ["Conduit", "Tray", "Direct Buried", "Free Air", "Wall Surface"]
                     onCurrentTextChanged: calculator.installMethod = currentText
+                    Layout.fillWidth: true
                 }
 
                 Label { text: "Ambient Temperature (°C):" }
@@ -57,6 +61,7 @@ WaveCard {
                     value: 30
                     stepSize: 5
                     onValueChanged: calculator.ambientTemp = value
+                    Layout.fillWidth: true
                 }
 
                 Label { text: "Number of Circuits:" }
@@ -66,6 +71,7 @@ WaveCard {
                     to: 20
                     value: 1
                     onValueChanged: calculator.groupingNumber = value
+                    Layout.fillWidth: true
                 }
 
                 Label { text: "Conductor Material:" }
@@ -73,46 +79,50 @@ WaveCard {
                     id: conductorMaterial
                     model: ["Copper", "Aluminum"]
                     onCurrentTextChanged: calculator.conductorMaterial = currentText
+                    Layout.fillWidth: true
                 }
             }
 
-            GroupBox {
-                title: "Results"
-
                 GridLayout {
                     columns: 2
-                    rowSpacing: 5
+                    rowSpacing: 15
                     columnSpacing: 10
 
-                    Label { text: "Base Ampacity:" }
+                    Label { text: "Results" ;Layout.minimumWidth: 180}
+
+                    Label {}
+
+                    Label { text: "Base Ampacity:" ;Layout.minimumWidth: 180}
                     Label { 
                         text: calculator.baseAmpacity.toFixed(1) + " A" 
                         color: Universal.foreground
+                        font.bold: true
+                        Layout.minimumWidth: 100
                     }
 
                     Label { text: "Derated Ampacity:" }
                     Label { 
                         text: calculator.deratedAmpacity.toFixed(1) + " A" 
                         color: Universal.foreground
+                        font.bold: true
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Voltage Drop per 100m:" }
                     Label { 
                         text: calculator.voltageDropPer100m.toFixed(1) + " V" 
                         color: Universal.foreground
+                        font.bold: true
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Economic Size:" }
                     Label { 
                         text: calculator.recommendedSize.toFixed(1) + " mm²" 
                         color: Universal.foreground
+                        font.bold: true
+                        Layout.fillWidth: true
                     }
-                }
-            }
-            
-            // Spacer
-            Item {
-                Layout.fillHeight: true
             }
         }
 

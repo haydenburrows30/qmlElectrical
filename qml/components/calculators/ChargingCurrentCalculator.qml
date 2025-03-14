@@ -46,7 +46,7 @@ WaveCard {
                 }
                 TextField {
                     id: voltage_input
-                    Layout.preferredWidth: 60
+                    Layout.preferredWidth: 100
                     Layout.alignment: Qt.AlignRight
                     enabled: voltagePresets.currentText === "Custom"
                     opacity: enabled ? 1.0 : 0.5
@@ -66,8 +66,8 @@ WaveCard {
                 ComboBox {
                     id: cablePresets
                     model: ["Custom", "XLPE 1C", "XLPE 3C", "Paper 1C", "Paper 3C"]
-                    Layout.preferredWidth: 150
-                    // Layout.fillWidth: true
+                    // Layout.preferredWidth: 150
+                    Layout.fillWidth: true
                     onCurrentTextChanged: {
                         if (currentText !== "Custom") {
                             // Typical values μF/km
@@ -90,7 +90,8 @@ WaveCard {
                 }
                 TextField {
                     id: capacitanceInput
-                    Layout.preferredWidth: 150
+                    // Layout.preferredWidth: 150
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignRight
                     enabled: cablePresets.currentText === "Custom"
                     opacity: enabled ? 1.0 : 0.5
@@ -108,7 +109,8 @@ WaveCard {
                 ComboBox {
                     id: freqPresets
                     model: ["50 Hz", "60 Hz"]
-                    Layout.preferredWidth: 150
+                    // Layout.preferredWidth: 150
+                    Layout.fillWidth: true
                     onCurrentTextChanged: {
                         calculator.frequency = parseFloat(currentText.replace(" Hz", ""))
                     }
@@ -123,7 +125,8 @@ WaveCard {
                 }
                 TextField {
                     id: lengthInput
-                    Layout.preferredWidth: 150
+                    // Layout.preferredWidth: 150
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignRight
                     placeholderText: "Enter Length"
                     onTextChanged: calculator.length = parseFloat(text)
@@ -138,7 +141,8 @@ WaveCard {
                     Layout.preferredWidth: 80
                 }
                 Rectangle {
-                    Layout.preferredWidth: 150
+                    // Layout.preferredWidth: 150
+                    Layout.fillWidth: true
                     Layout.preferredHeight: 30
                     color: Universal.background
                     border.color: Universal.foreground

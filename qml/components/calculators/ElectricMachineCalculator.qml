@@ -20,12 +20,14 @@ WaveCard {
 
         // Left side - Controls and Results
         ColumnLayout {
-            Layout.preferredWidth: 350
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignTop
             spacing: 10
 
             // Machine Type Selection
             GroupBox {
                 title: "Machine Selection"
+                Layout.fillWidth: true
                 
                 ColumnLayout {
                     spacing: 10
@@ -33,6 +35,7 @@ WaveCard {
                         id: machineTypeCombo
                         model: calculator.machineTypes
                         onCurrentTextChanged: calculator.setMachineType(currentText)
+                        Layout.minimumWidth: 270
                     }
                 }
             }
@@ -40,19 +43,20 @@ WaveCard {
             // Electrical Parameters
             GroupBox {
                 title: "Electrical Parameters"
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
-                    
 
-                    Label { text: "Rated Voltage (V):" }
+                    Label { text: "Rated Voltage (V):"; Layout.minimumWidth: 130}
                     TextField {
                         id: ratedVoltageInput
                         placeholderText: "Enter voltage"
                         text: "400"
                         onTextChanged: if(text) calculator.setRatedVoltage(parseFloat(text))
+                        Layout.minimumWidth: 130
                     }
 
                     Label { text: "Rated Current (A):" }
@@ -61,6 +65,7 @@ WaveCard {
                         placeholderText: "Enter current"
                         text: "10"
                         onTextChanged: if(text) calculator.setRatedCurrent(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Power Factor:" }
@@ -70,6 +75,7 @@ WaveCard {
                         text: "0.85"
                         enabled: !machineTypeCombo.currentText.includes("DC")
                         onTextChanged: if(text) calculator.setPowerFactor(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Efficiency (%):" }
@@ -78,6 +84,7 @@ WaveCard {
                         placeholderText: "Enter efficiency"
                         text: "90"
                         onTextChanged: if(text) calculator.setEfficiency(parseFloat(text) / 100)
+                        Layout.fillWidth: true
                     }
                 }
             }
@@ -85,13 +92,14 @@ WaveCard {
             // Mechanical Parameters
             GroupBox {
                 title: "Mechanical Parameters"
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Number of Poles:" }
+                    Label { text: "Number of Poles:" ; Layout.minimumWidth: 130}
                     SpinBox {
                         id: polesSpinBox
                         from: 2
@@ -100,6 +108,7 @@ WaveCard {
                         stepSize: 2
                         enabled: !machineTypeCombo.currentText.includes("DC")
                         onValueChanged: calculator.setPoles(value)
+                        Layout.minimumWidth: 130
                     }
 
                     Label { text: "Frequency (Hz):" }
@@ -108,12 +117,14 @@ WaveCard {
                         text: "50"
                         enabled: !machineTypeCombo.currentText.includes("DC")
                         onTextChanged: if(text) calculator.setFrequency(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: machineTypeCombo.currentText === "Induction Motor" ? "Slip (%):" : "Speed (RPM):" }
                     TextField {
                         id: speedInput
                         text: machineTypeCombo.currentText === "Induction Motor" ? "3.3" : "1500"
+                        Layout.fillWidth: true
                         onTextChanged: {
                             if(!text) return
                             if(machineTypeCombo.currentText === "Induction Motor") {
@@ -129,19 +140,18 @@ WaveCard {
             // Thermal Parameters
             GroupBox {
                 title: "Thermal Parameters"
-                
-
+                Layout.fillWidth: true
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Temperature Class:" }
+                    Label { text: "Temperature Class:" ; Layout.minimumWidth: 130}
                     ComboBox {
                         id: tempClassCombo
                         model: calculator.temperatureClasses
                         onCurrentTextChanged: if(currentText) calculator.setTemperatureClass(currentText)
-                        Layout.fillWidth: true
+                        Layout.minimumWidth: 130
                     }
 
                     Label { text: "Cooling Method:" }
@@ -155,6 +165,7 @@ WaveCard {
                     Label { text: "Temperature Rise:" }
                     Label {
                         text: calculator.temperatureRise.toFixed(1) + " °C"
+                        Layout.fillWidth: true
                         color: calculator.temperatureRise > 80 ? 
                                Universal.theme === Universal.Dark ? "#FF8080" : "red" :
                                Universal.foreground
@@ -165,6 +176,7 @@ WaveCard {
             // Results Section
             GroupBox {
                 title: "Results"
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
@@ -175,11 +187,15 @@ WaveCard {
                     Label { 
                         text: calculator.ratedPower.toFixed(2) + " kW"
                         color: Universal.foreground
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 100
                     }
                     
                     Label { text: "Power with Derating:" }
                     Label { 
                         text: (calculator.ratedPower * calculator.efficiency).toFixed(2) + " kW"
+                        Layout.minimumWidth: 100
+                        Layout.fillWidth: true
                         color: calculator.temperatureRise > 80 ? 
                                Universal.theme === Universal.Dark ? "#FF8080" : "red" :
                                Universal.foreground
@@ -188,18 +204,24 @@ WaveCard {
                     Label { text: "Torque:" }
                     Label { 
                         text: calculator.torque.toFixed(2) + " N·m"
+                        Layout.minimumWidth: 100
+                        Layout.fillWidth: true
                         color: Universal.foreground
                     }
 
                     Label { text: "Losses:" }
                     Label { 
                         text: calculator.losses.toFixed(2) + " kW"
+                        Layout.minimumWidth: 100
+                        Layout.fillWidth: true
                         color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
                     }
 
                     Label { text: "Efficiency:" }
                     Label { 
                         text: (calculator.efficiency * 100).toFixed(1) + "%"
+                        Layout.minimumWidth: 100
+                        Layout.fillWidth: true
                         color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
                     }
                 }

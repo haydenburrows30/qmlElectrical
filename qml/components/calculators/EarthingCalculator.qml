@@ -20,7 +20,8 @@ WaveCard {
 
         // Left side - inputs and results
         ColumnLayout {
-            Layout.preferredWidth: 350
+            // Layout.preferredWidth: 300
+            Layout.alignment: Qt.AlignTop
             spacing: 10
 
             // Grid Parameters
@@ -32,12 +33,13 @@ WaveCard {
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Soil Resistivity (Ω⋅m):" }
+                    Label { text: "Soil Resistivity (Ω⋅m):" ; Layout.minimumWidth: 150}
                     TextField {
                         id: soilResistivityInput
                         text: "100"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setSoilResistivity(parseFloat(text))
+                        Layout.minimumWidth: 100
                     }
 
                     Label { text: "Grid Depth (m):" }
@@ -46,6 +48,7 @@ WaveCard {
                         text: "0.5"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setGridDepth(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Grid Length (m):" }
@@ -54,6 +57,7 @@ WaveCard {
                         text: "20"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setGridLength(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Grid Width (m):" }
@@ -62,6 +66,7 @@ WaveCard {
                         text: "20"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setGridWidth(parseFloat(text))
+                        Layout.fillWidth: true
                     }
                 }
             }
@@ -75,12 +80,13 @@ WaveCard {
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Rod Length (m):" }
+                    Label { text: "Rod Length (m):" ; Layout.minimumWidth: 150}
                     TextField {
                         id: rodLengthInput
                         text: "3"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setRodLength(parseFloat(text))
+                        Layout.minimumWidth: 100
                     }
 
                     Label { text: "Number of Rods:" }
@@ -90,6 +96,7 @@ WaveCard {
                         to: 20
                         value: 4
                         onValueChanged: calculator.setRodCount(value)
+                        Layout.fillWidth: true
                     }
                 }
             }
@@ -103,12 +110,13 @@ WaveCard {
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Fault Current (A):" }
+                    Label { text: "Fault Current (A):" ;Layout.minimumWidth: 150}
                     TextField {
                         id: faultCurrentInput
                         text: "10000"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setFaultCurrent(parseFloat(text))
+                        Layout.minimumWidth: 100
                     }
 
                     Label { text: "Fault Duration (s):" }
@@ -117,6 +125,7 @@ WaveCard {
                         text: "0.5"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setFaultDuration(parseFloat(text))
+                        Layout.fillWidth: true
                     }
                 }
             }
@@ -128,12 +137,13 @@ WaveCard {
                 GridLayout {
                     columns: 2
                     rowSpacing: 5
-                    columnSpacing: 10
+                    columnSpacing: 15
 
-                    Label { text: "Grid Resistance:" }
+                    Label { text: "Grid Resistance:" ;Layout.minimumWidth: 150}
                     Label { 
                         text: calculator.gridResistance.toFixed(3) + " Ω"
                         color: Universal.foreground
+                        Layout.minimumWidth: 100
                     }
 
                     Label { text: "Ground Rise:" }
