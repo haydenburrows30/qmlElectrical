@@ -5,14 +5,6 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-import PCalculator 1.0
-import Charging 1.0
-import Fault 1.0
-import Sine 1.0
-import RLC 1.0
-import VDrop 1.0
-import Results 1.0
-
 import 'components'
 import 'components/calculators'
 
