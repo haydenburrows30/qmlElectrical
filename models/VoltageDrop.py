@@ -1,6 +1,5 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject, QAbstractTableModel, Qt, QUrl
 import pandas as pd
-import numpy as np
 import math
 import os
 import json  # Add this import

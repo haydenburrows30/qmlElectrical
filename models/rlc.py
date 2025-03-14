@@ -1,14 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtCharts import *
-from PySide6.QtQuick import QQuickPaintedItem
-from PySide6.QtGui import QPainter, QPen, QColor
 
 import numpy as np
-import math
-import electricpy as ep
-from electricpy import conversions
-from electricpy.visu import SeriesRLC
-from electricpy.visu import phasorplot
 
 class SeriesRLCChart(QObject):
     chartDataChanged = Signal()

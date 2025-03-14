@@ -25,7 +25,6 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 
 ```
 pip install -r requirements.txt
-pip install git+https://github.com/engineerjoe440/ElectricPy.git
 ```
 
 ```

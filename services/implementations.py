@@ -3,7 +3,7 @@ from typing import Any
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.ThreePhase import ThreePhaseSineWaveModel
-from models.ElectricPy import SeriesRLCChart
+from models.rlc import SeriesRLCChart
 from models.VoltageDrop import VoltageDrop
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart

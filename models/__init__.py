@@ -1,5 +1,5 @@
 from .VoltageDrop import VoltageDrop
-from .ElectricPy import SeriesRLCChart
+from .rlc import SeriesRLCChart
 from .ThreePhase import ThreePhaseSineWaveModel
 from .battery_calculator import BatteryCalculator
 

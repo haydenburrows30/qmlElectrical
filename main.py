@@ -16,7 +16,7 @@ from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFacto
 from models.config import app_config
 
 from models.ThreePhase import ThreePhaseSineWaveModel
-from models.ElectricPy import SeriesRLCChart
+from models.rlc import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.VoltageDrop import VoltageDrop
 from models.ResultsManager import ResultsManager

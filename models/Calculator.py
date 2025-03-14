@@ -4,7 +4,6 @@ from models.calculators.BaseCalculator import BaseCalculator
 from PySide6.QtCore import *
 from PySide6.QtCharts import *
 
-import numpy as np
 import math
 
 class PowerCalculator(BaseCalculator):

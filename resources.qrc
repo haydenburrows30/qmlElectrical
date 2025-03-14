@@ -15,14 +15,10 @@
     <file>qml/components/WaveCard.qml</file>
     <file>qml/components/WaveControls.qml</file>
     <file>qml/components/WaveChart.qml</file>
-    <file>qml/components/PhasorView.qml</file>
-    <file>qml/components/Measurements.qml</file>
     <file>qml/components/PhaseTable.qml</file>
     <file>qml/components/PowerTriangle.qml</file>
-    <file>qml/components/PowerTriangleViz.qml</file>
     <file>qml/components/PhasorDiagram.qml</file>
     <file>qml/components/SavedResults.qml</file>
-    <file>qml/components/BarChart.qml</file>
     <file>qml/components/CButton.qml</file>
     <file>qml/components/CToolTip.qml</file>
     <file>qml/components/CustomBorderRect.qml</file>
@@ -33,7 +29,6 @@
     <file>qml/components/RealTimeChart.qml</file>
     <file>qml/components/ChargingCurrentViz.qml</file>
     <file>qml/components/ImpedanceVectorViz.qml</file>
-    <file>qml/components/SineWaveViz.qml</file>
 
     <!-- Icons -->
     <file>icons/gallery/24x24/LightBar.svg</file>
@@ -62,12 +57,6 @@
     <file>data/cable_data_al_1c.csv</file>
     <file>data/cable_data_al_3c.csv</file>
     <file>data/diversity_factor.csv</file>
-
-    <!-- Models -->
-    <file>models/VoltageDrop.py</file>
-    <file>models/ElectricPy.py</file>
-    <file>models/ThreePhase.py</file>
-    <file>models/battery_calculator.py</file>
 
     <!-- Configuration -->
     <file>data/qtquickcontrols2.conf</file>
