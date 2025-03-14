@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Type, Dict
-from ..Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
+from ..calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
 from .BaseCalculator import BaseCalculator
 from ..transformer_calculator import TransformerCalculator
 from ..motor_calculator import MotorCalculator

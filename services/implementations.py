@@ -2,9 +2,9 @@ import logging
 from typing import Any
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from .interfaces import ILogger, IQmlEngine, IModelFactory
-from models.ThreePhase import ThreePhaseSineWaveModel
+from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import SeriesRLCChart
-from models.VoltageDrop import VoltageDrop
+from models.voltage_drop_orion import VoltageDrop
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart
 

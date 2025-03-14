@@ -14,14 +14,14 @@ from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
 from models.config import app_config
 
-from models.ThreePhase import ThreePhaseSineWaveModel
+from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
-from models.VoltageDrop import VoltageDrop
+from models.voltage_drop_orion import VoltageDrop
 from models.ResultsManager import ResultsManager
 from models.RealTimeChart import RealTimeChart
 
-from models.Calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
+from models.calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.voltage_drop_calculator import VoltageDropCalculator
 from models.motor_calculator import MotorCalculator
@@ -32,7 +32,7 @@ from models.harmonic_analysis import HarmonicAnalysisCalculator
 from models.instrument_transformer import InstrumentTransformerCalculator
 from models.overcurrent_curves import OvercurrentCurvesCalculator
 from models.discrimination_analyzer import DiscriminationAnalyzer
-from models.ChargingCalculator import ChargingCalculator
+from models.charging_calculator import ChargingCalculator
 from models.battery_calculator import BatteryCalculator
 from models.machine_calculator import MachineCalculator
 from models.earthing_calculator import EarthingCalculator

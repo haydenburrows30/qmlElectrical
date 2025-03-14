@@ -1,16 +1,14 @@
-from .VoltageDrop import VoltageDrop
 from .rlc import SeriesRLCChart
-from .ThreePhase import ThreePhaseSineWaveModel
+from .three_phase import ThreePhaseSineWaveModel
 from .battery_calculator import BatteryCalculator
 
 __all__ = [
-    'VoltageDrop',
+    'voltage_drop_orion',
     'SeriesRLCChart',
     'PowerCalculator', 
     'ChargingCalculator',
     'FaultCurrentCalculator',
     'ConversionCalculator',
-    'PowerTriangleModel',
     'ThreePhaseSineWaveModel',
     'BatteryCalculator'
 ]
