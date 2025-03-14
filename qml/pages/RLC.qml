@@ -3,12 +3,9 @@ import QtQml
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls.Universal
 import QtCharts
 import QtCore
-
-import QtQuick.Studio.DesignEffects
 
 import '../components'
 

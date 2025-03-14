@@ -3,8 +3,6 @@ import QtCore
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt.labs.qmlmodels 1.0
-import QtQuick.Studio.DesignEffects
 import QtQuick.Shapes
 
 Item {

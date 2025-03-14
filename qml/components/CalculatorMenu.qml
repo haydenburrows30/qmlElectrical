@@ -7,8 +7,6 @@ import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls.Universal
 import QtCharts
 
-import QtQuick.Studio.DesignEffects
-
 import "../components"
 import "../components/calculators"
 

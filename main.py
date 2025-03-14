@@ -2,10 +2,9 @@ import os
 import sys
 import logging
 import asyncio
-from pathlib import Path
-from typing import Optional, Any  # Add Any import
+from typing import Optional, Any
 
-from PySide6.QtQml import qmlRegisterType, QQmlApplicationEngine  # Add QQmlApplicationEngine import
+from PySide6.QtQml import qmlRegisterType
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -60,7 +59,7 @@ class Application:
     def __init__(self, container: Optional[Container] = None):
         """Initialize application with dependency container and configuration."""
         # Load config first
-        self.config = app_config  # Use the imported config instead of creating new AppConfig
+        self.config = app_config
         self.container = container or Container()
 
         self.app = QApplication(sys.argv)
@@ -240,7 +239,6 @@ def main():
     app.run()
 
 if __name__ == "__main__":
-    # Remove duplicate app and engine initialization
     container = setup_container()
     app = Application(container)
     app.run()
