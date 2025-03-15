@@ -1,16 +1,14 @@
 # Electrical Calculator
 
-A comprehensive electrical engineering calculator suite built with Python and QML that provides tools for cable sizing, voltage drop calculations, fault current analysis, and more.
+A comprehensive electrical engineering calculator suite built with Python and QML that provides tools for cable sizing, voltage drop calculations, vector and phase visualisation, basic electrical calculations and more.
 
 ## Features
 
 ### Core Calculations
 - Cable sizing and selection
-- Voltage drop analysis 
-- Fault current calculations
-- Power factor correction
-- Load diversity analysis
-- Phase balancing
+- Voltage drop analysis
+- Vector and phase visualisations
+- Basic electrical calculations
 
 https://github.com/user-attachments/assets/9ee3eb73-768c-4548-9c1c-ed7e54e14f74
 
@@ -34,9 +32,9 @@ https://github.com/user-attachments/assets/9ee3eb73-768c-4548-9c1c-ed7e54e14f74
 
 ### Prerequisites
 - Python 3.8 or later
-- Qt 6.0 or later
 - PySide6
-- See `requirements.txt` for full dependencies
+- reportlab
+- numpy
 
 ### Basic Installation
 
@@ -125,17 +123,5 @@ electrical-calculator/
 └── build_scripts/ # Build automation scripts
 ```
 
-### Contributing
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
 This project is licensed under the MIT License - see the `LICENSE` file for details.
-
-## Acknowledgments
-- Qt Company for the Qt framework
-- Contributors and maintainers
-- Community feedback and support
