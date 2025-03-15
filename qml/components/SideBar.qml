@@ -44,16 +44,15 @@ Drawer {
     visible: true
 
     Rectangle {
-        id:fade
+        id: fade
         width: parent.width
-        anchors.top: parent.top
+        anchors.bottom: parent.bottom  // Changed from top to bottom
         height: 20
-        z:99
+        z: 99
         gradient: Gradient {
             orientation: Gradient.Vertical
-
-            GradientStop { position: 1.0; color: "transparent" }
-            GradientStop { position: 0; color: palette.base }
+            GradientStop { position: 0.0; color: "transparent" }
+            GradientStop { position: 1.0; color: palette.base }
         }
     }
 

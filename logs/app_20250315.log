@@ -1276,3 +1276,76 @@
 2025-03-15 20:41:49,230 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
 2025-03-15 20:41:49,334 - ResultsManager - INFO - Loaded 1 results from CSV
 2025-03-15 20:41:49,418 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:13:44,670 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:13:44,771 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:13:44,843 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:17:29,025 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:17:29,118 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:17:29,190 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:18:52,606 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:18:52,701 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:18:52,763 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-15 21:19:11,564 - ResultsManager - INFO - Loaded 2 results from CSV
+2025-03-15 21:19:11,564 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:11,954 - ResultsManager - INFO - Loaded 3 results from CSV
+2025-03-15 21:19:11,955 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:12,134 - ResultsManager - INFO - Loaded 4 results from CSV
+2025-03-15 21:19:12,134 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:12,314 - ResultsManager - INFO - Loaded 5 results from CSV
+2025-03-15 21:19:12,314 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:12,478 - ResultsManager - INFO - Loaded 6 results from CSV
+2025-03-15 21:19:12,478 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:12,646 - ResultsManager - INFO - Loaded 7 results from CSV
+2025-03-15 21:19:12,646 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:12,807 - ResultsManager - INFO - Loaded 8 results from CSV
+2025-03-15 21:19:12,807 - ResultsManager - INFO - Saved new calculation for Al 185mm² cable
+2025-03-15 21:19:14,342 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:20:47,611 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:20:47,713 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:20:47,779 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:23:11,589 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:23:11,697 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:23:11,771 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:24:14,305 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:24:14,390 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:24:14,459 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:24:35,357 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:24:35,483 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:24:35,594 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:26:05,872 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:26:05,957 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:26:06,031 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:27:37,862 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:27:37,954 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:27:38,031 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:28:59,950 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:29:00,035 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:29:00,107 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:31:17,045 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:31:17,147 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:31:17,223 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:32:19,918 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:32:20,014 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:32:20,093 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:34:04,391 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:34:04,479 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:34:04,559 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:35:02,226 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:35:02,322 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:35:42,508 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:35:42,617 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:36:19,124 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:36:19,216 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:36:19,291 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:37:29,877 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:37:29,961 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:37:30,038 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:38:42,917 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:38:43,018 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:38:43,107 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:39:58,426 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:39:58,526 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:39:58,602 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:40:43,499 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-15 21:40:43,611 - ResultsManager - INFO - Loaded 0 results from CSV
+2025-03-15 21:40:43,687 - ResultsManager - INFO - Loaded 0 results from CSV
