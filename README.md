@@ -11,6 +11,7 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 - Power factor correction
 - Load diversity analysis
 - Phase balancing
+
 ![] (https://github.com/user-attachments/assets/34fe21ad-553b-4a54-a89d-d57fa3c74dc5)
 
 ![Image](https://github.com/user-attachments/assets/344f6725-d1f3-4d2c-80be-b3ae8c69b64b)
