@@ -6,12 +6,13 @@ import "../"
 import "../../components"
 import Machine 1.0
 
-WaveCard {
+Item {
     id: machineCard
-    title: 'Electric Machine Calculator'
+    // title: 'Electric Machine Calculator'
 
     property MachineCalculator calculator: MachineCalculator {}
     property color textColor: Universal.foreground
+    property int waveHeight: 200
 
     RowLayout {
         anchors.fill: parent
@@ -25,9 +26,10 @@ WaveCard {
             spacing: 10
 
             // Machine Type Selection
-            GroupBox {
+            WaveCard {
                 title: "Machine Selection"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 90
                 
                 ColumnLayout {
                     spacing: 10
@@ -41,9 +43,10 @@ WaveCard {
             }
 
             // Electrical Parameters
-            GroupBox {
+            WaveCard {
                 title: "Electrical Parameters"
                 Layout.fillWidth: true
+                Layout.minimumHeight: waveHeight
 
                 GridLayout {
                     columns: 2
@@ -90,11 +93,13 @@ WaveCard {
             }
 
             // Mechanical Parameters
-            GroupBox {
+            WaveCard {
                 title: "Mechanical Parameters"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 170
 
                 GridLayout {
+                    id: mechanicalParamsGrid
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
@@ -138,9 +143,11 @@ WaveCard {
             }
 
             // Thermal Parameters
-            GroupBox {
+            WaveCard {
                 title: "Thermal Parameters"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 160
+
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
@@ -174,13 +181,14 @@ WaveCard {
             }
 
             // Results Section
-            GroupBox {
+            WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 5
+                    rowSpacing: 15
                     columnSpacing: 10
 
                     Label { text: "Rated Power:" }
@@ -229,12 +237,9 @@ WaveCard {
         }
 
         // Right side - Visualization
-        Rectangle {
+        WaveCard {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: Universal.background
-            border.color: Universal.foreground
-            border.width: 1
 
             ElectricMachineViz {
                 anchors.fill: parent

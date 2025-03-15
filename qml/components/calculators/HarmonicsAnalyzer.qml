@@ -6,20 +6,21 @@ import "../"
 import "../../components"
 import HarmonicAnalysis 1.0
 
-WaveCard {
+Item {
     id: harmonicsCard
-    title: 'Harmonics Analysis'
+    // title: 'Harmonics Analysis'
 
     property HarmonicAnalysisCalculator calculator: HarmonicAnalysisCalculator {}
 
     RowLayout {
         spacing: 10
-        anchors.centerIn: parent
+        anchors.fill: parent
 
         ColumnLayout {
-            Layout.preferredWidth: 300
+            Layout.maximumWidth: 300
+            Layout.fillHeight: true
 
-            GroupBox {
+            WaveCard {
                 title: "Harmonic Components"
                 Layout.fillWidth: true
 
@@ -43,9 +44,10 @@ WaveCard {
             }
 
             // Results
-            GroupBox {
+            WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 100
 
                 GridLayout {
                     columns: 2
@@ -63,10 +65,10 @@ WaveCard {
 
         // Right Panel - Visualizations
         ColumnLayout {
-            // Layout.fillWidth: true
-            // Layout.fillHeight: true
-            Layout.preferredWidth: 600
-            Layout.preferredHeight: 600
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            // Layout.preferredWidth: 600
+            // Layout.preferredHeight: 600
 
             // Waveform Chart
             ChartView {

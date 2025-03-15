@@ -9,11 +9,11 @@ import "../../components"
 
 import DiscriminationAnalyzer 1.0
 
-WaveCard {
+Item {
     id: discriminationAnalyzerCard
-    title: 'Discrimination Analysis'
-    Layout.minimumWidth: 1000
-    Layout.minimumHeight: 700
+    // title: 'Discrimination Analysis'
+    // Layout.minimumWidth: 1000
+    // Layout.minimumHeight: 700
     Layout.fillWidth: true
     Layout.fillHeight: true
 
@@ -22,46 +22,60 @@ WaveCard {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 20
+        spacing: 10
 
         // Left Column - Controls and Results
         ColumnLayout {
-            Layout.preferredWidth: 400
+            Layout.maximumWidth: 300
+            Layout.minimumWidth: 300
             Layout.fillHeight: true
             spacing: 10
 
             // Configuration Section
-            GroupBox {
+            WaveCard {
                 title: "Configuration"
                 Layout.fillWidth: true
-
+                Layout.minimumHeight: 120
+                
                 ColumnLayout {
                     spacing: 10
+                    Layout.alignment: Qt.AlignHCenter
 
                     Text {
-                        text: "Minimum Margin: " + marginSlider.value.toFixed(2) + "s"
-                        font.bold: true
+                        text: "Minimum Margin: "
                         color: Universal.foreground  // Use theme foreground color
                     }
-                    Slider {
-                        id: marginSlider
-                        Layout.fillWidth: true
-                        from: 0.1
-                        to: 1.0
-                        value: calculator.minimumMargin
-                        stepSize: 0.05
-                        onValueChanged: calculator.minimumMargin = value
+                    RowLayout {
+
+                        Slider {
+                            id: marginSlider
+                            Layout.minimumWidth: 200
+                            Layout.fillWidth: true
+                            from: 0.1
+                            to: 1.0
+                            value: calculator.minimumMargin
+                            stepSize: 0.05
+                            onValueChanged: calculator.minimumMargin = value
+                        }
+
+                        Text {
+                            text: marginSlider.value.toFixed(2) + "s"
+                            font.bold: true
+                            color: Universal.foreground  // Use theme foreground color
+                            Layout.fillWidth: true
+                        }
                     }
                 }
             }
 
             // Relay Input Section
-            GroupBox {
+            WaveCard {
                 title: "Add New Relay"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 280
 
                 ColumnLayout {
-                    spacing: 5
+                    spacing: 10
                     Text {
                         text: "Relays added: " + calculator.relayCount + " (minimum 2 needed)"
                         color: calculator.relayCount < 2 ? 
@@ -130,11 +144,16 @@ WaveCard {
             }
 
             // Fault Current Section
-            GroupBox {
+            WaveCard {  
                 title: "Fault Current Analysis"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 90
 
-                ColumnLayout {
+                RowLayout {
+                    spacing: 10
+                    uniformCellSizes: true
+                    Layout.fillWidth: true
+
                     TextField {
                         id: faultCurrent
                         Layout.fillWidth: true
@@ -143,7 +162,7 @@ WaveCard {
                     }
                     Button {
                         text: "Add Fault Level"
-                        Layout.fillWidth: true
+                        // Layout.fillWidth: true
                         onClicked: {
                             console.log("Adding fault level:", parseFloat(faultCurrent.text))
                             calculator.addFaultLevel(
@@ -155,7 +174,7 @@ WaveCard {
             }
 
             // Added Relays List
-            GroupBox {
+            WaveCard {
                 title: "Added Relays"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 150
@@ -203,10 +222,11 @@ WaveCard {
             }
 
             // Results Section
-            GroupBox {
+            WaveCard {
                 title: "Discrimination Results"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.minimumHeight: 200
 
                 ListView {
                     id: resultsList
@@ -217,12 +237,15 @@ WaveCard {
                     Text {
                         text: "Add at least 2 relays to see discrimination results"
                         visible: calculator.relayCount < 2
-                        anchors.centerIn: parent
-                        color: Universal.foreground  // Use theme foreground color
+                        // anchors.centerIn: parent
+                        anchors.fill: parent
+                        color: Universal.foreground
+                        wrapMode: Text.Wrap
+
                     }
 
                     delegate: Column {
-                        required property var resultData  // Changed from modelData
+                        required property var resultData
                         width: ListView.view.width
                         spacing: 4
                         visible: resultData !== undefined && resultData !== null
@@ -233,7 +256,7 @@ WaveCard {
                                 return resultData.primary + " → " + resultData.backup
                             }
                             font.bold: true
-                            color: Universal.foreground  // Default to theme color
+                            color: Universal.foreground
                         }
                         Repeater {
                             model: (resultData && resultData.margins) ? resultData.margins : []
@@ -257,13 +280,9 @@ WaveCard {
         }
 
         // Right Column - Visualization
-        Rectangle {
+        WaveCard {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: 600
-            border.color: "#cccccc"
-            border.width: 1
-            radius: 4
 
             Column {
                 anchors.fill: parent

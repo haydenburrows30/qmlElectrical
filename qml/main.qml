@@ -15,6 +15,11 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
+    SeriesRLCChart {id: seriesRLCChart}
+    SineWaveModel {id: sineModel}
+    VoltageDrop {id: voltageDrop}
+    ResultsManager {id: resultsManager}
+
     // Add splash screen
     Popup {
         id: splashScreen
@@ -75,11 +80,6 @@ ApplicationWindow {
             }
         }
     }
-
-    SeriesRLCChart {id: seriesRLCChart}
-    SineWaveModel {id: sineModel}
-    VoltageDrop {id: voltageDrop}
-    ResultsManager {id: resultsManager}
 
     CButton {
         id: menu

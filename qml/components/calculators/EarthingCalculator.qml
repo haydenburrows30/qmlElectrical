@@ -6,9 +6,9 @@ import "../"
 import "../../components"
 import Earthing 1.0
 
-WaveCard {
+Item {
     id: earthingCard
-    title: 'Earthing System Calculator'
+    // title: 'Earthing System Calculator'
 
     property EarthingCalculator calculator: EarthingCalculator {}
     property color textColor: Universal.foreground
@@ -20,13 +20,15 @@ WaveCard {
 
         // Left side - inputs and results
         ColumnLayout {
-            // Layout.preferredWidth: 300
+            Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignTop
             spacing: 10
 
             // Grid Parameters
-            GroupBox {
+            WaveCard {
                 title: "Grid Parameters"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
@@ -72,8 +74,10 @@ WaveCard {
             }
 
             // Rod Parameters
-            GroupBox {
+            WaveCard {
                 title: "Ground Rods"
+                Layout.minimumHeight: 130
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
@@ -102,8 +106,10 @@ WaveCard {
             }
 
             // Fault Parameters
-            GroupBox {
+            WaveCard {
                 title: "Fault Parameters"
+                Layout.minimumHeight: 130
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
@@ -131,12 +137,14 @@ WaveCard {
             }
 
             // Results Section
-            GroupBox {
+            WaveCard {
                 title: "Results"
+                Layout.minimumHeight: 200
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 5
+                    rowSpacing: 15
                     columnSpacing: 15
 
                     Label { text: "Grid Resistance:" ;Layout.minimumWidth: 150}
@@ -174,12 +182,9 @@ WaveCard {
         }
 
         // Right side - Visualization will be added in EarthingViz.qml
-        Rectangle {
+        WaveCard {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: Universal.background
-            border.color: Universal.foreground
-            border.width: 1
 
             EarthingViz {
                 anchors.fill: parent
