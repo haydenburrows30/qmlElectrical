@@ -20,7 +20,7 @@ Item {
 
         // Left side inputs and results
         ColumnLayout {
-            Layout.maximumWidth: 400
+            Layout.maximumWidth: 300
             Layout.minimumWidth: 300
             Layout.alignment: Qt.AlignTop
             spacing: 10

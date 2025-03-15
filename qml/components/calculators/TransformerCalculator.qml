@@ -16,7 +16,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 15
+        spacing: 10
 
         // Left side - Inputs and results
         ColumnLayout {
@@ -90,7 +90,6 @@ Item {
 
                 ColumnLayout {
                     spacing: 5
-
 
                     Label { 
                         text: "Turns Ratio: " + calculator.turnsRatio.toFixed(2)

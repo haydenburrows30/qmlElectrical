@@ -17,8 +17,8 @@ Item {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 15
-
+        spacing: 10
+        
         // Left side - inputs and results
         ColumnLayout {
             Layout.maximumWidth: 350

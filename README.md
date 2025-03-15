@@ -1,8 +1,17 @@
 # Electrical Calculator
 
-A comprehensive electrical engineering calculator suite built with Python and QML.
+A comprehensive electrical engineering calculator suite built with Python and QML that provides tools for cable sizing, voltage drop calculations, fault current analysis, and more.
 
 ## Features
+
+### Core Calculations
+- Cable sizing and selection
+- Voltage drop analysis 
+- Fault current calculations
+- Power factor correction
+- Load diversity analysis
+- Phase balancing
+
 ![Image](https://github.com/user-attachments/assets/344f6725-d1f3-4d2c-80be-b3ae8c69b64b)
 
 ![Image](https://github.com/user-attachments/assets/f14193c9-bb32-4ed7-8e2a-3737d09fbb80)
@@ -19,17 +28,40 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 
 ![Image](https://github.com/user-attachments/assets/68ec1a52-4fd0-4e80-bd2a-2b5375aecb41)
 
-# Installation
+## Getting Started
 
+### Prerequisites
+- Python 3.8 or later
+- Qt 6.0 or later
+- PySide6
+- See `requirements.txt` for full dependencies
+
+### Basic Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/electrical-calculator.git
+cd electrical-calculator
 ```
+
+2. Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-```
+3. Generate resources:
+```bash
 pyside6-rcc resources.qrc -o data/rc_resources.py
 ```
 
-## Building for Windows
+4. Run the application:
+```bash
+python main.py
+```
+
+## Building From Source
+
+### Windows Build
 
 1. Install build requirements:
 ```bash
@@ -53,9 +85,9 @@ The executable will be in the `dist` folder, and the installer will be created a
 - PySide6
 - NSIS (for creating installer)
 
-## Cross-Platform Building
+### Cross-Platform Building
 
-### Building Windows Executable from Linux
+#### Building Windows Executable from Linux
 1. Install Wine:
 ```bash
 sudo apt install wine64
@@ -77,3 +109,31 @@ The script will automatically:
 pip install -r build_requirements.txt
 python build_scripts/windows_build.py
 ```
+
+## Development
+
+### Project Structure
+```
+electrical-calculator/
+├── components/     # Reusable QML components
+├── pages/         # Main application pages
+├── data/          # Data files and resources
+├── icons/         # Application icons
+├── docs/          # Documentation
+└── build_scripts/ # Build automation scripts
+```
+
+### Contributing
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+## Acknowledgments
+- Qt Company for the Qt framework
+- Contributors and maintainers
+- Community feedback and support

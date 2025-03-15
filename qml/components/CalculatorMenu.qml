@@ -55,6 +55,13 @@ WaveCard {
                 delegate: CalcButton {
                     text: modelData.name
                     onClicked: {
+                        // Find the index of the selected calculator in the parent's calculatorList
+                        for (let i = 0; i < home.calculatorList.length; i++) {
+                            if (home.calculatorList[i] === modelData.source) {
+                                home.currentCalculatorIndex = i;
+                                break;
+                            }
+                        }
                         calculatorLoader.setSource(modelData.source)
                     }
                 }

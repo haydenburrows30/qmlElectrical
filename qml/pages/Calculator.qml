@@ -80,8 +80,7 @@ Page {
                 Layout.preferredWidth: 200
                 Layout.fillWidth: true
                 onClicked: {
-                    currentCalculatorIndex = 0
-                    calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
+                    calculatorLoader.setSource(calculatorList[0])
                 }
             }
             CalcButton {
