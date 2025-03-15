@@ -7,7 +7,7 @@ Rectangle {
     id: controlRect
     color: Universal.background
     border.width: 1
-    border.color: sideBar.toggle1 ? Universal.Dark : "transparent"
+    border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("grey",1.8)
     radius: 4
     
     property string title: ""

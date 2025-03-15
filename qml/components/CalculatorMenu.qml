@@ -11,7 +11,7 @@ import "../components/calculators"
 
 import "../"
 
-Page {
+WaveCard {
     // Define calculator data model (sorted alphabetically by name)
     property var calculators: [
         { name: "Battery Calculator", source: "../components/calculators/BatteryCalculator.qml" },

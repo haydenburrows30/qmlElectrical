@@ -7,9 +7,9 @@ import "../../components"
 
 import Battery 1.0
 
-WaveCard {
+Item {
     id: batteryCalculator
-    title: 'Battery Sizing Calculator'
+    // title: 'Battery Sizing Calculator'
 
     property BatteryCalculator calculator: BatteryCalculator {}
     // Helper property for theme colors
@@ -20,128 +20,126 @@ WaveCard {
         spacing: 10
 
         ColumnLayout {
+            id: inputLayout
             Layout.preferredWidth: 400
+            Layout.alignment: Qt.AlignTop
             spacing: 10
 
-            GroupBox {
+            WaveCard {
                 title: "System Parameters"
-                
-                ColumnLayout {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 280
                     
-                    GridLayout {
-                        columns: 2
-                        rowSpacing: 10
-                        columnSpacing: 10
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
+                    Layout.fillWidth: true
+                    
+                    Label { text: "Load (watts):" }
+                    TextField {
+                        id: loadInput
+                        placeholderText: "Enter load"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(text) calculator.load = parseFloat(text)
                         Layout.fillWidth: true
-                        
-                        Label { text: "Load (watts):" }
-                        TextField {
-                            id: loadInput
-                            placeholderText: "Enter load"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(text) calculator.load = parseFloat(text)
-                            Layout.fillWidth: true
-                        }
+                    }
 
-                        Label { text: "System Voltage (V):" }
-                        ComboBox {
-                            id: systemVoltageCombo
-                            model: [12, 24, 48]
-                            onCurrentTextChanged: calculator.systemVoltage = parseInt(currentText)
-                            Layout.fillWidth: true
-                        }
-                        
-                        Label { text: "Backup Time (hours):" }
-                        TextField {
-                            id: backupTimeInput
-                            placeholderText: "Enter hours"
-                            text: "4"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(text) calculator.backupTime = parseFloat(text)
-                            Layout.fillWidth: true
-                        }
-                        
-                        Label { text: "Depth of Discharge (%):" }
-                        Slider {
-                            id: dodSlider
-                            from: 30
-                            to: 80
-                            value: 50
-                            stepSize: 5
-                            onValueChanged: calculator.depthOfDischarge = value
-                            Layout.fillWidth: true
-                        }
-                        
-                        Item { width: 1 }  // Spacer
-                        Text { 
-                            text: dodSlider.value + "%" 
-                            horizontalAlignment: Text.AlignHCenter
-                            Layout.fillWidth: true
-                            color: Universal.foreground  // Use theme foreground color
-                        }
-                        
-                        Label { text: "Battery Type:" }
-                        ComboBox {
-                            id: batteryType
-                            model: ["Lead Acid", "Lithium Ion", "AGM"]
-                            onCurrentTextChanged: calculator.batteryType = currentText
-                            Layout.fillWidth: true
-                        }
+                    Label { text: "System Voltage (V):" }
+                    ComboBox {
+                        id: systemVoltageCombo
+                        model: [12, 24, 48]
+                        onCurrentTextChanged: calculator.systemVoltage = parseInt(currentText)
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "Backup Time (hours):" }
+                    TextField {
+                        id: backupTimeInput
+                        placeholderText: "Enter hours"
+                        text: "4"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(text) calculator.backupTime = parseFloat(text)
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "Depth of Discharge (%):" }
+                    Slider {
+                        id: dodSlider
+                        from: 30
+                        to: 80
+                        value: 50
+                        stepSize: 5
+                        onValueChanged: calculator.depthOfDischarge = value
+                        Layout.fillWidth: true
+                    }
+                    
+                    Item { width: 1 }  // Spacer
+                    Text { 
+                        text: dodSlider.value + "%" 
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.fillWidth: true
+                        color: Universal.foreground
+                    }
+                    
+                    Label { text: "Battery Type:" }
+                    ComboBox {
+                        id: batteryType
+                        model: ["Lead Acid", "Lithium Ion", "AGM"]
+                        onCurrentTextChanged: calculator.batteryType = currentText
+                        Layout.fillWidth: true
                     }
                 }
             }
             
-            GroupBox {
+            WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                
-                ColumnLayout {
+                Layout.minimumHeight: 160
                     
-                    GridLayout {
-                        columns: 2
-                        rowSpacing: 5
-                        columnSpacing: 10
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
 
-                        Label { text: "Current Draw:" }
-                        Label { 
-                            text: calculator.currentDraw.toFixed(2) + " A"
-                            font.bold: true
-                            color: Universal.foreground  // Use theme color 
-                        }
+                    Label { text: "Current Draw:" }
+                    Label { 
+                        text: calculator.currentDraw.toFixed(2) + " A"
+                        font.bold: true
+                        color: Universal.foreground
+                    }
 
-                        Label { text: "Required Capacity:" }
-                        Label { 
-                            text: calculator.requiredCapacity.toFixed(1) + " Ah"
-                            font.bold: true
-                            color: Universal.foreground  // Use theme color
-                        }
-                        
-                        Label { text: "Recommended Capacity:" }
-                        Label { 
-                            text: calculator.recommendedCapacity.toFixed(1) + " Ah"
-                            font.bold: true 
-                            color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
-                        }
-                        
-                        Label { text: "Energy Storage:" }
-                        Label { 
-                            text: calculator.energyStorage.toFixed(2) + " kWh"
-                            font.bold: true
-                            color: Universal.foreground  // Use theme color 
-                        }
+                    Label { text: "Required Capacity:" }
+                    Label { 
+                        text: calculator.requiredCapacity.toFixed(1) + " Ah"
+                        font.bold: true
+                        color: Universal.foreground
+                    }
+                    
+                    Label { text: "Recommended Capacity:" }
+                    Label { 
+                        text: calculator.recommendedCapacity.toFixed(1) + " Ah"
+                        font.bold: true 
+                        color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
+                    }
+                    
+                    Label { text: "Energy Storage:" }
+                    Label { 
+                        text: calculator.energyStorage.toFixed(2) + " kWh"
+                        font.bold: true
+                        color: Universal.foreground
                     }
                 }
             }
         }
 
-        Rectangle {
-            Layout.topMargin: 30
-            Layout.minimumHeight: 400
+        WaveCard {
+            Layout.minimumHeight: inputLayout.height
             Layout.minimumWidth: 400
-            color: Universal.background  // Use theme background
-            border.color: Universal.foreground  // Use theme foreground for border
-            border.width: 1
-            radius: 5
+            // color: Universal.background
+            // border.color: Universal.foreground
+            // border.width: 1
+            // radius: 5
             
             Canvas {
                 id: batteryVizCanvas

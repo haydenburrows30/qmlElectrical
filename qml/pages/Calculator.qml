@@ -31,6 +31,10 @@ import Machine 1.0
 Page {
     id: home
 
+    background: Rectangle {
+        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+    }
+
     property var calculatorList: [
         "../components/CalculatorMenu.qml",
         "../components/calculators/BatteryCalculator.qml",
@@ -93,7 +97,6 @@ Page {
 
         Loader {
             id: calculatorLoader
-            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
             Layout.fillHeight: true
             source: "../components/CalculatorMenu.qml"
