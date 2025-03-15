@@ -12,7 +12,7 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 - Load diversity analysis
 - Phase balancing
 
-![video]((media/"Screencast.mp4"))
+![video](media/"Screencast.mp4")
 
 ![Image](https://github.com/user-attachments/assets/7f9eb6e1-06b2-4d72-934f-b613d32ca90c)
 
