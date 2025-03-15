@@ -7,6 +7,10 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 ### Core Calculations
 - Cable sizing and selection
 - Voltage drop analysis 
+
+https://github.com/user-attachments/assets/9ee3eb73-768c-4548-9c1c-ed7e54e14f74
+
+
 - Fault current calculations
 - Power factor correction
 - Load diversity analysis
