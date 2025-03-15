@@ -133,6 +133,12 @@ Drawer {
                     tooltip: "Real Time"
                     icon: "RealTime"
                 }
+                // ListElement {
+                //     title: "Devon"
+                //     source: "../pages/Devon.qml"
+                //     tooltip: "Real Time"
+                //     icon: "RealTime"
+                // }
             }
 
             footer:

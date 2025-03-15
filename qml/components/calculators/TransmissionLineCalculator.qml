@@ -6,38 +6,45 @@ import "../"
 import "../../components"   
 import Transmission 1.0
 
-WaveCard {
+Item {
     id: transmissionCard
-    title: 'Transmission Line Calculator'
 
     property TransmissionLineCalculator calculator: TransmissionLineCalculator {}
     property color textColor: Universal.foreground
+    property int colWidth: 195
 
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 15
+        spacing: 10
 
         // Left side - inputs and results
         ColumnLayout {
-            Layout.preferredWidth: 350
+            Layout.maximumWidth: 350
+            Layout.alignment: Qt.AlignTop
             spacing: 10
 
             // Line Parameters
-            GroupBox {
+            WaveCard {
                 title: "Line Parameters"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 300
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Length (km):" }
+                    Label { 
+                        text: "Length (km):"
+                        Layout.minimumWidth: colWidth
+                        }
                     TextField {
                         id: lengthInput
                         text: "100"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setLength(parseFloat(text))
+                        Layout.minimumWidth: 100
                     }
 
                     Label { text: "Resistance (Ω/km):" }
@@ -46,6 +53,7 @@ WaveCard {
                         text: "0.1"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setResistance(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Inductance (mH/km):" }
@@ -54,6 +62,7 @@ WaveCard {
                         text: "1.0"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setInductance(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Capacitance (µF/km):" }
@@ -62,6 +71,7 @@ WaveCard {
                         text: "0.01"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setCapacitance(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Conductance (S/km):" }
@@ -70,6 +80,7 @@ WaveCard {
                         text: "0"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setConductance(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Frequency (Hz):" }
@@ -78,25 +89,34 @@ WaveCard {
                         text: "50"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setFrequency(parseFloat(text))
+                        Layout.fillWidth: true
                     }
                 }
             }
 
-            GroupBox {
+            WaveCard {
                 title: "Advanced Parameters"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 210
+                Layout.minimumWidth: 300
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
 
-                    Label { text: "Bundle Configuration:" }
+                    Label { 
+                        text: "Bundle Configuration:" 
+                        Layout.minimumWidth: colWidth
+                        }
                     SpinBox {
                         id: subConductors
                         from: 1
                         to: 4
                         value: 2
                         onValueChanged: calculator.setSubConductors(value)
+                        Layout.minimumWidth: 100
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Bundle Spacing (m):" }
@@ -105,6 +125,7 @@ WaveCard {
                         text: "0.4"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setBundleSpacing(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Conductor Temperature (°C):" }
@@ -113,6 +134,7 @@ WaveCard {
                         text: "75"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setConductorTemperature(parseFloat(text))
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Earth Resistivity (Ω⋅m):" }
@@ -121,59 +143,80 @@ WaveCard {
                         text: "100"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.setEarthResistivity(parseFloat(text))
+                        Layout.fillWidth: true
                     }
                 }
             }
 
             // Results
-            GroupBox {
+            WaveCard {
                 title: "Results"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 150
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 5
+                    rowSpacing: 15
                     columnSpacing: 10
 
                     Label { text: "Characteristic Impedance:" }
                     Label { 
                         text: calculator.zMagnitude.toFixed(2) + " Ω ∠" + 
                               calculator.zAngle.toFixed(1) + "°"
+                        font.bold: true
                     }
 
                     Label { text: "Attenuation Constant:" }
-                    Label { text: calculator.attenuationConstant.toFixed(4) + " Np/km" }
+                    Label { text: calculator.attenuationConstant.toFixed(4) + " Np/km" ; font.bold: true}
 
                     Label { text: "Phase Constant:" }
-                    Label { text: calculator.phaseConstant.toFixed(4) + " rad/km" }
+                    Label { text: calculator.phaseConstant.toFixed(4) + " rad/km" ; font.bold: true}
+                }
+            }
 
-                    Label { text: "ABCD Parameters:" }
-                    GridLayout {
-                        columns: 2
-                        Layout.columnSpan: 2
+            WaveCard {
+                title: "ABCD Results"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 370
+            
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 15
 
-                        Label { text: "A = " + calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°" }
-                        Label { text: "B = " + calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°" }
-                        Label { text: "C = " + calculator.cMagnitude.toFixed(3) + " ∠" + calculator.cAngle.toFixed(1) + "°" }
-                        Label { text: "D = " + calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°" }
-                    }
+                    Label { text: "A:" }
+                    Label { 
+                        text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°" 
+                        font.bold: true
+                        }
+                    Label { text: "B:"}
+                    Label { 
+                        text: calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°" ; font.bold: true
+                        }
+                    Label { text: "C:"}
+                    Label { 
+                        text: calculator.cMagnitude.toFixed(3) + " ∠" + calculator.cAngle.toFixed(1) + "°" ; font.bold: true
+                        }
+                    Label { text: "D:"}
+                    Label { 
+                        text: calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°" ; font.bold: true
+                        }
 
-                    Label { text: "SIL:" }
+                    Label { text: "SIL:"}
                     Label { 
                         text: calculator.surgeImpedanceLoading.toFixed(1) + " MW"
                         color: Universal.foreground
+                        font.bold: true
                     }
                 }
             }
         }
 
         // Right side - Visualization
-        Rectangle {
-            
+        WaveCard {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            color: Universal.background
-            border.color: Universal.foreground
-            border.width: 1
+            title: "Visualization"
 
             TransmissionLineViz {
                 anchors.fill: parent

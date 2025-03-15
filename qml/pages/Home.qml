@@ -81,6 +81,17 @@ Page {
 			}
 		}
 
+		// HButton {
+		// 	icon.name: "RealTime"
+		// 	text: "Devon"
+		// 	back: Qt.lighter(palette.accent,1.5)
+		// 	fore: Qt.lighter(palette.accent,1.0)
+		// 	onClicked: {
+		// 		stackView.push("../pages/Devon.qml")
+		// 		sideBar.change(6)
+		// 	}
+		// }
+
 		
 	}
 }

@@ -7,9 +7,8 @@ import "../../components"
 
 import Transformer 1.0
 
-WaveCard {
+Item {
     id: transformerCard
-    title: 'Transformer Calculator'
 
     property TransformerCalculator calculator: TransformerCalculator {}
     property color textColor: Universal.foreground
@@ -21,13 +20,15 @@ WaveCard {
 
         // Left side - Inputs and results
         ColumnLayout {
-            Layout.preferredWidth: 300
-            Layout.fillHeight: true
+            Layout.maximumWidth: 300
             spacing: 10
+            Layout.alignment: Qt.AlignTop
 
             // Primary Side
-            GroupBox {
+            WaveCard {
                 title: "Primary Side"
+                Layout.minimumHeight: 150
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
@@ -53,38 +54,39 @@ WaveCard {
             }
 
             // Secondary Side
-            GroupBox {
+            WaveCard {
                 title: "Secondary Side"
-
+                Layout.minimumHeight: 120
+                Layout.fillWidth: true
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 10
 
-
                     Label { text: "Voltage (V):" }
                     TextField {
                         id: secondaryVoltage
                         placeholderText: "Enter voltage"
                         onTextChanged: if(text) calculator.secondaryVoltage = parseFloat(text)
-
+                        Layout.minimumWidth: 150
                     }
 
                     Label { text: "Current (A):" }
                     Text {
                         id: secondaryCurrent
-                        Layout.minimumWidth: 150
                         text: calculator.secondaryCurrent.toFixed(2)
                         color: Universal.foreground
+                        Layout.minimumWidth: 150
                     }
                 }
             }
 
             // Results
-            GroupBox {
+            WaveCard {
                 title: "Results"
-
+                Layout.minimumHeight: 130
+                Layout.fillWidth: true
 
                 ColumnLayout {
                     spacing: 5
@@ -106,30 +108,30 @@ WaveCard {
                     }
                 }
             }
-            
-            // Spacer
-            Item {
-                Layout.fillHeight: true
-            }
         }
 
         // Right side - Visualization
-
-        PowerTransformerVisualization {
+        WaveCard {
+            title: "Transformer Visualization"
             Layout.fillHeight: true
             Layout.fillWidth: true
-            anchors.margins: 5
-            
-            primaryVoltage: parseFloat(primaryVoltage.text || "0")
-            primaryCurrent: parseFloat(primaryCurrent.text || "0")
-            secondaryVoltage: parseFloat(secondaryVoltage.text || "0")
-            secondaryCurrent: calculator ? calculator.secondaryCurrent : 0
-            powerRating: calculator ? calculator.powerRating : 0
-            turnsRatio: calculator ? calculator.turnsRatio : 1
-            efficiency: calculator ? calculator.efficiency : 0
-            
-            darkMode: Universal.theme === Universal.Dark
-            textColor: transformerCard.textColor
+            Layout.alignment: Qt.AlignCenter
+
+            PowerTransformerVisualization {
+                anchors.fill: parent
+                anchors.margins: 5
+                
+                primaryVoltage: parseFloat(primaryVoltage.text || "0")
+                primaryCurrent: parseFloat(primaryCurrent.text || "0")
+                secondaryVoltage: parseFloat(secondaryVoltage.text || "0")
+                secondaryCurrent: calculator ? calculator.secondaryCurrent : 0
+                powerRating: calculator ? calculator.powerRating : 0
+                turnsRatio: calculator ? calculator.turnsRatio : 1
+                efficiency: calculator ? calculator.efficiency : 0
+                
+                darkMode: Universal.theme === Universal.Dark
+                textColor: transformerCard.textColor
+            }
         }
     }
 }
