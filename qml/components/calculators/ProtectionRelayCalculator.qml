@@ -22,7 +22,7 @@ Item {
             WaveCard {
                 title: "Relay Settings"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 300
 
                 GridLayout {
                     columns: 2
@@ -54,18 +54,16 @@ Item {
                         onCurrentTextChanged: relay.curveType = currentText
                         Layout.fillWidth: true
                     }
-                }
-            }
 
-            WaveCard {
-                title: "Test Values"
-                Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        Layout.margins: 10
+                        height: 1
+                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                    }
 
-                GridLayout {
-                    columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+                    Label { text: "Results:" ; Layout.columnSpan: 2 ; font.bold: true ; font.pixelSize: 16}
 
                     Label { text: "Fault Current (A):" }
                     TextField {
@@ -88,7 +86,7 @@ Item {
         WaveCard {
             title: "Time-Current Curve"
             Layout.minimumHeight: settingsColumn.height
-            Layout.minimumWidth: settingsColumn.height
+            Layout.minimumWidth: settingsColumn.height * 1.75
 
 
         // Time-Current Curve Chart

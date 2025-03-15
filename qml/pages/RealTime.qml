@@ -29,15 +29,12 @@ Page {
         
         Flickable {
             contentWidth: parent.width
-            contentHeight: parent.height
-            bottomMargin : 5
-            leftMargin : 5
-            rightMargin : 5
-            topMargin : 5
+            contentHeight: rtChart.height + 10
     
             RealTimeChart {
                 id: rtChart
-                anchors.fill: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 isActive: home.visible
             }
         }

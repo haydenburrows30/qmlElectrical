@@ -25,14 +25,15 @@ Item {
             WaveCard {
                 title: "Harmonic Components"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 290
+                Layout.minimumHeight: 410
 
                 ColumnLayout {
                     spacing: 10
                     Repeater {
                         model: [1, 3, 5, 7, 11, 13]
                         delegate: RowLayout {
-                            Label { text: `${modelData}${modelData === 1 ? "st" : "th"} Harmonic:` }
+                            spacing: 10
+                            Label { text: `${modelData}${modelData === 1 ? "st" : "th"} Harmonic:` ; Layout.preferredWidth: 120 }
                             TextField {
                                 placeholderText: modelData === 1 ? "100%" : "0%"
                                 enabled: modelData !== 1
@@ -40,29 +41,31 @@ Item {
                                 onTextChanged: if(text) {
                                     calculator.setHarmonic(modelData, parseFloat(text), 0)
                                 }
-                                Layout.preferredWidth: 80
+                                Layout.preferredWidth: 120
                             }
                         }
                     }
-                }
-            }
 
-            // Results
-            WaveCard {
-                title: "Results"
-                Layout.fillWidth: true
-                Layout.minimumHeight: 100
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.margins: 10
+                        height: 1
+                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                    }
 
-                GridLayout {
+                    GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 10
 
-                    Label { text: "THD:" }
+                    Label { text: "Results:" ; Layout.columnSpan: 2 ; font.bold: true ; font.pixelSize: 16}
+
+                    Label { text: "THD:" ; Layout.preferredWidth: 120 }
                     Label { text: calculator.thd.toFixed(2) + "%" }
 
-                    Label { text: "Crest Factor:" }
+                    Label { text: "Crest Factor:" ; Layout.preferredWidth: 120 }
                     Label { text: calculator.crestFactor.toFixed(2) }
+                }
                 }
             }
         }

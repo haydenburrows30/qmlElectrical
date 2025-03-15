@@ -26,7 +26,7 @@ Item {
             WaveCard {
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 280
+                Layout.minimumHeight: 480
                     
                 GridLayout {
                     columns: 2
@@ -87,18 +87,16 @@ Item {
                         onCurrentTextChanged: calculator.batteryType = currentText
                         Layout.fillWidth: true
                     }
-                }
-            }
-            
-            WaveCard {
-                title: "Results"
-                Layout.fillWidth: true
-                Layout.minimumHeight: 160
-                    
-                GridLayout {
-                    columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        Layout.margins: 10
+                        height: 1
+                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                    }
+
+                    Label { text: "Results:" ; Layout.columnSpan: 2 ; font.bold: true ; font.pixelSize: 16}
 
                     Label { text: "Current Draw:" }
                     Label { 
@@ -129,6 +127,46 @@ Item {
                     }
                 }
             }
+            
+            // WaveCard {
+            //     title: "Results"
+            //     Layout.fillWidth: true
+            //     Layout.minimumHeight: 160
+                    
+            //     GridLayout {
+            //         columns: 2
+            //         rowSpacing: 10
+            //         columnSpacing: 10
+
+            //         Label { text: "Current Draw:" }
+            //         Label { 
+            //             text: calculator.currentDraw.toFixed(2) + " A"
+            //             font.bold: true
+            //             color: Universal.foreground
+            //         }
+
+            //         Label { text: "Required Capacity:" }
+            //         Label { 
+            //             text: calculator.requiredCapacity.toFixed(1) + " Ah"
+            //             font.bold: true
+            //             color: Universal.foreground
+            //         }
+                    
+            //         Label { text: "Recommended Capacity:" }
+            //         Label { 
+            //             text: calculator.recommendedCapacity.toFixed(1) + " Ah"
+            //             font.bold: true 
+            //             color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
+            //         }
+                    
+            //         Label { text: "Energy Storage:" }
+            //         Label { 
+            //             text: calculator.energyStorage.toFixed(2) + " kWh"
+            //             font.bold: true
+            //             color: Universal.foreground
+            //         }
+            //     }
+            // }
         }
 
         WaveCard {

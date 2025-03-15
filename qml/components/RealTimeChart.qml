@@ -10,8 +10,12 @@ import "../components"
 
 import RealTimeChart 1.0
 
-Item {
+Pane {
     id: root
+
+    background: Rectangle {
+        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+    }
 
         property bool isActive: false
         property bool showTracker: !realTimeChart.isRunning
@@ -24,173 +28,168 @@ Item {
             }
         }
 
+    anchors.fill: parent
+
     RowLayout {
         anchors.fill: parent
-        spacing: 5
+        spacing: 10
             
-            // // Scrollable area for controls
-            // ScrollView {
-            //     contentWidth: availableWidth
-            //     Layout.preferredWidth: 350
-            //     Layout.fillHeight: true
+        ColumnLayout {
+            id: mainLayout
+            Layout.fillHeight: true
+            Layout.minimumWidth: 350
+            Layout.maximumWidth: 350
+            spacing: 10
+            
+            // Wave type controls
+            WaveCard {
+                title: "Wave Types"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 180
 
-            ColumnLayout {
-                Layout.fillHeight: true
-                // Layout.minimumHeight: 1000
-                Layout.minimumWidth: 350
-                Layout.maximumWidth: 350
-                spacing: 5
-                
-                // Wave type controls
-                WaveCard {
-                    title: "Wave Types"
+                ColumnLayout {
+                    spacing: 10
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 180
-
-                    ColumnLayout {
-                        spacing: 10
-                        Layout.fillWidth: true
-                        
-                        Repeater {
-                            model: [{name: "Alpha", color: "#ff0000"}, 
-                                {name: "Beta", color: "#00cc00"}, 
-                                {name: "Gamma", color: "#0000ff"}]
-                            RowLayout {
-                                // Layout.fillWidth: true
-                                Layout.minimumWidth: 300
-                                spacing: 5
-                                Label { 
-                                    text: modelData.name
-                                    color: modelData.color
-                                    Layout.minimumWidth: 80
-                                }
-                                ComboBox {
-                                    model: ["Sine", "Square", "Sawtooth", "Triangle"]
-                                    Layout.fillWidth: true
-                                    onCurrentIndexChanged: realTimeChart.setWaveType(index, currentIndex)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Wave parameters
-                WaveCard {
-                    title: "Parameters"
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 600
                     
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        // Layout.fillHeight: true
-
-                        Repeater {
-                            model: ["Alpha", "Beta", "Gamma"]
-                            Column {
+                    Repeater {
+                        model: [{name: "Alpha", color: "#ff0000"}, 
+                            {name: "Beta", color: "#00cc00"}, 
+                            {name: "Gamma", color: "#0000ff"}]
+                        RowLayout {
+                            // Layout.fillWidth: true
+                            Layout.minimumWidth: 300
+                            spacing: 5
+                            Label { 
+                                text: modelData.name
+                                color: modelData.color
+                                Layout.minimumWidth: 80
+                            }
+                            ComboBox {
+                                model: ["Sine", "Square", "Sawtooth", "Triangle"]
                                 Layout.fillWidth: true
-                                Layout.minimumWidth: 300
-                                property int index: modelData === "Alpha" ? 0 : modelData === "Beta" ? 1 : 2
-                                property color waveColor: index === 0 ? "#ff0000" : index === 1 ? "#00cc00" : "#0000ff"
-                                
-                                Label { 
-                                    text: modelData
-                                    color: parent.waveColor 
-                                    font.bold: true
-                                }
-                                
-                                Grid {
-                                    columns: 2
-                                    spacing: 5
-                                    width: parent.width
-
-                                    Label { text: "Frequency:" }
-                                    Slider {
-                                        id: freqSlider
-                                        width: parent.width - 70
-                                        from: 0.1; to: 2.0
-                                        Component.onCompleted: value = realTimeChart.frequencies[index]
-                                        onMoved: realTimeChart.setFrequency(index, value)
-                                    }
-                                    
-                                    Label { text: "Amplitude:" }
-                                    Slider {
-                                        id: ampSlider
-                                        width: parent.width - 70
-                                        from: 10; to: 100
-                                        Component.onCompleted: value = realTimeChart.amplitudes[index]
-                                        onMoved: realTimeChart.setAmplitude(index, value)
-                                    }
-                                    
-                                    Label { text: "Offset:" }
-                                    Slider {
-                                        id: offsetSlider
-                                        width: parent.width - 70
-                                        from: 50; to: 250
-                                        Component.onCompleted: value = realTimeChart.offsets[index]
-                                        onMoved: realTimeChart.setOffset(index, value)
-                                    }
-                                    
-                                    Label { text: "Phase:" }
-                                    Slider {
-                                        id: phaseSlider
-                                        width: parent.width - 70
-                                        from: -Math.PI; to: Math.PI
-                                        Component.onCompleted: value = realTimeChart.phases[index]
-                                        onMoved: realTimeChart.setPhase(index, value)
-                                    }
-                                }
+                                onCurrentIndexChanged: realTimeChart.setWaveType(index, currentIndex)
                             }
                         }
                     }
                 }
-
-                // // Control buttons
-                WaveCard {
-                    title: "Controls"
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 80
-                    
-                    RowLayout {
-                        Button {
-                            text: realTimeChart.isRunning ? "Pause" : "Resume"
-                            onClicked: realTimeChart.toggleRunning()
-                            Layout.fillWidth: true
-                        }
-                        Button {
-                            text: "Restart"
-                            onClicked: realTimeChart.restart()
-                            icon.name: "view-refresh"
-                            Layout.fillWidth: true
-                        }
-                    }
-                }
-
-                // Save/Load
-                WaveCard {
-                    title: "Configuration"
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 80
-                    
-                    RowLayout {
-                        spacing: 10
-                        Button {
-                            text: "Save"
-                            onClicked: realTimeChart.saveConfiguration()
-                            Layout.fillWidth: true
-                        }
-                        Button {
-                            text: "Load"
-                            onClicked: realTimeChart.loadConfiguration()
-                            Layout.fillWidth: true
-                        }
-                    }
-                }
-
-                Label {Layout.fillHeight: true}
             }
 
+            // Wave parameters
+            WaveCard {
+                title: "Parameters"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 600
+                
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    // Layout.fillHeight: true
+
+                    Repeater {
+                        model: ["Alpha", "Beta", "Gamma"]
+                        Column {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 300
+                            property int index: modelData === "Alpha" ? 0 : modelData === "Beta" ? 1 : 2
+                            property color waveColor: index === 0 ? "#ff0000" : index === 1 ? "#00cc00" : "#0000ff"
+                            
+                            Label { 
+                                text: modelData
+                                color: parent.waveColor 
+                                font.bold: true
+                            }
+                            
+                            Grid {
+                                columns: 2
+                                spacing: 5
+                                width: parent.width
+
+                                Label { text: "Frequency:" }
+                                Slider {
+                                    id: freqSlider
+                                    width: parent.width - 70
+                                    from: 0.1; to: 2.0
+                                    Component.onCompleted: value = realTimeChart.frequencies[index]
+                                    onMoved: realTimeChart.setFrequency(index, value)
+                                }
+                                
+                                Label { text: "Amplitude:" }
+                                Slider {
+                                    id: ampSlider
+                                    width: parent.width - 70
+                                    from: 10; to: 100
+                                    Component.onCompleted: value = realTimeChart.amplitudes[index]
+                                    onMoved: realTimeChart.setAmplitude(index, value)
+                                }
+                                
+                                Label { text: "Offset:" }
+                                Slider {
+                                    id: offsetSlider
+                                    width: parent.width - 70
+                                    from: 50; to: 250
+                                    Component.onCompleted: value = realTimeChart.offsets[index]
+                                    onMoved: realTimeChart.setOffset(index, value)
+                                }
+                                
+                                Label { text: "Phase:" }
+                                Slider {
+                                    id: phaseSlider
+                                    width: parent.width - 70
+                                    from: -Math.PI; to: Math.PI
+                                    Component.onCompleted: value = realTimeChart.phases[index]
+                                    onMoved: realTimeChart.setPhase(index, value)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // // Control buttons
+            WaveCard {
+                title: "Controls"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 80
+                
+                RowLayout {
+                    Button {
+                        text: realTimeChart.isRunning ? "Pause" : "Resume"
+                        onClicked: realTimeChart.toggleRunning()
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        text: "Restart"
+                        onClicked: realTimeChart.restart()
+                        icon.name: "view-refresh"
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+
+            // Save/Load
+            WaveCard {
+                title: "Configuration"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 80
+                
+                RowLayout {
+                    spacing: 10
+                    Button {
+                        text: "Save"
+                        onClicked: realTimeChart.saveConfiguration()
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        text: "Load"
+                        onClicked: realTimeChart.loadConfiguration()
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+        }
+
         // Chart
-        Rectangle {
+        WaveCard {
+            title: "Real Time Chart"
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -199,6 +198,7 @@ Item {
             ChartView {
                 id: chartView
                 anchors.fill: parent
+
                 antialiasing: true
                 legend.visible: true
                 theme: Universal.theme

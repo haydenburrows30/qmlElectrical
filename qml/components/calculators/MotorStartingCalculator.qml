@@ -31,12 +31,12 @@ Item {
         anchors.margins: 10
 
         RowLayout {
-            spacing: 10
 
             WaveCard {
                 title: "DOL"
-                Layout.fillWidth: true
+                // Layout.fillWidth: true
                 Layout.minimumHeight: 200
+                Layout.minimumWidth: 330
             
                 GridLayout {
                     columns: 2
@@ -52,6 +52,8 @@ Item {
                         onTextChanged: calculator.setMotorPower(parseFloat(text))
                         Layout.preferredWidth: 150
                         Layout.alignment: Qt.AlignRight
+                        validator: DoubleValidator { bottom: 0 ; top: 999 }
+                        maximumLength: 4
                     }
                     
                     Label {
@@ -66,6 +68,8 @@ Item {
                         onTextChanged: calculator.setEfficiency(parseFloat(text) / 100)
                         Layout.preferredWidth: 150
                         Layout.alignment: Qt.AlignRight
+                        validator: DoubleValidator { bottom: 0 ; top: 99 }
+                        maximumLength: 2
                     }
 
                     Label {
@@ -77,9 +81,13 @@ Item {
                         id: motorPowerFactor
                         placeholderText: "Enter PF"
                         text: "0.85"
-                        onTextChanged: calculator.setPowerFactor(parseFloat(text))
+                        onTextChanged: {
+                            calculator.setPowerFactor(parseFloat(text))
+                            
+                        }
                         Layout.preferredWidth: 150
                         Layout.alignment: Qt.AlignRight
+                        
                     }
                     
                     Label {
@@ -104,11 +112,14 @@ Item {
 
             WaveCard {
                 title: "Results"
-                Layout.fillWidth: true
+                // Layout.fillWidth: true
+                Layout.minimumWidth: 280
                 Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
+                    rowSpacing: 15
+
                     Label {
                         text: "Full Load Current:"
                         Layout.preferredWidth: 150

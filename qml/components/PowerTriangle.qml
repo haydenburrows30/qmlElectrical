@@ -7,7 +7,6 @@ import components 1.0
 
 Rectangle {
     id: root
-    color: "transparent"
     
     // Properties
     property real activePower: sineModel.activePower
@@ -29,6 +28,7 @@ Rectangle {
         id: triangleContainer
         anchors.fill: parent
         anchors.margins: 1
+        // anchors.bottom: parent.bottom
 
         // Calculate triangle dimensions
         property real baseLength: activePower * triangleScale
@@ -40,14 +40,15 @@ Rectangle {
         
         // Scale factor to fit triangle within container
         property real scaleFactor: Math.min(
-            maxSize / Math.max(baseLength, 0.8),
-            maxSize / Math.max(triangleHeight, 0.8)
+            maxSize / Math.max(baseLength, 1),
+            maxSize / Math.max(triangleHeight, 1)
         )
 
         // Triangle shape
         Shape {
             id: triangle
-            anchors.centerIn: parent
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
 
             ShapePath {
                 strokeWidth: 2

@@ -13,17 +13,19 @@ Item {
     property color textColor: Universal.foreground
 
     RowLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
         anchors.margins: 10
         spacing: 10
 
         WaveCard {
             title: "Impedance Calculator"
-            Layout.minimumHeight: 150
+            Layout.minimumHeight: 300
             Layout.minimumWidth: 300
             Layout.alignment: Qt.AlignTop
         
             ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 10
 
                 RowLayout {
                     spacing: 5
@@ -39,7 +41,7 @@ Item {
                                 calculator.setResistance(parseFloat(text))
                             }
                         }
-                        Layout.preferredWidth: 130
+                        Layout.preferredWidth: 140
                         Layout.alignment: Qt.AlignRight
                     }
                 }
@@ -52,7 +54,7 @@ Item {
                     }
                     TextField {
                         id: reactanceInput
-                        Layout.preferredWidth: 130
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         placeholderText: "Enter Reactance"
                         onTextChanged: {
@@ -74,7 +76,7 @@ Item {
                         id: impedanceOutput
                         text: calculator && !isNaN(calculator.impedance) ? 
                             calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
-                        Layout.preferredWidth: 130
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         color: Universal.foreground  // Use theme foreground color
                     }
@@ -83,8 +85,8 @@ Item {
         }
 
         WaveCard {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            Layout.minimumHeight: 300
+            Layout.minimumWidth: 300
             
             ImpedanceVectorViz {
                 id: impedanceViz

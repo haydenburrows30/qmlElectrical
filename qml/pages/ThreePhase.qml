@@ -96,62 +96,19 @@ Page {
                         }
 
                         WaveCard {
-                            title: "Power Analysis"
-                            Layout.fillWidth: true
-                            Layout.minimumHeight: 460
-                            Layout.minimumWidth: 400
-
-                            ColumnLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.minimumHeight: 200
-                                    Layout.minimumWidth: 250
-
-                                    PowerTriangle {
-                                        anchors.fill: parent
-                                        activePower: sineModel.activePower
-                                        reactivePower: sineModel.reactivePower
-                                        apparentPower: sineModel.apparentPower
-                                        powerFactor: sineModel.averagePowerFactor
-                                        triangleScale: 100
-                                        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
-                                        textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
-                                    }
-                                }
-
-                                GridLayout {
-                                    columns: 2
-                                    Layout.fillWidth: true
-                                    Layout.minimumHeight: 100
-                                    
-                                    Label { text: "Total Apparent Power (S):" }
-                                    Label { text: sineModel.apparentPower.toFixed(2) + " kVA" }
-                                    
-                                    Label { text: "Total Active Power (P):" }
-                                    Label { text: sineModel.activePower.toFixed(2) + " kW" }
-                                    
-                                    Label { text: "Total Reactive Power (Q):" }
-                                    Label { text: sineModel.reactivePower.toFixed(2) + " kVAR" }
-                                    
-                                    Label { text: "System Power Factor:" }
-                                    Label { text: sineModel.averagePowerFactor.toFixed(3) }
-                                }
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        WaveCard {
                             title: "Sequence Components"
                             Layout.minimumWidth: 400
                             Layout.minimumHeight: 300
+                            Layout.alignment: Qt.AlignTop
+                            Layout.fillHeight: true
                             
                             GridLayout {
-                                anchors.fill: parent
+                                // anchors.fill: parent
+                                anchors.top: parent.top
+                                anchors.left: parent.left
+                                anchors.right: parent.right
                                 anchors.margins: 10
+
                                 columns: 3
                                 rowSpacing: 10
                                 columnSpacing: 15
@@ -213,6 +170,51 @@ Page {
                             }
                         }
 
+                        WaveCard {
+                            title: "Power Analysis"
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.minimumHeight: 460
+                            Layout.minimumWidth: 400
+
+                            ColumnLayout {
+                                anchors.fill: parent
+
+                                PowerTriangle {
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 250
+                                    Layout.minimumWidth: 250
+                                    activePower: sineModel.activePower
+                                    reactivePower: sineModel.reactivePower
+                                    apparentPower: sineModel.apparentPower
+                                    powerFactor: sineModel.averagePowerFactor
+                                    triangleScale: 100
+                                    color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+                                    textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
+                                }
+
+                                GridLayout {
+                                    columns: 2
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 100
+                                    
+                                    Label { text: "Total Apparent Power (S):" }
+                                    Label { text: sineModel.apparentPower.toFixed(2) + " kVA" }
+                                    
+                                    Label { text: "Total Active Power (P):" }
+                                    Label { text: sineModel.activePower.toFixed(2) + " kW" }
+                                    
+                                    Label { text: "Total Reactive Power (Q):" }
+                                    Label { text: sineModel.reactivePower.toFixed(2) + " kVAR" }
+                                    
+                                    Label { text: "System Power Factor:" }
+                                    Label { text: sineModel.averagePowerFactor.toFixed(3) }
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
                         WaveCard {
                             title: "Waveform"
                             Layout.minimumWidth: 620
