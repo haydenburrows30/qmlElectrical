@@ -7,11 +7,7 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 
 ![Image](https://github.com/user-attachments/assets/f14193c9-bb32-4ed7-8e2a-3737d09fbb80)
 
-![Image](https://github.com/user-attachments/assets/d112afaf-e464-4e35-87f1-8dae126792d3)
-
 ![Image](https://github.com/user-attachments/assets/78289c45-4dae-4b97-8e61-c341a3de903c)
-
-![Image](https://github.com/user-attachments/assets/1b5119a5-dc3e-4ed3-9f72-887c32b9437d)
 
 ![Image](https://github.com/user-attachments/assets/c29e6749-ead1-4cb7-8332-aab87a47f8ed)
 
@@ -20,6 +16,14 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 ![Image](https://github.com/user-attachments/assets/c1909aba-47fa-4016-aead-fc55083e2c73)
 
 ![Image](https://github.com/user-attachments/assets/dd3c6ca1-404a-4111-8db9-d93a5e479611)
+
+![Image](https://github.com/user-attachments/assets/63c39487-3109-4e64-9ebe-c13e941e69c6)
+
+![Image](https://github.com/user-attachments/assets/000c387f-f8dd-4732-879c-021c3430657a)
+
+![Image](https://github.com/user-attachments/assets/79e2eec1-9ea1-4451-a5d9-e47eecc2302d)
+
+![Image](https://github.com/user-attachments/assets/68ec1a52-4fd0-4e80-bd2a-2b5375aecb41)
 
 # Installation
 
