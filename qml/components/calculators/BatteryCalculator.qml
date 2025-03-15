@@ -9,10 +9,8 @@ import Battery 1.0
 
 Item {
     id: batteryCalculator
-    // title: 'Battery Sizing Calculator'
 
     property BatteryCalculator calculator: BatteryCalculator {}
-    // Helper property for theme colors
     property color textColor: Universal.foreground
         
     RowLayout {
@@ -136,10 +134,6 @@ Item {
         WaveCard {
             Layout.minimumHeight: inputLayout.height
             Layout.minimumWidth: 400
-            // color: Universal.background
-            // border.color: Universal.foreground
-            // border.width: 1
-            // radius: 5
             
             Canvas {
                 id: batteryVizCanvas

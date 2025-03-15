@@ -6,9 +6,9 @@ import "../"
 import "../../components"
 import InstrumentTransformer 1.0
 
-WaveCard {
+Item {
     id: instrumentTransformerCard
-    title: 'Instrument Transformer Calculator'
+    // title: 'Instrument Transformer Calculator'
 
     property InstrumentTransformerCalculator calculator: InstrumentTransformerCalculator {}
     property color textColor: Universal.foreground
@@ -22,12 +22,14 @@ WaveCard {
         ColumnLayout {
             Layout.maximumWidth: 400
             Layout.minimumWidth: 300
+            Layout.alignment: Qt.AlignTop
             spacing: 10
 
             // CT Section
-            GroupBox {
+            WaveCard {
                 title: "Current Transformer"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
@@ -64,9 +66,10 @@ WaveCard {
             }
 
             // VT Section
-            GroupBox {
+            WaveCard {
                 title: "Voltage Transformer"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 100
 
                 GridLayout {
                     columns: 2
@@ -84,13 +87,14 @@ WaveCard {
             }
 
             // Results Section
-            GroupBox {
+            WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 140
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 5
+                    rowSpacing: 10
                     columnSpacing: 10
 
                     Label { text: "CT Knee Point:" }
@@ -118,12 +122,9 @@ WaveCard {
         }
 
         // Right side visualization
-        Rectangle {
+        WaveCard {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: Universal.background
-            border.color: Universal.foreground
-            border.width: 1
 
             TransformerVisualization {
                 id: transformerViz

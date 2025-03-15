@@ -21,10 +21,10 @@ Item {
 
     Canvas {
         id: impedanceCanvas
-        // anchors.fill: parent
-        anchors.centerIn: parent
-        width: 300
-        height: 300
+        anchors.fill: parent
+        // anchors.centerIn: parent
+        // width: 500
+        // height: 500
         
         onPaint: {
             var ctx = getContext("2d");

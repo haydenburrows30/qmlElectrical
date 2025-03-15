@@ -6,9 +6,8 @@ import "../"
 import "../../components"
 import ProtectionRelay 1.0
 
-WaveCard {
+Item {
     id: protectionRelayCard
-    title: 'Protection Relay Calculator'
 
     property ProtectionRelayCalculator relay: ProtectionRelayCalculator {}
 
@@ -18,10 +17,12 @@ WaveCard {
 
         ColumnLayout {
             Layout.preferredWidth: 300
+            id: settingsColumn
 
-            GroupBox {
+            WaveCard {
                 title: "Relay Settings"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
@@ -56,9 +57,10 @@ WaveCard {
                 }
             }
 
-            GroupBox {
+            WaveCard {
                 title: "Test Values"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
@@ -83,49 +85,52 @@ WaveCard {
             }
         }
 
+        WaveCard {
+            title: "Time-Current Curve"
+            Layout.minimumHeight: settingsColumn.height
+            Layout.minimumWidth: settingsColumn.height
+
+
         // Time-Current Curve Chart
-        ChartView {
-            id: relayChart
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumWidth: 600
-            Layout.minimumHeight: 600
+            ChartView {
+                id: relayChart
+                theme: Universal.theme
+                anchors.fill: parent
 
-            theme: Universal.theme
+                antialiasing: true
+                
+                LogValueAxis {
+                    id: currentAxis
+                    min: 10
+                    max: 10000
+                    base: 10
+                    titleText: "Current (A)"
+                }
+                
+                LogValueAxis {
+                    id: timeAxis
+                    min: 0.01
+                    max: 100
+                    base: 10
+                    titleText: "Time (s)"
+                }
 
-            antialiasing: true
-            
-            LogValueAxis {
-                id: currentAxis
-                min: 10
-                max: 10000
-                base: 10
-                titleText: "Current (A)"
-            }
-            
-            LogValueAxis {
-                id: timeAxis
-                min: 0.01
-                max: 100
-                base: 10
-                titleText: "Time (s)"
-            }
+                LineSeries {
+                    id: tripCurve
+                    name: "Trip Curve"
+                    axisX: currentAxis
+                    axisY: timeAxis
+                }
 
-            LineSeries {
-                id: tripCurve
-                name: "Trip Curve"
-                axisX: currentAxis
-                axisY: timeAxis
-            }
-
-            // Add connection to update curve when calculations complete
-            Connections {
-                target: relay
-                function onCalculationsComplete() {
-                    tripCurve.clear()
-                    var points = relay.curvePoints
-                    for (var i = 0; i < points.length; i++) {
-                        tripCurve.append(points[i].current, points[i].time)
+                // Add connection to update curve when calculations complete
+                Connections {
+                    target: relay
+                    function onCalculationsComplete() {
+                        tripCurve.clear()
+                        var points = relay.curvePoints
+                        for (var i = 0; i < points.length; i++) {
+                            tripCurve.append(points[i].current, points[i].time)
+                        }
                     }
                 }
             }

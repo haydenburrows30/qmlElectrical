@@ -6,31 +6,33 @@ import "../"
 import "../../components"
 import PFCorrection 1.0
 
-WaveCard {
+Item {
     id: pfCorrectionCard
-    title: 'Power Factor Correction'
+
     property PowerFactorCorrectionCalculator calculator: PowerFactorCorrectionCalculator {}
-    
-    // Helper property to make theme color usable in canvas
     property color textColor: Universal.foreground
 
     RowLayout {
         spacing: 10
         anchors.centerIn: parent
+        anchors.margins: 10
 
         // Input Section
         ColumnLayout {
-            Layout.minimumWidth: 300
+            id: inputColumn
+            Layout.minimumWidth: 350
+            spacing: 10
 
-            GroupBox {
+            WaveCard {
                 title: "System Parameters"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
-                    columnSpacing: 10
-
+                    columnSpacing: 1
+                    
                     Label { text: "Active Power (kW):" }
                     TextField {
                         id: activePowerInput
@@ -62,13 +64,14 @@ WaveCard {
             }
 
             // Results Section
-            GroupBox {
+            WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
+                Layout.minimumHeight: 150
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 5
+                    rowSpacing: 10
                     columnSpacing: 10
 
                     Label { text: "Required Capacitor:" }
@@ -97,13 +100,11 @@ WaveCard {
         }
 
         // Power Triangle Visualization    
-        Rectangle {
-            Layout.minimumHeight: 300
-            Layout.minimumWidth: 300
-            color: Universal.background
-            border.color: Universal.foreground
-            border.width: 1
-            
+        WaveCard {
+            title: "Power Triangle"
+            Layout.minimumWidth: inputColumn.height
+            Layout.minimumHeight: inputColumn.height
+
             Canvas {
                 id: powerTriangle
                 anchors.fill: parent

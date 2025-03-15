@@ -6,12 +6,10 @@ import "../"
 import "../../components"
 import MotorStarting 1.0  // Import the correct namespace
 
-WaveCard {
+Item {
     id: motorStartingCard
-    title: 'Motor Starting Calculator'
-    color: Universal.background // Override the background color with theme color
+
     property MotorStartingCalculator calculator: MotorStartingCalculator {}
-    // Add a property to cache the value
     property real cachedStartingMultiplier: calculator ? calculator.startingMultiplier : 7.0
     
     // Update the cached value when needed - only reads from calculator without setting the property
@@ -27,13 +25,18 @@ WaveCard {
         }
     }
 
-    RowLayout {
-        anchors.centerIn: parent
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 10
+        anchors.margins: 10
 
-        ColumnLayout {
+        RowLayout {
+            spacing: 10
 
-            GroupBox {
+            WaveCard {
                 title: "DOL"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 200
             
                 GridLayout {
                     columns: 2
@@ -99,8 +102,10 @@ WaveCard {
                 }
             }
 
-            GroupBox {
+            WaveCard {
                 title: "Results"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 200
 
                 GridLayout {
                     columns: 2
@@ -142,13 +147,10 @@ WaveCard {
             }
         }
 
-        Rectangle {
-            Layout.minimumHeight: 300
-            Layout.minimumWidth:500
+        WaveCard {
             Layout.fillHeight: true
-            color: "transparent"
-            border.color: Universal.foreground
-            border.width: 1
+            Layout.fillWidth: true
+            title: "Starting Current Profile"
             
             Canvas {
                 id: motorStartCanvas
