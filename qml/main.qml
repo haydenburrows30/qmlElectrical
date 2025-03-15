@@ -4,6 +4,9 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+import QtQuick.Controls.Material
+import QtQuick.Effects
+import Qt.labs.settings 1.0  // Change this import
 
 import 'components'
 import 'components/calculators'
@@ -118,75 +121,104 @@ ApplicationWindow {
             icon_name: "Menu"
             width: 60
             height: 60
-            z: 10
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-            }
+            z: 1000  // Much higher z-index to ensure it's always on top
+            visible: true
+            
+            // Position flush with left and bottom edges
+            x: 0  // Flush with left edge
+            y: parent.height - height  // Flush with bottom edge
+            
             tooltip_text: sideBar.open_closed ? "Close Menu" : "Open Menu"
 
-            background: Rectangle {
-                radius: 0
-                color: {
-                    if (menu.down)
-                        return sideBar.toggle1 ? "#2a2a2a" : "#d0d0d0"
-                    if (menu.hovered)
-                        return sideBar.toggle1 ? "#404040" : "#e0e0e0"
-                    return sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+            MouseArea {
+                id: dragArea
+                anchors.fill: parent
+                drag.target: menu
+                drag.axis: Drag.XAndYAxis
+                drag.minimumX: 0 
+                drag.maximumX: parent.parent.width - menu.width
+                drag.minimumY: 0
+                drag.maximumY: parent.parent.height - menu.height
+                
+                property bool isDragging: false
+                property point startPos
+                
+                function handlePressed(mouseX, mouseY) {
+                    startPos = Qt.point(mouseX, mouseY)
                 }
-
-                // Add border and top accent for better visibility
-                Rectangle {
-                    anchors.fill: parent
-                    color: "transparent"
-                    border.width: 1
-                    border.color: sideBar.toggle1 ? "#404040" : "#d0d0d0"
-
-                    Rectangle {
-                        anchors.top: parent.top
-                        width: parent.width
-                        height: 2
-                        visible: menu.hovered || menu.visualFocus
-                        color: Universal.accent
-                        opacity: 0.8
+                
+                function handlePositionChanged(mouseX, mouseY) {
+                    if (!isDragging) {
+                        let dx = mouseX - startPos.x
+                        let dy = mouseY - startPos.y
+                        isDragging = Math.sqrt(dx * dx + dy * dy) > 5
+                    }
+                    
+                    if (isDragging) {
+                        settings.menuX = menu.x
+                        settings.menuY = menu.y
+                        let isOriginalPosition = menu.x === 0 && menu.y === parent.parent.height - menu.height
+                        
+                        if (isOriginalPosition) {
+                            sideBar.menuMoved = false
+                            if (!menu.inOriginalPosition) {
+                                sideBar.open()
+                            }
+                        } else {
+                            sideBar.menuMoved = true
+                            if (menu.inOriginalPosition && sideBar.position === 1) {
+                                sideBar.close()
+                            }
+                        }
                     }
                 }
+                
+                onPressed: (mouse) => {
+                     handlePressed(mouse.x, mouse.y)
+                }
+                onPositionChanged: (mouse) => {
+                    handlePositionChanged(mouse.x, mouse.y)
+                }
+                
+                onReleased: {
+                    if (!isDragging) {
+                        menu.clicked()
+                    }
+                    isDragging = false
+                    settings.menuX = menu.x
+                    settings.menuY = menu.y
+                }
+                
+                onClicked: if (!isDragging) menu.clicked()
             }
 
-            // Add keyboard shortcut
-            Shortcut {
-                sequence: "Ctrl+M"
-                onActivated: menu.clicked()
-            }
+            // Add property to track original position
+            property bool inOriginalPosition: x === 0 && y === parent.height - height
             
-            // Rotate icon on toggle
-            transform: Rotation {
-                id: iconRotation
-                origin.x: menu.width / 2
-                origin.y: menu.height / 2
-                angle: sideBar.position * -180
-                Behavior on angle {
-                    NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
-                }
-            }
+            onXChanged: sideBar.menuMoved = !inOriginalPosition
+            onYChanged: sideBar.menuMoved = !inOriginalPosition
 
             onClicked: { 
                 sideBar.react()
-                forceActiveFocus() // Ensure button can receive keyboard focus
+                forceActiveFocus()
             }
         }
-        
+
         SideBar {
             id: sideBar
             edge: Qt.LeftEdge
             width: 60
-            height: parent.height - menu.height
+            height: menuMoved ? parent.height : parent.height - menu.height
             y: 0  // Start from top
-            z: 5
+            property bool menuMoved: false
         }
     }
 
-    Settings {id: settings}
+    Settings {
+        id: settings
+        property real menuX
+        property real menuY
+    }
 
     Universal.theme: sideBar.toggle1 ? Universal.Dark : Universal.Light
     Universal.accent: sideBar.toggle1 ? Universal.Red : Universal.Cyan

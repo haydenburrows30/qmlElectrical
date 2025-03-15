@@ -12,6 +12,7 @@ RoundButton {
 
     property var icon_name : ""
     property string tooltip_text: ""
+    z:99
 
     ToolTip {
         id: toolTip
@@ -24,20 +25,9 @@ RoundButton {
     
     background: Rectangle {
         radius: control.radius
-        visible: !control.flat || control.down || control.checked || control.highlighted
-        color: control.down ? control.Universal.baseMediumLowColor :
-            control.enabled && (control.highlighted || control.checked) ? control.Universal.accent :
-                                                                            "transparent"
-
-        Rectangle {
-            width: parent.width
-            height: parent.height
-            radius: control.radius
-            color: "transparent"
-            visible: enabled && control.hovered
-            border.width: 2
-            border.color: control.Universal.baseMediumLowColor
-        }
+        color: control.down ? "#404040" : control.hovered ? "#505050" : "#606060"
+        border.width: 1
+        border.color: "#808080"
     }
 
     onClicked: {toolTip.hide()}

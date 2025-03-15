@@ -6,13 +6,14 @@ import QtQuick.Dialogs
 Drawer {
     id: sideBar
     // width automatically derived from RowLayout child's implicitWidth
-    height: parent.height
+    height: parent ? (menuMoved ? parent.height : parent.height - 60) : 0
     width: 60
     property int open_closed: {sideBar.position}
     property int hide: 0
     property int show: 0
 
     property bool toggle1 : false
+    property bool menuMoved: false
 
     signal mySignal()
 
@@ -48,7 +49,6 @@ Drawer {
         width: parent.width
         anchors.bottom: parent.bottom  // Changed from top to bottom
         height: 20
-        z: 99
         gradient: Gradient {
             orientation: Gradient.Vertical
             GradientStop { position: 0.0; color: "transparent" }
