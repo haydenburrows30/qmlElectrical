@@ -10,8 +10,8 @@ Button {
 
     icon.width: 80
     icon.height: 80
-    Layout.minimumWidth: 200
-    Layout.minimumHeight: 200
+    Layout.minimumWidth: 150
+    Layout.minimumHeight: 150
 
     display: AbstractButton.TextUnderIcon
 

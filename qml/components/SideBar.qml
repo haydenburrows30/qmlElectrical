@@ -133,8 +133,8 @@ Drawer {
                     icon: "RealTime"
                 }
                 // ListElement {
-                //     title: "Devon"
-                //     source: "../pages/Devon.qml"
+                //     title: "Playground"
+                //     source: "../pages/PlayGround.qml"
                 //     tooltip: "Real Time"
                 //     icon: "RealTime"
                 // }

@@ -13,18 +13,18 @@ Page {
 		anchors.centerIn: parent
 		columns: 2
 
-		HButton {
-			icon.name: "Home"
-			text: "Home"
+		// HButton {
+		// 	icon.name: "Home"
+		// 	text: "Home"
 
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
+		// 	back: Qt.lighter(palette.accent,1.5)
+		// 	fore: Qt.lighter(palette.accent,1.0)
 
-			onClicked: {
-				stackView.push("../pages/Home.qml")
-				sideBar.change(0)
-			}
-		}
+		// 	onClicked: {
+		// 		stackView.push("../pages/Home.qml")
+		// 		sideBar.change(0)
+		// 	}
+		// }
 
 		HButton {
 			icon.name: "Voltage Drop"
@@ -83,15 +83,13 @@ Page {
 
 		// HButton {
 		// 	icon.name: "RealTime"
-		// 	text: "Devon"
+		// 	text: "PlayGround"
 		// 	back: Qt.lighter(palette.accent,1.5)
 		// 	fore: Qt.lighter(palette.accent,1.0)
 		// 	onClicked: {
-		// 		stackView.push("../pages/Devon.qml")
+		// 		stackView.push("../pages/PlayGround.qml")
 		// 		sideBar.change(6)
 		// 	}
 		// }
-
-		
 	}
 }

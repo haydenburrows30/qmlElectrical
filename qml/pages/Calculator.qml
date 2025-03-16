@@ -1,104 +1,112 @@
 import QtQuick
-import QtQml
+import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.Controls.Universal
-import QtCharts
 
-import "../components"
-import "../components/calculators"
+import '../components'
 
-import "../"
-
-import PCalculator 1.0
-import Charging 1.0
-import Fault 1.0
-import Sine 1.0
-import RLC 1.0
-import VDrop 1.0
-import Results 1.0
-import Conversion 1.0
-import CableAmpacity 1.0
-import ProtectionRelay 1.0
-import InstrumentTransformer 1.0
-import DiscriminationAnalyzer 1.0
-import HarmonicAnalysis 1.0
-import PFCorrection 1.0
-import Battery 1.0
-import Machine 1.0
+//https://forum.qt.io/topic/81646/expandible-collapsible-pane-with-smooth-animation-in-qml
 
 Page {
-    id: home
+    title: "Accordion Example"
 
     background: Rectangle {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
-    property var calculatorList: [
-        "../components/CalculatorMenu.qml",
-        "../components/calculators/BatteryCalculator.qml",
-        "../components/calculators/CableAmpacityCalculator.qml",
-        "../components/calculators/ChargingCurrentCalculator.qml",
-        "../components/calculators/DiscriminationAnalyzer.qml",
-        "../components/calculators/EarthingCalculator.qml",
-        "../components/calculators/ElectricMachineCalculator.qml",
-        "../components/calculators/HarmonicsAnalyzer.qml",
-        "../components/calculators/ImpedanceCalculator.qml",
-        "../components/calculators/InstrumentTransformerCalculator.qml",
-        "../components/calculators/MotorStartingCalculator.qml",
-        "../components/calculators/PowerCurrentCalculator.qml",
-        "../components/calculators/PowerFactorCorrection.qml",
-        "../components/calculators/ProtectionRelayCalculator.qml",
-        "../components/calculators/TransformerCalculator.qml",
-        "../components/calculators/TransmissionLineCalculator.qml",
-        "../components/calculators/UnitConverter.qml",
-        "../components/calculators/VoltageDropCalculator.qml"
+    property var basic: [
+        { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml" },
+        { name: qsTr("Power Current"), source: "../components/calculators/PowerCurrentCalculator.qml" },
+        { name: qsTr("Unit Converter"), source: "../components/calculators/UnitConverter.qml" },
     ]
-    property int currentCalculatorIndex: 0
 
-    ColumnLayout {
-        anchors.fill: parent
-        spacing: 5
+    property var protection: [
+        { name: qsTr("Discrimination Analysis"), source: "../components/calculators/DiscriminationAnalyzer.qml" },
+        { name: qsTr("Protection Relay"), source: "../components/calculators/ProtectionRelayCalculator.qml" },
+        { name: qsTr("Instrument Transformer"), source: "../components/calculators/InstrumentTransformerCalculator.qml" },
+        { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml" },
+                { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml" }
+    ]
 
-        RowLayout {
-            anchors.margins: 5
-            Layout.fillWidth: true
-            spacing: 10
+    property var cable: [
+        { name: qsTr("Cable Ampacity"), source: "../components/calculators/CableAmpacityCalculator.qml" },
+        { name: qsTr("Charging Current"), source: "../components/calculators/ChargingCurrentCalculator.qml" },
+        { name: qsTr("Voltage Drop"), source: "../components/calculators/VoltageDropCalculator.qml" },
+        { name: qsTr("Transmission Line"), source: "../components/calculators/TransmissionLineCalculator.qml" },
+    ]
+    
+    property var theory: [
+        { name: qsTr("Transformer Calculator"), source: "../components/calculators/TransformerCalculator.qml" },
+        { name: qsTr("Harmonics Analysis"), source: "../components/calculators/HarmonicsAnalyzer.qml" },
+        { name: qsTr("Machine Calculator"), source: "../components/calculators/ElectricMachineCalculator.qml" },
 
-            CalcButton {
-                text: "←"
-                Layout.maximumWidth: 40
-                onClicked: {
-                    currentCalculatorIndex = (currentCalculatorIndex - 1 + calculatorList.length) % calculatorList.length
-                    calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
-                }
+    ]
+
+    MenuBar {
+        id: menuBar
+        anchors.horizontalCenter : parent.horizontalCenter
+
+        background: 
+            Rectangle {
+                color: "#21be2b"
+                width: parent.width
+                height: 1
+                anchors.bottom: parent.bottom
             }
 
-            CalcButton {
-                text: calculatorLoader.source.toString().split("/").pop().replace(".qml", "")
-                Layout.preferredWidth: 200
-                Layout.fillWidth: true
-                onClicked: {
-                    calculatorLoader.setSource(calculatorList[0])
+        Menu {
+            title: "Basic Calculators"
+            Repeater {
+                model: basic
+
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: calculatorLoader.source = modelData.source
                 }
             }
-            CalcButton {
-                text: "→"
-                Layout.maximumWidth: 40
-                Layout.alignment: Qt.AlignRight
-                onClicked: {
-                    currentCalculatorIndex = (currentCalculatorIndex + 1) % calculatorList.length
-                    calculatorLoader.setSource(calculatorList[currentCalculatorIndex])
-                }
-            } 
         }
+        Menu {
+            title: "Protection"
+            Repeater {
+                model: protection
 
-        Loader {
-            id: calculatorLoader
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            source: "../components/CalculatorMenu.qml"
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: calculatorLoader.source = modelData.source
+                }
+            }
         }
+        Menu {
+            title: "Cable"
+            Repeater {
+                model: cable
+
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: calculatorLoader.source = modelData.source
+                }
+            }
+        }
+        Menu {
+            title: "Theory"
+            Repeater {
+                model: theory
+
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: calculatorLoader.source = modelData.source
+                }
+            }
+        }
+    }
+
+    Loader {
+        id: calculatorLoader
+        anchors.left: parent.left
+        anchors.top: menuBar.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        source: "../components/CalculatorMenu.qml"
     }
 }
