@@ -20,21 +20,31 @@ Item {
 
         // Left side inputs and results
         ColumnLayout {
-            Layout.maximumWidth: 300
-            Layout.minimumWidth: 300
-            Layout.alignment: Qt.AlignTop
+            id: leftColumn
+            Layout.maximumWidth: 400
+            Layout.minimumWidth: 320
+            Layout.fillHeight: true
             spacing: 10
 
             // CT Section
             WaveCard {
                 title: "Current Transformer"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.fillHeight: true
+                // Layout.minimumHeight: 600
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 15
+
+                    Label { text: "CT Type:" }
+                    ComboBox {
+                        id: ctType
+                        model: ["Measurement", "Protection", "Combined"]
+                        onCurrentTextChanged: calculator.currentCtType = currentText.toLowerCase()
+                        Layout.fillWidth: true
+                    }
 
                     Label { text: "CT Ratio:" }
                     ComboBox {
@@ -45,36 +55,77 @@ Item {
                     }
 
                     Label { text: "Burden (VA):" }
-                    SpinBox {
+                    TextField {
                         id: ctBurden
-                        from: 3  // Changed to integer
-                        to: 30
-                        value: 15
-                        stepSize: 3  // Changed to integer
-                        onValueChanged: calculator.burden = value
+                        text: "15.0"
+                        validator: DoubleValidator {
+                            bottom: 3.0
+                            top: 100.0
+                            notation: DoubleValidator.StandardNotation
+                            decimals: 1
+                        }
+                        onTextChanged: {
+                            if (acceptableInput) {
+                                calculator.burden = parseFloat(text)
+                            }
+                        }
                         Layout.fillWidth: true
+                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    }
+
+                    Label { text: "Power Factor:" }
+                    SpinBox {
+                        id: powerFactor
+                        from: 50
+                        to: 100
+                        value: 80
+                        stepSize: 5
+                        onValueChanged: calculator.powerFactor = value / 100
+                        Layout.fillWidth: true
+                        textFromValue: function(value) { return value + "%" }
+                    }
+
+                    Label { text: "Temperature (°C):" }
+                    TextField {
+                        id: temperature
+                        text: "25.0"
+                        validator: DoubleValidator {
+                            bottom: -40.0
+                            top: 120.0
+                            notation: DoubleValidator.StandardNotation
+                            decimals: 1
+                        }
+                        onTextChanged: {
+                            if (acceptableInput) {
+                                calculator.temperature = parseFloat(text)
+                            }
+                        }
+                        Layout.fillWidth: true
+                        inputMethodHints: Qt.ImhFormattedNumbersOnly
                     }
 
                     Label { text: "Accuracy Class:" }
                     ComboBox {
                         id: accuracyClass
-                        model: ["0.1", "0.2", "0.5", "1.0"]
+                        model: calculator.availableAccuracyClasses
                         onCurrentTextChanged: if (currentText) calculator.accuracyClass = currentText
                         Layout.fillWidth: true
                     }
-                }
-            }
 
-            // VT Section
-            WaveCard {
-                title: "Voltage Transformer"
-                Layout.fillWidth: true
-                Layout.minimumHeight: 100
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        Layout.margins: 10
+                        height: 1
+                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                    }
 
-                GridLayout {
-                    columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 15
+                    Label { 
+                        text: "Voltage Transformer"
+                        font.bold: true
+                        Layout.columnSpan: 2
+                        font.pixelSize: 16
+                        }
 
                     Label { text: "VT Ratio:" }
                     ComboBox {
@@ -83,19 +134,47 @@ Item {
                         onCurrentTextChanged: if (currentText) calculator.setVtRatio(currentText)
                         Layout.fillWidth: true
                     }
-                }
-            }
 
-            // Results Section
-            WaveCard {
-                title: "Results"
-                Layout.fillWidth: true
-                Layout.minimumHeight: 140
+                    Label { text: "VT Burden (VA):" }
+                    TextField {
+                        id: vtBurden
+                        text: "100.0"
+                        validator: DoubleValidator {
+                            bottom: 25.0
+                            top: 2000.0
+                            notation: DoubleValidator.StandardNotation
+                            decimals: 1
+                        }
+                        onTextChanged: {
+                            if (acceptableInput) {
+                                calculator.vtBurden = parseFloat(text)
+                            }
+                        }
+                        Layout.fillWidth: true
+                    }
 
-                GridLayout {
-                    columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+                    Label { text: "Rated Voltage Factor:" }
+                    ComboBox {
+                        id: ratedVoltageFactor
+                        model: ["continuous", "30s", "ground_fault"]
+                        onCurrentTextChanged: calculator.ratedVoltageFactor = currentText
+                        Layout.fillWidth: true
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        Layout.margins: 10
+                        height: 1
+                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                    }
+
+                    Label { 
+                        text: "Results"
+                        font.bold: true
+                        Layout.columnSpan: 2
+                        font.pixelSize: 16
+                        }
 
                     Label { text: "CT Knee Point:" }
                     Label { 
@@ -117,19 +196,67 @@ Item {
                         font.bold: true
                         color: Universal.foreground
                     }
+
+                    Label { text: "Error Margin:" }
+                    Label { 
+                        text: isFinite(calculator.errorMargin) ? calculator.errorMargin.toFixed(2) + "%" : "0.0%"
+                        font.bold: true
+                        color: calculator.errorMargin > parseFloat(accuracyClass.currentText) ? "red" : Universal.foreground
+                    }
+
+                    Label { text: "Temperature Effect:" }
+                    Label { 
+                        text: isFinite(calculator.temperatureEffect) ? calculator.temperatureEffect.toFixed(2) + "%" : "0.0%"
+                        font.bold: true
+                        color: Universal.foreground
+                    }
+
+                    Label { text: "VT Rated Voltage:" }
+                    Label { 
+                        text: isFinite(calculator.vtRatedVoltage) ? calculator.vtRatedVoltage.toFixed(1) + " V" : "0.0 V"
+                        font.bold: true
+                        color: Universal.foreground
+                    }
+
+                    Label { text: "VT Impedance:" }
+                    Label { 
+                        text: isFinite(calculator.vtImpedance) ? calculator.vtImpedance.toFixed(1) + " Ω" : "0.0 Ω"
+                        font.bold: true
+                        color: Universal.foreground
+                    }
+
+                    Label { text: "VT Burden Status:" }
+                    Label { 
+                        text: calculator.vtBurdenStatus
+                        font.bold: true
+                        color: calculator.vtBurdenWithinRange ? "green" : "red"
+                    }
+
+                    Label { text: "Burden Utilization:" }
+                    Label { 
+                        text: isFinite(calculator.vtBurdenUtilization) ? 
+                              calculator.vtBurdenUtilization.toFixed(1) + "%" : "0.0%"
+                        font.bold: true
+                        color: {
+                            if (calculator.vtBurdenUtilization < 50) return "green"
+                            if (calculator.vtBurdenUtilization < 80) return "orange"
+                            return "red"
+                        }
+                    }
                 }
             }
         }
 
         // Right side visualization
         WaveCard {
-            Layout.fillWidth: true
+            Layout.minimumHeight: 600
+            Layout.minimumWidth: 600
             Layout.fillHeight: true
+            Layout.fillWidth: true
 
             TransformerVisualization {
                 id: transformerViz
                 anchors.fill: parent
-                anchors.margins: 5
                 
                 // Pass CT data
                 ctRatio: ctRatio.currentText || "100/5"

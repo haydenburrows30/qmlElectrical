@@ -79,7 +79,7 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 100
+                Layout.minimumHeight: 110
                 
 
                 GridLayout {

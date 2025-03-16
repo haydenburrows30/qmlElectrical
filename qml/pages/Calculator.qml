@@ -9,7 +9,6 @@ import '../components'
 //https://forum.qt.io/topic/81646/expandible-collapsible-pane-with-smooth-animation-in-qml
 
 Page {
-    title: "Accordion Example"
 
     background: Rectangle {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"

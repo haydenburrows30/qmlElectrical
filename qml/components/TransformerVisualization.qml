@@ -31,9 +31,12 @@ Item {
     onCtMaxFaultChanged: canvas.requestPaint()
     onVtRatioChanged: canvas.requestPaint()
 
+    
+
     Canvas {
         id: canvas
-        anchors.fill: parent
+        width: 600
+        height: 600
         
         onPaint: {
             var ctx = getContext("2d");
@@ -49,26 +52,26 @@ Item {
             var coreColor = darkMode ? "#A0A0A0" : "#696969";
             
             // Draw CT
-            drawTransformer(ctx, width * 0.3, height * 0.3, width * 0.4, height * 0.3, 
+            drawTransformer(ctx, width * 0.2, height * 0.01, width * 0.5, height * 0.4, 
                           "Current Transformer", ctPrimary + "A", ctSecondary + "A", 
                           "Burden: " + ctBurden + " VA", 
                           "Knee Point: " + ctKneePoint.toFixed(1) + "V",
                           primaryColor, secondaryColor);
             
             // Draw VT
-            drawTransformer(ctx, width * 0.3, height * 0.7, width * 0.4, height * 0.3,
+            drawTransformer(ctx, width * 0.2, height * 0.55, width * 0.5, height * 0.4,
                           "Voltage Transformer", vtPrimary + "V", vtSecondary + "V",
                           "", "", primaryColor, secondaryColor);
             
             // Draw connection between them if needed
-            ctx.strokeStyle = textColor.toString();
-            ctx.lineWidth = 1;
-            ctx.setLineDash([5, 3]);
-            ctx.beginPath();
-            ctx.moveTo(width * 0.5, height * 0.45);
-            ctx.lineTo(width * 0.5, height * 0.55);
-            ctx.stroke();
-            ctx.setLineDash([]);
+            // ctx.strokeStyle = textColor.toString();
+            // ctx.lineWidth = 1;
+            // ctx.setLineDash([5, 3]);
+            // ctx.beginPath();
+            // ctx.moveTo(width * 0.5, height * 0.45);
+            // ctx.lineTo(width * 0.5, height * 0.55);
+            // ctx.stroke();
+            // ctx.setLineDash([]);
         }
         
         function drawTransformer(ctx, x, y, width, height, title, primary, secondary, info1, info2, primaryColor, secondaryColor) {
@@ -91,9 +94,9 @@ Item {
             ctx.fillStyle = textColor.toString();
             ctx.font = "bold 14px sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText(title, x + width / 2, y - 10);
+            ctx.fillText(title, x + width / 2, y + 10);
             
-            ctx.font = "12px sans-serif";
+            ctx.font = "14px sans-serif";
             // Primary label
             ctx.fillText(primary, x + width * 0.15, y + height / 2);
             
@@ -102,11 +105,11 @@ Item {
             
             // Info text
             if (info1) {
-                ctx.fillText(info1, x + width / 2, y + height + 15);
+                ctx.fillText(info1, x + width / 2, y + height);
             }
             
             if (info2) {
-                ctx.fillText(info2, x + width / 2, y + height + 35);
+                ctx.fillText(info2, x + width / 2, y + height + 25);
             }
         }
         

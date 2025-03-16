@@ -16,13 +16,13 @@ Item {
         anchors.centerIn: parent
 
         ColumnLayout {
-            Layout.preferredWidth: 300
+            Layout.preferredWidth: 350
             id: settingsColumn
 
             WaveCard {
                 title: "Relay Settings"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: 400
 
                 GridLayout {
                     columns: 2
@@ -35,7 +35,7 @@ Item {
                         placeholderText: "Enter current"
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) relay.pickupCurrent = parseFloat(text)
-                        Layout.fillWidth: true
+                        Layout.minimumWidth: 180
                     }
 
                     Label { text: "Time Dial:" }
