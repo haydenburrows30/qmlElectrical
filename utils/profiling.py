@@ -1,274 +1,263 @@
 import time
 import functools
-from collections import defaultdict
+import psutil
+import platform
+import gc
+import os
 import threading
-import statistics
-import psutil  # Add system monitoring
-import gc      # Add garbage collection monitoring
+from datetime import datetime
 
 class PerformanceProfiler:
-    """Utility class for performance profiling across the application"""
-    
+    """Singleton performance profiling utility"""
     _instance = None
     _lock = threading.RLock()
     
     @classmethod
     def get_instance(cls):
-        """Get singleton instance of the profiler"""
+        """Get or create the singleton instance"""
         with cls._lock:
             if cls._instance is None:
                 cls._instance = cls()
             return cls._instance
     
     def __init__(self):
-        self.profiling_enabled = False
-        self.profile_data = defaultdict(list)  # Method name -> list of execution times
-        self.call_counts = defaultdict(int)    # Method name -> number of calls
-        self.frame_times = []  # Store frame render times
+        """Initialize the profiler with empty metrics"""
+        self.enabled = False
+        self.detailed_logging = False
+        self.function_stats = {}
+        self.frame_times = []
         self.last_frame_time = time.time()
-        self.system_stats = []  # Store CPU/memory usage
-        self.max_samples = 100  # Limit data collection to prevent memory issues
-        self.detailed_logging = False  # Enable for verbose logging
+        self.log_file = None
+        self.system_stats = {
+            "start_time": time.time(),
+            "start_memory_mb": self._get_memory_usage(),
+            "max_memory_mb": 0,
+            "platform": platform.system(),
+            "python_version": platform.python_version(),
+            "cpu_count": psutil.cpu_count(logical=False),
+            "logical_cores": psutil.cpu_count(logical=True)
+        }
         
+    def _get_memory_usage(self):
+        """Get current memory usage in MB"""
+        try:
+            # Force garbage collection to get accurate memory usage
+            gc.collect()
+            process = psutil.Process(os.getpid())
+            memory_info = process.memory_info()
+            # Convert to MB
+            return memory_info.rss / (1024 * 1024)
+        except Exception as e:
+            print(f"Error getting memory usage: {e}")
+            return 0
+            
     def enable(self):
-        """Enable performance profiling"""
-        self.profiling_enabled = True
-        self.last_frame_time = time.time()
-        
-    def disable(self):
-        """Disable performance profiling"""
-        self.profiling_enabled = False
+        """Enable the profiler"""
+        self.enabled = True
+        # Create a log file with timestamp if detailed logging is enabled
+        if self.detailed_logging and not self.log_file:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_dir = os.path.join(os.path.expanduser("~"), "Documents", "performance_logs")
+            os.makedirs(log_dir, exist_ok=True)
+            self.log_file = open(os.path.join(log_dir, f"perf_log_{timestamp}.txt"), "w")
+            self.log_file.write("Timestamp,Function,Duration_ms,Memory_MB\n")
     
+    def disable(self):
+        """Disable the profiler"""
+        self.enabled = False
+        # Close log file if open
+        if self.log_file:
+            self.log_file.close()
+            self.log_file = None
+            
     def clear(self):
         """Clear all profiling data"""
-        self.profile_data.clear()
-        self.call_counts.clear()
-        self.frame_times.clear()
-        self.system_stats.clear()
+        self.function_stats = {}
+        self.frame_times = []
         self.last_frame_time = time.time()
-        
-    def record_execution(self, method_name, execution_time):
-        """Record execution time for a method"""
-        if not self.profiling_enabled:
+        # Reset max memory but keep current memory as starting point
+        current_memory = self._get_memory_usage()
+        self.system_stats["start_time"] = time.time()
+        self.system_stats["start_memory_mb"] = current_memory
+        self.system_stats["max_memory_mb"] = current_memory
+            
+    def record_function_call(self, name, duration_ms, memory_mb=None):
+        """Record statistics for a function call"""
+        if not self.enabled:
             return
             
-        with self._lock:
-            # Limit data collection to prevent memory issues
-            if len(self.profile_data[method_name]) >= self.max_samples:
-                self.profile_data[method_name].pop(0)  # Remove oldest
-                
-            self.profile_data[method_name].append(execution_time)
-            self.call_counts[method_name] += 1
+        # Update memory tracking
+        if memory_mb is None:
+            memory_mb = self._get_memory_usage()
             
-            # Detailed logging for very slow operations
-            if self.detailed_logging and execution_time > 0.1:  # > 100ms
-                print(f"SLOW OPERATION: {method_name} took {execution_time*1000:.2f}ms")
+        # Update max memory if current usage is higher
+        if memory_mb > self.system_stats.get("max_memory_mb", 0):
+            self.system_stats["max_memory_mb"] = memory_mb
+            
+        # Create stats entry if it doesn't exist
+        if name not in self.function_stats:
+            self.function_stats[name] = {
+                "count": 0,
+                "total_time_ms": 0,
+                "min_time_ms": float('inf'),
+                "max_time_ms": 0,
+                "average_time_ms": 0
+            }
+            
+        # Update stats
+        stats = self.function_stats[name]
+        stats["count"] += 1
+        stats["total_time_ms"] += duration_ms
+        stats["min_time_ms"] = min(stats["min_time_ms"], duration_ms)
+        stats["max_time_ms"] = max(stats["max_time_ms"], duration_ms)
+        stats["average_time_ms"] = stats["total_time_ms"] / stats["count"]
+        
+        # Log to file if detailed logging is enabled
+        if self.detailed_logging and self.log_file:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            self.log_file.write(f"{timestamp},{name},{duration_ms:.3f},{memory_mb:.2f}\n")
+            self.log_file.flush()  # Ensure it's written immediately
     
     def record_frame(self):
         """Record frame time for UI performance tracking"""
-        if not self.profiling_enabled:
+        if not self.enabled:
             return
             
         current_time = time.time()
-        frame_time = current_time - self.last_frame_time
+        frame_time_ms = (current_time - self.last_frame_time) * 1000
         self.last_frame_time = current_time
         
-        with self._lock:
-            if len(self.frame_times) >= self.max_samples:
-                self.frame_times.pop(0)  # Remove oldest
-            self.frame_times.append(frame_time)
-            
-            # Record system stats every 10 frames
-            if len(self.frame_times) % 10 == 0:
-                self.record_system_stats()
-    
-    def record_system_stats(self):
-        """Record system resource usage"""
-        if not self.profiling_enabled:
-            return
-            
-        try:
-            # Get memory and CPU stats
-            process = psutil.Process()
-            mem_info = process.memory_info()
-            cpu_percent = process.cpu_percent(interval=0.1)
-            
-            stats = {
-                "timestamp": time.time(),
-                "memory_mb": mem_info.rss / (1024 * 1024),
-                "cpu_percent": cpu_percent,
-                "gc_objects": len(gc.get_objects()),
-            }
-            
-            with self._lock:
-                if len(self.system_stats) >= self.max_samples:
-                    self.system_stats.pop(0)
-                self.system_stats.append(stats)
-                
-        except Exception as e:
-            print(f"Error recording system stats: {e}")
+        # Only track reasonable frame times (exclude initial frames or pauses)
+        if 1.0 <= frame_time_ms <= 1000.0:
+            self.frame_times.append(frame_time_ms)
+            # Limit the number of stored frame times to avoid memory growth
+            if len(self.frame_times) > 1000:
+                self.frame_times = self.frame_times[-1000:]
     
     def get_frame_stats(self):
-        """Get frame timing statistics"""
-        with self._lock:
-            if not self.frame_times:
-                return {"avg_fps": 0, "min_fps": 0, "max_fps": 0, "frame_count": 0}
-                
-            frame_times = self.frame_times.copy()
+        """Get statistics about frame times"""
+        if not self.frame_times:
+            return {
+                "count": 0,
+                "average_ms": 0,
+                "min_ms": 0,
+                "max_ms": 0,
+                "fps": 0
+            }
             
-        # Calculate FPS stats (excluding outliers)
-        frame_times.sort()
-        # Remove top and bottom 10% to avoid outliers
-        trim = max(1, int(len(frame_times) * 0.1))
-        trimmed_times = frame_times[trim:-trim] if len(frame_times) > trim*2 else frame_times
-        
-        avg_time = statistics.mean(trimmed_times) if trimmed_times else 0
-        min_time = min(trimmed_times) if trimmed_times else 0
-        max_time = max(trimmed_times) if trimmed_times else 0
-        
-        # Convert times to FPS (frames per second)
-        avg_fps = 1.0 / avg_time if avg_time > 0 else 0
-        min_fps = 1.0 / max_time if max_time > 0 else 0
-        max_fps = 1.0 / min_time if min_time > 0 else 0
+        count = len(self.frame_times)
+        avg_time = sum(self.frame_times) / count
+        fps = 1000 / avg_time if avg_time > 0 else 0
         
         return {
-            "avg_fps": avg_fps,
-            "min_fps": min_fps,
-            "max_fps": max_fps,
-            "frame_count": len(self.frame_times)
+            "count": count,
+            "average_ms": avg_time,
+            "min_ms": min(self.frame_times),
+            "max_ms": max(self.frame_times),
+            "fps": fps
         }
-        
-    def get_system_stats(self):
-        """Get system resource usage summary"""
-        with self._lock:
-            if not self.system_stats:
-                return {"avg_memory_mb": 0, "avg_cpu": 0}
-                
-            memory_values = [s["memory_mb"] for s in self.system_stats]
-            cpu_values = [s["cpu_percent"] for s in self.system_stats]
-            
-        return {
-            "avg_memory_mb": statistics.mean(memory_values) if memory_values else 0,
-            "max_memory_mb": max(memory_values) if memory_values else 0,
-            "avg_cpu": statistics.mean(cpu_values) if cpu_values else 0,
-            "max_cpu": max(cpu_values) if cpu_values else 0
-        }
-    
-    def get_summary(self):
-        """Get summary of profiling data"""
-        result = []
-        
-        with self._lock:
-            for method_name, times in self.profile_data.items():
-                if not times:
-                    continue
-                    
-                result.append({
-                    "method": method_name,
-                    "calls": self.call_counts[method_name],
-                    "total_time": sum(times),
-                    "avg_time": statistics.mean(times) if times else 0,
-                    "min_time": min(times) if times else 0,
-                    "max_time": max(times) if times else 0,
-                    "median_time": statistics.median(times) if times else 0,
-                })
-                
-        # Sort by total time (highest first)
-        result.sort(key=lambda x: x["total_time"], reverse=True)
-        return result
     
     def print_summary(self):
-        """Print profiling summary to console"""
-        summary = self.get_summary()
-        frame_stats = self.get_frame_stats()
-        system_stats = self.get_system_stats()
-        
+        """Print a summary of profiling data with error handling"""
+        if not self.enabled:
+            print("Profiling is not enabled")
+            return
+            
         print("\n===== PERFORMANCE PROFILING SUMMARY =====")
         
-        # Print UI performance first
-        print("\n--- UI Performance ---")
-        print(f"Average FPS: {frame_stats['avg_fps']:.1f}")
-        print(f"Min FPS: {frame_stats['min_fps']:.1f}")
-        print(f"Max FPS: {frame_stats['max_fps']:.1f}")
-        print(f"Frame count: {frame_stats['frame_count']}")
+        # Print system stats safely, handling missing keys
+        print("\nSYSTEM INFORMATION:")
+        system_stats = self.system_stats or {}
+        print(f"Platform: {system_stats.get('platform', 'Unknown')}")
+        print(f"Python: {system_stats.get('python_version', 'Unknown')}")
+        print(f"CPU: {system_stats.get('cpu_count', 0)} cores ({system_stats.get('logical_cores', 0)} logical)")
         
-        # Print system resource usage
-        print("\n--- System Resources ---")
-        print(f"Average Memory: {system_stats['avg_memory_mb']:.1f} MB")
-        print(f"Max Memory: {system_stats['max_memory_mb']:.1f} MB")
-        print(f"Average CPU: {system_stats['avg_cpu']:.1f}%")
-        print(f"Max CPU: {system_stats['max_cpu']:.1f}%")
-        
-        # Print method performance
-        print("\n--- Method Performance ---")
-        print("{:<30} {:<10} {:<12} {:<12} {:<12}".format(
-            "Method", "Calls", "Total (ms)", "Avg (ms)", "Max (ms)"))
-        print("-" * 80)
-        
-        for item in summary:
-            print("{:<30} {:<10} {:<12.2f} {:<12.2f} {:<12.2f}".format(
-                item["method"], 
-                item["calls"],
-                item["total_time"] * 1000,  # Convert to ms
-                item["avg_time"] * 1000,    # Convert to ms
-                item["max_time"] * 1000     # Convert to ms
-            ))
+        # Handle memory stats safely
+        try:
+            current_memory = self._get_memory_usage()
+            start_memory = system_stats.get('start_memory_mb', 0)
+            max_memory = system_stats.get('max_memory_mb', current_memory)
             
-            # Add detailed analysis for slow methods
-            if item["avg_time"] * 1000 > 100:  # If average time > 100ms
-                print(f"   ⚠️ PERFORMANCE BOTTLENECK: {item['method']} is very slow")
-                print(f"      Consider reducing connections or optimizing implementation")
+            print(f"Current Memory: {current_memory:.1f} MB")
+            print(f"Starting Memory: {start_memory:.1f} MB")
+            print(f"Max Memory: {max_memory:.1f} MB")
+            print(f"Memory Growth: {(current_memory - start_memory):.1f} MB")
+        except Exception as e:
+            print(f"Error calculating memory stats: {e}")
+            print("Memory stats: Unavailable")
             
-        print("\n--- Potential Issues ---")
-        
-        # Check for potential QML bottlenecks
-        if frame_stats['avg_fps'] < 30:
-            print("⚠️ Low frame rate detected! UI operations may be causing lag.")
-            print("   Solutions: Reduce QML animations, simplify UI, or optimize data binding")
-        
-        # Check for potential Python bottlenecks
-        if system_stats['max_cpu'] > 80:
-            print("⚠️ High CPU usage detected! Python calculations may be causing lag.")
-            print("   Solutions: Optimize calculations, add caching, or move to background thread")
+        # Total execution time
+        try:
+            duration = time.time() - system_stats.get('start_time', time.time())
+            print(f"Profiling Duration: {duration:.1f} seconds")
+        except Exception:
+            print("Profiling Duration: Unknown")
             
-        print("========================================\n")
+        # Frame stats
+        try:
+            frame_stats = self.get_frame_stats()
+            if frame_stats["count"] > 0:
+                print(f"\nFRAME PERFORMANCE:")
+                print(f"Frame Count: {frame_stats['count']}")
+                print(f"Average Frame Time: {frame_stats['average_ms']:.2f} ms")
+                print(f"FPS: {frame_stats['fps']:.1f}")
+                print(f"Min/Max Frame Time: {frame_stats['min_ms']:.2f}/{frame_stats['max_ms']:.2f} ms")
+        except Exception as e:
+            print(f"Error calculating frame stats: {e}")
+            
+        # Function stats
+        if self.function_stats:
+            print("\nFUNCTION PERFORMANCE:")
+            print(f"{'Function':<40} {'Count':>8} {'Total (ms)':>12} {'Avg (ms)':>10} {'Min (ms)':>10} {'Max (ms)':>10}")
+            print("-" * 100)
+            
+            # Sort by total time
+            sorted_stats = sorted(self.function_stats.items(), 
+                                 key=lambda x: x[1]['total_time_ms'], 
+                                 reverse=True)
+            
+            for name, stats in sorted_stats:
+                # Truncate long function names
+                display_name = name if len(name) <= 37 else name[:34] + "..."
+                print(f"{display_name:<40} {stats['count']:>8} {stats['total_time_ms']:>12.2f} "
+                      f"{stats['average_time_ms']:>10.2f} {stats['min_time_ms']:>10.2f} "
+                      f"{stats['max_time_ms']:>10.2f}")
+        else:
+            print("\nNo function calls recorded")
+        
+        print("\n========================================")
 
-def profile(func=None, *, disabled=False):
-    """Decorator for profiling methods
-    
-    Args:
-        func: Function to decorate
-        disabled: If True, profiling will be disabled for this method
+def profile(func):
+    """Decorator to profile function execution time"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        profiler = PerformanceProfiler.get_instance()
         
-    Usage:
-        @profile  # Basic usage
-        def my_method():
-            pass
+        if not profiler.enabled:
+            return func(*args, **kwargs)
             
-        @profile(disabled=True)  # Disable for specific method
-        def another_method():
-            pass
-    """
-    def decorator(f):
-        @functools.wraps(f)
-        def wrapper(*args, **kwargs):
-            profiler = PerformanceProfiler.get_instance()
-            
-            if disabled or not profiler.profiling_enabled:
-                return f(*args, **kwargs)
-                
-            start_time = time.time()
-            try:
-                result = f(*args, **kwargs)
-            finally:
-                end_time = time.time()
-                execution_time = end_time - start_time
-                profiler.record_execution(f.__qualname__, execution_time)
-                
-            return result
-        return wrapper
+        # Record memory before function call
+        start_memory = profiler._get_memory_usage()
+        start_time = time.time()
         
-    # Handle both @profile and @profile(disabled=...)
-    if func is None:
-        return decorator
-    return decorator(func)
+        try:
+            result = func(*args, **kwargs)
+        finally:
+            end_time = time.time()
+            end_memory = profiler._get_memory_usage()
+            
+            # Calculate execution time in milliseconds
+            duration_ms = (end_time - start_time) * 1000
+            
+            # Get function name
+            function_name = f"{func.__module__}.{func.__name__}"
+            
+            # Record in profiler
+            profiler.record_function_call(
+                function_name, 
+                duration_ms, 
+                end_memory
+            )
+            
+        return result
+    return wrapper

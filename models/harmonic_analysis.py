@@ -45,7 +45,7 @@ class CalculationWorker(QRunnable):
                 cache_key = self.calculator._get_cache_key()
                 
                 # Check cache to avoid duplicate work
-                if cache_key in self.calculator._calculation_cache:
+                if (cache_key in self.calculator._calculation_cache):
                     cached_result = self.calculator._calculation_cache[cache_key]
                     # Load values from cache
                     self.calculator._thd = cached_result['thd']
@@ -176,8 +176,12 @@ class HarmonicAnalysisCalculator(QObject):
     
     @Slot()
     def printProfilingSummary(self):
-        """Print profiling summary to console"""
-        PerformanceProfiler.get_instance().print_summary()
+        """Print profiling summary to console with error handling"""
+        try:
+            PerformanceProfiler.get_instance().print_summary()
+        except Exception as e:
+            print(f"Error printing profiling summary: {e}")
+            print("Some performance data might not be available.")
     
     @Property(bool, notify=profilingChanged)
     def profilingEnabled(self):

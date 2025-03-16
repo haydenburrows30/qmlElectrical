@@ -46,6 +46,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import data.rc_resources as rc_resources
 from models.series_helper import SeriesHelper
+from models.bar_series_helper import BarSeriesHelper  # Add new import
 
 class Application:
     """Main application class implementing dependency injection and component management.
@@ -202,7 +203,8 @@ class Application:
             (EarthingCalculator, "Earthing", 1, 0, "EarthingCalculator"),
             (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator"),
             (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
-            (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper")
+            (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
+            (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper")  # Add new type
         ]
 
         for type_info in qml_types:
@@ -211,6 +213,10 @@ class Application:
     def load_qml(self):
         self.qml_engine.load_qml(os.path.join(CURRENT_DIR, "qml", "main.qml"))
         
+        # Add platform helper registration
+        from utils.platform_helper import PlatformHelper
+        self.qml_engine.engine.rootContext().setContextProperty("PlatformHelper", PlatformHelper())
+
     def run(self):
         """Run the application."""
         try:
