@@ -351,7 +351,7 @@ Page {
                                 min: 0
                                 max: 1000
                                 tickCount: 10
-                                labelFormat: "%.1f"
+                                labelFormat: "\u00B0"
                                 titleText: "Frequency (Hz)"
                             }
 

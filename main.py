@@ -45,6 +45,7 @@ from services.worker_pool import WorkerPool
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import data.rc_resources as rc_resources
+from models.series_helper import SeriesHelper
 
 class Application:
     """Main application class implementing dependency injection and component management.
@@ -200,7 +201,8 @@ class Application:
             (MachineCalculator, "Machine", 1, 0, "MachineCalculator"),
             (EarthingCalculator, "Earthing", 1, 0, "EarthingCalculator"),
             (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator"),
-            (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator")
+            (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
+            (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper")
         ]
 
         for type_info in qml_types:
