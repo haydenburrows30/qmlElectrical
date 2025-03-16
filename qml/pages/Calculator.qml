@@ -18,7 +18,7 @@ Page {
     property var basic: [
         { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml" },
         { name: qsTr("Power Current"), source: "../components/calculators/PowerCurrentCalculator.qml" },
-        { name: qsTr("Unit Converter"), source: "../components/calculators/UnitConverter.qml" },
+        { name: qsTr("Unit Converter"), source: "../components/calculators/UnitConverter.qml" }
     ]
 
     property var protection: [
@@ -43,68 +43,81 @@ Page {
 
     ]
 
-    MenuBar {
-        id: menuBar
+    Row{
+        id: menuBar1
+        height: menuBar.height
         anchors.horizontalCenter : parent.horizontalCenter
 
-        background: 
-            Rectangle {
-                color: "#21be2b"
-                width: parent.width
-                height: 1
-                anchors.bottom: parent.bottom
+        Button {
+            text: "Home"
+            width: 100
+            height: menuBar.height
+            onClicked: calculatorLoader.source = "../components/CalculatorMenu.qml"
+        }
+
+        MenuBar {
+            id: menuBar
+            
+            background: 
+                Rectangle {
+                    color: "#21be2b"
+                    width: parent.width
+                    height: 1
+                    anchors.bottom: parent.bottom
+                }
+
+            Menu {
+                title: "Basic Calculators"
+                Repeater {
+                    model: basic
+
+                    MenuItem {
+                        text: modelData.name
+                        onTriggered: calculatorLoader.source = modelData.source
+                    }
+                }
+                
             }
+            Menu {
+                title: "Protection"
+                Repeater {
+                    model: protection
 
-        Menu {
-            title: "Basic Calculators"
-            Repeater {
-                model: basic
+                    MenuItem {
+                        text: modelData.name
+                        onTriggered: calculatorLoader.source = modelData.source
+                    }
+                }
+            }
+            Menu {
+                title: "Cable"
+                Repeater {
+                    model: cable
 
-                MenuItem {
-                    text: modelData.name
-                    onTriggered: calculatorLoader.source = modelData.source
+                    MenuItem {
+                        text: modelData.name
+                        onTriggered: calculatorLoader.source = modelData.source
+                    }
+                }
+            }
+            Menu {
+                title: "Theory"
+                Repeater {
+                    model: theory
+
+                    MenuItem {
+                        text: modelData.name
+                        onTriggered: calculatorLoader.source = modelData.source
+                    }
                 }
             }
         }
-        Menu {
-            title: "Protection"
-            Repeater {
-                model: protection
-
-                MenuItem {
-                    text: modelData.name
-                    onTriggered: calculatorLoader.source = modelData.source
-                }
-            }
-        }
-        Menu {
-            title: "Cable"
-            Repeater {
-                model: cable
-
-                MenuItem {
-                    text: modelData.name
-                    onTriggered: calculatorLoader.source = modelData.source
-                }
-            }
-        }
-        Menu {
-            title: "Theory"
-            Repeater {
-                model: theory
-
-                MenuItem {
-                    text: modelData.name
-                    onTriggered: calculatorLoader.source = modelData.source
-                }
-            }
-        }
-    }
+}
 
     Loader {
         id: calculatorLoader
         anchors.left: parent.left
-        anchors.top: menuBar.bottom
+        anchors.top: menuBar1.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         source: "../components/CalculatorMenu.qml"

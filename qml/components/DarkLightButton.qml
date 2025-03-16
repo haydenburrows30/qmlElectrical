@@ -6,8 +6,8 @@ import QtQuick.Layouts
 
 RoundButton {
     id: round_button
-    implicitWidth: 50
-    implicitHeight: 50
+    implicitWidth: 40
+    implicitHeight: 40
     icon.width: 30
     icon.height: 30
     checkable: true

@@ -47,7 +47,7 @@ Drawer {
     Rectangle {
         id: fade
         width: parent.width
-        anchors.bottom: parent.bottom  // Changed from top to bottom
+        anchors.bottom: parent.bottom
         height: 20
         gradient: Gradient {
             orientation: Gradient.Vertical
@@ -132,53 +132,45 @@ Drawer {
                     tooltip: "Real Time"
                     icon: "RealTime"
                 }
-                // ListElement {
-                //     title: "Playground"
-                //     source: "../pages/PlayGround.qml"
-                //     tooltip: "Real Time"
-                //     icon: "RealTime"
-                // }
             }
 
             footer:
-                ColumnLayout {
                     DarkLightButton {
                         id: action
                         icon_name1: "Dark"
                         icon_name2: "Light"
                         mode_1: "Light Mode"
                         mode_2: "Dark Mode"
-                        implicitHeight: 60
-                        implicitWidth: 60
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        implicitHeight: 50
+                        implicitWidth: 50
+                        anchors.horizontalCenter: parent.horizontalCenter
 
                         onClicked: {
                             action.checked ? toggle1 = true : toggle1= false
                         }
                     }
 
-                    ItemDelegate {
-                        id: footerdel
-                        highlighted: listView.currentIndex == -1
-                        implicitHeight: 60
-                        implicitWidth: 60
+                    // ItemDelegate {
+                    //     id: footerdel
+                    //     highlighted: listView.currentIndex == -1
+                    //     implicitHeight: 60
+                    //     implicitWidth: 60
 
-                        CToolTip {
-                            id: toolTip
-                            text: "Settings"
-                            width: 110
-                        }
+                    //     CToolTip {
+                    //         id: toolTip
+                    //         text: "Settings"
+                    //         width: 110
+                    //     }
                         
-                        icon.name: 'Setting'
-                        icon.width: 30
-                        icon.height: 30
+                    //     icon.name: 'Setting'
+                    //     icon.width: 30
+                    //     icon.height: 30
 
-                        onClicked: {
-                            settings.open()
-                            listView.currentIndex = -1
-                        }
-                    }
-                }
+                    //     onClicked: {
+                    //         settings.open()
+                    //         listView.currentIndex = -1
+                    //     }
+                    // }
         }
     }
 }
