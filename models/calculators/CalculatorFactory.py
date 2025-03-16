@@ -14,6 +14,7 @@ from ..voltage_drop_calculator import VoltageDropCalculator
 from ..machine_calculator import MachineCalculator
 from ..earthing_calculator import EarthingCalculator
 from ..transmission_calculator import TransmissionLineCalculator
+from ..delta_transformer import DeltaTransformerCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -67,7 +68,8 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "conversion": ConversionCalculator,
             "machine": MachineCalculator,
             "earthing": EarthingCalculator,
-            "transmission_line": TransmissionLineCalculator
+            "transmission_line": TransmissionLineCalculator,
+            "delta_transformer": DeltaTransformerCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

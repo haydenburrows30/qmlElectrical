@@ -127,46 +127,6 @@ Item {
                     }
                 }
             }
-            
-            // WaveCard {
-            //     title: "Results"
-            //     Layout.fillWidth: true
-            //     Layout.minimumHeight: 160
-                    
-            //     GridLayout {
-            //         columns: 2
-            //         rowSpacing: 10
-            //         columnSpacing: 10
-
-            //         Label { text: "Current Draw:" }
-            //         Label { 
-            //             text: calculator.currentDraw.toFixed(2) + " A"
-            //             font.bold: true
-            //             color: Universal.foreground
-            //         }
-
-            //         Label { text: "Required Capacity:" }
-            //         Label { 
-            //             text: calculator.requiredCapacity.toFixed(1) + " Ah"
-            //             font.bold: true
-            //             color: Universal.foreground
-            //         }
-                    
-            //         Label { text: "Recommended Capacity:" }
-            //         Label { 
-            //             text: calculator.recommendedCapacity.toFixed(1) + " Ah"
-            //             font.bold: true 
-            //             color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
-            //         }
-                    
-            //         Label { text: "Energy Storage:" }
-            //         Label { 
-            //             text: calculator.energyStorage.toFixed(2) + " kWh"
-            //             font.bold: true
-            //             color: Universal.foreground
-            //         }
-            //     }
-            // }
         }
 
         WaveCard {

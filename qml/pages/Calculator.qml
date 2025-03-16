@@ -25,7 +25,8 @@ Page {
         { name: qsTr("Protection Relay"), source: "../components/calculators/ProtectionRelayCalculator.qml" },
         { name: qsTr("Instrument Transformer"), source: "../components/calculators/InstrumentTransformerCalculator.qml" },
         { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml" },
-                { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml" }
+        { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml" },
+        { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml" }
     ]
 
     property var cable: [

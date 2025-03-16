@@ -37,6 +37,7 @@ from models.machine_calculator import MachineCalculator
 from models.earthing_calculator import EarthingCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.transmission_calculator import TransmissionLineCalculator
+from models.delta_transformer import DeltaTransformerCalculator
 
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
@@ -198,7 +199,8 @@ class Application:
             (ConversionCalculator, "Conversion", 1, 0, "ConversionCalculator"),
             (MachineCalculator, "Machine", 1, 0, "MachineCalculator"),
             (EarthingCalculator, "Earthing", 1, 0, "EarthingCalculator"),
-            (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator")
+            (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator"),
+            (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator")
         ]
 
         for type_info in qml_types:
