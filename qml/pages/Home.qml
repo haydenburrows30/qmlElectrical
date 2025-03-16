@@ -8,88 +8,372 @@ import '../components'
 
 Page {
     id: home
+    
+    // Add a welcome header
+    Text {
+        id: welcomeHeader
+        text: "Electrical Engineering Tools"
+        font.pixelSize: 32
+        font.bold: true
+        color: palette.text
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: 30
+        }
+    }
+    
+    Text {
+        id: welcomeSubtitle
+        text: "Select a tool to get started"
+        font.pixelSize: 16
+        color: palette.text
+        opacity: 0.7
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: welcomeHeader.bottom
+            topMargin: 10
+        }
+    }
 
-	GridLayout {
-		anchors.centerIn: parent
-		columns: 2
+    GridLayout {
+        id: buttonGrid
+        anchors {
+            top: welcomeSubtitle.bottom
+            topMargin: 40
+            horizontalCenter: parent.horizontalCenter
+        }
+        width: Math.min(parent.width * 0.9, 600)
+        columns: width > 500 ? 3 : 2
+        rowSpacing: 20
+        columnSpacing: 20
 
-		// HButton {
-		// 	icon.name: "Home"
-		// 	text: "Home"
+        HButton {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 120
+            icon.name: "Voltage Drop"
+            // text: "Voltage Drop"
+            back: Qt.lighter(palette.accent, 1.5)
+            fore: Qt.lighter(palette.accent, 1.0)
+            
+            // Add hover effect
+            Behavior on scale { NumberAnimation { duration: 100 } }
+            
+            // Improved description layout
+            Item {
+                anchors.fill: parent
+                
+                Image {
+                    id: buttonIcon
+                    source: "../images/icons/voltage-drop.png" // Replace with actual icon path
+                    width: 32
+                    height: 32
+                    anchors {
+                        top: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                        topMargin: 10  // Reduced from 15
+                    }
+                    visible: status === Image.Ready // Only show if image loads successfully
+                }
+                
+                Text {
+                    text: "Voltage Drop"
+                    font.bold: true
+                    font.pixelSize: 16
+                    color: palette.buttonText
+                    anchors {
+                        top: buttonIcon.visible ? buttonIcon.bottom : parent.top
+                        topMargin: buttonIcon.visible ? 5 : 15  // Reduced from 8/25
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                Text {
+                    text: "Calculate voltage drop"
+                    font.pixelSize: 12
+                    color: palette.buttonText
+                    opacity: 0.8
+                    anchors {
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                        bottomMargin: 15
+                    }
+                    width: parent.width - 20
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+            }
+            
+            onClicked: {
+                stackView.push("../pages/VoltageDrop.qml")
+                sideBar.change(1)
+            }
+            
+            // Add subtle hover effect
+            HoverHandler {
+                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+            }
+        }
 
-		// 	back: Qt.lighter(palette.accent,1.5)
-		// 	fore: Qt.lighter(palette.accent,1.0)
+        HButton {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 120
+            icon.name: "Calculator" 
+            // text: "Calculators"
+            back: Qt.lighter(palette.accent, 1.5)
+            fore: Qt.lighter(palette.accent, 1.0)
+            
+            Item {
+                anchors.fill: parent
+                
+                Image {
+                    id: calcIcon
+                    source: "../images/icons/calculator.png" // Replace with actual icon path
+                    width: 32
+                    height: 32
+                    anchors {
+                        top: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                        topMargin: 10  // Reduced from 15
+                    }
+                    visible: status === Image.Ready
+                }
+                
+                Text {
+                    text: "Calculators"
+                    font.bold: true
+                    font.pixelSize: 16
+                    color: palette.buttonText
+                    anchors {
+                        top: calcIcon.visible ? calcIcon.bottom : parent.top
+                        topMargin: calcIcon.visible ? 5 : 15  // Reduced from 8/25
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                Text {
+                    text: "Electrical calculation tools"
+                    font.pixelSize: 12
+                    color: palette.buttonText
+                    opacity: 0.8
+                    anchors {
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                        bottomMargin: 15
+                    }
+                    width: parent.width - 20
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+            }
+            
+            onClicked: {
+                stackView.push("../pages/Calculator.qml")
+                sideBar.change(2)
+            }
+            
+            HoverHandler {
+                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+            }
+        }
 
-		// 	onClicked: {
-		// 		stackView.push("../pages/Home.qml")
-		// 		sideBar.change(0)
-		// 	}
-		// }
+        HButton {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 120
+            icon.name: "Wave"
+            // text: "3 Phase"
+            back: Qt.lighter(palette.accent, 1.5)
+            fore: Qt.lighter(palette.accent, 1.0)
+            
+            Item {
+                anchors.fill: parent
+                
+                Image {
+                    id: waveIcon
+                    source: "../images/icons/wave.png" // Replace with actual icon path
+                    width: 32
+                    height: 32
+                    anchors {
+                        top: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                        topMargin: 10  // Reduced from 15
+                    }
+                    visible: status === Image.Ready
+                }
+                
+                Text {
+                    text: "3 Phase"
+                    font.bold: true
+                    font.pixelSize: 16
+                    color: palette.buttonText
+                    anchors {
+                        top: waveIcon.visible ? waveIcon.bottom : parent.top
+                        topMargin: waveIcon.visible ? 5 : 15  // Reduced from 8/25
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                Text {
+                    text: "Three phase power calculations"
+                    font.pixelSize: 12
+                    color: palette.buttonText
+                    opacity: 0.8
+                    anchors {
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                        bottomMargin: 15
+                    }
+                    width: parent.width - 20
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+            }
+            
+            onClicked: {
+                stackView.push("../pages/ThreePhase.qml")
+                sideBar.change(3)
+            }
+            
+            HoverHandler {
+                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+            }
+        }
 
-		HButton {
-			icon.name: "Voltage Drop"
-			text: "Voltage Drop"
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
-			onClicked: {
-				stackView.push("../pages/VoltageDrop.qml")
-				sideBar.change(1)
-			}
-		}
+        HButton {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 120
+            icon.name: "RLC"
+            // text: "RLC"
+            back: Qt.lighter(palette.accent, 1.5)
+            fore: Qt.lighter(palette.accent, 1.0)
+            
+            Item {
+                anchors.fill: parent
+                
+                Image {
+                    id: rlcIcon
+                    source: "../images/icons/rlc.png" // Replace with actual icon path
+                    width: 32
+                    height: 32
+                    anchors {
+                        top: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                        topMargin: 10  // Reduced from 15
+                    }
+                    visible: status === Image.Ready
+                }
+                
+                Text {
+                    text: "RLC"
+                    font.bold: true
+                    font.pixelSize: 16
+                    color: palette.buttonText
+                    anchors {
+                        top: rlcIcon.visible ? rlcIcon.bottom : parent.top
+                        topMargin: rlcIcon.visible ? 5 : 15  // Reduced from 8/25
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                Text {
+                    text: "Ohm-mH-uF circuit analysis"
+                    font.pixelSize: 12
+                    color: palette.buttonText
+                    opacity: 0.8
+                    anchors {
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                        bottomMargin: 15
+                    }
+                    width: parent.width - 20
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+            }
+            
+            onClicked: {
+                stackView.push("../pages/RLC.qml")
+                sideBar.change(4)
+            }
+            
+            HoverHandler {
+                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+            }
+        }
 
-		HButton {
-			icon.name: "Calculator"
-			text: "Calculators"
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
-			onClicked: {
-				stackView.push("../pages/Calculator.qml")
-				sideBar.change(2)
-			}
-		}
-
-		HButton {
-			icon.name: "Wave"
-			text: "3 Phase"
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
-			onClicked: {
-				stackView.push("../pages/ThreePhase.qml")
-				sideBar.change(3)
-			}
-		}
-
-		HButton {
-			icon.name: "RLC"
-			text: "RLC"
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
-			onClicked: {
-				stackView.push("../pages/RLC.qml")
-				sideBar.change(4)
-			}
-		}
-
-		HButton {
-			icon.name: "RealTime"
-			text: "Real Time Chart"
-			back: Qt.lighter(palette.accent,1.5)
-			fore: Qt.lighter(palette.accent,1.0)
-			onClicked: {
-				stackView.push("../pages/RealTime.qml")
-				sideBar.change(5)
-			}
-		}
-
-		// HButton {
-		// 	icon.name: "RealTime"
-		// 	text: "PlayGround"
-		// 	back: Qt.lighter(palette.accent,1.5)
-		// 	fore: Qt.lighter(palette.accent,1.0)
-		// 	onClicked: {
-		// 		stackView.push("../pages/PlayGround.qml")
-		// 		sideBar.change(6)
-		// 	}
-		// }
-	}
+        HButton {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 120
+            icon.name: "RealTime"
+            // text: "Real Time Chart"
+            back: Qt.lighter(palette.accent, 1.5)
+            fore: Qt.lighter(palette.accent, 1.0)
+            
+            Item {
+                anchors.fill: parent
+                
+                Image {
+                    id: realTimeIcon
+                    source: "../images/icons/real-time.png" // Replace with actual icon path
+                    width: 32
+                    height: 32
+                    anchors {
+                        top: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                        topMargin: 10  // Reduced from 15
+                    }
+                    visible: status === Image.Ready
+                }
+                
+                Text {
+                    text: "Real Time Chart"
+                    font.bold: true
+                    font.pixelSize: 16
+                    color: palette.buttonText
+                    anchors {
+                        top: realTimeIcon.visible ? realTimeIcon.bottom : parent.top
+                        topMargin: realTimeIcon.visible ? 5 : 15  // Reduced from 8/25
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                Text {
+                    text: "Live data visualization tools"
+                    font.pixelSize: 12
+                    color: palette.buttonText
+                    opacity: 0.8
+                    anchors {
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                        bottomMargin: 15
+                    }
+                    width: parent.width - 20
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+            }
+            
+            onClicked: {
+                stackView.push("../pages/RealTime.qml")
+                sideBar.change(5)
+            }
+            
+            HoverHandler {
+                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+            }
+        }
+    }
+    
+    // App version footer
+    Text {
+        text: "v1.0.0"
+        font.pixelSize: 12
+        color: palette.text
+        opacity: 0.5
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+            margins: 10
+        }
+    }
 }

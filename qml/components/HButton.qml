@@ -8,8 +8,8 @@ Button {
     id: control
     text: ""
 
-    icon.width: 80
-    icon.height: 80
+    icon.width: 60
+    icon.height: 60
     Layout.minimumWidth: 150
     Layout.minimumHeight: 150
 
