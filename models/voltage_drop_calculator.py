@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 
-class VoltageDropCalculator(QObject):
+class VoltageDropCalc(QObject):
     """Calculator for voltage drop in cables"""
 
     lengthChanged = Signal()

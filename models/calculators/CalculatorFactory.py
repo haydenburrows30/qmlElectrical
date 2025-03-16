@@ -10,7 +10,7 @@ from ..protection_relay import ProtectionRelayCalculator
 from ..harmonic_analysis import HarmonicAnalysisCalculator
 from ..instrument_transformer import InstrumentTransformerCalculator
 from ..discrimination_analyzer import DiscriminationAnalyzer
-from ..voltage_drop_calculator import VoltageDropCalculator
+from ..voltage_drop_calculator import VoltageDropCalc
 from ..machine_calculator import MachineCalculator
 from ..earthing_calculator import EarthingCalculator
 from ..transmission_calculator import TransmissionLineCalculator
@@ -64,7 +64,7 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "harmonic_analysis": HarmonicAnalysisCalculator,
             "instrument_transformer": InstrumentTransformerCalculator,
             "discrimination_analyzer": DiscriminationAnalyzer,
-            "voltage_drop": VoltageDropCalculator,
+            "voltage_drop": VoltageDropCalc,
             "conversion": ConversionCalculator,
             "machine": MachineCalculator,
             "earthing": EarthingCalculator,

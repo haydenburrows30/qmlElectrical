@@ -17,13 +17,13 @@ from models.config import app_config
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import SeriesRLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
-from models.voltage_drop_orion import VoltageDrop
+from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
 
 from models.calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
 from models.transformer_calculator import TransformerCalculator
-from models.voltage_drop_calculator import VoltageDropCalculator
+from models.voltage_drop_calculator import VoltageDropCalc
 from models.motor_calculator import MotorCalculator
 from models.power_factor_correction import PowerFactorCorrectionCalculator
 from models.cable_ampacity import CableAmpacityCalculator
@@ -192,11 +192,11 @@ class Application:
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
             (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
             (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
-            (VoltageDrop,"VDrop", 1, 0, "VoltageDrop"),
+            (VoltageDropCalculator,"VDrop", 1, 0, "VoltageDrop"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
             (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
-            (VoltageDropCalculator, "VoltageDrop", 1, 0, "VoltageDropCalculator"),
+            (VoltageDropCalc, "VoltageDrop", 1, 0, "VoltageDropCalc"),
             (BatteryCalculator, "Battery", 1, 0, "BatteryCalculator"),
             (ConversionCalculator, "Conversion", 1, 0, "ConversionCalculator"),
             (MachineCalculator, "Machine", 1, 0, "MachineCalculator"),

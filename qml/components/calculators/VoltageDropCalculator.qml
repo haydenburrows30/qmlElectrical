@@ -9,7 +9,7 @@ import QtQuick.Controls.Universal
 Item {
     id: voltageDropCard
 
-    property VoltageDropCalculator calculator: VoltageDropCalculator {}
+    property VoltageDropCalc calculator: VoltageDropCalc {}
 
     RowLayout {
         id: layoutt
