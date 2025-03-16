@@ -1,4 +1,8 @@
-from PySide6.QtCore import QObject, Property, Signal, Slot, QPointF, QTimer
+from PySide6.QtCore import (
+    QObject, Property, Signal, Slot, QPointF, QTimer, QThreadPool, 
+    QRunnable, QThread, QMetaObject, Qt, Q_ARG
+)
+from PySide6.QtWidgets import QApplication
 import numpy as np
 import math
 import csv
@@ -9,6 +13,78 @@ import time
 
 # Import the profiling decorator
 from utils.profiling import profile, PerformanceProfiler
+
+class CalculationWorker(QRunnable):
+    """Worker class to run calculations in a separate thread"""
+    
+    def __init__(self, calculator, params=None):
+        super().__init__()
+        self.calculator = calculator
+        self.params = params or {}
+        self.setAutoDelete(True)
+        
+    def run(self):
+        """Execute the calculation in a separate thread"""
+        try:
+            # Check which calculation to run based on parameters
+            if 'resolution' in self.params:
+                # Resolution calculation
+                points = self.params['resolution']
+                result = self.calculator.calculateWithResolution(points)
+                if result:
+                    self.calculator._waveform = result['waveform']
+                    self.calculator._fundamental_wave = result['fundamental']
+                    self.calculator._waveform_points = result['waveform_points']
+                    self.calculator._fundamental_points = result['fundamental_points']
+                    
+                    # Signal that calculation is complete
+                    self.calculator._pending_signals = {"waveformChanged"}
+                    self.calculator._emit_pending = True  # Set flag instead of calling batchUpdate
+            else:
+                # Full calculation based on current harmonics
+                cache_key = self.calculator._get_cache_key()
+                
+                # Check cache to avoid duplicate work
+                if cache_key in self.calculator._calculation_cache:
+                    cached_result = self.calculator._calculation_cache[cache_key]
+                    # Load values from cache
+                    self.calculator._thd = cached_result['thd']
+                    self.calculator._cf = cached_result['cf']
+                    self.calculator._ff = cached_result['ff']
+                    self.calculator._waveform = cached_result['waveform']
+                    self.calculator._fundamental_wave = cached_result['fundamental_wave']
+                    self.calculator._individual_distortion = cached_result['individual_distortion']
+                    self.calculator._harmonic_phases = cached_result['harmonic_phases']
+                    self.calculator._waveform_points = cached_result['waveform_points']
+                    self.calculator._fundamental_points = cached_result['fundamental_points']
+                    
+                    # For cache hits, immediately update status
+                    QMetaObject.invokeMethod(self.calculator, "_update_calculation_status",
+                                           Qt.ConnectionType.QueuedConnection,
+                                           Q_ARG(bool, False),
+                                           Q_ARG(float, 1.0))
+                else:
+                    # Perform full calculation
+                    self.calculator._calculate_full()
+                
+                # Signal that calculation is complete
+                self.calculator._pending_signals = {"harmonicsChanged", "waveformChanged", 
+                                                  "crestFactorChanged", "formFactorChanged",
+                                                  "calculationsComplete"}
+                self.calculator._emit_pending = True
+
+            # Use QMetaObject::invokeMethod to safely signal back to main thread
+            QMetaObject.invokeMethod(self.calculator, "checkPendingUpdates", 
+                                   Qt.ConnectionType.QueuedConnection)
+        except Exception as e:
+            print(f"Error in calculation worker: {e}")
+            # Always ensure we reset calculation status on error
+            QMetaObject.invokeMethod(self.calculator, "_update_calculation_status",
+                                   Qt.ConnectionType.QueuedConnection,
+                                   Q_ARG(bool, False),
+                                   Q_ARG(float, 0.0))
+            import traceback
+            traceback.print_exc()
 
 class HarmonicAnalysisCalculator(QObject):
     """Calculator for harmonic analysis and THD calculation"""
@@ -21,6 +97,8 @@ class HarmonicAnalysisCalculator(QObject):
     formFactorChanged = Signal()
     waveformChanged = Signal()
     profilingChanged = Signal()  # Add new signal for profiling state
+    calculationStatusChanged = Signal()
+    calculationProgressChanged = Signal(float)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -58,13 +136,28 @@ class HarmonicAnalysisCalculator(QObject):
         # Add pending signals tracking
         self._pending_signals = set()
         
-        self._calculate()
+        # Initialize calculation status tracking BEFORE calling methods that use it
+        self._calculation_in_progress = False
+        self._calculation_progress = 0.0
+        self._cancel_requested = False
         
         # Profiling support
         self._profiling_enabled = False
+        
+        # Add thread pool for background calculations
+        self._thread_pool = QThreadPool.globalInstance()
+        self._thread_pool.setMaxThreadCount(min(4, QThreadPool.globalInstance().maxThreadCount()))
+        print(f"Using {self._thread_pool.maxThreadCount()} threads for calculations")
+        
+        # Flag to track if updates are needed
+        self._emit_pending = False
+        
+        # Now run initial calculation after all variables are initialized
+        self._calculate()
 
     @Slot(bool)
     def enableProfiling(self, enabled):
+        """Enable or disable performance profiling"""
         """Enable or disable performance profiling"""
         self._profiling_enabled = enabled
         profiler = PerformanceProfiler.get_instance()
@@ -91,6 +184,36 @@ class HarmonicAnalysisCalculator(QObject):
         """Get profiling enabled state"""
         return self._profiling_enabled
 
+    @Property(bool, notify=calculationStatusChanged)
+    def calculationInProgress(self):
+        """Indicates if a calculation is currently in progress"""
+        return self._calculation_in_progress
+    
+    @Property(float, notify=calculationProgressChanged)
+    def calculationProgress(self):
+        """Current calculation progress (0.0 to 1.0)"""
+        return self._calculation_progress
+    
+    @Slot()
+    def cancelCalculation(self):
+        """Request cancellation of any in-progress calculation"""
+        self._cancel_requested = True
+        print("Calculation cancellation requested")
+    
+    @Slot(bool, float)
+    def _update_calculation_status(self, in_progress, progress=0.0):
+        """Update calculation status and emit signals if changed"""
+        status_changed = (self._calculation_in_progress != in_progress)
+        self._calculation_in_progress = in_progress
+        
+        # Only emit progress signal if significant change
+        if abs(self._calculation_progress - progress) > 0.01:
+            self._calculation_progress = progress
+            self.calculationProgressChanged.emit(progress)
+        
+        if status_changed:
+            self.calculationStatusChanged.emit()
+
     @profile
     def _get_cache_key(self):
         """Generate a unique key for the current harmonics configuration
@@ -103,7 +226,26 @@ class HarmonicAnalysisCalculator(QObject):
         
     @profile
     def _calculate(self):
+        """Start calculation in a worker thread"""
+        # Set calculation status to in-progress
+        self._cancel_requested = False
+        self._update_calculation_status(True, 0.0)
+        
+        # Create a worker and start it in the thread pool
+        worker = CalculationWorker(self)
+        self._thread_pool.start(worker)
+        
+    @profile
+    def _calculate_full(self):
         try:
+            # Update progress
+            self._update_calculation_status(True, 0.1)
+            
+            # Check cancellation
+            if self._cancel_requested:
+                self._update_calculation_status(False)
+                return
+            
             # Check cache first
             cache_key = self._get_cache_key()
             if (cache_key in self._calculation_cache):
@@ -129,10 +271,21 @@ class HarmonicAnalysisCalculator(QObject):
                 
                 # Emit signals once cached data is loaded
                 self.batchUpdate()
+                
+                # Update status before returning
+                self._update_calculation_status(False)
                 return
             
             # Cache miss - perform full calculation
             self._cache_misses += 1
+            
+            # Update progress
+            self._update_calculation_status(True, 0.2)
+            
+            # Check cancellation
+            if self._cancel_requested:
+                self._update_calculation_status(False)
+                return
             
             # Update harmonics array from dictionary input
             harmonics = [0.0] * 15  # Reset array
@@ -151,6 +304,14 @@ class HarmonicAnalysisCalculator(QObject):
                         phases[order-1] = 0.0
             
             self._harmonics = harmonics
+            
+            # Update progress
+            self._update_calculation_status(True, 0.3)
+            
+            # Check cancellation
+            if self._cancel_requested:
+                self._update_calculation_status(False)
+                return
             
             # Calculate THD using only actual harmonics (excluding fundamental)
             if self._fundamental > 0:
@@ -172,6 +333,9 @@ class HarmonicAnalysisCalculator(QObject):
             self._harmonic_phases = [
                 phases[order-1] for order in display_orders
             ]
+            
+            # Update progress
+            self._update_calculation_status(True, 0.5)
             
             # Generate waveform with validation
             # Reduce default resolution for better performance
@@ -232,6 +396,14 @@ class HarmonicAnalysisCalculator(QObject):
                 self._cf = 1.414
                 self._ff = 1.11
             
+            # Update progress
+            self._update_calculation_status(True, 0.8)
+            
+            # Check cancellation
+            if self._cancel_requested:
+                self._update_calculation_status(False)
+                return
+            
             # Generate QPointF ready data for more efficient plotting
             # Reuse t for point generation to avoid recalculating
             self._waveform_points = self._generate_points_array(t, wave)
@@ -261,6 +433,9 @@ class HarmonicAnalysisCalculator(QObject):
                                      "crestFactorChanged", "formFactorChanged",
                                      "calculationsComplete"}
                                      
+            # Reset calculation status
+            self._update_calculation_status(False, 1.0)
+            
             # Add a slight delay before updating to avoid overwhelming the UI thread
             self._update_timer.setInterval(20)  # Increase delay to 20ms
             self.batchUpdate()
@@ -269,6 +444,9 @@ class HarmonicAnalysisCalculator(QObject):
             print(f"Calculation error: {e}")
             import traceback
             traceback.print_exc()  # Print full stack trace for debugging
+            
+            # Reset calculation status on error
+            self._update_calculation_status(False)
     
     @profile
     def _generate_points_array(self, x_values, y_values):
@@ -311,9 +489,24 @@ class HarmonicAnalysisCalculator(QObject):
                                      "calculationsComplete"}
         
         self._update_pending = True
-        if not self._update_timer.isActive():
-            self._update_timer.start()
+        
+        # Only start timer from main thread
+        if QThread.currentThread() == QApplication.instance().thread():
+            if not self._update_timer.isActive():
+                self._update_timer.start()
+        else:
+            # If called from worker thread, set flag for main thread to handle
+            self._emit_pending = True
+            QMetaObject.invokeMethod(self, "checkPendingUpdates", 
+                                    Qt.ConnectionType.QueuedConnection)
             
+    @Slot()
+    def checkPendingUpdates(self):
+        """Check and process any pending updates (called from main thread)"""
+        if self._emit_pending:
+            self._emit_pending = False
+            self.batchUpdate()
+
     @profile
     def _emitSignals(self):
         """Actually emit the signals after the delay"""
@@ -424,8 +617,16 @@ class HarmonicAnalysisCalculator(QObject):
     @Slot()
     def resetHarmonics(self):
         """Reset harmonics to default values (pure fundamental)."""
+        # Reset harmonics immediately on main thread
         self._harmonics_dict = {1: (100.0, 0.0)}  # Only fundamental at 100%
-        self._calculate()
+        
+        # Start calculation with loading indicator
+        self._cancel_requested = False
+        self._update_calculation_status(True, 0.0)
+        
+        # Create and start worker
+        worker = CalculationWorker(self)
+        self._thread_pool.start(worker)
 
     @Slot()
     def exportData(self):
@@ -576,7 +777,7 @@ class HarmonicAnalysisCalculator(QObject):
     @profile
     @Slot(int)
     def updateResolution(self, points=500):
-        """Update waveform with specified resolution"""
+        """Update waveform with specified resolution in a worker thread"""
         # More aggressive throttling for better performance
         # Dynamic resolution based on device capability
         try:
@@ -596,16 +797,9 @@ class HarmonicAnalysisCalculator(QObject):
         # Upper limit to prevent lag on any system
         adjusted_points = min(points, 500)
         
-        result = self.calculateWithResolution(adjusted_points)
-        if result:
-            self._waveform = result['waveform']
-            self._fundamental_wave = result['fundamental']
-            self._waveform_points = result['waveform_points']
-            self._fundamental_points = result['fundamental_points']
-            
-            # Only emit waveform changed since other properties didn't change
-            self._pending_signals = {"waveformChanged"}
-            self.batchUpdate()
+        # Start calculation in worker thread
+        worker = CalculationWorker(self, {'resolution': adjusted_points})
+        self._thread_pool.start(worker)
         return True
 
     @Slot()
@@ -649,3 +843,23 @@ class HarmonicAnalysisCalculator(QObject):
                 PerformanceProfiler.get_instance().record_frame()
             except Exception as e:
                 print(f"Error recording frame time: {e}")
+
+    # Add a method to check thread pool status
+    @Slot(result="QVariantMap")  # Add explicit return type annotation
+    def getThreadPoolStatus(self):
+        """Get current status of the thread pool"""
+        try:
+            # Add error handling to prevent exceptions
+            active_threads = self._thread_pool.activeThreadCount() if hasattr(self._thread_pool, 'activeThreadCount') else 0
+            max_threads = self._thread_pool.maxThreadCount() if hasattr(self._thread_pool, 'maxThreadCount') else 1
+            
+            return {
+                "active_threads": active_threads,
+                "max_threads": max_threads
+            }
+        except Exception as e:
+            print(f"Error getting thread pool status: {e}")
+            return {
+                "active_threads": 0,
+                "max_threads": 1
+            }

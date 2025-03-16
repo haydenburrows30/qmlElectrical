@@ -64,6 +64,78 @@ class SeriesHelper(QObject):
         # Replace all points in one operation
         return self.fillSeries(series, points)
     
+    @Slot(QXYSeries, list, list, int, int)
+    def fillSeriesParallel(self, series, x_values, y_values, max_points=500, min_points=50):
+        """Fill series with downsampling in a thread-efficient manner
+        
+        Optimized for large datasets by using a two-stage approach:
+        1. First display a low-resolution version for immediate feedback
+        2. Then compute and display a higher-resolution version in the background
+        
+        Args:
+            series: The QXYSeries to fill
+            x_values: List of x coordinates
+            y_values: List of y coordinates
+            max_points: Maximum number of points to display
+            min_points: Minimum number of points for initial display
+        """
+        if not series or not x_values or not y_values:
+            return False
+            
+        # For very large datasets, do quick preview first
+        if len(x_values) > 1000:
+            # First display a quick, low-resolution preview
+            x_preview, y_preview = self.downsample(x_values, y_values, min_points)
+            self.fillSeriesFromArrays(series, x_preview, y_preview)
+            
+            # Then schedule full-resolution update using a safer approach
+            from PySide6.QtCore import QThread, Signal, QObject
+            
+            class DownsampleWorker(QObject):
+                resultReady = Signal(list, list)
+                
+                def __init__(self, helper, x, y, max_pts):
+                    super().__init__()
+                    self.helper = helper
+                    self.x = x
+                    self.y = y
+                    self.max_pts = max_pts
+                    
+                def process(self):
+                    try:
+                        x_ds, y_ds = self.helper.downsample(self.x, self.y, self.max_pts)
+                        self.resultReady.emit(x_ds, y_ds)
+                    except Exception as e:
+                        print(f"Error in downsampling worker: {e}")
+            
+            # Create worker and thread
+            worker_thread = QThread()
+            worker = DownsampleWorker(self, x_values, y_values, max_points)
+            worker.moveToThread(worker_thread)
+            
+            # Connect signals using a safer approach
+            worker_thread.started.connect(worker.process)
+            # Use lambda to avoid updating UI directly from worker thread
+            worker.resultReady.connect(lambda x, y: QMetaObject.invokeMethod(
+                self, 
+                "fillSeriesFromArrays", 
+                Qt.ConnectionType.QueuedConnection,
+                Q_ARG(QXYSeries, series),
+                Q_ARG(list, x),
+                Q_ARG(list, y)
+            ))
+            worker.resultReady.connect(worker_thread.quit)
+            # Use direct connections for cleanup events
+            worker_thread.finished.connect(lambda: worker.deleteLater(), Qt.ConnectionType.DirectConnection)
+            worker_thread.finished.connect(lambda: worker_thread.deleteLater(), Qt.ConnectionType.DirectConnection)
+            
+            # Start processing
+            worker_thread.start()
+            return True
+        else:
+            # For smaller datasets, just use normal processing
+            return self.fillSeriesOptimized(series, x_values, y_values, max_points)
+    
     def is_valid_number(self, value):
         """Check if a value is a valid, finite number"""
         try:

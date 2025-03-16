@@ -49,10 +49,20 @@ Page {
         anchors.horizontalCenter : parent.horizontalCenter
 
         Button {
+            id: control
             text: "Home"
             width: 100
             height: menuBar.height
             onClicked: calculatorLoader.source = "../components/CalculatorMenu.qml"
+
+            // background: Rectangle {
+            //     implicitWidth: 100
+            //     implicitHeight: 40
+            //     opacity: enabled ? 1 : 0.3
+            //     control.color: control.down ? "#17a81a" : "#21be2b"
+            //     control.width: 1
+            //     radius: 2
+            // }
         }
 
         MenuBar {

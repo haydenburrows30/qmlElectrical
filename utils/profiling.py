@@ -112,7 +112,7 @@ class PerformanceProfiler:
         """Get frame timing statistics"""
         with self._lock:
             if not self.frame_times:
-                return {"avg_fps": 0, "min_fps": 0, "max_fps": 0}
+                return {"avg_fps": 0, "min_fps": 0, "max_fps": 0, "frame_count": 0}
                 
             frame_times = self.frame_times.copy()
             
