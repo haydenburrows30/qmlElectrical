@@ -15,7 +15,7 @@ from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFacto
 from models.config import app_config
 
 from models.three_phase import ThreePhaseSineWaveModel
-from models.rlc import SeriesRLCChart
+from models.rlc import RLCChart
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
@@ -46,7 +46,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import data.rc_resources as rc_resources
 from models.series_helper import SeriesHelper
-from models.bar_series_helper import BarSeriesHelper  # Add new import
+from models.bar_series_helper import BarSeriesHelper
 
 class Application:
     """Main application class implementing dependency injection and component management.
@@ -138,6 +138,8 @@ class Application:
     def setup(self):
         """Configure application components and initialize subsystems."""
         self.logger.setup(level=logging.INFO)
+
+        
         self.setup_app()
         
         # Run async operations in the event loop
@@ -191,7 +193,7 @@ class Application:
             (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
             (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
-            (SeriesRLCChart, "RLC", 1, 0, "SeriesRLCChart"),
+            (RLCChart, "RLC", 1, 0, "RLCChart"),
             (VoltageDropCalculator,"VDrop", 1, 0, "VoltageDrop"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
@@ -205,6 +207,12 @@ class Application:
             (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
             (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
             (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper")  # Add new type
+            
+        # Register to QML context
+        # rlcChart = RLCChart()
+        # circuitDiagrams = CircuitDiagrams()
+        # self.qml_engine.engine.rootContext().setContextProperty("rlcChart", rlcChart)
+        # self.qml_engine.engine.rootContext().setContextProperty("circuitDiagrams", circuitDiagrams)
         ]
 
         for type_info in qml_types:

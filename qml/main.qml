@@ -6,7 +6,8 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtQuick.Controls.Material
 import QtQuick.Effects
-import Qt.labs.settings 1.0  // Change this import
+import Qt.labs.settings 1.0
+import RLC 1.0  // Import RLC directly
 
 import 'components'
 import 'components/calculators'
@@ -18,7 +19,7 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
-    SeriesRLCChart {id: seriesRLCChart}
+    RLCChart {id: rlcChart}  // Use consistent naming
     SineWaveModel {id: sineModel}
     VoltageDrop {id: voltageDrop}
     ResultsManager {id: resultsManager}

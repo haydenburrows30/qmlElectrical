@@ -16,8 +16,10 @@ Page {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
+    property int currentMode: 0 // 0 for series, 1 for parallel
+
     Connections {
-        target: seriesRLCChart
+        target: rlcChart
         function onFormattedDataChanged(data) {
             var gainSeries = rlcChartView.series(0)
             var resonantSeries = rlcChartView.series(1)
@@ -26,7 +28,7 @@ Page {
             resonantSeries.clear()
             
             // Use Python fill_series for gain data
-            seriesRLCChart.fill_series(gainSeries)
+            rlcChart.fill_series(gainSeries)
             
             // Fill resonant line directly since it's just 2 points
             resonantSeries.append(data[1][0].x, data[1][0].y)
@@ -34,10 +36,15 @@ Page {
         }
 
         function onAxisRangeChanged() {
-            axisX.min = seriesRLCChart.axisXMin
-            axisX.max = seriesRLCChart.axisXMax
-            axisY.min = seriesRLCChart.axisYMin
-            axisY.max = seriesRLCChart.axisYMax
+            axisX.min = rlcChart.axisXMin
+            axisX.max = rlcChart.axisXMax
+            axisY.min = rlcChart.axisYMin
+            axisY.max = rlcChart.axisYMax
+        }
+        
+        function onCircuitModeChanged(mode) {
+            circuitModeTabs.currentIndex = mode
+            currentMode = mode
         }
     }
 
@@ -48,320 +55,489 @@ Page {
         
         Flickable {
             contentHeight: mainLayout.height
-            bottomMargin : 5
-            leftMargin : 5
-            rightMargin : 5
-            topMargin : 5
+            bottomMargin: 5
+            leftMargin: 5
+            rightMargin: 5
+            topMargin: 5
 
-            RowLayout {
+            ColumnLayout {
                 id: mainLayout
                 anchors.fill: parent
                 spacing: 5
 
-                WaveCard {
-                    title: 'Series RLC Frequency Response'
-                    Layout.minimumHeight: 700
-                    Layout.minimumWidth: 330
-                    Layout.fillHeight: true
+                TabBar {
+                    id: circuitModeTabs
+                    Layout.fillWidth: true
                     
-                    GridLayout {
-                        columns: 2
-
-                        Label {
-                            text: "Resistance (Ω):"
-                            Layout.preferredWidth: 150
+                    TabButton {
+                        text: "Series RLC"
+                        onClicked: {
+                            rlcChart.setCircuitMode(0)
                         }
-
-                        TextField {
-                            id: resistanceInput
-                            placeholderText: "Enter Resistance"
-                            text: "10"  // Default value
-                            validator: DoubleValidator {
-                                bottom: 0.0001
-                                decimals: 4
-                                notation: DoubleValidator.ScientificNotation
-                            }
-                            onTextChanged: {
-                                if (!acceptableInput) {
-                                    messagePopup.showError("Invalid resistance value")
-                                    return
-                                }
-                                seriesRLCChart.setResistance(parseFloat(text))
-                            }
-                            Layout.preferredWidth: 150
-                            Layout.alignment: Qt.AlignRight
-                        }
-
-                        Label {
-                            text: "Inductance (H):"
-                            Layout.preferredWidth: 150
-                        }
-
-                        TextField {
-                            id: inductanceInput1
-                            placeholderText: "Enter Inductance"
-                            text: "0.1"  // Default value
-                            validator: DoubleValidator {
-                                bottom: 0.0001
-                                decimals: 4
-                                notation: DoubleValidator.ScientificNotation
-                            }
-                            onTextChanged: {
-                                if (!acceptableInput) {
-                                    messagePopup.showError("Invalid inductance value")
-                                    return
-                                }
-                                seriesRLCChart.setInductance(parseFloat(text))
-                            }
-                            Layout.preferredWidth: 150
-                            Layout.alignment: Qt.AlignRight
-                        }
-
-                        Label {
-                            text: "Capacitance (F):"
-                            Layout.preferredWidth: 150
-                        }
-
-                        TextField {
-                            id: capacitanceInput1
-                            placeholderText: "Enter Capacitance"
-                            text: "0.0001013"  // 101.3µF
-                            validator: DoubleValidator {
-                                bottom: 0.0001
-                                decimals: 6
-                                notation: DoubleValidator.ScientificNotation
-                            }
-                            onTextChanged: {
-                                if (!acceptableInput) {
-                                    messagePopup.showError("Invalid capacitance value")
-                                    return
-                                }
-                                seriesRLCChart.setCapacitance(parseFloat(text))
-                            }
-                            Layout.preferredWidth: 150
-                            Layout.alignment: Qt.AlignRight
-                        }
-
-                        Label {
-                            text: "Frequency (Hz):"
-                            Layout.preferredWidth: 150
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-
-                            TextField {
-                                id: minFreqInput
-                                placeholderText: "Min"
-                                text: "0"
-                                onTextChanged: {
-                                    if (!acceptableInput) {
-                                        messagePopup.showError("Invalid minimum frequency")
-                                        return
-                                    }
-                                    var min = Number(text)
-                                    var max = Number(maxFreqInput.text)
-                                    if (!isNaN(min) && !isNaN(max)) {
-                                        if (min < 0) {
-                                            messagePopup.showError("Minimum frequency cannot be negative")
-                                            return
-                                        }
-                                        if (max <= min) {
-                                            messagePopup.showError("Maximum frequency must be greater than minimum")
-                                            return
-                                        }
-                                        seriesRLCChart.setFrequencyRange(min, max)
-                                    }
-                                }
-                                validator: DoubleValidator {
-                                    bottom: 0
-                                    decimals: 1
-                                }
-                            }
-
-                            Label {
-                                text: "to"
-                            }
-
-                            TextField {
-                                id: maxFreqInput
-                                placeholderText: "Max"
-                                text: "100"
-                                onTextChanged: {
-                                    var min = Number(minFreqInput.text)
-                                    var max = Number(text)
-                                    if (!isNaN(min) && !isNaN(max) && min >= 0 && max > min) {
-                                        seriesRLCChart.setFrequencyRange(min, max)
-                                    }
-                                }
-                                validator: DoubleValidator {
-                                    bottom: 0
-                                    decimals: 1
-                                }
-                            }
-                        }
-
-                        Label {
-                            text: "Resonant Frequency:"
-                            Layout.preferredWidth: 150
-                            Layout.fillWidth:  true
-                            
-                        }
-                        Label {
-                            text: seriesRLCChart.resonantFreq.toFixed(2) + " Hz"
-                            Layout.preferredWidth: 150
-                            Layout.alignment: Qt.AlignHCenter
-                            color: "red"
-                        }
-
-                        Button {
-                            text: "Reset All Values"
-                            Layout.columnSpan: 2
-                            Layout.fillWidth: true
-                            onClicked: {
-                                seriesRLCChart.resetValues()
-                                resistanceInput.text = "10"
-                                inductanceInput1.text = "0.1"
-                                capacitanceInput1.text = "0.0001013"
-                                minFreqInput.text = "0"
-                                maxFreqInput.text = "100"
-                            }
+                    }
+                    
+                    TabButton {
+                        text: "Parallel RLC"
+                        onClicked: {
+                            rlcChart.setCircuitMode(1)
                         }
                     }
                 }
 
-                WaveCard {
-                    title: 'Series RLC Chart'
+                RowLayout {
+                    spacing: 5
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    ColumnLayout {
-                        anchors.fill: parent
-
-                        ChartView {
-                            id: rlcChartView
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            antialiasing: true
-
-                            theme: Universal.theme
-
-                            MouseArea {
-                                anchors.fill: parent
-                                drag.target: dragTarget
-                                drag.axis: Drag.XAxis
-                                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                hoverEnabled: true
-
-                                onDoubleClicked: {
-                                    rlcChartView.zoomReset()
-                                }
-
-                                onClicked: function(mouse) {
-                                    if (mouse.button === Qt.RightButton) {
-                                        contextMenu.popup()
-                                    }
-                                }
-
-                                onWheel: (wheel)=> {
-                                    if (wheel.angleDelta.y > 0) {
-                                        rlcChartView.zoom(0.9)
-                                    } else {
-                                        rlcChartView.zoom(1.1)
-                                    }
-                                }
-                            }
-
-                            Menu {
-                                id: contextMenu
-                                title: "Chart Options"
-                                
-                                Menu {
-                                    title: "Save Chart"
-                                    
-                                    MenuItem {
-                                        text: "Standard Quality (1x)"
-                                        onTriggered: {
-                                            saveDialog.currentScale = 1.0
-                                            saveDialog.open()
-                                        }
-                                    }
-                                    
-                                    MenuItem {
-                                        text: "High Quality (2x)"
-                                        onTriggered: {
-                                            saveDialog.currentScale = 2.0
-                                            saveDialog.open()
-                                        }
-                                    }
-                                    
-                                    MenuItem {
-                                        text: "Ultra Quality (4x)"
-                                        onTriggered: {
-                                            saveDialog.currentScale = 4.0
-                                            saveDialog.open()
-                                        }
-                                    }
-                                }
-                                
-                                MenuSeparator {}
-                                
-                                MenuItem {
-                                    text: "Reset Zoom"
-                                    onTriggered: rlcChartView.zoomReset()
-                                }
-                            }
-
+                    WaveCard {
+                        id: parametersCard
+                        title: currentMode === 0 ? 'Series RLC Parameters' : 'Parallel RLC Parameters'
+                        Layout.minimumHeight: 700
+                        Layout.minimumWidth: 330
+                        Layout.fillHeight: true
+                        
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: 5
+                            
+                            // Circuit diagram
                             Item {
-                                id: dragTarget
-
-                                property real oldX : x
-                                property real oldY : y
-
-                                onXChanged: {
-                                    rlcChartView.scrollLeft( x - oldX );
-                                    oldX = x;
-                                }
-                                onYChanged: {
-                                    rlcChartView.scrollUp( y - oldY );
-                                    oldY = y;
-                                }
-                            }
-
-                            Component.onCompleted: {
-                                var gainSeries = createSeries(ChartView.SeriesTypeLine, "Gain", axisX, axisY)
-
-                                gainSeries.color = "blue"
-                                gainSeries.width = 2
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 160
                                 
-                                var resonantSeries = createSeries(ChartView.SeriesTypeLine, "Resonant Frequency", axisX, axisY)
-                                resonantSeries.color = "red"
-                                resonantSeries.width = 2
-                                resonantSeries.style = Qt.DashLine
-
-                                // Initialize with default values
-                                seriesRLCChart.setResistance(10.0)
-                                seriesRLCChart.setInductance(0.1)
-                                seriesRLCChart.setCapacitance(0.0001013)
-                                seriesRLCChart.setFrequencyRange(0, 100)
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: sideBar.toggle1 ? "#2a2a2a" : "#f0f0f0"
+                                    border.color: sideBar.toggle1 ? "#3a3a3a" : "#d0d0d0"
+                                    border.width: 1
+                                    radius: 4
+                                }
+                                
+                                // Use a safer approach to handle SVG images with fallback
+                                Image {
+                                    id: circuitDiagram
+                                    anchors.centerIn: parent
+                                    width: parent.width - 20
+                                    height: parent.height - 20
+                                    source: {
+                                    }
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
+                                    mipmap: true
+                                }
+                                
+                                // Add fallback text for when image fails to load
+                                Text {
+                                    id: errorText
+                                    visible: circuitDiagram.status === Image.Error || circuitDiagram.source === ""
+                                    anchors.centerIn: parent
+                                    text: currentMode === 0 ? "Series RLC Circuit" : "Parallel RLC Circuit"
+                                    color: sideBar.toggle1 ? "#ffffff" : "#000000"
+                                    font.pixelSize: 14
+                                }
                             }
+                            
+                            GridLayout {
+                                columns: 2
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
 
-                            ValueAxis {
-                                id: axisX
-                                min: 0
-                                max: 1000
-                                tickCount: 10
-                                labelFormat: "\u00B0"
-                                titleText: "Frequency (Hz)"
+                                Label {
+                                    text: "Resistance (Ω):"
+                                    Layout.preferredWidth: 150
+                                }
+
+                                TextField {
+                                    id: resistanceInput
+                                    placeholderText: "Enter Resistance"
+                                    text: "10"  // Default value
+                                    validator: DoubleValidator {
+                                        bottom: 0.0001
+                                        decimals: 4
+                                        notation: DoubleValidator.ScientificNotation
+                                    }
+                                    
+                                    property bool userEditing: false
+                                    
+                                    onTextChanged: {
+                                        if (userEditing) {
+                                            // Only do basic format validation while editing
+                                            if (!acceptableInput && text !== "" && text !== "." && text !== "0." && 
+                                                !text.endsWith('e') && !text.endsWith('-') && !text.endsWith('+')) {
+                                                messagePopup.showError("Invalid resistance format")
+                                            }
+                                        }
+                                    }
+                                    
+                                    onActiveFocusChanged: {
+                                        if (activeFocus) {
+                                            userEditing = true
+                                        } else {
+                                            userEditing = false
+                                            if (!acceptableInput) {
+                                                messagePopup.showError("Invalid resistance value")
+                                                text = "10"
+                                                return
+                                            }
+                                            
+                                            // Now apply the value
+                                            var value = parseFloat(text)
+                                            if (value < 0.0001) {
+                                                messagePopup.showError("Resistance must be at least 0.0001 Ω")
+                                                text = "0.0001"
+                                                value = 0.0001
+                                            }
+                                            rlcChart.setResistance(value)
+                                        }
+                                    }
+                                    
+                                    Keys.onReturnPressed: { focus = false }
+                                    Keys.onEnterPressed: { focus = false }
+                                    
+                                    Layout.preferredWidth: 150
+                                    Layout.alignment: Qt.AlignRight
+                                }
+
+                                Label {
+                                    text: "Inductance (H):"
+                                    Layout.preferredWidth: 150
+                                }
+
+                                TextField {
+                                    id: inductanceInput
+                                    placeholderText: "Enter Inductance"
+                                    text: "0.1"  // Default value
+                                    validator: DoubleValidator {
+                                        bottom: 0.0001
+                                        decimals: 4
+                                        notation: DoubleValidator.ScientificNotation
+                                    }
+                                    
+                                    property bool userEditing: false
+                                    
+                                    onTextChanged: {
+                                        if (userEditing) {
+                                            // Only do basic format validation while editing
+                                            if (!acceptableInput && text !== "" && text !== "." && text !== "0." && 
+                                                !text.endsWith('e') && !text.endsWith('-') && !text.endsWith('+')) {
+                                                messagePopup.showError("Invalid inductance format")
+                                            }
+                                        }
+                                    }
+                                    
+                                    onActiveFocusChanged: {
+                                        if (activeFocus) {
+                                            userEditing = true
+                                        } else {
+                                            userEditing = false
+                                            if (!acceptableInput) {
+                                                messagePopup.showError("Invalid inductance value")
+                                                text = "0.1"
+                                                return
+                                            }
+                                            
+                                            // Now apply the value
+                                            var value = parseFloat(text)
+                                            if (value < 0.0001) {
+                                                messagePopup.showError("Inductance must be at least 0.0001 H")
+                                                text = "0.0001"
+                                                value = 0.0001
+                                            }
+                                            rlcChart.setInductance(value)
+                                        }
+                                    }
+                                    
+                                    Keys.onReturnPressed: { focus = false }
+                                    Keys.onEnterPressed: { focus = false }
+                                    
+                                    Layout.preferredWidth: 150
+                                    Layout.alignment: Qt.AlignRight
+                                }
+
+                                Label {
+                                    text: "Capacitance (F):"
+                                    Layout.preferredWidth: 150
+                                }
+
+                                TextField {
+                                    id: capacitanceInput
+                                    placeholderText: "Enter Capacitance"
+                                    text: "0.0001013"  // 101.3µF
+                                    validator: DoubleValidator {
+                                        bottom: 0.0001
+                                        decimals: 6
+                                        notation: DoubleValidator.ScientificNotation
+                                    }
+                                    
+                                    property bool userEditing: false
+                                    
+                                    onTextChanged: {
+                                        if (userEditing) {
+                                            // Only do basic format validation while editing
+                                            if (!acceptableInput && text !== "" && text !== "." && text !== "0." && 
+                                                !text.endsWith('e') && !text.endsWith('-') && !text.endsWith('+')) {
+                                                messagePopup.showError("Invalid capacitance format")
+                                            }
+                                        }
+                                    }
+                                    
+                                    onActiveFocusChanged: {
+                                        if (activeFocus) {
+                                            userEditing = true
+                                        } else {
+                                            userEditing = false
+                                            if (!acceptableInput) {
+                                                messagePopup.showError("Invalid capacitance value")
+                                                text = "0.0001013"
+                                                return
+                                            }
+                                            
+                                            // Now apply the value
+                                            var value = parseFloat(text)
+                                            if (value < 0.0001) {
+                                                messagePopup.showError("Capacitance must be at least 0.0001 F")
+                                                text = "0.0001"
+                                                value = 0.0001
+                                            }
+                                            rlcChart.setCapacitance(value)
+                                        }
+                                    }
+                                    
+                                    Keys.onReturnPressed: { focus = false }
+                                    Keys.onEnterPressed: { focus = false }
+                                    
+                                    Layout.preferredWidth: 150
+                                    Layout.alignment: Qt.AlignRight
+                                }
+
+                                Label {
+                                    text: "Frequency (Hz):"
+                                    Layout.preferredWidth: 150
+                                }
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+
+                                    TextField {
+                                        id: minFreqInput
+                                        placeholderText: "Min"
+                                        text: "0"
+                                        validator: DoubleValidator {
+                                            bottom: 0
+                                            decimals: 1
+                                        }
+                                        onTextChanged: {
+                                            if (!acceptableInput) {
+                                                messagePopup.showError("Invalid minimum frequency")
+                                                return
+                                            }
+                                            var min = Number(text)
+                                            var max = Number(maxFreqInput.text)
+                                            if (!isNaN(min) && !isNaN(max)) {
+                                                if (min < 0) {
+                                                    messagePopup.showError("Minimum frequency cannot be negative")
+                                                    return
+                                                }
+                                                if (max <= min) {
+                                                    messagePopup.showError("Maximum frequency must be greater than minimum")
+                                                    return
+                                                }
+                                                rlcChart.setFrequencyRange(min, max)
+                                            }
+                                        }
+                                    }
+
+                                    Label {
+                                        text: "to"
+                                    }
+
+                                    TextField {
+                                        id: maxFreqInput
+                                        placeholderText: "Max"
+                                        text: "100"
+                                        validator: DoubleValidator {
+                                            bottom: 0
+                                            decimals: 1
+                                        }
+                                        onTextChanged: {
+                                            var min = Number(minFreqInput.text)
+                                            var max = Number(text)
+                                            if (!isNaN(min) && !isNaN(max) && min >= 0 && max > min) {
+                                                rlcChart.setFrequencyRange(min, max)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Label {
+                                    text: "Resonant Frequency:"
+                                    Layout.preferredWidth: 150
+                                    Layout.fillWidth: true
+                                }
+
+                                Label {
+                                    text: rlcChart.resonantFreq.toFixed(2) + " Hz"
+                                    Layout.preferredWidth: 150
+                                    Layout.alignment: Qt.AlignHCenter
+                                    color: "red"
+                                }
+
+                                Label {
+                                    text: "Quality Factor (Q):"
+                                    Layout.preferredWidth: 150
+                                    Layout.fillWidth: true
+                                }
+
+                                Label {
+                                    text: rlcChart.qualityFactor.toFixed(2)
+                                    Layout.preferredWidth: 150
+                                    Layout.alignment: Qt.AlignHCenter
+                                    color: "blue"
+                                }
+
+                                Button {
+                                    text: "Reset All Values"
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    onClicked: {
+                                        rlcChart.resetValues()
+                                        resistanceInput.text = "10"
+                                        inductanceInput.text = "0.1"
+                                        capacitanceInput.text = "0.0001013"
+                                        minFreqInput.text = "0"
+                                        maxFreqInput.text = "100"
+                                    }
+                                }
                             }
+                        }
+                    }
 
-                            ValueAxis {
-                                id: axisY
-                                min: 0
-                                max: 100
-                                tickCount: 10
-                                labelFormat: "%.3f"
-                                titleText: "Gain (ratio)"
+                    WaveCard {
+                        title: currentMode === 0 ? 'Series RLC Response' : 'Parallel RLC Response'
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        ColumnLayout {
+                            anchors.fill: parent
+
+                            ChartView {
+                                id: rlcChartView
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                antialiasing: true
+                                theme: Universal.theme
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    drag.target: dragTarget
+                                    drag.axis: Drag.XAxis
+                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                    hoverEnabled: true
+
+                                    onDoubleClicked: {
+                                        rlcChartView.zoomReset()
+                                    }
+
+                                    onClicked: function(mouse) {
+                                        if (mouse.button === Qt.RightButton) {
+                                            contextMenu.popup()
+                                        }
+                                    }
+
+                                    onWheel: (wheel)=> {
+                                        if (wheel.angleDelta.y > 0) {
+                                            rlcChartView.zoom(0.9)
+                                        } else {
+                                            rlcChartView.zoom(1.1)
+                                        }
+                                    }
+                                }
+
+                                Menu {
+                                    id: contextMenu
+                                    title: "Chart Options"
+                                    
+                                    Menu {
+                                        title: "Save Chart"
+                                        MenuItem {
+                                            text: "Standard Quality (1x)"
+                                            onTriggered: {
+                                                saveDialog.currentScale = 1.0
+                                                saveDialog.open()
+                                            }
+                                        }
+                                        MenuItem {
+                                            text: "High Quality (2x)"
+                                            onTriggered: {
+                                                saveDialog.currentScale = 2.0
+                                                saveDialog.open()
+                                            }
+                                        }
+                                        MenuItem {
+                                            text: "Ultra Quality (4x)"
+                                            onTriggered: {
+                                                saveDialog.currentScale = 4.0
+                                                saveDialog.open()
+                                            }
+                                        }
+                                    }
+                                    MenuSeparator {}
+                                    MenuItem {
+                                        text: "Reset Zoom"
+                                        onTriggered: rlcChartView.zoomReset()
+                                    }
+                                }
+
+                                Item {
+                                    id: dragTarget
+                                    property real oldX : x
+                                    property real oldY : y
+
+                                    onXChanged: {
+                                        rlcChartView.scrollLeft( x - oldX );
+                                        oldX = x;
+                                    }
+
+                                    onYChanged: {
+                                        rlcChartView.scrollUp( y - oldY );
+                                        oldY = y;
+                                    }
+                                }
+
+                                Component.onCompleted: {
+                                    var gainSeries = createSeries(ChartView.SeriesTypeLine, "Gain", axisX, axisY)
+                                    gainSeries.color = "blue"
+                                    gainSeries.width = 2
+
+                                    var resonantSeries = createSeries(ChartView.SeriesTypeLine, "Resonant Frequency", axisX, axisY)
+                                    resonantSeries.color = "red"
+                                    resonantSeries.width = 2
+                                    resonantSeries.style = Qt.DashLine
+
+                                    // Initialize with default values
+                                    rlcChart.setResistance(10.0)
+                                    rlcChart.setInductance(0.1)
+                                    rlcChart.setCapacitance(0.0001013)
+                                    rlcChart.setFrequencyRange(0, 100)
+                                }
+
+                                ValueAxis {
+                                    id: axisX
+                                    min: 0
+                                    max: 1000
+                                    tickCount: 10
+                                    labelFormat: "\u00B0"
+                                    titleText: "Frequency (Hz)"
+                                }
+
+                                ValueAxis {
+                                    id: axisY
+                                    min: 0
+                                    max: 100
+                                    tickCount: 10
+                                    labelFormat: "%.3f"
+                                    titleText: currentMode === 0 ? "Gain (ratio)" : "Impedance (Ω)"
+                                }
                             }
                         }
                     }
@@ -380,21 +556,21 @@ Page {
         
         // Add property to track the selected scale
         property real currentScale: 2.0
-        
+
         // Generate default filename with timestamp
         currentFile: {
             let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
             return "rlc_chart_" + timestamp + ".png"
         }
-        
+
         onAccepted: {
             // Use the selected scale factor
-            seriesRLCChart.saveChart(selectedFile, currentScale)
+            rlcChart.saveChart(selectedFile, currentScale)
         }
     }
 
     Connections {
-        target: seriesRLCChart
+        target: rlcChart
         function onGrabRequested(filepath, scale) {
             loadingIndicator.visible = true
             console.log("Grabbing image to:", filepath, "with scale:", scale)
@@ -437,7 +613,7 @@ Page {
             isError = true
             open()
         }
-
+        
         contentItem: ColumnLayout {
             Label {
                 text: messagePopup.messageText
@@ -469,4 +645,3 @@ Page {
         }
     }
 }
-

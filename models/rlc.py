@@ -3,12 +3,17 @@ from PySide6.QtCharts import *
 
 import numpy as np
 
-class SeriesRLCChart(QObject):
+class RLCChart(QObject):
     chartDataChanged = Signal()
     resonantFreqChanged = Signal(float)
-    axisRangeChanged = Signal()  # Add new signal
-    formattedDataChanged = Signal(list)  # Add new signal
-    grabRequested = Signal(str, float)  # Change signal definition to include scale
+    axisRangeChanged = Signal()  
+    formattedDataChanged = Signal(list)  
+    grabRequested = Signal(str, float)
+    circuitModeChanged = Signal(int)  # Add signal for mode changes
+
+    # Circuit mode constants
+    SERIES_MODE = 0
+    PARALLEL_MODE = 1
 
     def __init__(self):
         super().__init__()
@@ -26,6 +31,8 @@ class SeriesRLCChart(QObject):
         self._axis_y_min = 0
         self._axis_y_max = None  # Change to None for initial state check
         self._formatted_points = []
+        self._circuit_mode = self.SERIES_MODE  # Default to series mode
+        self._quality_factor = 0.0  # Add Q factor
         self.generateChartData()
 
     @Slot(float)
@@ -42,7 +49,22 @@ class SeriesRLCChart(QObject):
     def setCapacitance(self, capacitance):
         self._capacitance = capacitance
         self.generateChartData()
-
+    
+    @Slot(int)
+    def setCircuitMode(self, mode):
+        if mode != self._circuit_mode:
+            self._circuit_mode = mode
+            self.generateChartData()
+            self.circuitModeChanged.emit(mode)
+    
+    @Property(int, notify=circuitModeChanged)
+    def circuitMode(self):
+        return self._circuit_mode
+    
+    @Property(float, notify=chartDataChanged)
+    def qualityFactor(self):
+        return self._quality_factor
+    
     @Slot(float, float)
     def setFrequencyRange(self, start, end):
         """Set frequency range with separate start and end values"""
@@ -91,7 +113,7 @@ class SeriesRLCChart(QObject):
     def generateChartData(self):
         if self._resistance > 0 and self._inductance > 0 and self._capacitance > 0:
             try:
-                # Calculate resonant frequency
+                # Calculate resonant frequency - same for both series and parallel
                 self._resonant_freq = 1.0 / (2.0 * np.pi * np.sqrt(self._inductance * self._capacitance))
                 self.resonantFreqChanged.emit(self._resonant_freq)
 
@@ -107,12 +129,25 @@ class SeriesRLCChart(QObject):
                 frequencies = np.concatenate([f1, f2, f3])
                 omega = 2 * np.pi * frequencies
                 
-                # Calculate impedance components and gain
-                z_r = np.full_like(omega, self._resistance)
-                z_l = omega * self._inductance
-                z_c = 1 / (omega * self._capacitance)
-                z_total = np.sqrt(z_r**2 + (z_l - z_c)**2)
-                gain = 1 / z_total
+                # Calculate impedance components and gain based on circuit mode
+                if self._circuit_mode == self.SERIES_MODE:
+                    # Series RLC
+                    z_r = np.full_like(omega, self._resistance)
+                    z_l = omega * self._inductance
+                    z_c = 1 / (omega * self._capacitance)
+                    z_total = np.sqrt(z_r**2 + (z_l - z_c)**2)
+                    gain = 1 / z_total
+                    # Calculate series Q factor at resonance
+                    self._quality_factor = (1.0 / self._resistance) * np.sqrt(self._inductance / self._capacitance)
+                else:
+                    # Parallel RLC
+                    y_r = 1.0 / np.full_like(omega, self._resistance)
+                    y_l = 1.0 / (omega * self._inductance)
+                    y_c = omega * self._capacitance
+                    y_total = np.sqrt(y_r**2 + (y_l - y_c)**2)
+                    gain = 1 / y_total
+                    # Calculate parallel Q factor at resonance
+                    self._quality_factor = self._resistance * np.sqrt(self._capacitance / self._inductance)
                 
                 # Create data points
                 valid_points = []
@@ -177,6 +212,8 @@ class SeriesRLCChart(QObject):
         self._resistance = 10.0
         self._inductance = 0.1
         self._capacitance = 101.3e-6
+        self._circuit_mode = self.SERIES_MODE
+        self.circuitModeChanged.emit(self.SERIES_MODE)
         self.generateChartData()
         self.resetZoom()  # Call resetZoom after generating new data
 
@@ -194,13 +231,32 @@ class SeriesRLCChart(QObject):
         try:
             # Convert QUrl to local file path
             if isinstance(filepath, QUrl):
+                original_path = filepath.toString()
                 filepath = filepath.toLocalFile()
+                print(f"Converting QUrl {original_path} to local file path: {filepath}")
             elif filepath.startswith('file:///'):
+                original_path = filepath
                 filepath = QUrl(filepath).toLocalFile()
+                print(f"Converting file:/// URL {original_path} to local file path: {filepath}")
             
-            print(f"Saving chart to: {filepath} with scale {scale}")
+            # Get absolute path and directory
+            import os
+            abs_path = os.path.abspath(filepath)
+            directory = os.path.dirname(abs_path)
+            
+            # Check if directory exists
+            if not os.path.exists(directory):
+                try:
+                    os.makedirs(directory, exist_ok=True)
+                    print(f"Created directory: {directory}")
+                except Exception as e:
+                    print(f"Failed to create directory {directory}: {e}")
+            
+            print(f"Saving chart to: {filepath} (absolute: {abs_path}) with scale {scale}")
             self.grabRequested.emit(filepath, scale)
             return True
         except Exception as e:
             print(f"Error saving chart: {e}")
+            import traceback
+            traceback.print_exc()
             return False

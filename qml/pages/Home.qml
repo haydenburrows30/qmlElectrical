@@ -52,7 +52,6 @@ Page {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
             icon.name: "Voltage Drop"
-            // text: "Voltage Drop"
             back: Qt.lighter(palette.accent, 1.5)
             fore: Qt.lighter(palette.accent, 1.0)
             
@@ -61,29 +60,15 @@ Page {
             
             // Improved description layout
             Item {
-                anchors.fill: parent
-                
-                Image {
-                    id: buttonIcon
-                    source: "../images/icons/voltage-drop.png" // Replace with actual icon path
-                    width: 32
-                    height: 32
-                    anchors {
-                        top: parent.top
-                        horizontalCenter: parent.horizontalCenter
-                        topMargin: 10  // Reduced from 15
-                    }
-                    visible: status === Image.Ready // Only show if image loads successfully
-                }
-                
+                anchors.fill: parent                
                 Text {
                     text: "Voltage Drop"
                     font.bold: true
                     font.pixelSize: 16
                     color: palette.buttonText
                     anchors {
-                        top: buttonIcon.visible ? buttonIcon.bottom : parent.top
-                        topMargin: buttonIcon.visible ? 5 : 15  // Reduced from 8/25
+                        top: parent.top
+                        topMargin: 8
                         horizontalCenter: parent.horizontalCenter
                     }
                 }
@@ -126,27 +111,14 @@ Page {
             Item {
                 anchors.fill: parent
                 
-                Image {
-                    id: calcIcon
-                    source: "../images/icons/calculator.png" // Replace with actual icon path
-                    width: 32
-                    height: 32
-                    anchors {
-                        top: parent.top
-                        horizontalCenter: parent.horizontalCenter
-                        topMargin: 10  // Reduced from 15
-                    }
-                    visible: status === Image.Ready
-                }
-                
                 Text {
                     text: "Calculators"
                     font.bold: true
                     font.pixelSize: 16
                     color: palette.buttonText
                     anchors {
-                        top: calcIcon.visible ? calcIcon.bottom : parent.top
-                        topMargin: calcIcon.visible ? 5 : 15  // Reduced from 8/25
+                        top: parent.top
+                        topMargin: 8
                         horizontalCenter: parent.horizontalCenter
                     }
                 }
@@ -188,27 +160,14 @@ Page {
             Item {
                 anchors.fill: parent
                 
-                Image {
-                    id: waveIcon
-                    source: "../images/icons/wave.png" // Replace with actual icon path
-                    width: 32
-                    height: 32
-                    anchors {
-                        top: parent.top
-                        horizontalCenter: parent.horizontalCenter
-                        topMargin: 10  // Reduced from 15
-                    }
-                    visible: status === Image.Ready
-                }
-                
                 Text {
                     text: "3 Phase"
                     font.bold: true
                     font.pixelSize: 16
                     color: palette.buttonText
                     anchors {
-                        top: waveIcon.visible ? waveIcon.bottom : parent.top
-                        topMargin: waveIcon.visible ? 5 : 15  // Reduced from 8/25
+                        top: parent.top
+                        topMargin: 8
                         horizontalCenter: parent.horizontalCenter
                     }
                 }
@@ -250,27 +209,14 @@ Page {
             Item {
                 anchors.fill: parent
                 
-                Image {
-                    id: rlcIcon
-                    source: "../images/icons/rlc.png" // Replace with actual icon path
-                    width: 32
-                    height: 32
-                    anchors {
-                        top: parent.top
-                        horizontalCenter: parent.horizontalCenter
-                        topMargin: 10  // Reduced from 15
-                    }
-                    visible: status === Image.Ready
-                }
-                
                 Text {
                     text: "RLC"
                     font.bold: true
                     font.pixelSize: 16
                     color: palette.buttonText
                     anchors {
-                        top: rlcIcon.visible ? rlcIcon.bottom : parent.top
-                        topMargin: rlcIcon.visible ? 5 : 15  // Reduced from 8/25
+                        top: parent.top
+                        topMargin: 8
                         horizontalCenter: parent.horizontalCenter
                     }
                 }
@@ -311,28 +257,14 @@ Page {
             
             Item {
                 anchors.fill: parent
-                
-                Image {
-                    id: realTimeIcon
-                    source: "../images/icons/real-time.png" // Replace with actual icon path
-                    width: 32
-                    height: 32
-                    anchors {
-                        top: parent.top
-                        horizontalCenter: parent.horizontalCenter
-                        topMargin: 10  // Reduced from 15
-                    }
-                    visible: status === Image.Ready
-                }
-                
                 Text {
                     text: "Real Time Chart"
                     font.bold: true
                     font.pixelSize: 16
                     color: palette.buttonText
                     anchors {
-                        top: realTimeIcon.visible ? realTimeIcon.bottom : parent.top
-                        topMargin: realTimeIcon.visible ? 5 : 15  // Reduced from 8/25
+                        top: parent.top
+                        topMargin: 8
                         horizontalCenter: parent.horizontalCenter
                     }
                 }

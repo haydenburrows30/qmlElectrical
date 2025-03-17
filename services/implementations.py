@@ -3,7 +3,7 @@ from typing import Any
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from .interfaces import ILogger, IQmlEngine, IModelFactory
 from models.three_phase import ThreePhaseSineWaveModel
-from models.rlc import SeriesRLCChart
+from models.rlc import RLCChart
 from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
@@ -87,7 +87,7 @@ class ModelFactory(IModelFactory):
         """
         model_map = {
             "three_phase": ThreePhaseSineWaveModel,
-            "series_rlc_chart": SeriesRLCChart,
+            "rlc_chart": RLCChart,  # Updated key to match new class name
             "voltage_drop": VoltageDropCalculator,
             "results_manager": ResultsManager,
             "realtime_chart": RealTimeChart
