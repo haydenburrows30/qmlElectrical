@@ -119,6 +119,108 @@ Page {
                                     anchors.margins: 10
                                     circuitType: currentMode
                                     darkMode: sideBar.toggle1
+                                    
+                                    // Add component highlighting when editing relevant fields
+                                    highlightR: resistanceInput.activeFocus
+                                    highlightL: inductanceInput.activeFocus
+                                    highlightC: capacitanceInput.activeFocus
+                                    
+                                    // Enable current animation
+                                    animateCurrent: enableAnimationCheckbox.checked
+                                    frequency: frequencySlider.value
+                                }
+                            }
+                            
+                            // Phase vector diagram
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 220
+                                
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: sideBar.toggle1 ? "#2a2a2a" : "#f0f0f0"
+                                    border.color: sideBar.toggle1 ? "#3a3a3a" : "#d0d0d0"
+                                    border.width: 1
+                                    radius: 4
+                                }
+                                
+                                PhaseVector {
+                                    id: phaseVector
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    circuitType: currentMode
+                                    darkMode: sideBar.toggle1
+                                    resistance: Number(resistanceInput.text)
+                                    inductance: Number(inductanceInput.text)
+                                    capacitance: Number(capacitanceInput.text)
+                                    frequency: frequencySlider.value
+                                    isAnimating: enableAnimationCheckbox.checked
+                                    showComponents: showComponentsCheckbox.checked
+                                }
+                            }
+                            
+                            // Animation controls
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 30
+                                
+                                CheckBox {
+                                    id: enableAnimationCheckbox
+                                    text: "Enable Animation"
+                                    checked: false
+                                    Layout.alignment: Qt.AlignLeft
+                                }
+                                
+                                CheckBox {
+                                    id: showComponentsCheckbox
+                                    text: "Show Components"
+                                    checked: true
+                                    Layout.alignment: Qt.AlignLeft
+                                }
+                            }
+                            
+                            // Frequency slider for animation
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 2
+                                
+                                Label {
+                                    text: "Animation Frequency: " + frequencySlider.value.toFixed(1) + " Hz"
+                                }
+                                
+                                Slider {
+                                    id: frequencySlider
+                                    from: 1
+                                    to: 100
+                                    value: 50
+                                    stepSize: 1
+                                    Layout.fillWidth: true
+                                    
+                                    background: Rectangle {
+                                        x: frequencySlider.leftPadding
+                                        y: frequencySlider.topPadding + frequencySlider.availableHeight / 2 - height / 2
+                                        width: frequencySlider.availableWidth
+                                        height: 4
+                                        radius: 2
+                                        color: sideBar.toggle1 ? "#555555" : "#cccccc"
+                                        
+                                        Rectangle {
+                                            width: frequencySlider.visualPosition * parent.width
+                                            height: parent.height
+                                            color: sideBar.toggle1 ? "#aaaaaa" : "#666666"
+                                            radius: 2
+                                        }
+                                    }
+                                    
+                                    handle: Rectangle {
+                                        x: frequencySlider.leftPadding + frequencySlider.visualPosition * frequencySlider.availableWidth - width / 2
+                                        y: frequencySlider.topPadding + frequencySlider.availableHeight / 2 - height / 2
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: frequencySlider.pressed ? "#f0f0f0" : "#ffffff"
+                                        border.color: "#999999"
+                                    }
                                 }
                             }
                             
@@ -365,6 +467,16 @@ Page {
                                     Layout.preferredWidth: 150
                                     Layout.alignment: Qt.AlignHCenter
                                     color: "red"
+                                    font.bold: isAtResonance()
+                                    font.pixelSize: isAtResonance() ? 14 : 12
+                                    
+                                    // Add visual feedback when near resonance
+                                    function isAtResonance() {
+                                        var minF = Number(minFreqInput.text)
+                                        var maxF = Number(maxFreqInput.text)
+                                        var resonantF = rlcChart.resonantFreq
+                                        return resonantF >= minF && resonantF <= maxF
+                                    }
                                 }
 
                                 Label {
