@@ -26,7 +26,8 @@ Page {
         { name: qsTr("Instrument Transformer"), source: "../components/calculators/InstrumentTransformerCalculator.qml" },
         { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml" },
         { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml" },
-        { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml" }
+        { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml" },
+        { name: qsTr("RGF"), source: "../components/calculators/RGF.qml" }
     ]
 
     property var cable: [
@@ -54,15 +55,6 @@ Page {
             width: 100
             height: menuBar.height
             onClicked: calculatorLoader.source = "../components/CalculatorMenu.qml"
-
-            // background: Rectangle {
-            //     implicitWidth: 100
-            //     implicitHeight: 40
-            //     opacity: enabled ? 1 : 0.3
-            //     control.color: control.down ? "#17a81a" : "#21be2b"
-            //     control.width: 1
-            //     radius: 2
-            // }
         }
 
         MenuBar {

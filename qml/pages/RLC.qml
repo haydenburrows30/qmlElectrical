@@ -92,8 +92,8 @@ Page {
                     WaveCard {
                         id: parametersCard
                         title: currentMode === 0 ? 'Series RLC Parameters' : 'Parallel RLC Parameters'
-                        Layout.minimumHeight: 700
-                        Layout.minimumWidth: 330
+                        Layout.minimumHeight: 800
+                        Layout.minimumWidth: 350
                         Layout.fillHeight: true
                         
                         ColumnLayout {

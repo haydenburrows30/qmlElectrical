@@ -15,6 +15,7 @@ from ..machine_calculator import MachineCalculator
 from ..earthing_calculator import EarthingCalculator
 from ..transmission_calculator import TransmissionLineCalculator
 from ..delta_transformer import DeltaTransformerCalculator
+from ..ref_rgf_calculator import RefRgfCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -69,7 +70,8 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "machine": MachineCalculator,
             "earthing": EarthingCalculator,
             "transmission_line": TransmissionLineCalculator,
-            "delta_transformer": DeltaTransformerCalculator
+            "delta_transformer": DeltaTransformerCalculator,
+            "ref_rgf": RefRgfCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

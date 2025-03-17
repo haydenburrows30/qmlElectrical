@@ -48,6 +48,9 @@ import data.rc_resources as rc_resources
 from models.series_helper import SeriesHelper
 from models.bar_series_helper import BarSeriesHelper
 
+# Import our calculator
+from models.ref_rgf_calculator import RefRgfCalculator
+
 class Application:
     """Main application class implementing dependency injection and component management.
     
@@ -206,7 +209,8 @@ class Application:
             (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator"),
             (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
             (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
-            (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper")
+            (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper"),
+            (RefRgfCalculator, "RefRgf", 1, 0, "RefRgfCalculator")
         ]
 
         for type_info in qml_types:
