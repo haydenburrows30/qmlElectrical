@@ -8,12 +8,8 @@ import Charging 1.0  // Import the Charging namespace for our calculator
 
 Item {
     id: charging_current
-    // title: 'Cable Charging Current'
-
-    // Create a local instance of our calculator
     property ChargingCalculator calculator: ChargingCalculator {}
     
-    // Helper property for theme colors
     property color textColor: Universal.foreground
 
     TextEdit {

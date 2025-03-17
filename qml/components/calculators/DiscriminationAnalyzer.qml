@@ -11,9 +11,6 @@ import DiscriminationAnalyzer 1.0
 
 Item {
     id: discriminationAnalyzerCard
-    // title: 'Discrimination Analysis'
-    // Layout.minimumWidth: 1000
-    // Layout.minimumHeight: 700
     Layout.fillWidth: true
     Layout.fillHeight: true
 
