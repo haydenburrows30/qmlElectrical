@@ -113,27 +113,12 @@ Page {
                                     radius: 4
                                 }
                                 
-                                // Use a safer approach to handle SVG images with fallback
-                                Image {
+                                CircuitDiagram {
                                     id: circuitDiagram
-                                    anchors.centerIn: parent
-                                    width: parent.width - 20
-                                    height: parent.height - 20
-                                    source: {
-                                    }
-                                    fillMode: Image.PreserveAspectFit
-                                    smooth: true
-                                    mipmap: true
-                                }
-                                
-                                // Add fallback text for when image fails to load
-                                Text {
-                                    id: errorText
-                                    visible: circuitDiagram.status === Image.Error || circuitDiagram.source === ""
-                                    anchors.centerIn: parent
-                                    text: currentMode === 0 ? "Series RLC Circuit" : "Parallel RLC Circuit"
-                                    color: sideBar.toggle1 ? "#ffffff" : "#000000"
-                                    font.pixelSize: 14
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    circuitType: currentMode
+                                    darkMode: sideBar.toggle1
                                 }
                             }
                             

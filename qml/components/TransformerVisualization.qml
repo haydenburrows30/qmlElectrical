@@ -31,8 +31,6 @@ Item {
     onCtMaxFaultChanged: canvas.requestPaint()
     onVtRatioChanged: canvas.requestPaint()
 
-    
-
     Canvas {
         id: canvas
         width: 600

@@ -206,13 +206,7 @@ class Application:
             (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator"),
             (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
             (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
-            (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper")  # Add new type
-            
-        # Register to QML context
-        # rlcChart = RLCChart()
-        # circuitDiagrams = CircuitDiagrams()
-        # self.qml_engine.engine.rootContext().setContextProperty("rlcChart", rlcChart)
-        # self.qml_engine.engine.rootContext().setContextProperty("circuitDiagrams", circuitDiagrams)
+            (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper")
         ]
 
         for type_info in qml_types:
