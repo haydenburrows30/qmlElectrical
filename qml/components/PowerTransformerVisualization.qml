@@ -69,13 +69,13 @@ Item {
             var secondaryIStr = secondaryCurrent.toFixed(1) + "A";
 
             // Draw transformer
-            drawTransformer(ctx, width * 0.1, height * 0.2, width * 0.8, height * 0.6, 
+            drawTransformer(ctx, width * 0.1, height * 0.05, width * 0.8, height * 0.6, 
                            primaryVStr, secondaryVStr, primaryIStr, secondaryIStr,
                            primaryConfig, secondaryConfig,
                            primaryColor, secondaryColor, coreColor);
                            
             // Draw vector group diagram
-            drawVectorGroupInfo(ctx, width * 0.5, height * 0.90, width * 0.8, height * 0.15,
+            drawVectorGroupInfo(ctx, width * 0.5, height * 0.7, width * 0.7, height * 0.3,
                                vectorGroup, turnsRatio, correctedRatio);
         }
         

@@ -31,8 +31,8 @@ Item {
                 width: scrollView.width
 
                 ColumnLayout {
-                    Layout.maximumWidth: 350
-                    spacing: 10
+                    Layout.maximumWidth: 300
+                    spacing: 5
                     Layout.alignment: Qt.AlignTop
 
                     WaveCard {
@@ -45,11 +45,14 @@ Item {
                             rowSpacing: 10
                             columnSpacing: 10
                             
-                            Label { text: "KVA:" }
+                            Label {
+                                text: "KVA:" 
+                                Layout.minimumWidth: 120
+                            }
                             TextField {
                                 id: kvaInput
                                 placeholderText: "Enter KVA"
-                                Layout.minimumWidth: 120
+                                Layout.minimumWidth: 150
                                 onTextChanged: {
                                     if (text) {
                                         calculator.setApparentPower(parseFloat(text));
@@ -62,7 +65,7 @@ Item {
                             Label { text: "Vector Group:" }
                             ComboBox {
                                 id: vectorGroupCombo
-                                Layout.minimumWidth: 120
+                                Layout.minimumWidth: 150
                                 model: ["Dyn11", "Yyn0", "Dyn1", "Yzn1", "Yd1", "Dd0", "Yy0"]
                                 onCurrentTextChanged: {
                                     calculator.setVectorGroup(currentText)
@@ -85,7 +88,10 @@ Item {
                             rowSpacing: 10
                             columnSpacing: 10
 
-                            Label { text: "Line Voltage (V):" }
+                            Label { 
+                                text: "Line Voltage (V):"
+                                Layout.minimumWidth: 120
+                            }
                             TextField {
                                 id: primaryVoltage
                                 Layout.minimumWidth: 150
@@ -127,7 +133,7 @@ Item {
                     // Secondary Side
                     WaveCard {
                         title: "Secondary Side"
-                        Layout.minimumHeight: 120
+                        Layout.minimumHeight: 110
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -135,7 +141,10 @@ Item {
                             rowSpacing: 10
                             columnSpacing: 10
 
-                            Label { text: "Line Voltage (V):" }
+                            Label { 
+                                text: "Line Voltage (V):"
+                                Layout.minimumWidth: 120
+                            }
                             TextField {
                                 id: secondaryVoltage
                                 placeholderText: "Enter line voltage"
@@ -160,9 +169,10 @@ Item {
                         }
                     }
 
+                    //Impedance
                     WaveCard {
                         title: "Impedance & Construction"
-                        Layout.minimumHeight: 380
+                        Layout.minimumHeight: 250
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -170,7 +180,10 @@ Item {
                             rowSpacing: 10
                             columnSpacing: 10
 
-                            Label { text: "Impedance (%):" }
+                            Label { 
+                                text: "Impedance (%):" 
+                                Layout.minimumWidth: 120
+                            }
                             TextField {
                                 id: impedanceInput
                                 placeholderText: "Enter impedance %"
@@ -181,12 +194,32 @@ Item {
                                         calculator.setImpedancePercent(parseFloat(text))
                                     }
                                 }
+                                // Add validator to allow decimal input
+                                validator: DoubleValidator {
+                                    bottom: 0.0
+                                    decimals: 2
+                                    notation: DoubleValidator.StandardNotation
+                                }
+                                // Add the same connection pattern for impedance as used for resistance
+                                Component.onCompleted: {
+                                    text = calculator.impedancePercent.toFixed(2)
+                                }
+                                
+                                Connections {
+                                    target: calculator
+                                    function onImpedancePercentChanged() {
+                                        // Only update if the user is not editing
+                                        if (!impedanceInput.activeFocus) {
+                                            impedanceInput.text = calculator.impedancePercent.toFixed(2)
+                                        }
+                                    }
+                                }
                             }
 
-                            Label { text: "Copper Losses (W):" }
+                            Label { text: "Cu Losses (W):" }
                             TextField {
                                 id: copperLossesInput
-                                placeholderText: "Enter copper losses"
+                                placeholderText: "Enter Cu losses"
                                 Layout.minimumWidth: 150
                                 Layout.fillWidth: true
                                 onTextChanged: {
@@ -194,20 +227,11 @@ Item {
                                         calculator.setCopperLosses(parseFloat(text))
                                     }
                                 }
-                            }
-                            
-                            Item {
-                                Layout.columnSpan: 2
-                                Layout.preferredHeight: 30
-                                Layout.fillWidth: true
-                                
-                                Label {
-                                    anchors.fill: parent
-                                    text: "Tip: Copper losses can be found as 'Load losses' or 'Cu losses' on nameplate"
-                                    font.italic: true
-                                    font.pixelSize: 10
-                                    color: Universal.accent
-                                    wrapMode: Text.Wrap
+                                // Add validator to allow decimal input
+                                validator: DoubleValidator {
+                                    bottom: 0.0
+                                    decimals: 1
+                                    notation: DoubleValidator.StandardNotation
                                 }
                             }
 
@@ -215,28 +239,31 @@ Item {
                             TextField {
                                 id: resistanceInput
                                 placeholderText: "Enter resistance %"
-                                text: calculator.resistancePercent.toFixed(2)
                                 Layout.minimumWidth: 150
                                 onTextChanged: {
                                     if (text) {
                                         calculator.setResistancePercent(parseFloat(text))
                                     }
                                 }
-                            }
-
-                            Label {
-                                text: "Finding R% on nameplate:"
-                                font.bold: true
-                                Layout.columnSpan: 2
-                                Layout.topMargin: 5
-                            }
-                            
-                            Label {
-                                text: "• Listed as R%, resistance, or copper losses (W)\n• Can be calculated from Z% and X/R ratio\n• Or from copper losses: R% = (PCu × 100) / (kVA × 1000)"
-                                Layout.columnSpan: 2
-                                font.pixelSize: 10
-                                Layout.fillWidth: true
-                                wrapMode: Text.Wrap
+                                // Add validator to allow decimal input
+                                validator: DoubleValidator {
+                                    bottom: 0.0
+                                    decimals: 2
+                                    notation: DoubleValidator.StandardNotation
+                                }
+                                Component.onCompleted: {
+                                    text = calculator.resistancePercent.toFixed(2)
+                                }
+                                
+                                Connections {
+                                    target: calculator
+                                    function onResistancePercentChanged() {
+                                        // Only update if the user is not editing
+                                        if (!resistanceInput.activeFocus) {
+                                            resistanceInput.text = calculator.resistancePercent.toFixed(2)
+                                        }
+                                    }
+                                }
                             }
 
                             Label { text: "Reactance (%):" }
@@ -265,34 +292,49 @@ Item {
 
                     // Results
                     WaveCard {
+                        id: results
                         title: "Results"
-                        Layout.minimumHeight: 300
+                        Layout.minimumHeight: 220
                         Layout.fillWidth: true
+                        showSettings: true
 
-                        ColumnLayout {
-                            spacing: 5
-                            anchors.fill: parent
+                        GridLayout {
+                            columns: 2
+                            rowSpacing: 10
+                            columnSpacing: 10
 
-                            // Results values section
                             Label { 
-                                text: "Phase-Phase Turns Ratio: " + calculator.turnsRatio.toFixed(2)
-                                visible: calculator.turnsRatio > 0
+                                text: "Turns Ratio:"
+                                Layout.minimumWidth: 120
+                            }
+                            Label { 
+                                text: calculator.turnsRatio.toFixed(1)
+                                color: Universal.foreground
+                                Layout.minimumWidth: 150
+                            }
+                            Label { 
+                                text: "Vector-corrected Ratio:"
                                 color: Universal.foreground
                             }
                             Label { 
-                                id: correctedRatioLabel
-                                text: "Vector-corrected Ratio: " + calculator.correctedRatio.toFixed(2)
-                                visible: calculator.correctedRatio > 0
+                                text: calculator.correctedRatio.toFixed(1)
                                 color: Universal.foreground
                                 font.italic: true
                             }
-
                             Label { 
-                                text: "Efficiency: " + calculator.efficiency.toFixed(2) + "%"
+                                text: "Efficiency:"
+                                color: Universal.foreground
+                            }
+                            Label { 
+                                text: calculator.efficiency.toFixed(0) + "%"
                                 color: Universal.foreground
                             }
                             Label {
-                                text: "Vector Group: " + calculator.vectorGroup
+                                text: "Vector Group:"
+                                color: Universal.foreground
+                            }
+                            Label {
+                                text: calculator.vectorGroup
                                 color: Universal.foreground
                             }
                             Label {
@@ -301,8 +343,8 @@ Item {
                                 font.pixelSize: 12
                                 wrapMode: Text.WordWrap
                                 Layout.fillWidth: true
+                                Layout.columnSpan: 2
                             }
-                            
                             Label {
                                 visible: calculator.vectorGroup.indexOf("D") === 0 || calculator.vectorGroup.indexOf("Y") === 0
                                 text: calculator.vectorGroup.indexOf("D") === 0 ? 
@@ -312,35 +354,14 @@ Item {
                                 font.pixelSize: 11
                                 wrapMode: Text.Wrap
                                 Layout.fillWidth: true
-                            }
-                            Label {
-                                text: "Note: All voltages are 3-phase line-to-line values"
-                                color: Universal.accent
-                                font.pixelSize: 11
-                                font.italic: true
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                            }
-                            
-                            // Tips button
-                            Button {
-                                text: "Tips & Explanations"
-                                icon.name: "help-about"
-                                Layout.alignment: Qt.AlignCenter
-                                Layout.topMargin: 10
-                                onClicked: tipsPopup.open()
-                            }
-                            
-                            Item { 
-                                // Spacer
-                                Layout.fillHeight: true 
+                                Layout.columnSpan: 2
                             }
                         }
                     }
                 }
 
                 WaveCard {
-                    // title: "Transformer Visualization"
+                    title: "Transformer Visualization"
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
@@ -382,133 +403,99 @@ Item {
     Popup {
         id: tipsPopup
         width: Math.min(parent.width * 0.8, 500)
-        height: Math.min(parent.height * 0.8, 600)
+        height: Math.min(parent.height * 0.8, 650)
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         modal: true
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        
-        // Add background for the popup to capture mouse clicks
-        Rectangle {
-            anchors.fill: parent
-            color: Universal.theme === Universal.Dark ? "#333333" : "#FFFFFF"
-            border.color: Universal.accent
-            border.width: 1
-            
-            // Add close button in top-right corner
-            Button {
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.margins: 5
-                text: "✕"
-                width: 30
-                height: 30
-                onClicked: tipsPopup.close()
-                background: Rectangle {
-                    color: "transparent"
-                }
-            }
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
         }
-        
-        ScrollView {
-            anchors.fill: parent
-            anchors.margins: 20
-            clip: true
             
-            ColumnLayout {
-                width: tipsPopup.width - 40
-                spacing: 15
-                
-                Label {
-                    text: "Transformer Tips & Explanations"
-                    font.pixelSize: 18
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.fillWidth: true
-                }
-                
-                // Vector Group Section
-                Label {
-                    text: "Vector Group"
-                    font.bold: true
-                    font.pixelSize: 14
-                    Layout.topMargin: 10
-                }
-                
-                Label {
-                    text: "• First letter: Primary connection (D = Delta, Y = Wye/Star)\n" +
-                          "• Second letter: Secondary connection (d = Delta, y = Wye/Star, z = Zigzag)\n" +
-                          "• Number: Phase shift in clock position (e.g., 11 = 330°, 1 = 30°)"
-                    wrapMode: Text.Wrap
-                    Layout.fillWidth: true
-                }
-                
-                // Impedance Section
-                Label {
-                    text: "Impedance"
-                    font.bold: true
-                    font.pixelSize: 14
-                    Layout.topMargin: 10
-                }
-                
-                Label {
-                    text: "Impedance is affected by:"
-                    font.bold: true
-                }
-                
-                Label {
-                    text: "• Winding resistance: copper losses, conductor size\n" +
-                          "• Leakage flux: winding geometry, spacing\n" +
-                          "• Core design: material, cross-section\n\n" +
-                          "Higher Z%: ↑ mechanical strength, ↓ fault current, ↑ voltage drop"
-                    wrapMode: Text.Wrap
-                    Layout.fillWidth: true
-                }
-                
-                Label {
-                    text: "Finding R% on nameplate:"
-                    font.bold: true
-                    Layout.topMargin: 10
-                }
-                
-                Label {
-                    text: "• Listed as R%, resistance, or copper losses (W)\n" +
-                          "• Can be calculated from Z% and X/R ratio\n" +
-                          "• Or from copper losses: R% = (PCu × 100) / (kVA × 1000)"
-                    wrapMode: Text.Wrap
-                    Layout.fillWidth: true
-                }
-                
-                // Current and Voltage Section
-                Label {
-                    text: "Current & Voltage"
-                    font.bold: true
-                    font.pixelSize: 14
-                    Layout.topMargin: 10
-                }
-                
-                Label {
-                    text: "• All voltages are 3-phase line-to-line values\n" +
-                          "• Vector group affects both voltage ratio and current distribution\n" +
-                          "• Delta: Line voltage = Phase voltage × √3\n" +
-                          "• Wye: Line voltage = Phase voltage\n" +
-                          "• For Dyn11, turns ratio is corrected by factor of √3"
-                    wrapMode: Text.Wrap
-                    Layout.fillWidth: true
-                }
-                
-                Button {
-                    text: "Close"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.topMargin: 20
-                    onClicked: tipsPopup.close()
-                }
-                
-                Item {
-                    Layout.fillHeight: true
-                }
+        ColumnLayout {
+            width: tipsPopup.width - 10
+            spacing: 15
+            
+            Label {
+                text: "Transformer Tips & Explanations"
+                font.pixelSize: 18
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+            }
+            
+            // Vector Group Section
+            Label {
+                text: "Vector Group"
+                font.bold: true
+                font.pixelSize: 14
+                Layout.topMargin: 10
+            }
+            
+            Label {
+                text: "• First letter: Primary connection (D = Delta, Y = Wye/Star)\n" +
+                        "• Second letter: Secondary connection (d = Delta, y = Wye/Star, z = Zigzag)\n" +
+                        "• Number: Phase shift in clock position (e.g., 11 = 330°, 1 = 30°)"
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+            }
+            
+            // Impedance Section
+            Label {
+                text: "Impedance"
+                font.bold: true
+                font.pixelSize: 14
+                Layout.topMargin: 10
+            }
+            
+            Label {
+                text: "Impedance is affected by:"
+                font.bold: true
+            }
+            
+            Label {
+                text: "• Winding resistance: copper losses, conductor size\n" +
+                        "• Leakage flux: winding geometry, spacing\n" +
+                        "• Core design: material, cross-section\n\n" +
+                        "Higher Z%: ↑ mechanical strength, ↓ fault current, ↑ voltage drop"
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+            }
+            
+            Label {
+                text: "Finding R% on nameplate:"
+                font.bold: true
+                Layout.topMargin: 10
+            }
+            
+            Label {
+                text: "• Listed as R%, resistance, or copper losses (W)\n" +
+                        "• Can be calculated from Z% and X/R ratio\n" +
+                        "• Or from copper losses: R% = (PCu × 100) / (kVA × 1000)"
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+            }
+            
+            // Current and Voltage Section
+            Label {
+                text: "Current & Voltage"
+                font.bold: true
+                font.pixelSize: 14
+                Layout.topMargin: 10
+            }
+            
+            Label {
+                text: "• All voltages are 3-phase line-to-line values\n" +
+                        "• Vector group affects both voltage ratio and current distribution\n" +
+                        "• Delta: Line voltage = Phase voltage × √3\n" +
+                        "• Wye: Line voltage = Phase voltage\n" +
+                        "• For Dyn11, turns ratio is corrected by factor of √3"
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
             }
         }
     }

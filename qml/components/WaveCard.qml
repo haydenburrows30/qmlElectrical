@@ -12,8 +12,18 @@ Rectangle {
     
     property string title: ""
     property bool showSettings: false
+    property bool open: false
 
     default property alias content: contentItem.data
+
+    Button {
+        id: helpButton
+        text: "i"
+        anchors.right: parent.right
+        anchors.top: parent.top
+        visible: showSettings
+        onClicked: open = true
+    }
 
     ColumnLayout {
         anchors.fill: parent
