@@ -257,7 +257,7 @@ Item {
                         }
                         color: acceptableInput ? "black" : "red"
                         onTextChanged: {
-                            if (acceptableInput && calculator) {
+                            if (acceptableInput && calculator1) {
                                 calculator1.setCurrent(parseFloat(text))
                             }
                         }
@@ -300,7 +300,7 @@ Item {
                         text: "0.8"  // Default value
                         color: acceptableInput ? "black" : "red"
                         onTextChanged: {
-                            if (acceptableInput && calculator) {
+                            if (acceptableInput && calculator1) {
                                 calculator1.setPowerFactor(parseFloat(text))
                             }
                         }
@@ -332,7 +332,7 @@ Item {
                                 horizontalAlignment: Text.AlignRight
                                 font.bold: true
                                 text: {
-                                    if (!calculator || isNaN(calculator.kw)) return "0.00 kW"
+                                    if (!calculator1 || isNaN(calculator1.kw)) return "0.00 kW"
                                     return calculator1.kw.toFixed(2) + " kW"
                                 }
                             }
