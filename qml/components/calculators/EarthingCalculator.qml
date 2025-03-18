@@ -139,7 +139,7 @@ Item {
             // Results Section
             WaveCard {
                 title: "Results"
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 220
                 Layout.fillWidth: true
 
                 GridLayout {

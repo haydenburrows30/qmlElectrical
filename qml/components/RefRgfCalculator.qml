@@ -28,7 +28,7 @@ Item {
 
         WaveCard {
             Layout.minimumWidth: 250
-            Layout.minimumHeight: 520
+            Layout.minimumHeight: 540
             title: "Parameters"
 
             ColumnLayout{

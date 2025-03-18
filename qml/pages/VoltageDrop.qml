@@ -20,7 +20,7 @@ Page {
     Connections {
         target: voltageDrop
         function onVoltageDropCalculated(value) {
-            console.log("Voltage drop updated:", value)
+            // console.log("Voltage drop updated:", value)
             root.currentVoltageDropValue = value
         }
     }
@@ -57,18 +57,18 @@ Page {
                             anchors.fill: parent
 
                             onResetRequested: {
-                                console.log("Reset requested")
+                                // console.log("Reset requested")
                             }
 
                             onResetCompleted: {
-                                console.log("Reset completed, updating UI")
+                                // console.log("Reset completed, updating UI")
 
                                 root.currentVoltageDropValue = voltageDrop.voltageDrop || 0
 
-                                console.log("After reset - voltage drop:", voltageDrop.voltageDrop)
-                                console.log("After reset - current:", voltageDrop.current)
-                                console.log("After reset - fuse size:", voltageDrop.networkFuseSize)
-                                console.log("After reset - combined rating:", voltageDrop.combinedRatingInfo)
+                                // console.log("After reset - voltage drop:", voltageDrop.voltageDrop)
+                                // console.log("After reset - current:", voltageDrop.current)
+                                // console.log("After reset - fuse size:", voltageDrop.networkFuseSize)
+                                // console.log("After reset - combined rating:", voltageDrop.combinedRatingInfo)
 
                                 resultsPanel.combinedRatingInfo = voltageDrop.combinedRatingInfo || "N/A"
                                 resultsPanel.totalLoad = voltageDrop.totalKva || 0.0

@@ -54,27 +54,51 @@ class MachineCalculator(QObject):
         }
         self._cooling_methods = ["TEFC", "ODP", "TENV"]
         
+        # Input mode
+        self._input_mode = "VC"  # Voltage and Current input mode by default
+                                 # Alternative: "VP" for Voltage and Power input
+        
         # Calculate initial values
         self._calculate()
     
     def _calculate(self):
         """Calculate machine parameters based on inputs"""
         try:
-            # Input power calculation
-            input_power = self._rated_voltage * self._rated_current * math.sqrt(3) * self._power_factor / 1000  # kW for 3-phase
-            
+            # First check input mode and calculate the missing parameter
+            if self._input_mode == "VP" and self._rated_voltage > 0 and self._rated_power > 0:
+                # Calculate current from power and voltage
+                if "DC" in self._machine_type:
+                    # DC machines: I = P/V
+                    self._rated_current = (self._rated_power * 1000) / self._rated_voltage
+                else:
+                    # 3-phase AC: I = P/(√3 * V * PF)
+                    self._rated_current = (self._rated_power * 1000) / (math.sqrt(3) * self._rated_voltage * self._power_factor)
+                self.ratedCurrentChanged.emit()
+
+            # Input power calculation - now using the updated values
             if "DC" in self._machine_type:
                 input_power = self._rated_voltage * self._rated_current / 1000  # kW for DC
+            else:
+                # For 3-phase AC machines
+                input_power = self._rated_voltage * self._rated_current * math.sqrt(3) * self._power_factor / 1000  # kW for 3-phase
             
-            # Efficiency calculations
+            # Efficiency calculations - Fixed to properly update power
             if self._machine_type.endswith("Motor"):
                 # Motor: Output = Input * Efficiency
-                self._rated_power = input_power * self._efficiency
+                if self._input_mode == "VC":  # Only update rated power if not directly set
+                    self._rated_power = input_power * self._efficiency
+                    self.ratedPowerChanged.emit()
                 self._losses = input_power - self._rated_power
             else:
-                # Generator: Output = Input * Efficiency (Input is mechanical power)
-                self._rated_power = input_power
-                self._losses = input_power * (1 - self._efficiency)
+                # Generator: Input is mechanical power, Output = Input * Efficiency
+                if self._input_mode == "VC":  # Only update rated power if not directly set
+                    self._rated_power = input_power  # Electrical output power
+                    self.ratedPowerChanged.emit()
+                mechanical_power = input_power / self._efficiency
+                self._losses = mechanical_power - self._rated_power
+            
+            # Emit signal to ensure UI updates
+            self.ratedPowerChanged.emit()
             
             # Speed and torque
             if self._machine_type == "Induction Motor":
@@ -158,7 +182,7 @@ class MachineCalculator(QObject):
         if self._machine_type != value and value in self._machine_types:
             self._machine_type = value
             self.machineTypeChanged.emit()
-            self._calculate()
+            self._calculate()  # Recalculate when machine type changes
     
     @Property(float, notify=ratedVoltageChanged)
     def ratedVoltage(self):
@@ -207,6 +231,13 @@ class MachineCalculator(QObject):
     @Property(float, notify=ratedPowerChanged)
     def ratedPower(self):
         return self._rated_power
+    
+    @ratedPower.setter
+    def ratedPower(self, value):
+        if self._rated_power != value and value > 0:
+            self._rated_power = value
+            self.ratedPowerChanged.emit()
+            self._calculate()
     
     @Property(float, notify=lossesChanged)
     def losses(self):
@@ -337,6 +368,17 @@ class MachineCalculator(QObject):
     def pullupTorque(self):
         return self._pullup_torque
     
+    # New property for input mode
+    @Property(str)
+    def inputMode(self):
+        return self._input_mode
+    
+    @inputMode.setter
+    def inputMode(self, value):
+        if value in ["VC", "VP"] and value != self._input_mode:
+            self._input_mode = value
+            self._calculate()
+    
     # QML slots
     @Slot(str)
     def setMachineType(self, machine_type):
@@ -381,6 +423,14 @@ class MachineCalculator(QObject):
     @Slot(str)
     def setCoolingMethod(self, method):
         self.coolingMethod = method
+    
+    @Slot(float)
+    def setRatedPower(self, power):
+        self.ratedPower = power
+    
+    @Slot(str)
+    def setInputMode(self, mode):
+        self.inputMode = mode
     
     @Slot()
     def calculate(self):
