@@ -12,6 +12,27 @@ Item {
     property FaultCurrentCalculator calculator: FaultCurrentCalculator {}
     property color textColor: Universal.foreground
 
+    Popup {
+        id: tipsPopup
+        width: 300
+        height: 200
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"Impedance is the total opposition to the flow of alternating current in a circuit. It is the vector sum of resistance and reactance. The impedance is calculated using the formula Z = √(R² + X²) where R is the resistance and X is the reactance. The phase angle is calculated using the formula θ = arctan(X / R) where θ is the phase angle, R is the resistance, and X is the reactance."}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10
@@ -85,8 +106,11 @@ Item {
         }
 
         WaveCard {
+            id: results
             Layout.minimumHeight: 300
             Layout.minimumWidth: 300
+
+            showSettings: true
             
             ImpedanceVectorViz {
                 id: impedanceViz

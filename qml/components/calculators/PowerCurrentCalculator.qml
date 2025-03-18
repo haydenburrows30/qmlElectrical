@@ -17,16 +17,65 @@ Item {
         visible: false
     }
 
+    Popup {
+        id: tipsPopup
+        width: 300
+        height: 200
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"Transformer Calculator helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: \n\n" +
+                   "Single Phase: I = kVA / V\n" +
+                   "Three Phase: I = kVA / (V × √3)"}
+            wrapMode: Text.WordWrap
+        }
+    }
+
+    Popup {
+        id: tipsPopup1
+        width: 300
+        height: 200
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results1.open
+
+        onAboutToHide: {
+            results1.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"The Power from Current Calculator helps you calculate the power consumed by a device based on the current and power factor. The formula used is: \n\n" +
+                     "Single Phase: P = V × I × PF / 1000\n" +
+                     "Three Phase: P = √3 × V × I × PF / 1000"}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         anchors.centerIn: parent
         spacing: 10
         anchors.margins: 10
 
         WaveCard {
+            id: results
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
             Layout.minimumWidth: 400
             title: "Transformer Calculator"
+
+            showSettings: true
          
             ColumnLayout {
                 anchors.centerIn: parent
@@ -204,10 +253,13 @@ Item {
         }
 
         WaveCard {
+            id: results1
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
             Layout.minimumWidth: 400
             title: "Power from Current Calculator"
+
+            showSettings: true
          
             ColumnLayout {
                 anchors.centerIn: parent

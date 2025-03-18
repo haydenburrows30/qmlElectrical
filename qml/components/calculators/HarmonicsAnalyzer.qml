@@ -43,6 +43,29 @@ Item {
         }
     }
 
+    Popup {
+        id: tipsPopup
+        width: 300
+        height: 200
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"This is a Harmonic Analyzer tool that can be used to analyze the harmonic components of a waveform. " +
+                   "You can adjust the amplitude and phase of each harmonic component to see how it affects the waveform. " +
+                   "You can also export the harmonic data to a CSV file for further analysis."}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         spacing: 10
         anchors.margins: 10
@@ -54,9 +77,12 @@ Item {
             spacing: 10
 
             WaveCard {
+                id: results
                 title: "Harmonic Components"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 550
+
+                showSettings: true
 
                 ColumnLayout {
                     spacing: 10
