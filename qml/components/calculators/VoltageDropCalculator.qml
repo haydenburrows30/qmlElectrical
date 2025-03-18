@@ -11,6 +11,30 @@ Item {
 
     property VoltageDropCalc calculator: VoltageDropCalc {}
 
+    Popup {
+        id: tipsPopup
+        width: 600
+        height: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"Voltage Drop Calculator\n\n" +
+                "Voltage drop is the reduction in voltage that occurs when current flows through a conductor. Voltage drop can cause electrical equipment to malfunction, reduce the efficiency of the system, and increase the risk of fire. Voltage drop is calculated using the formula VD = I * R * L / 1000, where VD is the voltage drop, I is the current, R is the resistance of the conductor, and L is the length of the conductor.\n\n" +
+                "The voltage drop calculator helps you calculate the voltage drop in a circuit based on the cable size, length, current, conductor material, and system voltage. Simply enter the required parameters, and the calculator will provide you with the voltage drop and drop percentage in the circuit. The calculator also highlights the drop percentage in red if it exceeds 3%, indicating that the voltage drop is too high and may cause issues in the system.\n\n" +
+                "The voltage drop visualization provides you with a visual representation of the voltage drop in the circuit. The source voltage is shown in blue, and the load voltage is shown in red. The drop percentage is displayed at the bottom of the visualization, with the drop percentage highlighted in red if it exceeds 3%. The visualization helps you understand the impact of voltage drop on the system and identify areas where voltage drop is too high."}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         id: layoutt
         anchors.centerIn: parent
@@ -22,9 +46,12 @@ Item {
             Layout.preferredWidth: 400
 
             WaveCard {
+                id: results
                 title: "Voltage Drop Calculator"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 260
+
+                showSettings: true
 
                 GridLayout {
                     id: cableParamsLayout

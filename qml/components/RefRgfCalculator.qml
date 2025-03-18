@@ -11,6 +11,30 @@ Item {
     property RefRgfCalculator refCalculator: RefRgfCalculator {}
     property color textColor: Universal.foreground
 
+    Popup {
+        id: tipsPopup
+        width: 600
+        height: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"REF/RGF Calculator\n\n" +
+                "The REF/RGF calculator is used to calculate the REF (Restricted Earth Fault) and RGF (Restricted Ground Fault) values based on transformer parameters and CT ratios. The calculator takes into account the transformer MVA, HV and LV voltages, connection type, impedance, CT phase and neutral ratios, and CT secondary type to calculate the REF and RGF values.\n\n" +
+                "The REF/RGF values are used to set the protection relays in the power system to detect and isolate earth faults and ground faults in the system. The REF/RGF values are set based on the transformer parameters and CT ratios to ensure that the protection relays operate correctly and isolate the faulted section of the system.\n\n" +
+                "The REF/RGF calculator helps you calculate the REF and RGF values based on the transformer parameters and CT ratios. Simply enter the transformer MVA, HV and LV voltages, connection type, impedance, CT phase and neutral ratios, and CT secondary type, and the calculator will provide you with the REF and RGF values needed to set the protection relays in the power system."}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     Text {
         anchors.bottom: mainLayout.top
         anchors.horizontalCenter: parent.horizontalCenter
@@ -27,9 +51,12 @@ Item {
         anchors.centerIn: parent
 
         WaveCard {
+            id: results
             Layout.minimumWidth: 250
             Layout.minimumHeight: 540
             title: "Parameters"
+
+            showSettings: true
 
             ColumnLayout{
                 spacing: 10
