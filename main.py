@@ -21,7 +21,7 @@ from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
 
-from models.calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator
+from models.calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, KwFromCurrentCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.voltage_drop_calculator import VoltageDropCalc
 from models.motor_calculator import MotorCalculator
@@ -210,7 +210,8 @@ class Application:
             (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
             (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
             (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper"),
-            (RefRgfCalculator, "RefRgf", 1, 0, "RefRgfCalculator")
+            (RefRgfCalculator, "RefRgf", 1, 0, "RefRgfCalculator"),
+            (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator")
         ]
 
         for type_info in qml_types:

@@ -3,12 +3,14 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../../components"
-import PCalculator 1.0  // Import the PowerCalculator
+import PCalculator 1.0
+import KwFromCurrent 1.0
 
 Item {
     id: power_current
     
     property PowerCalculator calculator: PowerCalculator {}
+    property KwFromCurrentCalculator calculator1: KwFromCurrentCalculator {}
 
     TextEdit {
         id: clipboardHelper
@@ -16,7 +18,7 @@ Item {
     }
 
     RowLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
         spacing: 10
         anchors.margins: 10
 
@@ -24,7 +26,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
             Layout.minimumWidth: 400
-            title: "Power & Current"
+            title: "Transformer Calculator"
          
             ColumnLayout {
                 anchors.centerIn: parent
@@ -195,6 +197,179 @@ Item {
                     color: "red"
                     visible: (!kvaInput.acceptableInput && kvaInput.text !== "") ||
                             (!voltageInput.acceptableInput && voltageInput.text !== "")
+                    text: "Please enter valid numbers"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+            }
+        }
+
+        WaveCard {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.minimumHeight: 300
+            Layout.minimumWidth: 400
+            title: "Power from Current Calculator"
+         
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 15
+                Layout.maximumWidth: 300
+
+                Text {
+                    text: "Single Phase: 230V | Three Phase: 415V"
+                    font.italic: true
+                    color: "gray"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                RowLayout {
+                    spacing: 10
+                    Label {
+                        text: "Phase Type:"
+                        Layout.preferredWidth: 100
+                    }
+                    ComboBox {
+                        id: phaseSelector1
+                        model: ["Single Phase", "Three Phase"]
+                        Layout.fillWidth: true
+                        onCurrentTextChanged: {
+                            if (calculator1) {
+                                calculator1.setPhase(currentText)
+                            }
+                        }
+                        currentIndex: 1
+                        Layout.alignment: Qt.AlignRight
+                    }
+                }
+
+                RowLayout {
+                    spacing: 10
+                    Label {
+                        text: "Current (A):"
+                        Layout.preferredWidth: 100
+                    }
+                    TextField {
+                        id: currentInput
+                        Layout.fillWidth: true
+                        placeholderText: "Enter current"
+                        validator: DoubleValidator {
+                            bottom: 0
+                            decimals: 2
+                        }
+                        color: acceptableInput ? "black" : "red"
+                        onTextChanged: {
+                            if (acceptableInput && calculator) {
+                                calculator1.setCurrent(parseFloat(text))
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    spacing: 10
+                    Label {
+                        text: "Power Factor:"
+                        Layout.preferredWidth: 100
+                    }
+                    
+                    ComboBox {
+                        id: pfPresets
+                        model: ["Custom", "0.8", "0.85", "0.9", "0.95", "1.0"]
+                        Layout.preferredWidth: 80
+                        onCurrentTextChanged: {
+                            if (currentText !== "Custom") {
+                                pfInput.text = currentText
+                                pfInput.enabled = false
+                            } else {
+                                pfInput.enabled = true
+                            }
+                        }
+                        currentIndex: 1  // Default to 0.8
+                    }
+                    
+                    TextField {
+                        id: pfInput
+                        Layout.fillWidth: true
+                        enabled: pfPresets.currentText === "Custom"
+                        opacity: enabled ? 1.0 : 0.5
+                        placeholderText: "0.8-1.0"
+                        validator: DoubleValidator {
+                            bottom: 0
+                            top: 1
+                            decimals: 2
+                        }
+                        text: "0.8"  // Default value
+                        color: acceptableInput ? "black" : "red"
+                        onTextChanged: {
+                            if (acceptableInput && calculator) {
+                                calculator1.setPowerFactor(parseFloat(text))
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    spacing: 10
+                    Layout.topMargin: 15
+                    
+                    Label {
+                        text: "Power (kW):"
+                        Layout.preferredWidth: 100
+                    }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+                        color: "#f0f0f0"
+                        radius: 4
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: 4
+                            spacing: 4
+
+                            Text {
+                                id: kwOutput
+                                Layout.fillWidth: true
+                                horizontalAlignment: Text.AlignRight
+                                font.bold: true
+                                text: {
+                                    if (!calculator || isNaN(calculator.kw)) return "0.00 kW"
+                                    return calculator1.kw.toFixed(2) + " kW"
+                                }
+                            }
+
+                            Button {
+                                Layout.preferredWidth: 50
+                                Layout.preferredHeight: 22
+                                text: "Copy"
+                                font.pointSize: 8
+                                ToolTip.text: "Copy to clipboard"
+                                ToolTip.visible: hovered
+                                onClicked: {
+                                    if (calculator1 && !isNaN(calculator1.kw)) {
+                                        clipboardHelper.text = kwOutput.text
+                                        clipboardHelper.selectAll()
+                                        clipboardHelper.copy()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    text: phaseSelector1.currentText === "Single Phase" ? 
+                          "Formula: P = V × I × PF / 1000" : 
+                          "Formula: P = √3 × V × I × PF / 1000"
+                    font.italic: true
+                    color: "gray"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Text {
+                    id: errorMessage1
+                    color: "red"
+                    visible: (!currentInput.acceptableInput && currentInput.text !== "") ||
+                             (!pfInput.acceptableInput && pfInput.text !== "")
                     text: "Please enter valid numbers"
                     Layout.alignment: Qt.AlignHCenter
                 }

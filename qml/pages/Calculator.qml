@@ -16,8 +16,8 @@ Page {
 
     property var basic: [
         { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml" },
-        { name: qsTr("Power Current"), source: "../components/calculators/PowerCurrentCalculator.qml" },
-        { name: qsTr("Unit Converter"), source: "../components/calculators/UnitConverter.qml" }
+        { name: qsTr("kVA / kw / A"), source: "../components/calculators/PowerCurrentCalculator.qml" },
+        { name: qsTr("Unit Converter"), source: "../components/calculators/UnitConverter.qml" },
     ]
 
     property var protection: [

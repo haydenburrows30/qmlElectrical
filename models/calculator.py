@@ -286,3 +286,70 @@ class ConversionCalculator(BaseCalculator):
         
     def calculate(self):
         self.calculateResult()
+
+class KwFromCurrentCalculator(BaseCalculator):
+    """Calculator for determining power (kW) from current input.
+    
+    Features:
+    - Single and three-phase power calculations
+    - Fixed voltage values (230V single phase, 415V three phase)
+    - Power factor support
+    
+    Signals:
+        kwCalculated: Emitted when kW calculation completes
+    """
+    kwCalculated = Signal(float)
+
+    def __init__(self):
+        super().__init__()
+        self._current = 0.0
+        self._phase = "Three Phase"
+        self._power_factor = 0.8  # Default power factor
+        self._kw = 0.0
+        
+        # Fixed voltages
+        self._single_phase_voltage = 230.0
+        self._three_phase_voltage = 415.0
+
+    @Slot(float)
+    def setCurrent(self, current):
+        """Set current in amperes.
+        
+        Args:
+            current: Current value in amperes
+        """
+        self._current = current
+        self.calculateKw()
+
+    @Slot(str)
+    def setPhase(self, phase):
+        self._phase = phase
+        self.calculateKw()
+
+    @Slot(float)
+    def setPowerFactor(self, pf):
+        self._power_factor = pf
+        self.calculateKw()
+
+    def calculateKw(self):
+        if self._current > 0:
+            if self._phase == "Single Phase":
+                # P = V × I × PF / 1000 (for kW)
+                self._kw = self._single_phase_voltage * self._current * self._power_factor / 1000
+            elif self._phase == "Three Phase":
+                # P = √3 × V × I × PF / 1000 (for kW)
+                self._kw = math.sqrt(3) * self._three_phase_voltage * self._current * self._power_factor / 1000
+            self.kwCalculated.emit(self._kw)
+
+    @Property(float, notify=kwCalculated)
+    def kw(self):
+        return self._kw
+
+    def reset(self):
+        self._current = 0.0
+        self._power_factor = 0.8
+        self._kw = 0.0
+        self.dataChanged.emit()
+        
+    def calculate(self):
+        self.calculateKw()
