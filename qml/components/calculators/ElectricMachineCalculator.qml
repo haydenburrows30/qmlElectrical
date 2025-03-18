@@ -30,8 +30,6 @@ Item {
             RowLayout {
                 id: mainLayout
                 width: scrollView.width
-                // anchors.margins: 10
-                // spacing: 10
 
                 // Left side - Controls and Results
                 ColumnLayout {

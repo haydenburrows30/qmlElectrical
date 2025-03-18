@@ -9,11 +9,15 @@ Item {
     property real primaryCurrent: 0
     property real secondaryVoltage: 0
     property real secondaryCurrent: 0
-    property real powerRating: 0
     property real turnsRatio: 1
     property real efficiency: 0
     property real correctedRatio: 1
     property string vectorGroup: "Dyn11"
+    
+    // Add impedance properties
+    property real impedancePercent: 6.0
+    property real reactancePercent: 5.0
+    property real resistancePercent: 1.0
     
     // Theme properties
     property bool darkMode: Universal.theme === Universal.Dark
@@ -29,11 +33,13 @@ Item {
     onPrimaryCurrentChanged: canvas.requestPaint()
     onSecondaryVoltageChanged: canvas.requestPaint()
     onSecondaryCurrentChanged: canvas.requestPaint()
-    onPowerRatingChanged: canvas.requestPaint()
     onTurnsRatioChanged: canvas.requestPaint()
     onEfficiencyChanged: canvas.requestPaint()
     onCorrectedRatioChanged: canvas.requestPaint()
     onVectorGroupChanged: canvas.requestPaint()
+    onImpedancePercentChanged: canvas.requestPaint()
+    onReactancePercentChanged: canvas.requestPaint()
+    onResistancePercentChanged: canvas.requestPaint()
 
     Canvas {
         id: canvas
@@ -49,7 +55,6 @@ Item {
             // Define colors based on theme
             var primaryColor = darkMode ? "#6CB4EE" : "#2196F3";
             var secondaryColor = darkMode ? "#FFA07A" : "#FF6347";
-            var windingColor = darkMode ? "#FFD700" : "#FFA500";
             var coreColor = darkMode ? "#A0A0A0" : "#696969";
             
             // Get vector group configuration
@@ -81,24 +86,23 @@ Item {
             var coreX = x + (width - coreWidth) / 2;
             var coreY = y + (height - coreHeight) / 2;
             
-            // Draw core
-            ctx.fillStyle = coreColor;
-            ctx.fillRect(coreX, coreY, coreWidth, coreHeight);
+            // Draw core with lamination pattern
+            drawTransformerCore(ctx, coreX, coreY, coreWidth, coreHeight, coreColor);
             
-            // Draw primary winding (left side)
+            // Draw primary winding symbol (left side)
             if (primaryConfig === "Delta") {
-                drawDeltaWinding(ctx, x, y + height * 0.1, width * 0.35, height * 0.8, primaryColor);
+                drawDeltaSymbol(ctx, x + width * 0.05, y + height * 0.3, width * 0.25, height * 0.4, primaryColor);
             } else {
-                drawWyeWinding(ctx, x, y + height * 0.1, width * 0.35, height * 0.8, primaryColor);
+                drawWyeSymbol(ctx, x + width * 0.05, y + height * 0.3, width * 0.25, height * 0.4, primaryColor);
             }
             
-            // Draw secondary winding (right side)
+            // Draw secondary winding symbol (right side)
             if (secondaryConfig === "Delta") {
-                drawDeltaWinding(ctx, x + width * 0.65, y + height * 0.1, width * 0.35, height * 0.8, secondaryColor);
+                drawDeltaSymbol(ctx, x + width * 0.7, y + height * 0.3, width * 0.25, height * 0.4, secondaryColor);
             } else if (secondaryConfig === "Wye") {
-                drawWyeWinding(ctx, x + width * 0.65, y + height * 0.1, width * 0.35, height * 0.8, secondaryColor);
+                drawWyeSymbol(ctx, x + width * 0.7, y + height * 0.3, width * 0.25, height * 0.4, secondaryColor);
             } else {
-                drawZigzagWinding(ctx, x + width * 0.65, y + height * 0.1, width * 0.35, height * 0.8, secondaryColor);
+                drawZigzagSymbol(ctx, x + width * 0.7, y + height * 0.3, width * 0.25, height * 0.4, secondaryColor);
             }
             
             // Draw labels
@@ -107,158 +111,178 @@ Item {
             ctx.textAlign = "center";
             
             // Primary voltage and current
-            ctx.fillText(primaryV, x + width * 0.175, y + height * 0.05);
+            ctx.fillText(primaryV + " (L-L)", x + width * 0.175, y + height * 0.05);  // Added L-L
             ctx.fillText(primaryI, x + width * 0.175, y + height * 0.95);
             
             // Secondary voltage and current
-            ctx.fillText(secondaryV, x + width * 0.825, y + height * 0.05);
+            ctx.fillText(secondaryV + " (L-L)", x + width * 0.825, y + height * 0.05);  // Added L-L
             ctx.fillText(secondaryI, x + width * 0.825, y + height * 0.95);
             
             // Configuration labels
             ctx.font = "bold 12px sans-serif";
-            ctx.fillText(primaryConfig + " Primary", x + width * 0.175, y + height * 0.5);
-            ctx.fillText(secondaryConfig + " Secondary", x + width * 0.825, y + height * 0.5);
-        }
-        
-        function drawDeltaWinding(ctx, x, y, width, height, color) {
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
+            ctx.fillText(primaryConfig + " Primary", x + width * 0.175, y + height * 0.2);
+            ctx.fillText(secondaryConfig + " Secondary", x + width * 0.825, y + height * 0.2);
             
-            // Draw delta shape outline - improved symmetry
-            var centerX = x + width * 0.5;
-            var topY = y + height * 0.15;
-            var bottomY = y + height * 0.85;
+            // Draw connection lines to core
+            ctx.strokeStyle = darkMode ? "#CCCCCC" : "#666666";
+            ctx.lineWidth = 1;
             
-            // Draw equilateral delta for better symmetry
+            // Primary connection
             ctx.beginPath();
-            ctx.moveTo(x + width * 0.25, topY);               // Top left
-            ctx.lineTo(x + width * 0.75, topY);               // Top right
-            ctx.lineTo(centerX, bottomY);                     // Bottom center
-            ctx.closePath();
+            ctx.moveTo(x + width * 0.175, y + height * 0.5);
+            ctx.lineTo(coreX, y + height * 0.5);
             ctx.stroke();
             
-            // Draw windings with more symmetry
-            var turns = 8;
-            var widthStep = (width * 0.5) / turns;
-            var heightStep = (bottomY - topY) / turns;
+            // Secondary connection
+            ctx.beginPath();
+            ctx.moveTo(x + width * 0.825, y + height * 0.5);
+            ctx.lineTo(coreX + coreWidth, y + height * 0.5);
+            ctx.stroke();
             
-            for (var i = 0; i < turns; i++) {
-                // Left side windings
-                ctx.beginPath();
-                ctx.moveTo(x + width * 0.25 + i * widthStep, topY + i * heightStep * 0.5);
-                ctx.lineTo(centerX - i * widthStep * 0.5, topY + i * heightStep * 0.5);
-                ctx.stroke();
-                
-                // Right side windings
-                ctx.beginPath();
-                ctx.moveTo(x + width * 0.75 - i * widthStep, topY + i * heightStep * 0.5);
-                ctx.lineTo(centerX + i * widthStep * 0.5, topY + i * heightStep * 0.5);
-                ctx.stroke();
-                
-                // Bottom windings
-                ctx.beginPath();
-                var yPos = bottomY - i * heightStep * 0.5;
-                var leftX = centerX - (width * 0.25) * (i / turns);
-                var rightX = centerX + (width * 0.25) * (i / turns);
-                ctx.moveTo(leftX, yPos);
-                ctx.lineTo(rightX, yPos);
-                ctx.stroke();
+            // Add impedance visualization if values are set
+            if (root.impedancePercent > 0) {
+                drawImpedanceComponents(ctx, x + width * 0.4, y + height * 0.85, width * 0.2, height * 0.1, 
+                                       root.impedancePercent, root.resistancePercent, root.reactancePercent);
             }
         }
         
-        function drawWyeWinding(ctx, x, y, width, height, color) {
-            ctx.strokeStyle = color;
+        // Draw transformer core with lamination pattern
+        function drawTransformerCore(ctx, x, y, width, height, color) {
+            // Background fill
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+            
+            // Draw lamination lines to represent core
+            ctx.strokeStyle = darkMode ? "#333333" : "#999999";
+            ctx.lineWidth = 1;
+            
+            // Vertical laminations
+            var laminationSpacing = width / 12;
+            for (var i = 1; i < 12; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + i * laminationSpacing, y);
+                ctx.lineTo(x + i * laminationSpacing, y + height);
+                ctx.stroke();
+            }
+            
+            // Add steel lamination texture effect
+            ctx.fillStyle = darkMode ? "rgba(30,30,30,0.3)" : "rgba(150,150,150,0.3)";
+            
+            // Draw core label
+            ctx.fillStyle = textColor.toString();
+            ctx.font = "bold 12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Core", x + width/2, y + height/2);
+            
+            // Draw outer border for core
+            ctx.strokeStyle = darkMode ? "#555555" : "#777777";
             ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, width, height);
+        }
+        
+        // Simple Delta symbol (triangle)
+        function drawDeltaSymbol(ctx, x, y, width, height, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
             
-            var centerX = x + width * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(x + width/2, y);             // Top point
+            ctx.lineTo(x, y + height);              // Bottom left
+            ctx.lineTo(x + width, y + height);      // Bottom right
+            ctx.closePath();                        // Back to top
+            ctx.stroke();
+            
+            // Add delta label
+            ctx.fillStyle = color;
+            ctx.font = "bold 24px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Δ", x + width/2, y + height/2 + 8);
+        }
+        
+        // Simple Wye/Star symbol (Y)
+        function drawWyeSymbol(ctx, x, y, width, height, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            
+            var centerX = x + width/2;
             var centerY = y + height * 0.4;
-            var bottomY = y + height * 0.85;
-            var topY = y + height * 0.15;
-            var radius = width * 0.3;
             
-            // Draw Y shape outline with improved symmetry
             ctx.beginPath();
             // Top left arm
-            ctx.moveTo(x + width * 0.2, topY);
+            ctx.moveTo(x, y);
             ctx.lineTo(centerX, centerY);
             // Top right arm
-            ctx.moveTo(x + width * 0.8, topY);
+            ctx.moveTo(x + width, y);
             ctx.lineTo(centerX, centerY);
-            // Vertical arm
-            ctx.lineTo(centerX, bottomY);
+            // Bottom arm
+            ctx.lineTo(centerX, y + height);
             ctx.stroke();
             
-            // Draw windings with better symmetry
-            var turns = 10;
-            var armLength = Math.sqrt(Math.pow(centerX - (x + width * 0.2), 2) + 
-                                     Math.pow(centerY - topY, 2));
-            var stepSize = armLength / turns;
-            
-            for (var i = 1; i < turns; i++) {
-                var ratio = i / turns;
-                
-                // Left arm winding
-                var leftX1 = x + width * 0.2 + (centerX - (x + width * 0.2)) * ratio;
-                var leftY1 = topY + (centerY - topY) * ratio;
-                var leftAngle = Math.atan2(centerY - topY, centerX - (x + width * 0.2));
-                var leftX2 = leftX1 + Math.cos(leftAngle + Math.PI/2) * stepSize * 0.3;
-                var leftY2 = leftY1 + Math.sin(leftAngle + Math.PI/2) * stepSize * 0.3;
-                
-                ctx.beginPath();
-                ctx.moveTo(leftX1, leftY1);
-                ctx.lineTo(leftX2, leftY2);
-                ctx.stroke();
-                
-                // Right arm winding
-                var rightX1 = x + width * 0.8 - (x + width * 0.8 - centerX) * ratio;
-                var rightY1 = topY + (centerY - topY) * ratio;
-                var rightAngle = Math.atan2(centerY - topY, (x + width * 0.8) - centerX);
-                var rightX2 = rightX1 + Math.cos(rightAngle - Math.PI/2) * stepSize * 0.3;
-                var rightY2 = rightY1 + Math.sin(rightAngle - Math.PI/2) * stepSize * 0.3;
-                
-                ctx.beginPath();
-                ctx.moveTo(rightX1, rightY1);
-                ctx.lineTo(rightX2, rightY2);
-                ctx.stroke();
-                
-                // Vertical arm winding
-                if (i > turns/2) {
-                    var vRatio = (i - turns/2) / (turns/2);
-                    var vY = centerY + (bottomY - centerY) * vRatio;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(centerX - stepSize * 0.3, vY);
-                    ctx.lineTo(centerX + stepSize * 0.3, vY);
-                    ctx.stroke();
-                }
-            }
+            // Add star label
+            ctx.fillStyle = color;
+            ctx.font = "bold 24px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Y", x + width/2, y + height/2 + 10);
         }
         
-        function drawZigzagWinding(ctx, x, y, width, height, color) {
-            var turns = 8;
-            var turnHeight = height / turns;
-            
+        // Zigzag symbol (Z)
+        function drawZigzagSymbol(ctx, x, y, width, height, color) {
             ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             
             // Draw zigzag pattern
             ctx.beginPath();
-            ctx.moveTo(x + width * 0.2, y + height * 0.15);
+            ctx.moveTo(x, y);                        // Top left
+            ctx.lineTo(x + width, y);                // Top right
+            ctx.lineTo(x, y + height/2);             // Middle left
+            ctx.lineTo(x + width, y + height/2);     // Middle right
+            ctx.lineTo(x, y + height);               // Bottom left
+            ctx.lineTo(x + width, y + height);       // Bottom right
+            ctx.stroke();
             
-            for (var i = 0; i < turns; i++) {
-                var yStart = y + height * 0.15 + i * height * 0.8 / turns;
-                var yEnd = y + height * 0.15 + (i + 1) * height * 0.8 / turns;
-                
-                if (i % 2 === 0) {
-                    ctx.lineTo(x + width * 0.8, yStart);
-                    ctx.lineTo(x + width * 0.2, yEnd);
-                } else {
-                    ctx.lineTo(x + width * 0.8, yStart);
-                    ctx.lineTo(x + width * 0.2, yEnd);
-                }
+            // Add zigzag label
+            ctx.fillStyle = color;
+            ctx.font = "bold 24px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Z", x + width/2, y + height/2 + 8);
+        }
+        
+        function drawImpedanceComponents(ctx, x, y, width, height, z, r, x) {
+            // Draw title
+            ctx.fillStyle = textColor.toString();
+            ctx.font = "10px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Z = " + z.toFixed(1) + "%", x + width/2, y - 5);
+            
+            // Draw R-X components
+            var rWidth = width * (r/z);
+            var xWidth = width * (x/z);
+            
+            // Draw R (resistance) element
+            ctx.strokeStyle = "#FF6347";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.rect(x, y, rWidth, height);
+            ctx.stroke();
+            ctx.fillText("R", x + rWidth/2, y + height/2 + 4);
+            
+            // Draw X (reactance) element as inductor symbol
+            ctx.strokeStyle = "#2196F3";
+            ctx.beginPath();
+            var xStart = x + rWidth + 5;
+            var loops = 3;
+            var loopWidth = xWidth / (loops + 1);
+            
+            ctx.moveTo(xStart, y + height/2);
+            
+            for (var i = 0; i < loops; i++) {
+                var loopX = xStart + i * loopWidth;
+                ctx.arc(loopX + loopWidth/2, y + height/2, loopWidth/2, Math.PI, 0, false);
             }
             
+            ctx.lineTo(xStart + xWidth, y + height/2);
             ctx.stroke();
+            ctx.fillText("X", xStart + xWidth/2, y + height + 10);
         }
         
         function drawVectorGroupInfo(ctx, x, y, width, height, vectorGroup, turnsRatio, correctedRatio) {
@@ -272,7 +296,8 @@ Item {
             var info = "Vector Group: " + vectorGroup + 
                       " | Phase Shift: " + phaseAngle +
                       " | Ratio: " + turnsRatio.toFixed(1) +
-                      " | Corrected: " + correctedRatio.toFixed(1);
+                      " | Corrected: " + correctedRatio.toFixed(1) +
+                      " | Z: " + root.impedancePercent.toFixed(1) + "%";
                       
             ctx.fillText(info, x, y);
             
@@ -295,11 +320,38 @@ Item {
             ctx.lineWidth = 2;
             
             var shift = phase === "11" ? 30 : phase === "1" ? -30 : 0;
+            var isZigzag = vectorGroup.charAt(1).toLowerCase() === "z";
             
             // Draw secondary vectors with phase shift
-            drawVector(ctx, cx, cy, radius * 0.7, 0 + shift);
-            drawVector(ctx, cx, cy, radius * 0.7, 120 + shift);
-            drawVector(ctx, cx, cy, radius * 0.7, 240 + shift);
+            if (isZigzag) {
+                // Draw the main zigzag resultant vectors
+                drawVector(ctx, cx, cy, radius * 0.7, 0 + shift);
+                drawVector(ctx, cx, cy, radius * 0.7, 120 + shift);
+                drawVector(ctx, cx, cy, radius * 0.7, 240 + shift);
+                
+                // Draw the component vectors that make up the zigzag
+                // These are the two sets of windings that combine to create the zigzag effect
+                ctx.strokeStyle = "#FF9E80"; // Lighter color for component vectors
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 2]);
+                
+                // First set of components (at 0°, 120°, 240°)
+                drawVector(ctx, cx, cy, radius * 0.35, 0 + shift);
+                drawVector(ctx, cx, cy, radius * 0.35, 120 + shift);
+                drawVector(ctx, cx, cy, radius * 0.35, 240 + shift);
+                
+                // Second set of components (at 180°, 300°, 60°) - these are the zigzag components
+                drawVector(ctx, cx, cy, radius * 0.35, 180 + shift);
+                drawVector(ctx, cx, cy, radius * 0.35, 300 + shift);
+                drawVector(ctx, cx, cy, radius * 0.35, 60 + shift);
+                
+                ctx.setLineDash([]);
+            } else {
+                // Normal vector drawing for non-zigzag configurations
+                drawVector(ctx, cx, cy, radius * 0.7, 0 + shift);
+                drawVector(ctx, cx, cy, radius * 0.7, 120 + shift);
+                drawVector(ctx, cx, cy, radius * 0.7, 240 + shift);
+            }
         }
         
         function drawVector(ctx, cx, cy, length, angle) {
