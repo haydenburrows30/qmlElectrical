@@ -25,18 +25,45 @@ Item {
         }
     }
 
+    Popup {
+        id: tipsPopup
+        width: parent.width * 0.6
+        height: parent.height * 0.6
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+            
+        Text {
+            anchors.fill: parent
+            text: {
+                "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. " +
+                "You can also select the starting method to see how the current profile changes. " +
+                "The starting current profile is displayed below the results."
+            }
+            wrapMode: Text.WordWrap
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 10
         anchors.margins: 10
 
         RowLayout {
-
             WaveCard {
+                id: results
                 title: "DOL"
-                // Layout.fillWidth: true
                 Layout.minimumHeight: 200
                 Layout.minimumWidth: 330
+
+                showSettings: true
             
                 GridLayout {
                     columns: 2

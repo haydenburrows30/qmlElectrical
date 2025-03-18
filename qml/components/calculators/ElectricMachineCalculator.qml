@@ -14,6 +14,46 @@ Item {
     property color textColor: Universal.foreground
     property int waveHeight: 300
 
+    Popup {
+        id: tipsPopup
+        width: parent.width * 0.8
+        height: parent.height * 0.8
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        ScrollView {
+            width: parent.width
+            height: parent.height
+            
+            Text {
+                anchors.fill: parent
+                text: {"Electric Machine Calculator\n\n" +
+                    "This calculator is used to estimate the electrical and mechanical parameters of an electric machine.\n\n" +
+                    "Machine Selection:\n" +
+                    "Select the type of machine from the drop-down list.\n\n" +
+                    "Electrical Parameters:\n" +
+                    "Select the input mode (V I or V kW) and enter the rated voltage, current, power, power factor, and efficiency.\n\n" +
+                    "Mechanical Parameters:\n" +
+                    "Enter the number of poles, frequency, speed, and slip.\n\n" +
+                    "Thermal Parameters:\n" +
+                    "Select the temperature class and cooling method.\n\n" +
+                    "Results:\n" +
+                    "The calculator will display the rated power, power with derating, torque, losses, and efficiency.\n\n" +
+                    "Visualization:\n" +
+                    "The right side of the calculator displays a visualization of the electric machine based on the input parameters.\n\n" +
+                    "Note: The calculator is for estimation purposes only and may not be accurate for all scenarios."}
+                wrapMode: Text.WordWrap
+            }
+        }
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -39,9 +79,12 @@ Item {
 
                     // Machine Type Selection
                     WaveCard {
+                        id: results
                         title: "Machine Selection"
                         Layout.fillWidth: true
                         Layout.minimumHeight: 90
+
+                        showSettings: true
                         
                         ColumnLayout {
                             spacing: 10
