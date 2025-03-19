@@ -1,0 +1,676 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Controls.Universal
+import QtQuick.Dialogs
+import QtCharts
+import "../"
+import "../../components"
+import Switchboard 1.0
+
+Item {
+    id: switchboardPanel
+    
+    property SwitchboardManager manager: SwitchboardManager {}
+    property color textColor: Universal.foreground
+
+    // Popup {
+    //     id: tipsPopup
+    //     width: 600
+    //     height: 400
+    //     x: (parent.width - width) / 2
+    //     y: (parent.height - height) / 2
+    //     modal: true
+    //     focus: true
+    //     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    //     visible: results.open
+
+    //     onAboutToHide: {
+    //         results.open = false
+    //     }
+    //     Text {
+    //         anchors.fill: parent
+    //         text: {"<h3>Switchboard Designer</h3><br>" +
+    //                "This tool helps you design electrical switchboards by entering circuit data such as:<br><br>" +
+    //                "• Breaker details (size, poles, type)<br>" +
+    //                "• Circuit destination and load<br>" +
+    //                "• Cabling specifications<br>" +
+    //                "• Load characteristics<br><br>" +
+    //                "The tool will calculate loading, verify compliance, and enable export of the full switchboard schedule.<br><br>" +
+    //                "Double-click any row to edit circuit details, or use the + button to add a new circuit."
+    //         }
+    //         wrapMode: Text.WordWrap
+    //     }
+    // }
+
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 10
+        spacing: 10
+
+        // Header section with general switchboard info
+        WaveCard {
+            id: results
+            title: "Switchboard Information"
+            Layout.fillWidth: true
+            Layout.preferredHeight: 180
+            showSettings: true
+
+            GridLayout {
+                anchors.fill: parent
+                columns: 4
+                rowSpacing: 10
+                columnSpacing: 15
+
+                Label { text: "Switchboard Name:" }
+                TextField {
+                    id: switchboardName
+                    placeholderText: "Enter name (e.g., MSB-1)"
+                    Layout.preferredWidth: 180
+                    onTextChanged: manager.setName(text)
+                }
+
+                Label { text: "Location:" }
+                TextField {
+                    id: switchboardLocation
+                    placeholderText: "Enter location"
+                    Layout.fillWidth: true
+                    onTextChanged: manager.setLocation(text)
+                }
+
+                Label { text: "Supply Voltage:" }
+                ComboBox {
+                    id: supplyVoltage
+                    model: ["230V", "400V", "415V", "11kV"]
+                    currentIndex: 1
+                    Layout.preferredWidth: 180
+                    onCurrentTextChanged: manager.setVoltage(currentText)
+                }
+
+                Label { text: "Phases:" }
+                ComboBox {
+                    id: phaseConfig
+                    model: ["1Ø + N", "3Ø + N", "3Ø"]
+                    currentIndex: 1
+                    Layout.fillWidth: true
+                    onCurrentTextChanged: manager.setPhases(currentText)
+                }
+
+                Label { text: "Main Incomer Rating:" }
+                TextField {
+                    id: mainRating
+                    placeholderText: "Enter amps"
+                    validator: IntValidator { bottom: 0 }
+                    Layout.preferredWidth: 180
+                    onTextChanged: if(text) manager.setMainRating(parseInt(text))
+                }
+
+                Label { text: "Switchboard Type:" }
+                ComboBox {
+                    id: switchboardType
+                    model: ["Main Switchboard", "Distribution Board", "Motor Control Center", "Sub-Board"]
+                    Layout.fillWidth: true
+                    onCurrentTextChanged: manager.setType(currentText)
+                }
+            }
+        }
+
+        // Circuit List Section
+        WaveCard {
+            title: "Circuit Schedule"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 5
+
+                // Data table header
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 40
+                    color: sideBar.toggle1 ? "#303030" : "#e0e0e0"
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 2
+
+                        Label { 
+                            text: "Circuit #" 
+                            Layout.preferredWidth: 60
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Destination" 
+                            Layout.preferredWidth: 150
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Rating" 
+                            Layout.preferredWidth: 60
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Poles" 
+                            Layout.preferredWidth: 50
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Type" 
+                            Layout.preferredWidth: 100
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Load"
+                            Layout.preferredWidth: 80
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Cable Size" 
+                            Layout.preferredWidth: 100
+                            font.bold: true
+                        }
+                        Label { 
+                            text: "Status" 
+                            Layout.fillWidth: true
+                            font.bold: true
+                        }
+                    }
+                }
+
+                // Circuit list
+                ListView {
+                    id: circuitList
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    
+                    // Simplify this
+                    model: manager.circuitCount
+                    
+                    // Add debug information
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Circuit count: " + manager.circuitCount
+                        visible: manager.circuitCount === 0  // Show only when empty
+                        color: "gray"
+                    }
+                    
+                    Component.onCompleted: {
+                        console.log("ListView created with circuit count:", model)
+                    }
+                    
+                    // Watch for circuit count changes directly
+                    onModelChanged: {
+                        console.log("ListView model changed to:", model)
+                    }
+                    
+                    // Use an Item as the root delegate to make positioning more reliable
+                    delegate: Item {
+                        id: delegateRoot
+                        width: ListView.view ? ListView.view.width : 100
+                        height: 40
+                        
+                        // Get the circuit data early to ensure it's available
+                        Component.onCompleted: {
+                            console.log("Creating delegate for index", index)
+                            if (!circuitData || Object.keys(circuitData).length === 0) {
+                                console.error("No circuit data for index", index)
+                            }
+                        }
+                        
+                        property var circuitData: manager.getCircuitAt(index)
+                        
+                        // Use a Rectangle for the background
+                        Rectangle {
+                            anchors.fill: parent
+                            color: index % 2 ? 
+                                (sideBar.toggle1 ? "#262626" : "#f5f5f5") : 
+                                (sideBar.toggle1 ? "#1a1a1a" : "#ffffff")
+                        }
+                        
+                        // Debug text to make issues more visible
+                        Text {
+                            text: "Circuit #" + (delegateRoot.circuitData.number || "??")
+                            anchors.centerIn: parent
+                            color: "red"
+                            visible: false // Set to true for debugging
+                        }
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onDoubleClicked: {
+                                circuitEditor.loadCircuit(index)
+                                circuitEditor.open()
+                            }
+                        }
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 10
+                            anchors.rightMargin: 10
+                            spacing: 2
+                            
+                            // Instead of relying on default values, use conditional expressions
+                            Label { 
+                                text: delegateRoot.circuitData ? delegateRoot.circuitData.number : "??"
+                                Layout.preferredWidth: 60
+                            }
+                            Label { 
+                                text: delegateRoot.circuitData ? delegateRoot.circuitData.destination : "??"
+                                Layout.preferredWidth: 150
+                                elide: Text.ElideRight
+                            }
+                            Label { 
+                                text: (delegateRoot.circuitData ? delegateRoot.circuitData.rating : 0) + "A"
+                                Layout.preferredWidth: 60
+                            }
+                            Label { 
+                                text: delegateRoot.circuitData ? delegateRoot.circuitData.poles : "??"
+                                Layout.preferredWidth: 50
+                            }
+                            Label { 
+                                text: delegateRoot.circuitData ? delegateRoot.circuitData.type : "??"
+                                Layout.preferredWidth: 100
+                            }
+                            Label { 
+                                text: (delegateRoot.circuitData ? delegateRoot.circuitData.load : 0).toFixed(2) + "kW"
+                                Layout.preferredWidth: 80
+                            }
+                            Label { 
+                                text: delegateRoot.circuitData ? delegateRoot.circuitData.cableSize : "??"
+                                Layout.preferredWidth: 100
+                            }
+                            Label { 
+                                text: delegateRoot.circuitData ? delegateRoot.circuitData.status : "??"
+                                Layout.fillWidth: true
+                                color: (delegateRoot.circuitData && delegateRoot.circuitData.status === "OK") ? 
+                                    (Universal.theme === Universal.Dark ? "#90EE90" : "green") :
+                                    (Universal.theme === Universal.Dark ? "#FF8080" : "red")
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+                    
+                    Button {
+                        text: "Add Circuit"
+                        icon.name: "add"
+                        onClicked: {
+                            circuitEditor.reset1()
+                            circuitEditor.open()
+                        }
+                    }
+                    
+                    Button {
+                        text: "Export Schedule"
+                        icon.name: "document-save"
+                        onClicked: exportMenu.open()
+                        
+                        Menu {
+                            id: exportMenu
+                            MenuItem {
+                                text: "Export as CSV"
+                                onTriggered: {
+                                    let result = manager.exportCSV()
+                                    messageDialog.text = result
+                                    messageDialog.open()
+                                }
+                            }
+                            MenuItem {
+                                text: "Export as PDF"
+                                onTriggered: {
+                                    let result = manager.exportPDF()
+                                    messageDialog.text = result
+                                    messageDialog.open()
+                                }
+                            }
+                            MenuItem {
+                                text: "Print Schedule"
+                                onTriggered: {
+                                    let result = manager.printSchedule()
+                                    messageDialog.text = result
+                                    messageDialog.open()
+                                }
+                            }
+                            MenuItem {
+                                text: "Save as JSON"
+                                onTriggered: {
+                                    let result = manager.saveToJSON()
+                                    messageDialog.text = result
+                                    messageDialog.open()
+                                }
+                            }
+                        }
+                    }
+                    
+                    Button {
+                        text: "Load Schedule"
+                        icon.name: "folder-open"
+                        onClicked: fileDialog.open()
+                    }
+                    
+                    Item { Layout.fillWidth: true } // Spacer
+                    
+                    Label { 
+                        text: "Total Load: " + manager.totalLoad.toFixed(2) + " kW"
+                        font.bold: true
+                    }
+                    
+                    Label { 
+                        text: "Utilization: " + manager.utilizationPercent.toFixed(1) + "%"
+                        font.bold: true
+                        color: manager.utilizationPercent > 80 ? 
+                            (Universal.theme === Universal.Dark ? "#FF8080" : "red") :
+                            (Universal.theme === Universal.Dark ? "#90EE90" : "green")
+                    }
+                }
+
+                TabBar {
+                    id: tabBar
+                    width: parent.width
+                    
+                    TabButton {
+                        text: "Circuit List"
+                        width: implicitWidth
+                    }
+                    TabButton {
+                        text: "Load Distribution"
+                        width: implicitWidth
+                    }
+                    TabButton {
+                        text: "Single Line Diagram"
+                        width: implicitWidth
+                    }
+                }
+                
+                StackLayout {
+                    currentIndex: tabBar.currentIndex
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 300
+                    
+                    // Tab 1: Circuit List (already shown above)
+                    Item {
+                        // Empty because we already have the circuit list above
+                    }
+                    
+                    // Tab 2: Load Distribution Chart
+                    Item {
+                        id: loadChartContainer
+                        width: parent.width
+                        height: parent.height
+
+                        LoadChart {
+                            anchors.fill: parent
+                            manager: switchboardPanel.manager
+                            darkMode: sideBar.toggle1
+                        }
+                    }
+                    
+                    // Tab 3: Single Line Diagram
+                    ScrollView {
+                        id: diagramView
+                        clip: true
+                        
+                        SwitchboardDiagram {
+                            id: singleLineDiagram
+                            width: Math.max(diagramView.width, 800)
+                            height: Math.max(diagramView.height, 800)
+                            switchboardName: manager.name
+                            mainRating: manager.mainRating
+                            voltage: manager.voltage
+                            phases: manager.phases
+                            circuits: {
+                                let model = manager.circuitModel;
+                                return model ? model._circuits : [];
+                            }
+                            darkMode: sideBar.toggle1
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Circuit Editor Dialog
+    Dialog {
+        id: circuitEditor
+        title: editMode ? "Edit Circuit " + circuitNumber : "Add New Circuit"
+        modal: true
+        standardButtons: Dialog.Save | Dialog.Cancel
+        width: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        
+        property bool editMode: false
+        property int circuitIndex: -1
+        property string circuitNumber: ""
+        
+        // Add explicit handler function instead of using Component.onCompleted
+        function handleAccepted() {
+            console.log("Saving circuit...");
+            
+            // Create the circuit data object
+            let circuitData = {
+                destination: destinationField.text,
+                rating: parseInt(ratingCombo.currentText),
+                poles: polesCombo.currentText,
+                type: typeCombo.currentText,
+                load: parseFloat(loadField.text || "0"),
+                cableSize: cableSizeCombo.currentText,
+                cableCores: cableCoresCombo.currentText,
+                length: parseFloat(lengthField.text || "0"),
+                notes: notesField.text
+            };
+            
+            console.log("Circuit data:", JSON.stringify(circuitData));
+            
+            // Save circuit details
+            if (editMode) {
+                let success = manager.updateCircuit(circuitIndex, circuitData);
+                console.log("Circuit updated, success =", success);
+            } else {
+                let success = manager.addCircuit(circuitData);
+                console.log("Circuit added, success =", success);
+                console.log("Current circuit count after adding:", manager.circuitCount);
+            }
+        }
+        
+        // Connect the accepted signal to our handler function
+        onAccepted: handleAccepted()
+        
+        function reset1() {
+            editMode = false
+            circuitIndex = -1
+            circuitNumber = ""
+            
+            // Clear fields
+            destinationField.text = ""
+            ratingCombo.currentIndex = 0
+            polesCombo.currentIndex = 1
+            typeCombo.currentIndex = 0
+            loadField.text = ""
+            cableSizeCombo.currentIndex = 0
+            cableCoresCombo.currentIndex = 0
+            lengthField.text = ""
+            notesField.text = ""
+        }
+        
+        function loadCircuit(index) {
+            editMode = true
+            circuitIndex = index
+            let circuit = manager.getCircuit(index)
+            circuitNumber = circuit.number
+            
+            // Fill form fields
+            destinationField.text = circuit.destination
+            
+            // Find and set the correct indices for combo boxes
+            for (let i = 0; i < ratingCombo.model.length; i++) {
+                if (ratingCombo.model[i] == circuit.rating.toString()) {
+                    ratingCombo.currentIndex = i
+                    break
+                }
+            }
+            
+            for (let i = 0; i < polesCombo.model.length; i++) {
+                if (polesCombo.model[i] == circuit.poles) {
+                    polesCombo.currentIndex = i
+                    break
+                }
+            }
+            
+            for (let i = 0; i < typeCombo.model.length; i++) {
+                if (typeCombo.model[i] == circuit.type) {
+                    typeCombo.currentIndex = i
+                    break
+                }
+            }
+            
+            loadField.text = circuit.load
+            
+            for (let i = 0; i < cableSizeCombo.model.length; i++) {
+                if (cableSizeCombo.model[i] == circuit.cableSize) {
+                    cableSizeCombo.currentIndex = i
+                    break
+                }
+            }
+            
+            for (let i = 0; i < cableCoresCombo.model.length; i++) {
+                if (cableCoresCombo.model[i] == circuit.cableCores) {
+                    cableCoresCombo.currentIndex = i
+                    break
+                }
+            }
+            
+            lengthField.text = circuit.length
+            notesField.text = circuit.notes || ""
+        }
+        
+        contentItem: GridLayout {
+            columns: 2
+            rowSpacing: 10
+            columnSpacing: 15
+            
+            Label { text: "Destination:" }
+            TextField {
+                id: destinationField
+                Layout.fillWidth: true
+                placeholderText: "e.g., Lighting Circuit 1"
+            }
+            
+            Label { text: "Breaker Rating (A):" }
+            ComboBox {
+                id: ratingCombo
+                model: ["6", "10", "16", "20", "25", "32", "40", "50", "63", "80", "100", "125", "160", "200", "250"]
+                Layout.fillWidth: true
+            }
+            
+            Label { text: "Poles:" }
+            ComboBox {
+                id: polesCombo
+                model: ["1P", "2P", "3P", "4P"]
+                currentIndex: 1  // Default to 2P
+                Layout.fillWidth: true
+            }
+            
+            Label { text: "Protection Type:" }
+            ComboBox {
+                id: typeCombo
+                model: ["MCB", "MCCB", "RCD", "RCBO", "Fuse"]
+                Layout.fillWidth: true
+            }
+            
+            Label { text: "Load (kW):" }
+            TextField {
+                id: loadField
+                Layout.fillWidth: true
+                placeholderText: "Enter load"
+                validator: DoubleValidator { bottom: 0 }
+            }
+            
+            Label { text: "Cable Size:" }
+            ComboBox {
+                id: cableSizeCombo
+                model: ["1.5mm²", "2.5mm²", "4mm²", "6mm²", "10mm²", "16mm²", "25mm²", "35mm²", "50mm²", "70mm²", "95mm²"]
+                Layout.fillWidth: true
+            }
+            
+            Label { text: "Cable Cores:" }
+            ComboBox {
+                id: cableCoresCombo
+                model: ["2C", "2C+E", "3C", "3C+E", "4C", "4C+E"]
+                Layout.fillWidth: true
+            }
+            
+            Label { text: "Cable Length (m):" }
+            TextField {
+                id: lengthField
+                Layout.fillWidth: true
+                placeholderText: "Enter length"
+                validator: DoubleValidator { bottom: 0 }
+            }
+            
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.columnSpan: 2
+                height: 1
+                color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+            }
+            
+            Label { 
+                text: "Notes:" 
+                Layout.alignment: Qt.AlignTop
+            }
+            TextArea {
+                id: notesField
+                Layout.fillWidth: true
+                Layout.preferredHeight: 60
+                placeholderText: "Optional notes about this circuit"
+            }
+        }
+    }
+    
+    // Add Message Dialog for notifications
+    Dialog {
+        id: messageDialog
+        title: "Switchboard Manager"
+        width: 400
+        height: 200
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        standardButtons: Dialog.Ok
+        
+        property string text: ""
+        
+        ColumnLayout {
+            anchors.fill: parent
+            
+            Label {
+                text: messageDialog.text
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+        }
+    }
+    
+    // Add File Dialog for loading JSON files
+    FileDialog {
+        id: fileDialog
+        title: "Load Switchboard Schedule"
+        nameFilters: ["JSON files (*.json)"]
+        
+        onAccepted: {
+            let result = manager.loadFromJSON(fileDialog.selectedFile.toString())
+            messageDialog.text = result
+            messageDialog.open()
+        }
+    }
+}

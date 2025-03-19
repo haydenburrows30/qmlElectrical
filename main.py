@@ -35,9 +35,9 @@ from models.charging_calculator import ChargingCalculator
 from models.battery_calculator import BatteryCalculator
 from models.machine_calculator import MachineCalculator
 from models.earthing_calculator import EarthingCalculator
-from models.transformer_calculator import TransformerCalculator
 from models.transmission_calculator import TransmissionLineCalculator
 from models.delta_transformer import DeltaTransformerCalculator
+from models.switchboard.switchboard_manager import SwitchboardManager
 
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
@@ -197,7 +197,7 @@ class Application:
             (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
             (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
             (RLCChart, "RLC", 1, 0, "RLCChart"),
-            (VoltageDropCalculator,"VDrop", 1, 0, "VoltageDrop"),
+            (VoltageDropCalculator, "VDrop", 1, 0, "VoltageDrop"),
             (ResultsManager, "Results", 1, 0, "ResultsManager"),
             (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
             (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
@@ -211,7 +211,8 @@ class Application:
             (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
             (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper"),
             (RefRgfCalculator, "RefRgf", 1, 0, "RefRgfCalculator"),
-            (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator")
+            (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator"),
+            (SwitchboardManager, "Switchboard", 1, 0, "SwitchboardManager")
         ]
 
         for type_info in qml_types:
@@ -254,7 +255,6 @@ def main():
     app.run()
 
 if __name__ == "__main__":
-    container = setup_container()
-    app = Application(container)
-    app.run()
+    main()
+
 

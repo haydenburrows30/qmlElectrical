@@ -26,8 +26,10 @@ Page {
 
         Text {
             anchors.fill: parent
-            text: { ""}
+            text: {"Placeholder text for information"}
             wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
     }
 
@@ -53,6 +55,7 @@ Page {
         { name: qsTr("Charging Current"), source: "../components/calculators/ChargingCurrentCalculator.qml" },
         { name: qsTr("Voltage Drop"), source: "../components/calculators/VoltageDropCalculator.qml" },
         { name: qsTr("Transmission Line"), source: "../components/calculators/TransmissionLineCalculator.qml" },
+        { name: qsTr("Switchboard"), source: "../components/calculators/SwitchboardPanel.qml" }
     ]
     
     property var theory: [
