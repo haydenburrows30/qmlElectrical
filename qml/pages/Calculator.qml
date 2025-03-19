@@ -14,6 +14,23 @@ Page {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
+    Popup {
+        id: tipsPopup
+        width: 500
+        height: 300
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        Text {
+            anchors.fill: parent
+            text: { ""}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     property var basic: [
         { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml" },
         { name: qsTr("kVA / kw / A"), source: "../components/calculators/PowerCurrentCalculator.qml" },
@@ -45,7 +62,7 @@ Page {
         { name: qsTr("Motor Starting"), source: "../components/calculators/MotorStartingCalculator.qml" }
     ]
 
-    Row{
+    Row {
         id: menuBar1
         height: menuBar.height
         anchors.horizontalCenter : parent.horizontalCenter
@@ -79,8 +96,8 @@ Page {
                         onTriggered: calculatorLoader.source = modelData.source
                     }
                 }
-                
             }
+
             Menu {
                 title: "Protection"
                 Repeater {
@@ -114,8 +131,15 @@ Page {
                     }
                 }
             }
+            Menu {
+                title: "Info"
+                MenuItem {
+                    text: "i"
+                    onTriggered: tipsPopup.open()
+                }
+            }
         }
-}
+    }
 
     Loader {
         id: calculatorLoader

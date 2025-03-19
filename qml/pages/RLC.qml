@@ -16,6 +16,33 @@ Page {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
 
+    Popup {
+        id: tipsPopup
+        width: 500
+        height: 300
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"<h3>RLC Circuit</h3><br>"
+                + "This page simulates the response of a series or parallel RLC circuit to an input frequency. "
+                + "The circuit consists of a resistor (R), inductor (L), and capacitor (C) in series or parallel. "
+                + "The circuit parameters can be adjusted to see how they affect the impedance and gain of the circuit. "
+                + "The resonant frequency and quality factor (Q) are also calculated based on the circuit parameters. "
+                + "The circuit response is displayed in a chart showing the gain or impedance vs. frequency. "
+                + "The phase vector diagram shows the phase angle of the impedance and the current in the circuit. " }
+            wrapMode: Text.WordWrap
+        }
+    }
+
     property int currentMode: 0 // 0 for series, 1 for parallel
 
     Connections {
@@ -90,11 +117,13 @@ Page {
                     Layout.fillHeight: true
 
                     WaveCard {
-                        id: parametersCard
                         title: currentMode === 0 ? 'Series RLC Parameters' : 'Parallel RLC Parameters'
                         Layout.minimumHeight: 800
                         Layout.minimumWidth: 350
                         Layout.fillHeight: true
+
+                        id: results
+                        showSettings: true
                         
                         ColumnLayout {
                             anchors.fill: parent
