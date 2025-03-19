@@ -13,6 +13,34 @@ Item {
     property InstrumentTransformerCalculator calculator: InstrumentTransformerCalculator {}
     property color textColor: Universal.foreground
 
+    Popup {
+        id: tipsPopup
+        width: 500
+        height: 400
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"<h3>Instrument Transformer Calculator</h3><br>" +
+                    "This calculator estimates the performance of current and voltage transformers based on various parameters.<br><br>" +
+                    "<b>Current Transformer:</b> The type, ratio, burden, power factor, temperature, and accuracy class.<br>" +
+                    "<b>Voltage Transformer:</b> The ratio, burden, rated voltage factor, and burden status.<br><br>" +
+                    "The calculator provides the knee point voltage, maximum fault current, minimum CT burden, error margin, temperature effect, VT rated voltage, VT impedance, and burden utilization.<br><br>" +
+                    "The visualization shows the transformer connections and the current and voltage waveforms.<br><br>" +
+                    "Developed by <b>Wave</b>."
+            }
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -31,7 +59,8 @@ Item {
                 title: "Current Transformer"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                // Layout.minimumHeight: 600
+                id: results
+                showSettings: true
 
                 GridLayout {
                     columns: 2

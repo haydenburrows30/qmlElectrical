@@ -42,16 +42,10 @@ Item {
                     "<br>" +
                     "For more information, refer to the relay's datasheet or contact the manufacturer.<br>" +
                     "<br>" +
-                    "<b>Disclaimer:</b> This calculator is for educational purposes only and should not be used for critical applications.<br>" +
-                    "<br>" +
                     "<b>References:</b><br>" +
                     "IEEE Standard C37.112-1996<br>" +
                     "IEC 60255-151:2009<br>" +
-                    "ANSI/IEEE C37.112-1996<br>" +
-                    "<br>" +
-                    "<b>Author:</b> Electrical Engineering Portal<br>" +
-                    "<b>Version:</b> 1.0<br>" +
-                    "<b>Date:</b> 2021-09-01" }
+                    "ANSI/IEEE C37.112-1996<br>"}
             wrapMode: Text.WordWrap
         }
     }

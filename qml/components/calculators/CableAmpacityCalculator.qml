@@ -14,6 +14,38 @@ Item {
     property AmpacityCalculator calculator: AmpacityCalculator {}
     property color textColor: Universal.foreground
 
+    Popup {
+        id: tipsPopup
+        width: 600
+        height: 400
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"<h3>Cable Ampacity Calculator</h3><br>" +
+                    "This calculator estimates the current carrying capacity of a cable based on various parameters.<br><br>" +
+                    "<b>Cable Size:</b> The cross-sectional area of the cable in mm².<br>" +
+                    "<b>Insulation Type:</b> The type of insulation used in the cable.<br>" +
+                    "<b>Installation Method:</b> The method of cable installation.<br>" +
+                    "<b>Ambient Temperature:</b> The temperature of the surrounding environment in °C.<br>" +
+                    "<b>Number of Circuits:</b> The number of cables or circuits in the installation.<br>" +
+                    "<b>Conductor Material:</b> The material used for the cable conductor.<br><br>" +
+                    "The calculator provides the base ampacity, derated ampacity, voltage drop per 100m, and recommended cable size.<br><br>" +
+                    "The visualization shows the current carrying capacity of the cable based on the selected parameters.<br><br>" +
+                    "Developed by <b>Wave</b>."
+            }
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -29,6 +61,9 @@ Item {
                 title: "System Parameters"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 300
+
+                id: results
+                showSettings: true
 
                 GridLayout {
                     columns: 2

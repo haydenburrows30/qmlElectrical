@@ -55,15 +55,7 @@ Popup {
     }
     Text {
         anchors.fill: parent
-        text: { "<h3>Battery Calculator</h3><br>" +
-                "This calculator estimates the battery capacity required for a given load and backup time.<br><br>" +
-                "<b>Load:</b> The power consumption in watts.<br>" +
-                "<b>System Voltage:</b> The voltage of the battery system.<br>" +
-                "<b>Backup Time:</b> The duration for which the battery should provide power.<br>" +
-                "<b>Depth of Discharge:</b> The percentage of battery capacity that can be used.<br>" +
-                "<b>Battery Type:</b> The type of battery used.<br><br>" +
-                "The calculator estimates the current draw, required capacity, recommended capacity, and energy storage.<br>" +
-                "The battery visualization shows the depth of discharge and recommended capacity." }
+        text: { ""}
         wrapMode: Text.WordWrap
     }
 }

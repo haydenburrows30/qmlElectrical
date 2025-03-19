@@ -16,7 +16,7 @@ Item {
     Popup {
         id: tipsPopup
         width: 500
-        height: 300
+        height: 400
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         modal: true

@@ -13,6 +13,43 @@ Item {
     property EarthingCalculator calculator: EarthingCalculator {}
     property color textColor: Universal.foreground
 
+    Popup {
+        id: tipsPopup
+        width: 700
+        height: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"<h3>Earthing System Calculator</h3><br>" +
+                    "This calculator estimates the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for an earthing system.<br><br>" +
+                    "<b>Grid Parameters:</b><br>" +
+                    "<b>Soil Resistivity:</b> The resistivity of the soil in Ω⋅m.<br>" +
+                    "<b>Grid Depth:</b> The depth of the grid in meters.<br>" +
+                    "<b>Grid Length:</b> The length of the grid in meters.<br>" +
+                    "<b>Grid Width:</b> The width of the grid in meters.<br><br>" +
+                    "<b>Rod Parameters:</b><br>" +
+                    "<b>Rod Length:</b> The length of the ground rods in meters.<br>" +
+                    "<b>Number of Rods:</b> The number of ground rods.<br><br>" +
+                    "<b>Fault Parameters:</b><br>" +
+                    "<b>Fault Current:</b> The fault current in Amperes.<br>" +
+                    "<b>Fault Duration:</b> The fault duration in seconds.<br><br>" +
+                    "The calculator provides the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for the earthing system.<br><br>" +
+                    "The visualization shows the earthing system with the grid and ground rods.<br><br>" +
+                    "Developed by <b>Wave</b>."
+            }
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -29,6 +66,9 @@ Item {
                 title: "Grid Parameters"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 200
+
+                id: results
+                showSettings: true
 
                 GridLayout {
                     columns: 2
