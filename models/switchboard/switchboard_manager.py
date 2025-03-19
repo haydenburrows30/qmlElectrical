@@ -261,7 +261,8 @@ class SwitchboardManager(QObject):
     type = Property(str, get_type, setType, notify=typeChanged)
     totalLoad = Property(float, get_total_load, notify=totalLoadChanged)
     utilizationPercent = Property(float, get_utilization_percent, notify=utilizationPercentChanged)
-    circuitModel = Property(QAbstractListModel, lambda self: self._circuit_model, constant=True)
+    # Fix the property type for circuitModel to use QObject instead of QAbstractListModel
+    circuitModel = Property(QObject, lambda self: self._circuit_model, constant=True)
     circuitCount = Property(int, get_circuit_count, notify=circuitCountChanged)
 
     # Methods
@@ -300,8 +301,9 @@ class SwitchboardManager(QObject):
         
         return True
 
-    @Slot(int, dict)
+    @Slot(int, dict, result=bool)
     def updateCircuit(self, index, circuit_data):
+        print(f"Updating circuit at index {index} with data: {circuit_data}")
         existing = self._circuit_model.get_circuit(index)
         if existing:
             circuit_number = existing.number
@@ -316,11 +318,20 @@ class SwitchboardManager(QObject):
             # Update in model
             self._circuit_model.update_circuit(index, updated_circuit)
             
-            # Emit signals
-            self.circuitsChanged.emit()
+            # Make sure the model updates are visible in QML
+            self._circuit_model.layoutChanged.emit()
+            
+            # Emit signals in the right order (similar to addCircuit)
+            print(f"Circuit updated successfully: {circuit_number}")
             self.totalLoadChanged.emit()
             self.utilizationPercentChanged.emit()
+            self.circuitsChanged.emit()
             self.circuitCountChanged.emit(len(self._circuit_model._circuits))
+            
+            return True
+        
+        print(f"Failed to update circuit: index {index} not found")
+        return False
     
     @Slot(int, result=dict)
     def getCircuit(self, index):

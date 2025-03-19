@@ -14,34 +14,34 @@ Item {
     property SwitchboardManager manager: SwitchboardManager {}
     property color textColor: Universal.foreground
 
-    // Popup {
-    //     id: tipsPopup
-    //     width: 600
-    //     height: 400
-    //     x: (parent.width - width) / 2
-    //     y: (parent.height - height) / 2
-    //     modal: true
-    //     focus: true
-    //     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    //     visible: results.open
+    Popup {
+        id: tipsPopup
+        width: 600
+        height: 400
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
 
-    //     onAboutToHide: {
-    //         results.open = false
-    //     }
-    //     Text {
-    //         anchors.fill: parent
-    //         text: {"<h3>Switchboard Designer</h3><br>" +
-    //                "This tool helps you design electrical switchboards by entering circuit data such as:<br><br>" +
-    //                "• Breaker details (size, poles, type)<br>" +
-    //                "• Circuit destination and load<br>" +
-    //                "• Cabling specifications<br>" +
-    //                "• Load characteristics<br><br>" +
-    //                "The tool will calculate loading, verify compliance, and enable export of the full switchboard schedule.<br><br>" +
-    //                "Double-click any row to edit circuit details, or use the + button to add a new circuit."
-    //         }
-    //         wrapMode: Text.WordWrap
-    //     }
-    // }
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: {"<h3>Switchboard Designer</h3><br>" +
+                   "This tool helps you design electrical switchboards by entering circuit data such as:<br><br>" +
+                   "• Breaker details (size, poles, type)<br>" +
+                   "• Circuit destination and load<br>" +
+                   "• Cabling specifications<br>" +
+                   "• Load characteristics<br><br>" +
+                   "The tool will calculate loading, verify compliance, and enable export of the full switchboard schedule.<br><br>" +
+                   "Double-click any row to edit circuit details, or use the + button to add a new circuit."
+            }
+            wrapMode: Text.WordWrap
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -205,7 +205,12 @@ Item {
                                     }
                                     Label { 
                                         text: "Cable Size" 
-                                        Layout.preferredWidth: 100
+                                        Layout.preferredWidth: 80
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Length" 
+                                        Layout.preferredWidth: 60
                                         font.bold: true
                                     }
                                     Label { 
@@ -236,9 +241,15 @@ Item {
                                     console.log("ListView created with circuit count:", model)
                                 }
                                 
-                                // Watch for circuit count changes directly
-                                onModelChanged: {
-                                    console.log("ListView model changed to:", model)
+                                // Add direct connection to the circuit count signal
+                                Connections {
+                                    target: manager
+                                    function onCircuitCountChanged() {
+                                        // Force refresh the list view
+                                        circuitList.model = 0;
+                                        circuitList.model = manager.circuitCount;
+                                        console.log("ListView refreshed with new circuit count:", manager.circuitCount);
+                                    }
                                 }
                                 
                                 // Use an Item as the root delegate to make positioning more reliable
@@ -315,7 +326,11 @@ Item {
                                         }
                                         Label { 
                                             text: delegateRoot.circuitData ? delegateRoot.circuitData.cableSize : "??"
-                                            Layout.preferredWidth: 100
+                                            Layout.preferredWidth: 80
+                                        }
+                                        Label { 
+                                            text: (delegateRoot.circuitData ? delegateRoot.circuitData.length : 0) + "m"
+                                            Layout.preferredWidth: 60
                                         }
                                         Label { 
                                             text: delegateRoot.circuitData ? delegateRoot.circuitData.status : "??"
@@ -512,6 +527,10 @@ Item {
             if (editMode) {
                 let success = manager.updateCircuit(circuitIndex, circuitData);
                 console.log("Circuit updated, success =", success);
+                
+                // Force the ListView to update by explicitly updating the model
+                circuitList.model = 0;  // Temporarily set to 0
+                circuitList.model = manager.circuitCount;  // Set back to the count
             } else {
                 let success = manager.addCircuit(circuitData);
                 console.log("Circuit added, success =", success);
@@ -598,8 +617,8 @@ Item {
             Label { text: "Destination:" }
             TextField {
                 id: destinationField
-                Layout.fillWidth: true
                 placeholderText: "e.g., Lighting Circuit 1"
+                Layout.fillWidth: true
             }
             
             Label { text: "Breaker Rating (A):" }
@@ -627,9 +646,9 @@ Item {
             Label { text: "Load (kW):" }
             TextField {
                 id: loadField
-                Layout.fillWidth: true
                 placeholderText: "Enter load"
                 validator: DoubleValidator { bottom: 0 }
+                Layout.fillWidth: true
             }
             
             Label { text: "Cable Size:" }
@@ -649,9 +668,9 @@ Item {
             Label { text: "Cable Length (m):" }
             TextField {
                 id: lengthField
-                Layout.fillWidth: true
                 placeholderText: "Enter length"
                 validator: DoubleValidator { bottom: 0 }
+                Layout.fillWidth: true
             }
             
             Rectangle {
@@ -667,9 +686,9 @@ Item {
             }
             TextArea {
                 id: notesField
+                placeholderText: "Optional notes about this circuit"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 60
-                placeholderText: "Optional notes about this circuit"
             }
         }
     }
@@ -704,7 +723,6 @@ Item {
         id: fileDialog
         title: "Load Switchboard Schedule"
         nameFilters: ["JSON files (*.json)"]
-        
         onAccepted: {
             let result = manager.loadFromJSON(fileDialog.selectedFile.toString())
             messageDialog.text = result
