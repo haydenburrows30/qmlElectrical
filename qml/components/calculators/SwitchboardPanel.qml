@@ -120,180 +120,281 @@ Item {
             title: "Circuit Schedule"
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.minimumHeight: 400 // Set minimum height for the card
 
             ColumnLayout {
                 anchors.fill: parent
                 spacing: 5
 
-                // Data table header
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 40
-                    color: sideBar.toggle1 ? "#303030" : "#e0e0e0"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        spacing: 2
-
-                        Label { 
-                            text: "Circuit #" 
-                            Layout.preferredWidth: 60
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Destination" 
-                            Layout.preferredWidth: 150
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Rating" 
-                            Layout.preferredWidth: 60
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Poles" 
-                            Layout.preferredWidth: 50
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Type" 
-                            Layout.preferredWidth: 100
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Load"
-                            Layout.preferredWidth: 80
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Cable Size" 
-                            Layout.preferredWidth: 100
-                            font.bold: true
-                        }
-                        Label { 
-                            text: "Status" 
-                            Layout.fillWidth: true
-                            font.bold: true
-                        }
+                // 1. TabBar at the very top
+                TabBar {
+                    id: tabBar
+                    width: parent.width
+                    
+                    TabButton {
+                        text: "Circuit List"
+                        width: implicitWidth
+                    }
+                    TabButton {
+                        text: "Load Distribution"
+                        width: implicitWidth
+                    }
+                    TabButton {
+                        text: "Single Line Diagram"
+                        width: implicitWidth
                     }
                 }
 
-                // Circuit list
-                ListView {
-                    id: circuitList
+                // 2. StackLayout content immediately following TabBar
+                StackLayout {
+                    currentIndex: tabBar.currentIndex
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    clip: true
+                    Layout.minimumHeight: 300
                     
-                    // Simplify this
-                    model: manager.circuitCount
-                    
-                    // Add debug information
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Circuit count: " + manager.circuitCount
-                        visible: manager.circuitCount === 0  // Show only when empty
-                        color: "gray"
-                    }
-                    
-                    Component.onCompleted: {
-                        console.log("ListView created with circuit count:", model)
-                    }
-                    
-                    // Watch for circuit count changes directly
-                    onModelChanged: {
-                        console.log("ListView model changed to:", model)
-                    }
-                    
-                    // Use an Item as the root delegate to make positioning more reliable
-                    delegate: Item {
-                        id: delegateRoot
-                        width: ListView.view ? ListView.view.width : 100
-                        height: 40
+                    // Tab 1: Circuit List
+                    Item {
+                        width: parent.width
+                        height: parent.height
                         
-                        // Get the circuit data early to ensure it's available
-                        Component.onCompleted: {
-                            console.log("Creating delegate for index", index)
-                            if (!circuitData || Object.keys(circuitData).length === 0) {
-                                console.error("No circuit data for index", index)
-                            }
-                        }
-                        
-                        property var circuitData: manager.getCircuitAt(index)
-                        
-                        // Use a Rectangle for the background
-                        Rectangle {
+                        ColumnLayout {
                             anchors.fill: parent
-                            color: index % 2 ? 
-                                (sideBar.toggle1 ? "#262626" : "#f5f5f5") : 
-                                (sideBar.toggle1 ? "#1a1a1a" : "#ffffff")
-                        }
-                        
-                        // Debug text to make issues more visible
-                        Text {
-                            text: "Circuit #" + (delegateRoot.circuitData.number || "??")
-                            anchors.centerIn: parent
-                            color: "red"
-                            visible: false // Set to true for debugging
-                        }
-                        
-                        MouseArea {
-                            anchors.fill: parent
-                            onDoubleClicked: {
-                                circuitEditor.loadCircuit(index)
-                                circuitEditor.open()
-                            }
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 10
-                            anchors.rightMargin: 10
-                            spacing: 2
+                            spacing: 5
                             
-                            // Instead of relying on default values, use conditional expressions
-                            Label { 
-                                text: delegateRoot.circuitData ? delegateRoot.circuitData.number : "??"
-                                Layout.preferredWidth: 60
-                            }
-                            Label { 
-                                text: delegateRoot.circuitData ? delegateRoot.circuitData.destination : "??"
-                                Layout.preferredWidth: 150
-                                elide: Text.ElideRight
-                            }
-                            Label { 
-                                text: (delegateRoot.circuitData ? delegateRoot.circuitData.rating : 0) + "A"
-                                Layout.preferredWidth: 60
-                            }
-                            Label { 
-                                text: delegateRoot.circuitData ? delegateRoot.circuitData.poles : "??"
-                                Layout.preferredWidth: 50
-                            }
-                            Label { 
-                                text: delegateRoot.circuitData ? delegateRoot.circuitData.type : "??"
-                                Layout.preferredWidth: 100
-                            }
-                            Label { 
-                                text: (delegateRoot.circuitData ? delegateRoot.circuitData.load : 0).toFixed(2) + "kW"
-                                Layout.preferredWidth: 80
-                            }
-                            Label { 
-                                text: delegateRoot.circuitData ? delegateRoot.circuitData.cableSize : "??"
-                                Layout.preferredWidth: 100
-                            }
-                            Label { 
-                                text: delegateRoot.circuitData ? delegateRoot.circuitData.status : "??"
+                            // Header row now inside the first tab
+                            Rectangle {
                                 Layout.fillWidth: true
-                                color: (delegateRoot.circuitData && delegateRoot.circuitData.status === "OK") ? 
-                                    (Universal.theme === Universal.Dark ? "#90EE90" : "green") :
-                                    (Universal.theme === Universal.Dark ? "#FF8080" : "red")
+                                height: 40
+                                color: sideBar.toggle1 ? "#303030" : "#e0e0e0"
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 10
+                                    anchors.rightMargin: 10
+                                    spacing: 2
+
+                                    Label { 
+                                        text: "Circuit #" 
+                                        Layout.preferredWidth: 60
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Destination" 
+                                        Layout.preferredWidth: 150
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Rating" 
+                                        Layout.preferredWidth: 60
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Poles" 
+                                        Layout.preferredWidth: 50
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Type" 
+                                        Layout.preferredWidth: 100
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Load"
+                                        Layout.preferredWidth: 80
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Cable Size" 
+                                        Layout.preferredWidth: 100
+                                        font.bold: true
+                                    }
+                                    Label { 
+                                        text: "Status" 
+                                        Layout.fillWidth: true
+                                        font.bold: true
+                                    }
+                                }
+                            }
+                            
+                            // Circuit list in tab 1
+                            ListView {
+                                id: circuitList
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                clip: true
+                                
+                                model: manager.circuitCount
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Circuit count: " + manager.circuitCount
+                                    visible: manager.circuitCount === 0  // Show only when empty
+                                    color: "gray"
+                                }
+                                
+                                Component.onCompleted: {
+                                    console.log("ListView created with circuit count:", model)
+                                }
+                                
+                                // Watch for circuit count changes directly
+                                onModelChanged: {
+                                    console.log("ListView model changed to:", model)
+                                }
+                                
+                                // Use an Item as the root delegate to make positioning more reliable
+                                delegate: Item {
+                                    id: delegateRoot
+                                    width: ListView.view ? ListView.view.width : 100
+                                    height: 40
+                                    
+                                    // Get the circuit data early to ensure it's available
+                                    Component.onCompleted: {
+                                        console.log("Creating delegate for index", index)
+                                        if (!circuitData || Object.keys(circuitData).length === 0) {
+                                            console.error("No circuit data for index", index)
+                                        }
+                                    }
+                                    
+                                    property var circuitData: manager.getCircuitAt(index)
+                                    
+                                    // Use a Rectangle for the background
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: index % 2 ? 
+                                            (sideBar.toggle1 ? "#262626" : "#f5f5f5") : 
+                                            (sideBar.toggle1 ? "#1a1a1a" : "#ffffff")
+                                    }
+                                    
+                                    // Debug text to make issues more visible
+                                    Text {
+                                        text: "Circuit #" + (delegateRoot.circuitData.number || "??")
+                                        anchors.centerIn: parent
+                                        color: "red"
+                                        visible: false // Set to true for debugging
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onDoubleClicked: {
+                                            circuitEditor.loadCircuit(index)
+                                            circuitEditor.open()
+                                        }
+                                    }
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 10
+                                        anchors.rightMargin: 10
+                                        spacing: 2
+                                        
+                                        // Instead of relying on default values, use conditional expressions
+                                        Label { 
+                                            text: delegateRoot.circuitData ? delegateRoot.circuitData.number : "??"
+                                            Layout.preferredWidth: 60
+                                        }
+                                        Label { 
+                                            text: delegateRoot.circuitData ? delegateRoot.circuitData.destination : "??"
+                                            Layout.preferredWidth: 150
+                                            elide: Text.ElideRight
+                                        }
+                                        Label { 
+                                            text: (delegateRoot.circuitData ? delegateRoot.circuitData.rating : 0) + "A"
+                                            Layout.preferredWidth: 60
+                                        }
+                                        Label { 
+                                            text: delegateRoot.circuitData ? delegateRoot.circuitData.poles : "??"
+                                            Layout.preferredWidth: 50
+                                        }
+                                        Label { 
+                                            text: delegateRoot.circuitData ? delegateRoot.circuitData.type : "??"
+                                            Layout.preferredWidth: 100
+                                        }
+                                        Label { 
+                                            text: (delegateRoot.circuitData ? delegateRoot.circuitData.load : 0).toFixed(2) + "kW"
+                                            Layout.preferredWidth: 80
+                                        }
+                                        Label { 
+                                            text: delegateRoot.circuitData ? delegateRoot.circuitData.cableSize : "??"
+                                            Layout.preferredWidth: 100
+                                        }
+                                        Label { 
+                                            text: delegateRoot.circuitData ? delegateRoot.circuitData.status : "??"
+                                            Layout.fillWidth: true
+                                            color: (delegateRoot.circuitData && delegateRoot.circuitData.status === "OK") ? 
+                                                (Universal.theme === Universal.Dark ? "#90EE90" : "green") :
+                                                (Universal.theme === Universal.Dark ? "#FF8080" : "red")
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+                    
+                    // Tab 2: Load Distribution Chart
+                    Item {
+                        id: loadChartContainer
+                        width: parent.width
+                        height: parent.height
+
+                        LoadChart {
+                            anchors.fill: parent
+                            manager: switchboardPanel.manager
+                            darkMode: sideBar.toggle1
+                        }
+                    }
+                    
+                    // Tab 3: Single Line Diagram
+                    ScrollView {
+                        id: diagramView
+                        clip: true
+                        
+                        SwitchboardDiagram {
+                            id: singleLineDiagram
+                            width: Math.max(diagramView.width, 800)
+                            height: Math.max(diagramView.height, 800)
+                            switchboardName: manager.name
+                            mainRating: manager.mainRating
+                            voltage: manager.voltage
+                            phases: manager.phases
+                            
+                            // Fix the circuits property binding
+                            property var circuitsList: []
+                            
+                            // Update circuits when circuit count changes
+                            Connections {
+                                target: manager
+                                function onCircuitCountChanged() {
+                                    // Rebuild the circuit list
+                                    let circuits = [];
+                                    for (let i = 0; i < manager.circuitCount; i++) {
+                                        circuits.push(manager.getCircuitAt(i));
+                                    }
+                                    singleLineDiagram.circuitsList = circuits;
+                                    console.log("Single line diagram updated with", circuits.length, "circuits");
+                                }
+                            }
+                            
+                            // Use the circuitsList property for the diagram
+                            circuits: circuitsList
+                            
+                            // Update on initialization
+                            Component.onCompleted: {
+                                // Initial population of circuits
+                                let circuits = [];
+                                for (let i = 0; i < manager.circuitCount; i++) {
+                                    circuits.push(manager.getCircuitAt(i));
+                                }
+                                circuitsList = circuits;
+                                console.log("Single line diagram initialized with", circuits.length, "circuits");
+                            }
+                            
+                            darkMode: sideBar.toggle1
+                        }
+                    }
+
                 }
 
+                // 3. Finally the buttons at the bottom
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 10
@@ -368,69 +469,6 @@ Item {
                         color: manager.utilizationPercent > 80 ? 
                             (Universal.theme === Universal.Dark ? "#FF8080" : "red") :
                             (Universal.theme === Universal.Dark ? "#90EE90" : "green")
-                    }
-                }
-
-                TabBar {
-                    id: tabBar
-                    width: parent.width
-                    
-                    TabButton {
-                        text: "Circuit List"
-                        width: implicitWidth
-                    }
-                    TabButton {
-                        text: "Load Distribution"
-                        width: implicitWidth
-                    }
-                    TabButton {
-                        text: "Single Line Diagram"
-                        width: implicitWidth
-                    }
-                }
-                
-                StackLayout {
-                    currentIndex: tabBar.currentIndex
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 300
-                    
-                    // Tab 1: Circuit List (already shown above)
-                    Item {
-                        // Empty because we already have the circuit list above
-                    }
-                    
-                    // Tab 2: Load Distribution Chart
-                    Item {
-                        id: loadChartContainer
-                        width: parent.width
-                        height: parent.height
-
-                        LoadChart {
-                            anchors.fill: parent
-                            manager: switchboardPanel.manager
-                            darkMode: sideBar.toggle1
-                        }
-                    }
-                    
-                    // Tab 3: Single Line Diagram
-                    ScrollView {
-                        id: diagramView
-                        clip: true
-                        
-                        SwitchboardDiagram {
-                            id: singleLineDiagram
-                            width: Math.max(diagramView.width, 800)
-                            height: Math.max(diagramView.height, 800)
-                            switchboardName: manager.name
-                            mainRating: manager.mainRating
-                            voltage: manager.voltage
-                            phases: manager.phases
-                            circuits: {
-                                let model = manager.circuitModel;
-                                return model ? model._circuits : [];
-                            }
-                            darkMode: sideBar.toggle1
-                        }
                     }
                 }
             }
