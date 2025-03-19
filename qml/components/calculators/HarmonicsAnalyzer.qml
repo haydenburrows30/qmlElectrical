@@ -59,9 +59,10 @@ Item {
         }
         Text {
             anchors.fill: parent
-            text: {"This is a Harmonic Analyzer tool that can be used to analyze the harmonic components of a waveform. " +
-                   "You can adjust the amplitude and phase of each harmonic component to see how it affects the waveform. " +
-                   "You can also export the harmonic data to a CSV file for further analysis."}
+            text: {"<h3>Harmonic Analyzer</h3><br>" +
+                "Analyze the harmonic components of a waveform. " +
+                "You can adjust the amplitude and phase of each harmonic component to see how it affects the waveform. <br>" +
+                "You can also export the harmonic data to a CSV file for further analysis."}
             wrapMode: Text.WordWrap
         }
     }

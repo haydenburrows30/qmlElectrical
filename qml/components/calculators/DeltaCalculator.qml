@@ -11,6 +11,38 @@ Item {
 
     property DeltaTransformerCalculator calculator: DeltaTransformerCalculator {}
 
+        Popup {
+        id: tipsPopup
+        width: 500
+        height: 300
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: { "<h3>Open Delta Transformer Calculator</h3><br>" +
+                    "This calculator estimates the resistor required for an open delta transformer.<br><br>" +
+                    "<b>Primary Voltage:</b> The primary side line-to-line voltage.<br>" +
+                    "<b>Secondary Voltage:</b> The secondary side line-to-line voltage.<br>" +
+                    "<b>Power Rating:</b> The secondary side VA rating.<br><br>" +
+                    "The phase voltage is calculated as V/3.<br>" +
+                    "The resistor is calculated based on the phase voltage.<br>" +
+                    "The power rating is derated to 86.6% for open delta.<br><br>" +
+                    "Click the 'Open Reference Guide' button to view the reference guide.<br>" +
+                    "Click the 'Calculate' button to calculate the resistor.<br>" +
+                    "The results will be displayed below the input fields.<br>" +
+                    "The validation indicator will change color based on the input validity.<br>"}
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         anchors.centerIn: parent
         spacing: 10
@@ -21,12 +53,15 @@ Item {
             spacing: 10
 
             WaveCard {
+                id: results
                 Layout.fillWidth: true
                 Layout.minimumHeight: 600
+                showSettings: true
 
                 ColumnLayout {
                     spacing: 10
                     anchors.fill: parent
+                    
 
                     Label {
                         text: "Open Delta Transformer Calculator"

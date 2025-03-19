@@ -11,6 +11,51 @@ Item {
 
     property ProtectionRelayCalculator relay: ProtectionRelayCalculator {}
 
+    Popup {
+        id: tipsPopup
+        width: 700
+        height: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        Text {
+            anchors.fill: parent
+            text: { "<h3>Protection Relay Calculator</h3><br>" +
+                    "This calculator estimates the operating time of a protection relay for a given fault current and settings.<br><br>" +
+                    "<b>Pickup Current:</b> The current at which the relay should trip.<br>" +
+                    "<b>Time Dial Setting:</b> The time dial setting of the relay.<br>" +
+                    "<b>Curve Type:</b> The type of curve used by the relay.<br>" +
+                    "<br>" +
+                    "<b>Fault Current:</b> The current at which the fault occurs.<br>" +
+                    "<br>" +
+                    "The operating time of the relay is calculated based on the selected settings and fault current.<br>" +
+                    "The time-current curve of the relay is also displayed for reference.<br>" +
+                    "<br>" +
+                    "Note: The operating time is an approximation and may vary based on the relay model and manufacturer.<br>" +
+                    "<br>" +
+                    "For more information, refer to the relay's datasheet or contact the manufacturer.<br>" +
+                    "<br>" +
+                    "<b>Disclaimer:</b> This calculator is for educational purposes only and should not be used for critical applications.<br>" +
+                    "<br>" +
+                    "<b>References:</b><br>" +
+                    "IEEE Standard C37.112-1996<br>" +
+                    "IEC 60255-151:2009<br>" +
+                    "ANSI/IEEE C37.112-1996<br>" +
+                    "<br>" +
+                    "<b>Author:</b> Electrical Engineering Portal<br>" +
+                    "<b>Version:</b> 1.0<br>" +
+                    "<b>Date:</b> 2021-09-01" }
+            wrapMode: Text.WordWrap
+        }
+    }
+
     RowLayout {
         spacing: 10
         anchors.centerIn: parent
@@ -23,6 +68,8 @@ Item {
                 title: "Relay Settings"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 400
+                id: results
+                showSettings: true
 
                 GridLayout {
                     columns: 2

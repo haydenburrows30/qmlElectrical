@@ -33,8 +33,8 @@ Item {
         }
         Text {
             anchors.fill: parent
-            text: {"Transformer Calculator helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: \n\n" +
-                   "Single Phase: I = kVA / V\n" +
+            text: {"<h3>Transformer Calculator </h3><br> Helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: <br><br>" +
+                   "Single Phase: I = kVA / V <br>" +
                    "Three Phase: I = kVA / (V × √3)"}
             wrapMode: Text.WordWrap
         }
@@ -56,8 +56,8 @@ Item {
         }
         Text {
             anchors.fill: parent
-            text: {"The Power from Current Calculator helps you calculate the power consumed by a device based on the current and power factor. The formula used is: \n\n" +
-                     "Single Phase: P = V × I × PF / 1000\n" +
+            text: {"<h3> Current->Power Calculator </h3><br> Calculate the power consumed by a device based on the current and power factor. The formula used is: <br><br>" +
+                     "Single Phase: P = V × I × PF / 1000<br>" +
                      "Three Phase: P = √3 × V × I × PF / 1000"}
             wrapMode: Text.WordWrap
         }
@@ -257,7 +257,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
             Layout.minimumWidth: 400
-            title: "Power from Current Calculator"
+            title: "Current-> Power Calculator"
 
             showSettings: true
          

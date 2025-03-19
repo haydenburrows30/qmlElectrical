@@ -53,8 +53,8 @@ Item {
         }
         Text {
             anchors.fill: parent
-            text: {"Unit Converter\n\n" +
-                "The unit converter helps you convert units of voltage, current, frequency, power, and temperature. The converter provides you with a simple and easy-to-use interface to convert units between different systems of measurement. Simply select the conversion type, enter the value you want to convert, and the converter will provide you with the converted value.\n\n" +
+            text: {"<h3>Unit Converter </h3><br>" +
+                "The unit converter helps you convert units of voltage, current, frequency, power, and temperature. The converter provides you with a simple and easy-to-use interface to convert units between different systems of measurement. Simply select the conversion type, enter the value you want to convert, and the converter will provide you with the converted value.<br>" +
                 "The unit converter supports a wide range of conversion types, including line to phase voltage, phase to line voltage, line to phase current, phase to line current, watts to dBmW, dBmW to watts, rad/s to Hz, horsepower to watts, RPM to Hz, radians to Hz, Hz to RPM, watts to horsepower, Celsius to Fahrenheit, and Fahrenheit to Celsius. The converter also provides you with a visual representation of the conversion formula, helping you understand the relationship between the different units of measurement."}
             wrapMode: Text.WordWrap
         }

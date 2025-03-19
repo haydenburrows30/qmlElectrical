@@ -34,20 +34,20 @@ Item {
             
             Text {
                 anchors.fill: parent
-                text: {"Electric Machine Calculator\n\n" +
-                    "This calculator is used to estimate the electrical and mechanical parameters of an electric machine.\n\n" +
-                    "Machine Selection:\n" +
-                    "Select the type of machine from the drop-down list.\n\n" +
-                    "Electrical Parameters:\n" +
-                    "Select the input mode (V I or V kW) and enter the rated voltage, current, power, power factor, and efficiency.\n\n" +
-                    "Mechanical Parameters:\n" +
-                    "Enter the number of poles, frequency, speed, and slip.\n\n" +
-                    "Thermal Parameters:\n" +
-                    "Select the temperature class and cooling method.\n\n" +
-                    "Results:\n" +
-                    "The calculator will display the rated power, power with derating, torque, losses, and efficiency.\n\n" +
-                    "Visualization:\n" +
-                    "The right side of the calculator displays a visualization of the electric machine based on the input parameters.\n\n" +
+                text: {"<h3>Electric Machine Calculator</h3><br>" +
+                    "This calculator is used to estimate the electrical and mechanical parameters of an electric machine.<br><br>" +
+                    "<b>Machine Selection:</b><br>" +
+                    "Select the type of machine from the drop-down list.<br><br>" +
+                    "<b>Electrical Parameters:</b><br>" +
+                    "Select the input mode (V I or V kW) and enter the rated voltage, current, power, power factor, and efficiency.<br><br>" +
+                    "<b>Mechanical Parameters:</b><br>" +
+                    "Enter the number of poles, frequency, speed, and slip.<br><br>" +
+                    "<b>Thermal Parameters:</b><br>" +
+                    "Select the temperature class and cooling method.<br><br>" +
+                    "<b>Results:</b><br>" +
+                    "The calculator will display the rated power, power with derating, torque, losses, and efficiency.<br><br>" +
+                    "<b>Visualization:</b><br>" +
+                    "The right side of the calculator displays a visualization of the electric machine based on the input parameters.<br>" +
                     "Note: The calculator is for estimation purposes only and may not be accurate for all scenarios."}
                 wrapMode: Text.WordWrap
             }

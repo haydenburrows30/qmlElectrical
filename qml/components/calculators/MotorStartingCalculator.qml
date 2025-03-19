@@ -42,9 +42,9 @@ Item {
             
         Text {
             anchors.fill: parent
-            text: {
-                "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. " +
-                "You can also select the starting method to see how the current profile changes. " +
+            text: { "<h3>Motor Starting Calculator </h3><br>" +
+                "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. <br>" +
+                "You can also select the starting method to see how the current profile changes. <br>" +
                 "The starting current profile is displayed below the results."
             }
             wrapMode: Text.WordWrap
