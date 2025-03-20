@@ -22,7 +22,7 @@ Item {
         
         Flickable {
             contentWidth: parent.width
-            contentHeight: mainLayout.height + 10
+            contentHeight: mainLayout.height + 40
             bottomMargin: 5
             leftMargin: 5
             rightMargin: 5
@@ -36,7 +36,7 @@ Item {
                     text: "Calculate Complete System"
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: 250
-                    Layout.bottomMargin: 40
+                    Layout.bottomMargin: 10
                     onClicked: calculate()
                 }
 
