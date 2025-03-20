@@ -38,6 +38,8 @@ from models.earthing_calculator import EarthingCalculator
 from models.transmission_calculator import TransmissionLineCalculator
 from models.delta_transformer import DeltaTransformerCalculator
 from models.switchboard.switchboard_manager import SwitchboardManager
+from models.wind_turbine_calculator import WindTurbineCalculator
+from models.transformer_line_calculator import TransformerLineCalculator
 
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
@@ -212,7 +214,9 @@ class Application:
             (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper"),
             (RefRgfCalculator, "RefRgf", 1, 0, "RefRgfCalculator"),
             (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator"),
-            (SwitchboardManager, "Switchboard", 1, 0, "SwitchboardManager")
+            (SwitchboardManager, "Switchboard", 1, 0, "SwitchboardManager"),
+            (WindTurbineCalculator, "WindTurbine", 1, 0, "WindTurbineCalculator"),
+            (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator")
         ]
 
         for type_info in qml_types:

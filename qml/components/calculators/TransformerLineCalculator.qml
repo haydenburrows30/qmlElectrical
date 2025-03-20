@@ -1,0 +1,588 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtCharts
+
+import TransformerLine 1.0
+
+Item {
+    id: root
+    anchors.fill: parent
+    
+    // Import the calculator
+    property var calculator
+    
+    // Property to prevent null errors
+    property bool calculatorReady: calculator !== null
+    
+    Component.onCompleted: {
+        // Create the calculator instance when component is loaded
+        calculator = Qt.createQmlObject('import QtQuick; import TransformerLine 1.0; TransformerLineCalculator {}', root, "dynamicCalculator");
+    }
+    
+    function safeValue(value, defaultVal) {
+        if (value === undefined || value === null) {
+            return defaultVal;
+        }
+        
+        if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+            return defaultVal;
+        }
+        
+        return value;
+    }
+    
+    ScrollView {
+        anchors.fill: parent
+        clip: true
+        
+        ColumnLayout {
+            width: parent.width
+            spacing: 20
+            
+            // Title
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Transformer & Line Calculator with Protection"
+                font.pixelSize: 24
+                font.bold: true
+                color: "#2c3e50"
+            }
+            
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "400V to 11kV Transformer with 5km Cable"
+                font.pixelSize: 16
+                color: "#7f8c8d"
+            }
+            
+            // Single-line diagram
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 150
+                Layout.margins: 10
+                color: "#f5f5f5"
+                border.color: "#dddddd"
+                radius: 5
+                
+                // Simple single-line diagram
+                Canvas {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    
+                    onPaint: {
+                        var ctx = getContext("2d")
+                        ctx.strokeStyle = "#333333"
+                        ctx.lineWidth = 2
+                        
+                        // Start with LV source
+                        var startX = 50
+                        var lineY = height/2
+                        
+                        // Draw LV source
+                        ctx.beginPath()
+                        ctx.moveTo(startX, lineY-20)
+                        ctx.lineTo(startX, lineY+20)
+                        ctx.stroke()
+                        
+                        // Draw LV line
+                        ctx.beginPath()
+                        ctx.moveTo(startX, lineY)
+                        ctx.lineTo(startX + 50, lineY)
+                        ctx.stroke()
+                        
+                        // Draw transformer
+                        ctx.beginPath()
+                        ctx.moveTo(startX + 50, lineY - 25)
+                        ctx.lineTo(startX + 50, lineY + 25)
+                        ctx.stroke()
+                        
+                        ctx.beginPath()
+                        ctx.moveTo(startX + 60, lineY - 25)
+                        ctx.lineTo(startX + 60, lineY + 25)
+                        ctx.stroke()
+                        
+                        // Draw HV Line with distance label
+                        ctx.beginPath()
+                        ctx.moveTo(startX + 60, lineY)
+                        ctx.lineTo(width - 100, lineY)
+                        ctx.stroke()
+                        
+                        // Draw relay
+                        ctx.beginPath()
+                        ctx.arc(startX + 90, lineY - 20, 15, 0, 2*Math.PI)
+                        ctx.stroke()
+                        
+                        // Draw load
+                        ctx.beginPath()
+                        ctx.moveTo(width - 100, lineY - 20)
+                        ctx.lineTo(width - 100, lineY + 20)
+                        ctx.lineTo(width - 60, lineY)
+                        ctx.lineTo(width - 100, lineY - 20)
+                        ctx.stroke()
+                        
+                        // Add labels
+                        ctx.font = "12px sans-serif"
+                        ctx.fillStyle = "#333333"
+                        ctx.fillText("400V", startX, lineY - 30)
+                        ctx.fillText("11kV", startX + 70, lineY - 30)
+                        ctx.fillText("5km Cable", width/2 - 30, lineY - 10)
+                        ctx.fillText("Relay", startX + 75, lineY - 30)
+                        ctx.fillText("Load", width - 80, lineY + 30)
+                    }
+                }
+            }
+            
+            // Transformer parameters section
+            GroupBox {
+                title: "Transformer Parameters (400V to 11kV)"
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    columns: 2
+                    columnSpacing: 20
+                    rowSpacing: 10
+                    Layout.fillWidth: true
+                    
+                    Label { text: "Transformer Rating (kVA):" }
+                    SpinBox {
+                        id: transformerRatingSpinBox
+                        from: 100
+                        to: 5000
+                        value: calculator ? calculator.transformerRating : 1000
+                        stepSize: 50
+                        editable: true
+                        Layout.fillWidth: true
+                        onValueModified: if (calculatorReady) calculator.setTransformerRating(value)
+                    }
+                    
+                    Label { text: "Transformer Impedance (%):" }
+                    SpinBox {
+                        id: transformerImpedanceSpinBox
+                        from: 30
+                        to: 100
+                        value: calculator ? calculator.transformerImpedance * 10 : 60
+                        stepSize: 1
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 10.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 10.0).toFixed(1);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 10);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setTransformerImpedance(realValue)
+                    }
+                    
+                    Label { text: "Transformer X/R Ratio:" }
+                    SpinBox {
+                        id: transformerXRRatioSpinBox
+                        from: 30
+                        to: 150
+                        value: calculator ? calculator.transformerXRRatio * 10 : 80
+                        stepSize: 5
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 10.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 10.0).toFixed(1);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 10);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setTransformerXRRatio(realValue)
+                    }
+                }
+            }
+            
+            // Line parameters section
+            GroupBox {
+                title: "Line Parameters (5km Cable)"
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    columns: 2
+                    columnSpacing: 20
+                    rowSpacing: 10
+                    Layout.fillWidth: true
+                    
+                    Label { text: "Line Length (km):" }
+                    SpinBox {
+                        id: lineLengthSpinBox
+                        from: 1
+                        to: 50
+                        value: calculator ? calculator.lineLength * 10 : 50
+                        stepSize: 5
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 10.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 10.0).toFixed(1);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 10);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setLineLength(realValue)
+                    }
+                    
+                    Label { text: "Line Resistance (Ohm/km):" }
+                    SpinBox {
+                        id: lineRSpinBox
+                        from: 1
+                        to: 100
+                        value: calculator ? calculator.lineR * 100 : 25
+                        stepSize: 1
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 100.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 100.0).toFixed(2);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 100);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setLineR(realValue)
+                    }
+                    
+                    Label { text: "Line Reactance (Ohm/km):" }
+                    SpinBox {
+                        id: lineXSpinBox
+                        from: 1
+                        to: 100
+                        value: calculator ? calculator.lineX * 100 : 20
+                        stepSize: 1
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 100.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 100.0).toFixed(2);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 100);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setLineX(realValue)
+                    }
+                }
+            }
+            
+            // Load parameters section
+            GroupBox {
+                title: "Load Parameters"
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    columns: 2
+                    columnSpacing: 20
+                    rowSpacing: 10
+                    Layout.fillWidth: true
+                    
+                    Label { text: "Load (MVA):" }
+                    SpinBox {
+                        id: loadMVASpinBox
+                        from: 1
+                        to: 100
+                        value: calculator ? calculator.loadMVA * 10 : 8
+                        stepSize: 1
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 10.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 10.0).toFixed(1);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 10);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setLoadMVA(realValue)
+                    }
+                    
+                    Label { text: "Power Factor:" }
+                    SpinBox {
+                        id: loadPowerFactorSpinBox
+                        from: 70
+                        to: 100
+                        value: calculator ? calculator.loadPowerFactor * 100 : 85
+                        stepSize: 1
+                        editable: true
+                        Layout.fillWidth: true
+                        property real realValue: value / 100.0
+                        
+                        textFromValue: function(value) {
+                            return (value / 100.0).toFixed(2);
+                        }
+                        
+                        valueFromText: function(text) {
+                            return Math.round(parseFloat(text) * 100);
+                        }
+                        
+                        onValueModified: if (calculatorReady) calculator.setLoadPowerFactor(realValue)
+                    }
+                }
+            }
+            
+            // System results section
+            GroupBox {
+                title: "System Calculation Results"
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    columns: 2
+                    columnSpacing: 20
+                    rowSpacing: 10
+                    Layout.fillWidth: true
+                    
+                    Label { text: "Transformer Z (Ohms):" }
+                    TextField {
+                        id: transformerZOhmsText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Transformer R (Ohms):" }
+                    TextField {
+                        id: transformerROhmsText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.transformerROhms, 0).toFixed(3) : "0.000"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Transformer X (Ohms):" }
+                    TextField {
+                        id: transformerXOhmsText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Line Total Z (Ohms):" }
+                    TextField {
+                        id: lineTotalZText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Voltage Drop (%):" }
+                    TextField {
+                        id: voltageDropText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.voltageDrop, 0).toFixed(2) : "0.00"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Fault Current at LV Side (kA):" }
+                    TextField {
+                        id: faultCurrentLVText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Fault Current at HV Side (kA):" }
+                    TextField {
+                        id: faultCurrentHVText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                }
+            }
+            
+            // Protection parameters section
+            GroupBox {
+                title: "Protection Settings"
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    columns: 2
+                    columnSpacing: 20
+                    rowSpacing: 10
+                    Layout.fillWidth: true
+                    
+                    Label { text: "Relay Pickup Current (A):" }
+                    TextField {
+                        id: relayPickupCurrentText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "CT Ratio:" }
+                    TextField {
+                        id: relayCtRatioText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? calculator.relayCtRatio : "300/5"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Relay Curve Type:" }
+                    TextField {
+                        id: relayCurveTypeText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                    
+                    Label { text: "Time Dial Setting:" }
+                    TextField {
+                        id: relayTimeDialText
+                        readOnly: true
+                        Layout.fillWidth: true
+                        text: calculatorReady ? safeValue(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
+                        background: Rectangle {
+                            color: "#e8f6ff"
+                            border.color: "#0078d7"
+                            radius: 2
+                        }
+                    }
+                }
+            }
+            
+            // Calculation button
+            Button {
+                text: "Calculate"
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 200
+                onClicked: {
+                    if (calculatorReady) {
+                        calculator.refreshCalculations()
+                    }
+                }
+            }
+            
+            // Information section
+            GroupBox {
+                title: "Information"
+                Layout.fillWidth: true
+                
+                ColumnLayout {
+                    width: parent.width
+                    spacing: 10
+                    
+                    Text {
+                        text: "<b>Protection Settings Notes:</b><br>" +
+                              "• Relay pickup is set at 120% of transformer rated current<br>" +
+                              "• CT ratio is selected based on the pickup current<br>" +
+                              "• Very Inverse curve is recommended for transformer protection<br>" +
+                              "• Time dial setting depends on coordination with upstream and downstream devices<br>" +
+                              "• Actual settings should be confirmed with a coordination study"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Text {
+                        text: "<b>Recommended Additional Protection:</b><br>" +
+                              "• Differential protection for transformer > 5 MVA<br>" +
+                              "• Earth fault protection (typically 10-20% of CT primary rating)<br>" +
+                              "• Restricted Earth Fault (REF) protection<br>" +
+                              "• Thermal overload protection<br>" +
+                              "• Buchholz relay for oil-filled transformers<br>" +
+                              "• Standby earth fault protection for the cable"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Text {
+                        text: "<b>Cable Selection Considerations:</b><br>" +
+                              "• Cable should be rated for at least 125% of full load current<br>" +
+                              "• Voltage drop should typically be kept below 5%<br>" +
+                              "• Cable must withstand fault current for protection clearing time<br>" +
+                              "• Standard 11kV cables include: 3-core XLPE with copper or aluminum conductors<br>" +
+                              "• Typical sizes for 1000 kVA transformer: 70-120 mm² depending on installation conditions"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+        }
+    }
+    
+    // Connection to backend signals
+    Connections {
+        target: calculator
+        
+        function onCalculationCompleted() {
+            // Update the displayed values
+            transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)
+            transformerROhmsText.text = safeValue(calculator.transformerROhms, 0).toFixed(3)
+            transformerXOhmsText.text = safeValue(calculator.transformerXOhms, 0).toFixed(3)
+            lineTotalZText.text = safeValue(calculator.lineTotalZ, 0).toFixed(3)
+            voltageDropText.text = safeValue(calculator.voltageDrop, 0).toFixed(2)
+            faultCurrentLVText.text = safeValue(calculator.faultCurrentLV, 0).toFixed(2)
+            faultCurrentHVText.text = safeValue(calculator.faultCurrentHV, 0).toFixed(2)
+            relayPickupCurrentText.text = safeValue(calculator.relayPickupCurrent, 0).toFixed(2)
+            relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
+            relayCtRatioText.text = calculator.relayCtRatio
+            relayCurveTypeText.text = calculator.relayCurveType
+        }
+    }
+}

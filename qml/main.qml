@@ -19,12 +19,12 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
-    RLCChart {id: rlcChart}  // Use consistent naming
+    RLCChart {id: rlcChart}
     SineWaveModel {id: sineModel}
     VoltageDrop {id: voltageDrop}
     ResultsManager {id: resultsManager}
 
-    // Add splash screen
+    // Splash screen
     Popup {
         id: splashScreen
         modal: true
@@ -43,8 +43,7 @@ ApplicationWindow {
             Column {
                 anchors.centerIn: parent
                 spacing: 20
-                
-                // Add app logo/icon here
+
                 Image {
                     source: "qrc:/icons/gallery/24x24/Calculator.svg"
                     width: 64
@@ -72,8 +71,7 @@ ApplicationWindow {
             }
         }
     }
-    
-    // Modified timer to close only when loading is complete
+
     Timer {
         interval: 100
         running: true
@@ -85,7 +83,6 @@ ApplicationWindow {
         }
     }
 
-    // Add parent container for proper z-ordering
     Item {
         anchors.fill: parent
 
@@ -116,18 +113,16 @@ ApplicationWindow {
             }
         }
 
-        // Menu button and sidebar as separate elements
         CButton {
             id: menu
             icon_name: "Menu"
             width: 60
             height: 60
-            z: 1000  // Much higher z-index to ensure it's always on top
+            z: 1000
             visible: true
-            
-            // Position flush with left and bottom edges
-            x: 0  // Flush with left edge
-            y: parent.height - height  // Flush with bottom edge
+
+            x: 0
+            y: parent.height - height
             
             tooltip_text: sideBar.open_closed ? "Close Menu" : "Open Menu"
 
@@ -193,7 +188,6 @@ ApplicationWindow {
                 onClicked: if (!isDragging) menu.clicked()
             }
 
-            // Add property to track original position
             property bool inOriginalPosition: x === 0 && y === parent.height - height
             
             onXChanged: sideBar.menuMoved = !inOriginalPosition
@@ -210,7 +204,7 @@ ApplicationWindow {
             edge: Qt.LeftEdge
             width: 60
             height: menuMoved ? parent.height : parent.height - menu.height
-            y: 0  // Start from top
+            y: 0
             property bool menuMoved: false
         }
     }
