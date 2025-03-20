@@ -18,6 +18,8 @@ from ..delta_transformer import DeltaTransformerCalculator
 from ..ref_rgf_calculator import RefRgfCalculator
 from ..wind_turbine_calculator import WindTurbineCalculator
 from ..transformer_line_calculator import TransformerLineCalculator
+from ..ohms_law_calculator import OhmsLawCalculator
+from ..voltage_divider_calculator import VoltageDividerCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -76,8 +78,9 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "ref_rgf": RefRgfCalculator,
             "kw_from_current": KwFromCurrentCalculator,
             "wind_turbine": WindTurbineCalculator,
-            "transformer_line": TransformerLineCalculator
-
+            "transformer_line": TransformerLineCalculator,
+            "ohms_law": OhmsLawCalculator,
+            "voltage_divider": VoltageDividerCalculator
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):

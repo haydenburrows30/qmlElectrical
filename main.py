@@ -52,6 +52,8 @@ from models.bar_series_helper import BarSeriesHelper
 
 # Import our calculator
 from models.ref_rgf_calculator import RefRgfCalculator
+from models.voltage_divider_calculator import VoltageDividerCalculator
+from models.ohms_law_calculator import OhmsLawCalculator
 
 class Application:
     """Main application class implementing dependency injection and component management.
@@ -216,7 +218,9 @@ class Application:
             (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator"),
             (SwitchboardManager, "Switchboard", 1, 0, "SwitchboardManager"),
             (WindTurbineCalculator, "WindTurbine", 1, 0, "WindTurbineCalculator"),
-            (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator")
+            (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator"),
+            (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
+            (OhmsLawCalculator, "OhmsLaw", 1, 0, "OhmsLawCalculator"),
         ]
 
         for type_info in qml_types:

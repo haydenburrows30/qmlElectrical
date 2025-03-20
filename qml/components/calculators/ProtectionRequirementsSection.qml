@@ -303,7 +303,7 @@ Item {
                             
                             Text {
                                 text: "• Use SafeRing/SafePlus with vacuum circuit breaker module (V) for protection\n" +
-                                    "• CT Ratio: " + (transformerReady ? transformerCalculator.relayCtRatio : "300/5") + "\n" +
+                                    "• CT Ratio: " + (transformerReady ? transformerCalculator.relayCtRatio : "300/1") + "\n" +
                                     "• VT Ratio: 11000/110V\n" +
                                     "• Ensure SF6 gas pressure monitoring is connected to alarm\n" +
                                     "• Configure local/remote control mode selection\n" +
@@ -363,7 +363,7 @@ Item {
                                             Text { 
                                                 text: transformerReady ? 
                                                         transformerCalculator.relayCtRatio : 
-                                                        "300/5" 
+                                                        "300/1"  // Updated default value to match 1A secondary
                                             }
                                         }
                                         
@@ -414,6 +414,94 @@ Item {
                                             "• Generation forecasting<br>" +
                                             "• Communication with grid operator (if required)<br>" +
                                             "• Data logging for regulatory compliance"
+                                    wrapMode: Text.WordWrap
+                                    Layout.fillWidth: true
+                                }
+                            }
+                        }
+
+                        // Add Voltage Regulator Protection info
+                        WaveCard {
+                            title: "Voltage Regulator Protection (Eaton VR-32)"
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 500  // Increased height for additional content
+                            Layout.alignment: Qt.AlignTop
+                            
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 10
+                                
+                                Text {
+                                    text: "<b>3× Eaton Single-Phase 185kVA Delta-Connected Regulators:</b>"
+                                    font.pixelSize: 14
+                                }
+                                
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: regulatorProtectionLayout.implicitHeight + 20
+                                    color: "#f7f0ff"
+                                    border.color: "#8a4eef"
+                                    radius: 5
+                                    
+                                    ColumnLayout {
+                                        id: regulatorProtectionLayout
+                                        anchors.fill: parent
+                                        anchors.margins: 10
+                                        spacing: 5
+                                        
+                                        GridLayout {
+                                            columns: 2
+                                            Layout.fillWidth: true
+                                            columnSpacing: 15
+                                            
+                                            Text { text: "• Over/Under Voltage (ANSI 59/27):" }
+                                            Text { text: "±15% of nominal voltage" }
+                                            
+                                            Text { text: "• Current-limiting fuses:" }
+                                            Text { text: "200A on each phase" }
+                                            
+                                            Text { text: "• Control Power Backup:" }
+                                            Text { text: "UPS for microprocessor controller" }
+                                            
+                                            Text { text: "• Motor Control Protection:" }
+                                            Text { text: "Circuit breakers for each motor" }
+                                            
+                                            Text { text: "• Position Indication:" }
+                                            Text { text: "Tap position indicators & SCADA interface" }
+                                            
+                                            Text { text: "• Inter-phase Coordination:" }
+                                            Text { text: "Common controller for all 3 units" }
+                                            
+                                            Text { text: "• Bypass Provision:" }
+                                            Text { text: "Manual bypass switches for each phase" }
+                                            
+                                            Text { text: "• Surge Protection:" }
+                                            Text { text: "9kV MOV arresters on both sides" }
+                                        }
+                                        
+                                        Text {
+                                            text: "\n<b>Configuration Details:</b>\n" +
+                                                  "• Delta-connected single-phase 185kVA regulators for 11kV line\n" +
+                                                  "• 32-step voltage regulators with ±10% regulation range\n" +
+                                                  "• Step voltage change: 0.625% per step (10% ÷ 16 steps)\n" +
+                                                  "• Suitable for addressing voltage rise during high wind generation periods\n" +
+                                                  "• Bidirectional power flow capability\n" +
+                                                  "• Total capacity: 555kVA (3 × 185kVA single-phase units)"
+                                            wrapMode: Text.WordWrap
+                                            Layout.fillWidth: true
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "<b>Control System Specifications:</b>\n" +
+                                          "• Cooper CL-6 or Eaton ComPak Plus voltage control system\n" +
+                                          "• Line drop compensation with R and X settings\n" +
+                                          "• Load balancing capability for the three single-phase units\n" +
+                                          "• Remote communications via DNP3.0 protocol\n" +
+                                          "• Data logging for voltage profiles and operations count\n" +
+                                          "• Reverse power detection for bidirectional regulation"
                                     wrapMode: Text.WordWrap
                                     Layout.fillWidth: true
                                 }
