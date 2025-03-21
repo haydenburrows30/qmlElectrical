@@ -13,14 +13,16 @@ class WindTurbineCalculator(QObject):
     cutInSpeedChanged = Signal()
     cutOutSpeedChanged = Signal()
     efficiencyChanged = Signal()
-    calculationCompleted = Signal()  # Main signal
-    calculationsComplete = Signal()  # Additional alias signal for QML compatibility
+    
+    # Add both signal names for compatibility
+    calculationCompleted = Signal()  # Standard name
+    calculationsComplete = Signal()  # Legacy name
     powerCurveChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         # Initialize properties with default values - increased blade radius for more realistic power
-        self._blade_radius = 40.0  # meters (increased from 25m for more realistic power)
+        self._blade_radius = 25.0  # meters (increased from 25m for more realistic power)
         self._wind_speed = 8.0     # m/s
         self._air_density = 1.225  # kg/m³
         self._power_coefficient = 0.4  # Betz limit is 0.593
@@ -62,9 +64,9 @@ class WindTurbineCalculator(QObject):
             # Generate power curve data
             self._generate_power_curve()
             
-            # Signal that calculations are complete - emit both signals for compatibility
+            # Emit both signals for backward compatibility
             self.calculationCompleted.emit()
-            self.calculationsComplete.emit()  # Backwards compatibility
+            self.calculationsComplete.emit()
             
         except Exception as e:
             print(f"Error in wind turbine calculation: {e}")
@@ -78,8 +80,8 @@ class WindTurbineCalculator(QObject):
             # Generate points from 0 to cut-out speed + 5
             max_power = 0
             
-            # Reference wind speed where power is at rated capacity (typically around 12-15 m/s)
-            rated_wind_speed = 12.0
+            # Reference wind speed where power is at rated capacity (typically around 12-15 m/s). changes with wind speed chosen
+            rated_wind_speed = self._wind_speed
             
             for speed in np.arange(0, self._cut_out_speed + 5.0, 0.5):
                 # Calculate power at this wind speed
@@ -100,12 +102,6 @@ class WindTurbineCalculator(QObject):
                 
                 # Append (speed, power in kW) tuple
                 self._power_curve.append((float(speed), power_kw))
-            
-            # Debug output to help track data flow
-            print(f"Generated power curve with {len(self._power_curve)} points")
-            print(f"Swept area: {self._swept_area:.2f} m²")
-            print(f"First few points: {self._power_curve[:5]}")
-            print(f"Maximum power in curve: {max_power:.2f} kW")
             
             self.powerCurveChanged.emit()
             
@@ -199,23 +195,23 @@ class WindTurbineCalculator(QObject):
             self._calculate()
     
     # Read-only results properties
-    @Property(float, notify=calculationCompleted)
+    @Property(float, notify=calculationsComplete)
     def sweptArea(self):
         return self._swept_area
     
-    @Property(float, notify=calculationCompleted)
+    @Property(float, notify=calculationsComplete)
     def theoreticalPower(self):
         return self._theoretical_power
     
-    @Property(float, notify=calculationCompleted)
+    @Property(float, notify=calculationsComplete)
     def actualPower(self):
         return self._actual_power
     
-    @Property(float, notify=calculationCompleted)
+    @Property(float, notify=calculationsComplete)
     def powerInKW(self):
         return self._actual_power / 1000.0
     
-    @Property(float, notify=calculationCompleted)
+    @Property(float, notify=calculationsComplete)
     def annualEnergy(self):
         return self._annual_energy
     
@@ -226,7 +222,6 @@ class WindTurbineCalculator(QObject):
             # Debug the data being sent to QML
             first_few = self._power_curve[:5]
             last_few = self._power_curve[-5:] if len(self._power_curve) >= 5 else []
-            print(f"Sending power curve to QML: first few = {first_few}, last few = {last_few}")
             
             # Create a new list of explicit dictionaries for better QML compatibility
             result = []
@@ -235,7 +230,6 @@ class WindTurbineCalculator(QObject):
                 result.append({"x": float(x), "y": float(y)})
             
             # Debug the converted data
-            print(f"First element in converted format: {result[0] if result else 'None'}")
             return result
         except Exception as e:
             print(f"Error converting power curve data: {e}")
