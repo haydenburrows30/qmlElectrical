@@ -15,36 +15,78 @@ class DataManager:
         self._diversity_factors = None
         self._fuse_sizes_data = None
         
-        # Load data files
+        # Load data from in-memory sources instead of CSV files
         self._load_all_cable_data()
         self._load_diversity_factors()
         self._load_fuse_sizes_data()
         
     def _load_all_cable_data(self):
-        """Load all cable data variants."""
+        """Load cable data from in-memory data structures instead of CSV files."""
         try:
-            self._cable_data_cu_1c = pd.read_csv("data/cable_data_cu_1c.csv")
-            self._cable_data_cu_3c = pd.read_csv("data/cable_data_cu_3c.csv")
-            self._cable_data_al_1c = pd.read_csv("data/cable_data_al_1c.csv")
-            self._cable_data_al_3c = pd.read_csv("data/cable_data_al_3c.csv")
+            # Create DataFrames from Python dictionaries - more efficient than CSV loading
+            
+            # Copper 1-core cable data
+            cu_1c_data = {
+                'size': [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400],
+                'mv_per_am': [26, 15.6, 9.8, 6.5, 3.9, 2.5, 1.6, 1.2, 0.87, 0.62, 0.46, 0.37, 0.31, 0.25, 0.20, 0.17, 0.15],
+                'max_current': [19.5, 27, 36, 45, 63, 85, 110, 135, 160, 200, 240, 280, 320, 365, 430, 495, 560]
+            }
+            
+            # Copper 3-core cable data
+            cu_3c_data = {
+                'size': [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400],
+                'mv_per_am': [26.5, 15.9, 10, 6.7, 4.0, 2.5, 1.6, 1.2, 0.93, 0.61, 0.45, 0.37, 0.33, 0.27, 0.22, 0.19, 0.17],
+                'max_current': [17.5, 24, 31, 39, 54, 63, 95, 165, 140, 240, 290, 355, 280, 470, 375, 430, 485]
+            }
+            
+            # Aluminum 1-core cable data
+            al_1c_data = {
+                'size': [16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630],
+                'mv_per_am': [2.6, 1.7, 1.9, 1.4, 0.98, 0.75, 0.60, 0.50, 0.41, 0.32, 0.27, 0.24, 0.21, 0.18],
+                'max_current': [115, 150, 105, 125, 160, 190, 220, 255, 290, 345, 395, 445, 495, 555]
+            }
+            
+            # Aluminum 3-core cable data
+            al_3c_data = {
+                'size': [16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630],
+                'mv_per_am': [4.2, 2.7, 2.0, 1.5, 1.1, 0.72, 0.58, 0.54, 0.39, 0.31, 0.27, 0.27, 0.24, 0.21],
+                'max_current': [57, 75, 92, 110, 140, 240, 275, 225, 350, 410, 460, 390, 435, 485]
+            }
+            
+            # Convert to DataFrames for compatibility with existing code
+            self._cable_data_cu_1c = pd.DataFrame(cu_1c_data)
+            self._cable_data_cu_3c = pd.DataFrame(cu_3c_data)
+            self._cable_data_al_1c = pd.DataFrame(al_1c_data)
+            self._cable_data_al_3c = pd.DataFrame(al_3c_data)
+            
         except Exception as e:
             print(f"Error loading cable data: {e}")
             
     def _load_diversity_factors(self):
-        """Load diversity factors from CSV file."""
+        """Load diversity factors from Python dict instead of CSV file."""
         try:
-            df = pd.read_csv("data/diversity_factor.csv")
-            # Rename columns to match expected names
-            df.columns = ['houses', 'factor']
-            self._diversity_factors = df
+            # Create diversity factors data
+            diversity_data = {
+                'houses': [1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50, 100, 200],
+                'factor': [1.0, 0.95, 0.90, 0.85, 0.80, 0.65, 0.55, 0.50, 0.45, 0.42, 0.40, 0.35, 0.30]
+            }
+            
+            self._diversity_factors = pd.DataFrame(diversity_data)
         except Exception as e:
             print(f"Error loading diversity factors: {e}")
             self._diversity_factors = pd.DataFrame({'houses': [1], 'factor': [1.0]})
             
     def _load_fuse_sizes_data(self):
-        """Load network fuse size data from CSV."""
+        """Load network fuse size data from Python dict instead of CSV."""
         try:
-            self._fuse_sizes_data = pd.read_csv("data/network_fuse_sizes.csv")
+            # Create network fuse sizes data
+            fuse_sizes_data = {
+                'Material': ['Cu', 'Cu', 'Cu', 'Cu', 'Cu', 'Al', 'Al', 'Al', 'Al', 'Al', 'Al', 'Al'],
+                'Size (mm2)': [16, 25, 35, 50, 95, 25, 35, 50, 95, 185, 300, 630],
+                'Network Fuse Size (A)': [80, 100, 125, 160, 250, 63, 80, 100, 160, 250, 315, 500]
+            }
+            
+            self._fuse_sizes_data = pd.DataFrame(fuse_sizes_data)
             print(f"Loaded {len(self._fuse_sizes_data)} fuse size entries")
         except Exception as e:
             print(f"Error loading fuse size data: {e}")
@@ -221,3 +263,187 @@ class DataManager:
                 factor *= 1.05  # Three-core cables have slightly higher impedance
             
         return factor
+
+    def calculate_rating_adjustments(self, cable, temperature=25.0, grouping=1.0, 
+                                   installation_method="D1 - Underground direct buried"):
+        """Calculate adjusted cable rating based on derating factors."""
+        try:
+            if cable is None:
+                return 0.0
+                
+            base_rating = float(cable['max_current'])
+            temp_factor = self._get_temperature_factor(temperature)
+            install_factor = self._get_installation_factor(installation_method, cable)
+            
+            adjusted_rating = base_rating * temp_factor * install_factor * grouping
+            return adjusted_rating
+            
+        except Exception as e:
+            print(f"Error calculating rating adjustments: {e}")
+            return 0.0
+            
+    def get_recommended_cable(self, current, voltage_drop_limit=5.0, length=1.0,
+                            material="Al", core_type="3C+E"):
+        """Get recommended cable size based on current and voltage drop limit."""
+        try:
+            cable_data = self.get_cable_data(material, core_type)
+            if cable_data is None or cable_data.empty:
+                return None
+                
+            # Filter cables that meet current rating
+            suitable_cables = cable_data[cable_data['max_current'] >= current]
+            
+            if suitable_cables.empty:
+                return None
+                
+            # Find smallest cable that meets voltage drop limit
+            for _, cable in suitable_cables.iterrows():
+                v_drop = self.calculate_voltage_drop(current, length, cable)
+                if v_drop <= voltage_drop_limit:
+                    return cable
+                    
+            # If no cable meets voltage drop, return largest available
+            return suitable_cables.iloc[-1]
+            
+        except Exception as e:
+            print(f"Error finding recommended cable: {e}")
+            return None
+            
+    def calculate_derating(self, base_rating, temperature=25.0, grouping=1.0,
+                          installation_method="D1 - Underground direct buried"):
+        """Calculate total derating factor."""
+        try:
+            temp_factor = self._get_temperature_factor(temperature)
+            install_factor = self._get_installation_factor(installation_method)
+            
+            total_factor = temp_factor * install_factor * grouping
+            return base_rating * total_factor
+            
+        except Exception as e:
+            print(f"Error calculating derating: {e}")
+            return base_rating
+            
+    def validate_cable_selection(self, cable, current, length, voltage=415.0,
+                               max_voltage_drop=5.0, temperature=25.0, grouping=1.0,
+                               installation_method="D1 - Underground direct buried"):
+        """Validate cable selection against current and voltage drop requirements."""
+        try:
+            if cable is None:
+                return {
+                    'valid': False,
+                    'current_ok': False,
+                    'voltage_ok': False,
+                    'message': "No cable selected"
+                }
+                
+            # Check current rating
+            adjusted_rating = self.calculate_rating_adjustments(
+                cable, temperature, grouping, installation_method
+            )
+            current_ok = current <= adjusted_rating
+            
+            # Check voltage drop
+            v_drop = self.calculate_voltage_drop(
+                current, length, cable, temperature,
+                installation_method, grouping
+            )
+            drop_percent = (v_drop / voltage) * 100
+            voltage_ok = drop_percent <= max_voltage_drop
+            
+            # Build result
+            result = {
+                'valid': current_ok and voltage_ok,
+                'current_ok': current_ok,
+                'voltage_ok': voltage_ok,
+                'adjusted_rating': adjusted_rating,
+                'voltage_drop': v_drop,
+                'drop_percent': drop_percent
+            }
+            
+            # Add appropriate message
+            if not current_ok and not voltage_ok:
+                result['message'] = "Cable undersized for both current and voltage drop"
+            elif not current_ok:
+                result['message'] = "Cable undersized for current"
+            elif not voltage_ok:
+                result['message'] = "Excessive voltage drop"
+            else:
+                result['message'] = "Cable selection OK"
+                
+            return result
+            
+        except Exception as e:
+            print(f"Error validating cable selection: {e}")
+            return {
+                'valid': False,
+                'current_ok': False,
+                'voltage_ok': False,
+                'message': f"Error: {str(e)}"
+            }
+            
+    def export_data(self, filepath):
+        """Export all cable data to CSV file."""
+        try:
+            # Combine all cable data into single DataFrame
+            dfs = []
+            
+            # Add copper cables
+            cu_1c = self._cable_data_cu_1c.copy()
+            cu_1c['material'] = 'Cu'
+            cu_1c['core_type'] = '1C+E'
+            dfs.append(cu_1c)
+            
+            cu_3c = self._cable_data_cu_3c.copy()
+            cu_3c['material'] = 'Cu'
+            cu_3c['core_type'] = '3C+E'
+            dfs.append(cu_3c)
+            
+            # Add aluminum cables
+            al_1c = self._cable_data_al_1c.copy()
+            al_1c['material'] = 'Al'
+            al_1c['core_type'] = '1C+E'
+            dfs.append(al_1c)
+            
+            al_3c = self._cable_data_al_3c.copy()
+            al_3c['material'] = 'Al'
+            al_3c['core_type'] = '3C+E'
+            dfs.append(al_3c)
+            
+            # Combine and save
+            df = pd.concat(dfs, ignore_index=True)
+            df.to_csv(filepath, index=False)
+            return True
+            
+        except Exception as e:
+            print(f"Error exporting data: {e}")
+            return False
+            
+    def import_data(self, filepath):
+        """Import cable data from CSV file."""
+        try:
+            df = pd.read_csv(filepath)
+            
+            # Split data by material and core type
+            for material in ['Cu', 'Al']:
+                for core_type in ['1C+E', '3C+E']:
+                    mask = (df['material'] == material) & (df['core_type'] == core_type)
+                    subset = df[mask][['size', 'mv_per_am', 'max_current']]
+                    
+                    if not subset.empty:
+                        # Update appropriate DataFrame
+                        if material == 'Cu':
+                            if core_type == '1C+E':
+                                self._cable_data_cu_1c = subset.reset_index(drop=True)
+                            else:
+                                self._cable_data_cu_3c = subset.reset_index(drop=True)
+                        else:
+                            if core_type == '1C+E':
+                                self._cable_data_al_1c = subset.reset_index(drop=True)
+                            else:
+                                self._cable_data_al_3c = subset.reset_index(drop=True)
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error importing data: {e}")
+            return False

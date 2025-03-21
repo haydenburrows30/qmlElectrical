@@ -257,6 +257,22 @@ def setup_container() -> Container:
     
     return container
 
+def setup_models(engine):
+    """Set up and register models properly with the QML engine."""
+    from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
+    from models.results_manager import ResultsManager
+    
+    # Create models with proper parent
+    voltage_drop = VoltageDropCalculator(engine)
+    results_manager = ResultsManager(engine)
+    
+    # Register with QML
+    engine.rootContext().setContextProperty("voltageDrop", voltage_drop)
+    engine.rootContext().setContextProperty("resultsManager", results_manager)
+    
+    # Return the models so they're not garbage collected
+    return voltage_drop, results_manager
+
 def main():
     container = setup_container()
     app = Application(container)

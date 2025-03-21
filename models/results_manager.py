@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractTableModel, Qt, QDateTime
+from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractTableModel, Qt, QDateTime, QThread
 import pandas as pd
 import os
 from dataclasses import dataclass
@@ -7,10 +7,6 @@ from .logger import setup_logger
 
 # Set up logger for this module
 logger = setup_logger("ResultsManager")
-
-# Constants
-RESULTS_DIR = 'results'
-RESULTS_FILE = os.path.join(RESULTS_DIR, 'calculations_history.csv')
 
 @dataclass
 class CalculationResult:
@@ -67,14 +63,12 @@ class ResultsManager(QObject):
     resultsChanged = Signal()
     saveError = Signal(str)  # New signal to notify UI of errors
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._results = []
         self._voltage_drop_threshold = 5.0  # Default 5%
         self._results_df = pd.DataFrame()
-        self._table_model = ResultsTableModel()
-        
-        # Define columns for both storage and display
+        self._table_model = ResultsTableModel(self)
         self._storage_columns = [
             'timestamp',
             'voltage_system',
@@ -92,71 +86,40 @@ class ResultsManager(QObject):
             'admd_enabled'
         ]
         
-        # Create results directory if it doesn't exist
-        try:
-            os.makedirs(RESULTS_DIR, exist_ok=True)
-            
-            # Create empty CSV if it doesn't exist
-            if not os.path.exists(RESULTS_FILE):
-                self._create_empty_csv()
-                
-            self._load_saved_results()
-        except Exception as e:
-            logger.error(f"Error initializing ResultsManager: {str(e)}")
-
-    def _create_empty_csv(self):
-        """Create empty CSV file with correct columns and data types."""
-        dtypes = {
-            'timestamp': str,
-            'voltage_system': str,
-            'kva_per_house': float,
-            'num_houses': int,
-            'diversity_factor': float,
-            'total_kva': float,
-            'current': float,
-            'cable_size': str,
-            'conductor': str,
-            'core_type': str,
-            'length': float,
-            'voltage_drop': float,
-            'drop_percent': float,
-            'admd_enabled': bool
-        }
+        # Instead of creating DataStore here, we'll use in-memory calculation storage
+        # This avoids the threading issue
+        self._calculation_history = []
         
-        empty_df = pd.DataFrame({col: pd.Series(dtype=dtype) for col, dtype in dtypes.items()})
-        empty_df.to_csv(RESULTS_FILE, index=False)
+        # Load initial data (empty since we're starting fresh)
+        self._load_saved_results()
 
     def _load_saved_results(self):
-        """Load existing results from CSV file."""
+        """Load existing results from in-memory storage."""
         try:
-            if os.path.exists(RESULTS_FILE) and os.path.getsize(RESULTS_FILE) > 0:
-                df = pd.read_csv(RESULTS_FILE)
-                if len(df) > 0:  # Only format if there's data
-                    display_df = pd.DataFrame({
-                        'Date/Time': df['timestamp'],
-                        'System': df['voltage_system'],
-                        'Load (kVA)': df['total_kva'],
-                        'Houses': df['num_houses'],
-                        'Cable': df['cable_size'].astype(str) + 'mm² ' + df['conductor'] + ' ' + df['core_type'],
-                        'Length (m)': df['length'],
-                        'Current (A)': df['current'],
-                        'V-Drop (V)': df['voltage_drop'],
-                        'Drop %': df['drop_percent']
-                    })
-                else:
-                    # Empty display DataFrame
-                    display_df = pd.DataFrame(columns=self._table_model._headers)
+            if self._calculation_history:
+                # Convert list of dictionaries to DataFrame
+                df = pd.DataFrame(self._calculation_history)
                 
-                self._results_df = display_df
-                self._table_model.update_data(display_df)
-                self.resultsChanged.emit()
-                logger.info(f"Loaded {len(df)} results from CSV")
+                # Format data for display
+                display_df = pd.DataFrame({
+                    'Date/Time': df['timestamp'],
+                    'System': df['voltage_system'],
+                    'Load (kVA)': df['total_kva'],
+                    'Houses': df['num_houses'],
+                    'Cable': df['cable_size'].astype(str) + 'mm² ' + df['conductor'] + ' ' + df['core_type'],
+                    'Length (m)': df['length'],
+                    'Current (A)': df['current'],
+                    'V-Drop (V)': df['voltage_drop'],
+                    'Drop %': df['drop_percent']
+                })
             else:
-                # Handle empty or non-existent file
+                # Empty display DataFrame
                 display_df = pd.DataFrame(columns=self._table_model._headers)
-                self._results_df = display_df
-                self._table_model.update_data(display_df)
-                logger.info("No results file found or file is empty")
+            
+            self._results_df = display_df
+            self._table_model.update_data(display_df)
+            self.resultsChanged.emit()
+            logger.info(f"Loaded {len(display_df)} results from memory")
         except Exception as e:
             logger.error(f"Error loading results: {str(e)}")
             # Create empty display DataFrame on error
@@ -166,7 +129,7 @@ class ResultsManager(QObject):
 
     @Slot()
     def refresh_results(self):
-        """Reload results from file."""
+        """Reload results from in-memory storage."""
         self._load_saved_results()
 
     @Property(QObject, constant=True)
@@ -179,20 +142,13 @@ class ResultsManager(QObject):
         """Remove a result by index."""
         try:
             if 0 <= index < len(self._results_df):
-                # Read the original storage file to modify it
-                storage_df = pd.read_csv(RESULTS_FILE)
-                if 0 <= index < len(storage_df):
-                    # Remove from storage DataFrame
-                    storage_df = storage_df.drop(index)
-                    storage_df.to_csv(RESULTS_FILE, index=False)
-                    
-                    # Update display DataFrame
-                    self._results_df = self._results_df.drop(index)
-                    self._table_model.update_data(self._results_df)
-                    self.resultsChanged.emit()
-                    logger.info(f"Removed result at index {index}")
-                else:
-                    logger.warning(f"Index {index} out of range for storage DataFrame")
+                # Remove from in-memory list
+                if 0 <= index < len(self._calculation_history):
+                    del self._calculation_history[index]
+                
+                # Update display
+                self._load_saved_results()
+                logger.info(f"Removed result at index {index}")
             else:
                 logger.warning(f"Index {index} out of range for display DataFrame")
         except Exception as e:
@@ -201,9 +157,12 @@ class ResultsManager(QObject):
 
     @Slot()
     def clear_all_results(self):
-        """Clear all saved results from the CSV file."""
+        """Clear all saved results from in-memory storage."""
         try:
-            self._create_empty_csv()
+            # Clear in-memory list
+            self._calculation_history.clear()
+            
+            # Update display
             display_df = pd.DataFrame(columns=self._table_model._headers)
             self._results_df = display_df
             self._table_model.update_data(display_df)
@@ -228,7 +187,7 @@ class ResultsManager(QObject):
     
     @Slot(dict)
     def save_calculation(self, data):
-        """Save a new calculation to CSV and update the model."""
+        """Save a new calculation to in-memory storage."""
         try:
             # Validate required fields
             required_fields = ['voltage_system', 'cable_size', 'conductor']
@@ -245,31 +204,11 @@ class ResultsManager(QObject):
             # Ensure data types
             processed_data = self._process_calculation_data(data)
             
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(RESULTS_FILE), exist_ok=True)
-            
-            # Read existing data with explicit dtypes
-            if os.path.exists(RESULTS_FILE):
-                df = pd.read_csv(RESULTS_FILE)
-            else:
-                df = pd.DataFrame(columns=self._storage_columns)
-            
-            # Create new row with explicit data types
-            new_row = pd.DataFrame([processed_data])
-            
-            # Ensure both DataFrames have the same column types before concatenation
-            for col in df.columns:
-                if col in new_row.columns:
-                    new_row[col] = new_row[col].astype(df[col].dtype)
-            
-            # Concatenate with type-matched DataFrames
-            df = pd.concat([df, new_row], ignore_index=True)
-            
-            # Save to CSV
-            df.to_csv(RESULTS_FILE, index=False)
+            # Save to in-memory list
+            self._calculation_history.append(processed_data)
             
             # Update display data
-            self._load_saved_results()  # Reload to ensure consistency
+            self._load_saved_results()
             
             logger.info(f"Saved new calculation for {processed_data['conductor']} {processed_data['cable_size']}mm² cable")
             return True
@@ -304,6 +243,34 @@ class ResultsManager(QObject):
             'drop_percent': float(data.get('drop_percent', 0.0)),
             'admd_enabled': bool(data.get('admd_enabled', False))
         }
+
+    # Export all calculations to CSV
+    @Slot(str, result=bool)
+    def export_to_csv(self, filepath=None):
+        """Export all calculation results to CSV file."""
+        try:
+            if not filepath:
+                from .voltdrop.file_utils import FileUtils
+                file_utils = FileUtils()
+                filepath = file_utils.get_save_filepath("csv", "calculation_history")
+                
+                if not filepath:
+                    self.saveError.emit("Export cancelled")
+                    return False
+            
+            # Convert in-memory list to DataFrame
+            df = pd.DataFrame(self._calculation_history)
+            
+            # Save to CSV
+            df.to_csv(filepath, index=False)
+            
+            logger.info(f"Exported {len(df)} calculations to {filepath}")
+            return True
+        except Exception as e:
+            error_msg = f"Error exporting to CSV: {str(e)}"
+            logger.error(error_msg)
+            self.saveError.emit(error_msg)
+            return False
     
     # Remove duplicate methods that are confusing - use consistent naming
     # These methods can be removed as they duplicate functionality

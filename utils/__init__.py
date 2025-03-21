@@ -1,1 +1,1 @@
-# Make utils a proper Python package
+# Package marker file for utils

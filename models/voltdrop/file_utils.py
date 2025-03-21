@@ -1,7 +1,7 @@
 import os
 import json
 import pandas as pd
-from PySide6.QtCore import QObject, Signal, QUrl
+from PySide6.QtCore import QObject, Signal, QUrl, QThread
 from PySide6.QtWidgets import QFileDialog
 
 class FileUtils(QObject):
@@ -10,10 +10,18 @@ class FileUtils(QObject):
     saveStatusChanged = Signal(bool, str)
     fileDialogRequested = Signal(str, str, str)  # type, default_dir, default_name
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        # Ensure we're in the main thread
+        if parent and QThread.currentThread() != parent.thread():
+            print("Warning: FileUtils created in a thread different from its parent")
+        
         self._results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'results'))
         os.makedirs(self._results_dir, exist_ok=True)
+        
+        # Create in-memory storage for calculation history
+        self._calculation_history = []
         
     def get_results_dir(self):
         """Get the results directory path."""
@@ -29,6 +37,26 @@ class FileUtils(QObject):
         
     def get_save_filepath(self, file_type, default_name=None, default_dir=None):
         """Show file dialog and get save filepath."""
+        # Ensure we're in the main thread before showing a dialog
+        if QThread.currentThread() != QThread.currentThread():
+            print("Warning: Attempting to show file dialog from a non-main thread")
+            # We should ideally use a signal to request the dialog from the main thread
+            # For now, we'll return a default path
+            if default_dir is None:
+                default_dir = self._results_dir
+            if default_name is None:
+                timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
+                default_name = f"voltage_drop_{timestamp}"
+            if file_type == "csv" and not default_name.endswith(".csv"):
+                default_name += ".csv"
+            elif file_type == "json" and not default_name.endswith(".json"):
+                default_name += ".json"
+            elif file_type == "pdf" and not default_name.endswith(".pdf"):
+                default_name += ".pdf"
+            elif file_type == "png" and not default_name.endswith(".png"):
+                default_name += ".png"
+            return os.path.join(default_dir, default_name)
+        
         if default_dir is None:
             default_dir = self._results_dir
             
@@ -132,22 +160,59 @@ class FileUtils(QObject):
             return False
             
     def save_calculation_history(self, calculation_data):
-        """Save calculation history to a CSV file."""
+        """Save calculation history to in-memory storage with option to export."""
         try:
-            filepath = os.path.join(self._results_dir, 'calculations_history.csv')
+            # Store calculation in memory
+            self._calculation_history.append(calculation_data)
             
-            # Convert to DataFrame
-            df = pd.DataFrame([calculation_data])
-            
-            # Check if file exists to determine if we need headers
-            file_exists = os.path.isfile(filepath)
-            df.to_csv(filepath, mode='a', header=not file_exists, index=False)
-            
-            success_msg = f"Calculation saved to {filepath}"
+            # Optional: Export to disk if needed
+            success_msg = f"Calculation saved to memory (Total: {len(self._calculation_history)})"
             self.saveStatusChanged.emit(True, success_msg)
             return True
             
         except Exception as e:
             error_msg = f"Error saving calculation: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+            
+    def get_calculation_history(self):
+        """Get the in-memory calculation history."""
+        return self._calculation_history
+        
+    def export_calculation_history(self, filepath=None):
+        """Export in-memory calculation history to CSV file."""
+        try:
+            if not filepath:
+                filepath = self.get_save_filepath("csv", "calculations_history")
+                
+                if not filepath:
+                    self.saveStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Convert to DataFrame
+            df = pd.DataFrame(self._calculation_history)
+            
+            # Save to CSV
+            df.to_csv(filepath, index=False)
+            
+            success_msg = f"Calculation history exported to {filepath}"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error exporting calculation history: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+            
+    def clear_calculation_history(self):
+        """Clear the in-memory calculation history."""
+        try:
+            self._calculation_history.clear()
+            success_msg = "Calculation history cleared"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error clearing calculation history: {e}"
             self.saveStatusChanged.emit(False, error_msg)
             return False
