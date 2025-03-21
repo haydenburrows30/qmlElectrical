@@ -326,3 +326,21 @@
 2025-03-21 15:27:17,949 - ResultsManager - INFO - Loaded 1 results from CSV
 2025-03-21 15:27:18,216 - ResultsManager - INFO - Loaded 1 results from CSV
 >>>>>>> 0b21e28187b2af686b07c105fe9df1b02a2e7d3e
+2025-03-21 19:31:31,449 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 19:31:31,586 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:31:31,697 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:41:36,382 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 19:41:36,518 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:41:36,631 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:46:20,865 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 19:46:21,013 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:46:21,150 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:47:49,654 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 19:47:49,811 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:47:49,934 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:49:16,241 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 19:49:16,394 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:49:16,506 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:49:43,236 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 19:49:43,384 - ResultsManager - INFO - Loaded 1 results from CSV
+2025-03-21 19:49:43,505 - ResultsManager - INFO - Loaded 1 results from CSV
