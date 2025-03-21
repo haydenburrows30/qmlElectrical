@@ -477,3 +477,66 @@
 2025-03-21 21:04:26,806 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
 2025-03-21 21:04:26,907 - ResultsManager - INFO - Loaded 0 results from memory
 2025-03-21 21:04:26,987 - ResultsManager - INFO - Loaded 0 results from memory
+2025-03-21 21:24:15,621 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:24:15,723 - ResultsManager - INFO - Loaded 2 results from SQL storage
+2025-03-21 21:24:15,803 - ResultsManager - INFO - Loaded 2 results from SQL storage
+2025-03-21 21:25:08,980 - ResultsManager - INFO - Loaded 3 results from SQL storage
+2025-03-21 21:25:08,980 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:25:13,878 - ResultsManager - INFO - Loaded 4 results from SQL storage
+2025-03-21 21:25:13,878 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:25:15,194 - ResultsManager - INFO - Loaded 5 results from SQL storage
+2025-03-21 21:25:15,194 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:26:44,498 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:26:44,624 - ResultsManager - INFO - Loaded 5 results from SQL storage
+2025-03-21 21:26:44,695 - ResultsManager - INFO - Loaded 5 results from SQL storage
+2025-03-21 21:26:49,215 - ResultsManager - INFO - Cleared all calculation history
+2025-03-21 21:26:55,502 - ResultsManager - INFO - Loaded 1 results from SQL storage
+2025-03-21 21:26:55,502 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:26:56,011 - ResultsManager - INFO - Loaded 2 results from SQL storage
+2025-03-21 21:26:56,011 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:26:57,567 - ResultsManager - INFO - Cleared all calculation history
+2025-03-21 21:26:59,171 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:27:01,180 - ResultsManager - INFO - Loaded 1 results from SQL storage
+2025-03-21 21:27:01,180 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:27:01,567 - ResultsManager - INFO - Loaded 2 results from SQL storage
+2025-03-21 21:27:01,567 - ResultsManager - INFO - Saved new calculation to SQL storage
+2025-03-21 21:27:03,055 - ResultsManager - INFO - Loaded 2 results from SQL storage
+2025-03-21 21:33:19,457 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:33:19,580 - ResultsManager - INFO - Loaded 3 results from SQL storage
+2025-03-21 21:33:19,661 - ResultsManager - INFO - Loaded 3 results from SQL storage
+2025-03-21 21:34:08,400 - ResultsManager - INFO - Cleared all calculation history
+2025-03-21 21:34:09,645 - ResultsManager - INFO - Cleared all calculation history
+2025-03-21 21:35:51,856 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:35:51,973 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:35:52,048 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:38:19,316 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:38:19,422 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:38:19,506 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:39:25,194 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:39:25,304 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:39:25,374 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:40:43,877 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:40:43,988 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:40:44,055 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:42:17,262 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:42:17,381 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:42:17,450 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:53:28,936 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:53:29,046 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:53:29,126 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:55:36,895 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:55:36,995 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:55:37,074 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:56:00,705 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:56:00,822 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:56:00,920 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:57:41,257 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:58:24,127 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 21:58:24,225 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 21:58:24,295 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 22:00:55,054 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 22:00:55,165 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 22:00:55,233 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 22:04:50,128 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-21 22:04:50,231 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-21 22:04:50,300 - ResultsManager - INFO - Loaded 0 results from SQL storage

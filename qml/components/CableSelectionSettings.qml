@@ -63,6 +63,12 @@ GridLayout {
         resetCompleted()
     }
 
+    function updateCalculations() {
+        let kva = parseFloat(kvaPerHouseInput.text) || 0
+        let houses = parseInt(numberOfHousesInput.value) || 1
+        voltageDrop.calculateTotalLoad(kva, houses)
+    }
+
     Label { text: "System Voltage:" }
     RowLayout {
         ComboBox {
@@ -193,18 +199,19 @@ GridLayout {
     }
 
     Label { text: "Number of Houses:" }
-    TextField {
+    SpinBox {
         id: numberOfHousesInput
-        placeholderText: "Enter number"
-        text: "1"  // Default 1 house
-        onTextChanged: {
-            let houses = parseInt(text) || 1
+        Layout.preferredWidth: 120
+        from: 1
+        to: 1000
+        value: 1
+        onValueChanged: {
+            console.log("Number of houses changed to:", value)
+            voltageDrop.setNumberOfHouses(value)
+            console.log("New diversity factor:", voltageDrop.diversityFactor)
             let kva = parseFloat(kvaPerHouseInput.text) || 0
-            voltageDrop.setNumberOfHouses(houses)
-            voltageDrop.calculateTotalLoad(kva, houses)
+            voltageDrop.calculateTotalLoad(kva, value)
         }
-        Layout.fillWidth: true
-        validator: IntValidator { bottom: 1 }
     }
 
     Button {

@@ -110,8 +110,8 @@ class Application:
             )
             self.loading_manager.update_task("models", progress)
             return model
-            
-        # Load models concurrently
+        
+        # Load models concurrently - removed CSV dependency from voltage_drop
         [self.sine_wave, self.voltage_drop, self.results_manager] = await asyncio.gather(
             load_model("three_phase", 0.3),
             load_model("voltage_drop", 0.6),
@@ -121,44 +121,9 @@ class Application:
         self.loading_manager._loading = False
         self.loading_manager.loadingChanged.emit()
 
-    async def preload_resources(self):
-        """Preload commonly used resources in background."""
-        resources = [
-            "cable_data_mv.csv",
-            "protection_curves.json",
-            "motor_starting.csv"
-        ]
-        
-        for resource in resources:
-            path = os.path.join(CURRENT_DIR, "data", resource)
-            if os.path.exists(path):
-                async def load_resource(p):
-                    data = await self.worker_pool.execute(self._load_file, p)
-                    self._resource_cache[p] = data
-                asyncio.create_task(load_resource(path))
-
-    def _load_file(self, path: str) -> Any:
-        """Load file contents (runs in worker process)."""
-        with open(path, 'r') as f:
-            return f.read()
-
-    def setup(self):
-        """Configure application components and initialize subsystems."""
-        self.logger.setup(level=logging.INFO)
-
-        
-        self.setup_app()
-        
-        # Run async operations in the event loop
-        self.loop.run_until_complete(self._setup_async())
-        
-        self.register_qml_types()
-        self.load_qml()
-
     async def _setup_async(self):
         """Run all async initialization tasks."""
         await asyncio.gather(
-            self.preload_resources(),
             self.load_models_async()
         )
 
@@ -233,6 +198,17 @@ class Application:
         from utils.platform_helper import PlatformHelper
         self.qml_engine.engine.rootContext().setContextProperty("PlatformHelper", PlatformHelper())
 
+    def setup(self):
+        """Configure application components and initialize subsystems."""
+        self.logger.setup(level=logging.INFO)
+        self.setup_app()
+        
+        # Run async operations in the event loop
+        self.loop.run_until_complete(self._setup_async())
+        
+        self.register_qml_types()
+        self.load_qml()
+    
     def run(self):
         """Run the application."""
         try:

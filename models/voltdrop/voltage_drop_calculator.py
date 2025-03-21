@@ -265,14 +265,16 @@ class VoltageDropCalculator(QObject):
     @Slot(int)
     def setNumberOfHouses(self, num_houses):
         """Set number of houses and update diversity factor."""
-        if num_houses > 0 and self._num_houses != num_houses:
+        if num_houses > 0:
             self._num_houses = num_houses
+            # Force refresh diversity factor from database
             self._diversity_factor = self._data_manager.get_diversity_factor(num_houses)
+            print(f"Set number of houses to {num_houses}, new diversity factor: {self._diversity_factor}")
             self.numberOfHousesChanged.emit(num_houses)
             self.diversityFactorChanged.emit()
-            # Recalculate if we have a total kVA value
+            # Recalculate with new factor
             if self._total_kva > 0:
-                self.setTotalKVA(self._total_kva)
+                self.calculateTotalLoad(self._total_kva / self._num_houses, num_houses)
 
     @Slot(float)
     def setDiversityFactor(self, factor):
@@ -317,7 +319,7 @@ class VoltageDropCalculator(QObject):
     @Property(float, notify=diversityFactorChanged)
     def diversityFactor(self):
         """Get current diversity factor."""
-        return self._diversity_factor
+        return self._diversity_factor  # Return cached value instead of querying again
 
     @Property(int, notify=numberOfHousesChanged)
     def numberOfHouses(self):

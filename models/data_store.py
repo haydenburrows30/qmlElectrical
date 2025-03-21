@@ -77,13 +77,33 @@ class DataStore(QObject):
         )
         ''')
         
-        # Create settings table
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS settings (
             key TEXT PRIMARY KEY,
             value TEXT
         )
         ''')
+        
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS diversity_factors (
+            houses INTEGER PRIMARY KEY,
+            factor REAL NOT NULL
+        )
+        ''')
+        
+        # Initialize diversity factors if table is empty
+        cursor.execute("SELECT COUNT(*) FROM diversity_factors")
+        if cursor.fetchone()[0] == 0:
+            # Load from CSV
+            csv_path = os.path.join(os.path.dirname(self._db_path), 'diversity_factor.csv')
+            if os.path.exists(csv_path):
+                df = pd.read_csv(csv_path)
+                for _, row in df.iterrows():
+                    cursor.execute(
+                        "INSERT INTO diversity_factors (houses, factor) VALUES (?, ?)",
+                        (int(row['No Houses']), float(row['Diversity Factor']))
+                    )
+                self._connection.commit()
         
         self._connection.commit()
 
@@ -276,6 +296,74 @@ class DataStore(QObject):
         # Notify listeners
         self.dataChanged.emit(data_type)
         return True
+    
+    def get_diversity_factor(self, num_houses):
+        """Get diversity factor based on number of houses."""
+        try:
+            cursor = self._connection.cursor()
+            
+            # First try exact match with row locking for reliability
+            cursor.execute("""
+                SELECT factor FROM diversity_factors 
+                WHERE houses = ? 
+                LIMIT 1
+            """, (num_houses,))
+            
+            result = cursor.fetchone()
+            print(f"Querying diversity factor for {num_houses} houses...")
+            
+            if result:
+                factor = float(result[0])
+                print(f"Found exact match: {factor}")
+                return factor
+            
+            # If no exact match, get next lower and higher values
+            cursor.execute("""
+                SELECT houses, factor, ABS(houses - ?) as diff 
+                FROM diversity_factors 
+                ORDER BY diff ASC 
+                LIMIT 2
+            """, (num_houses,))
+            
+            closest = cursor.fetchall()
+            if closest:
+                print(f"Found closest matches: {closest}")
+                if len(closest) == 1:
+                    return float(closest[0][1])
+                else:
+                    # Interpolate between values
+                    h1, f1, _ = closest[0]
+                    h2, f2, _ = closest[1]
+                    # Linear interpolation
+                    factor = f1 + (f2 - f1) * (num_houses - h1) / (h2 - h1)
+                    print(f"Interpolated value: {factor}")
+                    return factor
+                    
+            print("No matching diversity factor found, using default")
+            return 1.0
+            
+        except Exception as e:
+            print(f"Error getting diversity factor: {e}")
+            return 1.0
+    
+    def get_fuse_size(self, cable_size, material="Al"):
+        """Get network fuse size for given cable size and material."""
+        try:
+            cursor = self._connection.cursor()
+            cursor.execute("""
+                SELECT fuse_size 
+                FROM fuse_sizes 
+                WHERE material = ? AND size = ?
+            """, (material, float(cable_size)))
+            
+            result = cursor.fetchone()
+            if result:
+                return f"{result[0]} A"
+            return "Not specified"
+                
+        except Exception as e:
+            print(f"Error looking up fuse size: {e}")
+            return "Error"
     
     def close(self):
         """Close database connection."""

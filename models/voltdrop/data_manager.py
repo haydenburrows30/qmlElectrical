@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import math
+import sqlite3
 
 class DataManager:
     """Class for managing cable data and calculation parameters."""
@@ -20,6 +21,8 @@ class DataManager:
         self._load_diversity_factors()
         self._load_fuse_sizes_data()
         
+        self.db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'application_data.db')
+
     def _load_all_cable_data(self):
         """Load cable data from in-memory data structures instead of CSV files."""
         try:
@@ -124,56 +127,56 @@ class DataManager:
     def get_diversity_factor(self, num_houses):
         """Get diversity factor based on number of houses."""
         try:
-            if self._diversity_factors is None:
-                return 1.0
-
-            df = self._diversity_factors
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
             
-            # Find exact match first
-            exact_match = df[df['houses'] == num_houses]
-            if not exact_match.empty:
-                return float(exact_match.iloc[0]['factor'])
-
-            # If no exact match, interpolate
-            if num_houses <= df['houses'].min():
-                return float(df.iloc[0]['factor'])
-            elif num_houses >= df['houses'].max():
-                return float(df.iloc[-1]['factor'])
-            else:
-                # Find surrounding values
-                idx = df['houses'].searchsorted(num_houses)
-                h1, h2 = df['houses'].iloc[idx-1:idx+1]
-                f1, f2 = df['factor'].iloc[idx-1:idx+1]
-                
-                # Linear interpolation
-                factor = f1 + (f2 - f1) * (num_houses - h1) / (h2 - h1)
+            # Get exact match with direct houses value
+            cursor.execute("""
+                SELECT factor 
+                FROM diversity_factors 
+                WHERE houses = ?
+            """, (num_houses,))
+            
+            result = cursor.fetchone()
+            if result:
+                factor = float(result[0])
+                print(f"Found exact diversity factor: {factor} for {num_houses} houses")
                 return factor
-
+            
+            conn.close()
+            return 1.0  # Fallback default
+            
         except Exception as e:
-            print(f"Error calculating diversity factor: {e}")
+            print(f"Error getting diversity factor: {e}")
             return 1.0
             
     def get_fuse_size(self, cable_size, material="Al"):
         """Get network fuse size for given cable size and material."""
         try:
-            if self._fuse_sizes_data is None:
-                return "N/A"
-                
-            # Look up the fuse size
-            match = self._fuse_sizes_data[
-                (self._fuse_sizes_data['Material'] == material) & 
-                (self._fuse_sizes_data['Size (mm2)'] == float(cable_size))
-            ]
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
             
-            if not match.empty:
-                return f"{match.iloc[0]['Network Fuse Size (A)']} A"
-            else:
-                return "Not specified"
+            # Query fuse size from database
+            cursor.execute("""
+                SELECT fuse_size 
+                FROM fuse_sizes 
+                WHERE material = ? AND size = ?
+            """, (material, float(cable_size)))
+            
+            result = cursor.fetchone()
+            if result:
+                return f"{result[0]} A"
+            
+            print(f"No fuse size found for {material} {cable_size}mm²")
+            return "Not specified"
                 
         except Exception as e:
             print(f"Error looking up fuse size: {e}")
             return "Error"
-            
+        finally:
+            if 'conn' in locals():
+                conn.close()
+                
     def calculate_current(self, kva, voltage=415.0, num_houses=1, diversity_factor=None):
         """Calculate current from kVA with diversity factor."""
         try:

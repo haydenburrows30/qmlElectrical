@@ -86,20 +86,20 @@ class ResultsManager(QObject):
             'admd_enabled'
         ]
         
-        # Instead of creating DataStore here, we'll use in-memory calculation storage
-        # This avoids the threading issue
-        self._calculation_history = []
+        # Initialize DataStore for SQL storage
+        from models.data_store import DataStore
+        self._data_store = DataStore(parent)
         
-        # Load initial data (empty since we're starting fresh)
+        # Load initial data from SQL storage
         self._load_saved_results()
 
     def _load_saved_results(self):
-        """Load existing results from in-memory storage."""
+        """Load existing results from SQL storage."""
         try:
-            if self._calculation_history:
-                # Convert list of dictionaries to DataFrame
-                df = pd.DataFrame(self._calculation_history)
-                
+            # Get data from DataStore
+            df = self._data_store.get_calculation_history()
+            
+            if not df.empty:
                 # Format data for display
                 display_df = pd.DataFrame({
                     'Date/Time': df['timestamp'],
@@ -113,16 +113,15 @@ class ResultsManager(QObject):
                     'Drop %': df['drop_percent']
                 })
             else:
-                # Empty display DataFrame
                 display_df = pd.DataFrame(columns=self._table_model._headers)
             
             self._results_df = display_df
             self._table_model.update_data(display_df)
             self.resultsChanged.emit()
-            logger.info(f"Loaded {len(display_df)} results from memory")
+            logger.info(f"Loaded {len(display_df)} results from SQL storage")
+            
         except Exception as e:
-            logger.error(f"Error loading results: {str(e)}")
-            # Create empty display DataFrame on error
+            logger.error(f"Error loading results from SQL: {str(e)}")
             display_df = pd.DataFrame(columns=self._table_model._headers)
             self._results_df = display_df
             self._table_model.update_data(display_df)
@@ -139,37 +138,47 @@ class ResultsManager(QObject):
 
     @Slot(int)
     def removeResult(self, index):
-        """Remove a result by index."""
+        """Remove a result by index from SQL storage."""
         try:
             if 0 <= index < len(self._results_df):
-                # Remove from in-memory list
-                if 0 <= index < len(self._calculation_history):
-                    del self._calculation_history[index]
+                # Get timestamp of record to delete
+                timestamp = self._results_df.iloc[index]['Date/Time']
                 
-                # Update display
+                # Delete from SQL storage
+                cursor = self._data_store._connection.cursor()
+                cursor.execute("DELETE FROM calculation_history WHERE timestamp = ?", (timestamp,))
+                self._data_store._connection.commit()
+                
+                # Refresh display
                 self._load_saved_results()
-                logger.info(f"Removed result at index {index}")
+                logger.info(f"Removed result at index {index} from SQL storage")
             else:
-                logger.warning(f"Index {index} out of range for display DataFrame")
+                logger.warning(f"Index {index} out of range")
         except Exception as e:
-            logger.error(f"Error removing result at index {index}: {str(e)}")
+            logger.error(f"Error removing result: {str(e)}")
             self.saveError.emit(f"Failed to remove result: {str(e)}")
 
     @Slot()
     def clear_all_results(self):
-        """Clear all saved results from in-memory storage."""
+        """Clear all saved results from SQL storage."""
         try:
-            # Clear in-memory list
-            self._calculation_history.clear()
+            # Clear data from SQL storage
+            success = self._data_store.clear_calculation_history()
             
-            # Update display
-            display_df = pd.DataFrame(columns=self._table_model._headers)
-            self._results_df = display_df
-            self._table_model.update_data(display_df)
-            self.resultsChanged.emit()
-            return True
+            if success:
+                # Update display
+                display_df = pd.DataFrame(columns=self._table_model._headers)
+                self._results_df = display_df
+                self._table_model.update_data(display_df)
+                self.resultsChanged.emit()
+                logger.info("Cleared all calculation history")
+                return True
+            else:
+                logger.error("Failed to clear calculation history")
+                return False
+                
         except Exception as e:
-            print(f"Error clearing results: {e}")
+            logger.error(f"Error clearing results: {e}")
             return False
 
     @Property('QVariantList', notify=resultsChanged)
@@ -187,37 +196,31 @@ class ResultsManager(QObject):
     
     @Slot(dict)
     def save_calculation(self, data):
-        """Save a new calculation to in-memory storage."""
+        """Save calculation to SQL storage."""
         try:
-            # Validate required fields
-            required_fields = ['voltage_system', 'cable_size', 'conductor']
-            for field in required_fields:
-                if not data.get(field):
-                    error_msg = f"Missing required field: {field}"
-                    logger.warning(error_msg)
-                    self.saveError.emit(error_msg)
-                    return False
-            
-            # Add timestamp
-            data['timestamp'] = QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-            
-            # Ensure data types
+            # Validate and process data
             processed_data = self._process_calculation_data(data)
             
-            # Save to in-memory list
-            self._calculation_history.append(processed_data)
+            # Save to SQL storage
+            success = self._data_store.add_calculation(processed_data)
             
-            # Update display data
-            self._load_saved_results()
-            
-            logger.info(f"Saved new calculation for {processed_data['conductor']} {processed_data['cable_size']}mm² cable")
-            return True
+            if success:
+                # Refresh display
+                self._load_saved_results()
+                logger.info(f"Saved new calculation to SQL storage")
+                return True
+            else:
+                error_msg = "Failed to save to SQL storage"
+                logger.error(error_msg)
+                self.saveError.emit(error_msg)
+                return False
+                
         except Exception as e:
             error_msg = f"Error saving calculation: {str(e)}"
             logger.error(error_msg)
             self.saveError.emit(error_msg)
             return False
-    
+
     def _process_calculation_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Process and validate calculation data.
         
@@ -244,34 +247,6 @@ class ResultsManager(QObject):
             'admd_enabled': bool(data.get('admd_enabled', False))
         }
 
-    # Export all calculations to CSV
-    @Slot(str, result=bool)
-    def export_to_csv(self, filepath=None):
-        """Export all calculation results to CSV file."""
-        try:
-            if not filepath:
-                from .voltdrop.file_utils import FileUtils
-                file_utils = FileUtils()
-                filepath = file_utils.get_save_filepath("csv", "calculation_history")
-                
-                if not filepath:
-                    self.saveError.emit("Export cancelled")
-                    return False
-            
-            # Convert in-memory list to DataFrame
-            df = pd.DataFrame(self._calculation_history)
-            
-            # Save to CSV
-            df.to_csv(filepath, index=False)
-            
-            logger.info(f"Exported {len(df)} calculations to {filepath}")
-            return True
-        except Exception as e:
-            error_msg = f"Error exporting to CSV: {str(e)}"
-            logger.error(error_msg)
-            self.saveError.emit(error_msg)
-            return False
-    
     # Remove duplicate methods that are confusing - use consistent naming
     # These methods can be removed as they duplicate functionality
     @Slot(int)
@@ -288,3 +263,8 @@ class ResultsManager(QObject):
     def refreshResults(self):
         """Alias for refresh_results"""
         self.refresh_results()
+
+    def __del__(self):
+        """Cleanup database connection on deletion."""
+        if hasattr(self, '_data_store'):
+            self._data_store.close()

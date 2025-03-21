@@ -1,5 +1,0 @@
-id,size,mv_per_am,max_current,material,core_type,description,insulation_type,standard,dc_resistance,ac_resistance,reactance,mass_kg_per_km,temperature_rating
-1,1.5,26.0,19.5,Cu,1C+E,,XLPE,AS/NZS 3008,,,,,
-2,2.5,15.6,27.0,Cu,1C+E,,XLPE,AS/NZS 3008,,,,,
-3,16.0,2.6,115.0,Al,1C+E,,XLPE,AS/NZS 3008,,,,,
-4,25.0,1.7,150.0,Al,1C+E,,XLPE,AS/NZS 3008,,,,,
