@@ -70,6 +70,120 @@ Item {
                     rowSpacing: 10
                     columnSpacing: 10
 
+                    Label { text: "Device Type:" }
+                    ComboBox {
+                        id: deviceType
+                        model: relay.deviceTypes
+                        textRole: "type"
+                        onCurrentIndexChanged: {
+                            if (currentIndex >= 0) {
+                                let device = model[currentIndex]
+                                // Get ratings without duplicates
+                                let ratings = relay.getUniqueDeviceRatings(device.type)
+                                ratingCombo.model = ratings
+                                breakingCapacity.text = device.breaking_capacity
+                            }
+                        }
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Rating:" }
+                    ComboBox {
+                        id: ratingCombo
+                        textRole: "rating"
+                        onCurrentIndexChanged: {
+                            if (currentIndex >= 0 && model) {
+                                let rating = model[currentIndex]
+                                pickupCurrent.text = rating.rating
+                                deviceDescription.text = rating.description
+                                
+                                // Determine curve type based on breaker type and rating
+                                if (deviceType.currentText === "MCB") {
+                                    breakerCurveCombo.visible = true
+                                    breakerCurveCombo.currentIndex = 1  // Default to C curve
+                                } else {
+                                    breakerCurveCombo.visible = false
+                                    curveType.currentIndex = 2  // Set to Extremely Inverse
+                                }
+                            }
+                        }
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Breaker Curve:" }
+                    ComboBox {
+                        id: breakerCurveCombo
+                        visible: deviceType.currentText === "MCB"
+                        model: ["B", "C", "D"]
+                        onCurrentTextChanged: {
+                            if (currentText) {
+                                // Set curveType index based on breaker curve
+                                switch(currentText) {
+                                    case "B": curveType.currentIndex = 0; break; // Standard Inverse
+                                    case "C": curveType.currentIndex = 1; break; // Very Inverse
+                                    case "D": curveType.currentIndex = 2; break; // Extremely Inverse
+                                }
+                            }
+                        }
+                        Layout.fillWidth: true
+                        
+                        ToolTip {
+                            text: "B: 3-5x In\nC: 5-10x In\nD: 10-20x In"
+                            visible: parent.hovered
+                        }
+                    }
+
+                    Label { text: "Breaking Capacity:" }
+                    TextField {
+                        id: breakingCapacity
+                        placeholderText: "Enter breaking capacity"
+                        validator: IntValidator { bottom: 0 }
+                        color: {
+                            if (!acceptableInput) return "red"
+                            if (deviceType.currentText === "MCB" && parseInt(text) > 10000) return "red"
+                            if (deviceType.currentText === "MCCB" && parseInt(text) < 10000) return "red"
+                            return activeFocus ? "black" : "gray"
+                        }
+                        
+                        ToolTip {
+                            text: {
+                                if (deviceType.currentText === "MCB") return "Valid range: 1000-10000A"
+                                if (deviceType.currentText === "MCCB") return "Valid range: 10000-50000A"
+                                return "Enter breaking capacity"
+                            }
+                            visible: parent.hovered || parent.activeFocus
+                        }
+
+                        onEditingFinished: {
+                            if (deviceType.currentIndex >= 0 && text) {
+                                let device = deviceType.model[deviceType.currentIndex]
+                                let capacity = parseInt(text)
+                                if (relay.updateBreakingCapacity(device.type, capacity)) {
+                                    // Force reload models
+                                    deviceType.model = undefined  // Clear first
+                                    deviceType.model = relay.deviceTypes
+                                    
+                                    // Update ratings for current device type
+                                    ratingCombo.model = relay.getDeviceRatings(device.type)
+                                    
+                                    // Update curve type index instead of text
+                                    curveType.currentIndex = capacity > 10000 ? 2 : 0
+                                } else {
+                                    // Reset to previous value if update failed
+                                    text = device.breaking_capacity
+                                }
+                            }
+                        }
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Description:" }
+                    TextField {
+                        id: deviceDescription
+                        readOnly: true
+                        Layout.fillWidth: true
+                    }
+
                     Label { text: "Pickup Current (A):" }
                     TextField {
                         id: pickupCurrent
@@ -91,9 +205,28 @@ Item {
                     Label { text: "Curve Type:" }
                     ComboBox {
                         id: curveType
-                        model: relay.curveTypes
-                        onCurrentTextChanged: relay.curveType = currentText
                         Layout.fillWidth: true
+                        model: {
+                            if (deviceType.currentText === "MCB") {
+                                return ["IEC Standard Inverse", "IEC Very Inverse", "IEC Extremely Inverse"]
+                            } else {
+                                return ["IEC Extremely Inverse"]
+                            }
+                        }
+                        onCurrentTextChanged: {
+                            if (currentText) {
+                                relay.setCurveType(currentText)
+                            }
+                        }
+                        
+                        Component.onCompleted: {
+                            currentIndex = 0
+                        }
+                        
+                        ToolTip {
+                            text: "B Curve: Standard Inverse\nC Curve: Very Inverse\nD Curve: Extremely Inverse"
+                            visible: parent.hovered
+                        }
                     }
 
                     Rectangle {
@@ -172,6 +305,24 @@ Item {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // Update connection to use correct curve point format
+    Connections {
+        target: relay
+        function onCalculationsComplete() {
+            let curvePoints = relay.getCurvePoints(
+                deviceType.currentText,
+                parseFloat(pickupCurrent.text) || 0
+            )
+            tripCurve.clear()
+            for (let point of curvePoints) {
+                tripCurve.append(
+                    point.multiplier * parseFloat(pickupCurrent.text), 
+                    point.time
+                )
             }
         }
     }

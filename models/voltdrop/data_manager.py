@@ -450,3 +450,281 @@ class DataManager:
         except Exception as e:
             print(f"Error importing data: {e}")
             return False
+
+    def get_installation_factor(self, code: str) -> dict:
+        """Get installation method data from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT code, description, base_factor, notes 
+                FROM installation_methods 
+                WHERE code = ?
+            """, (code,))
+            result = cursor.fetchone()
+            if result:
+                return {
+                    'code': result[0],
+                    'description': result[1],
+                    'base_factor': float(result[2]),
+                    'notes': result[3]
+                }
+            return None
+        finally:
+            conn.close()
+
+    def get_temperature_factor(self, temperature: int, insulation_type: str) -> float:
+        """Get temperature derating factor from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT factor 
+                FROM temperature_factors 
+                WHERE temperature <= ? AND insulation_type = ?
+                ORDER BY temperature DESC 
+                LIMIT 1
+            """, (temperature, insulation_type))
+            result = cursor.fetchone()
+            return float(result[0]) if result else 1.0
+        finally:
+            conn.close()
+
+    def get_material_properties(self, material: str) -> dict:
+        """Get cable material properties from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT resistivity, temperature_coefficient, description 
+                FROM cable_materials 
+                WHERE material = ?
+            """, (material,))
+            result = cursor.fetchone()
+            if result:
+                return {
+                    'resistivity': float(result[0]),
+                    'temperature_coefficient': float(result[1]),
+                    'description': result[2]
+                }
+            return None
+        finally:
+            conn.close()
+
+    def get_standard_requirements(self, code: str) -> dict:
+        """Get standard requirements from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT description, voltage_drop_limit, current_rating_table, category 
+                FROM standards_reference 
+                WHERE code = ?
+            """, (code,))
+            result = cursor.fetchone()
+            if result:
+                return {
+                    'description': result[0],
+                    'voltage_drop_limit': float(result[1]) if result[1] else None,
+                    'current_rating_table': result[2],
+                    'category': result[3]
+                }
+            return None
+        finally:
+            conn.close()
+
+    def get_voltage_system(self, voltage: float = None) -> dict:
+        """Get voltage system data from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if voltage:
+                cursor.execute("""
+                    SELECT voltage, name, description, frequency, phase_count, category, notes
+                    FROM voltage_systems WHERE voltage = ?
+                """, (voltage,))
+                result = cursor.fetchone()
+                if result:
+                    return {
+                        'voltage': result[0],
+                        'name': result[1],
+                        'description': result[2],
+                        'frequency': result[3],
+                        'phase_count': result[4],
+                        'category': result[5],
+                        'notes': result[6]
+                    }
+            else:
+                # Return all voltage systems
+                cursor.execute("SELECT * FROM voltage_systems ORDER BY voltage")
+                return cursor.fetchall()
+                
+            return None
+        finally:
+            conn.close()
+
+    def get_circuit_breaker(self, rating: float, type: str = None) -> dict:
+        """Get circuit breaker data from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            query = "SELECT * FROM circuit_breakers WHERE rating = ?"
+            params = [rating]
+            
+            if type:
+                query += " AND type = ?"
+                params.append(type)
+                
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+            
+            if result:
+                return {
+                    'type': result[1],
+                    'rating': result[2],
+                    'breaking_capacity': result[3],
+                    'curve_type': result[4],
+                    'manufacturer': result[5],
+                    'model': result[6],
+                    'description': result[7]
+                }
+            return None
+        finally:
+            conn.close()
+
+    def get_insulation_type(self, code: str) -> dict:
+        """Get insulation type data from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT code, name, max_temp, description, material, standard
+                FROM insulation_types WHERE code = ?
+            """, (code,))
+            result = cursor.fetchone()
+            if result:
+                return {
+                    'code': result[0],
+                    'name': result[1],
+                    'max_temp': result[2],
+                    'description': result[3],
+                    'material': result[4],
+                    'standard': result[5]
+                }
+            return None
+        finally:
+            conn.close()
+
+    def get_soil_resistivity(self, soil_type: str = None) -> dict:
+        """Get soil resistivity data from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if soil_type:
+                cursor.execute("""
+                    SELECT soil_type, min_resistivity, max_resistivity, typical_value, 
+                           moisture_content, notes
+                    FROM soil_resistivity WHERE soil_type = ?
+                """, (soil_type,))
+                result = cursor.fetchone()
+                if result:
+                    return {
+                        'soil_type': result[0],
+                        'min_resistivity': result[1],
+                        'max_resistivity': result[2],
+                        'typical_value': result[3],
+                        'moisture_content': result[4],
+                        'notes': result[5]
+                    }
+            else:
+                # Return all soil types
+                cursor.execute("SELECT * FROM soil_resistivity")
+                return cursor.fetchall()
+                
+            return None
+        finally:
+            conn.close()
+
+    def get_protection_curve(self, device_type: str, rating: float) -> list:
+        """Get protection curve points from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT current_multiplier, tripping_time, curve_type, temperature
+                FROM protection_curves 
+                WHERE device_type = ? AND rating = ?
+                ORDER BY current_multiplier
+            """, (device_type, rating))
+            results = cursor.fetchall()
+            if results:
+                return [{
+                    'current_multiplier': row[0],
+                    'tripping_time': row[1],
+                    'curve_type': row[2],
+                    'temperature': row[3]
+                } for row in results]
+            return []
+        finally:
+            conn.close()
+
+    def _calculate_voltage_drop(self):
+        """Calculate voltage drop using mV/A/m method."""
+        try:
+            # Initial validation checks
+            if self._current <= 0 or self._length <= 0:
+                return 0.0
+
+            # Current and length checks
+            if self._current <= 0 or self._length <= 0:
+                return 0.0
+
+            # Cable data retrieval
+            cable = self.get_cable_by_size(self._cable_size, self._conductor_material, self._core_type)
+            if cable is None:
+                return 0.0
+
+            # Get temperature factor from database
+            temp_factor = self.get_temperature_factor(
+                self._temperature,
+                'XLPE' if self._conductor_material == 'Al' else 'PVC'
+            )
+            
+            # Get installation method factor
+            install_method = self.get_installation_factor(
+                self._installation_method.split(' - ')[0]
+            )
+            install_factor = install_method['base_factor'] if install_method else 1.0
+            
+            # Get material properties
+            material_props = self.get_material_properties(self._conductor_material)
+            resistivity_factor = material_props['resistivity'] / 1.72e-8 if material_props else 1.0
+            
+            # Voltage drop calculation
+            mv_per_am = float(cable['mv_per_am'])
+            v_drop = (
+                self._current * 
+                self._length * 
+                mv_per_am * 
+                temp_factor * 
+                install_factor * 
+                resistivity_factor /
+                1000.0
+            )
+
+            # Table data population
+            self._voltage_drop = v_drop
+            self._voltage_drop_percent = (v_drop / self._voltage) * 100
+
+            # Status determination
+            self._status = "OK" if self._voltage_drop_percent <= self._voltage_drop_limit else "Excessive voltage drop"
+
+            # Signal emissions
+            self.voltageDropCalculated.emit(self._voltage_drop, self._voltage_drop_percent, self._status)
+            
+        except Exception as e:
+            print(f"Error calculating voltage drop: {e}")
+            return 0.0
