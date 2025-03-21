@@ -250,7 +250,7 @@ Item {
                     WaveCard {
                         title: "Voltage Regulator"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 420  // Increased height for additional parameters
+                        Layout.preferredHeight: 450  // Increased height for additional parameters
                         
                         GridLayout {
                             anchors.fill: parent
@@ -429,7 +429,7 @@ Item {
                         WaveCard {
                             title: "Electrical System Results"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 330
+                            Layout.preferredHeight: 350
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -668,7 +668,7 @@ Item {
                         WaveCard {
                             title: "Voltage Regulation Results"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 250
+                            Layout.preferredHeight: 280
                             visible: regulatorEnabledSwitch.checked
                             Layout.alignment: Qt.AlignTop
                             
