@@ -43,6 +43,74 @@ Item {
         ohmsLawCanvas.requestPaint();
     }
 
+    Popup {
+        id: tipsPopup
+        width: 600
+        height: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            width: parent.width
+            spacing: 10
+            
+            Text {
+                text: "<b>Basic Ohm's Law Equations:</b>"
+                font.pixelSize: 14
+            }
+            
+            GridLayout {
+                columns: 2
+                Layout.fillWidth: true
+                columnSpacing: 30
+                
+                Text { text: "Voltage (V):" }
+                Text { text: "V = I × R" }
+                
+                Text { text: "Current (I):" }
+                Text { text: "I = V / R" }
+                
+                Text { text: "Resistance (R):" }
+                Text { text: "R = V / I" }
+                
+                Text { text: "Power (P):" }
+                Text { text: "P = V × I = I² × R = V² / R" }
+            }
+            
+            Text {
+                text: "<b>Applications:</b>"
+                font.pixelSize: 14
+                Layout.topMargin: 10
+            }
+            
+            Text {
+                text: "Ohm's Law is the foundation of electrical engineering and is used for circuit analysis, " +
+                    "component selection, power calculations, fuse and circuit protection sizing, voltage " +
+                    "regulation, and more. Understanding these relationships is essential for designing and " +
+                    "troubleshooting electrical and electronic circuits."
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            
+            Text {
+                text: "<b>Note:</b> Ohm's Law applies to resistive elements in DC circuits and to the magnitude " +
+                    "of voltage, current, and impedance in sinusoidal AC circuits."
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.topMargin: 10
+            }
+        }
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: 10
@@ -51,12 +119,15 @@ Item {
         RowLayout {
 
             WaveCard {
+                id: results
                 title: "Input Parameters"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 200
                 Layout.minimumWidth: 350
                 Layout.maximumWidth: 350
                 Layout.alignment: Qt.AlignTop
+
+                showSettings: true
                 
                 GridLayout {
                     anchors.margins: 10
@@ -128,90 +199,26 @@ Item {
                 Layout.minimumWidth: 250
                 Layout.maximumWidth: 250
                 Layout.alignment: Qt.AlignTop
-                
-                RowLayout {
+
+                GridLayout {
+                    id: resultGrid
+                    columns: 2
                     anchors.fill: parent
                     anchors.margins: 10
                     width: parent.width
-                    spacing: 20
-
-                    GridLayout {
-                        id: resultGrid
-                        columns: 2
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignTop
-                        columnSpacing: 10
-                        
-                        Text { text: "Voltage (V):" ; Layout.minimumWidth: 100 }
-                        Text { text: calculatorReady ? calculator.voltage.toFixed(1) + " V" : "N/A" ; font.bold: true }
-                        
-                        Text { text: "Current (I):" }
-                        Text { text: calculatorReady ? calculator.current.toFixed(1) + " A" : "N/A" ; font.bold: true }
-                        
-                        Text { text: "Resistance (R):" }
-                        Text { text: calculatorReady ? calculator.resistance.toFixed(1) + " Ω" : "N/A" ; font.bold: true }
-                        
-                        Text { text: "Power (P):" }
-                        Text { text: calculatorReady ? calculator.power.toFixed(1) + " W" : "N/A" ; font.bold: true }
-                    }
-
-                    Canvas {
-                        id: ohmsLawCanvas
-                        Layout.preferredWidth: 200
-                        Layout.preferredHeight: 200
-                        
-                        onPaint: {
-                            let ctx = getContext("2d");
-                            ctx.clearRect(0, 0, width, height);
-                            
-                            // Draw a simple circuit for visualization
-                            ctx.strokeStyle = "#333333";
-                            ctx.fillStyle = "#333333";
-                            ctx.lineWidth = 2;
-                            ctx.font = "12px sans-serif";
-                            
-                            let centerX = width / 2;
-                            let centerY = height / 2;
-                            let radius = Math.min(width, height) / 2.5;
-                            
-                            // Draw the circuit
-                            ctx.beginPath();
-                            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                            ctx.stroke();
-                            
-                            // Draw the Ohm's Law formula in the middle
-                            ctx.fillText("V = I × R", centerX - 30, centerY - 10);
-                            ctx.fillText("P = V × I", centerX - 30, centerY + 10);
-                            
-                            // Draw spokes with labels
-                            let angleStep = Math.PI / 2;
-                            let labels = ["V", "I", "R", "P"];
-                            
-                            let values = [
-                                calculator.voltage,
-                                calculator.current,
-                                calculator.resistance,
-                                calculator.power
-                            ];
-                            
-                            for (let i = 0; i < 4; i++) {
-                                let angle = i * angleStep;
-                                let x1 = centerX + radius * Math.cos(angle);
-                                let y1 = centerY + radius * Math.sin(angle);
-                                let x2 = centerX + (radius + 20) * Math.cos(angle);
-                                let y2 = centerY + (radius + 20) * Math.sin(angle);
-                                
-                                ctx.beginPath();
-                                ctx.moveTo(centerX, centerY);
-                                ctx.lineTo(x1, y1);
-                                ctx.stroke();
-
-                                let labelX = x2 - 10;
-                                let labelY = y2 + 5;
-                                ctx.fillText(labels[i] + ": " + values[i].toFixed(2), labelX, labelY);
-                            }
-                        }
-                    }
+                    columnSpacing: 10
+                    
+                    Text { text: "Voltage (V):" ; Layout.minimumWidth: 100 }
+                    Text { text: calculatorReady ? calculator.voltage.toFixed(1) + " V" : "N/A" ; font.bold: true }
+                    
+                    Text { text: "Current (I):" }
+                    Text { text: calculatorReady ? calculator.current.toFixed(1) + " A" : "N/A" ; font.bold: true }
+                    
+                    Text { text: "Resistance (R):" }
+                    Text { text: calculatorReady ? calculator.resistance.toFixed(1) + " Ω" : "N/A" ; font.bold: true }
+                    
+                    Text { text: "Power (P):" }
+                    Text { text: calculatorReady ? calculator.power.toFixed(1) + " W" : "N/A" ; font.bold: true }
                 }
             }
         }
@@ -222,56 +229,60 @@ Item {
             Layout.minimumHeight: 400
             Layout.alignment: Qt.AlignTop
             
-            ColumnLayout {
+            Canvas {
+                id: ohmsLawCanvas
                 anchors.fill: parent
-                anchors.margins: 10
-                width: parent.width
-                spacing: 10
                 
-                Text {
-                    text: "<b>Basic Ohm's Law Equations:</b>"
-                    font.pixelSize: 14
-                }
-                
-                GridLayout {
-                    columns: 2
-                    Layout.fillWidth: true
-                    columnSpacing: 30
+                onPaint: {
+                    let ctx = getContext("2d");
+                    ctx.clearRect(0, 0, width, height);
                     
-                    Text { text: "Voltage (V):" }
-                    Text { text: "V = I × R" }
+                    // Draw a simple circuit for visualization
+                    ctx.strokeStyle = "#333333";
+                    ctx.fillStyle = "#333333";
+                    ctx.lineWidth = 2;
+                    ctx.font = "12px sans-serif";
                     
-                    Text { text: "Current (I):" }
-                    Text { text: "I = V / R" }
+                    let centerX = width / 2;
+                    let centerY = height / 2;
+                    let radius = Math.min(width, height) / 2.5;
                     
-                    Text { text: "Resistance (R):" }
-                    Text { text: "R = V / I" }
+                    // Draw the circuit
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.stroke();
                     
-                    Text { text: "Power (P):" }
-                    Text { text: "P = V × I = I² × R = V² / R" }
-                }
-                
-                Text {
-                    text: "<b>Applications:</b>"
-                    font.pixelSize: 14
-                    Layout.topMargin: 10
-                }
-                
-                Text {
-                    text: "Ohm's Law is the foundation of electrical engineering and is used for circuit analysis, " +
-                        "component selection, power calculations, fuse and circuit protection sizing, voltage " +
-                        "regulation, and more. Understanding these relationships is essential for designing and " +
-                        "troubleshooting electrical and electronic circuits."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Text {
-                    text: "<b>Note:</b> Ohm's Law applies to resistive elements in DC circuits and to the magnitude " +
-                        "of voltage, current, and impedance in sinusoidal AC circuits."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    Layout.topMargin: 10
+                    // Draw the Ohm's Law formula in the middle
+                    ctx.fillText("V = I × R", centerX - 30, centerY - 10);
+                    ctx.fillText("P = V × I", centerX - 30, centerY + 10);
+                    
+                    // Draw spokes with labels
+                    let angleStep = Math.PI / 2;
+                    let labels = ["V", "I", "R", "P"];
+                    
+                    let values = [
+                        calculator.voltage,
+                        calculator.current,
+                        calculator.resistance,
+                        calculator.power
+                    ];
+                    
+                    for (let i = 0; i < 4; i++) {
+                        let angle = i * angleStep;
+                        let x1 = centerX + radius * Math.cos(angle);
+                        let y1 = centerY + radius * Math.sin(angle);
+                        let x2 = centerX + (radius + 20) * Math.cos(angle);
+                        let y2 = centerY + (radius + 20) * Math.sin(angle);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.lineTo(x1, y1);
+                        ctx.stroke();
+
+                        let labelX = x2 - 10;
+                        let labelY = y2 + 5;
+                        ctx.fillText(labels[i] + ": " + values[i].toFixed(2), labelX, labelY);
+                    }
                 }
             }
         }

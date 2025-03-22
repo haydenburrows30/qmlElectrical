@@ -61,7 +61,7 @@ Item {
             WaveCard {
                 title: "Relay Settings"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 400
+                Layout.minimumHeight: 500
                 id: results
                 showSettings: true
 
@@ -260,10 +260,10 @@ Item {
         WaveCard {
             title: "Time-Current Curve"
             Layout.minimumHeight: settingsColumn.height
-            Layout.minimumWidth: settingsColumn.height * 1.75
+            Layout.minimumWidth: settingsColumn.height * 1.5
 
 
-        // Time-Current Curve Chart
+            // Time-Current Curve Chart
             ChartView {
                 id: relayChart
                 theme: Universal.theme

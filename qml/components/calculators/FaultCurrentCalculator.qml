@@ -209,6 +209,7 @@ Item {
                     
                     // Set colors based on theme
                     var lineColor = root.Universal.theme === Universal.Dark ? "#FFFFFF" : "#000000"
+                    var accentColor = root.Universal.theme === Universal.Dark ? "#00B4FF" : "#0078D4"
                     ctx.strokeStyle = lineColor
                     ctx.fillStyle = lineColor
                     ctx.lineWidth = 2
@@ -216,74 +217,130 @@ Item {
                     // Draw system source
                     var startX = 50
                     var centerY = height/2
-                    drawSource(ctx, startX, centerY - 50)
+                    drawSource(ctx, startX, centerY - 50, accentColor)
                     
                     // Draw busbar
+                    ctx.lineWidth = 3
                     ctx.beginPath()
                     ctx.moveTo(startX, centerY - 20)
                     ctx.lineTo(width - 50, centerY - 20)
                     ctx.stroke()
                     
                     // Draw transformer
-                    drawTransformer(ctx, startX + 100, centerY)
+                    drawTransformer(ctx, startX + 100, centerY, accentColor)
                     
                     // Draw cable
-                    drawCable(ctx, startX + 200, centerY)
+                    drawCable(ctx, startX + 200, centerY, lineColor)
                     
                     // Draw fault location with lightning bolt
-                    drawFault(ctx, width - 100, centerY + 20)
+                    drawFault(ctx, width - 100, centerY + 20, "#FFB900")
                     
-                    // Add labels
-                    ctx.font = "12px sans-serif"
-                    ctx.fillText(systemVoltage.text + " kV", startX - 20, centerY - 70)
-                    ctx.fillText("System MVA: " + systemMva.text, startX - 20, centerY - 90)
-                    ctx.fillText("Z = " + transformerZ.text + "%", startX + 80, centerY + 50)
-                    ctx.fillText(cableLength.text + "km", startX + 200, centerY - 40)
-                    ctx.fillText("If = " + calculator.initialSymCurrent.toFixed(1) + " kA", width - 120, centerY + 60)
+                    // Add labels with improved styling
+                    ctx.fillStyle = lineColor
+                    ctx.font = "bold 12px sans-serif"
+                    ctx.textAlign = "center"
+                    ctx.fillText(systemVoltage.text + " kV", startX, centerY - 90)
+                    ctx.font = "11px sans-serif"
+                    ctx.fillText("System MVA: " + systemMva.text, startX, centerY - 75)
+                    ctx.fillText("Z = " + transformerZ.text + "%", startX + 115, centerY + 50)
+                    ctx.fillText(cableLength.text + " km", startX + 300, centerY - 40)
+                    
+                    // Draw fault current with highlight
+                    ctx.font = "bold 13px sans-serif"
+                    ctx.fillStyle = "#FFB900"
+                    ctx.fillText("If = " + calculator.initialSymCurrent.toFixed(1) + " kA", width - 100, centerY + 60)
                 }
                 
-                function drawSource(ctx, x, y) {
+                function drawSource(ctx, x, y, accentColor) {
+                    // Outer circle
                     ctx.beginPath()
-                    ctx.arc(x, y, 20, 0, 2 * Math.PI)
-                    ctx.moveTo(x-10, y)
-                    ctx.lineTo(x+10, y)
-                    ctx.moveTo(x, y-10)
-                    ctx.lineTo(x, y+10)
+                    ctx.strokeStyle = accentColor
+                    ctx.lineWidth = 2.5
+                    ctx.arc(x, y, 22, 0, 2 * Math.PI)
+                    ctx.stroke()
+                    
+                    // Inner symbol
+                    ctx.beginPath()
+                    ctx.strokeStyle = ctx.fillStyle
+                    ctx.lineWidth = 2
+                    ctx.moveTo(x-12, y)
+                    ctx.lineTo(x+12, y)
+                    ctx.moveTo(x, y-12)
+                    ctx.lineTo(x, y+12)
                     ctx.stroke()
                 }
                 
-                function drawTransformer(ctx, x, y) {
+                function drawTransformer(ctx, x, y, accentColor) {
+                    ctx.strokeStyle = accentColor
+                    ctx.lineWidth = 2.5
+                    
+                    // Primary winding
                     ctx.beginPath()
-                    ctx.moveTo(x, y-20)
-                    ctx.lineTo(x, y+20)
-                    ctx.moveTo(x+15, y-20)
-                    ctx.lineTo(x+15, y+20)
+                    drawRoundedLine(ctx, x, y-25, x, y+25, 4)
+                    
+                    // Secondary winding
+                    ctx.beginPath()
+                    drawRoundedLine(ctx, x+20, y-25, x+20, y+25, 4)
+                    
+                    // Core lines
+                    ctx.lineWidth = 1.5
+                    ctx.beginPath()
+                    ctx.moveTo(x-5, y-20)
+                    ctx.lineTo(x+25, y-20)
+                    ctx.moveTo(x-5, y+20)
+                    ctx.lineTo(x+25, y+20)
                     ctx.stroke()
                 }
                 
-                function drawCable(ctx, x, y) {
+                function drawRoundedLine(ctx, x1, y1, x2, y2, radius) {
+                    ctx.moveTo(x1, y1 + radius)
+                    ctx.arcTo(x1, y1, x1 + radius, y1, radius)
+                    ctx.lineTo(x2, y1)
+                    ctx.arcTo(x2, y1, x2, y1 + radius, radius)
+                    ctx.lineTo(x2, y2 - radius)
+                    ctx.arcTo(x2, y2, x2 - radius, y2, radius)
+                    ctx.stroke()
+                }
+                
+                function drawCable(ctx, x, y, lineColor) {
+                    ctx.strokeStyle = lineColor
+                    ctx.lineWidth = 2.5
+                    
+                    // Main line
                     ctx.beginPath()
                     ctx.moveTo(x, y-20)
                     ctx.lineTo(x+200, y-20)
                     ctx.stroke()
                     
-                    // Add zigzag for impedance
-                    var zigzagWidth = 10
-                    var zigzagHeight = 10
-                    for(var i = 0; i < 8; i++) {
-                        ctx.lineTo(x + (i+1)*zigzagWidth, y-20 + (i%2 ? -zigzagHeight : zigzagHeight))
+                    // Impedance symbol
+                    ctx.lineWidth = 2
+                    ctx.beginPath()
+                    var amplitude = 12
+                    var period = 15
+                    ctx.moveTo(x + 20, y-20)
+                    for(var i = 0; i <= 180; i++) {
+                        var xPos = x + 20 + i
+                        var yPos = y - 20 + Math.sin(i/period) * amplitude
+                        ctx.lineTo(xPos, yPos)
                     }
                     ctx.stroke()
                 }
                 
-                function drawFault(ctx, x, y) {
+                function drawFault(ctx, x, y, faultColor) {
+                    ctx.strokeStyle = faultColor
+                    ctx.lineWidth = 3
                     ctx.beginPath()
                     ctx.moveTo(x, y-40)
-                    ctx.lineTo(x-10, y-20)
-                    ctx.lineTo(x+5, y-10)
-                    ctx.lineTo(x-5, y)
-                    ctx.lineTo(x+10, y+10)
-                    ctx.lineTo(x, y+20)
+                    ctx.lineTo(x-8, y-25)
+                    ctx.lineTo(x+8, y-10)
+                    ctx.lineTo(x-8, y+5)
+                    ctx.lineTo(x+8, y+20)
+                    ctx.lineTo(x, y+35)
+                    ctx.stroke()
+                    
+                    // Add glow effect
+                    ctx.strokeStyle = faultColor + "40" // 40 = 25% opacity
+                    ctx.lineWidth = 6
                     ctx.stroke()
                 }
             }
