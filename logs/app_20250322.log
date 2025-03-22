@@ -21090,3 +21090,1755 @@ Voltage Regulator:
 2025-03-22 21:25:56,367 - qmltest - INFO - • Grouping Factor: 1.00
 2025-03-22 21:25:56,367 - qmltest - INFO - Invalid input parameters, skipping calculation
 2025-03-22 21:25:56,369 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:28:39,707 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:28:39,822 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:28:39,823 - qmltest - INFO - Input Parameters:
+2025-03-22 21:28:39,823 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:28:39,823 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:28:39,823 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:28:39,823 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:28:39,823 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:28:39,823 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:28:39,825 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:28:39,903 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:28:39,903 - qmltest - INFO - Input Parameters:
+2025-03-22 21:28:39,904 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:28:39,904 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:28:39,904 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:28:39,904 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:28:39,904 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:28:39,904 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:28:39,905 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:28:41,853 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:28:41,854 - qmltest - INFO - Input Parameters:
+2025-03-22 21:28:41,854 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:28:41,854 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:28:41,854 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:28:41,854 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:28:41,854 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:28:41,854 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:28:41,855 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:28:41,855 - qmltest - INFO - Input Parameters:
+2025-03-22 21:28:41,855 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:28:41,855 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:28:41,855 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:28:41,855 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:28:41,855 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:28:41,855 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:28:41,862 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:28:41,862 - qmltest - INFO - Input Parameters:
+2025-03-22 21:28:41,862 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:28:41,862 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:28:41,862 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:28:41,862 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:28:41,862 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:28:41,862 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:36,103 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:30:36,211 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:30:36,211 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:36,211 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:36,211 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:36,211 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:30:36,211 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:30:36,211 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:36,211 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:36,211 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:36,274 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:36,274 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:36,274 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:36,274 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:30:36,274 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:30:36,274 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:36,274 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:36,274 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:36,276 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:30:38,254 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:38,254 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:38,254 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:38,254 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:30:38,254 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:38,254 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:38,254 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:38,254 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:38,255 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:38,255 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:38,255 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:38,255 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:30:38,255 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:38,255 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:38,255 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:38,255 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:38,259 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:38,259 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:38,259 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:38,259 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:30:38,259 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:38,259 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:38,259 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:38,259 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:40,767 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:40,767 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:40,767 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:40,767 - qmltest - INFO - • Length: 1.00 m
+2025-03-22 21:30:40,768 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:40,768 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:40,768 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:40,768 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:40,838 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:40,838 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:40,839 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:40,839 - qmltest - INFO - • Length: 12.00 m
+2025-03-22 21:30:40,839 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:40,839 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:40,839 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:40,839 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:40,915 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:40,915 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:40,915 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:30:40,915 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:40,915 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:40,916 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:40,916 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:40,916 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:30:43,302 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,302 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,302 - qmltest - INFO - • Current: 121.73 A
+2025-03-22 21:30:43,302 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,302 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,302 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,302 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,302 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,302 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,303 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,303 - qmltest - INFO - • Voltage Drop: 57.86 V (13.94%)
+2025-03-22 21:30:43,303 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,303 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,303 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,303 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,303 - qmltest - INFO - • Voltage Drop: 37.19 V (8.96%)
+2025-03-22 21:30:43,303 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,303 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,303 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,303 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,303 - qmltest - INFO - • Voltage Drop: 27.55 V (6.64%)
+2025-03-22 21:30:43,303 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,303 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,303 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,303 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,303 - qmltest - INFO - • Voltage Drop: 20.66 V (4.98%)
+2025-03-22 21:30:43,303 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,303 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,303 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,303 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,304 - qmltest - INFO - • Voltage Drop: 15.15 V (3.65%)
+2025-03-22 21:30:43,304 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,304 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,304 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,304 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,304 - qmltest - INFO - • Voltage Drop: 9.92 V (2.39%)
+2025-03-22 21:30:43,304 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,304 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,304 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,304 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,304 - qmltest - INFO - • Voltage Drop: 7.99 V (1.93%)
+2025-03-22 21:30:43,304 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,304 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,304 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,304 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,304 - qmltest - INFO - • Voltage Drop: 7.44 V (1.79%)
+2025-03-22 21:30:43,304 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,304 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,304 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,304 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,304 - qmltest - INFO - • Voltage Drop: 5.37 V (1.29%)
+2025-03-22 21:30:43,304 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,305 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,305 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,305 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,305 - qmltest - INFO - • Voltage Drop: 4.27 V (1.03%)
+2025-03-22 21:30:43,305 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,305 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,305 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,305 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,305 - qmltest - INFO - • Voltage Drop: 3.72 V (0.90%)
+2025-03-22 21:30:43,305 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,305 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,305 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,305 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,305 - qmltest - INFO - • Voltage Drop: 3.72 V (0.90%)
+2025-03-22 21:30:43,305 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,305 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,305 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,305 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,305 - qmltest - INFO - • Voltage Drop: 3.31 V (0.80%)
+2025-03-22 21:30:43,305 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,305 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,305 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,305 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,305 - qmltest - INFO - • Voltage Drop: 2.89 V (0.70%)
+2025-03-22 21:30:43,305 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,315 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,315 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,315 - qmltest - INFO - • Final Voltage Drop: 2.89 V
+2025-03-22 21:30:43,315 - qmltest - INFO - • Drop Percentage: 0.70%
+2025-03-22 21:30:43,315 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:43,483 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,483 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,483 - qmltest - INFO - • Current: 194.77 A
+2025-03-22 21:30:43,483 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,483 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,483 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,483 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,483 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,484 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,484 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,484 - qmltest - INFO - • Voltage Drop: 92.57 V (22.31%)
+2025-03-22 21:30:43,484 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,484 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,484 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,484 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,484 - qmltest - INFO - • Voltage Drop: 59.51 V (14.34%)
+2025-03-22 21:30:43,484 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,484 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,484 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,484 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,484 - qmltest - INFO - • Voltage Drop: 44.08 V (10.62%)
+2025-03-22 21:30:43,484 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,484 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,484 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,484 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,484 - qmltest - INFO - • Voltage Drop: 33.06 V (7.97%)
+2025-03-22 21:30:43,484 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,484 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,484 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,485 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,485 - qmltest - INFO - • Voltage Drop: 24.24 V (5.84%)
+2025-03-22 21:30:43,485 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,485 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,485 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,485 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,485 - qmltest - INFO - • Voltage Drop: 15.87 V (3.82%)
+2025-03-22 21:30:43,485 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,485 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,485 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,485 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,485 - qmltest - INFO - • Voltage Drop: 12.78 V (3.08%)
+2025-03-22 21:30:43,485 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,485 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,485 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,485 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,485 - qmltest - INFO - • Voltage Drop: 11.90 V (2.87%)
+2025-03-22 21:30:43,485 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,485 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,485 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,485 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,485 - qmltest - INFO - • Voltage Drop: 8.60 V (2.07%)
+2025-03-22 21:30:43,485 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,485 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,485 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,486 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,486 - qmltest - INFO - • Voltage Drop: 6.83 V (1.65%)
+2025-03-22 21:30:43,486 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,486 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,486 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,486 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,486 - qmltest - INFO - • Voltage Drop: 5.95 V (1.43%)
+2025-03-22 21:30:43,486 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,486 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,486 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,486 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,486 - qmltest - INFO - • Voltage Drop: 5.95 V (1.43%)
+2025-03-22 21:30:43,486 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,486 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,486 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,486 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,486 - qmltest - INFO - • Voltage Drop: 5.29 V (1.27%)
+2025-03-22 21:30:43,486 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,486 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,486 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,486 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,486 - qmltest - INFO - • Voltage Drop: 4.63 V (1.12%)
+2025-03-22 21:30:43,486 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,486 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,486 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,486 - qmltest - INFO - • Final Voltage Drop: 4.63 V
+2025-03-22 21:30:43,486 - qmltest - INFO - • Drop Percentage: 1.12%
+2025-03-22 21:30:43,486 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:43,487 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,487 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,487 - qmltest - INFO - • Current: 116.86 A
+2025-03-22 21:30:43,487 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,487 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,487 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,487 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,487 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,487 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,487 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,487 - qmltest - INFO - • Voltage Drop: 55.54 V (13.38%)
+2025-03-22 21:30:43,487 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,487 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,487 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,487 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,487 - qmltest - INFO - • Voltage Drop: 35.70 V (8.60%)
+2025-03-22 21:30:43,487 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,487 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,487 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,487 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,487 - qmltest - INFO - • Voltage Drop: 26.45 V (6.37%)
+2025-03-22 21:30:43,487 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,487 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,487 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,487 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,487 - qmltest - INFO - • Voltage Drop: 19.84 V (4.78%)
+2025-03-22 21:30:43,487 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,487 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,487 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,487 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 14.55 V (3.51%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 9.52 V (2.29%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 7.67 V (1.85%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 7.14 V (1.72%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 5.16 V (1.24%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 4.10 V (0.99%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 3.57 V (0.86%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 3.57 V (0.86%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 3.17 V (0.76%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,488 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,488 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,488 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,488 - qmltest - INFO - • Voltage Drop: 2.78 V (0.67%)
+2025-03-22 21:30:43,488 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,489 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,489 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,489 - qmltest - INFO - • Final Voltage Drop: 2.78 V
+2025-03-22 21:30:43,489 - qmltest - INFO - • Drop Percentage: 0.67%
+2025-03-22 21:30:43,489 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:43,647 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,647 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,647 - qmltest - INFO - • Current: 178.94 A
+2025-03-22 21:30:43,647 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,647 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,647 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,647 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,648 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,648 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,648 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,648 - qmltest - INFO - • Voltage Drop: 85.05 V (20.49%)
+2025-03-22 21:30:43,648 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,648 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,648 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,648 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,648 - qmltest - INFO - • Voltage Drop: 54.67 V (13.17%)
+2025-03-22 21:30:43,648 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,648 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,648 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,648 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,648 - qmltest - INFO - • Voltage Drop: 40.50 V (9.76%)
+2025-03-22 21:30:43,648 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,649 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,649 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,649 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,649 - qmltest - INFO - • Voltage Drop: 30.37 V (7.32%)
+2025-03-22 21:30:43,649 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,649 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,649 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,649 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,649 - qmltest - INFO - • Voltage Drop: 22.27 V (5.37%)
+2025-03-22 21:30:43,649 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,649 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,649 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,649 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,649 - qmltest - INFO - • Voltage Drop: 14.58 V (3.51%)
+2025-03-22 21:30:43,649 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,649 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,649 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,649 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,649 - qmltest - INFO - • Voltage Drop: 11.74 V (2.83%)
+2025-03-22 21:30:43,649 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,649 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,649 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,649 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,650 - qmltest - INFO - • Voltage Drop: 10.93 V (2.63%)
+2025-03-22 21:30:43,650 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,650 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,650 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,650 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,650 - qmltest - INFO - • Voltage Drop: 7.90 V (1.90%)
+2025-03-22 21:30:43,650 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,650 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,650 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,650 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,650 - qmltest - INFO - • Voltage Drop: 6.28 V (1.51%)
+2025-03-22 21:30:43,650 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,650 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,650 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,650 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,650 - qmltest - INFO - • Voltage Drop: 5.47 V (1.32%)
+2025-03-22 21:30:43,650 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,650 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,650 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,650 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,650 - qmltest - INFO - • Voltage Drop: 5.47 V (1.32%)
+2025-03-22 21:30:43,650 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,650 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,650 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,650 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,650 - qmltest - INFO - • Voltage Drop: 4.86 V (1.17%)
+2025-03-22 21:30:43,650 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,650 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,651 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,651 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,651 - qmltest - INFO - • Voltage Drop: 4.25 V (1.02%)
+2025-03-22 21:30:43,651 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,651 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,651 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,651 - qmltest - INFO - • Final Voltage Drop: 4.25 V
+2025-03-22 21:30:43,651 - qmltest - INFO - • Drop Percentage: 1.02%
+2025-03-22 21:30:43,651 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:43,651 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,651 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,652 - qmltest - INFO - • Current: 119.30 A
+2025-03-22 21:30:43,652 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,652 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,652 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,652 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,652 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,652 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,652 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,652 - qmltest - INFO - • Voltage Drop: 56.70 V (13.66%)
+2025-03-22 21:30:43,652 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,652 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,652 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,652 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,652 - qmltest - INFO - • Voltage Drop: 36.45 V (8.78%)
+2025-03-22 21:30:43,652 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,652 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,652 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,652 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,652 - qmltest - INFO - • Voltage Drop: 27.00 V (6.51%)
+2025-03-22 21:30:43,652 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,652 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,652 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,652 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,652 - qmltest - INFO - • Voltage Drop: 20.25 V (4.88%)
+2025-03-22 21:30:43,652 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,652 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,652 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,652 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,652 - qmltest - INFO - • Voltage Drop: 14.85 V (3.58%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 9.72 V (2.34%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 7.83 V (1.89%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 7.29 V (1.76%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 5.26 V (1.27%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 4.18 V (1.01%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 3.64 V (0.88%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 3.64 V (0.88%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 3.24 V (0.78%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,653 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,653 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,653 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,653 - qmltest - INFO - • Voltage Drop: 2.83 V (0.68%)
+2025-03-22 21:30:43,653 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,654 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,654 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,654 - qmltest - INFO - • Final Voltage Drop: 2.83 V
+2025-03-22 21:30:43,654 - qmltest - INFO - • Drop Percentage: 0.68%
+2025-03-22 21:30:43,654 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:43,827 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,827 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,827 - qmltest - INFO - • Current: 174.51 A
+2025-03-22 21:30:43,827 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,827 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,827 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,827 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,828 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,828 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,828 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,828 - qmltest - INFO - • Voltage Drop: 82.94 V (19.99%)
+2025-03-22 21:30:43,828 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,828 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,828 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,828 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,828 - qmltest - INFO - • Voltage Drop: 53.32 V (12.85%)
+2025-03-22 21:30:43,828 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,828 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,828 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,828 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,828 - qmltest - INFO - • Voltage Drop: 39.50 V (9.52%)
+2025-03-22 21:30:43,828 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,828 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,828 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,828 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,828 - qmltest - INFO - • Voltage Drop: 29.62 V (7.14%)
+2025-03-22 21:30:43,828 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,829 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,829 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,829 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,829 - qmltest - INFO - • Voltage Drop: 21.72 V (5.23%)
+2025-03-22 21:30:43,829 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,829 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,829 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,829 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,829 - qmltest - INFO - • Voltage Drop: 14.22 V (3.43%)
+2025-03-22 21:30:43,829 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,829 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,829 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,829 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,829 - qmltest - INFO - • Voltage Drop: 11.45 V (2.76%)
+2025-03-22 21:30:43,829 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,829 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,829 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,829 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,829 - qmltest - INFO - • Voltage Drop: 10.66 V (2.57%)
+2025-03-22 21:30:43,829 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,829 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,829 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,830 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,830 - qmltest - INFO - • Voltage Drop: 7.70 V (1.86%)
+2025-03-22 21:30:43,830 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,830 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,830 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,830 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,830 - qmltest - INFO - • Voltage Drop: 6.12 V (1.48%)
+2025-03-22 21:30:43,830 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,830 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,830 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,830 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,830 - qmltest - INFO - • Voltage Drop: 5.33 V (1.28%)
+2025-03-22 21:30:43,830 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,830 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,830 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,830 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,830 - qmltest - INFO - • Voltage Drop: 5.33 V (1.28%)
+2025-03-22 21:30:43,830 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,830 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,830 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,830 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,830 - qmltest - INFO - • Voltage Drop: 4.74 V (1.14%)
+2025-03-22 21:30:43,830 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,830 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,830 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,830 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,830 - qmltest - INFO - • Voltage Drop: 4.15 V (1.00%)
+2025-03-22 21:30:43,830 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,831 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,831 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,831 - qmltest - INFO - • Final Voltage Drop: 4.15 V
+2025-03-22 21:30:43,831 - qmltest - INFO - • Drop Percentage: 1.00%
+2025-03-22 21:30:43,831 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:43,831 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:43,831 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:43,831 - qmltest - INFO - • Current: 124.65 A
+2025-03-22 21:30:43,831 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:43,831 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:43,831 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:43,831 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:43,831 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:43,831 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:43,831 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:43,831 - qmltest - INFO - • Voltage Drop: 59.24 V (14.28%)
+2025-03-22 21:30:43,831 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,831 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:43,831 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 38.09 V (9.18%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 28.21 V (6.80%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 21.16 V (5.10%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 15.52 V (3.74%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 10.16 V (2.45%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 8.18 V (1.97%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 7.62 V (1.84%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:43,832 - qmltest - INFO - • Voltage Drop: 5.50 V (1.33%)
+2025-03-22 21:30:43,832 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,832 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:43,832 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:43,832 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:43,833 - qmltest - INFO - • Voltage Drop: 4.37 V (1.05%)
+2025-03-22 21:30:43,833 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,833 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:43,833 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,833 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:43,833 - qmltest - INFO - • Voltage Drop: 3.81 V (0.92%)
+2025-03-22 21:30:43,833 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,833 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:43,833 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:43,833 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:43,833 - qmltest - INFO - • Voltage Drop: 3.81 V (0.92%)
+2025-03-22 21:30:43,833 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,833 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:43,833 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:43,833 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:43,833 - qmltest - INFO - • Voltage Drop: 3.39 V (0.82%)
+2025-03-22 21:30:43,833 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,833 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:43,833 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:43,833 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:43,833 - qmltest - INFO - • Voltage Drop: 2.96 V (0.71%)
+2025-03-22 21:30:43,833 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:43,833 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:43,833 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:43,833 - qmltest - INFO - • Final Voltage Drop: 2.96 V
+2025-03-22 21:30:43,833 - qmltest - INFO - • Drop Percentage: 0.71%
+2025-03-22 21:30:43,833 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:44,007 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:44,007 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:44,007 - qmltest - INFO - • Current: 175.29 A
+2025-03-22 21:30:44,007 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:44,007 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:44,007 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:44,007 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:44,008 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:44,008 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:44,008 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:44,008 - qmltest - INFO - • Voltage Drop: 83.31 V (20.08%)
+2025-03-22 21:30:44,008 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,008 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:44,008 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:44,008 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:44,008 - qmltest - INFO - • Voltage Drop: 53.56 V (12.91%)
+2025-03-22 21:30:44,008 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,008 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:44,008 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:44,008 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:44,008 - qmltest - INFO - • Voltage Drop: 39.67 V (9.56%)
+2025-03-22 21:30:44,008 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,008 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:44,009 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:44,009 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:44,009 - qmltest - INFO - • Voltage Drop: 29.75 V (7.17%)
+2025-03-22 21:30:44,009 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,009 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:44,009 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:44,009 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:44,009 - qmltest - INFO - • Voltage Drop: 21.82 V (5.26%)
+2025-03-22 21:30:44,009 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:44,009 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:44,009 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:44,009 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:44,009 - qmltest - INFO - • Voltage Drop: 14.28 V (3.44%)
+2025-03-22 21:30:44,009 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:44,009 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:44,009 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:44,009 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:44,009 - qmltest - INFO - • Voltage Drop: 11.50 V (2.77%)
+2025-03-22 21:30:44,009 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:44,009 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:44,009 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:44,009 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:44,009 - qmltest - INFO - • Voltage Drop: 10.71 V (2.58%)
+2025-03-22 21:30:44,009 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:44,010 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:44,010 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:44,010 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:44,010 - qmltest - INFO - • Voltage Drop: 7.74 V (1.86%)
+2025-03-22 21:30:44,010 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,010 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:44,010 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:44,010 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:44,010 - qmltest - INFO - • Voltage Drop: 6.15 V (1.48%)
+2025-03-22 21:30:44,010 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,010 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:44,010 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:44,010 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:44,010 - qmltest - INFO - • Voltage Drop: 5.36 V (1.29%)
+2025-03-22 21:30:44,010 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,010 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:44,010 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:44,010 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:44,010 - qmltest - INFO - • Voltage Drop: 5.36 V (1.29%)
+2025-03-22 21:30:44,010 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,010 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:44,010 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:44,010 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:44,010 - qmltest - INFO - • Voltage Drop: 4.76 V (1.15%)
+2025-03-22 21:30:44,010 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,011 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:44,011 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:44,011 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:44,011 - qmltest - INFO - • Voltage Drop: 4.17 V (1.00%)
+2025-03-22 21:30:44,011 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,011 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:44,011 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:44,011 - qmltest - INFO - • Final Voltage Drop: 4.17 V
+2025-03-22 21:30:44,011 - qmltest - INFO - • Drop Percentage: 1.00%
+2025-03-22 21:30:44,011 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:30:44,012 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:30:44,012 - qmltest - INFO - Input Parameters:
+2025-03-22 21:30:44,012 - qmltest - INFO - • Current: 131.47 A
+2025-03-22 21:30:44,012 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:30:44,012 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:30:44,012 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:30:44,012 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:30:44,012 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:30:44,013 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:30:44,013 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:30:44,013 - qmltest - INFO - • Voltage Drop: 62.48 V (15.06%)
+2025-03-22 21:30:44,013 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,013 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:30:44,013 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:30:44,013 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:30:44,013 - qmltest - INFO - • Voltage Drop: 40.17 V (9.68%)
+2025-03-22 21:30:44,013 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,013 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:30:44,013 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:30:44,013 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:30:44,013 - qmltest - INFO - • Voltage Drop: 29.75 V (7.17%)
+2025-03-22 21:30:44,013 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:30:44,013 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:30:44,013 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:30:44,013 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:30:44,013 - qmltest - INFO - • Voltage Drop: 22.32 V (5.38%)
+2025-03-22 21:30:44,013 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:30:44,013 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:30:44,013 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:30:44,013 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:30:44,013 - qmltest - INFO - • Voltage Drop: 16.36 V (3.94%)
+2025-03-22 21:30:44,013 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:44,014 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:30:44,014 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:30:44,014 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:30:44,014 - qmltest - INFO - • Voltage Drop: 10.71 V (2.58%)
+2025-03-22 21:30:44,014 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:44,014 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:30:44,014 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:30:44,014 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:30:44,014 - qmltest - INFO - • Voltage Drop: 8.63 V (2.08%)
+2025-03-22 21:30:44,014 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:30:44,014 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:30:44,014 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:30:44,014 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:30:44,014 - qmltest - INFO - • Voltage Drop: 8.03 V (1.94%)
+2025-03-22 21:30:44,014 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,014 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:30:44,014 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:30:44,014 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:30:44,014 - qmltest - INFO - • Voltage Drop: 5.80 V (1.40%)
+2025-03-22 21:30:44,014 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,014 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:30:44,014 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:30:44,014 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:30:44,014 - qmltest - INFO - • Voltage Drop: 4.61 V (1.11%)
+2025-03-22 21:30:44,014 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,015 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:30:44,015 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:44,015 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:30:44,015 - qmltest - INFO - • Voltage Drop: 4.02 V (0.97%)
+2025-03-22 21:30:44,015 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,015 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:30:44,015 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:30:44,015 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:30:44,015 - qmltest - INFO - • Voltage Drop: 4.02 V (0.97%)
+2025-03-22 21:30:44,015 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,015 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:30:44,015 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:30:44,015 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:30:44,015 - qmltest - INFO - • Voltage Drop: 3.57 V (0.86%)
+2025-03-22 21:30:44,015 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,015 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:30:44,016 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:30:44,016 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:30:44,016 - qmltest - INFO - • Voltage Drop: 3.12 V (0.75%)
+2025-03-22 21:30:44,016 - qmltest - INFO - • Status: OK
+2025-03-22 21:30:44,016 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:30:44,016 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:30:44,016 - qmltest - INFO - • Final Voltage Drop: 3.12 V
+2025-03-22 21:30:44,016 - qmltest - INFO - • Drop Percentage: 0.75%
+2025-03-22 21:30:44,016 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:31:06,613 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:31:06,721 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:31:06,722 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:06,722 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:06,722 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:06,722 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:06,722 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:31:06,722 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:06,722 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:06,722 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:06,783 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:06,784 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:06,784 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:06,784 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:06,784 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:31:06,784 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:06,784 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:06,784 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:06,785 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:31:10,483 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:10,483 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:10,483 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:10,483 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:10,483 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:10,483 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:10,483 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:10,483 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:10,484 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:10,484 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:10,484 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:10,484 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:10,484 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:10,484 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:10,484 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:10,484 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:10,489 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:10,489 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:10,489 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:10,489 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:10,489 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:10,489 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:10,489 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:10,489 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:13,591 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:13,591 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:13,591 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:13,591 - qmltest - INFO - • Length: 1.00 m
+2025-03-22 21:31:13,591 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:13,591 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:13,591 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:13,591 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:13,659 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:13,659 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:13,659 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:13,659 - qmltest - INFO - • Length: 12.00 m
+2025-03-22 21:31:13,659 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:13,659 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:13,659 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:13,659 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:13,729 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:13,730 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:13,730 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:13,730 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:31:13,730 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:13,730 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:13,730 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:13,730 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:15,239 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:15,239 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:15,239 - qmltest - INFO - • Current: 121.73 A
+2025-03-22 21:31:15,239 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:31:15,239 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:15,239 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:15,239 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:15,240 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:31:15,240 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:31:15,240 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:31:15,240 - qmltest - INFO - • Voltage Drop: 57.86 V (13.94%)
+2025-03-22 21:31:15,240 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,240 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:31:15,240 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:31:15,241 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:31:15,241 - qmltest - INFO - • Voltage Drop: 37.19 V (8.96%)
+2025-03-22 21:31:15,241 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,241 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:31:15,241 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:31:15,241 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:31:15,241 - qmltest - INFO - • Voltage Drop: 27.55 V (6.64%)
+2025-03-22 21:31:15,241 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:31:15,241 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:31:15,241 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:31:15,241 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:31:15,241 - qmltest - INFO - • Voltage Drop: 20.66 V (4.98%)
+2025-03-22 21:31:15,241 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,241 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:31:15,241 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:31:15,241 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:31:15,241 - qmltest - INFO - • Voltage Drop: 15.15 V (3.65%)
+2025-03-22 21:31:15,241 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,241 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:31:15,241 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:31:15,241 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:31:15,241 - qmltest - INFO - • Voltage Drop: 9.92 V (2.39%)
+2025-03-22 21:31:15,241 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,241 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:31:15,241 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:31:15,241 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 7.99 V (1.93%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 7.44 V (1.79%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 5.37 V (1.29%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 4.27 V (1.03%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 3.72 V (0.90%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 3.72 V (0.90%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 3.31 V (0.80%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,242 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:31:15,242 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:31:15,242 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:31:15,242 - qmltest - INFO - • Voltage Drop: 2.89 V (0.70%)
+2025-03-22 21:31:15,242 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,253 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:31:15,253 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:31:15,253 - qmltest - INFO - • Final Voltage Drop: 2.89 V
+2025-03-22 21:31:15,253 - qmltest - INFO - • Drop Percentage: 0.70%
+2025-03-22 21:31:15,253 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:31:15,957 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:15,957 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:15,957 - qmltest - INFO - • Current: 194.77 A
+2025-03-22 21:31:15,958 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:31:15,958 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:15,958 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:15,958 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:15,958 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:31:15,958 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:31:15,958 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:31:15,958 - qmltest - INFO - • Voltage Drop: 92.57 V (22.31%)
+2025-03-22 21:31:15,958 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,958 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:31:15,958 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:31:15,958 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:31:15,958 - qmltest - INFO - • Voltage Drop: 59.51 V (14.34%)
+2025-03-22 21:31:15,958 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,959 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:31:15,959 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:31:15,959 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:31:15,959 - qmltest - INFO - • Voltage Drop: 44.08 V (10.62%)
+2025-03-22 21:31:15,959 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,959 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:31:15,959 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:31:15,959 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:31:15,959 - qmltest - INFO - • Voltage Drop: 33.06 V (7.97%)
+2025-03-22 21:31:15,959 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,959 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:31:15,959 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:31:15,959 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:31:15,959 - qmltest - INFO - • Voltage Drop: 24.24 V (5.84%)
+2025-03-22 21:31:15,959 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:31:15,959 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:31:15,959 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:31:15,959 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:31:15,959 - qmltest - INFO - • Voltage Drop: 15.87 V (3.82%)
+2025-03-22 21:31:15,959 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,959 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:31:15,959 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:31:15,959 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:31:15,959 - qmltest - INFO - • Voltage Drop: 12.78 V (3.08%)
+2025-03-22 21:31:15,960 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,960 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:31:15,960 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:31:15,960 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:31:15,960 - qmltest - INFO - • Voltage Drop: 11.90 V (2.87%)
+2025-03-22 21:31:15,960 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,960 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:31:15,960 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:31:15,960 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:31:15,960 - qmltest - INFO - • Voltage Drop: 8.60 V (2.07%)
+2025-03-22 21:31:15,960 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,960 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:31:15,960 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:31:15,960 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:31:15,960 - qmltest - INFO - • Voltage Drop: 6.83 V (1.65%)
+2025-03-22 21:31:15,960 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,960 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:31:15,960 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:31:15,960 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:31:15,960 - qmltest - INFO - • Voltage Drop: 5.95 V (1.43%)
+2025-03-22 21:31:15,960 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,960 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:31:15,960 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:31:15,960 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:31:15,960 - qmltest - INFO - • Voltage Drop: 5.95 V (1.43%)
+2025-03-22 21:31:15,960 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,960 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:31:15,960 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:31:15,961 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:31:15,961 - qmltest - INFO - • Voltage Drop: 5.29 V (1.27%)
+2025-03-22 21:31:15,961 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,961 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:31:15,961 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:31:15,961 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:31:15,961 - qmltest - INFO - • Voltage Drop: 4.63 V (1.12%)
+2025-03-22 21:31:15,961 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,961 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:31:15,961 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:31:15,961 - qmltest - INFO - • Final Voltage Drop: 4.63 V
+2025-03-22 21:31:15,961 - qmltest - INFO - • Drop Percentage: 1.12%
+2025-03-22 21:31:15,961 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:31:15,962 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:15,962 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:15,962 - qmltest - INFO - • Current: 116.86 A
+2025-03-22 21:31:15,962 - qmltest - INFO - • Length: 123.00 m
+2025-03-22 21:31:15,962 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:15,962 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:15,962 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:15,962 - qmltest - INFO - 
+Cable Size 16.0 mm²:
+2025-03-22 21:31:15,962 - qmltest - INFO - • mV/A/m: 4.2
+2025-03-22 21:31:15,962 - qmltest - INFO - • Rating: 57.0 A
+2025-03-22 21:31:15,962 - qmltest - INFO - • Voltage Drop: 55.54 V (13.38%)
+2025-03-22 21:31:15,962 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,962 - qmltest - INFO - 
+Cable Size 25.0 mm²:
+2025-03-22 21:31:15,962 - qmltest - INFO - • mV/A/m: 2.7
+2025-03-22 21:31:15,962 - qmltest - INFO - • Rating: 75.0 A
+2025-03-22 21:31:15,962 - qmltest - INFO - • Voltage Drop: 35.70 V (8.60%)
+2025-03-22 21:31:15,962 - qmltest - INFO - • Status: SEVERE
+2025-03-22 21:31:15,962 - qmltest - INFO - 
+Cable Size 35.0 mm²:
+2025-03-22 21:31:15,962 - qmltest - INFO - • mV/A/m: 2.0
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 92.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 26.45 V (6.37%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: WARNING
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 50.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 1.5
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 110.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 19.84 V (4.78%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 70.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 1.1
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 140.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 14.55 V (3.51%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 95.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 0.72
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 240.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 9.52 V (2.29%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: SUBMAIN
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 120.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 0.58
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 275.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 7.67 V (1.85%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 150.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 0.54
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 225.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 7.14 V (1.72%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 185.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 0.39
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 350.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 5.16 V (1.24%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 240.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 0.31
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 410.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 4.10 V (0.99%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,963 - qmltest - INFO - 
+Cable Size 300.0 mm²:
+2025-03-22 21:31:15,963 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:31:15,963 - qmltest - INFO - • Rating: 460.0 A
+2025-03-22 21:31:15,963 - qmltest - INFO - • Voltage Drop: 3.57 V (0.86%)
+2025-03-22 21:31:15,963 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,964 - qmltest - INFO - 
+Cable Size 400.0 mm²:
+2025-03-22 21:31:15,964 - qmltest - INFO - • mV/A/m: 0.27
+2025-03-22 21:31:15,964 - qmltest - INFO - • Rating: 390.0 A
+2025-03-22 21:31:15,964 - qmltest - INFO - • Voltage Drop: 3.57 V (0.86%)
+2025-03-22 21:31:15,964 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,964 - qmltest - INFO - 
+Cable Size 500.0 mm²:
+2025-03-22 21:31:15,964 - qmltest - INFO - • mV/A/m: 0.24
+2025-03-22 21:31:15,964 - qmltest - INFO - • Rating: 435.0 A
+2025-03-22 21:31:15,964 - qmltest - INFO - • Voltage Drop: 3.17 V (0.76%)
+2025-03-22 21:31:15,964 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,964 - qmltest - INFO - 
+Cable Size 630.0 mm²:
+2025-03-22 21:31:15,964 - qmltest - INFO - • mV/A/m: 0.21
+2025-03-22 21:31:15,964 - qmltest - INFO - • Rating: 485.0 A
+2025-03-22 21:31:15,964 - qmltest - INFO - • Voltage Drop: 2.78 V (0.67%)
+2025-03-22 21:31:15,964 - qmltest - INFO - • Status: OK
+2025-03-22 21:31:15,964 - qmltest - INFO - 
+Selected Cable Results:
+2025-03-22 21:31:15,964 - qmltest - INFO - • Size: 630.0 mm²
+2025-03-22 21:31:15,964 - qmltest - INFO - • Final Voltage Drop: 2.78 V
+2025-03-22 21:31:15,964 - qmltest - INFO - • Drop Percentage: 0.67%
+2025-03-22 21:31:15,964 - qmltest - INFO - 
+=== Voltage Drop Calculations Complete ===
+
+2025-03-22 21:31:43,074 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:31:43,163 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:43,163 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:43,163 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:43,163 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:43,163 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:31:43,163 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:43,163 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:43,163 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:43,165 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:31:43,221 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:43,221 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:43,221 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:43,221 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:43,221 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:31:43,221 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:43,221 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:43,221 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:43,223 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:31:45,928 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:45,928 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:45,928 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:45,928 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:45,929 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:45,929 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:45,929 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:45,929 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:45,929 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:45,929 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:45,929 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:45,929 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:45,930 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:45,930 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:45,930 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:45,930 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:45,934 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:45,934 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:45,934 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:45,934 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:45,934 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:45,934 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:45,934 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:45,934 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:46,265 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:46,265 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:46,265 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:46,265 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:46,265 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:46,265 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:46,265 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:46,265 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:46,266 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:46,266 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:46,266 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:46,266 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:46,266 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:46,266 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:46,266 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:46,266 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:31:46,272 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:31:46,272 - qmltest - INFO - Input Parameters:
+2025-03-22 21:31:46,272 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:31:46,272 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:31:46,272 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:31:46,272 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:31:46,272 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:31:46,272 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:27,345 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:34:27,442 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:27,443 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:27,443 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:27,443 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:27,443 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:34:27,443 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:27,443 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:27,443 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:27,448 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:34:27,500 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:27,500 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:27,500 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:27,500 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:27,500 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:34:27,500 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:27,500 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:27,500 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:27,502 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:34:29,189 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:29,189 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:29,189 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:29,189 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:29,189 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:34:29,189 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:29,189 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:29,189 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:29,190 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:29,190 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:29,190 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:29,190 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:29,190 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:34:29,190 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:29,190 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:29,190 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:29,195 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:29,195 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:29,195 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:29,195 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:29,195 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:34:29,195 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:29,195 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:29,195 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:48,856 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:34:48,958 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:48,958 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:48,958 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:48,958 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:48,958 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:34:48,958 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:48,958 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:48,958 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:48,959 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:34:49,025 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:49,025 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:49,025 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:49,025 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:49,025 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:34:49,025 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:49,025 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:49,025 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:49,026 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:34:52,062 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:52,063 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:52,063 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:52,063 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:52,063 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:34:52,063 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:52,063 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:52,063 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:52,064 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:52,064 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:52,064 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:52,064 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:52,064 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:34:52,064 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:52,064 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:52,064 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:52,069 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:34:52,069 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:52,069 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:34:52,069 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:34:52,069 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-22 21:34:52,069 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:34:52,069 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:34:52,069 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:34:57,036 - qmltest - INFO - 
+=== Starting Transformer-Line Calculations ===
+2025-03-22 21:34:57,036 - qmltest - INFO - 
+Transformer Impedance Calculations:
+2025-03-22 21:34:57,036 - qmltest - INFO - • Z base: 403.33 Ω
+2025-03-22 21:34:57,036 - qmltest - INFO - • Z (pu): 0.060
+2025-03-22 21:34:57,036 - qmltest - INFO - • Total Z: 24.20 Ω
+2025-03-22 21:34:57,036 - qmltest - INFO - • R: 3.00 Ω
+2025-03-22 21:34:57,036 - qmltest - INFO - • X: 24.01 Ω
+2025-03-22 21:34:57,036 - qmltest - INFO - 
+Line Parameters:
+2025-03-22 21:34:57,036 - qmltest - INFO - • Total Z: 1.60∠38.7° Ω
+2025-03-22 21:34:57,036 - qmltest - INFO - 
+Load Current:
+2025-03-22 21:34:57,036 - qmltest - INFO - • Magnitude: 41.99 A
+2025-03-22 21:34:57,036 - qmltest - INFO - • Angle: 31.8°
+2025-03-22 21:34:57,036 - qmltest - INFO - • Complex: 35.69-22.12j A
+2025-03-22 21:34:57,036 - qmltest - INFO - Source voltage: 6350.85 V
+2025-03-22 21:34:57,036 - qmltest - INFO - Voltage drop complex: (705.0129320764006+798.6944070023735j)
+2025-03-22 21:34:57,036 - qmltest - INFO - Receiving end voltage: (5645.840029009483-798.6944070023735j)
+2025-03-22 21:34:57,036 - qmltest - INFO - Natural voltage drop: 10.22%
+2025-03-22 21:34:57,036 - qmltest - INFO - Unregulated voltage: 9.88 kV
+2025-03-22 21:34:57,036 - qmltest - INFO - Fault current LV: 7.22 kA
+2025-03-22 21:34:57,036 - qmltest - INFO - Fault current HV: 0.25 kA
+2025-03-22 21:34:57,037 - qmltest - INFO - Transformer full load current: 15.75 A
+2025-03-22 21:34:57,037 - qmltest - INFO - Relay pickup current: 19.68 A
+2025-03-22 21:34:57,037 - qmltest - INFO - CT ratio selected: 50/1
+2025-03-22 21:34:57,037 - qmltest - INFO - 
+Ground fault calculation:
+2025-03-22 21:34:57,037 - qmltest - INFO - Z0 transformer: 20.57 Ω
+2025-03-22 21:34:57,037 - qmltest - INFO - Z0 line: 3.75+3.00j Ω
+2025-03-22 21:34:57,037 - qmltest - INFO - Zn referred: 3781.25 Ω
+2025-03-22 21:34:57,037 - qmltest - INFO - Ground fault current: 1.66 A
+2025-03-22 21:34:57,037 - qmltest - INFO - 
+Protection Settings:
+2025-03-22 21:34:57,037 - qmltest - INFO - • Relay Pickup Current: 19.68 A
+2025-03-22 21:34:57,037 - qmltest - INFO - • CT Ratio: 50/1
+2025-03-22 21:34:57,037 - qmltest - INFO - • Time Dial: 0.30
+2025-03-22 21:34:57,037 - qmltest - INFO - • Curve Type: Very Inverse (IEC)
+2025-03-22 21:34:57,037 - qmltest - INFO - 
+Voltage Regulator:
+2025-03-22 21:34:57,037 - qmltest - INFO - • Unregulated Voltage: 9.88 kV
+2025-03-22 21:34:57,037 - qmltest - INFO - • Target Voltage: 11.00 kV
+2025-03-22 21:34:57,037 - qmltest - INFO - • Tap Position: 16
+2025-03-22 21:34:57,037 - qmltest - INFO - • Regulated Voltage: 10.86 kV
+2025-03-22 21:34:57,037 - qmltest - INFO - 
+=== Calculations Complete ===
+
+2025-03-22 21:34:57,048 - qmltest - INFO - 
+=== Starting Wind Turbine Calculations ===
+2025-03-22 21:34:57,048 - qmltest - INFO - Input Parameters:
+2025-03-22 21:34:57,048 - qmltest - INFO - • Blade Radius: 25.0 m
+2025-03-22 21:34:57,048 - qmltest - INFO - • Wind Speed: 8.0 m/s
+2025-03-22 21:34:57,048 - qmltest - INFO - • Air Density: 1.225 kg/m³
+2025-03-22 21:34:57,048 - qmltest - INFO - • Power Coefficient: 0.4
+2025-03-22 21:34:57,048 - qmltest - INFO - • Generator Efficiency: 90.0%
+2025-03-22 21:34:57,048 - qmltest - INFO - 
+Swept Area: 1963.50 m²
+2025-03-22 21:34:57,048 - qmltest - INFO - Theoretical Power: 615.75 kW
+2025-03-22 21:34:57,048 - qmltest - INFO - Actual Power Output: 221.67 kW
+2025-03-22 21:34:57,048 - qmltest - INFO - 
+Annual Energy Production: 679.64 MWh
+2025-03-22 21:34:57,048 - qmltest - INFO - 
+Generating Power Curve...
+2025-03-22 21:34:57,048 - qmltest - INFO - === Wind Turbine Calculations Complete ===
+
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+=== Starting Transformer-Line Calculations ===
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+Transformer Impedance Calculations:
+2025-03-22 21:34:57,049 - qmltest - INFO - • Z base: 403.33 Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - • Z (pu): 0.060
+2025-03-22 21:34:57,049 - qmltest - INFO - • Total Z: 24.20 Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - • R: 3.00 Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - • X: 24.01 Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+Line Parameters:
+2025-03-22 21:34:57,049 - qmltest - INFO - • Total Z: 1.60∠38.7° Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+Load Current:
+2025-03-22 21:34:57,049 - qmltest - INFO - • Magnitude: 0.01 A
+2025-03-22 21:34:57,049 - qmltest - INFO - • Angle: 31.8°
+2025-03-22 21:34:57,049 - qmltest - INFO - • Complex: 0.01-0.01j A
+2025-03-22 21:34:57,049 - qmltest - INFO - Source voltage: 6350.85 V
+2025-03-22 21:34:57,049 - qmltest - INFO - Voltage drop complex: (0.19535095612215722+0.2213090128684688j)
+2025-03-22 21:34:57,049 - qmltest - INFO - Receiving end voltage: (6350.657610129762-0.2213090128684688j)
+2025-03-22 21:34:57,049 - qmltest - INFO - Natural voltage drop: 0.00%
+2025-03-22 21:34:57,049 - qmltest - INFO - Unregulated voltage: 11.00 kV
+2025-03-22 21:34:57,049 - qmltest - INFO - Fault current LV: 7.22 kA
+2025-03-22 21:34:57,049 - qmltest - INFO - Fault current HV: 0.25 kA
+2025-03-22 21:34:57,049 - qmltest - INFO - Transformer full load current: 15.75 A
+2025-03-22 21:34:57,049 - qmltest - INFO - Relay pickup current: 19.68 A
+2025-03-22 21:34:57,049 - qmltest - INFO - CT ratio selected: 50/1
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+Ground fault calculation:
+2025-03-22 21:34:57,049 - qmltest - INFO - Z0 transformer: 20.57 Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - Z0 line: 3.75+3.00j Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - Zn referred: 3781.25 Ω
+2025-03-22 21:34:57,049 - qmltest - INFO - Ground fault current: 1.66 A
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+Protection Settings:
+2025-03-22 21:34:57,049 - qmltest - INFO - • Relay Pickup Current: 19.68 A
+2025-03-22 21:34:57,049 - qmltest - INFO - • CT Ratio: 50/1
+2025-03-22 21:34:57,049 - qmltest - INFO - • Time Dial: 0.30
+2025-03-22 21:34:57,049 - qmltest - INFO - • Curve Type: Very Inverse (IEC)
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+Voltage Regulator:
+2025-03-22 21:34:57,049 - qmltest - INFO - • Unregulated Voltage: 11.00 kV
+2025-03-22 21:34:57,049 - qmltest - INFO - • Target Voltage: 11.00 kV
+2025-03-22 21:34:57,049 - qmltest - INFO - • Tap Position: 0
+2025-03-22 21:34:57,049 - qmltest - INFO - • Regulated Voltage: 11.00 kV
+2025-03-22 21:34:57,049 - qmltest - INFO - 
+=== Calculations Complete ===
+
+2025-03-22 21:34:57,549 - qmltest - INFO - 
+=== Starting Transformer-Line Calculations ===
+2025-03-22 21:34:57,549 - qmltest - INFO - 
+Transformer Impedance Calculations:
+2025-03-22 21:34:57,549 - qmltest - INFO - • Z base: 403.33 Ω
+2025-03-22 21:34:57,549 - qmltest - INFO - • Z (pu): 0.060
+2025-03-22 21:34:57,549 - qmltest - INFO - • Total Z: 24.20 Ω
+2025-03-22 21:34:57,549 - qmltest - INFO - • R: 3.00 Ω
+2025-03-22 21:34:57,549 - qmltest - INFO - • X: 24.01 Ω
+2025-03-22 21:34:57,549 - qmltest - INFO - 
+Line Parameters:
+2025-03-22 21:34:57,549 - qmltest - INFO - • Total Z: 1.60∠38.7° Ω
+2025-03-22 21:34:57,549 - qmltest - INFO - 
+Load Current:
+2025-03-22 21:34:57,549 - qmltest - INFO - • Magnitude: 11.63 A
+2025-03-22 21:34:57,549 - qmltest - INFO - • Angle: 31.8°
+2025-03-22 21:34:57,549 - qmltest - INFO - • Complex: 9.89-6.13j A
+2025-03-22 21:34:57,549 - qmltest - INFO - Source voltage: 6350.85 V
+2025-03-22 21:34:57,549 - qmltest - INFO - Voltage drop complex: (195.35095612215719+221.30901286846876j)
+2025-03-22 21:34:57,549 - qmltest - INFO - Receiving end voltage: (6155.502004963727-221.30901286846876j)
+2025-03-22 21:34:57,549 - qmltest - INFO - Natural voltage drop: 3.01%
+2025-03-22 21:34:57,550 - qmltest - INFO - Unregulated voltage: 10.67 kV
+2025-03-22 21:34:57,550 - qmltest - INFO - Fault current LV: 7.22 kA
+2025-03-22 21:34:57,550 - qmltest - INFO - Fault current HV: 0.25 kA
+2025-03-22 21:34:57,550 - qmltest - INFO - Transformer full load current: 15.75 A
+2025-03-22 21:34:57,550 - qmltest - INFO - Relay pickup current: 19.68 A
+2025-03-22 21:34:57,550 - qmltest - INFO - CT ratio selected: 50/1
+2025-03-22 21:34:57,550 - qmltest - INFO - 
+Ground fault calculation:
+2025-03-22 21:34:57,550 - qmltest - INFO - Z0 transformer: 20.57 Ω
+2025-03-22 21:34:57,550 - qmltest - INFO - Z0 line: 3.75+3.00j Ω
+2025-03-22 21:34:57,550 - qmltest - INFO - Zn referred: 3781.25 Ω
+2025-03-22 21:34:57,550 - qmltest - INFO - Ground fault current: 1.66 A
+2025-03-22 21:34:57,550 - qmltest - INFO - 
+Protection Settings:
+2025-03-22 21:34:57,550 - qmltest - INFO - • Relay Pickup Current: 19.68 A
+2025-03-22 21:34:57,550 - qmltest - INFO - • CT Ratio: 50/1
+2025-03-22 21:34:57,550 - qmltest - INFO - • Time Dial: 0.30
+2025-03-22 21:34:57,550 - qmltest - INFO - • Curve Type: Very Inverse (IEC)
+2025-03-22 21:34:57,550 - qmltest - INFO - 
+Voltage Regulator:
+2025-03-22 21:34:57,550 - qmltest - INFO - • Unregulated Voltage: 10.67 kV
+2025-03-22 21:34:57,550 - qmltest - INFO - • Target Voltage: 11.00 kV
+2025-03-22 21:34:57,550 - qmltest - INFO - • Tap Position: 5
+2025-03-22 21:34:57,550 - qmltest - INFO - • Regulated Voltage: 11.00 kV
+2025-03-22 21:34:57,550 - qmltest - INFO - 
+=== Calculations Complete ===
+
+2025-03-22 21:35:13,102 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-22 21:35:13,205 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:35:13,205 - qmltest - INFO - Input Parameters:
+2025-03-22 21:35:13,205 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:35:13,205 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:35:13,205 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:35:13,205 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:35:13,205 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:35:13,205 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:35:13,207 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-22 21:35:13,266 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-22 21:35:13,266 - qmltest - INFO - Input Parameters:
+2025-03-22 21:35:13,266 - qmltest - INFO - • Current: 0.00 A
+2025-03-22 21:35:13,266 - qmltest - INFO - • Length: 0.00 m
+2025-03-22 21:35:13,266 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-22 21:35:13,266 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-22 21:35:13,266 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-22 21:35:13,266 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-22 21:35:13,268 - ResultsManager - INFO - Loaded 0 results from SQL storage

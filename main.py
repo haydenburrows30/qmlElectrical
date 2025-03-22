@@ -2,9 +2,8 @@ import os
 import sys
 import logging
 import asyncio
-from typing import Optional, Any
+from typing import Optional
 
-from PySide6.QtQml import qmlRegisterType
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -41,6 +40,11 @@ from models.switchboard.switchboard_manager import SwitchboardManager
 from models.wind_turbine_calculator import WindTurbineCalculator
 from models.transformer_line_calculator import TransformerLineCalculator
 from models.fault_current_calculator import FaultCurrentCalculator
+from models.ref_rgf_calculator import RefRgfCalculator
+from models.voltage_divider_calculator import VoltageDividerCalculator
+from models.ohms_law_calculator import OhmsLawCalculator
+from models.series_helper import SeriesHelper
+from models.bar_series_helper import BarSeriesHelper
 
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
@@ -48,13 +52,6 @@ from services.worker_pool import WorkerPool
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 import data.rc_resources as rc_resources
-from models.series_helper import SeriesHelper
-from models.bar_series_helper import BarSeriesHelper
-
-# Import our calculator
-from models.ref_rgf_calculator import RefRgfCalculator
-from models.voltage_divider_calculator import VoltageDividerCalculator
-from models.ohms_law_calculator import OhmsLawCalculator
 
 class Application:
     """Main application class implementing dependency injection and component management.
@@ -112,7 +109,7 @@ class Application:
             self.loading_manager.update_task("models", progress)
             return model
         
-        # Load models concurrently - removed CSV dependency from voltage_drop
+        # Load models concurrently
         [self.sine_wave, self.voltage_drop, self.results_manager] = await asyncio.gather(
             load_model("three_phase", 0.3),
             load_model("voltage_drop", 0.6),
@@ -234,22 +231,6 @@ def setup_container() -> Container:
     container.register(IModelFactory, ModelFactory)
     
     return container
-
-def setup_models(engine):
-    """Set up and register models properly with the QML engine."""
-    from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
-    from models.results_manager import ResultsManager
-    
-    # Create models with proper parent
-    voltage_drop = VoltageDropCalculator(engine)
-    results_manager = ResultsManager(engine)
-    
-    # Register with QML
-    engine.rootContext().setContextProperty("voltageDrop", voltage_drop)
-    engine.rootContext().setContextProperty("resultsManager", results_manager)
-    
-    # Return the models so they're not garbage collected
-    return voltage_drop, results_manager
 
 def main():
     container = setup_container()
