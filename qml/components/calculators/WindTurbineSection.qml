@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 import "../"  // Import for WaveCard component
+import "../buttons"  // Add this import for ExportButton
 
 Item {
     id: windTurbineSection
@@ -336,6 +337,21 @@ Item {
                                     } catch (e) {
                                         console.error("Error calculating AEP:", e);
                                         advancedAepText.text = "Error";
+                                    }
+                                }
+                            }
+                            
+                            // Update export button data
+                            ExportButton {
+                                Layout.columnSpan: 2
+                                Layout.alignment: Qt.AlignRight
+                                defaultFileName: "wind_turbine_report.pdf"
+                                onExport: function(fileUrl) {
+                                    if (calculatorReady) {
+                                        // Get current generator current calculation
+                                        let genCurrent = (calculator.powerInKW * 1000) / (Math.sqrt(3) * 400)
+                                        
+                                        calculator.exportWindTurbineReport(fileUrl)
                                     }
                                 }
                             }

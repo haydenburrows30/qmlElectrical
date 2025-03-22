@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import numpy as np
+from utils.pdf_generator import PDFGenerator  # Update to absolute import
 
 class WindTurbineCalculator(QObject):
     """Calculator for wind turbine power output and performance analysis"""
@@ -278,6 +279,40 @@ class WindTurbineCalculator(QObject):
         self._generate_power_curve()
         return True
     
+    @Slot(str)
+    def exportWindTurbineReport(self, filename):
+        """Export wind turbine calculations to PDF"""
+        try:
+            # Clean up filename
+            clean_path = filename.strip()
+            if not clean_path.lower().endswith('.pdf'):
+                clean_path += '.pdf'
+                
+            data = {
+                "blade_radius": self._blade_radius,
+                "wind_speed": self._wind_speed,
+                "air_density": self._air_density,
+                "power_coefficient": self._power_coefficient,
+                "efficiency": self._efficiency,
+                "cut_in_speed": self._cut_in_speed,
+                "cut_out_speed": self._cut_out_speed,
+                "swept_area": self._swept_area,
+                "theoretical_power": self._theoretical_power,
+                "actual_power": self._actual_power,
+                "annual_energy": self._annual_energy,
+                "rated_capacity": self._actual_power * 1.2 / 1000,  # kVA
+                "output_current": (self._actual_power / 1000) / (math.sqrt(3) * 0.4),  # A at 400V
+                "capacity_factor": self.calculateCapacityFactor(self._wind_speed)
+            }
+            
+            generator = PDFGenerator()
+            generator.generate_wind_turbine_report(data, clean_path)
+            print(f"Wind turbine report exported to: {clean_path}")
+            
+        except Exception as e:
+            print(f"Error exporting wind turbine report: {e}")
+            print(f"Attempted filename: {filename}")
+
     # Advanced analysis methods
     @Slot(float, float, result=float)
     def estimateAEP(self, avg_wind_speed, weibull_k=2.0):

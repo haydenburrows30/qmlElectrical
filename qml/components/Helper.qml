@@ -15,6 +15,7 @@
 ≥ // greater than or equal to symbol in text
 ≤ // less than or equal to symbol in text
 ≡ // identical to symbol in text
+± // plus-minus symbol in text
 
 font.bold: true // bold text
 font.italic: true // italic text

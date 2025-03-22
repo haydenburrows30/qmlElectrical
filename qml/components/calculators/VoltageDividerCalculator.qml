@@ -37,11 +37,12 @@ Item {
         spacing: 10
         
         RowLayout {
+            id: header
             // Input parameters
             WaveCard {
                 title: "Input Parameters"
-                Layout.preferredWidth: 400
-                Layout.minimumHeight: 250
+                Layout.preferredWidth: 300
+                Layout.minimumHeight: 300
                 
                 GridLayout {
                     anchors.fill: parent
@@ -104,8 +105,8 @@ Item {
             // Results
             WaveCard {
                 title: "Results"
-                Layout.preferredWidth: 400
-                Layout.minimumHeight: 250
+                Layout.preferredWidth: 300
+                Layout.minimumHeight: 300
                 
                 GridLayout {
                     anchors.fill: parent
@@ -168,14 +169,60 @@ Item {
                     }
                 }
             }
+
+            // Formula and explanation
+            WaveCard {
+                title: "Voltage Divider Formula"
+                Layout.minimumWidth: 400
+                Layout.minimumHeight: 300
+                
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    width: parent.width
+                    
+                    Text {
+                        text: "<b>Voltage Divider Equation:</b>"
+                        font.pixelSize: 14
+                    }
+                    
+                    Text {
+                        text: "Vout = Vin × (R2 / (R1 + R2))"
+                        font.italic: true
+                    }
+                    
+                    Text {
+                        text: "<b>Applications:</b>"
+                        font.pixelSize: 14
+                        Layout.topMargin: 10
+                    }
+                    
+                    Text {
+                        text: "• Level shifting for ADC inputs\n" +
+                            "• Reference voltage generation\n" +
+                            "• Biasing circuits\n" +
+                            "• Attenuators\n" +
+                            "• Potential dividers for measurement"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Text {
+                        text: "<b>Note:</b> For high impedance loads, the output voltage closely follows the theoretical value. " +
+                            "For low impedance loads, loading effects must be considered."
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                        Layout.topMargin: 10
+                    }
+                }
+            }
         }
         
         // Circuit visualization
         WaveCard {
             title: "Circuit Visualization"
-            Layout.fillWidth: true
-            Layout.preferredHeight: 300  // Increased height
             Layout.minimumHeight: 300    // Set minimum height
+            Layout.minimumWidth: header.width
             
             Canvas {
                 id: circuitCanvas
@@ -280,53 +327,6 @@ Item {
                     ctx.moveTo(groundX - 6, groundY + 20);
                     ctx.lineTo(groundX + 6, groundY + 20);
                     ctx.stroke();
-                }
-            }
-        }
-        
-        // Formula and explanation
-        WaveCard {
-            title: "Voltage Divider Formula"
-            Layout.fillWidth: true
-            Layout.minimumHeight: 300
-            
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                width: parent.width
-                
-                Text {
-                    text: "<b>Voltage Divider Equation:</b>"
-                    font.pixelSize: 14
-                }
-                
-                Text {
-                    text: "Vout = Vin × (R2 / (R1 + R2))"
-                    font.italic: true
-                }
-                
-                Text {
-                    text: "<b>Applications:</b>"
-                    font.pixelSize: 14
-                    Layout.topMargin: 10
-                }
-                
-                Text {
-                    text: "• Level shifting for ADC inputs\n" +
-                          "• Reference voltage generation\n" +
-                          "• Biasing circuits\n" +
-                          "• Attenuators\n" +
-                          "• Potential dividers for measurement"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Text {
-                    text: "<b>Note:</b> For high impedance loads, the output voltage closely follows the theoretical value. " +
-                          "For low impedance loads, loading effects must be considered."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    Layout.topMargin: 10
                 }
             }
         }

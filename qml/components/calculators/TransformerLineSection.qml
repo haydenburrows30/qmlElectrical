@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../"  // Import for WaveCard component
+import "../buttons"  // Add this import
 
 Item {
     id: transformerLineSection
@@ -11,7 +12,48 @@ Item {
     property bool calculatorReady
     property real totalGeneratedPower
     property var safeValueFunction
-    
+
+    // Move function to component level
+    function updateDisplayValues() {
+        if (!calculatorReady) return
+        
+        // Update transformer/line values
+        transformerZOhmsText.text = safeValueFunction(calculator.transformerZOhms, 0).toFixed(3)
+        transformerROhmsText.text = safeValueFunction(calculator.transformerROhms, 0).toFixed(3)
+        transformerXOhmsText.text = safeValueFunction(calculator.transformerXOhms, 0).toFixed(3)
+        lineTotalZText.text = safeValueFunction(calculator.lineTotalZ, 0).toFixed(3)
+        voltageDropText.text = safeValueFunction(calculator.voltageDrop, 0).toFixed(2)
+        faultCurrentLVText.text = safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2)
+        faultCurrentHVText.text = safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2)
+        
+        // Update protection settings
+        relayPickupCurrentText.text = safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2)
+        relayTimeDialText.text = safeValueFunction(calculator.relayTimeDial, 0).toFixed(2)
+        relayCtRatioText.text = calculator.relayCtRatio
+        relayCurveTypeText.text = calculator.relayCurveType
+        
+        // Update regulator values
+        regulatedVoltageText.text = safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2)
+        regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
+    }
+
+    // Update display when load parameters change
+    Connections {
+        target: calculator
+        function onLoadChanged() {
+            if (calculatorReady) {
+                transformerLineSection.updateDisplayValues()
+            }
+        }
+    }
+
+    // Only update MVA when power changes, let power factor changes handle themselves
+    onTotalGeneratedPowerChanged: {
+        if (calculatorReady) {
+            calculator.setLoadMVA(totalGeneratedPower / 1000000)
+        }
+    }
+
     // Signal for when calculation is requested
     signal calculate()
 
@@ -234,7 +276,11 @@ Item {
                                     return Math.round(parseFloat(text) * 100);
                                 }
                                 
-                                onValueModified: if (calculatorReady) calculator.setLoadPowerFactor(realValue)
+                                onValueModified: {
+                                    if (calculatorReady) {
+                                        calculator.setLoadPowerFactorMaintainPower(realValue)
+                                    }
+                                }
                             }
                             
                             Button {
@@ -424,12 +470,11 @@ Item {
                         Layout.minimumWidth: 400
                         Layout.maximumWidth: 400
                         
-
                         // System results section
                         WaveCard {
                             title: "Electrical System Results"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 350
+                            Layout.preferredHeight: 450
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -490,7 +535,7 @@ Item {
                                     }
                                 }
                                 
-                                Label { text: "Voltage Drop (%):" }
+                                Label { text: "Natural Voltage Drop (%):" }
                                 TextField {
                                     id: voltageDropText
                                     readOnly: true
@@ -526,6 +571,46 @@ Item {
                                         color: "#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
+                                    }
+                                }
+                                
+                                Label { text: "Unregulated Voltage (kV):" }
+                                TextField {
+                                    readOnly: true
+                                    Layout.fillWidth: true
+                                    text: calculatorReady ? 
+                                        safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
+                                        "0.00"
+                                    background: Rectangle {
+                                        color: "#e8f6ff"
+                                        border.color: "#0078d7"
+                                        radius: 2
+                                    }
+                                }
+                                
+                                // Add export button
+                                ExportButton {
+                                    Layout.columnSpan: 2
+                                    Layout.alignment: Qt.AlignRight
+                                    defaultFileName: "transformer_report.pdf"
+                                    onExport: function(fileUrl) {
+                                        if (calculatorReady) {
+                                            // Prepare data for PDF
+                                            let data = {
+                                                "transformer_rating": calculator.transformerRating,
+                                                "transformer_impedance": calculator.transformerImpedance,
+                                                "transformer_xr_ratio": calculator.transformerXRRatio,
+                                                "transformer_z": calculator.transformerZOhms,
+                                                "transformer_r": calculator.transformerROhms,
+                                                "transformer_x": calculator.transformerXOhms,
+                                                "ground_fault_current": calculator.groundFaultCurrent,
+                                                "ct_ratio": calculator.relayCtRatio,
+                                                "relay_pickup_current": calculator.relayPickupCurrent,
+                                                "relay_curve_type": calculator.relayCurveType,
+                                                "time_dial": calculator.relayTimeDial
+                                            }
+                                            calculator.exportTransformerReport(data, fileUrl)
+                                        }
                                     }
                                 }
                             }
@@ -595,7 +680,25 @@ Item {
                                         radius: 2
                                     }
                                 }
+                                
+                                Button {
+                                    text: "Expert Settings..."
+                                    Layout.columnSpan: 2
+                                    Layout.alignment: Qt.AlignRight
+                                    onClicked: expertProtectionPopup.open()
+                                }
                             }
+                        }
+                        
+                        // Remove the old Wind Power Protection card
+                        
+                        // Add expert protection popup
+                        ExpertProtectionPopup {
+                            id: expertProtectionPopup
+                            calculator: transformerLineSection.calculator
+                            safeValueFunction: transformerLineSection.safeValueFunction
+                            x: Math.round((parent.width - width) / 2)
+                            y: Math.round((parent.height - height) / 2)
                         }
                     }
 
@@ -622,17 +725,7 @@ Item {
                                 TextField {
                                     readOnly: true
                                     Layout.fillWidth: true
-                                    text: {
-                                        // Calculate based on load MVA
-                                        var currentHV = (totalGeneratedPower / 1000 * 1000) / (Math.sqrt(3) * 11)
-                                        
-                                        if (currentHV < 30) return "25 mm²"
-                                        else if (currentHV < 50) return "35 mm²"
-                                        else if (currentHV < 70) return "50 mm²"
-                                        else if (currentHV < 90) return "70 mm²"
-                                        else if (currentHV < 120) return "95 mm²" 
-                                        else return "120 mm² or larger"
-                                    }
+                                    text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
                                     background: Rectangle {
                                         color: "#e8f6ff"
                                         border.color: "#0078d7"
@@ -644,17 +737,7 @@ Item {
                                 TextField {
                                     readOnly: true
                                     Layout.fillWidth: true
-                                    text: {
-                                        // Calculate based on generator output
-                                        var currentLV = (totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)
-                                        
-                                        if (currentLV < 100) return "25 mm²"
-                                        else if (currentLV < 150) return "50 mm²"
-                                        else if (currentLV < 200) return "70 mm²"
-                                        else if (currentLV < 250) return "95 mm²"
-                                        else if (currentLV < 300) return "120 mm²"
-                                        else return "150 mm² or larger"
-                                    }
+                                    text: calculatorReady ? calculator.recommendedLVCable : "25 mm²"
                                     background: Rectangle {
                                         color: "#e8f6ff"
                                         border.color: "#0078d7"
@@ -756,7 +839,6 @@ Item {
         }
     }
     
-    // Direct property binding instead of signals
     Timer {
         id: updateTimer
         interval: 250
@@ -764,30 +846,7 @@ Item {
         running: calculatorReady
         onTriggered: {
             if(calculatorReady) {
-                updateDisplayValues()
-            }
-        }
-        
-        function updateDisplayValues() {
-            // Update transformer/line values
-            transformerZOhmsText.text = safeValueFunction(calculator.transformerZOhms, 0).toFixed(3)
-            transformerROhmsText.text = safeValueFunction(calculator.transformerROhms, 0).toFixed(3)
-            transformerXOhmsText.text = safeValueFunction(calculator.transformerXOhms, 0).toFixed(3)
-            lineTotalZText.text = safeValueFunction(calculator.lineTotalZ, 0).toFixed(3)
-            voltageDropText.text = safeValueFunction(calculator.voltageDrop, 0).toFixed(2)
-            faultCurrentLVText.text = safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2)
-            faultCurrentHVText.text = safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2)
-            
-            // Update protection settings
-            relayPickupCurrentText.text = safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2)
-            relayTimeDialText.text = safeValueFunction(calculator.relayTimeDial, 0).toFixed(2)
-            relayCtRatioText.text = calculator.relayCtRatio
-            relayCurveTypeText.text = calculator.relayCurveType
-            
-            // Update regulator values
-            if (calculatorReady) {
-                regulatedVoltageText.text = safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2)
-                regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
+                transformerLineSection.updateDisplayValues()
             }
         }
     }
