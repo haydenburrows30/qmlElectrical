@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtCharts
 
 import "../"
+import "../visualizers/"
 
 import VoltDivider 1.0
 
@@ -221,113 +222,20 @@ Item {
         // Circuit visualization
         WaveCard {
             title: "Circuit Visualization"
-            Layout.minimumHeight: 300    // Set minimum height
+            Layout.minimumHeight: 300
             Layout.minimumWidth: header.width
             
-            Canvas {
+            CircuitVisualizer {
                 id: circuitCanvas
                 anchors.fill: parent
-                anchors.margins: 20      // Increased margins
+                anchors.margins: 20
                 
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-                    
-                    // Colors and dimensions
-                    ctx.strokeStyle = "#333333";
-                    ctx.fillStyle = "#333333";
-                    ctx.lineWidth = 2;
-                    ctx.font = "14px sans-serif";  // Increased font size
-                    
-                    var startX = width * 0.2;      // Adjusted starting position
-                    var startY = height / 2;
-                    var resistorLength = width * 0.2;  // Made relative to width
-                    var resistorHeight = 30;
-                    var wireLength = width * 0.1;     // Made relative to width
-                    
-                    // Draw battery with more space
-                    ctx.beginPath();
-                    ctx.moveTo(startX, startY - 25);  // Increased spacing
-                    ctx.lineTo(startX, startY + 25);
-                    ctx.stroke();
-                    
-                    // Battery symbol details
-                    ctx.beginPath();
-                    ctx.moveTo(startX - 15, startY - 15);
-                    ctx.lineTo(startX + 15, startY - 15);
-                    ctx.stroke();
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(startX - 7, startY);
-                    ctx.lineTo(startX + 7, startY);
-                    ctx.stroke();
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(startX - 15, startY + 15);
-                    ctx.lineTo(startX + 15, startY + 15);
-                    ctx.stroke();
-                    
-                    // Draw Vin label with better positioning
-                    ctx.fillText("Vin = " + vinField.text + "V", startX - 60, startY - 35);
-                    
-                    // Draw top wire
-                    ctx.beginPath();
-                    ctx.moveTo(startX, startY - 25);
-                    ctx.lineTo(startX + wireLength, startY - 25);
-                    ctx.lineTo(startX + wireLength, startY - 60);
-                    ctx.lineTo(startX + wireLength + resistorLength + wireLength, startY - 60);
-                    ctx.lineTo(startX + wireLength + resistorLength + wireLength, startY - 25);
-                    ctx.lineTo(startX + wireLength + resistorLength + wireLength + wireLength, startY - 25);
-                    ctx.stroke();
-                    
-                    // Draw R1 with better label positioning
-                    ctx.beginPath();
-                    ctx.rect(startX + wireLength, startY - 25, resistorLength, resistorHeight);
-                    ctx.stroke();
-                    ctx.fillText("R1 = " + r1Field.text + "Ω", startX + wireLength, startY - 35);
-                    
-                    // Draw R2 with better label positioning
-                    ctx.beginPath();
-                    ctx.rect(startX + wireLength, startY + 25, resistorLength, resistorHeight);
-                    ctx.stroke();
-                    ctx.fillText("R2 = " + r2Field.text + "Ω", startX + wireLength, startY + 80);
-                    
-                    // Draw bottom wire
-                    ctx.beginPath();
-                    ctx.moveTo(startX, startY + 25);
-                    ctx.lineTo(startX + wireLength, startY + 25);
-                    ctx.moveTo(startX + wireLength + resistorLength, startY + 40);
-                    ctx.lineTo(startX + wireLength + resistorLength + wireLength, startY + 40);
-                    ctx.lineTo(startX + wireLength + resistorLength + wireLength, startY + 25);
-                    ctx.lineTo(startX + wireLength + resistorLength + wireLength + wireLength, startY + 25);
-                    ctx.stroke();
-                    
-                    // Draw Vout connection and label
-                    ctx.beginPath();
-                    ctx.moveTo(startX + wireLength + resistorLength, startY + 40);
-                    ctx.lineTo(startX + wireLength + resistorLength, startY - 40);
-                    ctx.stroke();
-                    
-                    // Draw Vout label with better positioning
-                    ctx.fillText("Vout = " + voutField.text + "V", 
-                               startX + wireLength + resistorLength + 10, 
-                               startY - 35);
-                    
-                    // Draw ground symbol
-                    var groundX = startX + wireLength + resistorLength + wireLength + wireLength;
-                    var groundY = startY;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(groundX, groundY - 10);
-                    ctx.lineTo(groundX, groundY + 10);
-                    ctx.moveTo(groundX - 10, groundY + 10);
-                    ctx.lineTo(groundX + 10, groundY + 10);
-                    ctx.moveTo(groundX - 8, groundY + 15);
-                    ctx.lineTo(groundX + 8, groundY + 15);
-                    ctx.moveTo(groundX - 6, groundY + 20);
-                    ctx.lineTo(groundX + 6, groundY + 20);
-                    ctx.stroke();
-                }
+                // Pass values from calculator to the visualizer
+                inputVoltage: vinField.text
+                resistorR1: r1Field.text 
+                resistorR2: r2Field.text
+                outputVoltage: voutField.text
+                currentValue: calculatorReady ? (calculator.current * 1000).toFixed(3) : "0.000"
             }
         }
     }
