@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
-import "../components"
+import "../"
+
 import RefRgf 1.0  // Import the namespace for our calculator
 
 Item {

@@ -8,6 +8,14 @@ import QtCharts
 
 import components 1.0
 import "../components"
+import "../components/buttons/"
+import "../components/calculators/"
+import "../components/charts/"
+import "../components/exports/"
+import "../components/inputs/"
+import "../components/monitors/"
+import "../components/popups/"
+import "../components/visualizers/"
 
 Page {
     id: root

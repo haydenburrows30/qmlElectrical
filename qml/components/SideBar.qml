@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
+import "buttons"
+
 Drawer {
     id: sideBar
     // width automatically derived from RowLayout child's implicitWidth

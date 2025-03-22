@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
+import "../charts"
+
 Popup {
     id: root
     modal: true

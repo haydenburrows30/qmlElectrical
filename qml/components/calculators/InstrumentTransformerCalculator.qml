@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../visualizers/"
 import InstrumentTransformer 1.0
 
 Item {

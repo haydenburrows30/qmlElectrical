@@ -64,11 +64,10 @@ Page {
         { name: qsTr("Transformer Calculator"), source: "../components/calculators/TransformerCalculator.qml" },
         { name: qsTr("Harmonics Analysis"), source: "../components/calculators/HarmonicsAnalyzer.qml" },
         { name: qsTr("Machine Calculator"), source: "../components/calculators/ElectricMachineCalculator.qml" },
-        { name: qsTr("Motor Starting"), source: "../components/calculators/MotorStartingCalculator.qml" },
+        { name: qsTr("Motor Starting"), source: "../components/calculators/MotorStartingCalculator.qml" }
     ]
     
     property var renewables: [
-        { name: qsTr("Wind Turbine"), source: "../components/calculators/WindTurbineCalculator.qml" },
         { name: qsTr("Wind & Grid Connection"), source: "../components/calculators/WindTransformerLineCalculator.qml" }
     ]
 

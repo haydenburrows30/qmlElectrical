@@ -4,7 +4,8 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
-import '../components'
+import "../components"
+import "../components/buttons/"
 
 Page {
     id: home

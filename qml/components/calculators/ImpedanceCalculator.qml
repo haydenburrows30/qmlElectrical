@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../visualizers/"
 import Impedance 1.0  // Import the correct namespace for the fault current calculator
 
 Item {

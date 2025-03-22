@@ -7,6 +7,8 @@ import Sine 1.0
 import components 1.0
 
 import "../components"
+import "../components/visualizers"
+import "../components/charts"
 
 Page {
     id: root

@@ -6,7 +6,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtCharts
 
-import "../components"
+import "../"
 
 import RealTimeChart 1.0
 

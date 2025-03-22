@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../visualizers/"
 import Charging 1.0  // Import the Charging namespace for our calculator
 
 Item {

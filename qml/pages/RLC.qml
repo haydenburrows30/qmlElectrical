@@ -7,7 +7,9 @@ import QtQuick.Controls.Universal
 import QtCharts
 import QtCore
 
-import '../components'
+import "../components"
+import "../components/visualizers"
+
 
 Page {
     id: phasor

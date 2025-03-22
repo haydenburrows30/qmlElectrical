@@ -8,6 +8,7 @@ import "../visualizers"
 import "../inputs"
 import "../displays"
 import "../monitors"
+import "../popups/"
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0
 

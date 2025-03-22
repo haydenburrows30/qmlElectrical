@@ -6,11 +6,11 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtQuick.Controls.Material
 import QtQuick.Effects
-import Qt.labs.settings 1.0
 import RLC 1.0  // Import RLC directly
 
-import 'components'
-import 'components/calculators'
+import "components"
+import "components/calculators"
+
 
 ApplicationWindow {
     id: window

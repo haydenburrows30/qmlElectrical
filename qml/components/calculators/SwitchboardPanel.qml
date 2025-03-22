@@ -6,6 +6,8 @@ import QtQuick.Dialogs
 import QtCharts
 import "../"
 import "../../components"
+import "../charts/"
+import "../visualizers/"
 import Switchboard 1.0
 
 Item {

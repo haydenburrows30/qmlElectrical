@@ -4,11 +4,12 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../visualizers/"
+
 import Earthing 1.0
 
 Item {
     id: earthingCard
-    // title: 'Earthing System Calculator'
 
     property EarthingCalculator calculator: EarthingCalculator {}
     property color textColor: Universal.foreground
