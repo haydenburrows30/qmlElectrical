@@ -6,8 +6,6 @@ import QtQuick.Layouts
 
 import '../components'
 
-//https://forum.qt.io/topic/81646/expandible-collapsible-pane-with-smooth-animation-in-qml
-
 Page {
 
     background: Rectangle {
@@ -51,7 +49,6 @@ Page {
         { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml" },
         { name: qsTr("RGF"), source: "../components/calculators/RGF.qml" },
         { name: qsTr("Fault Current"), source: "../components/calculators/FaultCurrentCalculator.qml" },
-        { name: qsTr("Arc Flash"), source: "../components/calculators/ArcFlashCalculator.qml" },
         { name: qsTr("Transformer & Line"), source: "../components/calculators/TransformerLineCalculator.qml" }
     ]
 
@@ -60,8 +57,7 @@ Page {
         { name: qsTr("Charging Current"), source: "../components/calculators/ChargingCurrentCalculator.qml" },
         { name: qsTr("Voltage Drop"), source: "../components/calculators/VoltageDropCalculator.qml" },
         { name: qsTr("Transmission Line"), source: "../components/calculators/TransmissionLineCalculator.qml" },
-        { name: qsTr("Switchboard"), source: "../components/calculators/SwitchboardPanel.qml" },
-        { name: qsTr("Conduit Fill"), source: "../components/calculators/ConduitFillCalculator.qml" }
+        { name: qsTr("Switchboard"), source: "../components/calculators/SwitchboardPanel.qml" }
     ]
     
     property var theory: [
@@ -69,16 +65,10 @@ Page {
         { name: qsTr("Harmonics Analysis"), source: "../components/calculators/HarmonicsAnalyzer.qml" },
         { name: qsTr("Machine Calculator"), source: "../components/calculators/ElectricMachineCalculator.qml" },
         { name: qsTr("Motor Starting"), source: "../components/calculators/MotorStartingCalculator.qml" },
-        { name: qsTr("Power Factor"), source: "../components/calculators/PowerFactorCalculator.qml" },
-        { name: qsTr("RLC Circuit"), source: "../components/calculators/RLCCalculator.qml" },
-        { name: qsTr("Resonance"), source: "../components/calculators/ResonanceCalculator.qml" }
     ]
     
     property var renewables: [
-        { name: qsTr("Solar Panel"), source: "../components/calculators/SolarPanelCalculator.qml" },
-        { name: qsTr("Battery Sizing"), source: "../components/calculators/BatterySizingCalculator.qml" },
         { name: qsTr("Wind Turbine"), source: "../components/calculators/WindTurbineCalculator.qml" },
-        { name: qsTr("Energy Storage"), source: "../components/calculators/EnergyStorageCalculator.qml" },
         { name: qsTr("Wind & Grid Connection"), source: "../components/calculators/WindTransformerLineCalculator.qml" }
     ]
 

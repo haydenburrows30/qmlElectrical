@@ -21,7 +21,7 @@ from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
 
-from models.calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, KwFromCurrentCalculator
+from models.calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.voltage_drop_calculator import VoltageDropCalc
 from models.motor_calculator import MotorCalculator
@@ -40,6 +40,7 @@ from models.delta_transformer import DeltaTransformerCalculator
 from models.switchboard.switchboard_manager import SwitchboardManager
 from models.wind_turbine_calculator import WindTurbineCalculator
 from models.transformer_line_calculator import TransformerLineCalculator
+from models.fault_current_calculator import FaultCurrentCalculator
 
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
@@ -156,7 +157,7 @@ class Application:
         qml_types = [
             (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
-            (FaultCurrentCalculator, "Fault", 1, 0, "FaultCurrentCalculator"),
+            (ImpedanceCalculator, "Impedance", 1, 0, "ImpedanceCalculator"),
             (TransformerCalculator, "Transformer", 1, 0, "TransformerCalculator"),
             (MotorCalculator, "MotorStarting", 1, 0, "MotorStartingCalculator"),
             (PowerFactorCorrectionCalculator, "PFCorrection", 1, 0, "PowerFactorCorrectionCalculator"),
@@ -186,6 +187,7 @@ class Application:
             (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator"),
             (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
             (OhmsLawCalculator, "OhmsLaw", 1, 0, "OhmsLawCalculator"),
+            (FaultCurrentCalculator, "FaultCurrent", 1, 0, "FaultCurrentCalculator"),
         ]
 
         for type_info in qml_types:

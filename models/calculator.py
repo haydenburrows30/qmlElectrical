@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, Signal, Property, QObject
+from PySide6.QtCore import Slot, Signal, Property
 from models.calculators.BaseCalculator import BaseCalculator
 
 from PySide6.QtCore import *
@@ -134,8 +134,8 @@ class ChargingCalculator(BaseCalculator):
     def calculate(self):
         self.calculateChargingCurrent()
     
-class FaultCurrentCalculator(BaseCalculator):
-    """Calculator for fault current analysis.
+class ImpedanceCalculator(BaseCalculator):
+    """Calculator for impedance analysis.
     
     Features:
     - Impedance calculations
@@ -210,14 +210,14 @@ class ConversionCalculator(BaseCalculator):
         """Calculate various electrical engineering conversions.
 
         Power & Energy Conversions:
-        - Watts to dBmW: $P_{dBm} = 10 \log_{10}(P_W \cdot 1000)$
+        - Watts to dBmW: $P_{dBm} = 10 \\log_{10}(P_W \\cdot 1000)$
         - dBmW to Watts: $P_W = 10^{P_{dBm}/10} / 1000$
-        - HP to Watts: $P_W = P_{HP} \cdot 746$
+        - HP to Watts: $P_W = P_{HP} \\cdot 746$
 
         Frequency & Angular:
-        - Rad/s to Hz: $f = \omega/(2\pi)$
+        - Rad/s to Hz: $f = \\omega/(2\\pi)$
         - RPM to Hz: $f = N/60$
-        - Hz to RPM: $N = f \cdot 60$
+        - Hz to RPM: $N = f \\cdot 60$
 
         Three-Phase Relationships:
         - Line-Phase Voltage: $V_{ph} = V_L/\sqrt{3}$
@@ -240,6 +240,7 @@ class ConversionCalculator(BaseCalculator):
         Reactance Frequency:
         - 50Hz to 60Hz: $X_{60} = X_{50} \cdot \\frac{60}{50}$
         """
+
         if self._input_value != 0:
             if self._conversion_type == "watts_to_dbmw":
                 self._result = 10 * math.log10(self._input_value * 1000)

@@ -4,12 +4,12 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
-import Fault 1.0  // Import the correct namespace for the fault current calculator
+import Impedance 1.0  // Import the correct namespace for the fault current calculator
 
 Item {
     id: fault_current
 
-    property FaultCurrentCalculator calculator: FaultCurrentCalculator {}
+    property ImpedanceCalculator calculator: ImpedanceCalculator {}
     property color textColor: Universal.foreground
 
     Popup {

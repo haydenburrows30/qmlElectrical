@@ -438,13 +438,6 @@ Item {
         try {
             // Get power curve data from backend with null check
             var powerCurveData = calculator.powerCurve || []
-            console.log("Power curve data points: " + powerCurveData.length)
-            
-            // Additional debugging for received data points
-            if (powerCurveData.length > 0) {
-                console.log("First data point type: " + typeof powerCurveData[0])
-                console.log("First data point details: " + JSON.stringify(powerCurveData[0]))
-            }
             
             // Find maximum power for Y axis scaling
             var maxPower = 0.1 // Minimum default
@@ -475,11 +468,6 @@ Item {
                     continue
                 }
                 
-                // Debug more individual points to see what's being processed
-                if (i % 10 === 0 || y > maxPower) {
-                    console.log("Point " + i + ": (" + x + ", " + y + ")")
-                }
-                
                 // Add point to chart
                 powerSeries.append(x, y)
                 
@@ -493,12 +481,8 @@ Item {
                 }
             }
             
-            // More detailed power reporting
-            console.log("Max power found: " + maxPower.toFixed(2) + " kW")
-            
             // Calculate average power (excluding zero points)
             var avgPower = nonZeroPoints > 0 ? totalPower / nonZeroPoints : 0
-            console.log("Max power: " + maxPower.toFixed(2) + " kW, Average non-zero power: " + avgPower.toFixed(2) + " kW")
             
             // Ensure a reasonable Y-axis max based on actual data
             var yAxisMax;
@@ -517,7 +501,6 @@ Item {
             
             // Update axes
             axisY.max = yAxisMax;
-            console.log("Chart Y-axis max set to: " + yAxisMax);
             
             // Also dynamically adjust the X-axis
             axisX.max = Math.max(calculator.cutOutSpeed + 5, 30);
@@ -532,7 +515,6 @@ Item {
     
     // Initialize UI when component completes
     Component.onCompleted: {
-        console.log("Wind Turbine Calculator component completed")
             
         // Use a timer to ensure all properties are properly initialized
         initTimer.start()

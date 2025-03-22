@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Type, Dict
-from ..calculator import ConversionCalculator, PowerCalculator, FaultCurrentCalculator, ChargingCalculator, KwFromCurrentCalculator
+from ..calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
 from .BaseCalculator import BaseCalculator
 from ..transformer_calculator import TransformerCalculator
 from ..motor_calculator import MotorCalculator
@@ -20,6 +20,7 @@ from ..wind_turbine_calculator import WindTurbineCalculator
 from ..transformer_line_calculator import TransformerLineCalculator
 from ..ohms_law_calculator import OhmsLawCalculator
 from ..voltage_divider_calculator import VoltageDividerCalculator
+from ..fault_current_calculator import FaultCurrentCalculator
 
 class CalculatorFactory(ABC):
     """Abstract factory interface for calculator creation.
@@ -59,7 +60,7 @@ class ConcreteCalculatorFactory(CalculatorFactory):
         """Register the standard set of calculator types."""
         self._calculators.update({
             "power": PowerCalculator,
-            "fault": FaultCurrentCalculator,
+            "impedance": ImpedanceCalculator,
             "charging": ChargingCalculator,
             "transformer": TransformerCalculator,
             "motor_starting": MotorCalculator,
@@ -80,7 +81,8 @@ class ConcreteCalculatorFactory(CalculatorFactory):
             "wind_turbine": WindTurbineCalculator,
             "transformer_line": TransformerLineCalculator,
             "ohms_law": OhmsLawCalculator,
-            "voltage_divider": VoltageDividerCalculator
+            "voltage_divider": VoltageDividerCalculator,
+            "fault_current": FaultCurrentCalculator,
         })
     
     def register_calculator(self, name: str, calculator_class: Type[BaseCalculator]):
