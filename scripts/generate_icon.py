@@ -16,7 +16,7 @@ def create_icon():
     sizes = [16, 24, 32, 48, 64, 128, 256]
     
     # Create resources/icons directory if it doesn't exist
-    icon_dir = "resources/icons"
+    icon_dir = "icons"
     os.makedirs(icon_dir, exist_ok=True)
     
     # Save as ICO file with multiple sizes
