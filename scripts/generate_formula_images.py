@@ -2,7 +2,6 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib import rcParams
-import numpy as np
 
 # Configure matplotlib for rendering without LaTeX dependencies
 matplotlib.use("Agg")  # Use non-interactive backend

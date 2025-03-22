@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Signal, Property
-from typing import Dict, List
+from typing import Dict
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 

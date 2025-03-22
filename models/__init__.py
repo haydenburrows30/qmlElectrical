@@ -1,6 +1,5 @@
 # Package marker file for models
 from .rlc import RLCChart
-# For backward compatibility:
 from .three_phase import ThreePhaseSineWaveModel
 from .battery_calculator import BatteryCalculator
 

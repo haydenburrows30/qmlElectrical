@@ -1,6 +1,5 @@
 import sqlite3
 import os
-import json
 import pandas as pd
 from datetime import datetime
 import shutil

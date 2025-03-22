@@ -2,7 +2,6 @@ import os
 import sys
 import subprocess
 import urllib.request
-from pathlib import Path
 
 def download_file(url: str, filename: str) -> bool:
     """Download a file from URL."""

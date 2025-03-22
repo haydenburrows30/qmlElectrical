@@ -1,6 +1,5 @@
 import platform
-import os
-from PySide6.QtCore import QObject, Signal, Slot, Property, QTimer
+from PySide6.QtCore import QObject, Signal, Slot, Property
 
 class PlatformHelper(QObject):
     """Helper class for platform-specific optimizations and workarounds"""

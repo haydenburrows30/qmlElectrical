@@ -44,7 +44,6 @@ from models.ref_rgf_calculator import RefRgfCalculator
 from models.voltage_divider_calculator import VoltageDividerCalculator
 from models.ohms_law_calculator import OhmsLawCalculator
 from models.series_helper import SeriesHelper
-from models.bar_series_helper import BarSeriesHelper
 
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
@@ -176,7 +175,6 @@ class Application:
             (TransmissionLineCalculator, "Transmission", 1, 0, "TransmissionLineCalculator"),
             (DeltaTransformerCalculator, "DeltaTransformer", 1, 0, "DeltaTransformerCalculator"),
             (SeriesHelper, "SeriesHelper", 1, 0, "SeriesHelper"),
-            (BarSeriesHelper, "BarSeriesHelper", 1, 0, "BarSeriesHelper"),
             (RefRgfCalculator, "RefRgf", 1, 0, "RefRgfCalculator"),
             (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator"),
             (SwitchboardManager, "Switchboard", 1, 0, "SwitchboardManager"),
