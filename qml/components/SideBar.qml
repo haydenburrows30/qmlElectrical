@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 
 import "buttons"
+import "tooltips"
 
 Drawer {
     id: sideBar
@@ -151,28 +152,6 @@ Drawer {
                             action.checked ? toggle1 = true : toggle1= false
                         }
                     }
-
-                    // ItemDelegate {
-                    //     id: footerdel
-                    //     highlighted: listView.currentIndex == -1
-                    //     implicitHeight: 60
-                    //     implicitWidth: 60
-
-                    //     CToolTip {
-                    //         id: toolTip
-                    //         text: "Settings"
-                    //         width: 110
-                    //     }
-                        
-                    //     icon.name: 'Setting'
-                    //     icon.width: 30
-                    //     icon.height: 30
-
-                    //     onClicked: {
-                    //         settings.open()
-                    //         listView.currentIndex = -1
-                    //     }
-                    // }
         }
     }
 }

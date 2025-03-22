@@ -1,6 +1,5 @@
-from PySide6.QtCore import Slot, Signal, Property, QObject, Qt, QUrl
+from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
-import math
 import json
 import logging
 

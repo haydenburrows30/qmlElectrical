@@ -19,15 +19,17 @@ ToolTip {
         verticalAlignment: Text.AlignVCenter
     }
 
-    background: CustomBorderRect{
+    background: Rectangle{
                     width : 110
                     height: 60
                     color: sideBar.toggle1 ? Qt.darker(palette.dark,5): palette.light
 
-                    lBorderwidth: 5
-                    rBorderwidth: 1
-                    tBorderwidth: 1
-                    bBorderwidth: 1
-                    borderColor: palette.accent
+                    anchors {
+                        leftMargin: 5
+                        rightMargin: 1
+                        topMargin: 1
+                        bottomMargin: 1
                     }
-}
+                    border.color: palette.accent
+                    }
+    }

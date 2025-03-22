@@ -10,6 +10,7 @@ import RLC 1.0  // Import RLC directly
 
 import "components"
 import "components/calculators"
+import "components/buttons"
 
 
 ApplicationWindow {

@@ -16,6 +16,8 @@ import "../components/inputs/"
 import "../components/monitors/"
 import "../components/popups/"
 import "../components/visualizers/"
+import "../components/voltage_drop/"
+import "../components/three_phase/"
 
 Page {
     id: root
