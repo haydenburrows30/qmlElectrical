@@ -46,7 +46,7 @@ Popup {
                         return safeValueFunction(z0, 0).toFixed(3)
                     }
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -62,7 +62,7 @@ Popup {
                         return safeValueFunction(z, 0).toFixed(3)
                     }
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -74,7 +74,7 @@ Popup {
                     Layout.fillWidth: true
                     text: safeValueFunction(calculator.groundFaultCurrent, 0).toFixed(3)
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -86,7 +86,7 @@ Popup {
                     Layout.fillWidth: true
                     text: (Math.acos(calculator.loadPowerFactor) * 180 / Math.PI).toFixed(1)
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -102,7 +102,7 @@ Popup {
                         return `${i.toFixed(1)}∠${(-angle * 180 / Math.PI).toFixed(1)}° A`
                     }
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -114,7 +114,7 @@ Popup {
                     Layout.fillWidth: true
                     text: `${calculator.voltageDrop.toFixed(2)}% ∠${(Math.acos(calculator.loadPowerFactor) * 180 / Math.PI).toFixed(1)}°`
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -126,7 +126,7 @@ Popup {
                     Layout.fillWidth: true
                     text: `${(calculator.unregulatedVoltage).toFixed(2)} kV`
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -149,7 +149,7 @@ Popup {
                     Layout.fillWidth: true
                     text: calculator ? safeValueFunction(calculator.groundFaultCurrent, 0).toFixed(2) : "0.00"
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -166,7 +166,7 @@ Popup {
                         calculator.frequencyRelaySettings.under_freq.toFixed(1) + " / " + 
                         calculator.frequencyRelaySettings.over_freq.toFixed(1) : "47.5 / 51.5"
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -178,7 +178,7 @@ Popup {
                     Layout.fillWidth: true
                     text: calculator ? calculator.frequencyRelaySettings.df_dt.toFixed(2) : "0.50"
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -195,7 +195,7 @@ Popup {
                         calculator.voltageRelaySettings.under_voltage.toFixed(2) + " / " +
                         calculator.voltageRelaySettings.over_voltage.toFixed(2) : "0.80 / 1.20"
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -210,7 +210,7 @@ Popup {
                     Layout.fillWidth: true
                     text: calculator ? safeValueFunction(calculator.differentialRelaySlope, 0).toString() : "25"
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }
@@ -225,7 +225,7 @@ Popup {
                     Layout.fillWidth: true
                     text: calculator ? (calculator.reversePowerThreshold * 100).toFixed(1) : "-10.0"
                     background: Rectangle {
-                        color: "#e8f6ff"
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
                         radius: 2
                     }

@@ -252,7 +252,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: (totalGeneratedPower / 1000).toFixed(3)
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -323,7 +323,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: "#f0f0f0"
+                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }
@@ -338,7 +338,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: "#f0f0f0"
+                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }
@@ -353,7 +353,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: "#f0f0f0"
+                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }
@@ -368,7 +368,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: "#f0f0f0"
+                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }
@@ -455,7 +455,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: "#f0f0f0"
+                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }
@@ -491,7 +491,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -504,7 +504,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.transformerROhms, 0).toFixed(3) : "0.000"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -517,7 +517,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -530,7 +530,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -543,7 +543,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0).toFixed(2) : "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -556,7 +556,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -569,7 +569,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -583,7 +583,7 @@ Item {
                                         safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
                                         "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -621,7 +621,7 @@ Item {
                         WaveCard {
                             title: "Transformer Protection Settings"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 230
+                            Layout.preferredHeight: 260
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -637,7 +637,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -650,7 +650,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? calculator.relayCtRatio : "300/1"  // Updated default value
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -663,7 +663,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -676,7 +676,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -728,7 +728,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -740,7 +740,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? calculator.recommendedLVCable : "25 mm²"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -771,7 +771,7 @@ Item {
                                         ((11 * (1 - safeValueFunction(calculator.voltageDrop, 0) / 100))).toFixed(2) : 
                                         "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -784,7 +784,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2) : "0.00"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -797,7 +797,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.regulatorTapPosition, 0).toString() : "0"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -809,7 +809,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: (calculator.voltageRegulatorRange / 16).toFixed(3)
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }
@@ -821,7 +821,7 @@ Item {
                                     Layout.fillWidth: true
                                     text: calculatorReady ? safeValueFunction(calculator.regulatorThreePhaseCapacity, 0).toFixed(0) : "555"
                                     background: Rectangle {
-                                        color: "#e8f6ff"
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
                                         radius: 2
                                     }

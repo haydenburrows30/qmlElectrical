@@ -16,6 +16,63 @@ Item {
     
     // Signal for when calculation is requested
     signal calculate()
+
+    Popup {
+        id: tipsPopup
+        width: 700
+        height: 500
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        RowLayout {
+            ColumnLayout {
+                Text {
+                    text: "<b>400V Generator Protection Requirements:</b><br>" +
+                        "• Over/Under Voltage Protection (27/59)<br>" +
+                        "• Over/Under Frequency Protection (81O/81U)<br>" +
+                        "• Overcurrent Protection (50/51)<br>" +
+                        "• Earth Fault Protection (50N/51N)<br>" +
+                        "• Reverse Power Protection (32)<br>" +
+                        "• Loss of Excitation Protection (40)<br>" +
+                        "• Stator Earth Fault Protection<br>" +
+                        "• Anti-Islanding Protection"
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "<b>Wind Turbine Power Formula:</b><br>" +
+                        "P = ½ × ρ × A × Cp × v³ × η<br>" +
+                        "Where:<br>" +
+                        "P = Power output (W)<br>" +
+                        "ρ = Air density (kg/m³)<br>" +
+                        "A = Swept area (m²) = π × r²<br>" +
+                        "Cp = Power coefficient<br>" +
+                        "v = Wind speed (m/s)<br>" +
+                        "η = Generator efficiency"
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+                Text {
+                    text: "<b>Notes:</b><br>" +
+                        "• The Betz limit sets the maximum theoretical Cp at 0.593<br>" +
+                        "• Air density varies with altitude and temperature<br>" +
+                        "• Modern large wind turbines typically operate with power coefficient around 0.35-0.45<br>" +
+                        "• The cut-in speed is when the turbine starts generating power<br>" +
+                        "• The cut-out speed is when the turbine shuts down to prevent damage"
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
         
     ScrollView {
         id: scrollView
@@ -35,16 +92,19 @@ Item {
                 width: scrollView.width
 
                 RowLayout {
+                    id: topLayout
+                    Layout.alignment: Qt.AlignHCenter
+
                     WaveCard {
                         title: "Wind Turbine Parameters"
-                        // Layout.fillWidth: true
-                        Layout.preferredHeight: 550
+                        Layout.fillHeight: true
                         Layout.minimumWidth: 350
                         Layout.alignment: Qt.AlignTop
-                        
+
+                        id: results
+                        showSettings: true
+
                         GridLayout {
-                            anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
@@ -109,7 +169,7 @@ Item {
                                 id: cutInSpinBox
                                 from: 1
                                 to: 10
-                                value: 3  // Set a default value
+                                value: 3
                                 stepSize: 1
                                 editable: true
                                 Layout.fillWidth: true
@@ -121,7 +181,7 @@ Item {
                                 id: cutOutSpinBox
                                 from: 15
                                 to: 35
-                                value: 25  // Set a default value
+                                value: 25
                                 stepSize: 1
                                 editable: true
                                 Layout.fillWidth: true
@@ -169,19 +229,37 @@ Item {
                                     }
                                 }
                             }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.columnSpan: 2
+                                Layout.margins: 10
+                                height: 1
+                                color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                            }
+
+                            ExportButton {
+                                Layout.alignment: Qt.AlignRight
+                                Layout.columnSpan: 2
+                                defaultFileName: "wind_turbine_report.pdf"
+                                onExport: function(fileUrl) {
+                                    if (calculatorReady) {
+                                        let genCurrent = (calculator.powerInKW * 1000) / (Math.sqrt(3) * 400)
+                                        
+                                        calculator.exportWindTurbineReport(fileUrl)
+                                    }
+                                }
+                            }
                         }
                     }
                     
                     WaveCard {
                         title: "Wind Turbine Output"
-                        // Layout.fillWidth: true
-                        Layout.preferredHeight: 550
-                        Layout.minimumWidth: 500
+                        Layout.minimumHeight: 480
+                        Layout.minimumWidth: 400
                         Layout.alignment: Qt.AlignTop
                         
                         GridLayout {
-                            anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
@@ -193,7 +271,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: safeValue(calculator.sweptArea, 0).toFixed(2)
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -206,7 +284,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: safeValue(calculator.theoreticalPower, 0).toFixed(2)
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -219,7 +297,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: safeValue(calculator.actualPower, 0).toFixed(2)
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -232,7 +310,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.powerInKW, 0).toFixed(2) : "0.00"
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -245,7 +323,7 @@ Item {
                                 Layout.fillWidth: true
                                 text: (totalGeneratedPower * 1.2).toFixed(2)
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -261,7 +339,7 @@ Item {
                                     ? ((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)).toFixed(2)
                                     : "0.00"
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
@@ -274,27 +352,42 @@ Item {
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.annualEnergy, 0).toFixed(2) : "0.00"
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
                             }
-                            
-                            Button {
-                                text: "Update Power Curve"
+
+                            Rectangle {
+                                Layout.fillWidth: true
                                 Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignHCenter
-                                onClicked: {
-                                    calculate()
-                                    updatePowerCurve()
-                                }
+                                Layout.margins: 10
+                                height: 1
+                                color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
                             }
 
-                            // Add advanced analysis section
                             Label { 
                                 text: "Advanced Analysis:"
-                                Layout.columnSpan: 2
                                 font.bold: true
+                            }
+
+                             Button {
+                                text: "Update"
+                                Layout.fillWidth: true
+                                onClicked: {
+                                    try {
+                                        // Safely call the estimateAEP function with proper arguments
+                                        var windSpeed = safeValue(avgWindSpeedSpinBox.value, 7);
+                                        var weibullK = 2.0; // Default Weibull shape parameter
+                                        
+                                        // Make sure both required arguments are provided
+                                        var aep = calculator.estimateAEP(windSpeed, weibullK);
+                                        advancedAepText.text = safeValue(aep, 0).toFixed(2);
+                                    } catch (e) {
+                                        console.error("Error calculating AEP:", e);
+                                        advancedAepText.text = "Error";
+                                    }
+                                }
                             }
                             
                             Label { text: "Average Wind Speed (m/s):" }
@@ -315,140 +408,60 @@ Item {
                                 Layout.fillWidth: true
                                 text: "0.00"
                                 background: Rectangle {
-                                    color: "#e8f6ff"
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
-                            }
-                            
-                            Button {
-                                text: "Run Advanced Analysis"
-                                Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignHCenter
-                                onClicked: {
-                                    try {
-                                        // Safely call the estimateAEP function with proper arguments
-                                        var windSpeed = safeValue(avgWindSpeedSpinBox.value, 7);
-                                        var weibullK = 2.0; // Default Weibull shape parameter
-                                        
-                                        // Make sure both required arguments are provided
-                                        var aep = calculator.estimateAEP(windSpeed, weibullK);
-                                        advancedAepText.text = safeValue(aep, 0).toFixed(2);
-                                    } catch (e) {
-                                        console.error("Error calculating AEP:", e);
-                                        advancedAepText.text = "Error";
-                                    }
-                                }
-                            }
-                            
-                            // Update export button data
-                            ExportButton {
-                                Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignRight
-                                defaultFileName: "wind_turbine_report.pdf"
-                                onExport: function(fileUrl) {
-                                    if (calculatorReady) {
-                                        // Get current generator current calculation
-                                        let genCurrent = (calculator.powerInKW * 1000) / (Math.sqrt(3) * 400)
-                                        
-                                        calculator.exportWindTurbineReport(fileUrl)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    WaveCard {
-                        title: "Wind Turbine Generator Protection Requirements"
-                        Layout.alignment: Qt.AlignTop
-                        Layout.minimumHeight: 550
-                        Layout.minimumWidth: 500
-                        
-                        ColumnLayout {
-                            anchors.fill: parent
-                            anchors.margins: 10
-                            
-                            Text {
-                                text: "<b>400V Generator Protection Requirements:</b><br>" +
-                                    "• Over/Under Voltage Protection (27/59)<br>" +
-                                    "• Over/Under Frequency Protection (81O/81U)<br>" +
-                                    "• Overcurrent Protection (50/51)<br>" +
-                                    "• Earth Fault Protection (50N/51N)<br>" +
-                                    "• Reverse Power Protection (32)<br>" +
-                                    "• Loss of Excitation Protection (40)<br>" +
-                                    "• Stator Earth Fault Protection<br>" +
-                                    "• Anti-Islanding Protection"
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                            }
-
-                            Text {
-                                text: "<b>Wind Turbine Power Formula:</b><br>" +
-                                    "P = ½ × ρ × A × Cp × v³ × η<br>" +
-                                    "Where:<br>" +
-                                    "P = Power output (W)<br>" +
-                                    "ρ = Air density (kg/m³)<br>" +
-                                    "A = Swept area (m²) = π × r²<br>" +
-                                    "Cp = Power coefficient<br>" +
-                                    "v = Wind speed (m/s)<br>" +
-                                    "η = Generator efficiency"
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                            }
-                            
-                            Text {
-                                text: "<b>Notes:</b><br>" +
-                                    "• The Betz limit sets the maximum theoretical Cp at 0.593<br>" +
-                                    "• Air density varies with altitude and temperature<br>" +
-                                    "• Modern large wind turbines typically operate with power coefficient around 0.35-0.45<br>" +
-                                    "• The cut-in speed is when the turbine starts generating power<br>" +
-                                    "• The cut-out speed is when the turbine shuts down to prevent damage"
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
                             }
                         }
                     }
                 }
 
-                RowLayout {
+                WaveCard {
+                    title: "Power Curve"
+                    Layout.minimumHeight: 350
+                    Layout.minimumWidth: topLayout.width
+                    Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
+                    
+                    ChartView {
+                        id: powerCurveChart
+                        anchors.fill: parent
+                        antialiasing: true
+                        legend.visible: true
 
-                    // Power curve chart
-                    WaveCard {
-                        title: "Power Curve"
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 350
-                        Layout.minimumWidth:700
-                        Layout.alignment: Qt.AlignTop
-                        
-                        ChartView {
-                            id: powerCurveChart
-                            anchors.fill: parent
-                            antialiasing: true
-                            legend.visible: true
-                            
-                            ValueAxis {
-                                id: axisX
-                                min: 0
-                                max: safeValue(calculator.cutOutSpeed, 25) + 5  // Use safeValue to prevent NaN
-                                titleText: "Wind Speed (m/s)"
-                            }
-                            
-                            ValueAxis {
-                                id: axisY
-                                min: 0
-                                max: 10  // Will be updated dynamically
-                                titleText: "Power Output (kW)"
-                            }
-                            
-                            LineSeries {
-                                id: powerSeries
-                                name: "Power Output"
-                                axisX: axisX
-                                axisY: axisY
+                                                                                                
+                        Button {
+                            text: "Update Power Curve"
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.margins: 10
+                            onClicked: {
+                                calculate()
+                                updatePowerCurve()
                             }
                         }
+                        
+                        ValueAxis {
+                            id: axisX
+                            min: 0
+                            max: safeValue(calculator.cutOutSpeed, 25) + 5  // Use safeValue to prevent NaN
+                            titleText: "Wind Speed (m/s)"
+                        }
+                        
+                        ValueAxis {
+                            id: axisY
+                            min: 0
+                            max: 10  // Will be updated dynamically
+                            titleText: "Power Output (kW)"
+                        }
+                        
+                        LineSeries {
+                            id: powerSeries
+                            name: "Power Output"
+                            axisX: axisX
+                            axisY: axisY
+                        }
                     }
-
                 }
             }
         }
