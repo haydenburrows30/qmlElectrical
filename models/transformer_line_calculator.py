@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Property, Signal, Slot, QSignalBlocker
 import math
 import cmath
 import logging
-from utils.pdf_generator import PDFGenerator  # Update to absolute import
+from utils.pdf_generator import PDFGenerator
 
 class TransformerLineCalculator(QObject):
     """Calculator for transformer-line system analysis including protection parameters"""

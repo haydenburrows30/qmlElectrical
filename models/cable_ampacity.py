@@ -1,5 +1,4 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
-import math
 
 class CableAmpacityCalculator(QObject):
     """Calculator for cable current carrying capacity with derating factors"""

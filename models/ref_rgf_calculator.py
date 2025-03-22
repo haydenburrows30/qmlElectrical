@@ -1,6 +1,5 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot
 import math
-import re
 
 class RefRgfCalculator(QObject):
     """Calculator for REF (Relay Earth Fault) and RGF (Restricted Ground Fault) values"""

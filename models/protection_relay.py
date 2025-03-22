@@ -1,6 +1,4 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
-import math
-import numpy as np
 import os
 import sqlite3
 

@@ -1,14 +1,11 @@
-// filepath: /home/hayden/Documents/qmltest/models/voltdrop/data_manager.py
 import pandas as pd
-import math
-from ..db_manager import DatabaseManager
 
 class DataManager:
     """Class for managing cable data and calculation parameters."""
     
     def __init__(self, db_manager=None):
         # Use provided database manager or create a new one
-        self._db_manager = db_manager or DatabaseManager()
+        self._db_manager = db_manager
         
         # Cache for frequently accessed data
         self._cache = {
@@ -212,5 +209,5 @@ class DataManager:
             print(f"Error looking up fuse size: {e}")
             return "Error"
             
-    def calculate_current(self, kva, voltage=415.0, num_houses=1, diversity_factor=None):
-        """
+    # def calculate_current(self, kva, voltage=415.0, num_houses=1, diversity_factor=None):
+    #     """

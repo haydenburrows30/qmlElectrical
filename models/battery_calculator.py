@@ -1,5 +1,4 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
-import math
 
 class BatteryCalculator(QObject):
     """Calculator for battery sizing and runtime calculations"""

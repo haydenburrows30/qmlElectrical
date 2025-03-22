@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal, Property, Slot
+from PySide6.QtCore import QObject, Signal, Slot
 import sqlite3
 import os
 
