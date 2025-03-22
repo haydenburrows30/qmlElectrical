@@ -35,11 +35,11 @@ GridLayout {
         temperatureInput.text = "25"
         groupingFactorInput.text = "1.0"
         kvaPerHouseInput.text = "7"
-        numberOfHousesInput.text = "1"
+        numberOfHousesInput.value = 1  // SpinBox uses value
         admdCheckBox.checked = false
         installationMethodCombo.currentIndex = 5  // "D1 - Underground direct buried"
         
-        // Now explicitly update the model with these values to ensure calculations are updated
+        // Now explicitly update the model with these values
         voltageDrop.setSelectedVoltage(voltageSelect.currentText)
         voltageDrop.setConductorMaterial(conductorSelect.currentText)
         voltageDrop.setCoreType(coreTypeSelect.currentText)
@@ -52,7 +52,7 @@ GridLayout {
         
         // Calculate total load using default values
         let kva = parseFloat(kvaPerHouseInput.text) || 7
-        let houses = parseInt(numberOfHousesInput.text) || 1
+        let houses = numberOfHousesInput.value || 1
         voltageDrop.setNumberOfHouses(houses)
         voltageDrop.calculateTotalLoad(kva, houses)
         
@@ -77,7 +77,6 @@ GridLayout {
             currentIndex: voltageDrop.selectedVoltage === "230V" ? 0 : 1
             onCurrentTextChanged: {
                 if (currentText) {
-                    console.log("Selecting voltage:", currentText)
                     voltageDrop.setSelectedVoltage(currentText)
                     // Disable ADMD checkbox for 230V
                     admdCheckBox.enabled = (currentText === "415V")
@@ -107,7 +106,6 @@ GridLayout {
         currentIndex: 1
         onCurrentTextChanged: {
             if (currentText) {
-                console.log("Selecting conductor:", currentText)
                 voltageDrop.setConductorMaterial(currentText)
             }
         }
@@ -121,7 +119,6 @@ GridLayout {
         currentIndex: 1
         onCurrentTextChanged: {
             if (currentText) {
-                console.log("Selecting core type:", currentText)
                 voltageDrop.setCoreType(currentText)
             }
         }
@@ -135,13 +132,11 @@ GridLayout {
         currentIndex: 13  // Set default selection
         onCurrentTextChanged: {
             if (currentText) {
-                console.log("Selecting cable:", currentText)
                 voltageDrop.selectCable(currentText)
             }
         }
         Component.onCompleted: {
             if (currentText) {
-                console.log("Initial cable selection:", currentText)
                 voltageDrop.selectCable(currentText)
             }
         }
@@ -206,9 +201,7 @@ GridLayout {
         to: 1000
         value: 1
         onValueChanged: {
-            console.log("Number of houses changed to:", value)
             voltageDrop.setNumberOfHouses(value)
-            console.log("New diversity factor:", voltageDrop.diversityFactor)
             let kva = parseFloat(kvaPerHouseInput.text) || 0
             voltageDrop.calculateTotalLoad(kva, value)
         }

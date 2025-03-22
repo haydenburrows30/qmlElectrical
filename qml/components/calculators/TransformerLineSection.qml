@@ -40,7 +40,8 @@ Item {
     // Update display when load parameters change
     Connections {
         target: calculator
-        function onLoadChanged() {
+        // Fix signal handler name to match loadChanged signal
+        function loadChanged() {  // Remove "on" prefix
             if (calculatorReady) {
                 transformerLineSection.updateDisplayValues()
             }

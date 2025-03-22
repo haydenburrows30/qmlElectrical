@@ -177,6 +177,97 @@ class PDFGenerator:
         
         doc.build(story)
 
+    def generate_protection_report(self, data, filename):
+        """Generate PDF report for complete protection requirements"""
+        doc = SimpleDocTemplate(filename, pagesize=A4)
+        story = []
+        
+        # Title
+        story.append(Paragraph("Wind Generation Protection Requirements", self.styles['CustomTitle']))
+        
+        # Generator Protection
+        story.append(Paragraph("1. LV Wind Generator Protection (400V)", self.styles['Heading2']))
+        gen_params = [
+            ["Parameter", "Value"],
+            ["Generator Output", f"{data['wind_power']/1000:.2f} MW"],
+            ["Generator Current", f"{data['generator_current']:.1f} A"],
+            ["Rated Capacity", f"{data['generator_capacity']/1000:.2f} MVA"],
+            ["Circuit Breaker Rating", f"{data['generator_current'] * 1.25:.1f} A (125% FLC)"],
+            ["Overcurrent Pickup", f"{data['generator_current'] * 1.1:.1f} A (110% FLC)"],
+            ["Earth Fault Pickup", "20% of rated current"],
+            ["Voltage Protection", "360V - 440V (±10%)"],
+            ["Frequency Protection", "49.0 - 51.0 Hz (±2%)"],
+            ["Reverse Power", "5% of rated power"],
+            ["Anti-Islanding", "ROCOF or Vector Shift"],
+        ]
+        story.append(Table(gen_params, style=self._get_table_style()))
+        story.append(Spacer(1, 20))
+        
+        # Transformer Protection
+        story.append(Paragraph("2. Transformer Protection", self.styles['Heading2']))
+        transformer_protection = [
+            ["Protection Type", "Setting", "Notes"],
+            ["Differential (87T)", "Required >5MVA", "For large transformers"],
+            ["Overcurrent (50/51)", f"{data['relay_settings']['pickup_current']:.1f} A", f"CT Ratio: {data['relay_settings']['ct_ratio']}"],
+            ["Earth Fault (64)", "REF Protection", "For Y-connected winding"],
+            ["Buchholz Relay", "Gas/Oil monitoring", "For oil-filled units"],
+            ["Temperature", "Alarm: 100°C", "Trip: 120°C"],
+            ["Pressure Relief", "Mechanical device", "Excessive pressure protection"],
+        ]
+        story.append(Table(transformer_protection, style=self._get_table_style()))
+        story.append(Spacer(1, 20))
+        
+        # REF615 Relay Configuration
+        story.append(Paragraph("3. ABB REF615 Relay Configuration (11kV)", self.styles['Heading2']))
+        ref615_settings = [
+            ["Function", "Settings", "Notes"],
+            ["Phase Overcurrent (51P)", "IEC Very Inverse", "TMS: 0.4"],
+            ["Earth Fault (51N)", "IEC Extremely Inverse", "20% of rated, TMS: 0.5"],
+            ["Inst. O/C (50P)", f"{data['relay_settings']['pickup_current'] * 0.8:.1f} A", "80% of fault current"],
+            ["Directional O/C (67)", "Forward", "60° characteristic angle"],
+            ["Auto-Reclose (79)", "1 fast + 1 delayed", "Enabled"],
+            ["Undervoltage (27)", "0.8 × Un", "3.0s delay"],
+            ["Overvoltage (59)", "1.1 × Un", "2.0s delay"],
+            ["Breaker Fail (50BF)", "150ms operate time", "Enabled"],
+        ]
+        story.append(Table(ref615_settings, style=self._get_table_style()))
+        story.append(Spacer(1, 20))
+        
+        # Voltage Regulator Protection
+        story.append(Paragraph("4. Voltage Regulator Protection", self.styles['Heading2']))
+        regulator_protection = [
+            ["Parameter", "Setting"],
+            ["Type", "3× Eaton VR-32 Single-Phase"],
+            ["Connection", "Delta-connected"],
+            ["Capacity", "185 kVA per phase (555 kVA total)"],
+            ["Voltage Protection", "±15% of nominal"],
+            ["Current Limiting", "200A fuses per phase"],
+            ["Control Power", "UPS backup"],
+            ["Step Control", "32 steps, ±10% range"],
+            ["Step Size", "0.625% per step"],
+            ["Surge Protection", "9kV MOV arresters"],
+        ]
+        story.append(Table(regulator_protection, style=self._get_table_style()))
+        story.append(Spacer(1, 20))
+        
+        # Grid Connection Requirements
+        story.append(Paragraph("5. Grid Connection Requirements", self.styles['Heading2']))
+        grid_requirements = [
+            "• Compliance with G59/G99 standards",
+            "• Low Voltage Ride Through (LVRT) capability",
+            "• Active power control for frequency regulation",
+            "• Reactive power capability (power factor control)",
+            "• Harmonics and flicker within limits",
+            "• Fault level contribution within grid limits",
+            "• Remote monitoring and control via SCADA",
+            "• Generation forecasting capability",
+            "• Data logging for regulatory compliance"
+        ]
+        for req in grid_requirements:
+            story.append(Paragraph(req, self.styles['Normal']))
+        
+        doc.build(story)
+
     def _get_table_style(self):
         """Get common table style"""
         return TableStyle([

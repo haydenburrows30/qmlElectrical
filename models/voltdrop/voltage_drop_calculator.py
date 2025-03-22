@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot, Signal, Property, QObject, Qt, QUrl
 import pandas as pd
 import math
 import json
+import logging
 
 from .table_model import VoltageDropTableModel
 from .file_utils import FileUtils
@@ -269,7 +270,7 @@ class VoltageDropCalculator(QObject):
             self._num_houses = num_houses
             # Force refresh diversity factor from database
             self._diversity_factor = self._data_manager.get_diversity_factor(num_houses)
-            print(f"Set number of houses to {num_houses}, new diversity factor: {self._diversity_factor}")
+            # print(f"Set number of houses to {num_houses}, new diversity factor: {self._diversity_factor}")
             self.numberOfHousesChanged.emit(num_houses)
             self.diversityFactorChanged.emit()
             # Recalculate with new factor
@@ -648,32 +649,36 @@ class VoltageDropCalculator(QObject):
     def _calculate_voltage_drop(self):
         """Calculate voltage drop using mV/A/m method."""
         try:
+            logger = logging.getLogger("qmltest")
+            print("Calculating voltage drop...")
+            
+            logger.info("\n=== Starting Voltage Drop Calculations ===")
+            logger.info(f"Input Parameters:")
+            logger.info(f"• Current: {self._current:.2f} A")
+            logger.info(f"• Length: {self._length:.2f} m")
+            logger.info(f"• Installation Method: {self._installation_method}")
+            logger.info(f"• Temperature: {self._temperature:.1f}°C")
+            logger.info(f"• Grouping Factor: {self._grouping_factor:.2f}")
+
             if self._current <= 0 or self._length <= 0 or self._selected_cable is None:
+                logger.info("Invalid input parameters, skipping calculation")
                 return
 
-            table_data = []
+            # Get cable data and calculate for all sizes
             cable_data = self._data_manager.get_cable_data(
                 self._conductor_material, self._core_type
             )
             
-            # Calculate voltage drop for each cable size
+            table_data = []
             for _, cable in cable_data.iterrows():
-                # Calculate voltage drop
                 v_drop = self._data_manager.calculate_voltage_drop(
-                    self._current, 
-                    self._length, 
-                    cable,
-                    self._temperature,
-                    self._installation_method,
-                    self._grouping_factor,
-                    self._admd_enabled,
-                    self._admd_factor,
-                    self._voltage
+                    self._current, self._length, cable,
+                    self._temperature, self._installation_method,
+                    self._grouping_factor, self._admd_enabled,
+                    self._admd_factor, self._voltage
                 )
                 
-                drop_percent = (v_drop / self._voltage) * 100  # Calculate percentage
-                
-                # Determine status based on AS/NZS 3008.1.1
+                drop_percent = (v_drop / self._voltage) * 100
                 status = "OK"
                 if drop_percent > 7.0:
                     status = "SEVERE"
@@ -681,6 +686,12 @@ class VoltageDropCalculator(QObject):
                     status = "WARNING"
                 elif drop_percent > 2.0:
                     status = "SUBMAIN"
+                    
+                logger.info(f"\nCable Size {float(cable['size'])} mm²:")
+                logger.info(f"• mV/A/m: {cable['mv_per_am']}")
+                logger.info(f"• Rating: {cable['max_current']} A")
+                logger.info(f"• Voltage Drop: {v_drop:.2f} V ({drop_percent:.2f}%)")
+                logger.info(f"• Status: {status}")
                 
                 table_data.append([
                     float(cable['size']),
@@ -692,28 +703,33 @@ class VoltageDropCalculator(QObject):
                     drop_percent,
                     status
                 ])
-            
+
             self._table_model.update_data(table_data)
             self.tableDataChanged.emit()
             
-            # Update single cable calculation
-            v_drop = self._data_manager.calculate_voltage_drop(
-                self._current, 
-                self._length, 
-                self._selected_cable,
-                self._temperature,
-                self._installation_method,
-                self._grouping_factor,
-                self._admd_enabled,
-                self._admd_factor,
-                self._voltage
-            )
+            # Calculate selected cable voltage drop
+            if self._selected_cable is not None:
+                v_drop = self._data_manager.calculate_voltage_drop(
+                    self._current, self._length, self._selected_cable,
+                    self._temperature, self._installation_method,
+                    self._grouping_factor, self._admd_enabled,
+                    self._admd_factor, self._voltage
+                )
+                self._voltage_drop = v_drop
+                self.voltageDropCalculated.emit(self._voltage_drop)
+                
+                logger.info(f"\nSelected Cable Results:")
+                logger.info(f"• Size: {float(self._selected_cable['size'])} mm²")
+                logger.info(f"• Final Voltage Drop: {v_drop:.2f} V")
+                logger.info(f"• Drop Percentage: {(v_drop / self._voltage * 100):.2f}%")
             
-            self._voltage_drop = v_drop
-            self.voltageDropCalculated.emit(self._voltage_drop)
+            print("Calculations complete.")
+            logger.info("\n=== Voltage Drop Calculations Complete ===\n")
             
         except Exception as e:
-            print(f"Error calculating voltage drops: {e}")
+            print(f"Error in calculations: {str(e)}")
+            logger.error(f"Error calculating voltage drops: {e}")
+            logger.exception(e)
 
     @Property(float, notify=voltageDropCalculated)
     def voltageDrop(self):

@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot, QSignalBlocker
 import math
 import cmath
+import logging
 from utils.pdf_generator import PDFGenerator  # Update to absolute import
 
 class TransformerLineCalculator(QObject):
@@ -123,9 +124,45 @@ class TransformerLineCalculator(QObject):
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
         try:
-            print(f"\nCalculating with:")
-            print(f"Power Factor: {self._load_pf}")
-            print(f"Load MVA: {self._load_mva}")
+            logger = logging.getLogger("qmltest")
+            print("Calculating system parameters...")
+            
+            # Log the start of calculations
+            logger.info("\n=== Starting Transformer-Line Calculations ===")
+            
+            # Calculate transformer impedance
+            transformer_z_pu = self._transformer_impedance / 100.0
+            transformer_z_base = (self._transformer_hv_voltage**2) / (self._transformer_rating * 1000)
+            self._transformer_z = transformer_z_pu * transformer_z_base
+            
+            # Remove print statements and keep only logging
+            logger.info("\nTransformer Impedance Calculations:")
+            logger.info(f"• Z base: {transformer_z_base:.2f} Ω")
+            logger.info(f"• Z (pu): {transformer_z_pu:.3f}")
+            logger.info(f"• Total Z: {self._transformer_z:.2f} Ω")
+            
+            # R and X components
+            angle = math.atan(self._transformer_x_r_ratio)
+            self._transformer_r = self._transformer_z * math.cos(angle)
+            self._transformer_x = self._transformer_z * math.sin(angle)
+            logger.info(f"• R: {self._transformer_r:.2f} Ω")
+            logger.info(f"• X: {self._transformer_x:.2f} Ω")
+            
+            # Line calculations
+            self._line_total_z = complex(self._line_r * self._line_length, 
+                                       self._line_x * self._line_length)
+            logger.info("\nLine Parameters:")
+            logger.info(f"• Total Z: {abs(self._line_total_z):.2f}∠{math.degrees(cmath.phase(self._line_total_z)):.1f}° Ω")
+            
+            # Voltage drop calculations
+            load_current = (self._load_mva * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage)
+            load_angle = math.acos(self._load_pf)
+            load_current_complex = load_current * complex(math.cos(load_angle), -math.sin(load_angle))
+            
+            logger.info("\nLoad Current:")
+            logger.info(f"• Magnitude: {load_current:.2f} A")
+            logger.info(f"• Angle: {math.degrees(load_angle):.1f}°")
+            logger.info(f"• Complex: {load_current_complex:.2f} A")
             
             # 1. Calculate transformer impedance in Ohms (referred to HV side)
             transformer_z_pu = self._transformer_impedance / 100.0
@@ -149,10 +186,6 @@ class TransformerLineCalculator(QObject):
             load_angle = math.acos(self._load_pf)
             load_current_complex = load_current * complex(math.cos(load_angle), -math.sin(load_angle))
             
-            print(f"Load current: {load_current:.2f} A")
-            print(f"Load angle: {math.degrees(load_angle):.2f} degrees")
-            print(f"Complex current: {load_current_complex}")
-            
             # Calculate voltage drop using complex arithmetic for more accurate results
             source_voltage = self._transformer_hv_voltage / math.sqrt(3)  # Phase voltage
             total_impedance = complex(self._transformer_r, self._transformer_x) + self._line_total_z
@@ -163,11 +196,11 @@ class TransformerLineCalculator(QObject):
             self._voltage_drop = ((abs(complex(source_voltage, 0)) - abs(receiving_end_voltage)) / source_voltage) * 100.0
             self._unregulated_voltage = (abs(receiving_end_voltage) * math.sqrt(3)) / 1000.0  # Line-to-line kV
             
-            print(f"Source voltage: {source_voltage:.2f} V")
-            print(f"Voltage drop complex: {voltage_drop_complex}")
-            print(f"Receiving end voltage: {receiving_end_voltage}")
-            print(f"Natural voltage drop: {self._voltage_drop:.2f}%")
-            print(f"Unregulated voltage: {self._unregulated_voltage:.2f} kV")
+            logger.info(f"Source voltage: {source_voltage:.2f} V")
+            logger.info(f"Voltage drop complex: {voltage_drop_complex}")
+            logger.info(f"Receiving end voltage: {receiving_end_voltage}")
+            logger.info(f"Natural voltage drop: {self._voltage_drop:.2f}%")
+            logger.info(f"Unregulated voltage: {self._unregulated_voltage:.2f} kV")
             
             # Calculate fault currents - before the regulator calculations
             # LV fault current - using actual transformer impedance
@@ -183,8 +216,8 @@ class TransformerLineCalculator(QObject):
             total_fault_z = complex(self._transformer_r, self._transformer_x) + self._line_total_z
             self._fault_current_hv = (self._transformer_hv_voltage / math.sqrt(3)) / abs(total_fault_z) / 1000  # kA
             
-            print(f"Fault current LV: {self._fault_current_lv:.2f} kA")
-            print(f"Fault current HV: {self._fault_current_hv:.2f} kA")
+            logger.info(f"Fault current LV: {self._fault_current_lv:.2f} kA")
+            logger.info(f"Fault current HV: {self._fault_current_hv:.2f} kA")
             
             # Rest of voltage regulator calculations...
             if self._voltage_regulator_enabled:
@@ -237,9 +270,9 @@ class TransformerLineCalculator(QObject):
             self._relay_time_dial = 0.3
             self._relay_curve_type = "Very Inverse (IEC)"
             
-            print(f"Transformer full load current: {transformer_full_load_current:.2f} A")
-            print(f"Relay pickup current: {self._relay_pickup_current:.2f} A")
-            print(f"CT ratio selected: {self._relay_ct_ratio}")
+            logger.info(f"Transformer full load current: {transformer_full_load_current:.2f} A")
+            logger.info(f"Relay pickup current: {self._relay_pickup_current:.2f} A")
+            logger.info(f"CT ratio selected: {self._relay_ct_ratio}")
             
             # Calculate cable sizes
             self._calculate_cable_sizes()
@@ -269,18 +302,37 @@ class TransformerLineCalculator(QObject):
             vln = self._transformer_hv_voltage / math.sqrt(3)
             self._ground_fault_current = vln / abs(z1 + z2 + z0_total)
             
-            print(f"Ground fault calculation:")
-            print(f"Z0 transformer: {z0_transformer:.2f} Ω")
-            print(f"Z0 line: {z0_line:.2f} Ω")
-            print(f"Zn referred: {z_ng_referred:.2f} Ω")
-            print(f"Ground fault current: {self._ground_fault_current:.2f} A")
+            logger.info("\nGround fault calculation:")
+            logger.info(f"Z0 transformer: {z0_transformer:.2f} Ω")
+            logger.info(f"Z0 line: {z0_line:.2f} Ω")
+            logger.info(f"Zn referred: {z_ng_referred:.2f} Ω")
+            logger.info(f"Ground fault current: {self._ground_fault_current:.2f} A")
+            
+            logger.info("\nProtection Settings:")
+            logger.info(f"• Relay Pickup Current: {self._relay_pickup_current:.2f} A")
+            logger.info(f"• CT Ratio: {self._relay_ct_ratio}")
+            logger.info(f"• Time Dial: {self._relay_time_dial:.2f}")
+            logger.info(f"• Curve Type: {self._relay_curve_type}")
+            
+            # Voltage regulator
+            if self._voltage_regulator_enabled:
+                logger.info("\nVoltage Regulator:")
+                logger.info(f"• Unregulated Voltage: {self._unregulated_voltage:.2f} kV")
+                logger.info(f"• Target Voltage: {self._voltage_regulator_target:.2f} kV")
+                logger.info(f"• Tap Position: {self._regulator_tap_position}")
+                logger.info(f"• Regulated Voltage: {self._regulated_voltage:.2f} kV")
+            
+            print("Calculations complete.")
+            logger.info("\n=== Calculations Complete ===\n")
             
             # Emit completion signal - emit both signals for compatibility
             self.calculationCompleted.emit()
             self.calculationsComplete.emit()  # Backwards compatibility
             
         except Exception as e:
-            print(f"Error in transformer-line calculations: {e}")
+            print(f"Error in calculations: {str(e)}")
+            logger.error(f"Error in transformer-line calculations: {e}")
+            logger.exception(e)
             
     @Property(float, notify=transformerChanged)
     def transformerRating(self):
@@ -707,3 +759,39 @@ class TransformerLineCalculator(QObject):
         except Exception as e:
             print(f"Error exporting transformer report: {e}")
             print(f"Attempted filename: {filename}")
+
+    @Slot("QVariant", str)
+    def exportProtectionReport(self, data, filename):
+        """Export protection requirements to PDF"""
+        try:
+            # Clean up filename
+            clean_path = filename.strip()
+            if not clean_path.lower().endswith('.pdf'):
+                clean_path += '.pdf'
+
+            # Convert QJSValue to Python dict
+            js_data = data.toVariant()
+
+            # Extract and validate the data
+            export_data = {
+                "wind_power": float(js_data["wind_power"]),
+                "generator_current": float(js_data["generator_current"]),
+                "generator_capacity": float(js_data["generator_capacity"]),
+                "transformer_rating": float(js_data["transformer_rating"]),
+                "relay_settings": {
+                    "pickup_current": float(self._relay_pickup_current),
+                    "ct_ratio": self._relay_ct_ratio,
+                    "curve_type": self._relay_curve_type
+                },
+                "voltage_protection": js_data["voltage_protection"],
+                "frequency_protection": js_data["frequency_protection"],
+            }
+            
+            generator = PDFGenerator()
+            generator.generate_protection_report(export_data, clean_path)
+            print(f"Protection report exported to: {clean_path}")
+            
+        except Exception as e:
+            print(f"Error exporting protection report: {e}")
+            print(f"Attempted filename: {filename}")
+            print(f"Data received: {data}")

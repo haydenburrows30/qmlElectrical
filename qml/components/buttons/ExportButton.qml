@@ -1,11 +1,11 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
+import QtCore
 
 Button {
     id: exportButton
     text: "Export PDF"
-    icon.source: "qrc:/icons/pdf.svg"  // Add an icon if you have one
     
     property string defaultFileName: "report.pdf"
     property var onExport: null
@@ -15,7 +15,7 @@ Button {
         title: "Save PDF Report"
         nameFilters: ["PDF files (*.pdf)"]
         fileMode: FileDialog.SaveFile
-        currentFolder: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
         
         onAccepted: {
             if (exportButton.onExport) {

@@ -140,7 +140,7 @@ class DataManager:
             result = cursor.fetchone()
             if result:
                 factor = float(result[0])
-                print(f"Found exact diversity factor: {factor} for {num_houses} houses")
+                # print(f"Found exact diversity factor: {factor} for {num_houses} houses")
                 return factor
             
             conn.close()

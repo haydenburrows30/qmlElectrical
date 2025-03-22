@@ -23,16 +23,21 @@ def setup_logger(name="qmltest", level=logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     
-    # Add file handler if not already added
-    if not logger.handlers:
-        file_handler = logging.FileHandler(log_file)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-        
-        # Also add console handler for development
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
+    # Remove any existing handlers
+    logger.handlers = []
+    
+    # Add file handler for all logs (INFO and above)
+    file_handler = logging.FileHandler(log_file)
+    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(file_formatter)
+    file_handler.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    
+    # Add console handler for warnings and errors only
+    console_handler = logging.StreamHandler()
+    console_formatter = logging.Formatter('%(levelname)s: %(message)s')
+    console_handler.setFormatter(console_formatter)
+    console_handler.setLevel(logging.WARNING)  # Only show warnings and errors in console
+    logger.addHandler(console_handler)
     
     return logger

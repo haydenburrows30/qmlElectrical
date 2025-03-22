@@ -1,7 +1,8 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import numpy as np
-from utils.pdf_generator import PDFGenerator  # Update to absolute import
+from utils.pdf_generator import PDFGenerator
+import logging
 
 class WindTurbineCalculator(QObject):
     """Calculator for wind turbine power output and performance analysis"""
@@ -44,34 +45,54 @@ class WindTurbineCalculator(QObject):
     def _calculate(self):
         """Calculate wind turbine parameters based on inputs"""
         try:
+            logger = logging.getLogger("qmltest")
+            logger.info("\n=== Starting Wind Turbine Calculations ===")
+            logger.info(f"Input Parameters:")
+            logger.info(f"• Blade Radius: {self._blade_radius} m")
+            logger.info(f"• Wind Speed: {self._wind_speed} m/s")
+            logger.info(f"• Air Density: {self._air_density} kg/m³")
+            logger.info(f"• Power Coefficient: {self._power_coefficient}")
+            logger.info(f"• Generator Efficiency: {self._efficiency*100}%")
+            
             # Calculate swept area
             self._swept_area = math.pi * self._blade_radius * self._blade_radius
+            logger.info(f"\nSwept Area: {self._swept_area:.2f} m²")
             
             # Calculate theoretical power
             self._theoretical_power = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)
+            logger.info(f"Theoretical Power: {self._theoretical_power/1000:.2f} kW")
             
-            # Calculate actual power considering cut-in/cut-out speeds
-            if self._wind_speed < self._cut_in_speed or self._wind_speed > self._cut_out_speed:
+            # Calculate actual power
+            if self._wind_speed < self._cut_in_speed:
+                logger.info(f"Wind speed below cut-in speed ({self._cut_in_speed} m/s)")
+                self._actual_power = 0.0
+            elif self._wind_speed > self._cut_out_speed:
+                logger.info(f"Wind speed above cut-out speed ({self._cut_out_speed} m/s)")
                 self._actual_power = 0.0
             else:
                 self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency
+                logger.info(f"Actual Power Output: {self._actual_power/1000:.2f} kW")
             
-            # Calculate annual energy production (simplified)
-            # Assumes wind is at the specified speed for 35% of the year
+            # Calculate annual energy
             average_wind_speed_hours = 0.35 * 365 * 24
             power_in_kw = self._actual_power / 1000
-            self._annual_energy = power_in_kw * average_wind_speed_hours / 1000  # MWh
+            self._annual_energy = power_in_kw * average_wind_speed_hours / 1000
+            logger.info(f"\nAnnual Energy Production: {self._annual_energy:.2f} MWh")
             
-            # Generate power curve data
+            # Generate power curve
+            logger.info("\nGenerating Power Curve...")
             self._generate_power_curve()
             
-            # Emit both signals for backward compatibility
+            logger.info("=== Wind Turbine Calculations Complete ===\n")
+            
+            # Emit signals
             self.calculationCompleted.emit()
             self.calculationsComplete.emit()
             
         except Exception as e:
-            print(f"Error in wind turbine calculation: {e}")
-    
+            logger.error(f"Error in wind turbine calculation: {e}")
+            logger.exception(e)
+
     def _generate_power_curve(self):
         """Generate the power curve data points"""
         try:
@@ -221,8 +242,8 @@ class WindTurbineCalculator(QObject):
         """Convert power curve data to a format that QML can properly interpret"""
         try:
             # Debug the data being sent to QML
-            first_few = self._power_curve[:5]
-            last_few = self._power_curve[-5:] if len(self._power_curve) >= 5 else []
+            # first_few = self._power_curve[:5]
+            # last_few = self._power_curve[-5:] if len(self._power_curve) >= 5 else []
             
             # Create a new list of explicit dictionaries for better QML compatibility
             result = []

@@ -314,7 +314,7 @@ class DataStore(QObject):
             
             if result:
                 factor = float(result[0])
-                print(f"Found exact match: {factor}")
+                # print(f"Found exact match: {factor}")
                 return factor
             
             # If no exact match, get next lower and higher values

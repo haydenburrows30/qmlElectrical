@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../"  // Import for WaveCard component
+import "../buttons"  // Add this import for ExportButton
 
 Item {
     id: protectionSection
@@ -32,12 +33,56 @@ Item {
                 id: mainLayout
                 width: scrollView.width
 
-                Button {
-                    text: "Calculate Complete System"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 250
-                    Layout.bottomMargin: 10
-                    onClicked: calculate()
+                // Add export button at the top
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.margins: 10
+                    
+                    Button {
+                        text: "Calculate Complete System"
+                        Layout.alignment: Qt.AlignLeft
+                        Layout.preferredWidth: 250
+                        onClicked: calculate()
+                    }
+                    
+                    ExportButton {
+                        Layout.alignment: Qt.AlignRight
+                        defaultFileName: "protection_requirements.pdf"
+                        onExport: function(fileUrl) {
+                            if (transformerReady && windTurbineReady) {
+                                // Collect data from both calculators
+                                let data = {
+                                    // Wind turbine protection data
+                                    "wind_power": totalGeneratedPower,
+                                    "generator_current": ((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)),
+                                    "generator_capacity": totalGeneratedPower * 1.2,
+                                    
+                                    // Transformer protection data
+                                    "transformer_rating": transformerCalculator.transformerRating,
+                                    "relay_settings": {
+                                        "pickup_current": transformerCalculator.relayPickupCurrent,
+                                        "ct_ratio": transformerCalculator.relayCtRatio,
+                                        "curve_type": transformerCalculator.relayCurveType
+                                    },
+                                    
+                                    // Protection requirements
+                                    "voltage_protection": {
+                                        "under_voltage": "0.8 × Un",
+                                        "over_voltage": "1.1 × Un",
+                                        "time_delay": "2.0s"
+                                    },
+                                    "frequency_protection": {
+                                        "under_freq": "47.5 Hz",
+                                        "over_freq": "51.5 Hz",
+                                        "rocof": "0.5 Hz/s"
+                                    }
+                                }
+                                
+                                // Export using transformer calculator's PDF generator
+                                transformerCalculator.exportProtectionReport(data, fileUrl)
+                            }
+                        }
+                    }
                 }
 
                 RowLayout {
