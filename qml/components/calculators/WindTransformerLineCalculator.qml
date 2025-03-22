@@ -60,29 +60,6 @@ Item {
         anchors.fill: parent
         spacing: 20
         
-        // // Title
-        // Text {
-        //     Layout.alignment: Qt.AlignHCenter
-        //     text: "Wind Turbine with Transformer & Line Protection"
-        //     font.pixelSize: 24
-        //     font.bold: true
-        //     color: "#2c3e50"
-        // }
-        
-        // Text {
-        //     Layout.alignment: Qt.AlignHCenter
-        //     text: "400V Wind Turbine to 11kV Transformer with 5km Cable"
-        //     font.pixelSize: 16
-        //     color: "#7f8c8d"
-        // }
-        
-        // System diagram
-        // SingleLineDiagram {
-        //     Layout.fillWidth: true
-        //     Layout.preferredHeight: 180
-        //     Layout.margins: 10
-        // }
-        
         TabBar {
             id: tabBar
             Layout.fillWidth: true
