@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
+import QtQuick.Controls.Universal
+
 import "../"
 import "../buttons"
 import "../popups"
@@ -415,6 +417,11 @@ Item {
                             onClicked: {
                                 calculate()
                                 updatePowerCurve()
+                            }
+
+                            background: Rectangle {
+                                color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                radius: 2
                             }
                         }
                         

@@ -18,15 +18,18 @@ GridLayout {
         font.bold: true
         font.pixelSize: 14
         Layout.columnSpan: 2
+        color: sideBar.toggle1 ? "white" : "black"
     }
     
     Text { 
         text: "Generator Circuit Breaker:" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: (((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)) * 1.25).toFixed(0) + " A (125% of full load current)"
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
 
     // Protection Functions Section
@@ -44,69 +47,84 @@ GridLayout {
         font.bold: true
         font.pixelSize: 14
         Layout.columnSpan: 2
+        color: sideBar.toggle1 ? "white" : "black"
     }
 
     Text { 
         text: "Overcurrent (ANSI 50/51):" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text {
         text: (((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)) * 1.1).toFixed(0) + " A" 
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
 
     Text { 
         text: "Earth Fault (ANSI 50N/51N):" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: "20% of rated current" 
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
     
     Text { 
         text: "Overvoltage (ANSI 59):" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: "110% of 400V" 
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
     
     Text { 
         text: "Undervoltage (ANSI 27):" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: "80% of 400V" 
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
     
     Text { 
         text: "Over/Under Frequency (ANSI 81O/U):" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: "±2% of nominal" 
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
     
     Text { 
         text: "Reverse Power (ANSI 32):" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: "5% of rated power" 
         font.bold: true
+        color: sideBar.toggle1 ? "white" : "black"
     }
 
     Text { 
         text: "Anti-Islanding Protection:" 
         leftPadding: 10
+        color: sideBar.toggle1 ? "white" : "black"
     }
     Text { 
         text: "Rate of Change of Frequency (ROCOF) or Vector Shift"
         font.bold: true
         wrapMode: Text.WordWrap
+        color: sideBar.toggle1 ? "white" : "black"
     }
 }

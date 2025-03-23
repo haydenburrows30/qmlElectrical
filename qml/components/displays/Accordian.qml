@@ -80,7 +80,6 @@ Pane {
                         anchors.right: parent.right
                         text: "LV Wind Generator Protection (400V)"
                         onClicked: paneSettingsList.shown = !paneSettingsList.shown
-                        
                     }
 
                     Pane {

@@ -23,33 +23,40 @@ ColumnLayout {
             font.pixelSize: 14
             Layout.columnSpan: 2
             Layout.topMargin: 5
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Operating Mode:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "3-phase, IEC Very Inverse (VI)"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Startup Value:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: (safeValueFunction(transformerCalculator.relayPickupCurrent, 0) * 1.1).toFixed(1) + " A"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Time Multiplier:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "0.4 (coordinate with downstream)"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
             // Earth Fault Section
@@ -67,33 +74,40 @@ ColumnLayout {
             font.bold: true
             font.pixelSize: 14
             Layout.columnSpan: 2
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Operating Mode:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "IEC Extremely Inverse (EI)"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Startup Value:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: (safeValueFunction(transformerCalculator.relayPickupCurrent, 0) * 0.2).toFixed(1) + " A (20% of rated)"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Time Multiplier:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "0.5"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
             // Instantaneous Overcurrent
@@ -111,24 +125,29 @@ ColumnLayout {
             font.bold: true
             font.pixelSize: 14
             Layout.columnSpan: 2
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Startup Value:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: (safeValueFunction(transformerCalculator.faultCurrentHV, 0) * 0.8).toFixed(1) + " A (80% of fault current)"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Operating Delay:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "100 ms"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
             // Directional Overcurrent
@@ -146,24 +165,29 @@ ColumnLayout {
             font.bold: true
             font.pixelSize: 14
             Layout.columnSpan: 2
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Direction Mode:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "Forward (from wind turbine to grid)"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Characteristic Angle:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "60°"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
             // Additional Functions
@@ -181,42 +205,51 @@ ColumnLayout {
             font.bold: true
             font.pixelSize: 14
             Layout.columnSpan: 2
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Auto-Reclosing (ANSI 79):"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "Enabled with 1 fast + 1 delayed cycle"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Undervoltage (ANSI 27):"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "0.8 × Un, delay 3.0s"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Overvoltage (ANSI 59):"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "1.1 × Un, delay 2.0s"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text { 
             text: "Breaker Failure (ANSI 50BF):"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text { 
             text: "Enabled, operate time 150ms"
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
             // Ring Main Unit Configuration
@@ -234,37 +267,44 @@ ColumnLayout {
             font.pixelSize: 14
             Layout.columnSpan: 2
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
         
         Text {
             text: "Equipment:"
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text {
             text: "SafeRing/SafePlus with vacuum circuit breaker module (V)"
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
         Text {
             text: "CT Ratio: "
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text {
             text: (transformerReady ? transformerCalculator.relayCtRatio : "300/1")
             wrapMode: Text.WordWrap
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
         Text {
             text: "VT Ratio: "
             leftPadding: 10
+            color: sideBar.toggle1? "white": "black"
         }
         Text {
             text: "11000/110V"
             wrapMode: Text.WordWrap
             font.bold: true
+            color: sideBar.toggle1? "white": "black"
         }
 
         Rectangle {
@@ -280,6 +320,7 @@ ColumnLayout {
             text: "Installation Requirements:"
             font.bold: true
             Layout.columnSpan: 2
+            color: sideBar.toggle1? "white": "black"
         }
         
         Column {
@@ -292,16 +333,19 @@ ColumnLayout {
                 text: "• Ensure SF6 gas pressure monitoring is connected to alarm"
                 wrapMode: Text.WordWrap
                 width: parent.width
+                color: sideBar.toggle1? "white": "black"
             }
             Text {
                 text: "• Configure local/remote control mode selection"
                 wrapMode: Text.WordWrap
                 width: parent.width
+                color: sideBar.toggle1? "white": "black"
             }
             Text {
                 text: "• Connect motor operators for remote circuit breaker control"
                 wrapMode: Text.WordWrap
                 width: parent.width
+                color: sideBar.toggle1? "white": "black"
             }
         }
     }

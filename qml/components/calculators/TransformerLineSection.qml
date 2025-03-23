@@ -241,7 +241,7 @@ Item {
                     WaveCard {
                         title: "Load Parameters (From Wind Turbine Output)"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 230  // Increased height for new field
+                        Layout.preferredHeight: 180
                         
                         GridLayout {
                             anchors.fill: parent
@@ -307,17 +307,7 @@ Item {
                                     }
                                 }
                             }
-                            
-                            Button {
-                                text: "Calculate System"
-                                Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignRight
-                                onClicked: {
-                                    calculate();
-                                    // Ensure MVA field is updated after calculation
-                                    loadMVAField.text = calculator.loadMVA.toFixed(3);
-                                }
-                            }
+
                         }
                     }
 
@@ -494,384 +484,380 @@ Item {
                         }
                     }
                 }
-
-                RowLayout {
+                ColumnLayout {
+                    Layout.minimumWidth: 400
+                    Layout.maximumWidth: 400
                     Layout.alignment: Qt.AlignTop
-
-                    ColumnLayout {
-                        Layout.minimumWidth: 400
-                        Layout.maximumWidth: 400
+                    
+                    // System results section
+                    WaveCard {
+                        title: "Electrical System Results"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 450
                         
-                        // System results section
-                        WaveCard {
-                            title: "Electrical System Results"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 450
+                        GridLayout {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            columns: 2
+                            columnSpacing: 20
+                            rowSpacing: 10
                             
-                            GridLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                columns: 2
-                                columnSpacing: 20
-                                rowSpacing: 10
-                                
-                                Label { text: "Transformer Z (Ohms):" }
-                                TextField {
-                                    id: transformerZOhmsText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Transformer R (Ohms):" }
-                                TextField {
-                                    id: transformerROhmsText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.transformerROhms, 0).toFixed(3) : "0.000"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Transformer X (Ohms):" }
-                                TextField {
-                                    id: transformerXOhmsText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Line Total Z (Ohms):" }
-                                TextField {
-                                    id: lineTotalZText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Natural Voltage Drop (%):" }
-                                TextField {
-                                    id: voltageDropText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2) : "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Fault Current at LV Side (kA):" }
-                                TextField {
-                                    id: faultCurrentLVText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Fault Current at HV Side (kA):" }
-                                TextField {
-                                    id: faultCurrentHVText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                Label { text: "Unregulated Voltage (kV):" }
-                                TextField {
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? 
-                                        safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
-                                        "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
-                                }
-                                
-                                // Add export button
-                                ExportButton {
-                                    Layout.columnSpan: 2
-                                    Layout.alignment: Qt.AlignRight
-                                    defaultFileName: "transformer_report.pdf"
-                                    onExport: function(fileUrl) {
-                                        if (calculatorReady) {
-                                            // Prepare data for PDF
-                                            let data = {
-                                                "transformer_rating": calculator.transformerRating,
-                                                "transformer_impedance": calculator.transformerImpedance,
-                                                "transformer_xr_ratio": calculator.transformerXRRatio,
-                                                "transformer_z": calculator.transformerZOhms,
-                                                "transformer_r": calculator.transformerROhms,
-                                                "transformer_x": calculator.transformerXOhms,
-                                                "ground_fault_current": calculator.groundFaultCurrent,
-                                                "ct_ratio": calculator.relayCtRatio,
-                                                "relay_pickup_current": calculator.relayPickupCurrent,
-                                                "relay_curve_type": calculator.relayCurveType,
-                                                "time_dial": calculator.relayTimeDial
-                                            }
-                                            calculator.exportTransformerReport(data, fileUrl)
-                                        }
-                                    }
+                            Label { text: "Transformer Z (Ohms):" }
+                            TextField {
+                                id: transformerZOhmsText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
                             }
-                        }
-
-                        // Transformer protection section
-                        WaveCard {
-                            id: transformerProtectionCard
-                            title: "Transformer Protection Settings"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 260
-
-                            // showSettings: true
                             
-                            GridLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                columns: 2
-                                columnSpacing: 20
-                                rowSpacing: 10
-                                
-                                Label { text: "Relay Pickup Current (A):" }
-                                TextField {
-                                    id: relayPickupCurrentText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            Label { text: "Transformer R (Ohms):" }
+                            TextField {
+                                id: transformerROhmsText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.transformerROhms, 0).toFixed(3) : "0.000"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "CT Ratio:" }
-                                TextField {
-                                    id: relayCtRatioText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? calculator.relayCtRatio : "300/1"  // Updated default value
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                            
+                            Label { text: "Transformer X (Ohms):" }
+                            TextField {
+                                id: transformerXOhmsText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Relay Curve Type:" }
-                                TextField {
-                                    id: relayCurveTypeText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                            
+                            Label { text: "Line Total Z (Ohms):" }
+                            TextField {
+                                id: lineTotalZText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Time Dial Setting:" }
-                                TextField {
-                                    id: relayTimeDialText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                            
+                            Label { text: "Natural Voltage Drop (%):" }
+                            TextField {
+                                id: voltageDropText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2) : "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Button {
-                                    text: "Expert Settings..."
-                                    Layout.columnSpan: 2
-                                    Layout.alignment: Qt.AlignRight
-                                    onClicked: {
-                                        // Force calculator to use current MVA and power factor
-                                        if (calculatorReady) {
-                                            // Update values just to be sure
-                                            calculator.setLoadMVA(parseFloat(loadMVAField.text));
-                                            calculator.setLoadPowerFactor(loadPowerFactorSpinBox.realValue);
-                                            calculator.refreshCalculations();
+                            }
+                            
+                            Label { text: "Fault Current at LV Side (kA):" }
+                            TextField {
+                                id: faultCurrentLVText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Fault Current at HV Side (kA):" }
+                            TextField {
+                                id: faultCurrentHVText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Unregulated Voltage (kV):" }
+                            TextField {
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? 
+                                    safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
+                                    "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            // Add export button
+                            ExportButton {
+                                Layout.columnSpan: 2
+                                Layout.alignment: Qt.AlignRight
+                                defaultFileName: "transformer_report.pdf"
+                                onExport: function(fileUrl) {
+                                    if (calculatorReady) {
+                                        // Prepare data for PDF
+                                        let data = {
+                                            "transformer_rating": calculator.transformerRating,
+                                            "transformer_impedance": calculator.transformerImpedance,
+                                            "transformer_xr_ratio": calculator.transformerXRRatio,
+                                            "transformer_z": calculator.transformerZOhms,
+                                            "transformer_r": calculator.transformerROhms,
+                                            "transformer_x": calculator.transformerXOhms,
+                                            "ground_fault_current": calculator.groundFaultCurrent,
+                                            "ct_ratio": calculator.relayCtRatio,
+                                            "relay_pickup_current": calculator.relayPickupCurrent,
+                                            "relay_curve_type": calculator.relayCurveType,
+                                            "time_dial": calculator.relayTimeDial
                                         }
-                                        expertProtectionPopup.open();
+                                        calculator.exportTransformerReport(data, fileUrl)
                                     }
                                 }
                             }
-                        }
-
-                        // Enhanced ExpertProtectionPopup with proper value passing
-                        ExpertProtectionPopup {
-                            id: expertProtectionPopup
-                            calculator: transformerLineSection.calculator
-                            safeValueFunction: function(value, defaultVal) {
-                                // Enhanced safe value function that handles null, undefined, NaN
-                                if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
-                                    return defaultVal;
-                                }
-                                return value;
-                            }
-                            x: Math.round((parent.width - width) / 2)
-                            y: Math.round((parent.height - height) / 2)
                         }
                     }
 
-                    ColumnLayout {
-                        Layout.minimumWidth: 400
-                        Layout.maximumWidth: 400
-                        Layout.alignment: Qt.AlignTop
-                                        
-                        // Cable selection guide
-                        WaveCard {
-                            title: "Cable Selection Guide for Wind Turbine Connection"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 150
-                            Layout.alignment: Qt.AlignTop
+                    // Transformer protection section
+                    WaveCard {
+                        id: transformerProtectionCard
+                        title: "Transformer Protection Settings"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 260
+
+                        // showSettings: true
+                        
+                        GridLayout {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            columns: 2
+                            columnSpacing: 20
+                            rowSpacing: 10
                             
-                            GridLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                columns: 2
-                                columnSpacing: 20
-                                rowSpacing: 10
-                                
-                                Label { text: "Recommended HV Cable Size:" }
-                                TextField {
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            Label { text: "Relay Pickup Current (A):" }
+                            TextField {
+                                id: relayPickupCurrentText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Recommended LV Cable Size:" }
-                                TextField {
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? calculator.recommendedLVCable : "25 mm²"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
+                            }
+                            
+                            Label { text: "CT Ratio:" }
+                            TextField {
+                                id: relayCtRatioText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? calculator.relayCtRatio : "300/1"  // Updated default value
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Relay Curve Type:" }
+                            TextField {
+                                id: relayCurveTypeText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Time Dial Setting:" }
+                            TextField {
+                                id: relayTimeDialText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Button {
+                                text: "Expert Settings..."
+                                Layout.columnSpan: 2
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    // Force calculator to use current MVA and power factor
+                                    if (calculatorReady) {
+                                        // Update values just to be sure
+                                        calculator.setLoadMVA(parseFloat(loadMVAField.text));
+                                        calculator.setLoadPowerFactor(loadPowerFactorSpinBox.realValue);
+                                        calculator.refreshCalculations();
                                     }
+                                    expertProtectionPopup.open();
                                 }
                             }
                         }
+                    }
+
+                    // Enhanced ExpertProtectionPopup with proper value passing
+                    ExpertProtectionPopup {
+                        id: expertProtectionPopup
+                        calculator: transformerLineSection.calculator
+                        safeValueFunction: function(value, defaultVal) {
+                            // Enhanced safe value function that handles null, undefined, NaN
+                            if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
+                                return defaultVal;
+                            }
+                            return value;
+                        }
+                        x: Math.round((parent.width - width) / 2)
+                        y: Math.round((parent.height - height) / 2)
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.minimumWidth: 400
+                    Layout.maximumWidth: 400
+                    Layout.alignment: Qt.AlignTop
+                                    
+                    // Cable selection guide
+                    WaveCard {
+                        title: "Cable Selection Guide for Wind Turbine Connection"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 150
+                        Layout.alignment: Qt.AlignTop
                         
-                        // Add regulator results section
-                        WaveCard {
-                            title: "Voltage Regulation Results"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 280
-                            visible: regulatorEnabledSwitch.checked
-                            Layout.alignment: Qt.AlignTop
+                        GridLayout {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            columns: 2
+                            columnSpacing: 20
+                            rowSpacing: 10
                             
-                            GridLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                columns: 2
-                                columnSpacing: 20
-                                rowSpacing: 10
-                                
-                                Label { text: "Unregulated Voltage (kV):" }
-                                TextField {
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? 
-                                        ((11 * (1 - safeValueFunction(calculator.voltageDrop, 0) / 100))).toFixed(2) : 
-                                        "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            Label { text: "Recommended HV Cable Size:" }
+                            TextField {
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Regulated Voltage (kV):" }
-                                TextField {
-                                    id: regulatedVoltageText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2) : "0.00"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                            
+                            Label { text: "Recommended LV Cable Size:" }
+                            TextField {
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? calculator.recommendedLVCable : "25 mm²"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Tap Position:" }
-                                TextField {
-                                    id: regulatorTapPositionText
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.regulatorTapPosition, 0).toString() : "0"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                        }
+                    }
+                    
+                    // Add regulator results section
+                    WaveCard {
+                        title: "Voltage Regulation Results"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 280
+                        visible: regulatorEnabledSwitch.checked
+                        Layout.alignment: Qt.AlignTop
+                        
+                        GridLayout {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            columns: 2
+                            columnSpacing: 20
+                            rowSpacing: 10
+                            
+                            Label { text: "Unregulated Voltage (kV):" }
+                            TextField {
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? 
+                                    ((11 * (1 - safeValueFunction(calculator.voltageDrop, 0) / 100))).toFixed(2) : 
+                                    "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Step Size (%):" }
-                                TextField {
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: (calculator.voltageRegulatorRange / 16).toFixed(3)
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                            
+                            Label { text: "Regulated Voltage (kV):" }
+                            TextField {
+                                id: regulatedVoltageText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2) : "0.00"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
-                                
-                                Label { text: "Total 3-Phase Capacity (kVA):" }
-                                TextField {
-                                    readOnly: true
-                                    Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.regulatorThreePhaseCapacity, 0).toFixed(0) : "555"
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        border.color: "#0078d7"
-                                        radius: 2
-                                    }
+                            }
+                            
+                            Label { text: "Tap Position:" }
+                            TextField {
+                                id: regulatorTapPositionText
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.regulatorTapPosition, 0).toString() : "0"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Step Size (%):" }
+                            TextField {
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: (calculator.voltageRegulatorRange / 16).toFixed(3)
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Total 3-Phase Capacity (kVA):" }
+                            TextField {
+                                readOnly: true
+                                Layout.fillWidth: true
+                                text: calculatorReady ? safeValueFunction(calculator.regulatorThreePhaseCapacity, 0).toFixed(0) : "555"
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
                                 }
                             }
                         }
