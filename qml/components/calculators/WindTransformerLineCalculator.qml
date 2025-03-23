@@ -50,7 +50,7 @@ Item {
         if (windTurbineReady && transformerReady) {
             // Update transformer load based on wind turbine output
             // Wind turbine output in kW, transformer needs MVA
-            var turbinePower = windTurbineCalculator.powerInKW / 1000;
+            var turbinePower = windTurbineCalculator.actualPower / 1000;
             transformerCalculator.setLoadMVA(turbinePower);
         }
     }

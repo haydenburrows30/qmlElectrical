@@ -335,11 +335,7 @@ Pane {
                         }
                     }
                 }
-
             }
         }
-
-        ScrollIndicator.vertical: ScrollIndicator { }
-
     }
 }

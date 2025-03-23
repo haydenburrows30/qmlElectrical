@@ -18,12 +18,14 @@ Item {
     function updateDisplayValues() {
         if (!calculatorReady) return
         
+        loadMVAField.text = calculator.loadMVA.toFixed(3);
+        
         // Update transformer/line values
         transformerZOhmsText.text = safeValueFunction(calculator.transformerZOhms, 0).toFixed(3)
         transformerROhmsText.text = safeValueFunction(calculator.transformerROhms, 0).toFixed(3)
         transformerXOhmsText.text = safeValueFunction(calculator.transformerXOhms, 0).toFixed(3)
         lineTotalZText.text = safeValueFunction(calculator.lineTotalZ, 0).toFixed(3)
-        voltageDropText.text = safeValueFunction(calculator.voltageDrop, 0).toFixed(2)
+        voltageDropText.text = safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2)
         faultCurrentLVText.text = safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2)
         faultCurrentHVText.text = safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2)
         
@@ -38,6 +40,13 @@ Item {
         regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
     }
 
+    // Only update MVA when power changes, let power factor changes handle themselves
+    onTotalGeneratedPowerChanged: {
+        if (calculatorReady) {
+            calculator.setLoadMVA(totalGeneratedPower / 1000000)
+        }
+    }
+
     // Update display when load parameters change
     Connections {
         target: calculator
@@ -46,13 +55,6 @@ Item {
             if (calculatorReady) {
                 transformerLineSection.updateDisplayValues()
             }
-        }
-    }
-
-    // Only update MVA when power changes, let power factor changes handle themselves
-    onTotalGeneratedPowerChanged: {
-        if (calculatorReady) {
-            calculator.setLoadMVA(totalGeneratedPower / 1000000)
         }
     }
 
@@ -239,7 +241,7 @@ Item {
                     WaveCard {
                         title: "Load Parameters (From Wind Turbine Output)"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 200
+                        Layout.preferredHeight: 230  // Increased height for new field
                         
                         GridLayout {
                             anchors.fill: parent
@@ -253,6 +255,19 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: (totalGeneratedPower / 1000).toFixed(3)
+                                background: Rectangle {
+                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    border.color: "#0078d7"
+                                    radius: 2
+                                }
+                            }
+                            
+                            Label { text: "Load (MVA):" }
+                            TextField {
+                                id: loadMVAField
+                                readOnly: false
+                                Layout.fillWidth: true
+                                text: { calculator.loadMVA.toFixed(3) }
                                 background: Rectangle {
                                     color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
@@ -281,7 +296,14 @@ Item {
                                 
                                 onValueModified: {
                                     if (calculatorReady) {
-                                        calculator.setLoadPowerFactorMaintainPower(realValue)
+                                        console.log("Setting power factor to:", realValue);
+                                        calculator.setLoadPowerFactorMaintainPower(realValue);
+                                        
+                                        // Update MVA field after power factor change
+                                        loadMVAField.text = calculator.loadMVA.toFixed(3);
+                                        
+                                        // Force UI update immediately
+                                        transformerLineSection.updateDisplayValues();
                                     }
                                 }
                             }
@@ -290,7 +312,11 @@ Item {
                                 text: "Calculate System"
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
-                                onClicked: calculate()
+                                onClicked: {
+                                    calculate();
+                                    // Ensure MVA field is updated after calculation
+                                    loadMVAField.text = calculator.loadMVA.toFixed(3);
+                                }
                             }
                         }
                     }
@@ -546,7 +572,7 @@ Item {
                                     id: voltageDropText
                                     readOnly: true
                                     Layout.fillWidth: true
-                                    text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0).toFixed(2) : "0.00"
+                                    text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2) : "0.00"
                                     background: Rectangle {
                                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         border.color: "#0078d7"
@@ -694,15 +720,31 @@ Item {
                                     text: "Expert Settings..."
                                     Layout.columnSpan: 2
                                     Layout.alignment: Qt.AlignRight
-                                    onClicked: expertProtectionPopup.open()
+                                    onClicked: {
+                                        // Force calculator to use current MVA and power factor
+                                        if (calculatorReady) {
+                                            // Update values just to be sure
+                                            calculator.setLoadMVA(parseFloat(loadMVAField.text));
+                                            calculator.setLoadPowerFactor(loadPowerFactorSpinBox.realValue);
+                                            calculator.refreshCalculations();
+                                        }
+                                        expertProtectionPopup.open();
+                                    }
                                 }
                             }
                         }
 
+                        // Enhanced ExpertProtectionPopup with proper value passing
                         ExpertProtectionPopup {
                             id: expertProtectionPopup
                             calculator: transformerLineSection.calculator
-                            safeValueFunction: transformerLineSection.safeValueFunction
+                            safeValueFunction: function(value, defaultVal) {
+                                // Enhanced safe value function that handles null, undefined, NaN
+                                if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
+                                    return defaultVal;
+                                }
+                                return value;
+                            }
                             x: Math.round((parent.width - width) / 2)
                             y: Math.round((parent.height - height) / 2)
                         }
@@ -844,7 +886,7 @@ Item {
             }
         }
     }
-    
+
     Timer {
         id: updateTimer
         interval: 250
@@ -857,29 +899,12 @@ Item {
         }
     }
 
-    // Popup {
-    //     id: regulatorPopup
-    //     x: Math.round((transformerLineSection.width - width) / 2)
-    //     y: Math.round((transformerLineSection.height - height) / 2)
-
-    //     contentItem: VoltageRegPopup {}
-
-    //     visible: regulatorCard.open
-    //     onClosed: {
-    //         regulatorCard.open = false
-    //     }
-    // }
-
-    // Popup {
-    //     id: transformerPopup
-    //     x: Math.round((transformerLineSection.width - width) / 2)
-    //     y: Math.round((transformerLineSection.height - height) / 2)
-
-    //     contentItem: ProtectionRequirementsPopup {}
-
-    //     visible: transformerProtectionCard.open
-    //     onClosed: {
-    //         transformerProtectionCard.open = false
-    //     }
-    // }
+    // Enhanced safeValueFunction implementation directly in the component
+    function safeValueFunction(value, defaultVal) {
+        // Enhanced safe value function that handles null, undefined, NaN
+        if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
+            return defaultVal;
+        }
+        return value;
+    }
 }

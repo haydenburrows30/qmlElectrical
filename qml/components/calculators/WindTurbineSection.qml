@@ -201,7 +201,7 @@ Item {
                                 defaultFileName: "wind_turbine_report.pdf"
                                 onExport: function(fileUrl) {
                                     if (calculatorReady) {
-                                        let genCurrent = (calculator.powerInKW * 1000) / (Math.sqrt(3) * 400)
+                                        let genCurrent = (calculator.actualPower) / (Math.sqrt(3) * 400)
                                         
                                         calculator.exportWindTurbineReport(fileUrl)
                                     }

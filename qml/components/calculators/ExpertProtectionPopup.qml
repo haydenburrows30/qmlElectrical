@@ -12,6 +12,18 @@ Popup {
     property var calculator
     property var safeValueFunction
     
+    // Force a refresh when opened
+    onOpened: {
+        if (calculator) {
+            try {
+                calculator.refreshCalculations();
+                gridLayout.forceActiveFocus();
+            } catch (e) {
+                console.error("Error refreshing calculations:", e);
+            }
+        }
+    }
+    
     ColumnLayout {
         anchors.fill: parent
         spacing: 10
@@ -27,6 +39,7 @@ Popup {
             Layout.fillHeight: true
             
             GridLayout {
+                id: gridLayout
                 width: parent.width
                 columns: 2
                 columnSpacing: 20
@@ -41,9 +54,10 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: {
-                        let z_base = (calculator.transformerRating * 1000) / (calculator.transformerImpedance / 100)
-                        let z0 = 0.85 * z_base
-                        return safeValueFunction(z0, 0).toFixed(3)
+                        if (!calculator) return "0.000";
+                        let z_base = safeValueFunction((calculator.transformerRating * 1000) / (calculator.transformerImpedance / 100), 1);
+                        let z0 = 0.85 * z_base;
+                        return safeValueFunction(z0, 0).toFixed(3);
                     }
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
@@ -57,9 +71,12 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: {
-                        let z = Math.sqrt(Math.pow(3 * calculator.lineR * calculator.lineLength, 2) + 
-                                        Math.pow(3 * calculator.lineX * calculator.lineLength, 2))
-                        return safeValueFunction(z, 0).toFixed(3)
+                        if (!calculator) return "0.000";
+                        let z = Math.sqrt(Math.pow(3 * safeValueFunction(calculator.lineR, 0.25) * 
+                                         safeValueFunction(calculator.lineLength, 5), 2) + 
+                                        Math.pow(3 * safeValueFunction(calculator.lineX, 0.2) * 
+                                         safeValueFunction(calculator.lineLength, 5), 2));
+                        return safeValueFunction(z, 0).toFixed(3);
                     }
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
@@ -72,7 +89,13 @@ Popup {
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: safeValueFunction(calculator.groundFaultCurrent, 0).toFixed(3)
+                    text: {
+                        if (!calculator) return "0.000";
+                        // Calculate neutral grounding impedance referred to HV side
+                        let z_ng = 5.0; // Default neutral grounding resistance
+                        let z_ng_referred = z_ng * Math.pow(11000 / 400, 2);
+                        return safeValueFunction(z_ng_referred, 0).toFixed(1);
+                    }
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -84,7 +107,7 @@ Popup {
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: (Math.acos(calculator.loadPowerFactor) * 180 / Math.PI).toFixed(1)
+                    text: calculator ? (Math.acos(safeValueFunction(calculator.loadPowerFactor, 0.85)) * 180 / Math.PI).toFixed(1) : "0.0"
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -92,15 +115,51 @@ Popup {
                     }
                 }
                 
-                Label { text: "Load Current:" }
+                Label { text: "Load MVA Value:" }
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: {
-                        let i = (calculator.loadMVA * 1e6) / (Math.sqrt(3) * 11000)
-                        let angle = Math.acos(calculator.loadPowerFactor)
-                        return `${i.toFixed(1)}∠${(-angle * 180 / Math.PI).toFixed(1)}° A`
+                    text: calculator ? (safeValueFunction(calculator.loadMVA, 0.001)).toFixed(3): "0.001"
+                    background: Rectangle {
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
+                        border.color: "#0078d7"
+                        radius: 2
                     }
+                }
+                
+                Label { text: "Load Current (A):" }
+                TextField {
+                    id: loadCurrentField
+                    readOnly: true
+                    Layout.fillWidth: true
+                    text: {
+                        if (!calculator) return "0.0∠0° A";
+                        
+                        // Get MVA from calculator, ensuring we have a minimum value
+                        let loadMVA = Math.max(0.001, safeValueFunction(calculator.loadMVA, 0.001));
+                        
+                        // Calculate load current in amps at 11kV (line-to-line voltage)
+                        let currentMagnitude = (loadMVA * 1000000) / (Math.sqrt(3) * 11000);
+                        
+                        // Calculate angle using power factor
+                        let powerFactor = safeValueFunction(calculator.loadPowerFactor, 0.85);
+                        let angle = Math.acos(powerFactor);
+                        
+                        // Format with angle notation
+                        return `${currentMagnitude.toFixed(1)}∠${(-angle * 180 / Math.PI).toFixed(1)}° A`;
+                    }
+                    background: Rectangle {
+                        color: sideBar.toggle1 ? "black":"#e8f6ff"
+                        border.color: "#0078d7"
+                        radius: 2
+                    }
+                }
+                
+                Label { text: "Ground Fault Current (A):" }
+                TextField {
+                    readOnly: true
+                    Layout.fillWidth: true
+                    text: calculator ? safeValueFunction(calculator.groundFaultCurrent, 10).toFixed(2) : "0.00"
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -112,7 +171,9 @@ Popup {
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: `${calculator.voltageDrop.toFixed(2)}% ∠${(Math.acos(calculator.loadPowerFactor) * 180 / Math.PI).toFixed(1)}°`
+                    text: calculator ? 
+                        `${safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2)}% ∠${(Math.acos(safeValueFunction(calculator.loadPowerFactor, 0.85)) * 180 / Math.PI).toFixed(1)}°` : 
+                        "0.00% ∠0.0°"
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -124,7 +185,9 @@ Popup {
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: `${(calculator.unregulatedVoltage).toFixed(2)} kV`
+                    text: calculator ? 
+                        `${safeValueFunction(calculator.unregulatedVoltage, 11).toFixed(2)} kV` : 
+                        "11.00 kV"
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -141,13 +204,12 @@ Popup {
                 }
 
                 Label { text: "Protection Settings"; font.bold: true ; Layout.columnSpan: 2 }
-                // Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
                 
-                Label { text: "Ground Fault Current (A):" }
+                Label { text: "Relay Pickup Current (A):" }
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: calculator ? safeValueFunction(calculator.groundFaultCurrent, 0).toFixed(2) : "0.00"
+                    text: calculator ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -199,7 +261,7 @@ Popup {
                 TextField {
                     readOnly: true
                     Layout.fillWidth: true
-                    text: calculator ? safeValueFunction(calculator.differentialRelaySlope, 0).toString() : "25"
+                    text: calculator ? safeValueFunction(calculator.differentialRelaySlope, 25).toString() : "25"
                     background: Rectangle {
                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                         border.color: "#0078d7"
@@ -222,8 +284,15 @@ Popup {
         }
         
         Button {
+            text: "Refresh Values"
+            Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+            Layout.rightMargin: 80
+            onClicked: calculator.refreshCalculations();
+        }
+        
+        Button {
             text: "Close"
-            Layout.alignment: Qt.AlignRight
+            Layout.alignment: Qt.AlignRight | Qt.AlignBottom
             onClicked: expertPopup.close()
         }
     }

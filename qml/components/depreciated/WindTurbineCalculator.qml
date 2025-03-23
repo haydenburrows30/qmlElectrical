@@ -248,7 +248,7 @@ Item {
                             id: powerKWText
                             readOnly: true
                             Layout.fillWidth: true
-                            text: safeValue(calculator.powerInKW, 0).toFixed(2)
+                            text: safeValue(calculator.actualPower, 0).toFixed(2)
                             background: Rectangle {
                                 color: "#e8f6ff"
                                 border.color: "#0078d7"
@@ -412,7 +412,7 @@ Item {
             sweptAreaText.text = safeValue(calculator.sweptArea, 0).toFixed(2)
             theoreticalPowerText.text = safeValue(calculator.theoreticalPower, 0).toFixed(2)
             actualPowerText.text = safeValue(calculator.actualPower, 0).toFixed(2)
-            powerKWText.text = safeValue(calculator.powerInKW, 0).toFixed(2)
+            powerKWText.text = safeValue(calculator.actualPower, 0).toFixed(2)
             annualEnergyText.text = safeValue(calculator.annualEnergy, 0).toFixed(2)
         }
         
