@@ -1,8 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../"  // Import for WaveCard component
-import "../buttons"  // Add this import
+import "../"
+import "../buttons"
+import "../popups"
 
 Item {
     id: transformerLineSection
@@ -76,12 +77,13 @@ Item {
                 width: scrollView.width
 
                 ColumnLayout {
+
                     Layout.maximumWidth: 400
                     Layout.minimumWidth: 400
                     
                     Layout.alignment: Qt.AlignTop
             
-                    // Transformer parameters section
+                        // Transformer parameters section
                     WaveCard {
                         title: "Transformer Parameters (400V to 11kV)"
                         Layout.fillWidth: true
@@ -152,7 +154,7 @@ Item {
                         }
                     }
                     
-                    // Line parameters section
+                        // Line parameters section
                     WaveCard {
                         title: "Line Parameters (5km Cable)"
                         Layout.fillWidth: true
@@ -233,7 +235,7 @@ Item {
                         }
                     }
                     
-                    // Load parameters updated by wind turbine output
+                        // Load parameters updated by wind turbine output
                     WaveCard {
                         title: "Load Parameters (From Wind Turbine Output)"
                         Layout.fillWidth: true
@@ -287,18 +289,21 @@ Item {
                             Button {
                                 text: "Calculate System"
                                 Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignHCenter
+                                Layout.alignment: Qt.AlignRight
                                 onClicked: calculate()
                             }
                         }
                     }
-                    
-                    // Add Voltage Regulator parameters section
+
+                        // Voltage Regulator parameters
                     WaveCard {
+                        id: regulatorCard
                         title: "Voltage Regulator"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 450  // Increased height for additional parameters
-                        
+                        Layout.preferredHeight: 450
+
+                        // showSettings: true
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
@@ -616,12 +621,15 @@ Item {
                                 }
                             }
                         }
-                        
+
                         // Transformer protection section
                         WaveCard {
+                            id: transformerProtectionCard
                             title: "Transformer Protection Settings"
                             Layout.fillWidth: true
                             Layout.preferredHeight: 260
+
+                            // showSettings: true
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -690,10 +698,7 @@ Item {
                                 }
                             }
                         }
-                        
-                        // Remove the old Wind Power Protection card
-                        
-                        // Add expert protection popup
+
                         ExpertProtectionPopup {
                             id: expertProtectionPopup
                             calculator: transformerLineSection.calculator
@@ -851,4 +856,30 @@ Item {
             }
         }
     }
+
+    // Popup {
+    //     id: regulatorPopup
+    //     x: Math.round((transformerLineSection.width - width) / 2)
+    //     y: Math.round((transformerLineSection.height - height) / 2)
+
+    //     contentItem: VoltageRegPopup {}
+
+    //     visible: regulatorCard.open
+    //     onClosed: {
+    //         regulatorCard.open = false
+    //     }
+    // }
+
+    // Popup {
+    //     id: transformerPopup
+    //     x: Math.round((transformerLineSection.width - width) / 2)
+    //     y: Math.round((transformerLineSection.height - height) / 2)
+
+    //     contentItem: ProtectionRequirementsPopup {}
+
+    //     visible: transformerProtectionCard.open
+    //     onClosed: {
+    //         transformerProtectionCard.open = false
+    //     }
+    // }
 }

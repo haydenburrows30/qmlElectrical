@@ -37,6 +37,8 @@ class WindTurbineCalculator(QObject):
         self._theoretical_power = 0.0  # W
         self._actual_power = 0.0       # W
         self._annual_energy = 0.0      # MWh/year
+        self._rated_capacity = 0.0         # kVA
+        self._output_current = 0.0         # A
         self._power_curve = []         # List of (wind_speed, power) tuples
         
         # Initialize calculations
@@ -75,9 +77,16 @@ class WindTurbineCalculator(QObject):
             
             # Calculate annual energy
             average_wind_speed_hours = 0.35 * 365 * 24
-            power_in_kw = self._actual_power / 1000
-            self._annual_energy = power_in_kw * average_wind_speed_hours / 1000
+            self._annual_energy = (self._actual_power / 1000) * average_wind_speed_hours / 1000
             logger.info(f"\nAnnual Energy Production: {self._annual_energy:.2f} MWh")
+
+            # Calculate kVAs
+            self._rated_capacity =  self._actual_power * 1.2 / 1000  # kVA
+            logger.info(f"\nRated Capcacity: {self._rated_capacity:.2f} MVA")
+
+            # Calculate output current
+            self._output_current =  (self._actual_power / 1000) / (math.sqrt(3) * 0.4)  # A at 400V
+            logger.info(f"\nOuput Current: {self._output_current:.2f} MVA")
             
             # Generate power curve
             logger.info("\nGenerating Power Curve...")
@@ -223,16 +232,20 @@ class WindTurbineCalculator(QObject):
     
     @Property(float, notify=calculationsComplete)
     def theoreticalPower(self):
-        return self._theoretical_power
+        return self._theoretical_power / 1000.0  # Convert to kW
     
     @Property(float, notify=calculationsComplete)
     def actualPower(self):
-        return self._actual_power
+        return self._actual_power / 1000.0  # Convert to kW
     
     @Property(float, notify=calculationsComplete)
-    def powerInKW(self):
-        return self._actual_power / 1000.0
+    def ratedCapacity(self):
+        return self._rated_capacity
     
+    @Property(float, notify=calculationsComplete)
+    def outputCurrent(self):
+        return self._output_current
+
     @Property(float, notify=calculationsComplete)
     def annualEnergy(self):
         return self._annual_energy
@@ -241,10 +254,6 @@ class WindTurbineCalculator(QObject):
     def powerCurve(self):
         """Convert power curve data to a format that QML can properly interpret"""
         try:
-            # Debug the data being sent to QML
-            # first_few = self._power_curve[:5]
-            # last_few = self._power_curve[-5:] if len(self._power_curve) >= 5 else []
-            
             # Create a new list of explicit dictionaries for better QML compatibility
             result = []
             for x, y in self._power_curve:

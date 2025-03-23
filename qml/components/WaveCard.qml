@@ -14,7 +14,25 @@ Rectangle {
     property bool showSettings: false
     property bool open: false
 
+    // property var popupContent: Item {}
+
+    // property var popupParent: {"width": 0, "height": 0}
+
     default property alias content: contentItem.data
+
+    // Popup {
+    //     id: helpPopup
+    //     width: popupContent.width
+    //     height: popupContent.height
+    //     x: popupParent["width"]/2 - width / 2
+    //     y: popupParent["height"] //- height
+    //     modal: true
+    //     focus: true
+    //     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+    //     contentItem : popupContent
+
+    // }
 
     Button {
         id: helpButton
@@ -22,7 +40,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         visible: showSettings
-        onClicked: open = true
+        onClicked: open = true //| helpPopup.open()
     }
 
     ColumnLayout {

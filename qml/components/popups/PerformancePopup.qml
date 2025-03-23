@@ -7,7 +7,7 @@ Popup {
     modal: true
     focus: true
     width: 400
-    height: 500  // Made taller to fit new controls
+    height: 500
     
     ColumnLayout {
         anchors.fill: parent

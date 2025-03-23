@@ -139,9 +139,9 @@ Popup {
                     height: 2
                     color: "darkgray"
                 }
-                
-                Label { text: "Ground Fault Parameters" }
-                Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
+
+                Label { text: "Protection Settings"; font.bold: true ; Layout.columnSpan: 2 }
+                // Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
                 
                 Label { text: "Ground Fault Current (A):" }
                 TextField {
@@ -154,10 +154,7 @@ Popup {
                         radius: 2
                     }
                 }
-                
-                Label { text: "Frequency Protection" }
-                Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
-                
+
                 Label { text: "Under/Over Frequency (Hz):" }
                 TextField {
                     readOnly: true
@@ -183,10 +180,7 @@ Popup {
                         radius: 2
                     }
                 }
-                
-                Label { text: "Voltage Protection" }
-                Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
-                
+
                 Label { text: "Under/Over Voltage (pu):" }
                 TextField {
                     readOnly: true
@@ -201,9 +195,6 @@ Popup {
                     }
                 }
                 
-                Label { text: "Differential Protection" }
-                Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
-                
                 Label { text: "Differential Slope (%):" }
                 TextField {
                     readOnly: true
@@ -215,10 +206,7 @@ Popup {
                         radius: 2
                     }
                 }
-                
-                Label { text: "Reverse Power Protection" }
-                Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
-                
+
                 Label { text: "Reverse Power Trip (%):" }
                 TextField {
                     readOnly: true

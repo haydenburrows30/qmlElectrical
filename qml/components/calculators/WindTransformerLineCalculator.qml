@@ -18,8 +18,8 @@ Item {
     property bool windTurbineReady: windTurbineCalculator !== null
     
     // Combined calculated values
-    property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.powerInKW : 0
-    property real windGeneratorCapacity: windTurbineReady ? windTurbineCalculator.powerInKW * 1.2 : 0 // 20% margin
+    property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.actualPower : 0
+    property real windGeneratorCapacity: windTurbineReady ? windTurbineCalculator.actualPower * 1.2 : 0 // 20% margin
     
     Component.onCompleted: {
         // Create calculator instances

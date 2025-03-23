@@ -2,8 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
-import "../"  // Import for WaveCard component
-import "../buttons"  // Add this import for ExportButton
+import "../"
+import "../buttons"
+import "../popups"
 
 Item {
     id: windTurbineSection
@@ -18,59 +19,15 @@ Item {
     signal calculate()
 
     Popup {
-        id: tipsPopup
-        width: 700
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
+        id: lVPopup
+        x: Math.round((windTurbineSection.width - width) / 2)
+        y: Math.round((windTurbineSection.height - height) / 2)
 
-        onAboutToHide: {
-            results.open = false
-        }
-        RowLayout {
-            ColumnLayout {
-                Text {
-                    text: "<b>400V Generator Protection Requirements:</b><br>" +
-                        "• Over/Under Voltage Protection (27/59)<br>" +
-                        "• Over/Under Frequency Protection (81O/81U)<br>" +
-                        "• Overcurrent Protection (50/51)<br>" +
-                        "• Earth Fault Protection (50N/51N)<br>" +
-                        "• Reverse Power Protection (32)<br>" +
-                        "• Loss of Excitation Protection (40)<br>" +
-                        "• Stator Earth Fault Protection<br>" +
-                        "• Anti-Islanding Protection"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
+        contentItem: Gen400VPopup {}
 
-                Text {
-                    text: "<b>Wind Turbine Power Formula:</b><br>" +
-                        "P = ½ × ρ × A × Cp × v³ × η<br>" +
-                        "Where:<br>" +
-                        "P = Power output (W)<br>" +
-                        "ρ = Air density (kg/m³)<br>" +
-                        "A = Swept area (m²) = π × r²<br>" +
-                        "Cp = Power coefficient<br>" +
-                        "v = Wind speed (m/s)<br>" +
-                        "η = Generator efficiency"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                Text {
-                    text: "<b>Notes:</b><br>" +
-                        "• The Betz limit sets the maximum theoretical Cp at 0.593<br>" +
-                        "• Air density varies with altitude and temperature<br>" +
-                        "• Modern large wind turbines typically operate with power coefficient around 0.35-0.45<br>" +
-                        "• The cut-in speed is when the turbine starts generating power<br>" +
-                        "• The cut-out speed is when the turbine shuts down to prevent damage"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-            }
+        visible: windTurbineCard.open
+        onClosed: {
+            windTurbineCard.open = false
         }
     }
         
@@ -96,12 +53,12 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
 
                     WaveCard {
+                        id: windTurbineCard
                         title: "Wind Turbine Parameters"
                         Layout.fillHeight: true
                         Layout.minimumWidth: 350
                         Layout.alignment: Qt.AlignTop
 
-                        id: results
                         showSettings: true
 
                         GridLayout {
@@ -255,7 +212,7 @@ Item {
                     
                     WaveCard {
                         title: "Wind Turbine Output"
-                        Layout.minimumHeight: 480
+                        Layout.minimumHeight: 460
                         Layout.minimumWidth: 400
                         Layout.alignment: Qt.AlignTop
                         
@@ -275,9 +232,15 @@ Item {
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
+
+                                hoverEnabled: true
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
+                                ToolTip.text: "self._swept_area = math.pi * self._blade_radius * self._blade_radius"
                             }
 
-                            Label { text: "Theoretical Power (W):" }
+                            Label { text: "Theoretical Power (kW):" }
                             TextField {
                                 id: theoreticalPowerText
                                 readOnly: true
@@ -288,32 +251,31 @@ Item {
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
+
+                                hoverEnabled: true
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
+                                ToolTip.text: "self._theoretical_power = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)"
                             }
 
-                            Label { text: "Actual Power Output (W):" }
+                            Label { text: "Actual Power Output (kW):" }
                             TextField {
                                 id: actualPowerText
                                 readOnly: true
                                 Layout.fillWidth: true
-                                text: safeValue(calculator.actualPower, 0).toFixed(2)
+                                text: calculatorReady ? safeValueFunction(calculator.actualPower, 0).toFixed(2) : "0.00"
                                 background: Rectangle {
                                     color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
-                            }
-                            
-                            Label { text: "Power Output (kW):" }
-                            TextField {
-                                id: powerKWText
-                                readOnly: true
-                                Layout.fillWidth: true
-                                text: calculatorReady ? safeValueFunction(calculator.powerInKW, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+
+                                hoverEnabled: true
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
+                                ToolTip.text: "self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency"
                             }
                             
                             Label { text: "Generator Rated Capacity (kVA):" }
@@ -321,12 +283,18 @@ Item {
                                 id: genCapacityText
                                 readOnly: true
                                 Layout.fillWidth: true
-                                text: (totalGeneratedPower * 1.2).toFixed(2)
+                                text: calculatorReady ? safeValueFunction(calculator.ratedCapacity, 0).toFixed(2) : "0.00"
                                 background: Rectangle {
                                     color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
+
+                                hoverEnabled: true
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
+                                ToolTip.text: "self._rated_capacity =  self._actual_power * 1.2 / 1000"
                             }
                             
                             Label { text: "Generator Output Current (A):" }
@@ -334,15 +302,18 @@ Item {
                                 id: genCurrentText
                                 readOnly: true
                                 Layout.fillWidth: true
-                                // I = S/(√3 × V) for three-phase systems
-                                text: totalGeneratedPower > 0 
-                                    ? ((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)).toFixed(2)
-                                    : "0.00"
+                                text: calculatorReady ? safeValueFunction(calculator.outputCurrent, 0).toFixed(2) : "0.00"
                                 background: Rectangle {
                                     color: sideBar.toggle1 ? "black":"#e8f6ff"
                                     border.color: "#0078d7"
                                     radius: 2
                                 }
+
+                                hoverEnabled: true
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
+                                ToolTip.text: "self._output_current =  (self._actual_power / 1000) / (math.sqrt(3) * 0.4)"
                             }
                             
                             Label { text: "Annual Energy Production (MWh/year):" }
@@ -368,28 +339,10 @@ Item {
 
                             Label { 
                                 text: "Advanced Analysis:"
+                                Layout.columnSpan: 2
                                 font.bold: true
                             }
 
-                             Button {
-                                text: "Update"
-                                Layout.fillWidth: true
-                                onClicked: {
-                                    try {
-                                        // Safely call the estimateAEP function with proper arguments
-                                        var windSpeed = safeValue(avgWindSpeedSpinBox.value, 7);
-                                        var weibullK = 2.0; // Default Weibull shape parameter
-                                        
-                                        // Make sure both required arguments are provided
-                                        var aep = calculator.estimateAEP(windSpeed, weibullK);
-                                        advancedAepText.text = safeValue(aep, 0).toFixed(2);
-                                    } catch (e) {
-                                        console.error("Error calculating AEP:", e);
-                                        advancedAepText.text = "Error";
-                                    }
-                                }
-                            }
-                            
                             Label { text: "Average Wind Speed (m/s):" }
                             SpinBox {
                                 id: avgWindSpeedSpinBox
@@ -399,6 +352,30 @@ Item {
                                 stepSize: 1
                                 editable: true
                                 Layout.fillWidth: true
+                                onValueModified: updateAdvancedAEP()
+                            }
+                            
+                            Label { text: "Weibull Shape Parameter:" }
+                            SpinBox {
+                                id: weibullKSpinBox
+                                from: 15
+                                to: 30
+                                value: 20
+                                stepSize: 1
+                                editable: true
+                                Layout.fillWidth: true
+                                
+                                property real realValue: value / 10
+                                
+                                textFromValue: function(value) {
+                                    return (value / 10).toFixed(1);
+                                }
+                                
+                                valueFromText: function(text) {
+                                    return Math.round(parseFloat(text) * 10);
+                                }
+                                
+                                onValueModified: updateAdvancedAEP()
                             }
                             
                             Label { text: "Estimated AEP (MWh/year):" }
@@ -576,14 +553,49 @@ Item {
         }
         
         function updateDisplayValues() {
-            powerKWText.text = safeValueFunction(calculator.powerInKW, 0).toFixed(2)
-            genCapacityText.text = (calculator.powerInKW * 1.2).toFixed(2)
+            actualPowerText.text = safeValueFunction(calculator.actualPower, 0).toFixed(2)
+            genCapacityText.text = (calculator.actualPower * 1.2).toFixed(2)
             
             // Calculate generator current at 400V
-            var genCurrent = (calculator.powerInKW * 1000) / (Math.sqrt(3) * 400)
+            var genCurrent = (calculator.actualPower * 1000) / (Math.sqrt(3) * 400)
             genCurrentText.text = safeValueFunction(genCurrent, 0).toFixed(2)
             
             annualEnergyText.text = safeValueFunction(calculator.annualEnergy, 0).toFixed(2)
         }
+        
+        // Add a timer specifically for the initial update of advanced AEP
+        property Timer updateDisplayValuesTimer: Timer {
+            interval: 500
+            repeat: false
+            onTriggered: {
+                if (calculatorReady) {
+                    updateAdvancedAEP();
+                }
+            }
+        }
+    }
+
+    // Add a function to update the advanced AEP calculation
+    function updateAdvancedAEP() {
+        if (!calculatorReady) return;
+        
+        try {
+            // Get values from the spinboxes
+            var windSpeed = safeValue(avgWindSpeedSpinBox.value, 7);
+            var weibullK = safeValue(weibullKSpinBox.value / 10, 2.0);
+            
+            // Call the Python method with both parameters
+            var aep = calculator.estimateAEP(windSpeed, weibullK);
+            advancedAepText.text = safeValue(aep, 0).toFixed(2);
+        } catch (e) {
+            console.error("Error calculating AEP:", e);
+            advancedAepText.text = "Error";
+        }
+    }
+    
+    // Component state management
+    Component.onCompleted: {
+        // Initial update after a small delay to ensure calculator is ready
+        updateTimer.updateDisplayValuesTimer.start();
     }
 }
