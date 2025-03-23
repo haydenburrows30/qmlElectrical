@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../visualizers"
 
 import TransformerLine 1.0
 
@@ -93,78 +94,8 @@ Item {
         anchors.centerIn: parent
         spacing: 10
        
-        // Single-line diagram
-        WaveCard {
-            title: "Single-Line Diagram"
-            Layout.rowSpan: 2
-            Layout.minimumHeight: 200
-            Layout.minimumWidth: 800
-            
-            // Simple single-line diagram
-            Canvas {
-                anchors.fill: parent
-                
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.strokeStyle = "#333333"
-                    ctx.lineWidth = 2
-                    
-                    // Start with LV source
-                    var startX = 50
-                    var lineY = height/2
-                    
-                    // Draw LV source
-                    ctx.beginPath()
-                    ctx.moveTo(startX, lineY-20)
-                    ctx.lineTo(startX, lineY+20)
-                    ctx.stroke()
-                    
-                    // Draw LV line
-                    ctx.beginPath()
-                    ctx.moveTo(startX, lineY)
-                    ctx.lineTo(startX + 50, lineY)
-                    ctx.stroke()
-                    
-                    // Draw transformer
-                    ctx.beginPath()
-                    ctx.moveTo(startX + 50, lineY - 25)
-                    ctx.lineTo(startX + 50, lineY + 25)
-                    ctx.stroke()
-                    
-                    ctx.beginPath()
-                    ctx.moveTo(startX + 60, lineY - 25)
-                    ctx.lineTo(startX + 60, lineY + 25)
-                    ctx.stroke()
-                    
-                    // Draw HV Line with distance label
-                    ctx.beginPath()
-                    ctx.moveTo(startX + 60, lineY)
-                    ctx.lineTo(width - 100, lineY)
-                    ctx.stroke()
-                    
-                    // Draw relay
-                    ctx.beginPath()
-                    ctx.arc(startX + 90, lineY - 20, 15, 0, 2*Math.PI)
-                    ctx.stroke()
-                    
-                    // Draw load
-                    ctx.beginPath()
-                    ctx.moveTo(width - 100, lineY - 20)
-                    ctx.lineTo(width - 100, lineY + 20)
-                    ctx.lineTo(width - 60, lineY)
-                    ctx.lineTo(width - 100, lineY - 20)
-                    ctx.stroke()
-                    
-                    // Add labels
-                    ctx.font = "12px sans-serif"
-                    ctx.fillStyle = "#333333"
-                    ctx.fillText("400V", startX, lineY - 30)
-                    ctx.fillText("11kV", startX + 70, lineY - 30)
-                    ctx.fillText("5km Cable", width/2 - 30, lineY - 10)
-                    ctx.fillText("Relay", startX + 75, lineY - 30)
-                    ctx.fillText("Load", width - 80, lineY + 30)
-                }
-            }
+        TransformerLineViz {
+
         }
 
         RowLayout {
@@ -353,7 +284,12 @@ Item {
                                 return Math.round(parseFloat(text) * 10);
                             }
                             
-                            onValueModified: if (calculatorReady) calculator.setLoadMVA(realValue)
+                            onValueModified: {
+                                if (calculatorReady) calculator.setLoadMVA(realValue)
+                                console.log("Load MVA: " + realValue)
+                                calculator.refreshCalculations()
+                                
+                                }
                         }
                         
                         Label { text: "Power Factor:" }
@@ -555,24 +491,32 @@ Item {
             }
         }
     }
-    
-    // Connection to backend signals
-    Connections {
-        target: calculator
-        
-        function onCalculationCompleted() {
-            // Update the displayed values
-            transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)
-            transformerROhmsText.text = safeValue(calculator.transformerROhms, 0).toFixed(3)
-            transformerXOhmsText.text = safeValue(calculator.transformerXOhms, 0).toFixed(3)
-            lineTotalZText.text = safeValue(calculator.lineTotalZ, 0).toFixed(3)
-            voltageDropText.text = safeValue(calculator.voltageDrop, 0).toFixed(2)
-            faultCurrentLVText.text = safeValue(calculator.faultCurrentLV, 0).toFixed(2)
-            faultCurrentHVText.text = safeValue(calculator.faultCurrentHV, 0).toFixed(2)
-            relayPickupCurrentText.text = safeValue(calculator.relayPickupCurrent, 0).toFixed(2)
-            relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
-            relayCtRatioText.text = calculator.relayCtRatio
-            relayCurveTypeText.text = calculator.relayCurveType
+
+    Timer {
+        id: updateTimer
+        interval: 250
+        repeat: true
+        running: calculatorReady
+        onTriggered: {
+            if(calculatorReady) {
+                root.updateDisplayValues()
+            }
         }
+    }
+
+    function updateDisplayValues() {
+        if (!calculatorReady) return
+        // Update the displayed values
+        transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)
+        transformerROhmsText.text = safeValue(calculator.transformerROhms, 0).toFixed(3)
+        transformerXOhmsText.text = safeValue(calculator.transformerXOhms, 0).toFixed(3)
+        lineTotalZText.text = safeValue(calculator.lineTotalZ, 0).toFixed(3)
+        voltageDropText.text = safeValue(calculator.voltageDrop, 0).toFixed(2)
+        faultCurrentLVText.text = safeValue(calculator.faultCurrentLV, 0).toFixed(2)
+        faultCurrentHVText.text = safeValue(calculator.faultCurrentHV, 0).toFixed(2)
+        relayPickupCurrentText.text = safeValue(calculator.relayPickupCurrent, 0).toFixed(2)
+        relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
+        relayCtRatioText.text = calculator.relayCtRatio
+        relayCurveTypeText.text = calculator.relayCurveType
     }
 }
