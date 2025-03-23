@@ -140,22 +140,22 @@ class TransformerLineCalculator(QObject):
             
             # Remove print statements and keep only logging
             logger.info("\nTransformer Impedance Calculations:")
-            logger.info(f"• Z base: {transformer_z_base:.2f} Ω")
+            logger.info(f"• Z base: {transformer_z_base:.2f} ohm")
             logger.info(f"• Z (pu): {transformer_z_pu:.3f}")
-            logger.info(f"• Total Z: {self._transformer_z:.2f} Ω")
+            logger.info(f"• Total Z: {self._transformer_z:.2f} ohm")
             
             # R and X components
             angle = math.atan(self._transformer_x_r_ratio)
             self._transformer_r = self._transformer_z * math.cos(angle)
             self._transformer_x = self._transformer_z * math.sin(angle)
-            logger.info(f"• R: {self._transformer_r:.2f} Ω")
-            logger.info(f"• X: {self._transformer_x:.2f} Ω")
+            logger.info(f"• R: {self._transformer_r:.2f} ohm")
+            logger.info(f"• X: {self._transformer_x:.2f} ohm")
             
             # Line calculations
             self._line_total_z = complex(self._line_r * self._line_length, 
                                        self._line_x * self._line_length)
             logger.info("\nLine Parameters:")
-            logger.info(f"• Total Z: {abs(self._line_total_z):.2f}∠{math.degrees(cmath.phase(self._line_total_z)):.1f}° Ω")
+            logger.info(f"• Total Z: {abs(self._line_total_z):.2f} at {math.degrees(cmath.phase(self._line_total_z)):.1f} degrees ohm")
             
             # Voltage drop calculations - improve for very low loads
             # Make sure we have a minimum load to avoid division by zero and ensure realistic results
@@ -328,9 +328,9 @@ class TransformerLineCalculator(QObject):
             self._ground_fault_current = max(vln / abs(z1 + z2 + z0_total), 10.0)  # Minimum 10A
             
             logger.info("\nGround fault calculation:")
-            logger.info(f"Z0 transformer: {z0_transformer:.2f} Ω")
-            logger.info(f"Z0 line: {z0_line:.2f} Ω")
-            logger.info(f"Zn referred: {z_ng_referred:.2f} Ω")
+            logger.info(f"Z0 transformer: {z0_transformer:.2f} ohm")
+            logger.info(f"Z0 line: {z0_line:.2f} ohm")
+            logger.info(f"Zn referred: {z_ng_referred:.2f} ohm")
             logger.info(f"Ground fault current: {self._ground_fault_current:.2f} A")
             
             logger.info("\nProtection Settings:")
