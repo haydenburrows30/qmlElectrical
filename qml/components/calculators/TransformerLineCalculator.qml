@@ -286,10 +286,8 @@ Item {
                             
                             onValueModified: {
                                 if (calculatorReady) calculator.setLoadMVA(realValue)
-                                console.log("Load MVA: " + realValue)
                                 calculator.refreshCalculations()
-                                
-                                }
+                            }
                         }
                         
                         Label { text: "Power Factor:" }
@@ -492,31 +490,22 @@ Item {
         }
     }
 
-    Timer {
-        id: updateTimer
-        interval: 250
-        repeat: true
-        running: calculatorReady
-        onTriggered: {
-            if(calculatorReady) {
-                root.updateDisplayValues()
+    Connections {
+        target: calculator
+        function calculationCompleted() {
+            if (calculatorReady) {
+                transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)
+                transformerROhmsText.text = safeValue(calculator.transformerROhms, 0).toFixed(3)
+                transformerXOhmsText.text = safeValue(calculator.transformerXOhms, 0).toFixed(3)
+                lineTotalZText.text = safeValue(calculator.lineTotalZ, 0).toFixed(3)
+                voltageDropText.text = safeValue(calculator.voltageDrop, 0).toFixed(2)
+                faultCurrentLVText.text = safeValue(calculator.faultCurrentLV, 0).toFixed(2)
+                faultCurrentHVText.text = safeValue(calculator.faultCurrentHV, 0).toFixed(2)
+                relayPickupCurrentText.text = safeValue(calculator.relayPickupCurrent, 0).toFixed(2)
+                relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
+                relayCtRatioText.text = calculator.relayCtRatio
+                relayCurveTypeText.text = calculator.relayCurveType
             }
         }
-    }
-
-    function updateDisplayValues() {
-        if (!calculatorReady) return
-        // Update the displayed values
-        transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)
-        transformerROhmsText.text = safeValue(calculator.transformerROhms, 0).toFixed(3)
-        transformerXOhmsText.text = safeValue(calculator.transformerXOhms, 0).toFixed(3)
-        lineTotalZText.text = safeValue(calculator.lineTotalZ, 0).toFixed(3)
-        voltageDropText.text = safeValue(calculator.voltageDrop, 0).toFixed(2)
-        faultCurrentLVText.text = safeValue(calculator.faultCurrentLV, 0).toFixed(2)
-        faultCurrentHVText.text = safeValue(calculator.faultCurrentHV, 0).toFixed(2)
-        relayPickupCurrentText.text = safeValue(calculator.relayPickupCurrent, 0).toFixed(2)
-        relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
-        relayCtRatioText.text = calculator.relayCtRatio
-        relayCurveTypeText.text = calculator.relayCurveType
     }
 }

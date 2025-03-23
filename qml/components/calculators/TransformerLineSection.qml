@@ -51,7 +51,7 @@ Item {
     Connections {
         target: calculator
         // Fix signal handler name to match loadChanged signal
-        function loadChanged() {  // Remove "on" prefix
+        function loadChanged() {
             if (calculatorReady) {
                 transformerLineSection.updateDisplayValues()
             }

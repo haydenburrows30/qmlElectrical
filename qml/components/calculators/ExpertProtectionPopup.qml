@@ -5,9 +5,9 @@ import QtQuick.Layouts
 Popup {
     id: expertPopup
     modal: true
-    padding: 20
-    width: 600
-    height: 500
+    padding: 10
+    width: 400
+    height: 600
     
     property var calculator
     property var safeValueFunction
@@ -282,18 +282,23 @@ Popup {
                 }
             }
         }
-        
-        Button {
-            text: "Refresh Values"
-            Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-            Layout.rightMargin: 80
-            onClicked: calculator.refreshCalculations();
-        }
-        
-        Button {
-            text: "Close"
-            Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-            onClicked: expertPopup.close()
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignRight
+            spacing: 10
+
+            Button {
+                text: "Refresh Values"
+                Layout.alignment: Qt.AlignRight
+                onClicked: calculator.refreshCalculations();
+            }
+            
+            Button {
+                text: "Close"
+                Layout.alignment: Qt.AlignRight
+                onClicked: expertPopup.close()
+            }
         }
     }
 }
