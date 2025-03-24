@@ -4,6 +4,7 @@ import math
 class InstrumentTransformerCalculator(QObject):
     """Calculator for CT and VT parameters"""
 
+    # Existing signals
     primaryCurrentChanged = Signal()
     secondaryCurrentChanged = Signal()
     primaryVoltageChanged = Signal()
@@ -13,7 +14,13 @@ class InstrumentTransformerCalculator(QObject):
     calculationsComplete = Signal()
     standardCtRatiosChanged = Signal()
     standardVtRatiosChanged = Signal()
-    accuracyClassesChanged = Signal()  # New signal
+    accuracyClassesChanged = Signal()
+    
+    # New signals
+    validationError = Signal(str)
+    resetCompleted = Signal()
+    saturationCurveChanged = Signal()
+    harmonicsChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -114,6 +121,32 @@ class InstrumentTransformerCalculator(QObject):
         self._vt_accuracy_class = "0.5"
         self._rated_voltage_factor = "continuous"
 
+        # Save default values for reset functionality
+        self._default_values = {
+            "primary_current": 100.0,
+            "secondary_current": 5.0,
+            "primary_voltage": 11000.0,
+            "secondary_voltage": 110.0,
+            "burden_va": 15.0,
+            "accuracy_class": "0.5",
+            "power_factor": 0.8,
+            "temperature": 25.0,
+            "vt_burden": 100.0,
+            "rated_voltage_factor": "continuous",
+            "current_ct_type": "measurement"
+        }
+        
+        # Add harmonics analysis data
+        self._harmonics = {
+            "1st": 100.0,  # Fundamental (%)
+            "3rd": 0.0,    # 3rd harmonic (%)
+            "5th": 0.0,    # 5th harmonic (%)
+            "7th": 0.0     # 7th harmonic (%)
+        }
+        
+        # Saturation curve data points
+        self._saturation_curve = []
+        
         self._calculate()
 
     @Property(float, notify=primaryVoltageChanged)
@@ -202,7 +235,12 @@ class InstrumentTransformerCalculator(QObject):
                 if self._current_ct_type == "protection":
                     # Extract ALF from accuracy class (e.g., "5P20" -> 20)
                     if "P" in self._accuracy_class:
-                        self._alf = float(self._accuracy_class.split("P")[1])
+                        # Fix: Extract the number after P properly
+                        try:
+                            self._alf = float(self._accuracy_class.split("P")[1])
+                        except ValueError:
+                            # Default ALF if conversion fails
+                            self._alf = 20.0
                     else:
                         self._alf = 20.0
                 
@@ -221,12 +259,30 @@ class InstrumentTransformerCalculator(QObject):
             # Calculate error margin considering power factor
             if self._current_ct_type == "protection":
                 # For protection class, extract number after P (e.g., 5P20 -> 5)
-                base_error = float(self._accuracy_class.split('P')[0])
+                # Fix: Add proper error handling for extracting protection class value
+                try:
+                    if "P" in self._accuracy_class:
+                        base_error = float(self._accuracy_class.split('P')[0])
+                    else:
+                        base_error = 5.0  # Default for protection class
+                except ValueError:
+                    base_error = 5.0  # Default if conversion fails
             elif self._current_ct_type == "combined":
                 # For combined class, use measurement part (e.g., 0.5/5P10 -> 0.5)
-                base_error = float(self._accuracy_class.split('/')[0])
+                # Fix: Add proper error handling for combined class
+                try:
+                    if "/" in self._accuracy_class:
+                        base_error = float(self._accuracy_class.split('/')[0])
+                    else:
+                        base_error = 0.5  # Default for combined class
+                except ValueError:
+                    base_error = 0.5  # Default if conversion fails
             else:
-                base_error = float(self._accuracy_class)
+                # Fix: Add proper error handling for measurement class
+                try:
+                    base_error = float(self._accuracy_class)
+                except ValueError:
+                    base_error = 0.5  # Default for measurement class
                 
             pf_compensation = (1 - self._power_factor) * base_error * 0.5
             temp_compensation = self._temperature_effect * 0.5
@@ -271,13 +327,71 @@ class InstrumentTransformerCalculator(QObject):
                     self._knee_point_voltage *= (1 + (vt_ratio / 1000))
                     self._min_accuracy_burden *= (1 + (vt_ratio / 10000))
             
+            # Generate saturation curve data
+            self._saturation_curve = self._calculate_saturation_curve()
+            
+            # Calculate harmonic effects based on saturation level
+            self._calculate_harmonics()
+            
             self.calculationsComplete.emit()
+            self.saturationCurveChanged.emit()
+            self.harmonicsChanged.emit()
             
         except Exception as e:
             print(f"Calculation error: {e}")
+            self.validationError.emit(f"Calculation error: {str(e)}")
             self._knee_point_voltage = 0.0
             self._max_fault_current = 0.0
             self._min_accuracy_burden = 0.0
+
+    def _calculate_saturation_curve(self):
+        """Generate CT saturation curve data points"""
+        curve_points = []
+        if self._knee_point_voltage > 0:
+            # Generate 20 points for the curve
+            for i in range(21):
+                # Normalized voltage (0 to 2 times knee point)
+                v_norm = i * 0.1 * self._knee_point_voltage * 2
+                
+                # Linear region (below knee point)
+                if v_norm <= self._knee_point_voltage:
+                    i_norm = v_norm / (0.1 * self._secondary_current)
+                else:
+                    # Saturation region (above knee point)
+                    # I = k * (V - Vknee)^0.3 + Iknee
+                    excess = v_norm - self._knee_point_voltage
+                    i_norm = self._secondary_current + 2 * math.pow(excess / self._knee_point_voltage, 0.3) * self._secondary_current
+                    
+                curve_points.append({"voltage": v_norm, "current": i_norm})
+        return curve_points
+    
+    def _calculate_harmonics(self):
+        """Calculate harmonic content based on CT saturation"""
+        # Start with clean signal
+        self._harmonics = {
+            "1st": 100.0,  # Fundamental always present
+            "3rd": 0.0,
+            "5th": 0.0,
+            "7th": 0.0
+        }
+        
+        # If we have a burden and knee point, calculate harmonics
+        if self._burden_va > 0 and self._knee_point_voltage > 0:
+            # Estimate operating point as a fraction of knee point
+            op_voltage = self._secondary_current * math.sqrt(self._burden_va)
+            saturation_level = op_voltage / self._knee_point_voltage
+            
+            # Harmonics increase with saturation
+            if saturation_level > 0.8:
+                # Highly saturated - significant harmonics
+                self._harmonics["3rd"] = min(40.0, (saturation_level - 0.8) * 200)
+                self._harmonics["5th"] = min(20.0, (saturation_level - 0.8) * 100)
+                self._harmonics["7th"] = min(10.0, (saturation_level - 0.8) * 50)
+            elif saturation_level > 0.5:
+                # Moderately saturated - some harmonics
+                self._harmonics["3rd"] = (saturation_level - 0.5) * 100
+                self._harmonics["5th"] = (saturation_level - 0.5) * 50
+                self._harmonics["7th"] = (saturation_level - 0.5) * 25
 
     @Property(list, notify=standardCtRatiosChanged)
     def standardCtRatios(self):
@@ -337,10 +451,40 @@ class InstrumentTransformerCalculator(QObject):
         """Set CT ratio from standard format (e.g., '100/5')"""
         try:
             primary, secondary = map(float, ratio.split('/'))
-            self.primaryCurrent = primary
+            self._primary_current = primary
             self._secondary_current = secondary
+            
+            # Calculate CT ratio for scaling
+            self._ct_ratio = primary / secondary
+            
+            # Recalculate knee point voltage based on ratio
+            if self._current_ct_type == "protection":
+                # Scale knee point multiplier based on ratio
+                ratio_factor = self._ct_ratio / 20  # Normalize to 100/5 ratio
+                knee_multiplier = 2.0 + math.log10(max(1, ratio_factor))
+                
+                # Additional multiplier for high ratio CTs
+                if primary > 1000:
+                    knee_multiplier *= 1.5
+                    
+                # Protection class affects base accuracy factor
+                base_factor = self._accuracy_factors.get(self._accuracy_class, 2.0)
+                
+                # Calculate new knee point
+                if self._burden_va > 0:
+                    self._knee_point_voltage = (knee_multiplier * 
+                        self._secondary_current * 
+                        math.sqrt(self._burden_va) * 
+                        base_factor)
+                    
+                    # Emit that calculations are complete
+                    self.calculationsComplete.emit()
+            
             self._calculate()
-        except:
+            self.primaryCurrentChanged.emit()
+            
+        except Exception as e:
+            print(f"Error setting CT ratio: {e}")
             pass
 
     @Slot(str)
@@ -410,3 +554,138 @@ class InstrumentTransformerCalculator(QObject):
         if factor in self._rated_voltage_factors:
             self._rated_voltage_factor = factor
             self._calculate()
+
+    @Slot()
+    def resetToDefaults(self):
+        """Reset all parameters to default values"""
+        self._primary_current = self._default_values["primary_current"]
+        self._secondary_current = self._default_values["secondary_current"]
+        self._primary_voltage = self._default_values["primary_voltage"]
+        self._secondary_voltage = self._default_values["secondary_voltage"]
+        self._burden_va = self._default_values["burden_va"]
+        self._accuracy_class = self._default_values["accuracy_class"]
+        self._power_factor = self._default_values["power_factor"]
+        self._temperature = self._default_values["temperature"]
+        self._vt_burden = self._default_values["vt_burden"]
+        self._rated_voltage_factor = self._default_values["rated_voltage_factor"]
+        self._current_ct_type = self._default_values["current_ct_type"]
+        
+        self._calculate()
+        self.resetCompleted.emit()
+        self.primaryCurrentChanged.emit()
+        self.burdenChanged.emit()
+        self.primaryVoltageChanged.emit()
+        self.standardCtRatiosChanged.emit()
+        self.accuracyClassesChanged.emit()
+
+    @Property(list, notify=saturationCurveChanged)
+    def saturationCurve(self):
+        """Return the saturation curve data for visualization"""
+        return self._saturation_curve
+    
+    @Property("QVariantMap", notify=harmonicsChanged)
+    def harmonics(self):
+        """Return harmonic content for visualization"""
+        return self._harmonics
+        
+    @Slot(str, float, result=bool)
+    def validateInput(self, field, value):
+        """Validate input values with specific constraints"""
+        try:
+            if field == "burden":
+                if value < 3.0 or value > 100.0:
+                    self.validationError.emit(f"Burden must be between 3.0 and 100.0 VA")
+                    return False
+            elif field == "vtBurden":
+                if value < 25.0 or value > 2000.0:
+                    self.validationError.emit(f"VT Burden must be between 25.0 and 2000.0 VA")
+                    return False
+            elif field == "temperature":
+                if value < -40.0 or value > 120.0:
+                    self.validationError.emit(f"Temperature must be between -40.0 and 120.0 °C")
+                    return False
+            # Add more validation as needed
+            return True
+        except Exception as e:
+            self.validationError.emit(f"Validation error: {str(e)}")
+            return False
+    
+    @Slot(float, result=float)
+    def convertCtoF(self, celsius):
+        """Convert Celsius to Fahrenheit"""
+        try:
+            return (celsius * 9/5) + 32
+        except:
+            return 0.0
+    
+    @Slot(float, result=float)
+    def convertFtoC(self, fahrenheit):
+        """Convert Fahrenheit to Celsius"""
+        try:
+            return (fahrenheit - 32) * 5/9
+        except:
+            return 0.0
+            
+    @Property(float, notify=calculationsComplete)
+    def saturationFactor(self):
+        """Calculate and return CT saturation factor"""
+        if self._burden_va > 0 and self._knee_point_voltage > 0:
+            op_voltage = self._secondary_current * math.sqrt(self._burden_va)
+            return op_voltage / self._knee_point_voltage
+        return 0.0
+    
+    @Property(str, notify=calculationsComplete)
+    def saturationStatus(self):
+        """Return CT saturation status as a string"""
+        saturation = self.saturationFactor
+        if saturation < 0.2:
+            return "Linear (Unsaturated)"
+        elif saturation < 0.5:
+            return "Slightly Saturated"
+        elif saturation < 0.8:
+            return "Moderately Saturated"
+        else:
+            return "Highly Saturated"
+            
+    @Property(str, notify=calculationsComplete)
+    def accuracyRecommendation(self):
+        """Provides recommendations for improving accuracy"""
+        messages = []
+        
+        # Error margin exceeds accuracy class
+        if self._error_margin > float(self._accuracy_class.split('/')[0].split('P')[0]):
+            messages.append("Error margin exceeds accuracy class.")
+            
+            # Check potential causes
+            if abs(self._temperature - self._reference_temp) > 20:
+                messages.append("Consider operating closer to reference temperature (25°C).")
+                
+            if self._power_factor < 0.8:
+                messages.append("Improve power factor for better accuracy.")
+                
+        # CT saturation issues
+        saturation = self.saturationFactor
+        if saturation > 0.8:
+            messages.append("CT is operating near saturation. Consider higher burden or different CT ratio.")
+        
+        # VT burden issues
+        if not self._vt_burden_within_range:
+            if self._vt_burden < self._vt_burden_ranges[min(self._vt_burden_ranges.keys(), 
+                             key=lambda x: abs(x - self._primary_voltage))]["min"]:
+                messages.append("VT is under-burdened. Consider increasing the burden.")
+            else:
+                messages.append("VT is over-burdened. Consider decreasing the burden or using a VT with higher VA rating.")
+        
+        return "\n".join(messages) if messages else "No issues detected. Operation within specifications."
+    
+    @Property(list, notify=calculationsComplete)
+    def environmentalFactors(self):
+        """Return data about environmental effects"""
+        return [
+            {"factor": "Temperature Deviation", "value": abs(self._temperature - self._reference_temp), 
+             "unit": "°C", "effect": self._temperature_effect},
+            {"factor": "Power Quality", "value": 100 - self._harmonics["3rd"] - self._harmonics["5th"] - self._harmonics["7th"], 
+             "unit": "%", "effect": sum([self._harmonics[h] for h in ["3rd", "5th", "7th"]]) * 0.05},
+            {"factor": "Saturation", "value": self.saturationFactor * 100, 
+             "unit": "%", "effect": self.saturationFactor * 5 if self.saturationFactor > 0.5 else 0}
+        ]

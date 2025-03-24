@@ -42,6 +42,43 @@ Item {
         }
     }
 
+    // Add a status notification
+    Popup {
+        id: errorPopup
+        width: 300
+        height: 150
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property string errorMessage: ""
+        
+        contentItem: ColumnLayout {
+            spacing: 20
+            
+            Label {
+                text: "Input Error"
+                font.bold: true
+                font.pixelSize: 16
+                Layout.alignment: Qt.AlignHCenter
+            }
+            
+            Label {
+                text: errorPopup.errorMessage
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: errorPopup.close()
+            }
+        }
+    }
+
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -115,23 +152,42 @@ Item {
                         textFromValue: function(value) { return value + "%" }
                     }
 
-                    Label { text: "Temperature (°C):" }
-                    TextField {
-                        id: temperature
-                        text: "25.0"
-                        validator: DoubleValidator {
-                            bottom: -40.0
-                            top: 120.0
-                            notation: DoubleValidator.StandardNotation
-                            decimals: 1
-                        }
-                        onTextChanged: {
-                            if (acceptableInput) {
-                                calculator.temperature = parseFloat(text)
-                            }
-                        }
+                    Label { text: "Temperature:" }
+                    RowLayout {
                         Layout.fillWidth: true
-                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        
+                        TextField {
+                            id: temperature
+                            text: "25.0"
+                            Layout.fillWidth: true
+                            validator: DoubleValidator {
+                                bottom: -40.0
+                                top: 120.0
+                                notation: DoubleValidator.StandardNotation
+                                decimals: 1
+                            }
+                            onTextChanged: {
+                                if (acceptableInput) {
+                                    calculator.temperature = parseFloat(text)
+                                }
+                            }
+                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        }
+                        
+                        ComboBox {
+                            id: tempUnit
+                            model: ["°C", "°F"]
+                            currentIndex: 0
+                            onCurrentTextChanged: {
+                                if (currentText === "°F" && acceptableInput) {
+                                    // Convert to Celsius for the backend
+                                    calculator.temperature = (parseFloat(temperature.text) - 32) * 5/9
+                                } else if (currentText === "°C" && acceptableInput) {
+                                    calculator.temperature = parseFloat(temperature.text)
+                                }
+                            }
+                            Layout.preferredWidth: 60
+                        }
                     }
 
                     Label { text: "Accuracy Class:" }
@@ -273,6 +329,60 @@ Item {
                             return "red"
                         }
                     }
+
+                    Label { text: "Custom Ratio:" }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        
+                        TextField {
+                            id: customRatio
+                            placeholderText: "e.g., 150/5"
+                            Layout.fillWidth: true
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^\d+\/\d+$/
+                            }
+                        }
+                        
+                        Button {
+                            text: "Apply"
+                            onClicked: {
+                                if (customRatio.acceptableInput) {
+                                    calculator.setCtRatio(customRatio.text)
+                                    let found = false
+                                    for (let i = 0; i < ctRatio.model.length; i++) {
+                                        if (ctRatio.model[i] === customRatio.text) {
+                                            ctRatio.currentIndex = i
+                                            found = true
+                                            break
+                                        }
+                                    }
+                                    if (!found) {
+                                        ctRatio.model.push(customRatio.text)
+                                        ctRatio.currentIndex = ctRatio.model.length - 1
+                                    }
+                                } else {
+                                    errorPopup.errorMessage = "Invalid ratio format. Please use format like '100/5'"
+                                    errorPopup.open()
+                                }
+                            }
+                        }
+                    }
+
+                    // Add a reset button at the bottom
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        Layout.margins: 10
+                        height: 1
+                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                    }
+                    
+                    Button {
+                        text: "Reset to Defaults"
+                        Layout.columnSpan: 2
+                        Layout.alignment: Qt.AlignHCenter
+                        onClicked: calculator.resetToDefaults()
+                    }
                 }
             }
         }
@@ -288,14 +398,20 @@ Item {
                 id: transformerViz
                 anchors.fill: parent
                 
-                // Pass CT data
+                // CT properties
                 ctRatio: ctRatio.currentText || "100/5"
-                ctBurden: ctBurden.value || 15
-                ctKneePoint: calculator ? calculator.kneePointVoltage : 0
-                ctMaxFault: calculator ? calculator.maxFaultCurrent : 0
+                ctBurden: parseFloat(ctBurden.text) || 15
+                ctKneePoint: calculator.kneePointVoltage || 0
+                ctMaxFault: calculator.maxFaultCurrent || 0
+                ctErrorMargin: calculator.errorMargin || 0
+                ctAccuracyClass: accuracyClass.currentText || "0.5"
+                ctPowerFactor: powerFactor.value / 100 || 0.8
                 
-                // Pass VT data
+                // VT properties
                 vtRatio: vtRatio.currentText || "11000/110"
+                vtBurden: parseFloat(vtBurden.text) || 100
+                vtUtilization: calculator.vtBurdenUtilization || 0
+                vtImpedance: calculator.vtImpedance || 0
                 
                 // Theme properties
                 darkMode: Universal.theme === Universal.Dark

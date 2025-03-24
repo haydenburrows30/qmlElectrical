@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>qml/components/calculators/InstrumentTransformerCalculator.qml</file>
+        <file>qml/components/visualizers/TransformerVisualization.qml</file>
+        <file>qml/components/visualizers/qmldir</file>
+    </qresource>
+</RCC>
