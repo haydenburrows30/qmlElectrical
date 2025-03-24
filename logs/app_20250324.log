@@ -1760,3 +1760,261 @@ Generating Power Curve...
 2025-03-24 20:00:00,517 - qmltest - INFO - • Grouping Factor: 1.00
 2025-03-24 20:00:00,517 - qmltest - INFO - Invalid input parameters, skipping calculation
 2025-03-24 20:00:00,520 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:01:12,068 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:01:12,241 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:01:12,242 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:01:12,242 - qmltest - INFO - Input Parameters:
+2025-03-24 20:01:12,242 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:01:12,242 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:01:12,242 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:01:12,242 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:01:12,242 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:01:12,242 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:01:12,342 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:01:12,343 - qmltest - INFO - Input Parameters:
+2025-03-24 20:01:12,343 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:01:12,343 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:01:12,343 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:01:12,343 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:01:12,343 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:01:12,343 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:01:12,345 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:03:28,146 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:03:28,320 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:03:28,320 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:03:28,320 - qmltest - INFO - Input Parameters:
+2025-03-24 20:03:28,320 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:03:28,320 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:03:28,320 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:03:28,320 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:03:28,321 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:03:28,321 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:03:28,412 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:03:28,412 - qmltest - INFO - Input Parameters:
+2025-03-24 20:03:28,412 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:03:28,412 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:03:28,412 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:03:28,412 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:03:28,412 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:03:28,412 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:03:28,415 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:04:03,421 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:04:03,592 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:04:03,592 - qmltest - INFO - Input Parameters:
+2025-03-24 20:04:03,592 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:04:03,592 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:04:03,592 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:04:03,592 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:04:03,592 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:04:03,592 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:04:03,596 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:04:03,707 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:04:03,707 - qmltest - INFO - Input Parameters:
+2025-03-24 20:04:03,707 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:04:03,707 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:04:03,707 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:04:03,707 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:04:03,707 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:04:03,707 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:04:03,710 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:07:19,097 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:07:19,252 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:07:19,252 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:07:19,252 - qmltest - INFO - Input Parameters:
+2025-03-24 20:07:19,252 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:07:19,252 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:07:19,252 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:07:19,253 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:07:19,253 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:07:19,253 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:07:19,357 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:07:19,357 - qmltest - INFO - Input Parameters:
+2025-03-24 20:07:19,357 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:07:19,357 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:07:19,357 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:07:19,357 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:07:19,357 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:07:19,357 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:07:19,359 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:11:54,906 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:11:55,076 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:11:55,077 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:11:55,077 - qmltest - INFO - Input Parameters:
+2025-03-24 20:11:55,077 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:11:55,077 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:11:55,077 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:11:55,077 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:11:55,077 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:11:55,077 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:11:55,173 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:11:55,173 - qmltest - INFO - Input Parameters:
+2025-03-24 20:11:55,173 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:11:55,173 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:11:55,173 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:11:55,173 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:11:55,173 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:11:55,173 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:11:55,177 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:13:09,398 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:13:09,546 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:13:09,547 - qmltest - INFO - Input Parameters:
+2025-03-24 20:13:09,547 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:13:09,547 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:13:09,547 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:13:09,547 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:13:09,547 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:13:09,547 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:13:09,550 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:13:09,650 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:13:09,650 - qmltest - INFO - Input Parameters:
+2025-03-24 20:13:09,650 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:13:09,650 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:13:09,650 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:13:09,650 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:13:09,650 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:13:09,650 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:13:09,654 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:14:29,050 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:14:29,219 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:14:29,219 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:14:29,219 - qmltest - INFO - Input Parameters:
+2025-03-24 20:14:29,219 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:14:29,220 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:14:29,220 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:14:29,220 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:14:29,220 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:14:29,220 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:14:29,325 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:14:29,325 - qmltest - INFO - Input Parameters:
+2025-03-24 20:14:29,325 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:14:29,325 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:14:29,325 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:14:29,325 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:14:29,325 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:14:29,325 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:14:29,328 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:15:36,750 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:15:36,918 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:15:36,918 - qmltest - INFO - Input Parameters:
+2025-03-24 20:15:36,918 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:15:36,918 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:15:36,918 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:15:36,919 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:15:36,919 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:15:36,919 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:15:36,921 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:15:37,020 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:15:37,020 - qmltest - INFO - Input Parameters:
+2025-03-24 20:15:37,020 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:15:37,020 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:15:37,020 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:15:37,020 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:15:37,020 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:15:37,020 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:15:37,023 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:15:37,799 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:15:37,799 - qmltest - INFO - Input Parameters:
+2025-03-24 20:15:37,799 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:15:37,799 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:15:37,799 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-24 20:15:37,799 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:15:37,799 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:15:37,799 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:15:37,801 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:15:37,801 - qmltest - INFO - Input Parameters:
+2025-03-24 20:15:37,801 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:15:37,801 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:15:37,801 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-24 20:15:37,801 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:15:37,801 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:15:37,801 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:15:37,810 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:15:37,810 - qmltest - INFO - Input Parameters:
+2025-03-24 20:15:37,810 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:15:37,810 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:15:37,810 - qmltest - INFO - • Installation Method: D2 - Underground in conduit
+2025-03-24 20:15:37,810 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:15:37,810 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:15:37,810 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:16:18,312 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:16:18,462 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:16:18,462 - qmltest - INFO - Input Parameters:
+2025-03-24 20:16:18,462 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:16:18,462 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:16:18,462 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:16:18,462 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:16:18,462 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:16:18,462 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:16:18,465 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:16:18,559 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:16:18,559 - qmltest - INFO - Input Parameters:
+2025-03-24 20:16:18,559 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:16:18,559 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:16:18,559 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:16:18,559 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:16:18,559 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:16:18,559 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:16:18,561 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:17:13,186 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:17:13,355 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:17:13,355 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:17:13,356 - qmltest - INFO - Input Parameters:
+2025-03-24 20:17:13,356 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:17:13,356 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:17:13,356 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:17:13,356 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:17:13,356 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:17:13,356 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:17:13,462 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:17:13,462 - qmltest - INFO - Input Parameters:
+2025-03-24 20:17:13,462 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:17:13,462 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:17:13,462 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:17:13,462 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:17:13,462 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:17:13,462 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:17:13,465 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:19:38,893 - config - INFO - Loading configuration module from: /home/hayden/Documents/qmltest
+2025-03-24 20:19:39,066 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 20:19:39,067 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:19:39,067 - qmltest - INFO - Input Parameters:
+2025-03-24 20:19:39,067 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:19:39,067 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:19:39,067 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:19:39,067 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:19:39,067 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:19:39,067 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:19:39,169 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 20:19:39,170 - qmltest - INFO - Input Parameters:
+2025-03-24 20:19:39,170 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 20:19:39,170 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 20:19:39,170 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 20:19:39,170 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 20:19:39,170 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 20:19:39,170 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 20:19:39,173 - ResultsManager - INFO - Loaded 0 results from SQL storage

@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../visualizers"
 import MotorStarting 1.0  // Import the correct namespace
 
 Item {
@@ -11,6 +12,11 @@ Item {
 
     property MotorStartingCalculator calculator: MotorStartingCalculator {}
     property real cachedStartingMultiplier: calculator ? calculator.startingMultiplier : 7.0
+    property bool hasValidInputs: motorPower.text.length > 0 && 
+                                 parseFloat(motorPower.text) > 0 &&
+                                 parseFloat(motorVoltage.text) > 0 &&
+                                 parseFloat(motorEfficiency.text) > 0 &&
+                                 parseFloat(motorPowerFactor.text) > 0
     
     // Update the cached value when needed - only reads from calculator without setting the property
     function getStartingMultiplier() {
@@ -23,6 +29,37 @@ Item {
         function onStartingMultiplierChanged() {
             cachedStartingMultiplier = calculator.startingMultiplier
         }
+        
+        function onMotorTypeChanged() {
+            // Update efficiency and power factor display based on motor type
+            motorEfficiency.text = (calculator.efficiency * 100).toFixed(0)
+            motorPowerFactor.text = calculator.powerFactor.toFixed(2)
+            
+            // Update method visibility/availability
+            updateMethodAvailability()
+        }
+    }
+    
+    function updateMethodAvailability() {
+        // Disable methods that aren't applicable to the current motor type
+        for (let i = 0; i < startingMethod.model.length; i++) {
+            let method = startingMethod.model[i]
+            let applicable = calculator.isMethodApplicable(method)
+            // Cannot directly disable ComboBox items in Qt Quick, 
+            // so we'll handle this in the ComboBox's delegate
+        }
+    }
+
+    // Show popup for tips or errors
+    function showMessage(title, message) {
+        messagePopup.title = title
+        messagePopup.message = message
+        messagePopup.open()
+    }
+
+    // Show motor type info
+    function showMotorInfo() {
+        showMessage("Motor Type Info", calculator.motorDescription)
     }
 
     Popup {
@@ -51,6 +88,44 @@ Item {
         }
     }
 
+    Popup {
+        id: messagePopup
+        width: parent.width * 0.6
+        height: parent.height * 0.3
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property string title: "Message"
+        property string message: ""
+        
+        ColumnLayout {
+            anchors.fill: parent
+            
+            Text {
+                text: messagePopup.title
+                font.bold: true
+                font.pixelSize: 16
+            }
+            
+            Text {
+                text: messagePopup.message
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            
+            Item { Layout.fillHeight: true }
+            
+            Button {
+                text: "Close"
+                Layout.alignment: Qt.AlignRight
+                onClicked: messagePopup.close()
+            }
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 10
@@ -59,14 +134,41 @@ Item {
         RowLayout {
             WaveCard {
                 id: results
-                title: "DOL"
-                Layout.minimumHeight: 200
-                Layout.minimumWidth: 330
+                title: "Motor Parameters"
+                Layout.minimumHeight: 300
+                Layout.minimumWidth: 410
 
                 showSettings: true
             
                 GridLayout {
                     columns: 2
+                    
+                    Label {
+                        text: "Motor Type:"
+                        Layout.preferredWidth: 150
+                    }
+                    
+                    RowLayout {
+                        Layout.preferredWidth: 200
+                        
+                        ComboBox {
+                            id: motorType
+                            model: ["Induction Motor", "Synchronous Motor", "Wound Rotor Motor", 
+                                    "Permanent Magnet Motor", "Single Phase Motor"]
+                            Layout.fillWidth: true
+                            onCurrentTextChanged: {
+                                if (currentText) {
+                                    calculator.setMotorType(currentText)
+                                }
+                            }
+                        }
+                        
+                        Button {
+                            text: "ⓘ"
+                            implicitWidth: 30
+                            onClicked: showMotorInfo()
+                        }
+                    }
 
                     Label {
                         text: "Motor Power (kW):"
@@ -76,11 +178,26 @@ Item {
                     TextField {
                         id: motorPower
                         placeholderText: "Enter Power"
-                        onTextChanged: calculator.setMotorPower(parseFloat(text))
-                        Layout.preferredWidth: 150
+                        onTextChanged: if(text.length > 0) calculator.setMotorPower(parseFloat(text))
+                        Layout.preferredWidth: 200
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0 ; top: 999 }
                         maximumLength: 4
+                    }
+                    
+                    Label {
+                        text: "Voltage (V):"
+                        Layout.preferredWidth: 150
+                    }
+
+                    TextField {
+                        id: motorVoltage
+                        placeholderText: "Enter Voltage"
+                        text: "400"
+                        onTextChanged: if(text.length > 0) calculator.setVoltage(parseFloat(text))
+                        Layout.preferredWidth: 200
+                        Layout.alignment: Qt.AlignRight
+                        validator: DoubleValidator { bottom: 0; top: 15000 }
                     }
                     
                     Label {
@@ -92,8 +209,8 @@ Item {
                         id: motorEfficiency
                         placeholderText: "Enter Efficiency"
                         text: "90"
-                        onTextChanged: calculator.setEfficiency(parseFloat(text) / 100)
-                        Layout.preferredWidth: 150
+                        onTextChanged: if(text.length > 0) calculator.setEfficiency(parseFloat(text) / 100)
+                        Layout.preferredWidth: 200
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0 ; top: 99 }
                         maximumLength: 2
@@ -109,12 +226,11 @@ Item {
                         placeholderText: "Enter PF"
                         text: "0.85"
                         onTextChanged: {
-                            calculator.setPowerFactor(parseFloat(text))
-                            
+                            if(text.length > 0) calculator.setPowerFactor(parseFloat(text))
                         }
-                        Layout.preferredWidth: 150
+                        Layout.preferredWidth: 200
                         Layout.alignment: Qt.AlignRight
-                        
+                        validator: DoubleValidator { bottom: 0 ; top: 1.0 }
                     }
                     
                     Label {
@@ -122,42 +238,88 @@ Item {
                         Layout.preferredWidth: 150
                     }
 
-                    ComboBox {
-                        id: startingMethod
-                        model: ["DOL", "Star-Delta", "Soft-Starter", "VFD"]
-                        onCurrentTextChanged: {
-                            if (currentText) {
-                                console.log("Selecting starting method:", currentText)
-                                calculator.startingMethod = currentText
+                    RowLayout {
+                        Layout.preferredWidth: 200
+                        
+                        ComboBox {
+                            id: startingMethod
+                            model: ["DOL", "Star-Delta", "Soft Starter", "VFD"]
+                            Layout.fillWidth: true
+                            
+                            delegate: ItemDelegate {
+                                width: startingMethod.width
+                                text: modelData
+                                highlighted: startingMethod.highlightedIndex === index
+                                enabled: calculator.isMethodApplicable(modelData)
+                                
+                                contentItem: Text {
+                                    text: modelData
+                                    color: enabled ? Universal.foreground : Universal.foreground + "80" // 50% opacity
+                                    elide: Text.ElideRight
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                            
+                            onCurrentTextChanged: {
+                                if (currentText && calculator.isMethodApplicable(currentText)) {
+                                    console.log("Selecting starting method:", currentText)
+                                    calculator.startingMethod = currentText
+                                }
                             }
                         }
-                        Layout.preferredWidth: 150
-                        Layout.alignment: Qt.AlignRight
+                    }
+                    
+                    Button {
+                        text: "Calculate"
+                        Layout.columnSpan: 2
+                        Layout.alignment: Qt.AlignCenter
+                        Layout.topMargin: 5
+                        enabled: hasValidInputs
+                        
+                        onClicked: {
+                            if (hasValidInputs) {
+                                calculator.setMotorPower(parseFloat(motorPower.text))
+                                calculator.setVoltage(parseFloat(motorVoltage.text))
+                                calculator.setEfficiency(parseFloat(motorEfficiency.text) / 100)
+                                calculator.setPowerFactor(parseFloat(motorPowerFactor.text))
+                            } else {
+                                showMessage("Input Error", "Please ensure all fields have valid values")
+                            }
+                        }
                     }
                 }
             }
 
             WaveCard {
                 title: "Results"
-                // Layout.fillWidth: true
-                Layout.minimumWidth: 280
-                Layout.minimumHeight: 200
+                Layout.minimumWidth: 350
+                Layout.minimumHeight: 300
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 15
 
                     Label {
-                        text: "Full Load Current:"
+                        text: "Motor Type:"
                         Layout.preferredWidth: 150
                         font.bold: true
+                    }
+                    
+                    Text {
+                        text: motorType.currentText
+                        Layout.preferredWidth: 150
+                        font.bold: true
+                    }
+                    
+                    Label {
+                        text: "Full Load Current:"
+                        Layout.preferredWidth: 150
                     }
                     
                     Text {
                         text: !isNaN(calculator.startingCurrent / getStartingMultiplier()) ? 
                                 (calculator.startingCurrent / getStartingMultiplier()).toFixed(1) + " A" : "0.0 A"
                         Layout.preferredWidth: 150
-                        font.bold: true
                     }
                 
                     Label {
@@ -171,6 +333,17 @@ Item {
                         color: "red"
                         Layout.preferredWidth: 150
                     }
+                    
+                    Label {
+                        text: "Current Multiplier:"
+                        Layout.preferredWidth: 150
+                    }
+                    
+                    Text {
+                        text: getStartingMultiplier().toFixed(1) + "x"
+                        Layout.preferredWidth: 150
+                    }
+                    
                     Label {
                         text: "Starting Torque:"
                         Layout.preferredWidth: 150
@@ -181,97 +354,22 @@ Item {
                                 (calculator.startingTorque * 100).toFixed(0) + "% FLT" : "0% FLT"
                         Layout.preferredWidth: 150
                     }
+                    
+                    Label {
+                        text: "Nominal Torque:"
+                        Layout.preferredWidth: 150
+                    }
+                    
+                    Text {
+                        text: !isNaN(calculator.startingTorque) ? 
+                                (calculator.startingTorque / (calculator.startingTorque * 100 / 100)).toFixed(1) + " Nm" : "0.0 Nm"
+                        Layout.preferredWidth: 150
+                    }
                 }
             }
         }
 
-        WaveCard {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            title: "Starting Current Profile"
-            
-            Canvas {
-                id: motorStartCanvas
-                anchors.fill: parent
-                anchors.margins: 10
-                
-                // Use the cached property directly instead of calling function
-                property real startingMultiplier: cachedStartingMultiplier
-                
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.reset();
-                    
-                    // Define dimensions first before using them
-                    var canvasWidth = motorStartCanvas.width;
-                    var canvasHeight = motorStartCanvas.height;
-                    
-                    // Add background fill to match theme
-                    ctx.fillStyle = Universal.background;
-                    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-                    
-                    // Draw starting current profile
-                    ctx.beginPath();
-                    ctx.moveTo(0, canvasHeight * 0.1);  // Start at 10% from top
-                    
-                    // Draw different profiles based on starting method
-                    switch(startingMethod.currentText) {
-                        case "DOL":
-                            // Direct square wave
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.9);
-                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
-                            break;
-                            
-                        case "Star-Delta":
-                            // Two-step start
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.4);
-                            ctx.lineTo(canvasWidth * 0.3, canvasHeight * 0.4);
-                            ctx.lineTo(canvasWidth * 0.3, canvasHeight * 0.9);
-                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
-                            break;
-                            
-                        case "Soft-Starter":
-                            // Gradual ramp
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
-                            ctx.quadraticCurveTo(
-                                canvasWidth * 0.4, canvasHeight * 0.4,
-                                canvasWidth * 0.8, canvasHeight * 0.9
-                            );
-                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
-                            break;
-                            
-                        case "VFD":
-                            // Controlled ramp
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.1);
-                            ctx.lineTo(canvasWidth * 0.1, canvasHeight * 0.9);
-                            ctx.lineTo(canvasWidth, canvasHeight * 0.9);
-                            break;
-                    }
-                    
-                    ctx.strokeStyle = Universal.foreground;
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    
-                    // Add labels
-                    ctx.font = "12px sans-serif";
-                    ctx.fillStyle = Universal.foreground;  // Use theme foreground color
-                    ctx.fillText("Time →", canvasWidth - 40, canvasHeight - 5);
-                    ctx.save();
-                    ctx.translate(10, canvasHeight/2);
-                    ctx.rotate(-Math.PI/2);
-                    ctx.fillText("Current →", 0, 0);
-                    ctx.restore();
-                }
-            }
-            
-            Connections {
-                target: calculator
-                function onResultsCalculated() {
-                    motorStartCanvas.requestPaint()
-                }
-            }
-        }
+        MotorStartingViz {}
+
     }
 }
