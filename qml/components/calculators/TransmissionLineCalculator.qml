@@ -401,22 +401,6 @@ Item {
                             textColor: transmissionCard.textColor
                         }
                     }
-
-                    // Pass the calculator instance to the TransmissionLineVIViz component
-                    TransmissionLineVIViz {
-                        title: "Voltage & Current Profiles"
-                        calculator: transmissionCard.calculator  // Pass the calculator instance
-                        Layout.fillWidth: true
-                        
-                        // Make sure this onCompleted handler runs
-                        Component.onCompleted: {
-                            console.log("VI Viz completed, calculator:", calculator ? "assigned" : "not assigned")
-                            // Force a recalculation to ensure we have profiles data
-                            if (calculator) {
-                                calculator.setLength(calculator.length)
-                            }
-                        }
-                    }
                 }
             }
         }

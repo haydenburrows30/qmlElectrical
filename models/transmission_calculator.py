@@ -51,8 +51,6 @@ class TransmissionLineCalculator(QObject):
         self._skin_factor = 1.0
         self._sil = 0.0  # Surge impedance loading
         self._earth_impedance = complex(0, 0)
-        self._voltage_profile = []
-        self._current_profile = []
 
         self._calculate()
 
@@ -128,9 +126,6 @@ class TransmissionLineCalculator(QObject):
             self._alpha = self._gamma.real  # Attenuation constant (Np/km)
             self._beta = self._gamma.imag   # Phase constant (rad/km)
             
-            # Calculate profiles with corrected values
-            self._calculate_profiles()
-            
             # Calculate ABCD parameters
             gamma_l = self._gamma * self._length
             # Check for numerical stability in hyperbolic functions
@@ -152,61 +147,6 @@ class TransmissionLineCalculator(QObject):
             
         except Exception as e:
             print(f"Error in transmission line calculation: {e}")
-
-    def _calculate_profiles(self):
-        """Calculate voltage and current profiles along the line"""
-        try:
-            points = 100
-            self._voltage_profile = []
-            self._current_profile = []
-            
-            # Boundary conditions
-            v_send = 1.0  # 1.0 pu
-            v_rec = 0.95  # 0.95 pu, typical voltage drop
-            
-            # Debug output
-            print(f"Calculating profiles: length={self._length}, points={points}")
-            
-            # Calculate voltage and current along the line
-            for i in range(points + 1):
-                z = i * self._length / points
-                relative_position = z / self._length
-                
-                # Calculate voltage and current on the line
-                if abs(self._gamma) > 0:
-                    # Use hyperbolic functions for distributed parameter model
-                    gamma_z = self._gamma * z
-                    gamma_remaining = self._gamma * (self._length - z)
-                    
-                    # Coefficients for sending and receiving end
-                    a1 = cmath.cosh(gamma_remaining) / cmath.cosh(self._gamma * self._length)
-                    a2 = cmath.cosh(gamma_z) / cmath.cosh(self._gamma * self._length)
-                    
-                    # Voltage at point z as a combination of sending and receiving voltages
-                    v = v_send * a1 + v_rec * a2
-                    
-                    # Current at point z
-                    i_send = (v_send - v_rec * cmath.cosh(self._gamma * self._length)) / (self._Z * cmath.sinh(self._gamma * self._length))
-                    i = i_send * cmath.cosh(gamma_z) - (v_send/self._Z) * cmath.sinh(gamma_z)
-                else:
-                    # Fallback to linear for zero or near-zero gamma
-                    v = v_send * (1 - relative_position) + v_rec * relative_position
-                    i = (v_send - v_rec) / (self._Z * self._length) if abs(self._Z) > 0 else 0
-                
-                # Store real values (not complex)
-                self._voltage_profile.append((z, abs(v)))
-                self._current_profile.append((z, abs(i)))
-            
-            # Debug output
-            print(f"Profile calculation complete: V-profile size={len(self._voltage_profile)}, I-profile size={len(self._current_profile)}")
-            print(f"Example V-profile points: {self._voltage_profile[0]}, {self._voltage_profile[-1]}")
-            print(f"Example I-profile points: {self._current_profile[0]}, {self._current_profile[-1]}")
-                
-        except Exception as e:
-            print(f"Error calculating profiles: {e}")
-            # Provide fallback values for visualization
-            self._voltage_profile = [(0, 1.0), (self._length/2, 0.975), (self._length, 0.95)]
-            self._current_profile = [(0, 0.1), (self._length/2, 0.08), (self._length, 0.05)]
 
     # Properties
     @Property(float, notify=lengthChanged)
@@ -361,14 +301,6 @@ class TransmissionLineCalculator(QObject):
     def surgeImpedanceLoading(self):
         return self._sil
 
-    @Property(list, notify=resultsCalculated)
-    def voltageProfile(self):
-        return self._voltage_profile
-
-    @Property(list, notify=resultsCalculated)
-    def currentProfile(self):
-        return self._current_profile
-
     @Property(float, notify=bundleConfigChanged)
     def bundleSpacing(self):
         return self._bundle_spacing
@@ -472,5 +404,3 @@ class TransmissionLineCalculator(QObject):
     @Slot(float)
     def setNominalVoltage(self, value):
         self.nominalVoltage = value
-
-    # ...similar slots for other new parameters...
