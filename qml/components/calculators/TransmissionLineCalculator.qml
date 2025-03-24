@@ -14,9 +14,30 @@ Item {
     property color textColor: Universal.foreground
     property int colWidth: 195
 
-    ScrollView {
-    id: scrollView
-    anchors.fill: parent
+    // Initialize inputs when component is loaded
+    Component.onCompleted: {
+        initializeFields()
+    }
+    
+    function initializeFields() {
+        // Set input fields from calculator model
+        lengthInput.text = calculator.length.toString()
+        resistanceInput.text = calculator.resistance.toString()
+        inductanceInput.text = calculator.inductance.toString()
+        capacitanceInput.text = calculator.capacitance.toString()
+        conductanceInput.text = calculator.conductance.toString()
+        frequencyInput.text = calculator.frequency.toString()
+        
+        // Advanced parameters
+        subConductors.value = calculator.subConductors
+        bundleSpacing.text = calculator.bundleSpacing.toString()
+        conductorTemp.text = calculator.conductorTemperature.toString()
+        earthResistivity.text = calculator.earthResistivity.toString()
+        
+        // Additional parameters
+        conductorGMR.text = calculator.conductorGMR.toString()
+        nominalVoltage.text = calculator.nominalVoltage.toString()
+    }
 
     Popup {
         id: tipsPopup
@@ -83,15 +104,18 @@ Item {
         }
     }
 
-    clip: true
-    
+    ScrollView {
+        id: scrollView
+        anchors.fill: parent
+        clip: true
+
         Flickable {
             contentWidth: parent.width
             contentHeight: mainLayout.height
-            bottomMargin : 5
-            leftMargin : 5
-            rightMargin : 5
-            topMargin : 5
+            bottomMargin: 5
+            leftMargin: 5
+            rightMargin: 5
+            topMargin: 5
 
             RowLayout {
                 id: mainLayout
@@ -102,94 +126,112 @@ Item {
                     Layout.alignment: Qt.AlignTop
                     spacing: 10
 
-                    // Line Parameters
+                    // Basic Line Parameters
                     WaveCard {
                         id: results
                         title: "Line Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 300
-
+                        Layout.minimumHeight: 380
                         showSettings: true
 
-                        GridLayout {
-                            columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 15
+                        ColumnLayout {
+                            spacing: 5
+                            anchors.fill: parent
+                            anchors.margins: 5
 
-                            Label { 
-                                text: "Length (km):"
-                                Layout.minimumWidth: colWidth
+                            GridLayout {
+                                columns: 2
+                                rowSpacing: 10
+                                columnSpacing: 15
+                                Layout.fillWidth: true
+
+                                Label { 
+                                    text: "Length (km):"
+                                    Layout.minimumWidth: colWidth
                                 }
-                            TextField {
-                                id: lengthInput
-                                text: "100"
-                                validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setLength(parseFloat(text))
-                                Layout.minimumWidth: 100
-                            }
+                                TextField {
+                                    id: lengthInput
+                                    text: "100"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setLength(parseFloat(text))
+                                    Layout.minimumWidth: 100
+                                }
 
-                            Label { text: "Resistance (Ω/km):" }
-                            TextField {
-                                id: resistanceInput
-                                text: "0.1"
-                                validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setResistance(parseFloat(text))
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Resistance (Ω/km):" }
+                                TextField {
+                                    id: resistanceInput
+                                    text: "0.1"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setResistance(parseFloat(text))
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Inductance (mH/km):" }
-                            TextField {
-                                id: inductanceInput
-                                text: "1.0"
-                                validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setInductance(parseFloat(text))
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Inductance (mH/km):" }
+                                TextField {
+                                    id: inductanceInput
+                                    text: "1.0"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setInductance(parseFloat(text))
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Capacitance (µF/km):" }
-                            TextField {
-                                id: capacitanceInput
-                                text: "0.01"
-                                validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setCapacitance(parseFloat(text))
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Capacitance (µF/km):" }
+                                TextField {
+                                    id: capacitanceInput
+                                    text: "0.01"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setCapacitance(parseFloat(text))
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Conductance (S/km):" }
-                            TextField {
-                                id: conductanceInput
-                                text: "0"
-                                validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setConductance(parseFloat(text))
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Conductance (S/km):" }
+                                TextField {
+                                    id: conductanceInput
+                                    text: "0"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setConductance(parseFloat(text))
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Frequency (Hz):" }
-                            TextField {
-                                id: frequencyInput
-                                text: "50"
-                                validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setFrequency(parseFloat(text))
-                                Layout.fillWidth: true
+                                Label { text: "Frequency (Hz):" }
+                                TextField {
+                                    id: frequencyInput
+                                    text: "50"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setFrequency(parseFloat(text))
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Label { text: "Nominal Voltage (kV):" }
+                                TextField {
+                                    id: nominalVoltage
+                                    text: "400"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: if(text && acceptableInput) calculator.setNominalVoltage(parseFloat(text))
+                                    Layout.fillWidth: true
+                                }
                             }
                         }
                     }
 
+                    // Advanced Parameters
                     WaveCard {
                         title: "Advanced Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 210
+                        Layout.minimumHeight: 280
                         Layout.minimumWidth: 300
 
                         GridLayout {
                             columns: 2
                             rowSpacing: 10
                             columnSpacing: 15
+                            anchors.fill: parent
+                            anchors.margins: 5
 
                             Label { 
                                 text: "Bundle Configuration:" 
                                 Layout.minimumWidth: colWidth
-                                }
+                            }
                             SpinBox {
                                 id: subConductors
                                 from: 1
@@ -205,7 +247,16 @@ Item {
                                 id: bundleSpacing
                                 text: "0.4"
                                 validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setBundleSpacing(parseFloat(text))
+                                onTextChanged: if(text && acceptableInput) calculator.setBundleSpacing(parseFloat(text))
+                                Layout.fillWidth: true
+                            }
+
+                            Label { text: "Conductor GMR (m):" }
+                            TextField {
+                                id: conductorGMR
+                                text: "0.0078"
+                                validator: DoubleValidator { bottom: 0 }
+                                onTextChanged: if(text && acceptableInput) calculator.setConductorGMR(parseFloat(text))
                                 Layout.fillWidth: true
                             }
 
@@ -214,7 +265,7 @@ Item {
                                 id: conductorTemp
                                 text: "75"
                                 validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setConductorTemperature(parseFloat(text))
+                                onTextChanged: if(text && acceptableInput) calculator.setConductorTemperature(parseFloat(text))
                                 Layout.fillWidth: true
                             }
 
@@ -223,7 +274,7 @@ Item {
                                 id: earthResistivity
                                 text: "100"
                                 validator: DoubleValidator { bottom: 0 }
-                                onTextChanged: if(text) calculator.setEarthResistivity(parseFloat(text))
+                                onTextChanged: if(text && acceptableInput) calculator.setEarthResistivity(parseFloat(text))
                                 Layout.fillWidth: true
                             }
                         }
@@ -233,12 +284,14 @@ Item {
                     WaveCard {
                         title: "Results"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 150
+                        Layout.minimumHeight: 200
 
                         GridLayout {
                             columns: 2
                             rowSpacing: 15
                             columnSpacing: 10
+                            anchors.fill: parent
+                            anchors.margins: 5
 
                             Label { text: "Characteristic Impedance:" }
                             Label { 
@@ -248,68 +301,121 @@ Item {
                             }
 
                             Label { text: "Attenuation Constant:" }
-                            Label { text: calculator.attenuationConstant.toFixed(4) + " Np/km" ; font.bold: true}
+                            Label { text: calculator.attenuationConstant.toFixed(6) + " Np/km" ; font.bold: true}
 
                             Label { text: "Phase Constant:" }
                             Label { text: calculator.phaseConstant.toFixed(4) + " rad/km" ; font.bold: true}
+                            
+                            Label { text: "Surge Impedance Loading:" }
+                            Label { 
+                                text: calculator.surgeImpedanceLoading.toFixed(1) + " MW"
+                                color: Universal.accent
+                                font.bold: true
+                            }
                         }
                     }
 
+                    // ABCD Results
                     WaveCard {
-                        title: "ABCD Results"
+                        title: "ABCD Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 370
+                        Layout.minimumHeight: 350
                     
                         GridLayout {
                             columns: 2
                             rowSpacing: 10
                             columnSpacing: 15
+                            anchors.fill: parent
+                            anchors.margins: 5
 
-                            Label { text: "A:" }
+                            Label { text: "A Parameter:" }
                             Label { 
                                 text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°" 
                                 font.bold: true
-                                }
-                            Label { text: "B:"}
+                            }
+                            
+                            Label { text: "B Parameter:" }
                             Label { 
-                                text: calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°" ; font.bold: true
-                                }
-                            Label { text: "C:"}
-                            Label { 
-                                text: calculator.cMagnitude.toFixed(3) + " ∠" + calculator.cAngle.toFixed(1) + "°" ; font.bold: true
-                                }
-                            Label { text: "D:"}
-                            Label { 
-                                text: calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°" ; font.bold: true
-                                }
-
-                            Label { text: "SIL:"}
-                            Label { 
-                                text: calculator.surgeImpedanceLoading.toFixed(1) + " MW"
-                                color: Universal.foreground
+                                text: calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°"
                                 font.bold: true
+                            }
+                            
+                            Label { text: "C Parameter:" }
+                            Label { 
+                                text: calculator.cMagnitude.toFixed(6) + " ∠" + calculator.cAngle.toFixed(1) + "°"
+                                font.bold: true
+                            }
+                            
+                            Label { text: "D Parameter:" }
+                            Label { 
+                                text: calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°"
+                                font.bold: true
+                            }
+                            
+                            // Info about ABCD parameters
+                            Rectangle {
+                                color: "transparent"
+                                height: 1
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label {
+                                text: "ABCD Parameter Interpretation:"
+                                font.bold: true
+                                Layout.columnSpan: 2
+                            }
+                            
+                            TextArea {
+                                text: "A = Open circuit voltage ratio\nB = Transfer impedance\n" +
+                                      "C = Transfer admittance\nD = Short circuit current ratio"
+                                readOnly: true
+                                background: null
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
                             }
                         }
                     }
                 }
 
                 // Right side - Visualization
-                WaveCard {
+                ColumnLayout {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    title: "Visualization"
+                    
+                    WaveCard {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        title: "Line Parameters Visualization"
 
-                    TransmissionLineViz {
-                        anchors.fill: parent
-                        anchors.margins: 5
+                        TransmissionLineViz {
+                            anchors.fill: parent
+                            anchors.margins: 5
+                            
+                            length: parseFloat(lengthInput.text || "100")
+                            characteristicImpedance: calculator.characteristicImpedance
+                            attenuationConstant: calculator.attenuationConstant
+                            phaseConstant: calculator.phaseConstant
+                            
+                            darkMode: Universal.theme === Universal.Dark
+                            textColor: transmissionCard.textColor
+                        }
+                    }
+
+                    // Pass the calculator instance to the TransmissionLineVIViz component
+                    TransmissionLineVIViz {
+                        title: "Voltage & Current Profiles"
+                        calculator: transmissionCard.calculator  // Pass the calculator instance
+                        Layout.fillWidth: true
                         
-                        length: parseFloat(lengthInput.text || "100")
-                        characteristicImpedance: calculator.characteristicImpedance
-                        attenuationConstant: calculator.attenuationConstant
-                        phaseConstant: calculator.phaseConstant
-                        
-                        darkMode: Universal.theme === Universal.Dark
-                        textColor: transmissionCard.textColor
+                        // Make sure this onCompleted handler runs
+                        Component.onCompleted: {
+                            console.log("VI Viz completed, calculator:", calculator ? "assigned" : "not assigned")
+                            // Force a recalculation to ensure we have profiles data
+                            if (calculator) {
+                                calculator.setLength(calculator.length)
+                            }
+                        }
                     }
                 }
             }

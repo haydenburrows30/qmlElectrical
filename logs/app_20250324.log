@@ -493,3 +493,516 @@ Generating Power Curve...
 2025-03-24 10:31:29,446 - qmltest - INFO - • Temperature: 25.0°C
 2025-03-24 10:31:29,446 - qmltest - INFO - • Grouping Factor: 1.00
 2025-03-24 10:31:29,446 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:20:40,610 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:20:40,834 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:20:40,834 - qmltest - INFO - Input Parameters:
+2025-03-24 12:20:40,834 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:20:40,834 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:20:40,834 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:20:40,834 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:20:40,834 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:20:40,834 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:20:40,834 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:20:41,134 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:20:41,134 - qmltest - INFO - Input Parameters:
+2025-03-24 12:20:41,134 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:20:41,134 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:20:41,134 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:20:41,134 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:20:41,134 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:20:41,134 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:20:41,134 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:23:47,334 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:23:47,554 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:23:47,554 - qmltest - INFO - Input Parameters:
+2025-03-24 12:23:47,554 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:23:47,554 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:23:47,554 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:23:47,554 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:23:47,554 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:23:47,554 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:23:47,554 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:23:47,725 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:23:47,725 - qmltest - INFO - Input Parameters:
+2025-03-24 12:23:47,725 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:23:47,725 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:23:47,725 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:23:47,725 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:23:47,725 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:23:47,725 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:23:47,735 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:24:14,546 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:24:14,698 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:24:14,698 - qmltest - INFO - Input Parameters:
+2025-03-24 12:24:14,698 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:24:14,698 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:24:14,698 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:24:14,698 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:24:14,698 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:24:14,698 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:24:14,714 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:24:14,890 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:24:14,890 - qmltest - INFO - Input Parameters:
+2025-03-24 12:24:14,890 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:24:14,890 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:24:14,890 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:24:14,890 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:24:14,890 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:24:14,890 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:24:14,894 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:29:51,735 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:29:52,008 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:29:52,008 - qmltest - INFO - Input Parameters:
+2025-03-24 12:29:52,008 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:29:52,008 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:29:52,008 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:29:52,008 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:29:52,008 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:29:52,008 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:29:52,009 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:29:52,283 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:29:52,283 - qmltest - INFO - Input Parameters:
+2025-03-24 12:29:52,283 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:29:52,283 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:29:52,283 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:29:52,283 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:29:52,283 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:29:52,283 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:29:52,285 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:32:02,005 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:32:02,182 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:32:02,182 - qmltest - INFO - Input Parameters:
+2025-03-24 12:32:02,182 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:32:02,182 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:32:02,182 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:32:02,182 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:32:02,182 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:32:02,182 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:32:02,182 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:32:02,367 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:32:02,367 - qmltest - INFO - Input Parameters:
+2025-03-24 12:32:02,367 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:32:02,367 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:32:02,367 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:32:02,367 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:32:02,367 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:32:02,367 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:32:02,368 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:32:41,152 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:32:41,323 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:32:41,323 - qmltest - INFO - Input Parameters:
+2025-03-24 12:32:41,323 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:32:41,323 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:32:41,323 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:32:41,323 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:32:41,323 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:32:41,323 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:32:41,323 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:32:41,502 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:32:41,502 - qmltest - INFO - Input Parameters:
+2025-03-24 12:32:41,502 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:32:41,502 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:32:41,502 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:32:41,502 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:32:41,502 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:32:41,502 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:32:41,502 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:33:28,310 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:33:28,483 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:33:28,483 - qmltest - INFO - Input Parameters:
+2025-03-24 12:33:28,483 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:33:28,483 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:33:28,483 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:33:28,483 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:33:28,483 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:33:28,483 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:33:28,499 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:33:28,669 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:33:28,669 - qmltest - INFO - Input Parameters:
+2025-03-24 12:33:28,669 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:33:28,669 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:33:28,669 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:33:28,669 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:33:28,669 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:33:28,669 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:33:28,671 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:34:29,688 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:34:29,893 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:34:29,893 - qmltest - INFO - Input Parameters:
+2025-03-24 12:34:29,893 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:34:29,893 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:34:29,893 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:34:29,893 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:34:29,893 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:34:29,893 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:34:29,893 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:34:30,075 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:34:30,075 - qmltest - INFO - Input Parameters:
+2025-03-24 12:34:30,075 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:34:30,075 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:34:30,075 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:34:30,075 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:34:30,075 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:34:30,075 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:34:30,077 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:35:34,432 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:35:34,681 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:35:34,681 - qmltest - INFO - Input Parameters:
+2025-03-24 12:35:34,681 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:35:34,681 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:35:34,681 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:35:34,681 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:35:34,681 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:35:34,681 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:35:34,681 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:35:34,957 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:35:34,957 - qmltest - INFO - Input Parameters:
+2025-03-24 12:35:34,957 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:35:34,957 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:35:34,957 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:35:34,957 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:35:34,957 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:35:34,957 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:35:34,957 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:36:23,989 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:36:24,164 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:36:24,164 - qmltest - INFO - Input Parameters:
+2025-03-24 12:36:24,164 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:36:24,164 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:36:24,164 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:36:24,164 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:36:24,164 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:36:24,164 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:36:24,164 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:36:24,330 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:36:24,330 - qmltest - INFO - Input Parameters:
+2025-03-24 12:36:24,330 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:36:24,330 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:36:24,330 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:36:24,330 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:36:24,330 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:36:24,330 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:36:24,346 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:39:30,788 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:39:30,962 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:39:30,962 - qmltest - INFO - Input Parameters:
+2025-03-24 12:39:30,962 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:39:30,962 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:39:30,962 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:39:30,962 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:39:30,962 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:39:30,962 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:39:30,962 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:39:31,130 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:39:31,130 - qmltest - INFO - Input Parameters:
+2025-03-24 12:39:31,130 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:39:31,130 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:39:31,130 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:39:31,130 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:39:31,130 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:39:31,130 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:39:31,130 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:39:52,218 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:39:52,392 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:39:52,392 - qmltest - INFO - Input Parameters:
+2025-03-24 12:39:52,392 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:39:52,392 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:39:52,392 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:39:52,392 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:39:52,392 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:39:52,392 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:39:52,392 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:39:52,553 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:39:52,553 - qmltest - INFO - Input Parameters:
+2025-03-24 12:39:52,553 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:39:52,553 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:39:52,553 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:39:52,553 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:39:52,554 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:39:52,554 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:39:52,556 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:39:55,647 - qmltest - INFO - 
+=== Starting Transformer-Line Calculations ===
+2025-03-24 12:39:55,647 - qmltest - INFO - Load MVA: 0.8000 MVA
+2025-03-24 12:39:55,647 - qmltest - INFO - Load power factor: 0.85
+2025-03-24 12:39:55,647 - qmltest - INFO - 
+Transformer Impedance Calculations:
+2025-03-24 12:39:55,647 - qmltest - INFO - • Z base: 403.33 ohm
+2025-03-24 12:39:55,647 - qmltest - INFO - • Z (pu): 0.060
+2025-03-24 12:39:55,647 - qmltest - INFO - • Total Z: 24.20 ohm
+2025-03-24 12:39:55,647 - qmltest - INFO - • R: 3.00 ohm
+2025-03-24 12:39:55,647 - qmltest - INFO - • X: 24.01 ohm
+2025-03-24 12:39:55,648 - qmltest - INFO - 
+Line Parameters:
+2025-03-24 12:39:55,648 - qmltest - INFO - • Total Z: 1.60 at 38.7 degrees ohm
+2025-03-24 12:39:55,648 - qmltest - INFO - 
+Load Current:
+2025-03-24 12:39:55,648 - qmltest - INFO - • Magnitude: 41.99 A
+2025-03-24 12:39:55,648 - qmltest - INFO - • Angle: 31.8°
+2025-03-24 12:39:55,648 - qmltest - INFO - • Complex: 35.69-22.12j A
+2025-03-24 12:39:55,648 - qmltest - INFO - Source voltage: 6350.85 V
+2025-03-24 12:39:55,648 - qmltest - INFO - Voltage drop complex: (705.0129320764006+798.6944070023735j)
+2025-03-24 12:39:55,648 - qmltest - INFO - Receiving end voltage: (5645.840029009483-798.6944070023735j)
+2025-03-24 12:39:55,648 - qmltest - INFO - Natural voltage drop: 10.22%
+2025-03-24 12:39:55,648 - qmltest - INFO - Unregulated voltage: 9.88 kV
+2025-03-24 12:39:55,648 - qmltest - INFO - Fault current LV: 7.22 kA
+2025-03-24 12:39:55,648 - qmltest - INFO - Fault current HV: 0.25 kA
+2025-03-24 12:39:55,648 - qmltest - INFO - Transformer full load current: 15.75 A
+2025-03-24 12:39:55,648 - qmltest - INFO - Relay pickup current: 19.68 A
+2025-03-24 12:39:55,648 - qmltest - INFO - CT ratio selected: 50/1
+2025-03-24 12:39:55,648 - qmltest - INFO - 
+Ground fault calculation:
+2025-03-24 12:39:55,648 - qmltest - INFO - Z0 transformer: 20.57 ohm
+2025-03-24 12:39:55,648 - qmltest - INFO - Z0 line: 3.75+3.00j ohm
+2025-03-24 12:39:55,648 - qmltest - INFO - Zn referred: 3781.25 ohm
+2025-03-24 12:39:55,648 - qmltest - INFO - Ground fault current: 10.00 A
+2025-03-24 12:39:55,648 - qmltest - INFO - 
+Protection Settings:
+2025-03-24 12:39:55,648 - qmltest - INFO - • Relay Pickup Current: 19.68 A
+2025-03-24 12:39:55,648 - qmltest - INFO - • CT Ratio: 50/1
+2025-03-24 12:39:55,648 - qmltest - INFO - • Time Dial: 0.30
+2025-03-24 12:39:55,648 - qmltest - INFO - • Curve Type: Very Inverse (IEC)
+2025-03-24 12:39:55,648 - qmltest - INFO - 
+Voltage Regulator:
+2025-03-24 12:39:55,648 - qmltest - INFO - • Unregulated Voltage: 9.88 kV
+2025-03-24 12:39:55,648 - qmltest - INFO - • Target Voltage: 11.00 kV
+2025-03-24 12:39:55,648 - qmltest - INFO - • Tap Position: 16
+2025-03-24 12:39:55,648 - qmltest - INFO - • Regulated Voltage: 10.86 kV
+2025-03-24 12:39:55,648 - qmltest - INFO - 
+=== Calculations Complete ===
+
+2025-03-24 12:39:55,653 - qmltest - INFO - 
+=== Starting Wind Turbine Calculations ===
+2025-03-24 12:39:55,653 - qmltest - INFO - Input Parameters:
+2025-03-24 12:39:55,653 - qmltest - INFO - • Blade Radius: 25.0 m
+2025-03-24 12:39:55,653 - qmltest - INFO - • Wind Speed: 8.0 m/s
+2025-03-24 12:39:55,653 - qmltest - INFO - • Air Density: 1.225 kg/m³
+2025-03-24 12:39:55,653 - qmltest - INFO - • Power Coefficient: 0.4
+2025-03-24 12:39:55,653 - qmltest - INFO - • Generator Efficiency: 90.0%
+2025-03-24 12:39:55,653 - qmltest - INFO - 
+Swept Area: 1963.50 m²
+2025-03-24 12:39:55,653 - qmltest - INFO - Theoretical Power: 615.75 kW
+2025-03-24 12:39:55,653 - qmltest - INFO - Actual Power Output: 221.67 kW
+2025-03-24 12:39:55,653 - qmltest - INFO - 
+Annual Energy Production: 679.64 MWh
+2025-03-24 12:39:55,653 - qmltest - INFO - 
+Rated Capcacity: 266.00 MVA
+2025-03-24 12:39:55,653 - qmltest - INFO - 
+Ouput Current: 319.95 MVA
+2025-03-24 12:39:55,653 - qmltest - INFO - 
+Generating Power Curve...
+2025-03-24 12:39:55,653 - qmltest - INFO - === Wind Turbine Calculations Complete ===
+
+2025-03-24 12:41:37,091 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:41:37,324 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:41:37,324 - qmltest - INFO - Input Parameters:
+2025-03-24 12:41:37,324 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:41:37,324 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:41:37,324 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:41:37,324 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:41:37,324 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:41:37,324 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:41:37,327 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:41:37,604 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:41:37,604 - qmltest - INFO - Input Parameters:
+2025-03-24 12:41:37,604 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:41:37,604 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:41:37,604 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:41:37,604 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:41:37,604 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:41:37,604 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:41:37,604 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:46:15,205 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:46:15,440 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:46:15,440 - qmltest - INFO - Input Parameters:
+2025-03-24 12:46:15,440 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:46:15,440 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:46:15,440 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:46:15,440 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:46:15,440 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:46:15,440 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:46:15,440 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:46:15,609 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:46:15,609 - qmltest - INFO - Input Parameters:
+2025-03-24 12:46:15,609 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:46:15,609 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:46:15,609 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:46:15,609 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:46:15,609 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:46:15,609 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:46:15,625 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:50:17,042 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:50:17,278 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:50:17,278 - qmltest - INFO - Input Parameters:
+2025-03-24 12:50:17,278 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:50:17,278 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:50:17,278 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:50:17,278 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:50:17,278 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:50:17,278 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:50:17,280 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:50:17,564 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:50:17,564 - qmltest - INFO - Input Parameters:
+2025-03-24 12:50:17,564 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:50:17,564 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:50:17,564 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:50:17,564 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:50:17,564 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:50:17,564 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:50:17,565 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:50:47,738 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:50:47,922 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:50:47,922 - qmltest - INFO - Input Parameters:
+2025-03-24 12:50:47,922 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:50:47,922 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:50:47,922 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:50:47,922 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:50:47,922 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:50:47,922 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:50:47,923 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:50:48,085 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:50:48,085 - qmltest - INFO - Input Parameters:
+2025-03-24 12:50:48,085 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:50:48,085 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:50:48,085 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:50:48,085 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:50:48,085 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:50:48,085 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:50:48,087 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:51:13,127 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:51:13,316 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:51:13,316 - qmltest - INFO - Input Parameters:
+2025-03-24 12:51:13,316 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:51:13,316 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:51:13,316 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:51:13,316 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:51:13,316 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:51:13,316 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:51:13,316 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:51:13,497 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:51:13,497 - qmltest - INFO - Input Parameters:
+2025-03-24 12:51:13,497 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:51:13,497 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:51:13,497 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:51:13,497 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:51:13,497 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:51:13,497 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:51:13,500 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:51:38,775 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:51:38,972 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:51:38,972 - qmltest - INFO - Input Parameters:
+2025-03-24 12:51:38,972 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:51:38,972 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:51:38,972 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:51:38,972 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:51:38,972 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:51:38,972 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:51:38,972 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:51:39,144 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:51:39,144 - qmltest - INFO - Input Parameters:
+2025-03-24 12:51:39,144 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:51:39,144 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:51:39,144 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:51:39,144 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:51:39,144 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:51:39,144 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:51:39,146 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:52:07,385 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:52:07,559 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:52:07,559 - qmltest - INFO - Input Parameters:
+2025-03-24 12:52:07,559 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:52:07,559 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:52:07,559 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:52:07,559 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:52:07,559 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:52:07,559 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:52:07,559 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:52:07,735 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:52:07,735 - qmltest - INFO - Input Parameters:
+2025-03-24 12:52:07,735 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:52:07,735 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:52:07,735 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:52:07,735 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:52:07,735 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:52:07,735 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:52:07,735 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:54:52,591 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 12:54:52,859 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:54:52,859 - qmltest - INFO - Input Parameters:
+2025-03-24 12:54:52,859 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:54:52,859 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:54:52,859 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:54:52,859 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:54:52,859 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:54:52,859 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:54:52,861 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 12:54:53,043 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 12:54:53,043 - qmltest - INFO - Input Parameters:
+2025-03-24 12:54:53,043 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 12:54:53,043 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 12:54:53,043 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 12:54:53,043 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 12:54:53,043 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 12:54:53,043 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 12:54:53,045 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 15:27:41,109 - config - INFO - Loading configuration module from: C:\Users\HBAdmin.INDLINE-L1032\qmlTableView
+2025-03-24 15:27:41,452 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 15:27:41,452 - qmltest - INFO - Input Parameters:
+2025-03-24 15:27:41,452 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 15:27:41,452 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 15:27:41,452 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 15:27:41,454 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 15:27:41,454 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 15:27:41,454 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 15:27:41,456 - ResultsManager - INFO - Loaded 0 results from SQL storage
+2025-03-24 15:27:41,848 - qmltest - INFO - 
+=== Starting Voltage Drop Calculations ===
+2025-03-24 15:27:41,848 - qmltest - INFO - Input Parameters:
+2025-03-24 15:27:41,848 - qmltest - INFO - • Current: 0.00 A
+2025-03-24 15:27:41,848 - qmltest - INFO - • Length: 0.00 m
+2025-03-24 15:27:41,848 - qmltest - INFO - • Installation Method: D1 - Underground direct buried
+2025-03-24 15:27:41,848 - qmltest - INFO - • Temperature: 25.0°C
+2025-03-24 15:27:41,849 - qmltest - INFO - • Grouping Factor: 1.00
+2025-03-24 15:27:41,849 - qmltest - INFO - Invalid input parameters, skipping calculation
+2025-03-24 15:27:41,851 - ResultsManager - INFO - Loaded 0 results from SQL storage
