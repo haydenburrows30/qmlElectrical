@@ -2,23 +2,37 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import "../style"
 
 import "buttons"
 import "tooltips"
 
 Drawer {
     id: sideBar
-    // width automatically derived from RowLayout child's implicitWidth
-    height: parent ? (menuMoved ? parent.height : parent.height - 60) : 0
-    width: 60
-    property int open_closed: {sideBar.position}
+    
+    // Configuration properties
+    property int drawerWidth: Style.sideBarWidth
+    property int delegateHeight: Style.delegateHeight
+    property bool menuMoved: false
+    property bool toggle1: false
     property int hide: 0
     property int show: 0
 
-    property bool toggle1 : false
-    property bool menuMoved: false
+    // Drawer setup
+    width: drawerWidth
+    height: parent ? (menuMoved ? parent.height : parent.height - 60) : 0
+    
+    modal: false
+    interactive: false
+    visible: true
 
-    signal mySignal()
+    // Add smooth transitions
+    Behavior on width {
+        NumberAnimation { 
+            duration: Style.sidebarAnimationDuration
+            easing.type: Easing.InOutQuad 
+        }
+    }
 
     onAboutToHide: {
         show = 0
@@ -43,18 +57,16 @@ Drawer {
         listView.currentIndex = indexchange
     }
 
-    modal: false
-    interactive: false
-    visible: true
-
     Rectangle {
         id: fade
         width: parent.width
         anchors.bottom: parent.bottom
         height: 20
+        opacity: 0.8  // Make fade more visible
         gradient: Gradient {
             orientation: Gradient.Vertical
             GradientStop { position: 0.0; color: "transparent" }
+            GradientStop { position: 0.5; color: palette.base.alpha(0.5) }
             GradientStop { position: 1.0; color: palette.base }
         }
     }
@@ -74,84 +86,55 @@ Drawer {
             clip: true
             footerPositioning : ListView.OverlayFooter
 
-            delegate: 
-                ItemDelegate {
-                    implicitHeight: 60
-                    implicitWidth: 60
+            delegate: ItemDelegate {
+                implicitHeight: sideBar.delegateHeight
+                implicitWidth: sideBar.drawerWidth
 
-                    highlighted: ListView.isCurrentItem
-
-                    icon.name: model.icon
-                    icon.width: 30
-                    icon.height: 30
-
-                    CToolTip {
-                        id: toolTip
-                        text: model.title
-                        width: 110
-                    }
-
-                    onClicked: {
-                        stackView.push(model.source,StackView.Immediate)
-                        listView.currentIndex = index
-                        toolTip.close()
+                // Add hover effect
+                background: Rectangle {
+                    color: parent.hovered ? palette.highlight.alpha(Style.highlightOpacity) : Style.transparent
+                    Behavior on color {
+                        ColorAnimation { duration: Style.colorAnimationDuration }
                     }
                 }
 
-            model: ListModel {
-                ListElement {
-                    title: "Home"
-                    source: "../pages/Home.qml"
-                    tooltip: "Home"
-                    icon: "Home"
-                    }
-                ListElement {
-                    title: "Voltage Drop"
-                    source: "../pages/VoltageDrop.qml"
-                    tooltip: "Voltage Drop"
-                    icon: "Voltage Drop"
+                highlighted: ListView.isCurrentItem
+
+                icon.name: model.icon
+                icon.width: 30
+                icon.height: 30
+
+                CToolTip {
+                    id: toolTip
+                    text: model.title
+                    width: Style.tooltipWidth
                 }
-                ListElement {
-                    title: "Calculator"
-                    source: "../pages/Calculator.qml"
-                    tooltip: "Calculator"
-                    icon: "Calculator"
-                }
-                ListElement {
-                    title: "Three Phase"
-                    source: "../pages/ThreePhase.qml"
-                    tooltip: "Three Phase"
-                    icon: "Wave"
-                }
-                ListElement {
-                    title: "RLC"
-                    source: "../pages/RLC.qml"
-                    tooltip: "RLC"
-                    icon: "RLC"
-                }
-                ListElement {
-                    title: "Real Time"
-                    source: "../pages/RealTime.qml"
-                    tooltip: "Real Time"
-                    icon: "RealTime"
+
+                onClicked: {
+                    stackView.push(model.source,StackView.Immediate)
+                    listView.currentIndex = index
+                    toolTip.close()
                 }
             }
 
-            footer:
-                    DarkLightButton {
-                        id: action
-                        icon_name1: "Dark"
-                        icon_name2: "Light"
-                        mode_1: "Light Mode"
-                        mode_2: "Dark Mode"
-                        implicitHeight: 50
-                        implicitWidth: 50
-                        anchors.horizontalCenter: parent.horizontalCenter
+            // Move model to separate file
+            model: SideBarModel {}
 
-                        onClicked: {
-                            action.checked ? toggle1 = true : toggle1= false
-                        }
+            footer:
+                DarkLightButton {
+                    id: action
+                    icon_name1: "Dark"
+                    icon_name2: "Light"
+                    mode_1: "Light Mode"
+                    mode_2: "Dark Mode"
+                    implicitHeight: 50
+                    implicitWidth: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    onClicked: {
+                        action.checked ? toggle1 = true : toggle1= false
                     }
+                }
         }
     }
 }

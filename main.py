@@ -7,6 +7,8 @@ from typing import Optional
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
+from PySide6.QtCore import QUrl
+from PySide6.QtQml import qmlRegisterSingletonType
 
 from services.interfaces import ICalculatorFactory, IModelFactory, IQmlEngine, ILogger
 from services.container import Container
@@ -150,6 +152,11 @@ class Application:
 
     def register_qml_types(self):
         """Get list of QML types to register."""
+        # Register Style singleton
+        style_url = QUrl.fromLocalFile(os.path.join(CURRENT_DIR, "qml", "style", "Style.qml"))
+        self.qml_engine.engine.addImportPath(os.path.join(CURRENT_DIR, "qml"))
+        qmlRegisterSingletonType(style_url, "Style", 1, 0, "Style")
+
         qml_types = [
             (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
             (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
@@ -179,10 +186,10 @@ class Application:
             (KwFromCurrentCalculator, "KwFromCurrent", 1, 0, "KwFromCurrentCalculator"),
             (SwitchboardManager, "Switchboard", 1, 0, "SwitchboardManager"),
             (WindTurbineCalculator, "WindTurbine", 1, 0, "WindTurbineCalculator"),
-            (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator"),
-            (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
             (OhmsLawCalculator, "OhmsLaw", 1, 0, "OhmsLawCalculator"),
+            (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator"),
             (FaultCurrentCalculator, "FaultCurrent", 1, 0, "FaultCurrentCalculator"),
+            (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator")
         ]
 
         for type_info in qml_types:
@@ -190,7 +197,7 @@ class Application:
 
     def load_qml(self):
         self.qml_engine.load_qml(os.path.join(CURRENT_DIR, "qml", "main.qml"))
-        
+
         # Add platform helper registration
         from utils.platform_helper import PlatformHelper
         self.qml_engine.engine.rootContext().setContextProperty("PlatformHelper", PlatformHelper())
@@ -199,10 +206,7 @@ class Application:
         """Configure application components and initialize subsystems."""
         self.logger.setup(level=logging.INFO)
         self.setup_app()
-        
-        # Run async operations in the event loop
         self.loop.run_until_complete(self._setup_async())
-        
         self.register_qml_types()
         self.load_qml()
     
@@ -216,7 +220,7 @@ class Application:
 
 def setup_container() -> Container:
     """Create and configure the dependency injection container.
-    
+
     Returns:
         Container: Configured dependency injection container
     """
@@ -237,5 +241,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
