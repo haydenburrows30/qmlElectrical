@@ -290,8 +290,17 @@ Item {
             ctx.font = "12px sans-serif";
             ctx.textAlign = "center";
             
-            var phase = vectorGroup.substring(2) || "0";
-            var phaseAngle = phase === "11" ? "30°" : phase === "1" ? "-30°" : "0°";
+            // Update phase angle description based on vector group
+            var clockNumber = vectorGroup.substring(2);
+            var phaseAngle;
+            
+            if (vectorGroup === "Dyn11") {
+                phaseAngle = "+30°";  // Dyn11 has a +30° (clockwise) shift
+            } else if (clockNumber === "1") {
+                phaseAngle = "-30°";  // Clock position 1 means -30° shift
+            } else {
+                phaseAngle = "0°";    // All other cases
+            }
             
             var info = "Vector Group: " + vectorGroup + 
                       " | Phase Shift: " + phaseAngle +
@@ -306,23 +315,31 @@ Item {
             var cx = x;
             var cy = y + radius * 0.8;
             
-            // Primary vectors
+            // Primary vectors (always at 0°, 120°, 240°)
             ctx.strokeStyle = "#2196F3";
             ctx.lineWidth = 2;
             
-            // Draw primary vectors (120° apart)
-            drawVector(ctx, cx, cy, radius, 0);
-            drawVector(ctx, cx, cy, radius, 120);
-            drawVector(ctx, cx, cy, radius, 240);
+            drawVector(ctx, cx, cy, radius, 0);      // A phase
+            drawVector(ctx, cx, cy, radius, 120);    // B phase
+            drawVector(ctx, cx, cy, radius, 240);    // C phase
             
-            // Secondary vectors with phase shift
+            // Secondary vectors with correct phase shift
             ctx.strokeStyle = "#FF6347";
             ctx.lineWidth = 2;
             
-            var shift = phase === "11" ? 30 : phase === "1" ? -30 : 0;
+            // Calculate phase shift based on vector group
+            var shift = 0;
+            if (vectorGroup === "Dyn11") {
+                shift = 30;  // 30° clockwise shift for Dyn11
+            } else if (vectorGroup === "Dyn1") {
+                shift = -30; // -30° (counterclockwise) shift for Dyn1
+            } else if (vectorGroup.endsWith("1")) {
+                shift = -30; // -30° for other groups ending in 1
+            }
+            
             var isZigzag = vectorGroup.charAt(1).toLowerCase() === "z";
             
-            // Draw secondary vectors with phase shift
+            // Draw secondary vectors with correct phase shift
             if (isZigzag) {
                 // Draw the main zigzag resultant vectors
                 drawVector(ctx, cx, cy, radius * 0.7, 0 + shift);
@@ -347,10 +364,10 @@ Item {
                 
                 ctx.setLineDash([]);
             } else {
-                // Normal vector drawing for non-zigzag configurations
-                drawVector(ctx, cx, cy, radius * 0.7, 0 + shift);
-                drawVector(ctx, cx, cy, radius * 0.7, 120 + shift);
-                drawVector(ctx, cx, cy, radius * 0.7, 240 + shift);
+                // Draw secondary vectors with applied phase shift
+                drawVector(ctx, cx, cy, radius * 0.7, 0 + shift);     // a phase
+                drawVector(ctx, cx, cy, radius * 0.7, 120 + shift);   // b phase
+                drawVector(ctx, cx, cy, radius * 0.7, 240 + shift);   // c phase
             }
         }
         

@@ -274,7 +274,7 @@ Item {
                     //Impedance
                     WaveCard {
                         title: "Impedance & Construction"
-                        Layout.minimumHeight: 250
+                        Layout.minimumHeight: 360
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -388,6 +388,56 @@ Item {
                                 id: voltageDrop
                                 text: calculator.voltageDrop.toFixed(2)
                                 color: Universal.foreground
+                            }
+
+                            Label { text: "Iron Losses (W):" }
+                            TextField {
+                                id: ironLossesInput
+                                placeholderText: "Enter Fe losses"
+                                Layout.minimumWidth: 150
+                                Layout.fillWidth: true
+                                onTextChanged: {
+                                    if (text) {
+                                        calculator.setIronLosses(parseFloat(text))
+                                    }
+                                }
+                                ToolTip.text: "Core losses due to hysteresis and eddy currents"
+                                ToolTip.visible: hovered
+                            }
+
+                            Label { text: "Temperature Rise:" }
+                            Label {
+                                text: calculator.temperatureRise.toFixed(1) + "°C"
+                                color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
+                                ToolTip.text: "Estimated temperature rise above ambient"
+                                ToolTip.visible: hovered
+                            }
+
+                            // Add warnings section
+                            Rectangle {
+                                visible: calculator.warnings.length > 0
+                                color: Universal.accent
+                                opacity: 0.1
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: warningColumn.height + 20
+
+                                ColumnLayout {
+                                    id: warningColumn
+                                    width: parent.width
+                                    anchors.centerIn: parent
+
+                                    Repeater {
+                                        model: calculator.warnings
+                                        Label {
+                                            text: "⚠️ " + modelData
+                                            color: Universal.accent
+                                            font.pixelSize: 12
+                                            Layout.fillWidth: true
+                                            horizontalAlignment: Text.AlignHCenter
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

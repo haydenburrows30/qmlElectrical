@@ -5,3 +5,5 @@ numpy==2.2.4
 reportlab
 psutil
 tabulate
+scipy
+pandas

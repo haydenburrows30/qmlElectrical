@@ -394,7 +394,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            TransformerVisualization {
+            InstrumentTransformerVisualization {
                 id: transformerViz
                 anchors.fill: parent
                 

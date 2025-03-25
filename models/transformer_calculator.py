@@ -24,6 +24,9 @@ class TransformerCalculator(QObject):
     
     # Add new signals
     copperLossesChanged = Signal()
+    ironLossesChanged = Signal()
+    temperatureRiseChanged = Signal()
+    warningsChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -71,6 +74,11 @@ class TransformerCalculator(QObject):
         
         # Add copper losses property (watts)
         self._copper_losses = 0.0  # Watts
+
+        # Add new properties
+        self._iron_losses = 0.0  # No-load losses in watts
+        self._temperature_rise = 0.0  # Temperature rise in Celsius
+        self._warnings = []  # List of warning messages
 
     @Property(float, notify=primaryVoltageChanged)
     def primaryVoltage(self):
@@ -228,6 +236,25 @@ class TransformerCalculator(QObject):
                 
                 self._calculate_impedance_parameters()
 
+    @Property(float, notify=ironLossesChanged)
+    def ironLosses(self):
+        return self._iron_losses
+        
+    @ironLosses.setter
+    def ironLosses(self, value):
+        if self._iron_losses != value and value >= 0:
+            self._iron_losses = value
+            self.ironLossesChanged.emit()
+            self._calculate_efficiency()
+
+    @Property(float, notify=temperatureRiseChanged)
+    def temperatureRise(self):
+        return self._temperature_rise
+        
+    @Property('QVariantList', notify=warningsChanged)
+    def warnings(self):
+        return self._warnings
+
     def _calculate_corrected_ratio(self):
         """Calculate turns ratio corrected for vector group"""
         try:
@@ -371,6 +398,39 @@ class TransformerCalculator(QObject):
         except Exception as e:
             print(f"Error calculating impedance parameters: {e}")
 
+    def _calculate_efficiency(self):
+        """Calculate transformer efficiency under load"""
+        if self._apparent_power > 0:
+            total_losses = self._iron_losses + self._copper_losses
+            input_power = self._apparent_power * 1000 * 0.8  # Assuming 0.8 power factor
+            if input_power > total_losses:
+                self._efficiency = ((input_power - total_losses) / input_power) * 100
+                self.efficiencyChanged.emit()
+
+    def _calculate_temperature_rise(self):
+        """Estimate temperature rise based on losses"""
+        if self._apparent_power > 0:
+            # Simplified estimation based on typical values
+            self._temperature_rise = (self._copper_losses / (self._apparent_power * 10)) + 35
+            self.temperatureRiseChanged.emit()
+
+    def _validate_parameters(self):
+        """Validate parameters and generate warnings"""
+        self._warnings = []
+        
+        if self._impedance_percent < 3:
+            self._warnings.append("Low impedance may result in high fault currents")
+        if self._impedance_percent > 8:
+            self._warnings.append("High impedance may cause excessive voltage drop")
+            
+        if self._efficiency < 90:
+            self._warnings.append("Unusually low efficiency detected")
+            
+        if self._temperature_rise > 65:
+            self._warnings.append("High temperature rise may reduce transformer life")
+            
+        self.warningsChanged.emit()
+
     # Helper methods for three-phase calculations
     def _line_to_phase_voltage(self, line_voltage):
         """Convert line-to-line voltage to phase voltage in a 3-phase system"""
@@ -425,3 +485,7 @@ class TransformerCalculator(QObject):
     @Slot(float)
     def setCopperLosses(self, value):
         self.copperLosses = value
+
+    @Slot(float)
+    def setIronLosses(self, value):
+        self.ironLosses = value
