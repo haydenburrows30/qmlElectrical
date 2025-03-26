@@ -24,6 +24,34 @@ The application follows a modular design pattern where components are broken dow
 - **VoltageDropDetails**: Detailed calculation information popup
 - **SavedResults**: Display and management of saved calculations
 
+### Export Components
+- **ExportFileDialog**: Generic file export dialog with configurable formats
+- **ExportFormatMenu**: Context menu for export format selection
+- **PDFGenerator**: Generation of detailed reports including:
+  - Transformer reports with protection settings
+  - Voltage drop calculation details 
+  - Cable comparison tables with metadata
+
+### Database Components
+- **DatabaseTools**: Database maintenance and schema management
+- **DataStore**: Centralized data storage with:
+  - In-memory caching
+  - SQLite persistence
+  - Thread-safe access
+  - Multiple data types (cables, diversity factors, etc.)
+
+### Protection Components 
+- **ProtectionRelayData**: Protection device database access
+  - Device types and ratings
+  - Protection curve data
+  - Trip settings and characteristics
+  - Relay CT ratios
+
+### Visualization Components
+- **VoltageDropChart**: Interactive voltage drop visualization
+- **TransmissionLineViz**: Line parameter visualization
+- **ProtectionRequirementsResults**: Protection settings display
+
 ## Component Relationships
 1. **VoltageDrop Page**
    - Contains CableSelectionSettings for input
