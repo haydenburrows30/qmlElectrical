@@ -302,10 +302,10 @@ Item {
                     Label {
                         text: "Motor Type:"
                         Layout.preferredWidth: 150
-                        font.bold: true
+                        // font.bold: true
                     }
                     
-                    Text {
+                    Label {
                         text: motorType.currentText
                         Layout.preferredWidth: 150
                         font.bold: true
@@ -316,7 +316,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
                     
-                    Text {
+                    Label {
                         text: !isNaN(calculator.startingCurrent / getStartingMultiplier()) ? 
                                 (calculator.startingCurrent / getStartingMultiplier()).toFixed(1) + " A" : "0.0 A"
                         Layout.preferredWidth: 150
@@ -327,7 +327,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
                     
-                    Text {
+                    Label {
                         text: !isNaN(calculator.startingCurrent) ? 
                                 calculator.startingCurrent.toFixed(1) + " A" : "0.0 A"
                         color: "red"
@@ -339,7 +339,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
                     
-                    Text {
+                    Label {
                         text: getStartingMultiplier().toFixed(1) + "x"
                         Layout.preferredWidth: 150
                     }
@@ -349,7 +349,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
                     
-                    Text {
+                    Label {
                         text: !isNaN(calculator.startingTorque) ? 
                                 (calculator.startingTorque * 100).toFixed(0) + "% FLT" : "0% FLT"
                         Layout.preferredWidth: 150
@@ -360,7 +360,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
                     
-                    Text {
+                    Label {
                         text: !isNaN(calculator.startingTorque) ? 
                                 (calculator.startingTorque / (calculator.startingTorque * 100 / 100)).toFixed(1) + " Nm" : "0.0 Nm"
                         Layout.preferredWidth: 150

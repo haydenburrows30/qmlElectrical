@@ -20,6 +20,8 @@ GridLayout {
     signal viewDetailsClicked()
     signal saveResultsClicked()
     signal viewChartClicked()
+
+    property color textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
     
     // Calculate percentage as local property for efficiency
     property real dropPercentage: currentVoltageDropValue / (parseFloat(selectedVoltage.slice(0, -1)) || 1) * 100
@@ -52,26 +54,24 @@ GridLayout {
         id: networkFuseSizeText
         text: combinedRatingInfo || "N/A"
         color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
-               "blue" : (text === "Error" ? "red" : sideBar.toggle1 ? "#ffffff" : "#000000")
+               "blue" : (text === "Error" ? "red" : textColor)
         font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
         Layout.fillWidth: true
     }
 
     Label { text: "Total Load (kVA):" }
-    Text {
+    Label {
         id: totalLoadText
         text: totalLoad.toFixed(1)
         font.bold: true
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "#ffffff" : "#000000"
     }
 
     Label { text: "Current (A):" }
-    Text {
+    Label {
         id: currentText
         text: current.toFixed(1)
         font.bold: true
-        color: sideBar.toggle1 ? "#ffffff" : "#000000"
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
     }

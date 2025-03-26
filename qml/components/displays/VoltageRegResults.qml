@@ -17,84 +17,84 @@ ColumnLayout {
         columnSpacing: 15
         rowSpacing: 8
         
-        Text { 
+        Label { 
             text: "Over/Under Voltage (ANSI 59/27):" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "±15% of nominal voltage" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Current-limiting fuses:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "200A on each phase" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Control Power Backup:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "UPS for microprocessor controller" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Motor Control Protection:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "Circuit breakers for each motor" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Position Indication:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "Tap position indicators & SCADA interface" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Inter-phase Coordination:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "Common controller for all 3 units" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Bypass Provision:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "Manual bypass switches for each phase" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
         
-        Text { 
+        Label { 
             text: "Surge Protection:" 
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "9kV MOV arresters on both sides" 
             font.bold: true
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
 
         Rectangle {
@@ -107,49 +107,49 @@ ColumnLayout {
         }
     }
 
-    Text { 
+    Label { 
         text: "Configuration Details:" 
         Layout.columnSpan: 2
         font.bold: true 
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
-    Text {
+    Label {
         text: "Delta-connected single-phase 185kVA regulators for 11kV line"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
-    Text {
+    Label {
         text:"32-step voltage regulators with ±10% regulation range"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Step voltage change: 0.625% per step (10% ÷ 16 steps)"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Suitable for addressing voltage rise during high wind generation periods"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text:"Bidirectional power flow capability"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Total capacity: 555kVA (3 × 185kVA single-phase units)"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
     Rectangle {
@@ -161,47 +161,47 @@ ColumnLayout {
         color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
     }
 
-    Text { 
+    Label { 
         text: "Control System Specifications:" 
         Layout.columnSpan: 2
         font.bold: true 
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
-    Text {
+    Label {
         text: "Cooper CL-6 or Eaton ComPak Plus voltage control system"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Line drop compensation with R and X settings"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Load balancing capability for the three single-phase units"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Remote communications via DNP3.0 protocol" 
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Data logging for voltage profiles and operations count"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: "Reverse power detection for bidirectional regulation"
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 }

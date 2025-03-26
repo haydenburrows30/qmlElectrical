@@ -13,23 +13,23 @@ GridLayout {
     rowSpacing: 8
 
     // Circuit Breaker Section
-    Text { 
+    Label { 
         text: "Circuit Breaker Ratings:"
         font.bold: true
         font.pixelSize: 14
         Layout.columnSpan: 2
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
     
-    Text { 
+    Label { 
         text: "Generator Circuit Breaker:" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: (((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)) * 1.25).toFixed(0) + " A (125% of full load current)"
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
     // Protection Functions Section
@@ -42,89 +42,89 @@ GridLayout {
         color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
     }
 
-    Text { 
+    Label { 
         text: "Protection Functions:" 
         font.bold: true
         font.pixelSize: 14
         Layout.columnSpan: 2
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
-    Text { 
+    Label { 
         text: "Overcurrent (ANSI 50/51):" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text {
+    Label {
         text: (((totalGeneratedPower * 1000) / (Math.sqrt(3) * 400)) * 1.1).toFixed(0) + " A" 
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
-    Text { 
+    Label { 
         text: "Earth Fault (ANSI 50N/51N):" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: "20% of rated current" 
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
     
-    Text { 
+    Label { 
         text: "Overvoltage (ANSI 59):" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: "110% of 400V" 
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
     
-    Text { 
+    Label { 
         text: "Undervoltage (ANSI 27):" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: "80% of 400V" 
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
     
-    Text { 
+    Label { 
         text: "Over/Under Frequency (ANSI 81O/U):" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: "±2% of nominal" 
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
     
-    Text { 
+    Label { 
         text: "Reverse Power (ANSI 32):" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: "5% of rated power" 
         font.bold: true
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 
-    Text { 
+    Label { 
         text: "Anti-Islanding Protection:" 
         leftPadding: 10
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
-    Text { 
+    Label { 
         text: "Rate of Change of Frequency (ROCOF) or Vector Shift"
         font.bold: true
         wrapMode: Text.WordWrap
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
 }

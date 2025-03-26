@@ -307,10 +307,9 @@ Item {
                 color: "#f44336"
                 anchors.verticalCenter: parent.verticalCenter
             }
-            Text {
+            Label {
                 text: "Voltage"
                 font.pixelSize: 12
-                color: sideBar.toggle1 ? "#ffffff" : "#000000"
             }
         }
         
@@ -322,10 +321,9 @@ Item {
                 color: "#ffcdd2"
                 anchors.verticalCenter: parent.verticalCenter
             }
-            Text {
+            Label {
                 text: "Current"
                 font.pixelSize: 12
-                color: sideBar.toggle1 ? "#ffffff" : "#000000"
             }
         }
     }

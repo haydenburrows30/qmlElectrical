@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import "../"
 import "../buttons"
 import "../popups"
+import "../backgrounds"
 
 Item {
     id: transformerLineSection
@@ -255,11 +256,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: (totalGeneratedPower / 1000).toFixed(3)
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Load (MVA):" }
@@ -268,11 +265,7 @@ Item {
                                 readOnly: false
                                 Layout.fillWidth: true
                                 text: { calculator.loadMVA.toFixed(3) }
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Power Factor:" }
@@ -343,11 +336,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
-                                    border.color: "#c0c0c0"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             // Regulator model - specific to VR-32
@@ -373,11 +362,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
-                                    border.color: "#c0c0c0"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             // Capacity per phase
@@ -388,11 +373,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
-                                    border.color: "#c0c0c0"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             // Target voltage setting
@@ -475,11 +456,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
-                                    border.color: "#c0c0c0"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                         }
                     }
@@ -508,11 +485,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Transformer R (Ohms):" }
@@ -521,11 +494,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.transformerROhms, 0).toFixed(3) : "0.000"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Transformer X (Ohms):" }
@@ -534,11 +503,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Line Total Z (Ohms):" }
@@ -547,11 +512,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Natural Voltage Drop (%):" }
@@ -560,11 +521,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Fault Current at LV Side (kA):" }
@@ -573,11 +530,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Fault Current at HV Side (kA):" }
@@ -586,11 +539,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Unregulated Voltage (kV):" }
@@ -600,11 +549,7 @@ Item {
                                 text: calculatorReady ? 
                                     safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
                                     "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             // Add export button
@@ -657,11 +602,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "CT Ratio:" }
@@ -670,11 +611,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? calculator.relayCtRatio : "300/1"  // Updated default value
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Relay Curve Type:" }
@@ -683,11 +620,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Time Dial Setting:" }
@@ -696,11 +629,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Button {
@@ -761,11 +690,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Recommended LV Cable Size:" }
@@ -773,11 +698,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? calculator.recommendedLVCable : "25 mm²"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                         }
                     }
@@ -804,11 +725,7 @@ Item {
                                 text: calculatorReady ? 
                                     ((11 * (1 - safeValueFunction(calculator.voltageDrop, 0) / 100))).toFixed(2) : 
                                     "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Regulated Voltage (kV):" }
@@ -817,11 +734,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Tap Position:" }
@@ -830,11 +743,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.regulatorTapPosition, 0).toString() : "0"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Step Size (%):" }
@@ -842,11 +751,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: (calculator.voltageRegulatorRange / 16).toFixed(3)
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                             
                             Label { text: "Total 3-Phase Capacity (kVA):" }
@@ -854,11 +759,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.regulatorThreePhaseCapacity, 0).toFixed(0) : "555"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                         }
                     }

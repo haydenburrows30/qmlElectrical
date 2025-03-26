@@ -11,52 +11,51 @@ ColumnLayout {
     Layout.margins: 50
     spacing: 15
 
-    Text {
+    Label {
         text: "Wind Turbine Grid Integration Requirements"
         font.bold: true
         font.pixelSize: 14
-        color: sideBar.toggle1 ? "white" : "black"
     }
     
     Column {
         Layout.fillWidth: true
         spacing: 8
         
-        Text { 
+        Label { 
             text: "• Compliance with G59/G99 or equivalent grid connection standards"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Low Voltage Ride Through (LVRT) capability"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Active power control for frequency regulation"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Reactive power capability (power factor control)"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Harmonics and flicker within acceptable limits"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Fault level contribution within grid limits"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
     }
     
@@ -66,40 +65,40 @@ ColumnLayout {
         color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
     }
     
-    Text {
+    Label {
         text: "SCADA and Communication"
         font.bold: true
         font.pixelSize: 14
-        color: sideBar.toggle1 ? "white" : "black"
+        
     }
     
     Column {
         Layout.fillWidth: true
         spacing: 8
         
-        Text { 
+        Label { 
             text: "• Remote monitoring and control capabilities"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Generation forecasting"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Communication with grid operator (if required)"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
-        Text { 
+        Label { 
             text: "• Data logging for regulatory compliance"
             width: parent.width
             wrapMode: Text.WordWrap
-            color: sideBar.toggle1 ? "white" : "black"
+            
         }
     }
 }

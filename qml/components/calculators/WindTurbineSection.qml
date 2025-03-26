@@ -7,6 +7,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../buttons"
 import "../popups"
+import "../backgrounds"
 
 Item {
     id: windTurbineSection
@@ -229,11 +230,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: safeValue(calculator.sweptArea, 0).toFixed(2)
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
 
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
@@ -248,11 +245,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: safeValue(calculator.theoreticalPower, 0).toFixed(2)
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
 
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
@@ -267,11 +260,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.actualPower, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
 
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
@@ -286,11 +275,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.ratedCapacity, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
 
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
@@ -305,11 +290,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.outputCurrent, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
 
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
@@ -324,11 +305,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.annualEnergy, 0).toFixed(2) : "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
 
                             Rectangle {
@@ -386,11 +363,7 @@ Item {
                                 readOnly: true
                                 Layout.fillWidth: true
                                 text: "0.00"
-                                background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    border.color: "#0078d7"
-                                    radius: 2
-                                }
+                                background: ProtectionRectangle {}
                             }
                         }
                     }

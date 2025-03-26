@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../backgrounds"
 
 Popup {
     id: expertPopup
@@ -59,11 +60,7 @@ Popup {
                         let z0 = 0.85 * z_base;
                         return safeValueFunction(z0, 0).toFixed(3);
                     }
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Z0 Line (Ω):" }
@@ -78,11 +75,7 @@ Popup {
                                          safeValueFunction(calculator.lineLength, 5), 2));
                         return safeValueFunction(z, 0).toFixed(3);
                     }
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Zn Referred (Ω):" }
@@ -96,11 +89,7 @@ Popup {
                         let z_ng_referred = z_ng * Math.pow(11000 / 400, 2);
                         return safeValueFunction(z_ng_referred, 0).toFixed(1);
                     }
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Load Angle (degrees):" }
@@ -108,11 +97,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? (Math.acos(safeValueFunction(calculator.loadPowerFactor, 0.85)) * 180 / Math.PI).toFixed(1) : "0.0"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Load MVA Value:" }
@@ -120,11 +105,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? (safeValueFunction(calculator.loadMVA, 0.001)).toFixed(3): "0.001"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Load Current (A):" }
@@ -148,11 +129,7 @@ Popup {
                         // Format with angle notation
                         return `${currentMagnitude.toFixed(1)}∠${(-angle * 180 / Math.PI).toFixed(1)}° A`;
                     }
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Ground Fault Current (A):" }
@@ -160,11 +137,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? safeValueFunction(calculator.groundFaultCurrent, 10).toFixed(2) : "0.00"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Voltage Drop:" }
@@ -174,11 +147,7 @@ Popup {
                     text: calculator ? 
                         `${safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2)}% ∠${(Math.acos(safeValueFunction(calculator.loadPowerFactor, 0.85)) * 180 / Math.PI).toFixed(1)}°` : 
                         "0.00% ∠0.0°"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Receiving End Voltage:" }
@@ -188,11 +157,7 @@ Popup {
                     text: calculator ? 
                         `${safeValueFunction(calculator.unregulatedVoltage, 11).toFixed(2)} kV` : 
                         "11.00 kV"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 // Separator before protection settings
@@ -210,11 +175,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
 
                 Label { text: "Under/Over Frequency (Hz):" }
@@ -224,11 +185,7 @@ Popup {
                     text: calculator ? 
                         calculator.frequencyRelaySettings.under_freq.toFixed(1) + " / " + 
                         calculator.frequencyRelaySettings.over_freq.toFixed(1) : "47.5 / 51.5"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Rate of Change (Hz/s):" }
@@ -236,11 +193,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? calculator.frequencyRelaySettings.df_dt.toFixed(2) : "0.50"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
 
                 Label { text: "Under/Over Voltage (pu):" }
@@ -250,11 +203,7 @@ Popup {
                     text: calculator ? 
                         calculator.voltageRelaySettings.under_voltage.toFixed(2) + " / " +
                         calculator.voltageRelaySettings.over_voltage.toFixed(2) : "0.80 / 1.20"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
                 
                 Label { text: "Differential Slope (%):" }
@@ -262,11 +211,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? safeValueFunction(calculator.differentialRelaySlope, 25).toString() : "25"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
 
                 Label { text: "Reverse Power Trip (%):" }
@@ -274,11 +219,7 @@ Popup {
                     readOnly: true
                     Layout.fillWidth: true
                     text: calculator ? (calculator.reversePowerThreshold * 100).toFixed(1) : "-10.0"
-                    background: Rectangle {
-                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                        border.color: "#0078d7"
-                        radius: 2
-                    }
+                    background: ProtectionRectangle {}
                 }
             }
         }

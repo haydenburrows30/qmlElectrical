@@ -209,17 +209,17 @@ Item {
                     width: parent.width
                     columnSpacing: 10
                     
-                    Text { text: "Voltage (V):" ; Layout.minimumWidth: 100 ; color: sideBar.toggle1 ? "white":"black"}
-                    Text { text: calculatorReady ? calculator.voltage.toFixed(1) + " V" : "N/A" ; font.bold: true ; color: sideBar.toggle1 ? "white":"black"}
+                    Label { text: "Voltage (V):" ; Layout.minimumWidth: 100}
+                    Label { text: calculatorReady ? calculator.voltage.toFixed(1) + " V" : "N/A" ; font.bold: true}
                     
-                    Text { text: "Current (I):" ;color: sideBar.toggle1 ? "white":"black"}
-                    Text { text: calculatorReady ? calculator.current.toFixed(1) + " A" : "N/A" ; font.bold: true ; color: sideBar.toggle1 ? "white":"black"}
+                    Label { text: "Current (I):" ;}
+                    Label { text: calculatorReady ? calculator.current.toFixed(1) + " A" : "N/A" ; font.bold: true}
                     
-                    Text { text: "Resistance (R):" ;color: sideBar.toggle1 ? "white":"black"}
-                    Text { text: calculatorReady ? calculator.resistance.toFixed(1) + " Ω" : "N/A" ; font.bold: true ; color: sideBar.toggle1 ? "white":"black"}
+                    Label { text: "Resistance (R):" ;}
+                    Label { text: calculatorReady ? calculator.resistance.toFixed(1) + " Ω" : "N/A" ; font.bold: true}
                     
-                    Text { text: "Power (P):" ;color: sideBar.toggle1 ? "white":"black"}
-                    Text { text: calculatorReady ? calculator.power.toFixed(1) + " W" : "N/A" ; font.bold: true ; color: sideBar.toggle1 ? "white":"black"}
+                    Label { text: "Power (P):" ;}
+                    Label { text: calculatorReady ? calculator.power.toFixed(1) + " W" : "N/A" ; font.bold: true}
                 }
             }
         }

@@ -15,7 +15,7 @@ Page {
     id: root
 
     // Add theme-aware text color property
-    property color textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
+    property color textColorPhase: sideBar.toggle1 ? "#ffffff" : "#000000"
 
     background: Rectangle {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
@@ -166,12 +166,12 @@ Page {
                                 Label { 
                                     text: sineModel.negativeSeq.toFixed(1) + " V"
                                     font.bold: true 
-                                    color: sineModel.negativeSeq > 5 ? "#ff4444" : textColor
+                                    color: sineModel.negativeSeq > 5 ? "#ff4444" : textColorPhase
                                 }
                                 Label { 
                                     text: sineModel.negativeSeqCurrent.toFixed(1) + " A"
                                     font.bold: true
-                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColor
+                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
                                 }
                                 
                                 // Zero Sequence
@@ -179,12 +179,12 @@ Page {
                                 Label { 
                                     text: sineModel.zeroSeq.toFixed(1) + " V"
                                     font.bold: true
-                                    color: sineModel.zeroSeq > 5 ? "#ff4444" : textColor
+                                    color: sineModel.zeroSeq > 5 ? "#ff4444" : textColorPhase
                                 }
                                 Label { 
                                     text: sineModel.zeroSeqCurrent.toFixed(1) + " A"
                                     font.bold: true
-                                    color: sineModel.zeroSeqCurrent > 0.1 ? "#ff4444" : textColor
+                                    color: sineModel.zeroSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
                                 }
                                 
                                 // Unbalance
@@ -192,12 +192,12 @@ Page {
                                 Label { 
                                     text: (sineModel.negativeSeq / sineModel.positiveSeq * 100).toFixed(1) + "%"
                                     font.bold: true
-                                    color: sineModel.negativeSeq / sineModel.positiveSeq > 0.02 ? "#ff4444" : textColor
+                                    color: sineModel.negativeSeq / sineModel.positiveSeq > 0.02 ? "#ff4444" : textColorPhase
                                 }
                                 Label { 
                                     text: (sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent * 100).toFixed(1) + "%"
                                     font.bold: true
-                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColor
+                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
                                 }
                             }
                         }
@@ -222,7 +222,7 @@ Page {
                                     powerFactor: sineModel.averagePowerFactor
                                     triangleScale: 100
                                     color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
-                                    textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
+                                    textColor: textColorPhase
                                 }
 
                                 GridLayout {
