@@ -28,7 +28,7 @@ Popup {
             
             ColumnLayout {
                 width: parent.width
-                spacing: 5
+                spacing: Style.spacing
 
                 ComboBox {
                     id: performanceMode
@@ -89,7 +89,7 @@ Popup {
             
             ColumnLayout {
                 width: parent.width
-                spacing: 5
+                spacing: Style.spacing
                 
                 CheckBox {
                     id: profilingCheckbox

@@ -66,7 +66,7 @@ Page {
                 id: mainLayout
                 width: scrollView.width
                 anchors.left: parent.left
-                spacing: 5
+                spacing: Style.spacing
 
                 ColumnLayout {
                     RowLayout {

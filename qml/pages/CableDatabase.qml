@@ -34,7 +34,7 @@ Page {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 15
-                    spacing: 5
+                    spacing: Style.spacing
                     
                     Label {
                         text: "Cable Database"

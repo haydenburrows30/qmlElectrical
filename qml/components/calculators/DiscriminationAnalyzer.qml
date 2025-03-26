@@ -211,7 +211,7 @@ Item {
                 ListView {
                     anchors.fill: parent
                     model: calculator.relayList
-                    spacing: 5
+                    spacing: Style.spacing
                     clip: true
 
                     delegate: Rectangle {

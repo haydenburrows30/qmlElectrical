@@ -92,7 +92,7 @@ Page {
             ColumnLayout {
                 id: mainLayout
                 anchors.fill: parent
-                spacing: 5
+                spacing: Style.spacing
 
                 TabBar {
                     id: circuitModeTabs
@@ -114,7 +114,7 @@ Page {
                 }
 
                 RowLayout {
-                    spacing: 5
+                    spacing: Style.spacing
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
@@ -129,7 +129,7 @@ Page {
                         
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: 5
+                            spacing: Style.spacing
                             
                             // Circuit diagram
                             Item {

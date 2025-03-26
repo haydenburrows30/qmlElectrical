@@ -36,7 +36,7 @@ Item {
     
     ColumnLayout {
         anchors.centerIn: parent
-        anchors.margins: 10
+        anchors.margins: Style.spacing
         spacing: Style.spacing
         
         RowLayout {
@@ -49,10 +49,10 @@ Item {
                 
                 GridLayout {
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.margins: Style.spacing
                     columns: 2
-                    columnSpacing: 20
-                    rowSpacing: 10
+                    columnSpacing: Style.spacing
+                    rowSpacing: Style.spacing
                     Layout.fillWidth: true
                     
                     Label { text: "Input Voltage (V):" }
@@ -113,10 +113,10 @@ Item {
                 
                 GridLayout {
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.margins: Style.spacing
                     columns: 2
-                    columnSpacing: 20
-                    rowSpacing: 10
+                    columnSpacing: Style.spacing
+                    rowSpacing: Style.spacing
                     Layout.fillWidth: true
                     
                     Label { text: "Output Voltage (V):" }
@@ -181,7 +181,7 @@ Item {
                 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.margins: Style.spacing
                     width: parent.width
                     
                     Text {
@@ -230,7 +230,7 @@ Item {
             CircuitVisualizer {
                 id: circuitCanvas
                 anchors.fill: parent
-                anchors.margins: 20
+                anchors.margins: Style.spacing
                 
                 // Pass values from calculator to the visualizer
                 inputVoltage: vinField.text

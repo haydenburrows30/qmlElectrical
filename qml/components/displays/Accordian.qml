@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../displays"
+import "../style"
 
 Pane {
 
@@ -104,7 +105,7 @@ Pane {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 10
-                            spacing: 5
+                            spacing: Style.spacing
 
                             WindGenProtectionResults {}
                         }
@@ -149,7 +150,7 @@ Pane {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 10
-                            spacing: 5
+                            spacing: Style.spacing
 
                             LineProtectionResults {}
                         }
@@ -194,7 +195,7 @@ Pane {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 10
-                            spacing: 5
+                            spacing: Style.spacing
 
                             ProtectionRequirementsResults {}
                         }
@@ -239,7 +240,7 @@ Pane {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 10
-                            spacing: 5
+                            spacing: Style.spacing
 
                             VoltageRegResults {}
                         }
@@ -283,7 +284,7 @@ Pane {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 10
-                            spacing: 5
+                            spacing: Style.spacing
 
                             ABBConfig {}
                         }
@@ -328,7 +329,7 @@ Pane {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 10
-                            spacing: 5
+                            spacing: Style.spacing
 
                             GridConnectionReq {}
                         }

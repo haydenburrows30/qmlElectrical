@@ -108,7 +108,7 @@ Item {
 
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: 5
+                            spacing: Style.spacing
                             
                             // Input Mode Selection
                             RowLayout {

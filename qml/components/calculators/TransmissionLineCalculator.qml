@@ -138,7 +138,7 @@ Item {
                         showSettings: true
 
                         ColumnLayout {
-                            spacing: 5
+                            spacing: Style.spacing
                             anchors.fill: parent
                             anchors.margins: 5
 

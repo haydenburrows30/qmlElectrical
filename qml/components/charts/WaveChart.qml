@@ -103,7 +103,7 @@ ChartView {
             x: 5
             y: 0
             visible: parent.visible
-            spacing: 5
+            spacing: Style.spacing
 
             Repeater {
                 model: trackerValues

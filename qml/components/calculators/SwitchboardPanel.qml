@@ -129,7 +129,7 @@ Item {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: 5
+                spacing: Style.spacing
 
                 // 1. TabBar at the very top
                 TabBar {
@@ -164,7 +164,7 @@ Item {
                         
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: 5
+                            spacing: Style.spacing
                             
                             // Header row now inside the first tab
                             Rectangle {

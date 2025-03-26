@@ -25,5 +25,5 @@ QtObject {
     readonly property real highlightOpacity: 0.1
 
     // width
-    readonly property int spacing: 10
+    readonly property int spacing: 5
 }

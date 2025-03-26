@@ -73,7 +73,7 @@ Item {
                         id: regConfigLayout
                         anchors.fill: parent
                         anchors.margins: 10
-                        spacing: 5
+                        spacing: Style.spacing
                         
                         Text {
                             text: "<b>Controller Configuration:</b>"

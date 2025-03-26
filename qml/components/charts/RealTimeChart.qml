@@ -120,7 +120,7 @@ Pane {
                         RowLayout {
                             // Layout.fillWidth: true
                             Layout.minimumWidth: 300
-                            spacing: 5
+                            spacing: Style.spacing
                             Label { 
                                 text: modelData.name
                                 color: modelData.color
@@ -162,7 +162,7 @@ Pane {
                             
                             Grid {
                                 columns: 2
-                                spacing: 5
+                                spacing: Style.spacing
                                 width: parent.width
 
                                 Label { text: "Frequency:" }
@@ -359,7 +359,7 @@ Pane {
                         x: 5
                         y: 0
                         visible: parent.visible
-                        spacing: 5
+                        spacing: Style.spacing
 
                         Repeater {
                             model: chartView.trackerValues

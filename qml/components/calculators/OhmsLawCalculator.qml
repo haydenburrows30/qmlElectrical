@@ -63,7 +63,7 @@ Item {
         }
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 10
+            anchors.margins: Style.spacing
             width: parent.width
             spacing: Style.spacing
             
@@ -75,7 +75,7 @@ Item {
             GridLayout {
                 columns: 2
                 Layout.fillWidth: true
-                columnSpacing: 30
+                columnSpacing: Style.spacing
                 
                 Text { text: "Voltage (V):" }
                 Text { text: "V = I × R" }
@@ -117,10 +117,11 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
-        anchors.margins: 10
+        anchors.margins: Style.spacing
         spacing: Style.spacing
 
         RowLayout {
+            spacing: Style.spacing
 
             WaveCard {
                 id: results
@@ -134,10 +135,10 @@ Item {
                 showSettings: true
                 
                 GridLayout {
-                    anchors.margins: 10
+                    anchors.margins: Style.spacing
                     columns: 3
-                    columnSpacing: 10
-                    rowSpacing: 10
+                    columnSpacing: Style.spacing
+                    rowSpacing: Style.spacing
                     Layout.fillWidth: true
                     
                     Label { text: "Select Two Known Parameters:"; Layout.columnSpan: 3 }
@@ -208,7 +209,7 @@ Item {
                     id: resultGrid
                     columns: 2
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.margins: Style.spacing
                     
                     Label { text: "Voltage (V):" ; Layout.minimumWidth: 100}
                     TextField { 
