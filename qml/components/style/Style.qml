@@ -23,4 +23,7 @@ QtObject {
     // Opacities
     readonly property real fadeOpacity: 0.8
     readonly property real highlightOpacity: 0.1
+
+    // width
+    readonly property int spacing: 10
 }

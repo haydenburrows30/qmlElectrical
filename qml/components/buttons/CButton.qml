@@ -3,7 +3,7 @@ import QtCore
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import "../../style"
+import "../style"
 
 /*!
     \brief Custom round button with tooltip

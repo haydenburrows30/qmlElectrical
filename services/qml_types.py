@@ -36,7 +36,7 @@ import os
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
     # Register Style singleton
-    style_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "style", "Style.qml"))
+    style_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "components","style", "Style.qml"))
     engine.addImportPath(os.path.join(current_dir, "qml"))
     qmlRegisterSingletonType(style_url, "Style", 1, 0, "Style")
 

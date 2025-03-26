@@ -5,6 +5,8 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
 
 import Transformer 1.0
 
@@ -12,8 +14,6 @@ Item {
     id: transformerCard
 
     property TransformerCalculator calculator: TransformerCalculator {}
-    property color textColor: Universal.foreground
-
 
     Popup {
         id: tipsPopup
@@ -31,8 +31,7 @@ Item {
         }
             
         ColumnLayout {
-            width: tipsPopup.width - 10
-            spacing: 15
+            spacing: Style.spacing
             
             Label {
                 text: "Transformer Tips & Explanations"
@@ -134,7 +133,7 @@ Item {
 
                 ColumnLayout {
                     Layout.maximumWidth: 300
-                    spacing: 5
+                    spacing: Style.spacing
                     Layout.alignment: Qt.AlignTop
 
                     WaveCard {
@@ -235,7 +234,7 @@ Item {
                     // Secondary Side
                     WaveCard {
                         title: "Secondary Side"
-                        Layout.minimumHeight: 110
+                        Layout.minimumHeight: 130
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -263,10 +262,12 @@ Item {
                             }
 
                             Label { text: "Current (A):" }
-                            Label {
+                            TextField {
                                 id: secondaryCurrent
                                 text: calculator.secondaryCurrent.toFixed(2)
-                                color: Universal.foreground
+                                Layout.fillWidth: true
+                                readOnly: true
+                                background: ProtectionRectangle {}
                             }
                         }
                     }
@@ -368,28 +369,6 @@ Item {
                                 }
                             }
 
-                            Label { text: "Reactance (%):" }
-                            Label {
-                                text: calculator.reactancePercent.toFixed(2)
-                                color: Universal.foreground
-                                Layout.minimumWidth: 150
-                            }
-
-                            Label { text: "Short-circuit MVA:" }
-                            Label {
-                                text: calculator.shortCircuitPower.toFixed(2)
-                                color: Universal.foreground
-                                Layout.minimumWidth: 150
-                            }
-
-                            Label { text: "Voltage Drop (%):" }
-                                
-                            Label {
-                                id: voltageDrop
-                                text: calculator.voltageDrop.toFixed(2)
-                                color: Universal.foreground
-                            }
-
                             Label { text: "Iron Losses (W):" }
                             TextField {
                                 id: ironLossesInput
@@ -403,14 +382,45 @@ Item {
                                 }
                                 ToolTip.text: "Core losses due to hysteresis and eddy currents"
                                 ToolTip.visible: hovered
+                                ToolTip.delay: 500
+                            }
+
+                            Label { text: "Reactance (%):" }
+                            TextField {
+                                text: calculator.reactancePercent.toFixed(2)
+                                Layout.fillWidth: true
+                                readOnly: true
+                                background: ProtectionRectangle {}
+                            }
+
+                            Label { text: "Short-circuit MVA:" }
+                            TextField {
+                                text: calculator.shortCircuitPower.toFixed(2)
+                                Layout.fillWidth: true
+                                readOnly: true
+                                background: ProtectionRectangle {}
+                            }
+
+                            Label { text: "Voltage Drop (%):" }
+                                
+                            TextField {
+                                id: voltageDrop
+                                text: calculator.voltageDrop.toFixed(2)
+                                readOnly: true
+                                Layout.fillWidth: true
+                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Temperature Rise:" }
-                            Label {
+                            TextField {
                                 text: calculator.temperatureRise.toFixed(1) + "°C"
                                 color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
                                 ToolTip.text: "Estimated temperature rise above ambient"
                                 ToolTip.visible: hovered
+                                Layout.fillWidth: true
+                                ToolTip.delay: 500
+                                readOnly: true
+                                background: ProtectionRectangle {}
                             }
 
                             // Add warnings section
@@ -531,7 +541,6 @@ Item {
                         vectorGroup: calculator ? calculator.vectorGroup : "Dyn11"
                         
                         darkMode: Universal.theme === Universal.Dark
-                        textColor: transformerCard.textColor
                     }
                 }
             }
