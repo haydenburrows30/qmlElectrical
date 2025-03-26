@@ -5,6 +5,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../backgrounds"
 
 import Earthing 1.0
 
@@ -123,7 +124,7 @@ Item {
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
-                    columnSpacing: 15
+                    columnSpacing: 10
 
                     Label { text: "Rod Length (m):" ; Layout.minimumWidth: 150}
                     TextField {
@@ -155,7 +156,7 @@ Item {
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
-                    columnSpacing: 15
+                    columnSpacing: 10
 
                     Label { text: "Fault Current (A):" ;Layout.minimumWidth: 150}
                     TextField {
@@ -185,38 +186,47 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 15
-                    columnSpacing: 15
 
-                    Label { text: "Grid Resistance:" ;Layout.minimumWidth: 150}
-                    Label { 
+                    Label { text: "Grid Resistance:" ; Layout.minimumWidth: 150}
+                    TextField{ 
                         text: calculator.gridResistance.toFixed(3) + " Ω"
-                        color: Universal.foreground
                         Layout.minimumWidth: 100
+                        readOnly: true
+                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Ground Rise:" }
-                    Label { 
+                    TextField { 
                         text: calculator.voltageRise.toFixed(1) + " V"
-                        color: Universal.foreground
+                        Layout.fillWidth: true
+                        readOnly: true
+                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Touch Voltage:" }
-                    Label { 
+                    TextField { 
                         text: calculator.touchVoltage.toFixed(1) + " V"
                         color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
+                        Layout.fillWidth: true
+                        readOnly: true
+                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Step Voltage:" }
-                    Label { 
+                    TextField { 
                         text: calculator.stepVoltage.toFixed(1) + " V"
                         color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
+                        Layout.fillWidth: true
+                        readOnly: true
+                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Min. Conductor Size:" }
-                    Label { 
+                    TextField { 
                         text: calculator.conductorSize.toFixed(1) + " mm²"
-                        color: Universal.foreground
+                        Layout.fillWidth: true
+                        readOnly: true
+                        background: ProtectionRectangle {}
                     }
                 }
             }

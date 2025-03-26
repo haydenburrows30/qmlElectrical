@@ -5,6 +5,7 @@ import QtCharts
 
 import "../"
 import "../visualizers"
+import "../backgrounds"
 
 import OhmsLaw 1.0
 
@@ -206,20 +207,34 @@ Item {
                     columns: 2
                     anchors.fill: parent
                     anchors.margins: 10
-                    width: parent.width
-                    columnSpacing: 10
                     
                     Label { text: "Voltage (V):" ; Layout.minimumWidth: 100}
-                    Label { text: calculatorReady ? calculator.voltage.toFixed(1) + " V" : "N/A" ; font.bold: true}
+                    TextField { 
+                        text: calculatorReady ? calculator.voltage.toFixed(1) + " V" : "N/A"
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                    }
                     
                     Label { text: "Current (I):" ;}
-                    Label { text: calculatorReady ? calculator.current.toFixed(1) + " A" : "N/A" ; font.bold: true}
+                    TextField { 
+                        text: calculatorReady ? calculator.current.toFixed(1) + " A" : "N/A"
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                    }
                     
                     Label { text: "Resistance (R):" ;}
-                    Label { text: calculatorReady ? calculator.resistance.toFixed(1) + " Ω" : "N/A" ; font.bold: true}
+                    TextField {
+                        text: calculatorReady ? calculator.resistance.toFixed(1) + " Ω" : "N/A"
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                    }
                     
                     Label { text: "Power (P):" ;}
-                    Label { text: calculatorReady ? calculator.power.toFixed(1) + " W" : "N/A" ; font.bold: true}
+                    TextField { 
+                        text: calculatorReady ? calculator.power.toFixed(1) + " W" : "N/A"
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                    }
                 }
             }
         }

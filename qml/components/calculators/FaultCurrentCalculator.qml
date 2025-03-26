@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../backgrounds"
+
 import FaultCurrent 1.0
 
 Item {
@@ -124,7 +126,7 @@ Item {
                     GridLayout {
                         columns: 2
                         rowSpacing: 10
-                        columnSpacing: 15
+                        columnSpacing: 10
                         Layout.fillWidth: true
 
                         // System parameters
@@ -223,6 +225,8 @@ Item {
                             checked = advancedPanel.visible
                         }
                     }
+
+                    Label {Layout.fillHeight: true}
                 }
             }
 
@@ -231,45 +235,44 @@ Item {
                 title: "Results"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 500
-                Layout.minimumWidth: 300
+                Layout.minimumWidth: 350
 
                 GridLayout {
                     anchors.fill: parent
-                    anchors.margins: 10
                     columns: 2
-                    rowSpacing: 15
-                    columnSpacing: 10
+                    anchors.margins: 10
 
                     // Main results
                     Label { 
                         text: "Initial Sym. Current:" 
-                        font.bold: true
+                        Layout.minimumWidth: 100
                     }
-                    Label { 
+                    TextField { 
                         text: calculator.initialSymCurrent.toFixed(1) + " kA"
-                        color: textColor
-                        font.bold: true
+                        background: ProtectionRectangle {}
+                        Layout.minimumWidth: 100
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Peak Fault Current:" }
-                    Label { 
+                    TextField { 
                         text: calculator.peakFaultCurrent.toFixed(1) + " kA"
-                        color: textColor
-                        font.bold: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Breaking Current:" }
-                    Label { 
+                    TextField { 
                         text: calculator.breakingCurrent.toFixed(1) + " kA"
-                        color: textColor
-                        font.bold: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Thermal Current:" }
-                    Label { 
+                    TextField { 
                         text: calculator.thermalCurrent.toFixed(1) + " kA"
-                        color: textColor
-                        font.bold: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     // Impedance details
@@ -287,21 +290,24 @@ Item {
                     }
 
                     Label { text: "Total Impedance:" }
-                    Label { 
+                    TextField { 
                         text: calculator.totalImpedance.toFixed(3) + " Ω"
-                        color: textColor
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
                     
                     Label { text: "R / X Components:" }
-                    Label { 
+                    TextField { 
                         text: calculator.totalR.toFixed(3) + " / " + calculator.totalX.toFixed(3) + " Ω"
-                        color: textColor
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
                     
                     Label { text: "Effective X/R Ratio:" }
-                    Label { 
+                    TextField { 
                         text: calculator.effectiveXrRatio.toFixed(1)
-                        color: textColor
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
                     
                     // Per-unit values 
@@ -319,21 +325,24 @@ Item {
                     }
                     
                     Label { text: "System Z (p.u.):" }
-                    Label { 
+                    TextField { 
                         text: calculator.systemPuZ.toFixed(3) 
-                        color: textColor
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
                     
                     Label { text: "Transformer Z (p.u.):" }
-                    Label { 
+                    TextField { 
                         text: calculator.transformerPuZ.toFixed(3)
-                        color: textColor
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
                     
                     Label { text: "Cable Z (p.u.):" }
-                    Label { 
+                    TextField { 
                         text: calculator.cablePuZ.toFixed(3)
-                        color: textColor
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
                 }
             }
@@ -343,7 +352,7 @@ Item {
                 id: advancedPanel
                 columns: 2
                 rowSpacing: 10
-                columnSpacing: 15
+                columnSpacing: 10
                 Layout.minimumHeight: 500
                 Layout.minimumWidth: 300
                 Layout.fillWidth: true

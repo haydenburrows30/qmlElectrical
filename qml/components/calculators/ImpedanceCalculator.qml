@@ -5,7 +5,9 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
-import Impedance 1.0  // Import the correct namespace for the fault current calculator
+import "../backgrounds"
+
+import Impedance 1.0
 
 Item {
     id: fault_current
@@ -48,63 +50,53 @@ Item {
             Layout.minimumWidth: 300
             Layout.alignment: Qt.AlignTop
         
-            ColumnLayout {
+            GridLayout {
                 anchors.centerIn: parent
-                spacing: 10
+                columns: 2
+                columnSpacing: 20
+                rowSpacing: 10
 
-                RowLayout {
-                    spacing: 5
-                    Label {
-                        text: "Resistance(R):"
-                        Layout.preferredWidth: 100
-                    }
-                    TextField {
-                        id: rInput
-                        placeholderText: "Enter Resistance"
-                        onTextChanged: {
-                            if (text && calculator) {
-                                calculator.setResistance(parseFloat(text))
-                            }
+                Label {
+                    text: "Resistance(R):"
+                    Layout.preferredWidth: 100
+                }
+                TextField {
+                    id: rInput
+                    placeholderText: "Enter Resistance"
+                    onTextChanged: {
+                        if (text && calculator) {
+                            calculator.setResistance(parseFloat(text))
                         }
-                        Layout.preferredWidth: 140
-                        Layout.alignment: Qt.AlignRight
                     }
+                    Layout.preferredWidth: 140
+                    Layout.alignment: Qt.AlignRight
                 }
 
-                RowLayout {
-                    spacing: 5
-                    Label {
-                        text: "Reactance (X):"
-                        Layout.preferredWidth: 100
-                    }
-                    TextField {
-                        id: reactanceInput
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignRight
-                        placeholderText: "Enter Reactance"
-                        onTextChanged: {
-                            if (text && calculator) {
-                                calculator.setReactance(parseFloat(text))
-                            }
+                Label {
+                    text: "Reactance (X):"
+                    Layout.preferredWidth: 100
+                }
+                TextField {
+                    id: reactanceInput
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignRight
+                    placeholderText: "Enter Reactance"
+                    onTextChanged: {
+                        if (text && calculator) {
+                            calculator.setReactance(parseFloat(text))
                         }
                     }
                 }
 
-                RowLayout {
-                    spacing: 5
-                    Layout.topMargin: 5
-                    Label {
-                        text: "Impedance (Z):"
-                        Layout.preferredWidth: 110
-                    }
-                    Text {
-                        id: impedanceOutput
-                        text: calculator && !isNaN(calculator.impedance) ? 
-                            calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignRight
-                        color: Universal.foreground  // Use theme foreground color
-                    }
+                Label {
+                    text: "Impedance (Z):"
+                    Layout.preferredWidth: 110
+                }
+                 TextField {
+                    text: calculator && !isNaN(calculator.impedance) ? calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
+                    Layout.fillWidth: true
+                    background: ProtectionRectangle {}
+                    readOnly: true
                 }
             }
         }
