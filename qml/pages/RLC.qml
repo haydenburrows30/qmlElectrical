@@ -9,7 +9,7 @@ import QtCore
 
 import "../components"
 import "../components/visualizers"
-
+import "../components/style"
 
 Page {
     id: phasor

@@ -76,7 +76,7 @@ Item {
             
             Button {
                 text: "OK"
-                Layout.alignment: Qt.AlignHCenter
+                Layout.alignment: Qt.AlignRight
                 onClicked: errorPopup.close()
             }
         }
@@ -90,30 +90,32 @@ Item {
         // Left side inputs and results
         ColumnLayout {
             id: leftColumn
-            Layout.maximumWidth: 400
-            Layout.minimumWidth: 320
-            Layout.fillHeight: true
+            Layout.minimumWidth: 350
+            Layout.maximumWidth: 350
             spacing: Style.spacing
+            Layout.alignment: Qt.AlignTop
 
             // CT Section
             WaveCard {
+                id: results
                 title: "Current Transformer"
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                id: results
+                Layout.minimumHeight: 380
+                
                 showSettings: true
 
                 GridLayout {
                     columns: 2
                     rowSpacing: 10
-                    columnSpacing: 15
+                    columnSpacing: 10
 
-                    Label { text: "CT Type:" }
+                    Label { text: "CT Type:" ; Layout.minimumWidth: 160}
                     ComboBox {
                         id: ctType
                         model: ["Measurement", "Protection", "Combined"]
                         onCurrentTextChanged: calculator.currentCtType = currentText.toLowerCase()
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 150
                     }
 
                     Label { text: "CT Ratio:" }
@@ -201,27 +203,72 @@ Item {
                         Layout.fillWidth: true
                     }
 
-                    Rectangle {
+                    Label { text: "Custom Ratio:" }
+                    RowLayout {
                         Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.margins: 10
-                        height: 1
-                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
-                    }
-
-                    Label { 
-                        text: "Voltage Transformer"
-                        font.bold: true
-                        Layout.columnSpan: 2
-                        font.pixelSize: 16
+                        
+                        TextField {
+                            id: customRatio
+                            placeholderText: "e.g., 150/5"
+                            Layout.fillWidth: true
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^\d+\/\d+$/
+                            }
                         }
+                        
+                        Button {
+                            text: "Apply"
+                            Layout.alignment: Qt.AlignRight
+                            onClicked: {
+                                if (customRatio.acceptableInput) {
+                                    calculator.setCtRatio(customRatio.text)
+                                    let found = false
+                                    for (let i = 0; i < ctRatio.model.length; i++) {
+                                        if (ctRatio.model[i] === customRatio.text) {
+                                            ctRatio.currentIndex = i
+                                            found = true
+                                            break
+                                        }
+                                    }
+                                    if (!found) {
+                                        ctRatio.model.push(customRatio.text)
+                                        ctRatio.currentIndex = ctRatio.model.length - 1
+                                    }
+                                } else {
+                                    errorPopup.errorMessage = "Invalid ratio format. Please use format like '100/5'"
+                                    errorPopup.open()
+                                }
+                            }
+                        }
+                    }
+                    
+                    Button {
+                        text: "Reset to Defaults"
+                        Layout.columnSpan: 2
+                        Layout.alignment: Qt.AlignRight
+                        onClicked: calculator.resetToDefaults()
+                    }
+                }
+            }
 
-                    Label { text: "VT Ratio:" }
+            // VT Section
+            WaveCard {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 180
+                title: "Voltage Transformer"
+
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
+
+                    Label { text: "VT Ratio:" ; Layout.minimumWidth: 160}
                     ComboBox {
                         id: vtRatio
                         model: calculator.standardVtRatios
                         onCurrentTextChanged: if (currentText) calculator.setVtRatio(currentText)
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 150
                     }
 
                     Label { text: "VT Burden (VA):" }
@@ -249,142 +296,101 @@ Item {
                         onCurrentTextChanged: calculator.ratedVoltageFactor = currentText
                         Layout.fillWidth: true
                     }
+                }
+            }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.margins: 10
-                        height: 1
-                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
-                    }
+            // Results Section
+            WaveCard {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 450
+                title: "Results"
 
-                    Label { 
-                        text: "Results"
-                        font.bold: true
-                        Layout.columnSpan: 2
-                        font.pixelSize: 16
-                        }
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
 
-                    Label { text: "CT Knee Point:" }
-                    Label { 
+                    Label { text: "CT Knee Point:" ; Layout.minimumWidth: 160}
+                    TextField { 
                         text: isFinite(calculator.kneePointVoltage) ? calculator.kneePointVoltage.toFixed(1) + " V" : "0.0 V"
-                        font.bold: true
-                        color: Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.minimumWidth: 150
                     }
 
                     Label { text: "Maximum Fault Current:" }
-                    Label { 
+                    TextField { 
                         text: isFinite(calculator.maxFaultCurrent) ? calculator.maxFaultCurrent.toFixed(1) + " A" : "0.0 A"
-                        font.bold: true
-                        color: Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Minimum CT Burden:" }
-                    Label { 
+                    TextField { 
                         text: isFinite(calculator.minAccuracyBurden) ? calculator.minAccuracyBurden.toFixed(2) + " Ω" : "0.0 Ω"
-                        font.bold: true
-                        color: Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Error Margin:" }
-                    Label { 
+                    TextField { 
                         text: isFinite(calculator.errorMargin) ? calculator.errorMargin.toFixed(2) + "%" : "0.0%"
-                        font.bold: true
                         color: calculator.errorMargin > parseFloat(accuracyClass.currentText) ? "red" : Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Temperature Effect:" }
-                    Label { 
+                    TextField { 
                         text: isFinite(calculator.temperatureEffect) ? calculator.temperatureEffect.toFixed(2) + "%" : "0.0%"
-                        font.bold: true
-                        color: Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "VT Rated Voltage:" }
-                    Label { 
+                    TextField { 
                         text: isFinite(calculator.vtRatedVoltage) ? calculator.vtRatedVoltage.toFixed(1) + " V" : "0.0 V"
-                        font.bold: true
-                        color: Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "VT Impedance:" }
-                    Label { 
+                    TextField { 
                         text: isFinite(calculator.vtImpedance) ? calculator.vtImpedance.toFixed(1) + " Ω" : "0.0 Ω"
-                        font.bold: true
-                        color: Universal.foreground
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "VT Burden Status:" }
-                    Label { 
+                    TextField { 
                         text: calculator.vtBurdenStatus
-                        font.bold: true
                         color: calculator.vtBurdenWithinRange ? "green" : "red"
+                        readOnly: true
+                        background: ProtectionRectangle {}
+                        // Layout.fillWidth: true
+                        Layout.minimumHeight: 60
+                        Layout.minimumWidth: 150
+                        wrapMode: Text.WordWrap
                     }
 
                     Label { text: "Burden Utilization:" }
-                    Label { 
+                    TextField {
                         text: isFinite(calculator.vtBurdenUtilization) ? 
-                              calculator.vtBurdenUtilization.toFixed(1) + "%" : "0.0%"
-                        font.bold: true
+                                calculator.vtBurdenUtilization.toFixed(1) + "%" : "0.0%"
                         color: {
                             if (calculator.vtBurdenUtilization < 50) return "green"
                             if (calculator.vtBurdenUtilization < 80) return "orange"
                             return "red"
                         }
-                    }
-
-                    Label { text: "Custom Ratio:" }
-                    RowLayout {
+                        readOnly: true
+                        background: ProtectionRectangle {}
                         Layout.fillWidth: true
-                        
-                        TextField {
-                            id: customRatio
-                            placeholderText: "e.g., 150/5"
-                            Layout.fillWidth: true
-                            validator: RegularExpressionValidator {
-                                regularExpression: /^\d+\/\d+$/
-                            }
-                        }
-                        
-                        Button {
-                            text: "Apply"
-                            onClicked: {
-                                if (customRatio.acceptableInput) {
-                                    calculator.setCtRatio(customRatio.text)
-                                    let found = false
-                                    for (let i = 0; i < ctRatio.model.length; i++) {
-                                        if (ctRatio.model[i] === customRatio.text) {
-                                            ctRatio.currentIndex = i
-                                            found = true
-                                            break
-                                        }
-                                    }
-                                    if (!found) {
-                                        ctRatio.model.push(customRatio.text)
-                                        ctRatio.currentIndex = ctRatio.model.length - 1
-                                    }
-                                } else {
-                                    errorPopup.errorMessage = "Invalid ratio format. Please use format like '100/5'"
-                                    errorPopup.open()
-                                }
-                            }
-                        }
-                    }
-
-                    // Add a reset button at the bottom
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.margins: 10
-                        height: 1
-                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
-                    }
-                    
-                    Button {
-                        text: "Reset to Defaults"
-                        Layout.columnSpan: 2
-                        Layout.alignment: Qt.AlignHCenter
-                        onClicked: calculator.resetToDefaults()
                     }
                 }
             }

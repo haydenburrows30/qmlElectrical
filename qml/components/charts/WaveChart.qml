@@ -2,6 +2,8 @@ import QtQuick
 import QtCharts
 import QtQuick.Controls
 
+import "../style"
+
 ChartView {
     id: chartView
     antialiasing: true

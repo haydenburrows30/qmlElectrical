@@ -54,11 +54,12 @@ Item {
             Layout.alignment: Qt.AlignTop
             spacing: Style.spacing
 
+            //Inputs
             WaveCard {
                 id: results
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 480
+                Layout.minimumHeight: 260
 
                 showSettings: true
                     
@@ -66,7 +67,7 @@ Item {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 10
-                    Layout.fillWidth: true
+                    // Layout.fillWidth: true
                     
                     Label { text: "Load (watts):" }
                     TextField {
@@ -75,6 +76,7 @@ Item {
                         validator: DoubleValidator { bottom: 0 }
                         onTextChanged: if(text) calculator.load = parseFloat(text)
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 180
                     }
 
                     Label { text: "System Voltage (V):" }
@@ -96,22 +98,26 @@ Item {
                     }
                     
                     Label { text: "Depth of Discharge (%):" }
-                    Slider {
-                        id: dodSlider
-                        from: 30
-                        to: 80
-                        value: 50
-                        stepSize: 5
-                        onValueChanged: calculator.depthOfDischarge = value
+
+                    RowLayout {
                         Layout.fillWidth: true
-                    }
-                    
-                    Item { width: 1 }  // Spacer
-                    Text { 
-                        text: dodSlider.value + "%" 
-                        horizontalAlignment: Text.AlignHCenter
-                        Layout.fillWidth: true
-                        color: Universal.foreground
+                        
+                        Slider {
+                            id: dodSlider
+                            from: 30
+                            to: 80
+                            value: 50
+                            stepSize: 5
+                            onValueChanged: calculator.depthOfDischarge = value
+                            Layout.maximumWidth: 150
+                        }
+
+                        Label { 
+                            text: dodSlider.value + "%" 
+                            Layout.alignment: Qt.AlignRight
+                            Layout.minimumWidth: 50
+                            Layout.fillWidth: true
+                        }
                     }
                     
                     Label { text: "Battery Type:" }
@@ -121,43 +127,53 @@ Item {
                         onCurrentTextChanged: calculator.batteryType = currentText
                         Layout.fillWidth: true
                     }
+                }
+            }
+            // Results
+            WaveCard {
+                Layout.minimumHeight: 200
+                title: "Results"
+                Layout.fillWidth: true
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.margins: 10
-                        height: 1
-                        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
-                    }
-
-                    Label { text: "Results:" ; Layout.columnSpan: 2 ; font.bold: true ; font.pixelSize: 16}
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
+                    Layout.fillWidth: true
 
                     Label { text: "Current Draw:" }
-                    Label { 
+                    TextField { 
                         text: calculator.currentDraw.toFixed(2) + " A"
-                        font.bold: true
-                        color: Universal.foreground
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 180
+                        readOnly: true
                     }
 
                     Label { text: "Required Capacity:" }
-                    Label { 
+                    TextField { 
                         text: calculator.requiredCapacity.toFixed(1) + " Ah"
-                        font.bold: true
-                        color: Universal.foreground
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                        readOnly: true
                     }
                     
                     Label { text: "Recommended Capacity:" }
-                    Label { 
+                    TextField { 
                         text: calculator.recommendedCapacity.toFixed(1) + " Ah"
                         font.bold: true 
                         color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                        readOnly: true
                     }
                     
                     Label { text: "Energy Storage:" }
-                    Label { 
+                    TextField { 
                         text: calculator.energyStorage.toFixed(2) + " kWh"
-                        font.bold: true
-                        color: Universal.foreground
+                        background: ProtectionRectangle {}
+                        Layout.fillWidth: true
+                        readOnly: true
                     }
                 }
             }

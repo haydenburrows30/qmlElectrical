@@ -5,6 +5,8 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Shapes
 
+import "../style"
+
 Item {
     id: phasorDiagram
     property var phaseAngles: [0, 120, 240]
@@ -15,13 +17,12 @@ Item {
     signal angleChanged(int index, real angle)
     signal currentAngleChanged(int index, real angle)
 
-    // Add properties for customization and reuse
-    property var colors: ["#f44336", "#4caf50", "#2196f3"]  // Material Design colors
-    property var currentColors: ["#ffcdd2", "#c8e6c9", "#bbdefb"]  // Lighter versions for current
+    property var colors: ["#f44336", "#4caf50", "#2196f3"]
+    property var currentColors: ["#ffcdd2", "#c8e6c9", "#bbdefb"]
     property real clickRadius: 20
     property real phasorRadius: Math.min(width, height) * 0.4
-    property real currentPhasorRadius: phasorRadius * 0.8  // Make current phasors slightly shorter
-    property var scaleValues: [0.25, 0.5, 0.75, 1.0]  // Add explicit scale values
+    property real currentPhasorRadius: phasorRadius * 0.8
+    property var scaleValues: [0.25, 0.5, 0.75, 1.0]
 
     width: 200
     height: 200

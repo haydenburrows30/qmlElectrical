@@ -191,7 +191,7 @@ Item {
                     Button {
                         text: "Calculate"
                         Layout.columnSpan: 3
-                        Layout.alignment: Qt.AlignHCenter
+                        Layout.alignment: Qt.AlignRight
                         onClicked: calculateOhmsLaw()
                     }
                 }

@@ -7,6 +7,7 @@ import "../"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import VoltDivider 1.0
 
@@ -33,7 +34,24 @@ Item {
         // Trigger canvas redraw
         circuitCanvas.requestPaint();
     }
-    
+
+    Popup {
+        id: tipsPopup
+        width: 600
+        height: 400
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: results.open
+
+        onAboutToHide: {
+            results.open = false
+        }
+        VoltageDividerPopup {}
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: Style.spacing
@@ -43,16 +61,19 @@ Item {
             id: header
             // Input parameters
             WaveCard {
+                id: results
                 title: "Input Parameters"
                 Layout.preferredWidth: 300
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: 200
+
+                showSettings: true
                 
                 GridLayout {
                     anchors.fill: parent
                     anchors.margins: Style.spacing
-                    columns: 2
                     columnSpacing: Style.spacing
                     rowSpacing: Style.spacing
+                    columns: 2
                     Layout.fillWidth: true
                     
                     Label { text: "Input Voltage (V):" }
@@ -99,9 +120,11 @@ Item {
                     Button {
                         text: "Calculate"
                         Layout.columnSpan: 2
-                        Layout.alignment: Qt.AlignHCenter
+                        Layout.alignment: Qt.AlignRight
                         onClicked: calculateVoltageDivider()
                     }
+
+                    Label { Layout.fillHeight: true }
                 }
             }
             
@@ -109,7 +132,7 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.preferredWidth: 300
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: 200
                 
                 GridLayout {
                     anchors.fill: parent
@@ -170,53 +193,8 @@ Item {
                             radius: 2
                         }
                     }
-                }
-            }
 
-            // Formula and explanation
-            WaveCard {
-                title: "Voltage Divider Formula"
-                Layout.minimumWidth: 400
-                Layout.minimumHeight: 300
-                
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: Style.spacing
-                    width: parent.width
-                    
-                    Text {
-                        text: "<b>Voltage Divider Equation:</b>"
-                        font.pixelSize: 14
-                    }
-                    
-                    Text {
-                        text: "Vout = Vin × (R2 / (R1 + R2))"
-                        font.italic: true
-                    }
-                    
-                    Text {
-                        text: "<b>Applications:</b>"
-                        font.pixelSize: 14
-                        Layout.topMargin: 10
-                    }
-                    
-                    Text {
-                        text: "• Level shifting for ADC inputs\n" +
-                            "• Reference voltage generation\n" +
-                            "• Biasing circuits\n" +
-                            "• Attenuators\n" +
-                            "• Potential dividers for measurement"
-                        wrapMode: Text.WordWrap
-                        Layout.fillWidth: true
-                    }
-                    
-                    Text {
-                        text: "<b>Note:</b> For high impedance loads, the output voltage closely follows the theoretical value. " +
-                            "For low impedance loads, loading effects must be considered."
-                        wrapMode: Text.WordWrap
-                        Layout.fillWidth: true
-                        Layout.topMargin: 10
-                    }
+                    Label { Layout.fillHeight: true }
                 }
             }
         }
