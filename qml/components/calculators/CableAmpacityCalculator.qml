@@ -5,6 +5,8 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
 
 import CableAmpacity 1.0
 
@@ -50,12 +52,12 @@ Item {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
         
         // Left side - inputs and results
         ColumnLayout {
             Layout.maximumWidth: 350
-            spacing: 10
+            spacing: Style.spacing
             Layout.alignment: Qt.AlignTop
 
             WaveCard {

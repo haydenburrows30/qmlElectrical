@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
 
 import Machine 1.0
 
@@ -76,7 +78,7 @@ Item {
                 ColumnLayout {
                     Layout.maximumWidth: 300
                     Layout.alignment: Qt.AlignTop
-                    spacing: 10
+                    spacing: Style.spacing
 
                     // Machine Type Selection
                     WaveCard {
@@ -88,7 +90,7 @@ Item {
                         showSettings: true
                         
                         ColumnLayout {
-                            spacing: 10
+                            spacing: Style.spacing
                             ComboBox {
                                 id: machineTypeCombo
                                 model: calculator.machineTypes
@@ -113,7 +115,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.topMargin: 5
                                 Layout.leftMargin: 10
-                                spacing: 10
+                                spacing: Style.spacing
 
                                 RadioButton {
                                     id: vcModeRadio

@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../"  // Import for WaveCard component
+import "../"
+import "../style"
+import "../backgrounds"
 
 Item {
     id: root
@@ -13,7 +15,7 @@ Item {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         
         WaveCard {
             title: "Eaton VR-32 Voltage Regulator Protection Specifications"
@@ -23,7 +25,7 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 10
-                spacing: 10
+                spacing: Style.spacing
                 
                 Text {
                     text: "<b>Key Components for 3× Eaton 185kVA Single-Phase Regulators:</b>"

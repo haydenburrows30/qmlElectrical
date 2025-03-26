@@ -5,6 +5,9 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers"
+import "../style"
+import "../backgrounds"
+
 import MotorStarting 1.0  // Import the correct namespace
 
 Item {
@@ -128,7 +131,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         anchors.margins: 10
 
         RowLayout {

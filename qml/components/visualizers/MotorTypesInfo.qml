@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
+import "../style"
+import "../backgrounds"
 
 WaveCard {
     id: motorTypesInfo
@@ -47,7 +49,7 @@ WaveCard {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         
         TabBar {
             id: motorInfoTabs

@@ -10,6 +10,8 @@ import "../components"
 import "../components/visualizers/"
 import "../components/charts/"
 import "../components/three_phase/"
+import "../components/style"
+import "../components/backgrounds"
 
 Page {
     id: root
@@ -86,7 +88,7 @@ Page {
                             ColumnLayout {
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                spacing: 10
+                                spacing: Style.spacing
 
                                 PhaseTable {
                                     Layout.fillWidth: true

@@ -1,6 +1,9 @@
+import "../style"
+import "../backgrounds"
+
 ColumnLayout {
     anchors.fill: parent
-    spacing: 10
+    spacing: Style.spacing
     
     PhaseVector {
         id: phaseVector

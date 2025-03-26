@@ -5,7 +5,9 @@ import QtQuick.Layouts
 import DeltaTransformer 1.0
 
 import "../"
-import "../../components"  
+import "../../components"
+import "../style"
+import "../backgrounds"
 
 Item {
 
@@ -45,12 +47,12 @@ Item {
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: 10
+        spacing: Style.spacing
 
         ColumnLayout {
             id: inputLayout
             Layout.minimumWidth: 400
-            spacing: 10
+            spacing: Style.spacing
 
             WaveCard {
                 id: results
@@ -59,7 +61,7 @@ Item {
                 showSettings: true
 
                 ColumnLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     anchors.fill: parent
                     
 
@@ -156,7 +158,7 @@ Item {
 
                         ColumnLayout {
                             width: parent.width
-                            spacing: 10
+                            spacing: Style.spacing
 
                             Label {
                                 id: phaseVoltageText

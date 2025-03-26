@@ -6,6 +6,8 @@ import "../"
 import "../../components"
 import "../visualizers/"
 import "../backgrounds"
+import "../style"
+import "../backgrounds"
 
 import Earthing 1.0
 
@@ -55,13 +57,13 @@ Item {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         // Left side - inputs and results
         ColumnLayout {
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignTop
-            spacing: 10
+            spacing: Style.spacing
 
             // Grid Parameters
             WaveCard {

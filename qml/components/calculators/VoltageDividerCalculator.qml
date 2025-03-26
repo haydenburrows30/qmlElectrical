@@ -5,6 +5,8 @@ import QtCharts
 
 import "../"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
 
 import VoltDivider 1.0
 
@@ -35,7 +37,7 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
         
         RowLayout {
             id: header

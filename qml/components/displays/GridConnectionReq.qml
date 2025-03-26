@@ -3,13 +3,15 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../buttons"
+import "../style"
+import "../backgrounds"
 
 ColumnLayout {
     id: gridConnectionLayout
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.margins: 50
-    spacing: 15
+    spacing: Style.spacing
 
     Label {
         text: "Wind Turbine Grid Integration Requirements"

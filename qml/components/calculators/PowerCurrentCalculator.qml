@@ -3,6 +3,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../../components"
+import "../style"
+import "../backgrounds"
+
 import PCalculator 1.0
 import KwFromCurrent 1.0
 
@@ -65,7 +68,7 @@ Item {
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: 10
+        spacing: Style.spacing
         anchors.margins: 10
 
         WaveCard {
@@ -79,11 +82,11 @@ Item {
          
             ColumnLayout {
                 anchors.centerIn: parent
-                spacing: 15
+                spacing: Style.spacing
                 Layout.maximumWidth: 300
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Phase:"
                         Layout.preferredWidth: 80
@@ -103,7 +106,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "kVA:"
                         Layout.preferredWidth: 80
@@ -143,7 +146,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Voltage:"
                         Layout.preferredWidth: 80
@@ -182,7 +185,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Layout.topMargin: 5
                     
                     Label {
@@ -263,7 +266,7 @@ Item {
          
             ColumnLayout {
                 anchors.centerIn: parent
-                spacing: 15
+                spacing: Style.spacing
                 Layout.maximumWidth: 300
 
                 Text {
@@ -274,7 +277,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Phase Type:"
                         Layout.preferredWidth: 100
@@ -294,7 +297,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Current (A):"
                         Layout.preferredWidth: 100
@@ -317,7 +320,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Power Factor:"
                         Layout.preferredWidth: 100
@@ -360,7 +363,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Layout.topMargin: 15
                     
                     Label {

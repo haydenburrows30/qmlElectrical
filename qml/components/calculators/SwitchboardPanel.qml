@@ -8,6 +8,9 @@ import "../"
 import "../../components"
 import "../charts/"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
+
 import Switchboard 1.0
 
 Item {
@@ -48,7 +51,7 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         // Header section with general switchboard info
         WaveCard {
@@ -414,7 +417,7 @@ Item {
                 // 3. Finally the buttons at the bottom
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: 10
+                    spacing: Style.spacing
                     
                     Button {
                         text: "Add Circuit"

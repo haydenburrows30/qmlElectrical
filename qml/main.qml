@@ -11,6 +11,8 @@ import RLC 1.0  // Import RLC directly
 import "components"
 import "components/calculators"
 import "components/buttons"
+import "components/style"
+import "components/backgrounds"
 
 
 ApplicationWindow {
@@ -43,7 +45,7 @@ ApplicationWindow {
             
             Column {
                 anchors.centerIn: parent
-                spacing: 20
+                spacing: Style.spacing
 
                 Image {
                     source: "qrc:/icons/gallery/24x24/Calculator.svg"

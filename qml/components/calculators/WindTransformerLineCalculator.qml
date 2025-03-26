@@ -2,6 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../style"
+import "../backgrounds"
+
 import TransformerLine 1.0
 import WindTurbine 1.0
 
@@ -58,7 +61,7 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
-        spacing: 20
+        spacing: Style.spacing
         
         TabBar {
             id: tabBar

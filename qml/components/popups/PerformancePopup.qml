@@ -2,6 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../style"
+import "../backgrounds"
+
 Popup {
     id: performancePopup
     modal: true
@@ -11,7 +14,7 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         
         Label {
             text: "Performance Settings"

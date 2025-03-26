@@ -4,6 +4,9 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
+import "../style"
+import "../backgrounds"
+
 Popup {
     id: detailsPopup
     modal: true
@@ -51,7 +54,7 @@ Popup {
         ColumnLayout {
             id: detailsContent
             width: parent.width
-            spacing: 20
+            spacing: Style.spacing
 
             Label {
                 text: "Calculation Results"
@@ -126,7 +129,7 @@ Popup {
 
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 20
+                spacing: Style.spacing
                 
                 Button {
                     text: "Save to PDF"

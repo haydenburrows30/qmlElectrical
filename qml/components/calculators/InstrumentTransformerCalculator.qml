@@ -5,6 +5,9 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
+
 import InstrumentTransformer 1.0
 
 Item {
@@ -56,7 +59,7 @@ Item {
         property string errorMessage: ""
         
         contentItem: ColumnLayout {
-            spacing: 20
+            spacing: Style.spacing
             
             Label {
                 text: "Input Error"
@@ -82,7 +85,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         // Left side inputs and results
         ColumnLayout {
@@ -90,7 +93,7 @@ Item {
             Layout.maximumWidth: 400
             Layout.minimumWidth: 320
             Layout.fillHeight: true
-            spacing: 10
+            spacing: Style.spacing
 
             // CT Section
             WaveCard {

@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
+import "../style"
+import "../backgrounds"
 
 WaveCard {
     id: root
@@ -10,11 +12,11 @@ WaveCard {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 10
+            spacing: Style.spacing
 
             Button {
                 text: "Clear All"

@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../style"
+import "../backgrounds"
 
 import Battery 1.0
 
@@ -44,13 +46,13 @@ Item {
         
     RowLayout {
         anchors.centerIn: parent
-        spacing: 10
+        spacing: Style.spacing
 
         ColumnLayout {
             id: inputLayout
             Layout.preferredWidth: 400
             Layout.alignment: Qt.AlignTop
-            spacing: 10
+            spacing: Style.spacing
 
             WaveCard {
                 id: results

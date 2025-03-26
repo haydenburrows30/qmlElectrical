@@ -2,16 +2,19 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../style"
+import "../backgrounds"
+
 ColumnLayout {
     id: harmonicInputForm
-    spacing: 10
+    spacing: Style.spacing
     
     property var calculator
     signal resetTriggered
     
     // Header row for magnitude and phase
     RowLayout {
-        spacing: 10
+        spacing: Style.spacing
         Label { text: "Harmonic"; Layout.preferredWidth: 120; font.bold: true }
         Label { text: "Magnitude"; Layout.preferredWidth: 120; font.bold: true }
         Label { text: "Phase"; Layout.preferredWidth: 120; font.bold: true }
@@ -20,7 +23,7 @@ ColumnLayout {
     Repeater {
         model: [1, 3, 5, 7, 11, 13]
         delegate: RowLayout {
-            spacing: 10
+            spacing: Style.spacing
             Label { 
                 text: `${modelData}${modelData === 1 ? "st" : modelData === 3 ? "rd" : "th"} Harmonic:` 
                 Layout.preferredWidth: 120 

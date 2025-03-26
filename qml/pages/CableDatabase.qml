@@ -5,6 +5,8 @@ import QtCharts
 
 import components 1.0
 import "../components"
+import "../components/style"
+import "../components/backgrounds"
 
 Page {
     id: root
@@ -21,7 +23,7 @@ Page {
         
         ColumnLayout {
             width: scrollView.width
-            spacing: 10
+            spacing: Style.spacing
             
             // Title and description
             Rectangle {
@@ -54,7 +56,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.margins: 10
-                spacing: 10
+                spacing: Style.spacing
                 
                 // Cable data editor
                 CableDataEditor {
@@ -67,7 +69,7 @@ Page {
                 ColumnLayout {
                     Layout.preferredWidth: 350
                     Layout.fillHeight: true
-                    spacing: 10
+                    spacing: Style.spacing
                     
                     // Cable reference data
                     WaveCard {
@@ -78,7 +80,7 @@ Page {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 10
-                            spacing: 10
+                            spacing: Style.spacing
                             
                             Label {
                                 text: "Cable Types and Standards"
@@ -119,7 +121,7 @@ Page {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 10
-                            spacing: 10
+                            spacing: Style.spacing
                             
                             Label {
                                 text: "Conductor Material Properties"
@@ -210,7 +212,7 @@ Page {
         
         ColumnLayout {
             anchors.fill: parent
-            spacing: 20
+            spacing: Style.spacing
             
             Label {
                 text: messagePopup.isError ? "Error" : "Success"

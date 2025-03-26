@@ -215,7 +215,7 @@ GridLayout {
 ### Column Layout
 ```qml
 ColumnLayout {
-    spacing: 10
+    spacing: Style.spacing
     
     WaveControls { /* ... */ }
     WaveChart { /* ... */ }

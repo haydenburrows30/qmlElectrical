@@ -4,6 +4,9 @@ import QtQuick.Layouts
 import QtQuick.Shapes
 import QtCharts
 
+import "../style"
+import "../backgrounds"
+
 Item {
     id: root
     
@@ -443,7 +446,7 @@ Item {
                     Grid {
                         anchors.centerIn: parent
                         columns: 3
-                        spacing: 20
+                        spacing: Style.spacing
                         
                         // CT Status
                         Rectangle {

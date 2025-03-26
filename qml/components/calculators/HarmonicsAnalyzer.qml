@@ -9,6 +9,9 @@ import "../inputs"
 import "../displays"
 import "../monitors"
 import "../popups/"
+import "../style"
+import "../backgrounds"
+
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0
 
@@ -69,14 +72,14 @@ Item {
     }
 
     RowLayout {
-        spacing: 10
+        spacing: Style.spacing
         anchors.margins: 10
         anchors.fill: parent
 
         ColumnLayout {
             Layout.maximumWidth: 400
             Layout.alignment: Qt.AlignTop
-            spacing: 10
+            spacing: Style.spacing
 
             WaveCard {
                 id: results
@@ -87,7 +90,7 @@ Item {
                 showSettings: true
 
                 ColumnLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     
                     // Use the new HarmonicInputForm component
                     HarmonicInputForm {
@@ -137,7 +140,7 @@ Item {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 10
+            spacing: Style.spacing
 
             // Waveform Chart
             WaveCard {

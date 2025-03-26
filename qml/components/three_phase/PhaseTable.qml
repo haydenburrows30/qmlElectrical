@@ -2,8 +2,11 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../style"
+import "../backgrounds"
+
 ColumnLayout {
-    spacing: 10
+    spacing: Style.spacing
 
     GridLayout {
         Layout.fillWidth: true

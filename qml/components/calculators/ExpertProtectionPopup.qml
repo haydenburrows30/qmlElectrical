@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../backgrounds"
+import "../style"
 
 Popup {
     id: expertPopup
@@ -27,7 +28,7 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         
         Label {
             text: "Expert Protection Settings"
@@ -227,7 +228,7 @@ Popup {
         RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight
-            spacing: 10
+            spacing: Style.spacing
 
             Button {
                 text: "Refresh Values"

@@ -5,6 +5,9 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
+
 import Transmission 1.0
 
 Item {
@@ -124,7 +127,7 @@ Item {
                 ColumnLayout {
                     Layout.maximumWidth: 350
                     Layout.alignment: Qt.AlignTop
-                    spacing: 10
+                    spacing: Style.spacing
 
                     // Basic Line Parameters
                     WaveCard {

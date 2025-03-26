@@ -5,6 +5,9 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../style"
+import "../backgrounds"
+
 import Charging 1.0  // Import the Charging namespace for our calculator
 
 Item {
@@ -51,7 +54,7 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         anchors.margins: 10
 
         WaveCard {
@@ -66,7 +69,7 @@ Item {
             ColumnLayout {
             
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
 
                     Label {
                         text: "Voltage (kV):"
@@ -96,7 +99,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Cable Type:"
                         Layout.preferredWidth: 80
@@ -121,7 +124,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "uF/km (1ph):"
                         Layout.preferredWidth: 80
@@ -139,7 +142,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Freq (Hz):"
                         Layout.preferredWidth: 80
@@ -156,7 +159,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Label {
                         text: "Length (km):"
                         Layout.preferredWidth: 80
@@ -172,7 +175,7 @@ Item {
                 }
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Layout.topMargin: 5
                     Label {
                         text: "Current:"

@@ -26,7 +26,7 @@ font.pixelSize: 20 // font size
 Layout.minimumHeight
 Layout.minimumWidth: 
 Layout.alignment: Qt.AlignTop
-spacing: 10
+spacing: Style.spacing
 anchors.centerIn: parent
 anchors.fill: parent
 Layout.fillWidth: true

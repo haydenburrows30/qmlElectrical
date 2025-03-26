@@ -4,6 +4,9 @@ import QtQuick.Layouts
 import QtCharts
 import QtQuick.Controls.Universal
 
+import "../style"
+import "../backgrounds"
+
 Item {
     id: chartComponent
     
@@ -27,7 +30,7 @@ Item {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
         
         Label {
             text: "Voltage Drop Comparison by Cable Size"
@@ -40,7 +43,7 @@ Item {
         // Add series visibility controls
         Row {
             Layout.alignment: Qt.AlignHCenter
-            spacing: 10
+            spacing: Style.spacing
             
             CheckBox {
                 id: thresholdCheck
@@ -70,7 +73,7 @@ Item {
         // Add axis customization
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: 20
+            spacing: Style.spacing
             
             TextField {
                 id: xAxisTitle
@@ -399,7 +402,7 @@ Item {
         
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: 20
+            spacing: Style.spacing
             
             Button {
                 text: "Close"

@@ -5,6 +5,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
+import "../style"
 import "../backgrounds"
 
 import Impedance 1.0
@@ -42,7 +43,7 @@ Item {
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         WaveCard {
             title: "Impedance Calculator"

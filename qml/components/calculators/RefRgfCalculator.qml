@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
+import "../style"
+import "../backgrounds"
 
 import RefRgf 1.0  // Import the namespace for our calculator
 
@@ -48,7 +50,7 @@ Item {
     RowLayout {
         id: mainLayout
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
         anchors.centerIn: parent
 
         WaveCard {
@@ -60,7 +62,7 @@ Item {
             showSettings: true
 
             ColumnLayout{
-                spacing: 10
+                spacing: Style.spacing
 
                 GridLayout {
                     id: ctTransformerGrid

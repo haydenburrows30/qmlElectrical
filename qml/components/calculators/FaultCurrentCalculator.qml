@@ -3,8 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
-import "../../components"
 import "../backgrounds"
+import "../style"
 
 import FaultCurrent 1.0
 
@@ -102,11 +102,11 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         RowLayout {
             id: firstRow
-            spacing: 10
+            spacing: Style.spacing
 
             WaveCard {
                 title: "System Parameters"
@@ -120,7 +120,7 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 10
-                    spacing: 10
+                    spacing: Style.spacing
                     
                     // Main input parameters
                     GridLayout {

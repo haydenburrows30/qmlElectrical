@@ -4,6 +4,9 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../../components"
+import "../style"
+import "../backgrounds"
+
 import PFCorrection 1.0
 
 Item {
@@ -38,36 +41,35 @@ Item {
     }
 
     RowLayout {
-        spacing: 10
+        spacing: Style.spacing
         anchors.centerIn: parent
-        anchors.margins: 10
+        anchors.margins: Style.spacing
 
         // Input Section
         ColumnLayout {
             id: inputColumn
             Layout.minimumWidth: 350
-            spacing: 10
+            spacing: Style.spacing
 
             WaveCard {
                 id: results
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 170
 
                 showSettings: true
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 1
+                    rowSpacing: Style.spacing
+                    columnSpacing: Style.spacing
                     
-                    Label { text: "Active Power (kW):" }
+                    Label { text: "Active Power (kW):" ; Layout.minimumWidth: 170}
                     TextField {
                         id: activePowerInput
                         placeholderText: "Enter power"
                         onTextChanged: if(text) calculator.activePower = parseFloat(text)
                         Layout.minimumWidth: 150
-                        // Layout.fillWidth: true
                     }
 
                     Label { text: "Current PF:" }
@@ -75,8 +77,7 @@ Item {
                         id: currentPFInput
                         placeholderText: "Enter current PF"
                         onTextChanged: if(text) calculator.currentPF = parseFloat(text)
-                        Layout.minimumWidth: 150
-                        // Layout.fillWidth: true
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Target PF:" }
@@ -85,8 +86,7 @@ Item {
                         placeholderText: "Enter target PF"
                         text: "0.95"
                         onTextChanged: if(text) calculator.targetPF = parseFloat(text)
-                        Layout.minimumWidth: 150
-                        // Layout.fillWidth: true
+                        Layout.fillWidth: true
                     }
                 }
             }
@@ -95,33 +95,38 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 150
+                Layout.minimumHeight: 170
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+                    rowSpacing: Style.spacing
+                    columnSpacing: Style.spacing
 
-                    Label { text: "Required Capacitor:" }
-                    Label { 
+                    Label { text: "Required Capacitor:" ; Layout.minimumWidth: 170}
+                    TextField { 
                         text: calculator.capacitorSize.toFixed(2) + " kVAR"
-                        font.bold: true 
-                        color: Universal.foreground  // Use theme color
+                        Layout.minimumWidth: 150
+                        Layout.fillWidth: true
+                        background: ProtectionRectangle {}
+                        readOnly: true
+
                     }
 
                     Label { text: "Capacitance Required:" }
-                    Label { 
+                    TextField { 
                         text: calculator.capacitance.toFixed(2) + " μF"
-                        font.bold: true 
-                        color: Universal.foreground  // Use theme color
+                        Layout.fillWidth: true
+                        background: ProtectionRectangle {}
+                        readOnly: true
                     }
 
                     Label { text: "Annual Savings:" }
-                    Label { 
+                    TextField { 
                         text: "$" + calculator.annualSavings.toFixed(2)
-                        font.bold: true 
-                        // Use theme-appropriate green (lighter in dark mode)
                         color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
+                        Layout.fillWidth: true
+                        background: ProtectionRectangle {}
+                        readOnly: true
                     }
                 }
             }

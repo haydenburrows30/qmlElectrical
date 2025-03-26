@@ -3,12 +3,14 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../buttons"
+import "../style"
+import "../backgrounds"
 
 ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.margins: 50
-    spacing: 10
+    spacing: Style.spacing
 
     GridLayout {
         columns: 2

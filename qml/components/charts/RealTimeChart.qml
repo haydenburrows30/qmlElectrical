@@ -7,6 +7,8 @@ import QtQuick.Controls.Universal
 import QtCharts
 
 import "../"
+import "../style"
+import "../backgrounds"
 
 import RealTimeChart 1.0
 
@@ -90,14 +92,14 @@ Pane {
 
     RowLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: Style.spacing
             
         ColumnLayout {
             id: mainLayout
             Layout.fillHeight: true
             Layout.minimumWidth: 350
             Layout.maximumWidth: 350
-            spacing: 10
+            spacing: Style.spacing
             
             // Wave type controls
             WaveCard {
@@ -108,7 +110,7 @@ Pane {
                 showSettings: true
 
                 ColumnLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Layout.fillWidth: true
                     
                     Repeater {
@@ -232,7 +234,7 @@ Pane {
                 Layout.minimumHeight: 80
                 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Button {
                         text: "Save"
                         onClicked: realTimeChart.saveConfiguration()

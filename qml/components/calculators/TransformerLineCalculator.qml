@@ -5,6 +5,8 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers"
+import "../style"
+import "../backgrounds"
 
 import TransformerLine 1.0
 
@@ -51,7 +53,7 @@ Item {
         }
         ColumnLayout {
                 width: parent.width
-                spacing: 10
+                spacing: Style.spacing
                 
                 Text {
                     text: "<b>Protection Settings Notes:</b><br>" +
@@ -92,7 +94,7 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.centerIn: parent
-        spacing: 10
+        spacing: Style.spacing
        
         TransformerLineViz {
 

@@ -3,7 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
-import "../../components"   
+import "../../components"
+import "../style"
+import "../backgrounds"
+
 import Conversion 1.0
 
 Item {
@@ -63,7 +66,7 @@ Item {
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         WaveCard {
             id: results
@@ -83,7 +86,7 @@ Item {
 
                     ColumnLayout {
                         id: conversionTypeLayout
-                        spacing: 10
+                        spacing: Style.spacing
 
                         RowLayout {
                             Label {
@@ -217,7 +220,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.minimumHeight: 80
 
-                    spacing: 10
+                    spacing: Style.spacing
 
                     Label {
                         text: converter.result.toFixed(2)

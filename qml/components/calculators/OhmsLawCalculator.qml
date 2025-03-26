@@ -6,6 +6,8 @@ import QtCharts
 import "../"
 import "../visualizers"
 import "../backgrounds"
+import "../style"
+import "../backgrounds"
 
 import OhmsLaw 1.0
 
@@ -63,7 +65,7 @@ Item {
             anchors.fill: parent
             anchors.margins: 10
             width: parent.width
-            spacing: 10
+            spacing: Style.spacing
             
             Text {
                 text: "<b>Basic Ohm's Law Equations:</b>"
@@ -116,7 +118,7 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         RowLayout {
 

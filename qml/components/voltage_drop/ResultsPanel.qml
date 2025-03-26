@@ -2,6 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../style"
+import "../backgrounds"
+
 Item {
     id: root
     
@@ -91,7 +94,7 @@ Item {
             Layout.columnSpan: 2
             Layout.fillWidth: true
             Layout.topMargin: 10
-            spacing: 10
+            spacing: Style.spacing
             uniformCellSizes: true
 
             Button {

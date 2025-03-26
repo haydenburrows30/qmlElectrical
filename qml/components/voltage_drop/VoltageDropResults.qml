@@ -3,6 +3,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
+import "../style"
+import "../backgrounds"
+
 GridLayout {
     id: resultsLayout
     columns: 2
@@ -94,7 +97,7 @@ GridLayout {
         Layout.columnSpan: 2
         Layout.fillWidth: true
         Layout.topMargin: 10
-        spacing: 10
+        spacing: Style.spacing
 
         Button {
             text: "Save Results"

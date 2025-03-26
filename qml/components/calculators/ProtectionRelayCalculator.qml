@@ -4,6 +4,9 @@ import QtQuick.Layouts
 import QtCharts
 import "../"
 import "../../components"
+import "../style"
+import "../backgrounds"
+
 import ProtectionRelay 1.0
 
 Item {
@@ -51,7 +54,7 @@ Item {
     }
 
     RowLayout {
-        spacing: 10
+        spacing: Style.spacing
         anchors.centerIn: parent
 
         ColumnLayout {

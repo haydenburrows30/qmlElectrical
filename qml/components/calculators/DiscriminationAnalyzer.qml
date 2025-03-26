@@ -6,6 +6,8 @@ import QtQuick.Controls.Universal
 
 import "../"
 import "../../components"
+import "../style"
+import "../backgrounds"
 
 import DiscriminationAnalyzer 1.0
 
@@ -46,14 +48,14 @@ Item {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         // Left Column - Controls and Results
         ColumnLayout {
             Layout.maximumWidth: 300
             Layout.minimumWidth: 300
             Layout.fillHeight: true
-            spacing: 10
+            spacing: Style.spacing
 
             // Configuration Section
             WaveCard {
@@ -65,7 +67,7 @@ Item {
                 showSettings: true
                 
                 ColumnLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Layout.alignment: Qt.AlignHCenter
 
                     Text {
@@ -102,7 +104,7 @@ Item {
                 Layout.minimumHeight: 280
 
                 ColumnLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     Text {
                         text: "Relays added: " + calculator.relayCount + " (minimum 2 needed)"
                         color: calculator.relayCount < 2 ? 
@@ -177,7 +179,7 @@ Item {
                 Layout.minimumHeight: 90
 
                 RowLayout {
-                    spacing: 10
+                    spacing: Style.spacing
                     uniformCellSizes: true
                     Layout.fillWidth: true
 
@@ -314,7 +316,7 @@ Item {
             Column {
                 anchors.fill: parent
                 anchors.margins: 10
-                spacing: 10
+                spacing: Style.spacing
 
                 Label {
                     width: parent.width

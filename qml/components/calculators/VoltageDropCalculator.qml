@@ -1,10 +1,15 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
+
 import "../"
 import "../../components"
+import "../style"
+import "../backgrounds"
+
 import VoltageDrop 1.0
-import QtQuick.Controls.Universal
+
 
 Item {
     id: voltageDropCard
@@ -38,11 +43,11 @@ Item {
     RowLayout {
         id: layoutt
         anchors.centerIn: parent
-        spacing: 10
+        spacing: Style.spacing
 
         ColumnLayout {
             id: inputLayout
-            spacing: 10
+            spacing: Style.spacing
             Layout.preferredWidth: 400
 
             WaveCard {

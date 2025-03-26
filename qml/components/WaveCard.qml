@@ -3,6 +3,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
+import "style"
+import "backgrounds"
+
 Rectangle {
     id: controlRect
     color: Universal.background
@@ -28,7 +31,7 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: 10
+        spacing: Style.spacing
 
         Label {
             Layout.fillWidth: true

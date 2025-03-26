@@ -48,7 +48,7 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
-        spacing: 10
+        spacing: Style.spacing
 
         Text {
             Layout.alignment: Qt.AlignHCenter
@@ -72,7 +72,7 @@ Item {
             
             ColumnLayout {
                 width: parent.width
-                spacing: 15
+                spacing: Style.spacing
 
                 // Input parameters section
                 GroupBox {
@@ -371,7 +371,7 @@ Item {
                     
                     ColumnLayout {
                         width: parent.width
-                        spacing: 10
+                        spacing: Style.spacing
                         
                         Text {
                             text: "<b>Wind Turbine Power Formula:</b><br>" +
