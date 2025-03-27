@@ -197,6 +197,65 @@ Item {
                                 height: 1
                                 color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
                             }
+                            
+                            RowLayout {
+                                Layout.columnSpan: 2
+                                Layout.alignment: Qt.AlignCenter
+                                
+                                Button {
+                                    text: "Vestas V27"
+                                    Layout.fillWidth: true
+                                    onClicked: {
+                                        if (calculatorReady) {
+                                            calculator.loadVestasV27Parameters()
+                                            // Update UI controls to reflect the new values
+                                            bladeRadiusSpinBox.value = calculator.bladeRadius
+                                            cutInSpinBox.value = calculator.cutInSpeed
+                                            cutOutSpinBox.value = calculator.cutOutSpeed
+                                            powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
+                                            efficiencySpinBox.value = calculator.efficiency * 100
+                                            // Update the power curve
+                                            updatePowerCurve()
+                                        }
+                                    }
+                                    
+                                    background: Rectangle {
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                        radius: 2
+                                    }
+                                    
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    ToolTip.text: "Load parameters for Vestas V27 225kW wind turbine"
+                                }
+                                
+                                Button {
+                                    text: "Reset"
+                                    Layout.fillWidth: true
+                                    onClicked: {
+                                        if (calculatorReady) {
+                                            calculator.resetToGenericTurbine()
+                                            // Update UI controls to reflect the new values
+                                            bladeRadiusSpinBox.value = calculator.bladeRadius
+                                            cutInSpinBox.value = calculator.cutInSpeed
+                                            cutOutSpinBox.value = calculator.cutOutSpeed
+                                            powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
+                                            efficiencySpinBox.value = calculator.efficiency * 100
+                                            // Update the power curve
+                                            updatePowerCurve()
+                                        }
+                                    }
+                                    
+                                    background: Rectangle {
+                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                        radius: 2
+                                    }
+                                    
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    ToolTip.text: "Reset to generic turbine with variable power output"
+                                }
+                            }
 
                             ExportButton {
                                 Layout.alignment: Qt.AlignRight

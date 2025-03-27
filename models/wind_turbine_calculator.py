@@ -72,7 +72,17 @@ class WindTurbineCalculator(QObject):
                 logger.info(f"Wind speed above cut-out speed ({self._cut_out_speed} m/s)")
                 self._actual_power = 0.0
             else:
-                self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency
+                # Check if we have rated power and are above rated wind speed
+                has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
+                
+                if has_rated_specs and self._wind_speed >= self._rated_wind_speed:
+                    # For speeds above rated wind speed, use the rated power
+                    self._actual_power = self._rated_power
+                    logger.info(f"Wind speed above rated speed, using rated power of {self._rated_power/1000:.2f} kW")
+                else:
+                    # Normal power calculation based on wind speed cubed
+                    self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency
+                
                 logger.info(f"Actual Power Output: {self._actual_power/1000:.2f} kW")
             
             # Calculate annual energy
@@ -111,8 +121,10 @@ class WindTurbineCalculator(QObject):
             # Generate points from 0 to cut-out speed + 5
             max_power = 0
             
-            # Reference wind speed where power is at rated capacity (typically around 12-15 m/s). changes with wind speed chosen
-            rated_wind_speed = self._wind_speed
+            # Use rated wind speed and power if they are set (for commercial turbines)
+            has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
+            rated_power = self._rated_power if has_rated_specs else None
+            rated_wind_speed = self._rated_wind_speed if has_rated_specs else self._wind_speed
             
             for speed in np.arange(0, self._cut_out_speed + 5.0, 0.5):
                 # Calculate power at this wind speed
@@ -123,8 +135,12 @@ class WindTurbineCalculator(QObject):
                     if speed <= rated_wind_speed:
                         power = 0.5 * self._air_density * self._swept_area * math.pow(speed, 3) * self._power_coefficient * self._efficiency
                     else:
-                        # After rated speed, power is constant until cut-out
-                        power = 0.5 * self._air_density * self._swept_area * math.pow(rated_wind_speed, 3) * self._power_coefficient * self._efficiency
+                        # After rated speed, power is constant at rated power until cut-out
+                        if has_rated_specs:
+                            power = rated_power
+                        else:
+                            # If no rated power is set, use the power at rated wind speed
+                            power = 0.5 * self._air_density * self._swept_area * math.pow(rated_wind_speed, 3) * self._power_coefficient * self._efficiency
                 
                 # Keep track of maximum power
                 power_kw = power / 1000.0
@@ -147,7 +163,13 @@ class WindTurbineCalculator(QObject):
         
         return 0.5 * self._air_density * self._swept_area * math.pow(speed, 3) * self._power_coefficient * self._efficiency
     
-    # Properties and setters
+    def _reset_rated_power_settings(self):
+        """Reset any fixed rated power settings to allow dynamic calculation"""
+        if hasattr(self, '_rated_power'):
+            delattr(self, '_rated_power')
+        if hasattr(self, '_rated_wind_speed'):
+            delattr(self, '_rated_wind_speed')
+    
     @Property(float, notify=bladeRadiusChanged)
     def bladeRadius(self):
         return self._blade_radius
@@ -156,6 +178,7 @@ class WindTurbineCalculator(QObject):
     def bladeRadius(self, value):
         if self._blade_radius != value and value > 0:
             self._blade_radius = value
+            self._reset_rated_power_settings()  # Reset rated power when changing blade radius
             self.bladeRadiusChanged.emit()
             self._calculate()
     
@@ -178,6 +201,7 @@ class WindTurbineCalculator(QObject):
     def airDensity(self, value):
         if self._air_density != value and value > 0:
             self._air_density = value
+            self._reset_rated_power_settings()  # Reset rated power when changing air density
             self.airDensityChanged.emit()
             self._calculate()
     
@@ -189,6 +213,7 @@ class WindTurbineCalculator(QObject):
     def powerCoefficient(self, value):
         if self._power_coefficient != value and 0 <= value <= 0.6:  # Betz limit is 0.593
             self._power_coefficient = value
+            self._reset_rated_power_settings()  # Reset rated power when changing power coefficient
             self.powerCoefficientChanged.emit()
             self._calculate()
     
@@ -222,6 +247,7 @@ class WindTurbineCalculator(QObject):
     def efficiency(self, value):
         if self._efficiency != value and 0 < value <= 1:
             self._efficiency = value
+            self._reset_rated_power_settings()  # Reset rated power when changing efficiency
             self.efficiencyChanged.emit()
             self._calculate()
     
@@ -294,6 +320,72 @@ class WindTurbineCalculator(QObject):
     @Slot(float)
     def setEfficiency(self, efficiency):
         self.efficiency = efficiency
+    
+    @Slot()
+    def resetToGenericTurbine(self):
+        """Reset to generic turbine without fixed rated power"""
+        try:
+            self._reset_rated_power_settings()
+            self._blade_radius = 25.0
+            self._power_coefficient = 0.4
+            self._cut_in_speed = 3.0
+            self._cut_out_speed = 25.0
+            self._efficiency = 0.9
+            
+            # Emit signals for all changed properties
+            self.bladeRadiusChanged.emit()
+            self.powerCoefficientChanged.emit()
+            self.cutInSpeedChanged.emit()
+            self.cutOutSpeedChanged.emit()
+            self.efficiencyChanged.emit()
+            
+            # Recalculate all values
+            self._calculate()
+            
+            print("Reset to generic turbine parameters")
+            return True
+        except Exception as e:
+            print(f"Error resetting to generic turbine parameters: {e}")
+            return False
+
+    @Slot()
+    def loadVestasV27Parameters(self):
+        """Load parameters for the Vestas V27 225kW turbine"""
+        try:
+            # Vestas V27 specifications
+            self._blade_radius = 13.5  # 27m rotor diameter / 2
+            self._power_coefficient = 0.44  # Higher CP for this commercial turbine
+            self._cut_in_speed = 3.5  # m/s
+            self._cut_out_speed = 25.0  # m/s
+            self._efficiency = 0.95  # 95% generator efficiency
+            
+            # Set rated power explicitly (225kW for Vestas V27)
+            self._rated_power = 225.0 * 1000  # Convert kW to W
+            
+            # Calculate rated wind speed (the speed at which the turbine reaches rated power)
+            # Using the wind power equation: P = 0.5 * rho * A * v³ * Cp * efficiency
+            # Solve for v: v = (P / (0.5 * rho * A * Cp * efficiency))^(1/3)
+            self._rated_wind_speed = math.pow(
+                self._rated_power / (0.5 * self._air_density * math.pi * self._blade_radius**2 * 
+                                    self._power_coefficient * self._efficiency), 
+                1/3
+            )
+            
+            # Emit signals for all changed properties
+            self.bladeRadiusChanged.emit()
+            self.powerCoefficientChanged.emit()
+            self.cutInSpeedChanged.emit()
+            self.cutOutSpeedChanged.emit()
+            self.efficiencyChanged.emit()
+            
+            # Recalculate all values
+            self._calculate()
+            
+            print(f"Loaded Vestas V27 parameters (rated power: 225kW at {self._rated_wind_speed:.1f} m/s)")
+            return True
+        except Exception as e:
+            print(f"Error loading Vestas V27 parameters: {e}")
+            return False
     
     @Slot(float, result=float)
     def calculatePowerAtSpeed(self, speed):
