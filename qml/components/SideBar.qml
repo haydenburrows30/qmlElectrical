@@ -9,8 +9,7 @@ import "tooltips"
 
 Drawer {
     id: sideBar
-    
-    // Configuration properties
+
     property int drawerWidth: Style.sideBarWidth
     property int delegateHeight: Style.delegateHeight
     property bool menuMoved: false
@@ -18,7 +17,6 @@ Drawer {
     property int hide: 0
     property int show: 0
 
-    // Drawer setup
     width: drawerWidth
     height: parent ? (menuMoved ? parent.height : parent.height - 60) : 0
     
@@ -61,7 +59,7 @@ Drawer {
         width: parent.width
         anchors.bottom: parent.bottom
         height: 20
-        opacity: 0.8  // Make fade more visible
+        opacity: 0.8
         gradient: Gradient {
             orientation: Gradient.Vertical
             GradientStop { position: 0.0; color: "transparent" }
@@ -115,7 +113,6 @@ Drawer {
                 }
             }
 
-            // Move model to separate file
             model: SideBarModel {}
 
             footer:

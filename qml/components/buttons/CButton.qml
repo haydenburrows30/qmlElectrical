@@ -5,10 +5,6 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import "../style"
 
-/*!
-    \brief Custom round button with tooltip
-    Provides consistent styling for round buttons
-*/
 RoundButton {
     id: control
     icon.width: Style.iconSize

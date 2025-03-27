@@ -15,14 +15,11 @@ WaveCard {
 
     border.color: "transparent"
 
-    property color textColor: Universal.foreground
-
     ColumnLayout {
         anchors.centerIn: parent
-        Text {
+        Label {
             text: "Choose a calculator above"
             font.pixelSize: 40
-            color: textColor
         }
     }
 }

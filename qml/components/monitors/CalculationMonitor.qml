@@ -79,6 +79,7 @@ Item {
         font.italic: true
         font.pixelSize: 10
         color: "gray"
+        }
     }
 
     TextArea {
@@ -93,18 +94,18 @@ Item {
         font.pixelSize: 10
         visible: profilingEnabled && calculator ? calculator.profilingEnabled : false
         z: 10
+    }
 
-        Connections {
-            target: calculator
-            function onCalculationsComplete() {
-                statusLog.append("✓ Calculations complete");
-            }
-            function onCalculationStatusChanged() {
-                if (calculator.calculationInProgress) {
-                    statusLog.append("⏳ Calculation started");
-                } else {
-                    statusLog.append("⏹ Calculation finished");
-                }
+    Connections {
+        target: calculator
+        function onCalculationsComplete() {
+            statusLog.append("✓ Calculations complete");
+        }
+        function onCalculationStatusChanged() {
+            if (calculator.calculationInProgress) {
+                statusLog.append("⏳ Calculation started");
+            } else {
+                statusLog.append("⏹ Calculation finished");
             }
         }
     }

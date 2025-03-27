@@ -17,7 +17,7 @@ ColumnLayout {
         columnSpacing: 20
         rowSpacing: 8
 
-            // Phase Overcurrent Section
+        // Phase Overcurrent Section
         Label { 
             text: "Phase Overcurrent (ANSI 51P)"
             font.bold: true
@@ -60,7 +60,7 @@ ColumnLayout {
             
         }
 
-            // Earth Fault Section
+        // Earth Fault Section
         Rectangle {
             Layout.fillWidth: true
             Layout.columnSpan: 2
@@ -111,7 +111,7 @@ ColumnLayout {
             
         }
 
-            // Instantaneous Overcurrent
+        // Instantaneous Overcurrent
         Rectangle {
             Layout.fillWidth: true
             Layout.columnSpan: 2
@@ -151,7 +151,7 @@ ColumnLayout {
             
         }
         
-            // Directional Overcurrent
+        // Directional Overcurrent
         Rectangle {
             Layout.fillWidth: true
             Layout.columnSpan: 2
@@ -252,7 +252,7 @@ ColumnLayout {
             
         }
 
-            // Ring Main Unit Configuration
+        // Ring Main Unit Configuration
         Rectangle {
             Layout.fillWidth: true
             Layout.columnSpan: 2
