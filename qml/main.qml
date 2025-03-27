@@ -15,7 +15,6 @@ import "components/buttons"
 import "components/style"
 import "components/backgrounds"
 
-
 ApplicationWindow {
     id: window
    
@@ -68,7 +67,6 @@ ApplicationWindow {
                 
                 Label {
                     text: loadingManager.loading ? "Loading..." : "Ready!"
-                    color: Universal.foreground
                     font.pixelSize: 16
                     anchors.horizontalCenter: parent.horizontalCenter
                 }

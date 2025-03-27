@@ -232,10 +232,10 @@ Item {
                 id: chargingCurrentViz
                 anchors.fill: parent
                 anchors.margins: 2
-                voltage: calculator.voltage //parseFloat(voltage_input.text || "0") 
-                capacitance: calculator.capacitance //parseFloat(capacitanceInput.text || "0")
+                voltage: calculator.voltage
+                capacitance: calculator.capacitance
                 frequency: calculator.frequency
-                length: calculator.length //parseFloat(lengthInput.text || "1")
+                length: calculator.length
                 current: calculator ? calculator.chargingCurrent : 0.0
             }
         }
