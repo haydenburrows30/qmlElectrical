@@ -9,7 +9,6 @@ from typing import Optional
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
-from PySide6.QtCore import QUrl
 
 # Application imports
 from services.interfaces import (

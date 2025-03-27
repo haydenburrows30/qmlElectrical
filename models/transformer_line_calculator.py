@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Property, Signal, Slot, QSignalBlocker
+from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import cmath
 import logging
