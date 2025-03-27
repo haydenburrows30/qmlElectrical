@@ -39,8 +39,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             color: sideBar.toggle1 ? "#ffffff" : "#000000"
         }
-        
-        // Add series visibility controls
+
         Row {
             Layout.alignment: Qt.AlignHCenter
             spacing: Style.spacing
@@ -70,7 +69,6 @@ Item {
             }
         }
 
-        // Add axis customization
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: Style.spacing
@@ -100,8 +98,7 @@ Item {
             antialiasing: true
             legend.visible: true
             theme: Universal.theme
-            
-            // Set the chart background color explicitly to avoid theme issues
+
             backgroundColor: sideBar.toggle1 ? "#2d2d2d" : "#ffffff"
             
             ValueAxis {
@@ -112,12 +109,12 @@ Item {
                 titleText: "Voltage Drop (%)"
                 labelsColor: sideBar.toggle1 ? "#ffffff" : "#000000"
                 gridVisible: true
-                labelFormat: "%.1f"  // Add format
-                minorGridVisible: true  // Show minor grid lines
-                minorTickCount: 1    // Add minor ticks between major ticks
-                gridLineColor: sideBar.toggle1 ? "#404040" : "#e0e0e0"  // Add grid line color
-                labelsVisible: true   // Explicitly show labels
-                lineVisible: true     // Show axis line
+                labelFormat: "%.1f"
+                minorGridVisible: true
+                minorTickCount: 1
+                gridLineColor: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                labelsVisible: true
+                lineVisible: true
             }
             
             CategoryAxis {
@@ -242,7 +239,7 @@ Item {
             LineSeries {
                 id: trendLine
                 name: "Trend"
-                color: "#80808080"  // Semi-transparent gray
+                color: "#80808080"
                 width: 2
                 axisX: axisX
                 axisY: axisY
@@ -258,30 +255,27 @@ Item {
                 height: tooltipText.height + 8
                 radius: 4
                 visible: false
-                z: 100  // Ensure tooltip appears above other elements
+                z: 100
                 
                 Text {
                     id: tooltipText
                     anchors.centerIn: parent
-                    text: ""  // Initialize with empty text
+                    text: ""
                     color: sideBar.toggle1 ? "#ffffff" : "#000000"
                 }
-                
-                // Close tooltip when clicked anywhere else
+
                 MouseArea {
                     anchors.fill: parent
                     onClicked: pointTooltip.visible = false
                 }
-                
-                // Auto-hide after 3 seconds
+
                 Timer {
                     running: pointTooltip.visible
                     interval: 3000
                     onTriggered: pointTooltip.visible = false
                 }
             }
-            
-            // Fix the MouseArea to properly handle right clicks and interactions
+
             MouseArea {
                 anchors.fill: parent
                 drag.target: chartDragTarget
@@ -297,7 +291,6 @@ Item {
                     if (mouse.button === Qt.RightButton) {
                         chartContextMenu.popup()
                     } else if (mouse.button === Qt.LeftButton) {
-                        // Show tooltip for closest point on left click
                         var closestPoint = findClosestPoint(mouse.x, mouse.y)
                         if (closestPoint) {
                             if (closestPoint.series === "current") {
@@ -327,7 +320,6 @@ Item {
                 }
             }
 
-            // Update context menu to include data export
             Menu {
                 id: chartContextMenu
                 title: "Chart Options"
@@ -382,13 +374,12 @@ Item {
             }
             
             Item {
-                id: chartDragTarget  // Add drag target for ChartView
+                id: chartDragTarget
                 property real oldX: x
                 property real oldY: y
             }
         }
-        
-        // Add checkbox to show all cable sizes
+
         CheckBox {
             id: showAllCheckbox
             text: "Show Comparison with All Cable Sizes"
@@ -408,8 +399,7 @@ Item {
                 text: "Close"
                 onClicked: chartComponent.closeRequested()
             }
-            
-            // Add button to reset zoom
+
             Button {
                 text: "Reset View"
                 onClicked: resetView()
@@ -417,12 +407,10 @@ Item {
         }
     }
 
-    // Helper function to reset view
     function resetView() {
         axisX.min = 0
         axisX.max = 18
-        
-        // Find the max value for y-axis
+
         let maxY = 10
         for (let i = 0; i < chartComponent.comparisonPoints.length; i++) {
             if (chartComponent.comparisonPoints[i].dropPercent > maxY) {
@@ -434,23 +422,20 @@ Item {
             maxY = chartComponent.percentage * 1.1
         }
         
-        axisY.max = Math.max(Math.ceil(maxY), 10) // At least show up to 10%
+        axisY.max = Math.max(Math.ceil(maxY), 10)
     }
 
-    // Add helper function to find closest point - widen the click area
     function findClosestPoint(mouseX, mouseY) {
         try {
-            // Convert from mouse coordinates to chart coordinates
             var chartPos = chartView.mapToValue(Qt.point(mouseX, mouseY))
-            
-            // Check current cable point first
+
             if (dropPercentSeries.count > 0) {
                 var point = dropPercentSeries.at(0)
                 var dx = chartPos.x - point.x
                 var dy = chartPos.y - point.y
                 var minDist = dx*dx + dy*dy
                 
-                if (minDist < 5) {  // Increased from 2 to 5 for wider click area
+                if (minDist < 5) {
                     return {
                         series: "current",
                         x: point.x,
@@ -458,11 +443,10 @@ Item {
                     }
                 }
             }
-            
-            // Check comparison points
+
             if (chartComponent.showAllCables && chartComponent.comparisonPoints.length > 0) {
                 var closestPoint = null
-                var minDistance = 9  // Increased from 4 to 9 for wider click area
+                var minDistance = 9
                 
                 for (var i = 0; i < chartComponent.comparisonPoints.length; i++) {
                     var cp = chartComponent.comparisonPoints[i]
@@ -485,47 +469,36 @@ Item {
             return null
         }
     }
-    
-    // Enhanced chart update function with multiple points and better visualization
+
     function enhancedChartUpdate() {
         console.log("Updating chart with enhanced approach")
         try {
-            // Known cable sizes in order - used for x-axis positioning
             const knownSizes = ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", 
                                 "120", "150", "185", "240", "300", "400", "500", "630"]
-            
-            // Clear existing data
+
             dropPercentSeries.clear()
             comparisonSeries.clear()
             thresholdLine.clear()
             trendLine.clear()
             chartComponent.comparisonPoints = []
-            
-            // Draw the 5% threshold line
+
             thresholdLine.append(0, 5)
             thresholdLine.append(knownSizes.length - 1, 5)
-            
-            // Find the index of the current cable size
+
             const selectedCable = chartComponent.cableSize
             const cableIndex = knownSizes.indexOf(selectedCable)
-            const xPosition = cableIndex >= 0 ? cableIndex : 10 // Default to middle if not found
-            
-            // Get the current cable's voltage drop
+            const xPosition = cableIndex >= 0 ? cableIndex : 10
+
             const currentDropValue = chartComponent.percentage
-            
-            // Add the current point (make it stand out)
+
             dropPercentSeries.append(xPosition, currentDropValue)
-            
-            // Create a trend line and comparison points if checkbox is checked
+
             if (chartComponent.showAllCables) {
-                // Extract data from the table if possible
                 let comparisonData = []
-                
-                // Iterate through knownSizes and find values in the table
+
                 for (let i = 0; i < knownSizes.length; i++) {
                     const cableSize = knownSizes[i]
-                    
-                    // Skip the current cable size - it's already displayed differently
+
                     if (cableSize === selectedCable) {
                         continue
                     }
@@ -556,16 +529,14 @@ Item {
                         } else if (estimatedDrop > 2) {
                             status = "SUBMAIN"
                         }
-                        
-                        // Add to comparison data
+
                         comparisonData.push({
                             cableSize: cableSize,
                             dropPercent: estimatedDrop,
                             xPos: i,
                             status: status
                         })
-                        
-                        // Add to comparisonPoints for tooltips
+
                         chartComponent.comparisonPoints.push({
                             cableSize: cableSize,
                             dropPercent: estimatedDrop,
@@ -573,19 +544,14 @@ Item {
                             y: estimatedDrop,
                             status: status
                         })
-                        
-                        // Add point to the comparison series
+
                         comparisonSeries.append(i, estimatedDrop)
-                        
-                        // Add point to trend line
                         trendLine.append(i, estimatedDrop)
                     }
                 }
-                
-                // Add the current point to the trend line
+
                 trendLine.append(xPosition, currentDropValue)
-                
-                // Sort trend line points by X coordinate
+
                 let trendPoints = []
                 for (let i = 0; i < trendLine.count; i++) {
                     trendPoints.push({
@@ -593,20 +559,17 @@ Item {
                         y: trendLine.at(i).y
                     })
                 }
-                
-                // Sort the trend points by x-coordinate
+
                 trendPoints.sort(function(a, b) {
                     return a.x - b.x
                 })
-                
-                // Recreate trend line with sorted points
+
                 trendLine.clear()
                 for (let i = 0; i < trendPoints.length; i++) {
                     trendLine.append(trendPoints[i].x, trendPoints[i].y)
                 }
             }
             
-            // Set chart title with more info
             const pctText = currentDropValue > 5 ? "OVER LIMIT" : "WITHIN LIMIT"
             const currentText = chartComponent.currentValue.toFixed(1) + "A"
             
@@ -617,8 +580,7 @@ Item {
             console.log("Enhanced chart updated successfully")
         } catch (err) {
             console.error("Enhanced chart error: " + err)
-            
-            // Add fallback visualization if the enhanced one fails
+
             dropPercentSeries.clear()
             dropPercentSeries.append(5, chartComponent.percentage)
             
@@ -630,12 +592,10 @@ Item {
         }
     }
 
-    // Public method to grab the chart image for saving
     function grabChartImage(callback, scale) {
         chartView.grabToImage(callback, Qt.size(chartView.width * scale, chartView.height * scale))
     }
 
-    // Add function to export chart data
     function exportChartData(format) {
         let data = {
             currentPoint: {

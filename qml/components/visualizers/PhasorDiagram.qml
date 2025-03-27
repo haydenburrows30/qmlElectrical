@@ -249,8 +249,7 @@ Item {
                 color: currentColors[index]
                 border.color: "white"
                 border.width: 2
-                
-                // Add small icon or label to distinguish from voltage
+
                 Text {
                     anchors.centerIn: parent
                     text: "I"

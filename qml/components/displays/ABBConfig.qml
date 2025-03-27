@@ -191,7 +191,6 @@ ColumnLayout {
             
         }
 
-            // Additional Functions
         Rectangle {
             Layout.fillWidth: true
             Layout.columnSpan: 2

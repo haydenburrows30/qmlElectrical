@@ -191,7 +191,6 @@ Item {
                     }
                     Button {
                         text: "Add Fault Level"
-                        // Layout.fillWidth: true
                         onClicked: {
                             console.log("Adding fault level:", parseFloat(faultCurrent.text))
                             calculator.addFaultLevel(
@@ -337,11 +336,11 @@ Item {
                     ValueAxis {
                         id: marginAxis
                         min: 0
-                        max: 10  // Increased to show more of the curves
+                        max: 10
                         titleText: "Time (s)"
                     }
                     
-                    LogValueAxis {  // Changed to LogValueAxis
+                    LogValueAxis {
                         id: faultAxis
                         min: 100
                         max: 20000
@@ -438,13 +437,13 @@ Item {
             console.log("Model rowCount:", model.rowCount())
             for(let i = 0; i < model.rowCount(); i++) {
                 let modelIndex = model.index(i, 0)
-                let result = model.data(modelIndex, calculator.results.DataRole)  // Fixed data role access
+                let result = model.data(modelIndex, calculator.results.DataRole)
                 console.log("Chart data for index", i, ":", JSON.stringify(result))
                 if (result && result.margins) {
                     result.margins.forEach(function(margin) {
                         if (margin.fault_current && margin.margin != null && 
                             isFinite(margin.fault_current) && isFinite(margin.margin) &&
-                            margin.margin > 0 && margin.margin < 10) {  // Add bounds check
+                            margin.margin > 0 && margin.margin < 10) {
                             marginPoints.append(margin.fault_current, margin.margin)
                         }
                     })

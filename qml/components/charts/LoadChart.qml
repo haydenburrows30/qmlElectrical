@@ -23,10 +23,8 @@ Item {
     }
     
     function updateLoadDistribution() {
-        // Clear the current chart
         loadSeries.clear();
-        
-        // Handle the case when manager is not available
+
         if (!manager) {
             console.log("Load chart: manager not available");
             return;
@@ -36,16 +34,14 @@ Item {
         
         let loadGroups = {};
         let totalLoad = 0;
-        
-        // Collect data from all circuits
+
         for (let i = 0; i < manager.circuitCount; i++) {
             let circuit = manager.getCircuitAt(i);
             if (!circuit) {
                 console.log("Could not get circuit at index", i);
                 continue;
             }
-            
-            // Use circuit number and destination to create a more unique identifier
+
             let destType = getCircuitType(circuit.destination || "");
             let circuitId = circuit.number + ": " + circuit.destination;
             let load = circuit.load || 0;
@@ -67,8 +63,7 @@ Item {
         
         console.log("Load groups:", JSON.stringify(loadGroups));
         console.log("Total load:", totalLoad);
-        
-        // Add each load group to the pie chart with custom colors
+
         let colors = ["#FF5722", "#2196F3", "#4CAF50", "#FFC107", "#9C27B0", "#00BCD4", "#795548", "#607D8B"];
         let colorIndex = 0;
         
@@ -77,8 +72,7 @@ Item {
                 let percentage = ((loadGroups[type] / totalLoad) * 100).toFixed(1);
                 let label = type + " (" + loadGroups[type].toFixed(2) + " kW, " + percentage + "%)";
                 let slice = loadSeries.append(label, loadGroups[type]);
-                
-                // Set custom colors for better visual distinction
+
                 slice.color = colors[colorIndex % colors.length];
                 slice.borderWidth = 2;
                 slice.borderColor = Qt.darker(slice.color, 1.2);
@@ -93,7 +87,6 @@ Item {
         }
         
         if (Object.keys(loadGroups).length === 0) {
-            // Add a placeholder if no data
             let slice = loadSeries.append("No Load Data", 1);
             slice.labelVisible = true;
         }

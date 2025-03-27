@@ -141,9 +141,8 @@ Item {
             Canvas {
                 id: powerTriangle
                 anchors.fill: parent
-                anchors.margins: 2 // Small margin to avoid painting over the border
-                
-                // Force repaint when theme changes
+                anchors.margins: 2
+
                 property bool darkMode: Universal.theme === Universal.Dark
                 onDarkModeChanged: requestPaint()
                 
@@ -172,7 +171,6 @@ Item {
                     var centerY = height/2
                     
                     // Draw triangle with thicker lines
-                    // Use color that works in both light and dark themes
                     ctx.strokeStyle = Universal.theme === Universal.Dark ? "#6CB4EE" : "#2196F3";
                     ctx.lineWidth = 2
                     ctx.beginPath()
@@ -181,9 +179,7 @@ Item {
                     ctx.lineTo(centerX + p*scale/2, centerY - q*scale)
                     ctx.closePath()
                     ctx.stroke()
-                    
-                    // Add labels - use explicit theme color reference
-                    // Convert the color to string format that Canvas can use
+
                     var foregroundColor = textColor.toString()
                     ctx.fillStyle = foregroundColor
                     ctx.font = "12px sans-serif"

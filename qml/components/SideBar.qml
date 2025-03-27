@@ -26,7 +26,6 @@ Drawer {
     interactive: false
     visible: true
 
-    // Add smooth transitions
     Behavior on width {
         NumberAnimation { 
             duration: Style.sidebarAnimationDuration
@@ -90,7 +89,6 @@ Drawer {
                 implicitHeight: sideBar.delegateHeight
                 implicitWidth: sideBar.drawerWidth
 
-                // Add hover effect
                 background: Rectangle {
                     color: parent.hovered ? palette.highlight.alpha(Style.highlightOpacity) : Style.transparent
                     Behavior on color {

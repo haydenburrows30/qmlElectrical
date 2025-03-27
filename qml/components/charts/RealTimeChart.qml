@@ -118,7 +118,6 @@ Pane {
                             {name: "Beta", color: "#00cc00"}, 
                             {name: "Gamma", color: "#0000ff"}]
                         RowLayout {
-                            // Layout.fillWidth: true
                             Layout.minimumWidth: 300
                             spacing: Style.spacing
                             Label { 
@@ -144,7 +143,6 @@ Pane {
                 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    // Layout.fillHeight: true
 
                     Repeater {
                         model: ["Alpha", "Beta", "Gamma"]
@@ -268,7 +266,7 @@ Pane {
                 RealTimeChart { id: realTimeChart }
 
                 property real viewPortStart: 0
-                property real viewPortWidth: 30  // 30 seconds view
+                property real viewPortWidth: 30
                 property real trackerX: 0
                 property var trackerValues: []
 
@@ -281,8 +279,8 @@ Pane {
                 ValueAxis {
                     id: axisX
                     min: 0
-                    max: 30  // Fixed 30 second window
-                    tickCount: 7  // Show tick every 5 seconds
+                    max: 30
+                    tickCount: 7
                     titleText: "Time (s)"
                 }
 
@@ -320,8 +318,7 @@ Pane {
                         seriesB.append(t, valB)
                         seriesC.append(t, valC)
 
-                        // Remove old points when beyond 30 seconds
-                        while (seriesA.count > 300) {  // Keep 300 points for smooth display
+                        while (seriesA.count > 300) {
                             seriesA.remove(0)
                             seriesB.remove(0)
                             seriesC.remove(0)
@@ -329,7 +326,6 @@ Pane {
                     }
 
                     function onResetChart() {
-                        // Clear all series when 30s is up
                         seriesA.clear()
                         seriesB.clear()
                         seriesC.clear()
@@ -338,23 +334,21 @@ Pane {
                 
                 Timer {
                     interval: 100
-                    running: root.isActive  // Changed from chartView.isActive
+                    running: root.isActive
                     repeat: true
                     onTriggered: realTimeChart.update()
                 }
 
-                // Add tracker line
                 Rectangle {
                     id: trackerLine
-                    visible: root.showTracker  // Changed from showTracker
+                    visible: root.showTracker
                     x: chartView.trackerX || 0
                     y: chartView.plotArea.y
                     width: 1
                     height: chartView.plotArea.height
                     color: "red"
-                    z: 1000  // Ensure it's above the plot
+                    z: 1000
 
-                    // Value labels
                     Column {
                         x: 5
                         y: 0
@@ -380,16 +374,14 @@ Pane {
                     }
                 }
 
-                // Add dots to track points on series
                 Rectangle {
                     id: dotA
                     width: 8
                     height: 8
                     radius: 4
                     color: "#ff0000"
-                    visible: root.showTracker  // Changed from showTracker
+                    visible: root.showTracker
                     z: 1001
-                    // Position will be set dynamically
                 }
 
                 Rectangle {
@@ -398,7 +390,7 @@ Pane {
                     height: 8
                     radius: 4
                     color: "#00cc00"
-                    visible: root.showTracker  // Changed from showTracker
+                    visible: root.showTracker
                     z: 1001
                 }
 
@@ -408,29 +400,27 @@ Pane {
                     height: 8
                     radius: 4
                     color: "#0000ff"
-                    visible: root.showTracker  // Changed from showTracker
+                    visible: root.showTracker
                     z: 1001
                 }
 
-                // Modified MouseArea
                 MouseArea {
                     id: chartMouseArea
                     anchors {
                         fill: parent
-                        topMargin: 40  // Exclude button area
+                        topMargin: 40
                     }
                     hoverEnabled: true
-                    enabled: root.showTracker  // Changed from showTracker
+                    enabled: root.showTracker
 
                     onPositionChanged: (mouse) => {
-                        if (root.showTracker) {  // Changed from showTracker
+                        if (root.showTracker) {
                             let chartPoint = mouse.x - chartView.plotArea.x
                             let xValue = axisX.min + (chartPoint / chartView.plotArea.width) * (axisX.max - axisX.min)
                             
                             chartView.trackerX = chartPoint + chartView.plotArea.x
                             chartView.trackerValues = realTimeChart.getValuesAtTime(xValue)
                             
-                            // Position the dots using chart's mapToPosition
                             if (chartView.trackerValues.length === 3) {
                                 let point = Qt.point(xValue, chartView.trackerValues[0].value)
                                 let pos = chartView.mapToPosition(point, seriesA)

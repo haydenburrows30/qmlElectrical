@@ -8,7 +8,7 @@ import "../visualizers"
 import "../style"
 import "../backgrounds"
 
-import MotorStarting 1.0  // Import the correct namespace
+import MotorStarting 1.0
 
 Item {
     id: motorStartingCard
@@ -21,12 +21,10 @@ Item {
                                  parseFloat(motorEfficiency.text) > 0 &&
                                  parseFloat(motorPowerFactor.text) > 0
     
-    // Update the cached value when needed - only reads from calculator without setting the property
     function getStartingMultiplier() {
         return calculator ? calculator.startingMultiplier : 7.0
     }
 
-    // Connect to the signal to update our cached value when needed
     Connections {
         target: calculator
         function onStartingMultiplierChanged() {
@@ -34,33 +32,26 @@ Item {
         }
         
         function onMotorTypeChanged() {
-            // Update efficiency and power factor display based on motor type
             motorEfficiency.text = (calculator.efficiency * 100).toFixed(0)
             motorPowerFactor.text = calculator.powerFactor.toFixed(2)
-            
-            // Update method visibility/availability
+
             updateMethodAvailability()
         }
     }
     
     function updateMethodAvailability() {
-        // Disable methods that aren't applicable to the current motor type
         for (let i = 0; i < startingMethod.model.length; i++) {
             let method = startingMethod.model[i]
             let applicable = calculator.isMethodApplicable(method)
-            // Cannot directly disable ComboBox items in Qt Quick, 
-            // so we'll handle this in the ComboBox's delegate
         }
     }
 
-    // Show popup for tips or errors
     function showMessage(title, message) {
         messagePopup.title = title
         messagePopup.message = message
         messagePopup.open()
     }
 
-    // Show motor type info
     function showMotorInfo() {
         showMessage("Motor Type Info", calculator.motorDescription)
     }
@@ -305,7 +296,6 @@ Item {
                     Label {
                         text: "Motor Type:"
                         Layout.preferredWidth: 150
-                        // font.bold: true
                     }
                     
                     Label {

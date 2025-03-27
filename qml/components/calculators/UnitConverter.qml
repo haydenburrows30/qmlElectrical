@@ -203,7 +203,6 @@ Item {
                             placeholderText: "Enter value"
                             verticalAlignment: Text.AlignVCenter
                             horizontalAlignment: Text.AlignHCenter
-                            // Layout.fillHeight: true
                             Layout.fillWidth: true
                             Layout.minimumHeight: conversionTypeLayout.height
                             font.pixelSize: 34

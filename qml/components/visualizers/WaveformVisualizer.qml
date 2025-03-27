@@ -54,39 +54,32 @@ ChartView {
                 }
             }
         }
-        
-        // Ensure maxY is a valid value before setting axis range
+
         if (!isFinite(maxY) || maxY <= 0) {
-            maxY = 100;  // Set a reasonable default if invalid
+            maxY = 100;
         }
-        
-        // Set axis range with 20% padding
+
         var paddedMax = Math.ceil(maxY * 1.2);
         axisY.min = -paddedMax;
         axisY.max = paddedMax;
-        
-        // Adjust point density based on available width
+
         var chartWidth = width;
-        
-        // Use a safe minimum width
+
         chartWidth = Math.max(100, chartWidth);
-        
-        // Windows optimization: use fewer points for better performance
+
         var maxPoints = isWindows ? 
-            Math.min(Math.floor(chartWidth / 4), 80) : // Fewer points on Windows
-            Math.min(Math.floor(chartWidth / 3), 100); // More points on other platforms
+            Math.min(Math.floor(chartWidth / 4), 80) :
+            Math.min(Math.floor(chartWidth / 3), 100);
             
         var pointSpacing = Math.max(1, Math.floor(points.length / maxPoints));
-        
-        // Use the efficient series filling methods
+
         var xValues = [];
         var yValues = [];
         var fundValues = [];
         
-        // Add null check to avoid errors
         if (points && points.length > 0) {
             for (var i = 0; i < points.length; i += pointSpacing) {
-                if (isFinite(points[i])) {  // Only add valid points
+                if (isFinite(points[i])) {
                     xValues.push(i * (360/points.length));
                     yValues.push(points[i]);
                 }
@@ -95,37 +88,31 @@ ChartView {
                     fundValues.push(fundamentalData[i]);
                 }
             }
-            
-            // Clear series first on Windows to prevent rendering issues
+
             if (isWindows && forceUpdate) {
                 waveformSeries.clear();
                 fundamentalSeries.clear();
             }
-            
-            // Fill both series efficiently with the reduced dataset
+
             if (xValues.length > 0 && yValues.length > 0) {
                 seriesHelper.fillSeriesFromArrays(waveformSeries, xValues, yValues);
                 
                 if (fundValues.length === xValues.length) {
                     seriesHelper.fillSeriesFromArrays(fundamentalSeries, xValues, fundValues);
                 }
-                
-                // Force immediate update on Windows
+
                 if (isWindows) {
                     update();
                 }
             }
         }
-        
-        // Signal that the update is complete
+
         if (onUpdateCompleted) {
             onUpdateCompleted();
         }
     }
-    
-    // Force first update after component is created
+
     Component.onCompleted: {
-        // Initial update, use a timer to ensure the chart is fully created
         initTimer.start();
     }
     
@@ -135,14 +122,12 @@ ChartView {
         repeat: false
         onTriggered: {
             updateWaveform();
-            // Try a second update for Windows
             if (Qt.platform.os === "windows") {
                 refreshTimer.start();
             }
         }
     }
-    
-    // Extra update for Windows platforms
+
     Timer {
         id: refreshTimer
         interval: 700
@@ -192,13 +177,11 @@ ChartView {
         useOpenGL: waveformChart.useOpenGL
         pointsVisible: false
     }
-    
-    // Expose functions to control axis labels
+
     function setLabelsVisible(visible) {
         axisX.labelsVisible = visible;
     }
-    
-    // Connect to calculator signals
+
     Connections {
         target: calculator
         

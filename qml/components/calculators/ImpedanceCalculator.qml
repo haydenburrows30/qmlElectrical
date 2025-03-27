@@ -119,9 +119,8 @@ Item {
                            parseFloat(calculator.impedance.toFixed(2)) : 5.0
                 phaseAngle: calculator && !isNaN(calculator.phaseAngle) ?
                             parseFloat(calculator.phaseAngle.toFixed(2)) : 53.13
-                // Use property names that match what ImpedanceVectorViz expects
                 darkMode: Universal.theme === Universal.Dark
-                textColor: fault_current.textColor  // Use the property name defined in ImpedanceVectorViz
+                textColor: fault_current.textColor
             }
         }
     }

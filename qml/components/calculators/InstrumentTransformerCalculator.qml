@@ -45,7 +45,6 @@ Item {
         }
     }
 
-    // Add a status notification
     Popup {
         id: errorPopup
         width: 300
@@ -373,7 +372,6 @@ Item {
                         color: calculator.vtBurdenWithinRange ? "green" : "red"
                         readOnly: true
                         background: ProtectionRectangle {}
-                        // Layout.fillWidth: true
                         Layout.minimumHeight: 60
                         Layout.minimumWidth: 150
                         wrapMode: Text.WordWrap

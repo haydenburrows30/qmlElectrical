@@ -107,7 +107,6 @@ Item {
                     ComboBox {
                         id: cablePresets
                         model: ["Custom", "XLPE 1C", "XLPE 3C", "Paper 1C", "Paper 3C"]
-                        // Layout.preferredWidth: 150
                         Layout.fillWidth: true
                         onCurrentTextChanged: {
                             if (currentText !== "Custom") {
@@ -131,7 +130,6 @@ Item {
                     }
                     TextField {
                         id: capacitanceInput
-                        // Layout.preferredWidth: 150
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         enabled: cablePresets.currentText === "Custom"
@@ -150,7 +148,6 @@ Item {
                     ComboBox {
                         id: freqPresets
                         model: ["50 Hz", "60 Hz"]
-                        // Layout.preferredWidth: 150
                         Layout.fillWidth: true
                         onCurrentTextChanged: {
                             calculator.frequency = parseFloat(currentText.replace(" Hz", ""))
@@ -166,7 +163,6 @@ Item {
                     }
                     TextField {
                         id: lengthInput
-                        // Layout.preferredWidth: 150
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         placeholderText: "Enter Length"
@@ -182,7 +178,6 @@ Item {
                         Layout.preferredWidth: 80
                     }
                     Rectangle {
-                        // Layout.preferredWidth: 150
                         Layout.fillWidth: true
                         Layout.preferredHeight: 30
                         color: Universal.background

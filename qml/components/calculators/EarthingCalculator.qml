@@ -234,7 +234,6 @@ Item {
             }
         }
 
-        // Right side - Visualization will be added in EarthingViz.qml
         WaveCard {
             Layout.fillWidth: true
             Layout.fillHeight: true

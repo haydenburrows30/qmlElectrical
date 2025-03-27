@@ -145,15 +145,13 @@ Item {
                 safeValueFunction: safeValue
             }
         }
-        
-        // Add a spacer item at the bottom to ensure there's scrollable space
+
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 50
         }
     }
-    
-    // Add polling timers to update UI state instead of relying on signals
+
     Timer {
         id: windTurbineTimer
         interval: 500

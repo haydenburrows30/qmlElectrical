@@ -125,13 +125,12 @@ Item {
             title: "Circuit Schedule"
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: 400 // Set minimum height for the card
+            Layout.minimumHeight: 400
 
             ColumnLayout {
                 anchors.fill: parent
                 spacing: Style.spacing
 
-                // 1. TabBar at the very top
                 TabBar {
                     id: tabBar
                     width: parent.width
@@ -150,7 +149,6 @@ Item {
                     }
                 }
 
-                // 2. StackLayout content immediately following TabBar
                 StackLayout {
                     currentIndex: tabBar.currentIndex
                     Layout.fillWidth: true
@@ -165,8 +163,7 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
                             spacing: Style.spacing
-                            
-                            // Header row now inside the first tab
+
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 40
@@ -238,32 +235,28 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "Circuit count: " + manager.circuitCount
-                                    visible: manager.circuitCount === 0  // Show only when empty
+                                    visible: manager.circuitCount === 0
                                     color: "gray"
                                 }
                                 
                                 Component.onCompleted: {
                                     console.log("ListView created with circuit count:", model)
                                 }
-                                
-                                // Add direct connection to the circuit count signal
+
                                 Connections {
                                     target: manager
                                     function onCircuitCountChanged() {
-                                        // Force refresh the list view
                                         circuitList.model = 0;
                                         circuitList.model = manager.circuitCount;
                                         console.log("ListView refreshed with new circuit count:", manager.circuitCount);
                                     }
                                 }
-                                
-                                // Use an Item as the root delegate to make positioning more reliable
+
                                 delegate: Item {
                                     id: delegateRoot
                                     width: ListView.view ? ListView.view.width : 100
                                     height: 40
-                                    
-                                    // Get the circuit data early to ensure it's available
+
                                     Component.onCompleted: {
                                         console.log("Creating delegate for index", index)
                                         if (!circuitData || Object.keys(circuitData).length === 0) {
@@ -272,21 +265,19 @@ Item {
                                     }
                                     
                                     property var circuitData: manager.getCircuitAt(index)
-                                    
-                                    // Use a Rectangle for the background
+
                                     Rectangle {
                                         anchors.fill: parent
                                         color: index % 2 ? 
                                             (sideBar.toggle1 ? "#262626" : "#f5f5f5") : 
                                             (sideBar.toggle1 ? "#1a1a1a" : "#ffffff")
                                     }
-                                    
-                                    // Debug text to make issues more visible
+
                                     Text {
                                         text: "Circuit #" + (delegateRoot.circuitData.number || "??")
                                         anchors.centerIn: parent
                                         color: "red"
-                                        visible: false // Set to true for debugging
+                                        visible: false
                                     }
                                     
                                     MouseArea {
@@ -302,8 +293,7 @@ Item {
                                         anchors.leftMargin: 10
                                         anchors.rightMargin: 10
                                         spacing: 2
-                                        
-                                        // Instead of relying on default values, use conditional expressions
+
                                         Label { 
                                             text: delegateRoot.circuitData ? delegateRoot.circuitData.number : "??"
                                             Layout.preferredWidth: 60
@@ -376,15 +366,12 @@ Item {
                             mainRating: manager.mainRating
                             voltage: manager.voltage
                             phases: manager.phases
-                            
-                            // Fix the circuits property binding
+
                             property var circuitsList: []
-                            
-                            // Update circuits when circuit count changes
+
                             Connections {
                                 target: manager
                                 function onCircuitCountChanged() {
-                                    // Rebuild the circuit list
                                     let circuits = [];
                                     for (let i = 0; i < manager.circuitCount; i++) {
                                         circuits.push(manager.getCircuitAt(i));
@@ -393,13 +380,10 @@ Item {
                                     console.log("Single line diagram updated with", circuits.length, "circuits");
                                 }
                             }
-                            
-                            // Use the circuitsList property for the diagram
+
                             circuits: circuitsList
                             
-                            // Update on initialization
                             Component.onCompleted: {
-                                // Initial population of circuits
                                 let circuits = [];
                                 for (let i = 0; i < manager.circuitCount; i++) {
                                     circuits.push(manager.getCircuitAt(i));
@@ -508,12 +492,10 @@ Item {
         property bool editMode: false
         property int circuitIndex: -1
         property string circuitNumber: ""
-        
-        // Add explicit handler function instead of using Component.onCompleted
+
         function handleAccepted() {
             console.log("Saving circuit...");
-            
-            // Create the circuit data object
+
             let circuitData = {
                 destination: destinationField.text,
                 rating: parseInt(ratingCombo.currentText),
@@ -527,23 +509,20 @@ Item {
             };
             
             console.log("Circuit data:", JSON.stringify(circuitData));
-            
-            // Save circuit details
+
             if (editMode) {
                 let success = manager.updateCircuit(circuitIndex, circuitData);
                 console.log("Circuit updated, success =", success);
-                
-                // Force the ListView to update by explicitly updating the model
-                circuitList.model = 0;  // Temporarily set to 0
-                circuitList.model = manager.circuitCount;  // Set back to the count
+
+                circuitList.model = 0;
+                circuitList.model = manager.circuitCount;
             } else {
                 let success = manager.addCircuit(circuitData);
                 console.log("Circuit added, success =", success);
                 console.log("Current circuit count after adding:", manager.circuitCount);
             }
         }
-        
-        // Connect the accepted signal to our handler function
+
         onAccepted: handleAccepted()
         
         function reset1() {
@@ -568,11 +547,9 @@ Item {
             circuitIndex = index
             let circuit = manager.getCircuit(index)
             circuitNumber = circuit.number
-            
-            // Fill form fields
+
             destinationField.text = circuit.destination
-            
-            // Find and set the correct indices for combo boxes
+
             for (let i = 0; i < ratingCombo.model.length; i++) {
                 if (ratingCombo.model[i] == circuit.rating.toString()) {
                     ratingCombo.currentIndex = i
@@ -697,8 +674,7 @@ Item {
             }
         }
     }
-    
-    // Add Message Dialog for notifications
+
     Dialog {
         id: messageDialog
         title: "Switchboard Manager"
@@ -722,8 +698,7 @@ Item {
             }
         }
     }
-    
-    // Add File Dialog for loading JSON files
+
     FileDialog {
         id: fileDialog
         title: "Load Switchboard Schedule"

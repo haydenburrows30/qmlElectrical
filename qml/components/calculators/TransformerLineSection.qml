@@ -41,17 +41,14 @@ Item {
         regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
     }
 
-    // Only update MVA when power changes, let power factor changes handle themselves
     onTotalGeneratedPowerChanged: {
         if (calculatorReady) {
             calculator.setLoadMVA(totalGeneratedPower / 1000000)
         }
     }
 
-    // Update display when load parameters change
     Connections {
         target: calculator
-        // Fix signal handler name to match loadChanged signal
         function loadChanged() {
             if (calculatorReady) {
                 transformerLineSection.updateDisplayValues()
@@ -59,7 +56,6 @@ Item {
         }
     }
 
-    // Signal for when calculation is requested
     signal calculate()
 
     ScrollView {
@@ -551,15 +547,13 @@ Item {
                                     "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
-                            // Add export button
+
                             ExportButton {
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 defaultFileName: "transformer_report.pdf"
                                 onExport: function(fileUrl) {
                                     if (calculatorReady) {
-                                        // Prepare data for PDF
                                         let data = {
                                             "transformer_rating": calculator.transformerRating,
                                             "transformer_impedance": calculator.transformerImpedance,
@@ -702,8 +696,7 @@ Item {
                             }
                         }
                     }
-                    
-                    // Add regulator results section
+
                     WaveCard {
                         title: "Voltage Regulation Results"
                         Layout.fillWidth: true

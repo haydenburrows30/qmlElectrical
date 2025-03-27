@@ -24,8 +24,7 @@ Item {
         let value2 = parseFloat(param2Value.text);
         
         if (isNaN(value1) || isNaN(value2)) return;
-        
-        // Create mapping for parameter combinations
+
         const calculationMap = {
             "0_1": calculator.calculateFromVI,
             "0_2": calculator.calculateFromVR,

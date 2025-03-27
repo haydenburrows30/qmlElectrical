@@ -11,14 +11,12 @@ import "../backgrounds"
 
 Item {
     id: windTurbineSection
-    
-    // Properties passed from parent
+
     property var calculator
     property bool calculatorReady
     property real totalGeneratedPower
     property var safeValueFunction
-    
-    // Signal for when calculation is requested
+
     signal calculate()
 
     Popup {
@@ -32,6 +30,10 @@ Item {
         onClosed: {
             windTurbineCard.open = false
         }
+    }
+    
+    WindPopup {
+        id: v27StatsPopup
     }
         
     ScrollView {
@@ -106,7 +108,7 @@ Item {
                                 id: airDensitySpinBox
                                 from: 100
                                 to: 150
-                                value: 122  // Set a default value (1.22 kg/m³)
+                                value: 122
                                 stepSize: 1
                                 editable: true
                                 Layout.fillWidth: true
@@ -208,13 +210,11 @@ Item {
                                     onClicked: {
                                         if (calculatorReady) {
                                             calculator.loadVestasV27Parameters()
-                                            // Update UI controls to reflect the new values
                                             bladeRadiusSpinBox.value = calculator.bladeRadius
                                             cutInSpinBox.value = calculator.cutInSpeed
                                             cutOutSpinBox.value = calculator.cutOutSpeed
                                             powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
                                             efficiencySpinBox.value = calculator.efficiency * 100
-                                            // Update the power curve
                                             updatePowerCurve()
                                         }
                                     }
@@ -223,10 +223,17 @@ Item {
                                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         radius: 2
                                     }
+                                }
+                                
+                                Button {
+                                    text: "V27 Info"
+                                    Layout.preferredWidth: 100
+                                    onClicked: v27StatsPopup.open()
                                     
-                                    ToolTip.visible: hovered
-                                    ToolTip.delay: 500
-                                    ToolTip.text: "Load parameters for Vestas V27 225kW wind turbine"
+                                    background: Rectangle {
+                                        color: sideBar.toggle1 ? "#404040" : "#d0e8ff"
+                                        radius: 2
+                                    }
                                 }
                                 
                                 Button {
@@ -235,13 +242,11 @@ Item {
                                     onClicked: {
                                         if (calculatorReady) {
                                             calculator.resetToGenericTurbine()
-                                            // Update UI controls to reflect the new values
                                             bladeRadiusSpinBox.value = calculator.bladeRadius
                                             cutInSpinBox.value = calculator.cutInSpeed
                                             cutOutSpinBox.value = calculator.cutOutSpeed
                                             powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
                                             efficiencySpinBox.value = calculator.efficiency * 100
-                                            // Update the power curve
                                             updatePowerCurve()
                                         }
                                     }
@@ -250,10 +255,6 @@ Item {
                                         color: sideBar.toggle1 ? "black":"#e8f6ff"
                                         radius: 2
                                     }
-                                    
-                                    ToolTip.visible: hovered
-                                    ToolTip.delay: 500
-                                    ToolTip.text: "Reset to generic turbine with variable power output"
                                 }
                             }
 
@@ -460,14 +461,14 @@ Item {
                         ValueAxis {
                             id: axisX
                             min: 0
-                            max: safeValue(calculator.cutOutSpeed, 25) + 5  // Use safeValue to prevent NaN
+                            max: safeValue(calculator.cutOutSpeed, 25) + 5
                             titleText: "Wind Speed (m/s)"
                         }
                         
                         ValueAxis {
                             id: axisY
                             min: 0
-                            max: 10  // Will be updated dynamically
+                            max: 10
                             titleText: "Power Output (kW)"
                         }
                         
@@ -484,58 +485,45 @@ Item {
     }
 
     function updatePowerCurve() {
-        
-        // Clear existing data
+
         powerSeries.clear()
-        
-        // Safety check for calculator and data
+
         if (!calculatorReady) {
             console.error("Calculator instance not ready")
             return
         }
         
         try {
-            // Get power curve data from backend with null check
             var powerCurveData = calculator.powerCurve || []
-            
-            // Additional debugging for received data points
+
             if (powerCurveData.length > 0) {
             }
-            
-            // Find maximum power for Y axis scaling
-            var maxPower = 0.1 // Minimum default
+
+            var maxPower = 0.1
             var totalPower = 0
             var nonZeroPoints = 0
-            
-            // Add all points to the series and calculate stats
+
             for (var i = 0; i < powerCurveData.length; i++) {
                 var point = powerCurveData[i]
-                
-                // Support both array format and dictionary format
+
                 var x, y;
                 if (typeof point === 'object') {
                     if ('x' in point && 'y' in point) {
-                        // Dictionary format with named keys
                         x = safeValue(point.x, 0)
                         y = safeValue(point.y, 0)
                     } else if (Array.isArray(point) && point.length >= 2) {
-                        // Array format [x, y]
                         x = safeValue(point[0], 0)
                         y = safeValue(point[1], 0)
                     } else {
-                        // Skip invalid points
                         continue
                     }
                 } else {
-                    // Skip non-object points
                     continue
                 }
-                
-                // Debug more individual points to see what's being processed
+
                 if (i % 10 === 0 || y > maxPower) {
                 }
-                
-                // Add point to chart
+
                 powerSeries.append(x, y)
                 
                 if (y > 0) {
@@ -548,31 +536,25 @@ Item {
                 }
             }
 
-            // Calculate average power (excluding zero points)
             var avgPower = nonZeroPoints > 0 ? totalPower / nonZeroPoints : 0
 
-            // Ensure a reasonable Y-axis max based on actual data
             var yAxisMax;
             if (maxPower < 1) {
-                yAxisMax = 1; // Minimum 1 kW
+                yAxisMax = 1;
             } else if (maxPower < 10) {
-                yAxisMax = Math.ceil(maxPower * 1.5); // Add 50% margin for small values
+                yAxisMax = Math.ceil(maxPower * 1.5);
             } else {
-                yAxisMax = Math.ceil(maxPower * 1.2); // Add 20% margin for larger values
+                yAxisMax = Math.ceil(maxPower * 1.2);
             }
-            
-            // Force minimum of 100 kW if maxPower is high
+
             if (maxPower > 50) {
                 yAxisMax = Math.max(yAxisMax, 100);
             }
-            
-            // Update axes
+
             axisY.max = yAxisMax;
-            
-            // Also dynamically adjust the X-axis
+
             axisX.max = Math.max(calculator.cutOutSpeed + 5, 30);
-            
-            // Force chart update
+
             powerCurveChart.update()
         } catch (e) {
             console.error("Error updating power curve:", e)
@@ -594,15 +576,13 @@ Item {
         function updateDisplayValues() {
             actualPowerText.text = safeValueFunction(calculator.actualPower, 0).toFixed(2)
             genCapacityText.text = (calculator.actualPower * 1.2).toFixed(2)
-            
-            // Calculate generator current at 400V
+
             var genCurrent = (calculator.actualPower * 1000) / (Math.sqrt(3) * 400)
             genCurrentText.text = safeValueFunction(genCurrent, 0).toFixed(2)
             
             annualEnergyText.text = safeValueFunction(calculator.annualEnergy, 0).toFixed(2)
         }
-        
-        // Add a timer specifically for the initial update of advanced AEP
+
         property Timer updateDisplayValuesTimer: Timer {
             interval: 500
             repeat: false
@@ -614,16 +594,13 @@ Item {
         }
     }
 
-    // Add a function to update the advanced AEP calculation
     function updateAdvancedAEP() {
         if (!calculatorReady) return;
         
         try {
-            // Get values from the spinboxes
             var windSpeed = safeValue(avgWindSpeedSpinBox.value, 7);
             var weibullK = safeValue(weibullKSpinBox.value / 10, 2.0);
             
-            // Call the Python method with both parameters
             var aep = calculator.estimateAEP(windSpeed, weibullK);
             advancedAepText.text = safeValue(aep, 0).toFixed(2);
         } catch (e) {
@@ -631,10 +608,8 @@ Item {
             advancedAepText.text = "Error";
         }
     }
-    
-    // Component state management
+
     Component.onCompleted: {
-        // Initial update after a small delay to ensure calculator is ready
         updateTimer.updateDisplayValuesTimer.start();
     }
 }

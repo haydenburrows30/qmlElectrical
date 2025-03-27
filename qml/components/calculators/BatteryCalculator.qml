@@ -67,7 +67,6 @@ Item {
                     columns: 2
                     rowSpacing: 10
                     columnSpacing: 10
-                    // Layout.fillWidth: true
                     
                     Label { text: "Load (watts):" }
                     TextField {

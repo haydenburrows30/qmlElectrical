@@ -42,8 +42,7 @@ Item {
         includeMotors.checked = calculator.includeMotors
         motorMva.text = calculator.motorMva.toString()
         motorContributionFactor.text = calculator.motorContributionFactor.toString()
-        
-        // Set the combo box to match the calculator's fault type
+
         for (let i = 0; i < faultType.model.length; i++) {
             if (faultType.model[i] === calculator.faultType) {
                 faultType.currentIndex = i
@@ -213,8 +212,7 @@ Item {
                             Layout.fillWidth: true
                         }
                     }
-                    
-                    // Advanced settings toggle button - Fix visibility toggle
+
                     Button {
                         id: advancedButton
                         text: "Advanced Settings"
@@ -359,15 +357,13 @@ Item {
 
                 visible: false
                 
-                // Add a clear header to make it obvious when it's visible
                 Label { 
                     text: "Advanced Settings" 
                     font.bold: true
                     Layout.columnSpan: 2
                     Layout.alignment: Qt.AlignHCenter
                 }
-                
-                // Add a visual separator
+
                 Rectangle {
                     height: 1
                     color: Universal.accent
@@ -446,8 +442,7 @@ Item {
                 onPaint: {
                     var ctx = getContext("2d")
                     ctx.reset()
-                    
-                    // Set colors based on theme
+
                     var lineColor = root.Universal.theme === Universal.Dark ? "#FFFFFF" : "#000000"
                     var accentColor = root.Universal.theme === Universal.Dark ? "#00B4FF" : "#0078D4"
                     var motorColor = root.Universal.theme === Universal.Dark ? "#C586C0" : "#9B4F96"
@@ -481,7 +476,6 @@ Item {
                     // Draw fault location with lightning bolt and fault resistance if any
                     drawFault(ctx, width - 100, centerY + 20, "#FFB900")
                     
-                    // Add labels with improved styling
                     ctx.fillStyle = lineColor
                     ctx.font = "bold 12px sans-serif"
                     ctx.textAlign = "center"
@@ -605,8 +599,7 @@ Item {
                     ctx.lineTo(x+8, y+20)
                     ctx.lineTo(x, y+35)
                     ctx.stroke()
-                    
-                    // Add glow effect
+
                     ctx.strokeStyle = faultColor + "40" // 40 = 25% opacity
                     ctx.lineWidth = 6
                     ctx.stroke()

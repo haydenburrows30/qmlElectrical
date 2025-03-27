@@ -12,16 +12,12 @@ Item {
     id: root
     anchors.fill: parent
     
-    // Use the calculator created by the factory in main.py
     property WindTurbineCalculator calculator: WindTurbineCalculator {}
-    
-    // Add a check to prevent null pointer errors
+
     property bool calculatorReady: calculator !== null
-    
-    // Break binding loops by using init functions to set initial values
+
     function initializeInputs() {
         if (calculatorReady) {
-            // Set initial values without creating binding loops
             bladeRadiusSpinBox.value = calculator.bladeRadius
             windSpeedSpinBox.value = calculator.windSpeed
             airDensitySpinBox.value = Math.round(calculator.airDensity * 100)
@@ -31,8 +27,7 @@ Item {
             efficiencySpinBox.value = Math.round(calculator.efficiency * 100)
         }
     }
-    
-    // Enhanced safeValue function with better error handling
+
     function safeValue(value, defaultVal) {
         if (value === undefined || value === null) {
             return defaultVal;
@@ -90,7 +85,7 @@ Item {
                             id: bladeRadiusSpinBox
                             from: 1
                             to: 100
-                            value: 25  // Set a default value
+                            value: 25
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -102,7 +97,7 @@ Item {
                             id: windSpeedSpinBox
                             from: 1
                             to: 30
-                            value: 8  // Set a default value
+                            value: 8  
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -114,7 +109,7 @@ Item {
                             id: airDensitySpinBox
                             from: 100
                             to: 150
-                            value: 122  // Set a default value (1.22 kg/m³)
+                            value: 122   (1.22 kg/m³)
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -137,7 +132,7 @@ Item {
                             id: powerCoefficientSpinBox
                             from: 0
                             to: 60
-                            value: 40  // Set a default value (0.40)
+                            value: 40   (0.40)
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -160,7 +155,7 @@ Item {
                             id: cutInSpinBox
                             from: 1
                             to: 10
-                            value: 3  // Set a default value
+                            value: 3  
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -172,7 +167,7 @@ Item {
                             id: cutOutSpinBox
                             from: 15
                             to: 35
-                            value: 25  // Set a default value
+                            value: 25  
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -184,7 +179,7 @@ Item {
                             id: efficiencySpinBox
                             from: 50
                             to: 100
-                            value: 90  // Set a default value (90%)
+                            value: 90   (90%)
                             stepSize: 1
                             editable: true
                             Layout.fillWidth: true
@@ -275,8 +270,7 @@ Item {
                             Layout.alignment: Qt.AlignHCenter
                             onClicked: calculator.refreshCalculations()
                         }
-                        
-                        // Add advanced analysis section
+
                         Label { 
                             text: "Advanced Analysis:"
                             Layout.columnSpan: 2
@@ -402,13 +396,11 @@ Item {
             }
         }
     }
-    
-    // Connect to backend signals to update UI - add error handling
+
     Connections {
         target: calculator
         
-        function onCalculationCompleted() {  // Updated from onCalculationsComplete to match Python backend
-            // Update text fields with calculated values, handling potential NaN/Infinity values
+        function onCalculationCompleted() {
             sweptAreaText.text = safeValue(calculator.sweptArea, 0).toFixed(2)
             theoreticalPowerText.text = safeValue(calculator.theoreticalPower, 0).toFixed(2)
             actualPowerText.text = safeValue(calculator.actualPower, 0).toFixed(2)
@@ -417,58 +409,45 @@ Item {
         }
         
         function onPowerCurveChanged() {
-            // Update power curve chart
             updatePowerCurve()
         }
     }
-    
-    // Update power curve from backend data - improved Y-axis scaling with debugging
+
     function updatePowerCurve() {
         console.log("Updating power curve...")
-        
-        // Clear existing data
+
         powerSeries.clear()
-        
-        // Safety check for calculator and data
+
         if (!calculatorReady) {
             console.error("Calculator instance not ready")
             return
         }
         
         try {
-            // Get power curve data from backend with null check
             var powerCurveData = calculator.powerCurve || []
-            
-            // Find maximum power for Y axis scaling
-            var maxPower = 0.1 // Minimum default
+
+            var maxPower = 0.1
             var totalPower = 0
             var nonZeroPoints = 0
-            
-            // Add all points to the series and calculate stats
+
             for (var i = 0; i < powerCurveData.length; i++) {
                 var point = powerCurveData[i]
-                
-                // Support both array format and dictionary format
+
                 var x, y;
                 if (typeof point === 'object') {
                     if ('x' in point && 'y' in point) {
-                        // Dictionary format with named keys
                         x = safeValue(point.x, 0)
                         y = safeValue(point.y, 0)
                     } else if (Array.isArray(point) && point.length >= 2) {
-                        // Array format [x, y]
                         x = safeValue(point[0], 0)
                         y = safeValue(point[1], 0)
                     } else {
-                        // Skip invalid points
                         continue
                     }
                 } else {
-                    // Skip non-object points
                     continue
                 }
-                
-                // Add point to chart
+
                 powerSeries.append(x, y)
                 
                 if (y > 0) {
@@ -480,47 +459,37 @@ Item {
                     maxPower = y
                 }
             }
-            
-            // Calculate average power (excluding zero points)
+
             var avgPower = nonZeroPoints > 0 ? totalPower / nonZeroPoints : 0
-            
-            // Ensure a reasonable Y-axis max based on actual data
+
             var yAxisMax;
             if (maxPower < 1) {
-                yAxisMax = 1; // Minimum 1 kW
+                yAxisMax = 1;
             } else if (maxPower < 10) {
-                yAxisMax = Math.ceil(maxPower * 1.5); // Add 50% margin for small values
+                yAxisMax = Math.ceil(maxPower * 1.5);
             } else {
-                yAxisMax = Math.ceil(maxPower * 1.2); // Add 20% margin for larger values
+                yAxisMax = Math.ceil(maxPower * 1.2);
             }
-            
-            // Force minimum of 100 kW if maxPower is high
+
             if (maxPower > 50) {
                 yAxisMax = Math.max(yAxisMax, 100);
             }
-            
-            // Update axes
+
             axisY.max = yAxisMax;
-            
-            // Also dynamically adjust the X-axis
+
             axisX.max = Math.max(calculator.cutOutSpeed + 5, 30);
-            
-            // Force chart update
+
             powerCurveChart.update()
         } catch (e) {
             console.error("Error updating power curve:", e)
             console.error("Error stack:", e.stack)
         }
     }
-    
-    // Initialize UI when component completes
+
     Component.onCompleted: {
-            
-        // Use a timer to ensure all properties are properly initialized
         initTimer.start()
     }
-    
-    // Use a timer to delay initialization to ensure backend is ready
+
     Timer {
         id: initTimer
         interval: 100
@@ -529,19 +498,16 @@ Item {
             if (calculatorReady) {
                 console.log("Calculator instance is available, initializing")
                 initializeInputs()
-                
-                // Force calculation to generate power curve
+
                 calculator.refreshCalculations()
-                
-                // Update power curve after a short delay to ensure data is ready
+
                 updateTimer.start()
             } else {
                 console.error("Calculator instance is not available - check main.py registration")
             }
         }
     }
-    
-    // Add a second timer to update the power curve after calculations are complete
+
     Timer {
         id: updateTimer
         interval: 200

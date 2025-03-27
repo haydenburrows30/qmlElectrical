@@ -352,7 +352,7 @@ Item {
                             top: 1
                             decimals: 2
                         }
-                        text: "0.8"  // Default value
+                        text: "0.8"  
                         color: acceptableInput ? "black" : "red"
                         onTextChanged: {
                             if (acceptableInput && calculator1) {

@@ -19,8 +19,7 @@ Canvas {
     onPaint: {
         var ctx = getContext("2d");
         ctx.reset();
-        
-        // Set canvas background
+
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, 0, width, height);
         

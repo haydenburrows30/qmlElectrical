@@ -7,8 +7,7 @@ Item {
     
     property var calculator
     property bool profilingEnabled: false
-    
-    // Add status indicator for background calculations
+
     BusyIndicator {
         id: calculationBusyIndicator
         anchors {
@@ -21,8 +20,7 @@ Item {
         visible: calculator ? calculator.calculationInProgress : false
         running: visible
     }
-    
-    // Add progress information
+
     Rectangle {
         anchors {
             right: parent.right
@@ -42,8 +40,7 @@ Item {
             font.bold: true
         }
     }
-    
-    // Add cancel button
+
     Button {
         anchors {
             right: parent.right
@@ -58,8 +55,7 @@ Item {
             }
         }
     }
-    
-    // Add thread status indicator with improved error handling
+
     Text {
         anchors {
             left: parent.left
@@ -67,7 +63,6 @@ Item {
             margins: 45
         }
         text: {
-            // Get thread pool status when calculation is in progress
             if (calculator && calculator.calculationInProgress) {
                 try {
                     var status = calculator.getThreadPoolStatus();
@@ -77,8 +72,7 @@ Item {
                 } catch (e) {
                     console.error("Error getting thread status:", e);
                 }
-                return "Threads: Active";  // Fallback message
-            }
+                return "Threads: Active";
             return "";
         }
         visible: calculator ? calculator.calculationInProgress : false
@@ -87,7 +81,6 @@ Item {
         color: "gray"
     }
 
-    // Add a TextArea to log status information
     TextArea {
         id: statusLog
         anchors {
@@ -99,9 +92,8 @@ Item {
         readOnly: true
         font.pixelSize: 10
         visible: profilingEnabled && calculator ? calculator.profilingEnabled : false
-        z: 10  // Make sure it's above other elements
-        
-        // Add connections to log status changes
+        z: 10
+
         Connections {
             target: calculator
             function onCalculationsComplete() {

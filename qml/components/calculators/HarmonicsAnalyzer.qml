@@ -21,10 +21,9 @@ Item {
     property HarmonicAnalysisCalculator calculator: HarmonicAnalysisCalculator {}
     property SeriesHelper seriesHelper: SeriesHelper {}
 
-    // Use a timer to batch UI updates and defer them slightly
     Timer {
         id: updateWaveformTimer
-        interval: Qt.platform.os === "windows" ? 100 : 50  // Increase interval on Windows
+        interval: Qt.platform.os === "windows" ? 100 : 50
         running: false
         repeat: false
         onTriggered: {
@@ -34,10 +33,9 @@ Item {
         }
     }
     
-    // Timer for harmonics updates
     Timer {
         id: updateHarmonicsTimer
-        interval: 50  // Increase to 50ms for less frequent updates
+        interval: 50
         running: false
         repeat: false
         onTriggered: {
@@ -91,19 +89,13 @@ Item {
 
                 ColumnLayout {
                     spacing: Style.spacing
-                    
-                    // Use the new HarmonicInputForm component
+
                     HarmonicInputForm {
                         id: harmonicForm
                         calculator: harmonicsCard.calculator
                         Layout.fillWidth: true
-                        
-                        onResetTriggered: {
-                            // Additional reset actions if needed
-                        }
                     }
 
-                    // Use the new ResultsDisplay component
                     ResultsDisplay {
                         id: resultsDisplay
                         calculator: harmonicsCard.calculator
@@ -118,7 +110,6 @@ Item {
                 text: "Export Data"
                 Layout.fillWidth: true
                 onClicked: {
-                    // Call a method in your calculator to export data
                     calculator.exportData()
                 }
                 ToolTip.text: "Export harmonic data to CSV"
@@ -134,7 +125,7 @@ Item {
                 }
             }
             
-        } // Close ColumnLayout
+        }
 
         // Right Panel - Visualizations
         ColumnLayout {
@@ -149,7 +140,6 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                // Use the WaveformVisualizer component
                 WaveformVisualizer {
                     id: waveformVisualizer
                     anchors.fill: parent
@@ -157,7 +147,6 @@ Item {
                     seriesHelper: harmonicsCard.seriesHelper
                 }
                 
-                // Add visibility control - Fix binding loop
                 CheckBox {
                     id: showLabels
                     anchors.left: parent.left
@@ -168,14 +157,12 @@ Item {
                     z: 10
 
                     onCheckedChanged: {
-                        // Update axis labels directly using the visualizer function
                         if (waveformVisualizer) {
                             waveformVisualizer.setLabelsVisible(checked);
                         }
                     }
                 }
                 
-                // Add performance settings button
                 Button {
                     id: performanceButton
                     anchors {
@@ -187,7 +174,6 @@ Item {
                     onClicked: performancePopup.open()
                 }
 
-                // Keep fundamental checkbox
                 CheckBox {
                     id: fundamentalCheckbox
                     text: "Show Fundamental"
@@ -205,14 +191,12 @@ Item {
                     }
                 }
 
-                // Add performance popup
                 PerformancePopup {
                     id: performancePopup
                     x: Math.round((parent.width - width) / 2)
                     y: Math.round((parent.height - height) / 2)
                 }
 
-                // Add the calculation monitor
                 CalculationMonitor {
                     id: calculationMonitor
                     anchors.fill: parent
@@ -227,15 +211,13 @@ Item {
                 Layout.fillWidth: true
                 title: "Harmonic Spectrum"
 
-                // Use our HarmonicSpectrum component
                 HarmonicSpectrum {
                     id: harmonicSpectrum
                     anchors.fill: parent
                     calculator: harmonicsCard.calculator
                     showPhaseAngles: showPhaseCheckbox.checked
                 }
-                
-                // Control for showing phase angles
+
                 CheckBox {
                     id: showPhaseCheckbox
                     text: "Show Phase Angles"
@@ -255,9 +237,8 @@ Item {
             }
         }
 
-    } // Close main RowLayout
+    }
 
-    // Connect to calculator signal to trigger updates
     Connections {
         target: calculator
         
@@ -266,4 +247,4 @@ Item {
             updateHarmonicsTimer.start();
         }
     }
-} // Close root Item
+}

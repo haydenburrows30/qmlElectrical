@@ -9,8 +9,7 @@ import "../components/buttons/"
 
 Page {
     id: home
-    
-    // Add a welcome header
+
     Text {
         id: welcomeHeader
         text: "Electrical Engineering Tools"
@@ -55,11 +54,9 @@ Page {
             icon.name: "Voltage Drop"
             back: Qt.lighter(palette.accent, 1.5)
             fore: Qt.lighter(palette.accent, 1.0)
-            
-            // Add hover effect
+
             Behavior on scale { NumberAnimation { duration: 100 } }
-            
-            // Improved description layout
+
             Item {
                 anchors.fill: parent                
                 Text {
@@ -94,8 +91,7 @@ Page {
                 stackView.push("../pages/VoltageDrop.qml")
                 sideBar.change(1)
             }
-            
-            // Add subtle hover effect
+
             HoverHandler {
                 onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
             }
@@ -105,7 +101,6 @@ Page {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
             icon.name: "Calculator" 
-            // text: "Calculators"
             back: Qt.lighter(palette.accent, 1.5)
             fore: Qt.lighter(palette.accent, 1.0)
             
@@ -154,7 +149,6 @@ Page {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
             icon.name: "Wave"
-            // text: "3 Phase"
             back: Qt.lighter(palette.accent, 1.5)
             fore: Qt.lighter(palette.accent, 1.0)
             
@@ -203,7 +197,6 @@ Page {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
             icon.name: "RLC"
-            // text: "RLC"
             back: Qt.lighter(palette.accent, 1.5)
             fore: Qt.lighter(palette.accent, 1.0)
             
@@ -252,7 +245,6 @@ Page {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
             icon.name: "RealTime"
-            // text: "Real Time Chart"
             back: Qt.lighter(palette.accent, 1.5)
             fore: Qt.lighter(palette.accent, 1.0)
             
@@ -296,8 +288,7 @@ Page {
             }
         }
     }
-    
-    // App version footer
+
     Text {
         text: "v1.0.0"
         font.pixelSize: 12

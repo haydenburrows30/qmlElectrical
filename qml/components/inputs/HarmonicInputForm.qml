@@ -11,8 +11,7 @@ ColumnLayout {
     
     property var calculator
     signal resetTriggered
-    
-    // Header row for magnitude and phase
+
     RowLayout {
         spacing: Style.spacing
         Label { text: "Harmonic"; Layout.preferredWidth: 120; font.bold: true }
@@ -43,8 +42,7 @@ ColumnLayout {
                 placeholderText: modelData === 1 ? "100%" : "0%"
                 enabled: modelData !== 1
                 validator: DoubleValidator { bottom: 0; top: 100 }
-                
-                // Add throttling to avoid excessive updates
+
                 property bool updatePending: false
                 onTextChanged: {
                     if(text) {
@@ -55,7 +53,7 @@ ColumnLayout {
                 
                 Timer {
                     id: updateTimer
-                    interval: 300 // 300ms throttle
+                    interval: 300
                     running: false
                     repeat: false
                     onTriggered: {
@@ -90,8 +88,7 @@ ColumnLayout {
                 placeholderText: "0°"
                 enabled: modelData !== 1
                 validator: DoubleValidator { bottom: -180; top: 180 }
-                
-                // Add throttling to avoid excessive updates
+
                 property bool updatePending: false
                 onTextChanged: {
                     if(text) {
@@ -102,7 +99,7 @@ ColumnLayout {
                 
                 Timer {
                     id: phaseUpdateTimer
-                    interval: 300 // 300ms throttle
+                    interval: 300
                     running: false
                     repeat: false
                     onTriggered: {
@@ -141,23 +138,16 @@ ColumnLayout {
         color: sideBar && sideBar.toggle1 ? "#404040" : "#e0e0e0"
     }
 
-    // Reset button
     Button {
         text: "Reset to Defaults"
         Layout.alignment: Qt.AlignHCenter
         onClicked: {
-            // Reset all harmonics to default values
             calculator.resetHarmonics()
-            
-            // Clear all text fields
             clearAllTextFields()
-            
-            // Signal that reset was triggered
             resetTriggered()
         }
     }
-    
-    // Method to clear all text fields
+
     function clearAllTextFields() {
         function clearTextFields(parent) {
             for (let i = 0; i < parent.children.length; i++) {

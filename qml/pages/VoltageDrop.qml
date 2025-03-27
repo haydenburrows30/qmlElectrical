@@ -22,15 +22,12 @@ import "../components/three_phase/"
 Page {
     id: root
     padding: 0
-    
-    // Move model to top level and create explicit binding
+
     property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
-    
-    // Add connections to ensure property updates when signal is emitted
+
     Connections {
         target: voltageDrop
         function onVoltageDropCalculated(value) {
-            // console.log("Voltage drop updated:", value)
             root.currentVoltageDropValue = value
         }
     }

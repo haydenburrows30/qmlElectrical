@@ -150,13 +150,11 @@ Page {
                                     anchors.margins: 10
                                     circuitType: currentMode
                                     darkMode: sideBar.toggle1
-                                    
-                                    // Add component highlighting when editing relevant fields
+
                                     highlightR: resistanceInput.activeFocus
                                     highlightL: inductanceInput.activeFocus
                                     highlightC: capacitanceInput.activeFocus
-                                    
-                                    // Enable current animation
+
                                     animateCurrent: enableAnimationCheckbox.checked
                                     frequency: frequencySlider.value
                                 }
@@ -268,7 +266,7 @@ Page {
                                 TextField {
                                     id: resistanceInput
                                     placeholderText: "Enter Resistance"
-                                    text: "10"  // Default value
+                                    text: "10"  
                                     validator: DoubleValidator {
                                         bottom: 0.0001
                                         decimals: 4
@@ -324,7 +322,7 @@ Page {
                                 TextField {
                                     id: inductanceInput
                                     placeholderText: "Enter Inductance"
-                                    text: "0.1"  // Default value
+                                    text: "0.1"  
                                     validator: DoubleValidator {
                                         bottom: 0.0001
                                         decimals: 4
@@ -500,8 +498,7 @@ Page {
                                     color: "red"
                                     font.bold: isAtResonance()
                                     font.pixelSize: isAtResonance() ? 14 : 12
-                                    
-                                    // Add visual feedback when near resonance
+
                                     function isAtResonance() {
                                         var minF = Number(minFreqInput.text)
                                         var maxF = Number(maxFreqInput.text)
@@ -681,18 +678,15 @@ Page {
         fileMode: FileDialog.SaveFile
         defaultSuffix: "png"
         currentFolder: Qt.platform.os === "windows" ? "file:///C:" : "file:///home"
-        
-        // Add property to track the selected scale
+
         property real currentScale: 2.0
 
-        // Generate default filename with timestamp
         currentFile: {
             let timestamp = new Date().toISOString().replace(/[:.]/g, '-')
             return "rlc_chart_" + timestamp + ".png"
         }
 
         onAccepted: {
-            // Use the selected scale factor
             rlcChart.saveChart(selectedFile, currentScale)
         }
     }
@@ -718,7 +712,6 @@ Page {
         }
     }
 
-    // Add message popup for feedback
     Popup {
         id: messagePopup
         modal: true
@@ -758,7 +751,6 @@ Page {
         }
     }
 
-    // Add loading indicator
     BusyIndicator {
         id: loadingIndicator
         anchors.centerIn: parent

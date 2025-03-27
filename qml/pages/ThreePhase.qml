@@ -16,7 +16,6 @@ import "../components/backgrounds"
 Page {
     id: root
 
-    // Add theme-aware text color property
     property color textColorPhase: sideBar.toggle1 ? "#ffffff" : "#000000"
 
     background: Rectangle {

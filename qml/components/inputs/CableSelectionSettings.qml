@@ -129,7 +129,7 @@ GridLayout {
     ComboBox {
         id: cableSelect
         model: voltageDrop.availableCables
-        currentIndex: 13  // Set default selection
+        currentIndex: 13
         onCurrentTextChanged: {
             if (currentText) {
                 voltageDrop.selectCable(currentText)

@@ -297,13 +297,13 @@ Item {
                                         calculator.setImpedancePercent(parseFloat(text))
                                     }
                                 }
-                                // Add validator to allow decimal input
+
                                 validator: DoubleValidator {
                                     bottom: 0.0
                                     decimals: 2
                                     notation: DoubleValidator.StandardNotation
                                 }
-                                // Add the same connection pattern for impedance as used for resistance
+
                                 Component.onCompleted: {
                                     text = calculator.impedancePercent.toFixed(2)
                                 }
@@ -330,7 +330,6 @@ Item {
                                         calculator.setCopperLosses(parseFloat(text))
                                     }
                                 }
-                                // Add validator to allow decimal input
                                 validator: DoubleValidator {
                                     bottom: 0.0
                                     decimals: 1
@@ -348,7 +347,6 @@ Item {
                                         calculator.setResistancePercent(parseFloat(text))
                                     }
                                 }
-                                // Add validator to allow decimal input
                                 validator: DoubleValidator {
                                     bottom: 0.0
                                     decimals: 2
@@ -423,7 +421,6 @@ Item {
                                 background: ProtectionRectangle {}
                             }
 
-                            // Add warnings section
                             Rectangle {
                                 visible: calculator.warnings.length > 0
                                 color: Universal.accent

@@ -14,7 +14,6 @@ Popup {
     property var calculator
     property var safeValueFunction
     
-    // Force a refresh when opened
     onOpened: {
         if (calculator) {
             try {
@@ -46,8 +45,7 @@ Popup {
                 columns: 2
                 columnSpacing: 20
                 rowSpacing: 10
-                
-                // Add detailed calculations section first
+
                 Label { text: "Detailed System Calculations"; font.bold: true }
                 Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
                 

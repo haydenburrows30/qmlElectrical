@@ -59,7 +59,7 @@ Canvas {
         ctx.reset();
         
         if (antialiasing) {
-            ctx.globalAlpha = 0.99; // Workaround to enable anti-aliasing
+            ctx.globalAlpha = 0.99;
         }
         
         if (circuitType === 0) {
@@ -71,13 +71,11 @@ Canvas {
     
     // Draw series RLC circuit
     function drawSeriesCircuit(ctx) {
-        // Set up dimensions
         var margin = width * 0.05;
         var centerY = height * 0.5;
         var componentLength = (width - 3 * margin) / 5;
         var wireY = centerY;
-        
-        // Components positions
+
         var sourceX = margin;
         var wireStartX = sourceX + margin;
         var resistorX = wireStartX;

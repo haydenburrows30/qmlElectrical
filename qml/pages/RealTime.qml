@@ -10,7 +10,6 @@ import "../components/charts/"
 Page {
     id: home
 
-    // Add theme-aware text color property
     property color textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
 
     background: Rectangle {

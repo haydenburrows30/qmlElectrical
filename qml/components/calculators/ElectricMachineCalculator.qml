@@ -11,7 +11,6 @@ import Machine 1.0
 
 Item {
     id: machineCard
-    // title: 'Electric Machine Calculator'
 
     property MachineCalculator calculator: MachineCalculator {}
     property color textColor: Universal.foreground
@@ -104,7 +103,7 @@ Item {
                     WaveCard {
                         title: "Electrical Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: waveHeight  // Increased height for the radio buttons
+                        Layout.minimumHeight: waveHeight
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -172,7 +171,6 @@ Item {
                                     onTextChanged: if(text) calculator.setRatedCurrent(parseFloat(text))
                                     Layout.fillWidth: true
                                     validator: DoubleValidator { bottom: 0.1; decimals: 2 }
-                                    // Current will be calculated in VP mode
                                 }
 
                                 Label { text: "Rated Power (kW):" }
@@ -180,13 +178,12 @@ Item {
                                     id: ratedPowerInput
                                     placeholderText: "Enter power"
                                     text: calculator.ratedPower.toFixed(2)
-                                    enabled: false  // Initially disabled in VC mode
+                                    enabled: false
                                     onTextChanged: if(text && enabled) calculator.setRatedPower(parseFloat(text))
                                     Layout.fillWidth: true
                                     validator: DoubleValidator { bottom: 0.1; decimals: 2 }
                                 }
                                 
-                                // Bind the text to the calculator values for the calculated fields
                                 Connections {
                                     target: calculator
                                     function onRatedPowerChanged() {
@@ -383,7 +380,7 @@ Item {
                         speedRPM: calculator.rotationalSpeed
                         torque: calculator.torque
                         slip: calculator.slip
-                        temperatureRise: calculator.temperatureRise  // Add this binding
+                        temperatureRise: calculator.temperatureRise
                         
                         darkMode: Universal.theme === Universal.Dark
                         textColor: machineCard.textColor

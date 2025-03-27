@@ -297,7 +297,6 @@ Item {
                     axisY: timeAxis
                 }
 
-                // Add connection to update curve when calculations complete
                 Connections {
                     target: relay
                     function onCalculationsComplete() {
@@ -312,7 +311,6 @@ Item {
         }
     }
 
-    // Update connection to use correct curve point format
     Connections {
         target: relay
         function onCalculationsComplete() {

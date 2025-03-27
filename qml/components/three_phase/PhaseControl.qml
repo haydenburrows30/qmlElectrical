@@ -25,10 +25,8 @@ ColumnLayout {
 
     function resetPhase() {
         if (phase === "A") {
-            // Reset voltage
             sineModel.setAmplitudeA(325.27)  // 230V RMS
             sineModel.setPhaseAngleA(0)
-            // Reset current
             sineModel.setCurrentA(100)
             sineModel.setCurrentAngleA(0)
         } else if (phase === "B") {
@@ -140,7 +138,6 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
                 from: 0
                 to: 1000
-                // Fix the value binding to directly use the current value without scaling
                 value: phase === "A" ? sineModel.currentA : 
                        phase === "B" ? sineModel.currentB : 
                        phase === "C" ? sineModel.currentC : defaultAmplitude1
@@ -148,11 +145,9 @@ ColumnLayout {
                 stepSize: 1
                 
                 onValueModified: {
-                    // Pass the actual value without any multiplication
                     amplitudeChanged1(value)
                 }
-                
-                // Define the formatter to handle the proper display of values
+
                 textFromValue: function(value, locale) {
                     return Number(value).toLocaleString(locale, 'f', 1)
                 }
