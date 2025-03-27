@@ -1,8 +1,11 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.charts.lineplots import LinePlot
+import os
 
 class PDFGenerator:
     def __init__(self):
@@ -52,6 +55,51 @@ class PDFGenerator:
         story.append(Table(basic_results, style=self._get_table_style()))
         story.append(Spacer(1, 20))
         
+        # Power Curve Chart - Use image if available, otherwise generate from data
+        story.append(Paragraph("Power Curve", self.styles['Heading2']))
+        story.append(Spacer(1, 10))
+        
+        # Check if we have a chart image
+        chart_image_path = data.get('chart_image_path', '')
+        if chart_image_path and os.path.exists(chart_image_path):
+            # Use the image from QML chart
+            try:
+                # Import PIL to get image dimensions
+                try:
+                    from PIL import Image as PILImage
+                    img_obj = PILImage.open(chart_image_path)
+                    img_width, img_height = img_obj.size
+                    aspect_ratio = img_height / img_width
+                    
+                    # Set width to fit the page with margins
+                    img_width = 500  # Width in points (slightly less than A4 width)
+                    img_height = img_width * aspect_ratio
+                    
+                    print(f"Chart image dimensions: {img_width}x{img_height}, aspect ratio: {aspect_ratio}")
+                except ImportError:
+                    # If PIL is not available, use default dimensions
+                    img_width = 500
+                    img_height = 350
+                    print("PIL not available, using default chart dimensions")
+                
+                img = Image(chart_image_path, width=img_width, height=img_height)
+                story.append(img)
+                story.append(Spacer(1, 5))
+                story.append(Paragraph("Figure 1: Wind Turbine Power Output vs Wind Speed", 
+                                      self.styles['Normal']))
+            except Exception as e:
+                print(f"Error adding chart image: {e}")
+                # Fall back to generated chart if image fails
+                if 'power_curve' in data:
+                    chart = self._create_power_curve_chart(data['power_curve'])
+                    story.append(chart)
+        elif 'power_curve' in data:
+            # Generate chart from data
+            chart = self._create_power_curve_chart(data['power_curve'])
+            story.append(chart)
+            
+        story.append(Spacer(1, 20))
+        
         # Protection Requirements
         story.append(Paragraph("Generator Protection Requirements", self.styles['Heading2']))
         protection_info = [
@@ -81,6 +129,73 @@ class PDFGenerator:
             story.append(Paragraph(note, self.styles['Normal']))
         
         doc.build(story)
+    
+    def _create_power_curve_chart(self, power_curve_data):
+        """Create a power curve chart using ReportLab's LinePlot"""
+        # Extract data
+        wind_speeds = power_curve_data.get('wind_speeds', [])
+        power_values = power_curve_data.get('power_values', [])
+        
+        # Create a drawing to hold the chart
+        width, height = 450, 280  # Increased height for title
+        drawing = Drawing(width, height)
+        
+        # Add chart title at the top
+        from reportlab.graphics.shapes import String
+        title = String(width/2, height - 20, "Wind Turbine Power Curve")
+        title.fontName = "Helvetica-Bold"
+        title.fontSize = 12
+        title.textAnchor = "middle"
+        drawing.add(title)
+        
+        # Create a line plot
+        line_plot = LinePlot()
+        line_plot.width = width - 50
+        line_plot.height = height - 80  # Reduced to make room for title and X-axis label
+        line_plot.x = 25
+        line_plot.y = 35  # Positioned higher to leave space for X-axis label
+        
+        # Add data to the line plot
+        data = [(speed, power) for speed, power in zip(wind_speeds, power_values)]
+        line_plot.data = [data]
+        
+        # Configure line style
+        line_plot.lines[0].strokeColor = colors.blue
+        line_plot.lines[0].strokeWidth = 2
+        
+        # Configure axes
+        line_plot.xValueAxis.valueMin = 0
+        line_plot.xValueAxis.valueMax = max(wind_speeds) + 2 if wind_speeds else 30
+        line_plot.xValueAxis.valueStep = 5
+        line_plot.yValueAxis.valueMin = 0
+        max_power = max(power_values) if power_values else 10
+        line_plot.yValueAxis.valueMax = max_power * 1.1
+        line_plot.yValueAxis.valueStep = max_power / 5 if max_power > 0 else 2
+        
+        # Add X axis label (centered below the axis and numbers)
+        x_label = String(width/2, 15, "Wind Speed (m/s)")
+        x_label.fontName = "Helvetica"
+        x_label.fontSize = 10
+        x_label.textAnchor = "middle"
+        drawing.add(x_label)
+        
+        # Add Y axis label (left side, no rotation)
+        y_label = String(10, line_plot.height/2 + line_plot.y, "Power (kW)")
+        y_label.fontName = "Helvetica"
+        y_label.fontSize = 10
+        y_label.textAnchor = "middle"
+        drawing.add(y_label)
+        
+        # Add subtitle or caption below the chart
+        subtitle = String(width/2, 5, "Figure 1: Relationship between wind speed and power output")
+        subtitle.fontName = "Helvetica-Oblique"
+        subtitle.fontSize = 8
+        subtitle.textAnchor = "middle"
+        drawing.add(subtitle)
+        
+        # Add the plot to the drawing
+        drawing.add(line_plot)
+        return drawing
         
     def generate_transformer_report(self, data, filename):
         """Generate PDF report for transformer line calculations"""
@@ -139,7 +254,7 @@ class PDFGenerator:
         fault_params = [
             ["Parameter", "Value"],
             ["LV Fault Current", f"{data.get('fault_current_lv', 0):.2f} kA"],
-            ["HV Fault Current", f"{data.get('fault_current_hv', 0):.2f} kA"],
+            ["HV Fault Current", f"{data.get('fault_current_hv', 0)::.2f} kA"],
             ["Ground Fault Current", f"{data['ground_fault_current']:.2f} A"],
         ]
         story.append(Table(fault_params, style=self._get_table_style()))

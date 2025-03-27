@@ -16,6 +16,8 @@ Item {
     property bool calculatorReady
     property real totalGeneratedPower
     property var safeValueFunction
+    // Add property for application directory path
+    property string applicationDirPath: Qt.application.directoryPath || "."
 
     signal calculate()
 
@@ -219,10 +221,10 @@ Item {
                                         }
                                     }
                                     
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        radius: 2
-                                    }
+                                    // background: Rectangle {
+                                    //     color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    //     radius: 2
+                                    // }
                                 }
                                 
                                 Button {
@@ -230,10 +232,10 @@ Item {
                                     Layout.preferredWidth: 100
                                     onClicked: v27StatsPopup.open()
                                     
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "#404040" : "#d0e8ff"
-                                        radius: 2
-                                    }
+                                    // background: Rectangle {
+                                    //     color: sideBar.toggle1 ? "#404040" : "#d0e8ff"
+                                    //     radius: 2
+                                    // }
                                 }
                                 
                                 Button {
@@ -251,10 +253,10 @@ Item {
                                         }
                                     }
                                     
-                                    background: Rectangle {
-                                        color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                        radius: 2
-                                    }
+                                    // background: Rectangle {
+                                    //     color: sideBar.toggle1 ? "black":"#e8f6ff"
+                                    //     radius: 2
+                                    // }
                                 }
                             }
 
@@ -264,9 +266,22 @@ Item {
                                 defaultFileName: "wind_turbine_report.pdf"
                                 onExport: function(fileUrl) {
                                     if (calculatorReady) {
-                                        let genCurrent = (calculator.actualPower) / (Math.sqrt(3) * 400)
+                                        // Use native path separators and system temp directory for better compatibility
+                                        let tempImagePath = applicationDirPath + "/temp_wind_chart.png";
                                         
-                                        calculator.exportWindTurbineReport(fileUrl)
+                                        console.log("Saving chart to: " + tempImagePath);
+                                        
+                                        // Save chart to image first
+                                        powerCurveChart.saveChartImage(tempImagePath);
+                                        
+                                        // Small delay to ensure image is saved
+                                        let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
+                                        timer.interval = 200;
+                                        timer.repeat = false;
+                                        timer.triggered.connect(function() {
+                                            calculator.exportWindTurbineReport(fileUrl, tempImagePath);
+                                        });
+                                        timer.start();
                                     }
                                 }
                             }
@@ -402,7 +417,6 @@ Item {
                                 value: 20
                                 stepSize: 1
                                 editable: true
-                                Layout.fillWidth: true
                                 
                                 property real realValue: value / 10
                                 
@@ -441,7 +455,14 @@ Item {
                         antialiasing: true
                         legend.visible: true
 
-                                                                                                
+                        // Add method to save chart as image
+                        function saveChartImage(filePath) {
+                            return powerCurveChart.grabToImage(function(result) {
+                                result.saveToFile(filePath);
+                                return filePath;
+                            });
+                        }
+                                                                                
                         Button {
                             text: "Update Power Curve"
                             anchors.top: parent.top

@@ -401,15 +401,39 @@ class WindTurbineCalculator(QObject):
         self._generate_power_curve()
         return True
     
-    @Slot(str)
-    def exportWindTurbineReport(self, filename):
-        """Export wind turbine calculations to PDF"""
+    @Slot(str, str)
+    def exportWindTurbineReport(self, filename, chart_image_path=""):
+        """Export wind turbine calculations to PDF
+        
+        Args:
+            filename: Path to save the PDF report
+            chart_image_path: Optional path to the chart image
+        """
         try:
-            # Clean up filename
+            # Clean up filename - handle QML URL format
             clean_path = filename.strip()
+            
+            # Remove the file:/// prefix if present
+            if clean_path.startswith('file:///'):
+                clean_path = clean_path[8:]  # Remove 'file:///'
+
+            # Handle the case with extra leading slash on Windows paths
+            if clean_path.startswith('/') and ':' in clean_path[1:3]:  # Like '/C:/'
+                clean_path = clean_path[1:]  # Remove leading slash
+                
+            # Ensure it has .pdf extension
             if not clean_path.lower().endswith('.pdf'):
                 clean_path += '.pdf'
                 
+            # Make sure the power curve is up-to-date
+            self._generate_power_curve()
+            
+            # Prepare power curve data (to be used if chart image isn't available)
+            power_curve_data = {
+                'wind_speeds': [point[0] for point in self._power_curve],
+                'power_values': [point[1] for point in self._power_curve]
+            }
+            
             data = {
                 "blade_radius": self._blade_radius,
                 "wind_speed": self._wind_speed,
@@ -424,7 +448,9 @@ class WindTurbineCalculator(QObject):
                 "annual_energy": self._annual_energy,
                 "rated_capacity": self._actual_power * 1.2 / 1000,  # kVA
                 "output_current": (self._actual_power / 1000) / (math.sqrt(3) * 0.4),  # A at 400V
-                "capacity_factor": self.calculateCapacityFactor(self._wind_speed)
+                "capacity_factor": self.calculateCapacityFactor(self._wind_speed),
+                "power_curve": power_curve_data,
+                "chart_image_path": chart_image_path if chart_image_path else ""
             }
             
             generator = PDFGenerator()
