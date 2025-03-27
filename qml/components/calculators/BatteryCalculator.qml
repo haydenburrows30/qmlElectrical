@@ -161,7 +161,7 @@ Item {
                     TextField { 
                         text: calculator.recommendedCapacity.toFixed(1) + " Ah"
                         font.bold: true 
-                        color: Universal.theme === Universal.Dark ? "#90EE90" : "green"  // Theme-aware color
+                        color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
                         background: ProtectionRectangle {}
                         Layout.fillWidth: true
                         readOnly: true

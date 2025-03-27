@@ -276,8 +276,7 @@ Item {
                         fillMode: Image.PreserveAspectFit
                         source: {
                             let formulaPath = "../../../assets/formulas/"
-                            
-                            // Use activeComboBox to determine which dropdown to check
+
                             if (activeComboBox === "conversionType") {
                                 switch(conversionType.currentText.toLowerCase().replace(/ /g, "_")) {
                                     case "line_to_phase_voltage": return formulaPath + "line_phase_voltage.png"

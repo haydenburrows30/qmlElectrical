@@ -136,7 +136,6 @@ Page {
                             Layout.fillHeight: true
                             
                             GridLayout {
-                                // anchors.fill: parent
                                 anchors.top: parent.top
                                 anchors.left: parent.left
                                 anchors.right: parent.right

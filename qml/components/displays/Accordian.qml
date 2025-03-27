@@ -246,8 +246,7 @@ Pane {
                         }
                     }
                 }
-                
-                // ABB REF615  ABBConfig {}
+
                 Column {
                     anchors.right: parent.right
                     anchors.left: parent.left

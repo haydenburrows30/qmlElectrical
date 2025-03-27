@@ -307,8 +307,6 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 450
 
-                        // showSettings: true
-
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
@@ -580,8 +578,6 @@ Item {
                         title: "Transformer Protection Settings"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 260
-
-                        // showSettings: true
                         
                         GridLayout {
                             anchors.fill: parent

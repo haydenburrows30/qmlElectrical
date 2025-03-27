@@ -98,7 +98,7 @@ ChartView {
         width: 1
         height: chartView.plotArea.height
         color: "red"
-        z: 1000  // Ensure it's above the plot
+        z: 1000
 
         // Value labels
         Column {

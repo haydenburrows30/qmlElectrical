@@ -189,7 +189,6 @@ Item {
             }
         }
 
-        // Export button
         Button {
             text: "Export Table"
             icon.name: "document-save"

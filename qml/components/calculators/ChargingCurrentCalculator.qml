@@ -8,7 +8,7 @@ import "../visualizers/"
 import "../style"
 import "../backgrounds"
 
-import Charging 1.0  // Import the Charging namespace for our calculator
+import Charging 1.0
 
 Item {
     id: charging_current

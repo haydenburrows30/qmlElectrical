@@ -45,7 +45,7 @@ Page {
         }
     }
 
-    property int currentMode: 0 // 0 for series, 1 for parallel
+    property int currentMode: 0
 
     Connections {
         target: rlcChart
@@ -55,11 +55,9 @@ Page {
             
             gainSeries.clear()
             resonantSeries.clear()
-            
-            // Use Python fill_series for gain data
+
             rlcChart.fill_series(gainSeries)
-            
-            // Fill resonant line directly since it's just 2 points
+
             resonantSeries.append(data[1][0].x, data[1][0].y)
             resonantSeries.append(data[1][1].x, data[1][1].y)
         }

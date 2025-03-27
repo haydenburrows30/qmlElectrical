@@ -44,12 +44,11 @@ Item {
     
     // Return a color based on the saturation level
     function saturationColor(level) {
-        if (level < 0.5) return "#4CAF50";  // Green
-        if (level < 0.8) return "#FF9800";  // Orange
-        return "#F44336";  // Red
+        if (level < 0.5) return "#4CAF50";
+        if (level < 0.8) return "#FF9800";
+        return "#F44336";
     }
 
-    // Let's create a helper function at the root Item level
     function calculateCurrent(voltage) {
         if (voltage <= 0 || ctKneePoint <= 0) return 0;
         
@@ -719,8 +718,7 @@ Item {
             }
         }
     }
-    
-    // Update the charts when property values change
+
     onCtBurdenChanged: {
         if (viewMode === 2 && waveformChart) {
             waveformChart.generateWaveforms();
@@ -738,10 +736,8 @@ Item {
             saturationChart.updateSaturationCurve();
         }
     }
-    
-    // Replace the existing onViewModeChanged handler
+
     onViewModeChanged: {
-        // Use callLater to ensure the chart is ready
         Qt.callLater(function() {
             if (viewMode === 1 && saturationChart) {
                 saturationChart.updateSaturationCurve();

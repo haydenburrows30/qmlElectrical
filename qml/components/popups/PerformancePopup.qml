@@ -131,7 +131,7 @@ Popup {
             }
         }
 
-        Item { Layout.fillHeight: true } // Spacer
+        Item { Layout.fillHeight: true }
 
         Button {
             text: "Close"

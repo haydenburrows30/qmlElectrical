@@ -32,19 +32,10 @@ Popup {
     property string combinedRatingInfo: "N/A"
     property real voltageDropValue: 0
     property real dropPercentage: 0
-    
-    // Signal to close the popup
+
     signal closeRequested()
-    
-    // Signal for saving details to PDF - remove filepath parameter
     signal saveToPdfRequested()
-    
-    // Signal for notifying PDF save results
     signal pdfSaveResult(bool success, string message)
-    
-    onAboutToShow: {
-        // Format values if needed before showing
-    }
 
     ScrollView {
         id: detailsScrollView
@@ -134,7 +125,7 @@ Popup {
                 Button {
                     text: "Save to PDF"
                     icon.name: "document-save"
-                    onClicked: detailsPopup.saveToPdfRequested()  // Just emit signal, no dialog
+                    onClicked: detailsPopup.saveToPdfRequested()
                 }
                 
                 Button {

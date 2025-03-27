@@ -11,27 +11,22 @@ import WindTurbine 1.0
 Item {
     id: root
     anchors.fill: parent
-    
-    // Import the calculators
+
     property var transformerCalculator
     property var windTurbineCalculator
-    
-    // Properties to prevent null errors
+
     property bool transformerReady: transformerCalculator !== null
     property bool windTurbineReady: windTurbineCalculator !== null
-    
-    // Combined calculated values
+
     property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.actualPower : 0
     property real windGeneratorCapacity: windTurbineReady ? windTurbineCalculator.actualPower * 1.2 : 0 // 20% margin
     
     Component.onCompleted: {
-        // Create calculator instances
         transformerCalculator = Qt.createQmlObject('import QtQuick; import TransformerLine 1.0; TransformerLineCalculator {}', 
                                                  root, "dynamicTransformerCalculator");
         windTurbineCalculator = Qt.createQmlObject('import QtQuick; import WindTurbine 1.0; WindTurbineCalculator {}', 
                                                  root, "dynamicWindCalculator");
-        
-        // Start timers when ready
+
         windTurbineTimer.running = windTurbineReady
         transformerTimer.running = transformerReady
     }
@@ -86,7 +81,7 @@ Item {
             WindTurbineSection {
                 id: windTurbineSection
                 Layout.fillWidth: true
-                Layout.preferredHeight: 750 // Ensure enough height
+                Layout.preferredHeight: 750
                 
                 // Pass the required properties and functions
                 calculator: windTurbineCalculator
@@ -105,7 +100,7 @@ Item {
             TransformerLineSection {
                 id: transformerLineSection
                 Layout.fillWidth: true
-                Layout.minimumHeight: 800 // Ensure enough height
+                Layout.minimumHeight: 800
                 
                 // Pass the required properties and functions
                 calculator: transformerCalculator

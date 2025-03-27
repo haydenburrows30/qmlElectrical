@@ -6,7 +6,8 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtQuick.Controls.Material
 import QtQuick.Effects
-import RLC 1.0  // Import RLC directly
+
+import RLC 1.0
 
 import "components"
 import "components/calculators"

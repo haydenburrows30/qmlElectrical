@@ -204,7 +204,7 @@ Pane {
                 }
             }
 
-            // // Control buttons
+            // Control buttons
             WaveCard {
                 title: "Controls"
                 Layout.fillWidth: true

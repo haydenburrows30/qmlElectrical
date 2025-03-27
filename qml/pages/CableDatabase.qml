@@ -24,8 +24,7 @@ Page {
         ColumnLayout {
             width: scrollView.width
             spacing: Style.spacing
-            
-            // Title and description
+
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 80

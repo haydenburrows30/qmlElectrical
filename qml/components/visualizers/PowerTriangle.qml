@@ -28,7 +28,6 @@ Rectangle {
         id: triangleContainer
         anchors.fill: parent
         anchors.margins: 1
-        // anchors.bottom: parent.bottom
 
         // Calculate triangle dimensions
         property real baseLength: activePower * triangleScale

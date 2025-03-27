@@ -13,11 +13,9 @@ import TransformerLine 1.0
 Item {
     id: root
     anchors.fill: parent
-    
-    // Import the calculator
+
     property var calculator
-    
-    // Property to prevent null errors
+
     property bool calculatorReady: calculator !== null
     
     Component.onCompleted: {

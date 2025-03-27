@@ -12,7 +12,6 @@ import InstrumentTransformer 1.0
 
 Item {
     id: instrumentTransformerCard
-    // title: 'Instrument Transformer Calculator'
 
     property InstrumentTransformerCalculator calculator: InstrumentTransformerCalculator {}
     property color textColor: Universal.foreground

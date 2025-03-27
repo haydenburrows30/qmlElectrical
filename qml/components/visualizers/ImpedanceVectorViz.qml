@@ -13,24 +13,18 @@ Item {
     property color textColor: "black"
     property color gridColor: "#eeeeee"
 
-    // Theme property
     property bool darkMode: Universal.theme === Universal.Dark
 
-    // Move the darkMode handler here at the Item level
     onDarkModeChanged: impedanceCanvas.requestPaint()
 
     Canvas {
         id: impedanceCanvas
         anchors.fill: parent
-        // anchors.centerIn: parent
-        // width: 500
-        // height: 500
         
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset();
-            
-            // Set background to transparent since parent Rectangle handles background
+
             ctx.clearRect(0, 0, width, height);
             
             // Calculate center and scale

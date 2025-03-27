@@ -12,7 +12,6 @@ import CableAmpacity 1.0
 
 Item {
     id: cableAmpacityCard
-    // title: 'Cable Ampacity Calculator'
 
     property AmpacityCalculator calculator: AmpacityCalculator {}
     property color textColor: Universal.foreground

@@ -338,14 +338,14 @@ Item {
                         ValueAxis {
                             id: axisX
                             min: 0
-                            max: safeValue(calculator.cutOutSpeed, 25) + 5  // Use safeValue to prevent NaN
+                            max: safeValue(calculator.cutOutSpeed, 25) + 5
                             titleText: "Wind Speed (m/s)"
                         }
                         
                         ValueAxis {
                             id: axisY
                             min: 0
-                            max: 10  // Will be updated dynamically
+                            max: 10
                             titleText: "Power Output (kW)"
                         }
                         

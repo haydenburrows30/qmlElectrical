@@ -6,7 +6,7 @@ import "../"
 import "../style"
 import "../backgrounds"
 
-import RefRgf 1.0  // Import the namespace for our calculator
+import RefRgf 1.0
 
 Item {
     id: calculator

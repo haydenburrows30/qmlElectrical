@@ -70,9 +70,8 @@ Item {
                     spacing: Style.spacing
                     Layout.alignment: Qt.AlignHCenter
 
-                    Text {
+                    Label {
                         text: "Minimum Margin: "
-                        color: Universal.foreground  // Use theme foreground color
                     }
                     RowLayout {
 
@@ -87,10 +86,9 @@ Item {
                             onValueChanged: calculator.minimumMargin = value
                         }
 
-                        Text {
+                        Label {
                             text: marginSlider.value.toFixed(2) + "s"
                             font.bold: true
-                            color: Universal.foreground  // Use theme foreground color
                             Layout.fillWidth: true
                         }
                     }
@@ -265,7 +263,6 @@ Item {
                     Text {
                         text: "Add at least 2 relays to see discrimination results"
                         visible: calculator.relayCount < 2
-                        // anchors.centerIn: parent
                         anchors.fill: parent
                         color: Universal.foreground
                         wrapMode: Text.Wrap
