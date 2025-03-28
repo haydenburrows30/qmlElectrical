@@ -1,36 +1,44 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
-import QtCore
 
-Button {
-    id: exportButton
-    text: "Export PDF"
+ModernButton {
+    id: control
     
-    property string defaultFileName: "report.pdf"
-    property var onExport: null
+    text: "Export"
+    primaryColor: "#673AB7"  // Deep purple for export function
+    
+    property string defaultFileName: "export.pdf"
+    // Only keep one signal declaration - using a name that is not a reserved word
+    signal fileSelected(var fileUrl)
+    
+    // Use a function property instead of an 'export' property
+    function _triggerExport(fileUrl) {
+        fileSelected(fileUrl)
+    }
     
     FileDialog {
         id: saveDialog
-        title: "Save PDF Report"
-        nameFilters: ["PDF files (*.pdf)"]
+        title: "Export Report"
         fileMode: FileDialog.SaveFile
-        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        nameFilters: ["PDF files (*.pdf)"]
+        currentFile: "file:///" + defaultFileName
         
         onAccepted: {
-            if (exportButton.onExport) {
-                // Convert URL to local file path
-                let path = selectedFile.toString()
-                // Remove file:// prefix
-                path = path.replace(/^(file:\/{2})/,"")
-                // Remove URL encoding
-                path = decodeURIComponent(path)
-                exportButton.onExport(path)
-            }
+            control.fileSelected(selectedFile)
         }
     }
     
     onClicked: {
         saveDialog.open()
+    }
+    
+    // Add dynamically created signal handler for backward compatibility
+    Component.onCompleted: {
+        // Create a compatible connection for old 'onExport' handler
+        if (control.parent && typeof control.parent.onExport === "function") {
+            console.log("Found onExport handler, creating compatibility connection")
+            control.fileSelected.connect(control.parent.onExport)
+        }
     }
 }

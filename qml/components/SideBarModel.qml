@@ -31,4 +31,9 @@ ListModel {
         source: "../pages/RealTime.qml"
         icon: "RealTime"
     }
+    ListElement {
+        title: "Playground"
+        source: "../pages/Playground.qml"
+        icon: "RealTime"
+    }
 }

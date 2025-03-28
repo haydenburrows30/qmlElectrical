@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 import QtQuick.Controls.Universal
+import QtQuick.Effects
+import QtQuick.Dialogs
 
 import "../"
 import "../buttons"
@@ -56,15 +58,146 @@ Item {
                 width: scrollView.width
 
                 RowLayout {
+                    Layout.minimumHeight: 60
+                    Layout.maximumWidth: topLayout.width
+                    Layout.alignment: Qt.AlignHCenter
+
+                    Label {Layout.fillWidth: true}
+
+                    Button {
+                        Layout.alignment: Qt.AlignRight
+                        text: "Export"
+                        
+                        background: Rectangle {
+                            id: exportButtonBg
+                            implicitWidth: 80
+                            implicitHeight: 36
+                            radius: 4
+                            color: parent.down ? Qt.darker("#673AB7", 1.2) : 
+                                   parent.hovered ? Qt.lighter("#673AB7", 1.1) : "#673AB7"
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
+                        }
+                        
+                        // Use MultiEffect instead of DropShadow
+                        MultiEffect {
+                            source: exportButtonBg
+                            anchors.fill: exportButtonBg
+                            shadowEnabled: true
+                            shadowBlur: 0.5
+                            shadowColor: "#30000000"
+                            shadowHorizontalOffset: parent.down ? 1 : 2
+                            shadowVerticalOffset: parent.down ? 1 : 2
+                        }
+                        
+                        property string defaultFileName: "wind_turbine_report.pdf"
+                        
+                        onClicked: {
+                            if (calculatorReady) {
+                                let fileDialog = FileDialog.createObject(windTurbineSection, {
+                                    title: "Export Report",
+                                    fileMode: FileDialog.SaveFile,
+                                    nameFilters: ["PDF files (*.pdf)"],
+                                    currentFile: "file:///" + defaultFileName
+                                });
+                                
+                                fileDialog.accepted.connect(function() {
+                                    // Use native path separators and system temp directory for better compatibility
+                                    let tempImagePath = applicationDirPath + "/temp_wind_chart.png";
+                                    
+                                    console.log("Saving chart to: " + tempImagePath);
+                                    
+                                    // Save chart to image first
+                                    powerCurveChart.saveChartImage(tempImagePath);
+                                    
+                                    // Small delay to ensure image is saved
+                                    let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
+                                    timer.interval = 200;
+                                    timer.repeat = false;
+                                    timer.triggered.connect(function() {
+                                        calculator.exportWindTurbineReport(fileDialog.selectedFile, tempImagePath);
+                                    });
+                                    timer.start();
+                                });
+                                
+                                fileDialog.open();
+                            }
+                        }
+                    }
+
+                    Button {
+                        icon.name: "Reset"
+                        
+                        background: Rectangle {
+                            id: resetButtonBg
+                            implicitWidth: 36
+                            implicitHeight: 36
+                            radius: 18
+                            color: parent.down ? Qt.darker("#f44336", 1.2) :
+                                   parent.hovered ? Qt.lighter("#f44336", 1.1) : "#f44336"
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.icon.name
+                            font.family: "FontAwesome"
+                            font.pixelSize: 16
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        // Use MultiEffect instead of DropShadow
+                        MultiEffect {
+                            source: resetButtonBg
+                            anchors.fill: resetButtonBg
+                            shadowEnabled: true
+                            shadowBlur: 0.5
+                            shadowColor: "#30000000"
+                            shadowHorizontalOffset: parent.down ? 1 : 2
+                            shadowVerticalOffset: parent.down ? 1 : 2
+                        }
+                        
+                        ToolTip.text: "Reset to default values"
+                        ToolTip.delay: 500
+                        ToolTip.visible: hovered
+                        onClicked: {
+                            if (calculatorReady) {
+                                calculator.resetToGenericTurbine()
+                                bladeRadiusSpinBox.value = calculator.bladeRadius
+                                cutInSpinBox.value = calculator.cutInSpeed
+                                cutOutSpinBox.value = calculator.cutOutSpeed
+                                powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
+                                efficiencySpinBox.value = calculator.efficiency * 100
+                                updatePowerCurve()
+                            }
+                        }
+                    }
+                }
+                
+                RowLayout {
                     id: topLayout
                     Layout.alignment: Qt.AlignHCenter
 
                     WaveCard {
                         id: windTurbineCard
                         title: "Wind Turbine Parameters"
-                        Layout.fillHeight: true
-                        Layout.minimumWidth: 350
-                        Layout.alignment: Qt.AlignTop
+                        Layout.minimumHeight: 460
+                        Layout.minimumWidth: 330
 
                         showSettings: true
 
@@ -201,14 +334,52 @@ Item {
                                 height: 1
                                 color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
                             }
-                            
-                            RowLayout {
+
+                            Label { 
+                                text: "Profiles"
                                 Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignCenter
-                                
+                                font.bold: true
+                            }
+
+                            RowLayout {
+
                                 Button {
                                     text: "Vestas V27"
-                                    Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignRight
+                                    
+                                    background: Rectangle {
+                                        id: vestasButtonBg
+                                        implicitWidth: 80
+                                        implicitHeight: 36
+                                        radius: 4
+                                        color: parent.down ? Qt.darker("#4CAF50", 1.2) : 
+                                               parent.hovered ? Qt.lighter("#4CAF50", 1.1) : "#4CAF50"
+                                        
+                                        Behavior on color {
+                                            ColorAnimation { duration: 150 }
+                                        }
+                                    }
+                                    
+                                    contentItem: Text {
+                                        text: parent.text
+                                        font: parent.font
+                                        color: "white"
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    // Use MultiEffect instead of DropShadow
+                                    MultiEffect {
+                                        source: vestasButtonBg
+                                        anchors.fill: vestasButtonBg
+                                        shadowEnabled: true
+                                        shadowBlur: 0.5
+                                        shadowColor: "#30000000"
+                                        shadowHorizontalOffset: parent.down ? 1 : 2
+                                        shadowVerticalOffset: parent.down ? 1 : 2
+                                    }
+                                    
                                     onClicked: {
                                         if (calculatorReady) {
                                             calculator.loadVestasV27Parameters()
@@ -220,69 +391,49 @@ Item {
                                             updatePowerCurve()
                                         }
                                     }
-                                    
-                                    // background: Rectangle {
-                                    //     color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    //     radius: 2
-                                    // }
                                 }
                                 
                                 Button {
                                     text: "V27 Info"
-                                    Layout.preferredWidth: 100
-                                    onClicked: v27StatsPopup.open()
+                                    Layout.alignment: Qt.AlignRight
                                     
-                                    // background: Rectangle {
-                                    //     color: sideBar.toggle1 ? "#404040" : "#d0e8ff"
-                                    //     radius: 2
-                                    // }
-                                }
-                                
-                                Button {
-                                    text: "Reset"
-                                    Layout.fillWidth: true
-                                    onClicked: {
-                                        if (calculatorReady) {
-                                            calculator.resetToGenericTurbine()
-                                            bladeRadiusSpinBox.value = calculator.bladeRadius
-                                            cutInSpinBox.value = calculator.cutInSpeed
-                                            cutOutSpinBox.value = calculator.cutOutSpeed
-                                            powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
-                                            efficiencySpinBox.value = calculator.efficiency * 100
-                                            updatePowerCurve()
+                                    background: Rectangle {
+                                        id: infoButtonBg
+                                        implicitWidth: 80
+                                        implicitHeight: 36
+                                        radius: 4
+                                        color: parent.down ? Qt.darker("#2196F3", 1.2) : 
+                                               parent.hovered ? Qt.lighter("#2196F3", 1.1) : "#2196F3"
+                                        
+                                        Behavior on color {
+                                            ColorAnimation { duration: 150 }
                                         }
                                     }
                                     
-                                    // background: Rectangle {
-                                    //     color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                    //     radius: 2
-                                    // }
-                                }
-                            }
-
-                            ExportButton {
-                                Layout.alignment: Qt.AlignRight
-                                Layout.columnSpan: 2
-                                defaultFileName: "wind_turbine_report.pdf"
-                                onExport: function(fileUrl) {
-                                    if (calculatorReady) {
-                                        // Use native path separators and system temp directory for better compatibility
-                                        let tempImagePath = applicationDirPath + "/temp_wind_chart.png";
-                                        
-                                        console.log("Saving chart to: " + tempImagePath);
-                                        
-                                        // Save chart to image first
-                                        powerCurveChart.saveChartImage(tempImagePath);
-                                        
-                                        // Small delay to ensure image is saved
-                                        let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
-                                        timer.interval = 200;
-                                        timer.repeat = false;
-                                        timer.triggered.connect(function() {
-                                            calculator.exportWindTurbineReport(fileUrl, tempImagePath);
-                                        });
-                                        timer.start();
+                                    contentItem: Text {
+                                        text: parent.text
+                                        font: parent.font
+                                        color: "white"
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                        elide: Text.ElideRight
                                     }
+                                    
+                                    // Use MultiEffect instead of DropShadow
+                                    MultiEffect {
+                                        source: infoButtonBg
+                                        anchors.fill: infoButtonBg
+                                        shadowEnabled: true
+                                        shadowBlur: 0.5
+                                        shadowColor: "#30000000"
+                                        shadowHorizontalOffset: parent.down ? 1 : 2
+                                        shadowVerticalOffset: parent.down ? 1 : 2
+                                    }
+                                    
+                                    onClicked: v27StatsPopup.open()
+                                    ToolTip.text: "View Vestas V27 statistics"
+                                    ToolTip.delay: 500
+                                    ToolTip.visible: hovered
                                 }
                             }
                         }
@@ -291,7 +442,7 @@ Item {
                     WaveCard {
                         title: "Wind Turbine Output"
                         Layout.minimumHeight: 460
-                        Layout.minimumWidth: 400
+                        Layout.minimumWidth: 410
                         Layout.alignment: Qt.AlignTop
                         
                         GridLayout {
@@ -468,14 +619,46 @@ Item {
                             anchors.top: parent.top
                             anchors.right: parent.right
                             anchors.margins: 10
+                            
+                            background: Rectangle {
+                                id: updateButtonBg
+                                implicitWidth: 140
+                                implicitHeight: 36
+                                radius: 4
+                                color: parent.down ? Qt.darker("#FF9800", 1.2) : 
+                                       parent.hovered ? Qt.lighter("#FF9800", 1.1) : "#FF9800"
+                                
+                                Behavior on color {
+                                    ColorAnimation { duration: 150 }
+                                }
+                            }
+                            
+                            contentItem: Text {
+                                text: parent.text
+                                font: parent.font
+                                color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+                            }
+                            
+                            // Use MultiEffect instead of DropShadow
+                            MultiEffect {
+                                source: updateButtonBg
+                                anchors.fill: updateButtonBg
+                                shadowEnabled: true
+                                shadowBlur: 0.5
+                                shadowColor: "#30000000"
+                                shadowHorizontalOffset: parent.down ? 1 : 2
+                                shadowVerticalOffset: parent.down ? 1 : 2
+                            }
+                            
+                            ToolTip.text: "Show power curve"
+                            ToolTip.delay: 500
+                            ToolTip.visible: hovered
                             onClicked: {
                                 calculate()
                                 updatePowerCurve()
-                            }
-
-                            background: Rectangle {
-                                color: sideBar.toggle1 ? "black":"#e8f6ff"
-                                radius: 2
                             }
                         }
                         

@@ -550,22 +550,19 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 defaultFileName: "transformer_report.pdf"
-                                onExport: function(fileUrl) {
+                                // Use the new signal name
+                                onFileSelected: function(fileUrl) {
                                     if (calculatorReady) {
-                                        let data = {
-                                            "transformer_rating": calculator.transformerRating,
-                                            "transformer_impedance": calculator.transformerImpedance,
-                                            "transformer_xr_ratio": calculator.transformerXRRatio,
-                                            "transformer_z": calculator.transformerZOhms,
-                                            "transformer_r": calculator.transformerROhms,
-                                            "transformer_x": calculator.transformerXOhms,
-                                            "ground_fault_current": calculator.groundFaultCurrent,
-                                            "ct_ratio": calculator.relayCtRatio,
-                                            "relay_pickup_current": calculator.relayPickupCurrent,
-                                            "relay_curve_type": calculator.relayCurveType,
-                                            "time_dial": calculator.relayTimeDial
-                                        }
-                                        calculator.exportTransformerReport(data, fileUrl)
+                                        let tempImagePath = applicationDirPath + "/temp_transformer_chart.png";
+                                        lineChartView.saveChartImage(tempImagePath);
+                                        
+                                        let timer = Qt.createQmlObject("import QtQuick; Timer {}", transformerLineSection);
+                                        timer.interval = 200;
+                                        timer.repeat = false;
+                                        timer.triggered.connect(function() {
+                                            calculator.exportTransformerReport(fileUrl, tempImagePath);
+                                        });
+                                        timer.start();
                                     }
                                 }
                             }

@@ -57,6 +57,10 @@ Item {
     }
 
     Text {
+        font.italic: true
+        font.pixelSize: 10;
+        color: "gray"
+        
         anchors {
             left: parent.left
             bottom: parent.bottom
@@ -74,11 +78,8 @@ Item {
                 }
                 return "Threads: Active";
             return "";
-        }
-        visible: calculator ? calculator.calculationInProgress : false
-        font.italic: true
-        font.pixelSize: 10
-        color: "gray"
+            }
+            visible: calculator ? calculator.calculationInProgress : false
         }
     }
 
