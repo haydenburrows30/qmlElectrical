@@ -307,16 +307,7 @@ Item {
                                 Component.onCompleted: {
                                     text = calculator.impedancePercent.toFixed(2)
                                 }
-                                
-                                Connections {
-                                    target: calculator
-                                    function onImpedancePercentChanged() {
-                                        // Only update if the user is not editing
-                                        if (!impedanceInput.activeFocus) {
-                                            impedanceInput.text = calculator.impedancePercent.toFixed(2)
-                                        }
-                                    }
-                                }
+
                             }
 
                             Label { text: "Cu Losses (W):" }
@@ -354,16 +345,6 @@ Item {
                                 }
                                 Component.onCompleted: {
                                     text = calculator.resistancePercent.toFixed(2)
-                                }
-                                
-                                Connections {
-                                    target: calculator
-                                    function onResistancePercentChanged() {
-                                        // Only update if the user is not editing
-                                        if (!resistanceInput.activeFocus) {
-                                            resistanceInput.text = calculator.resistancePercent.toFixed(2)
-                                        }
-                                    }
                                 }
                             }
 
@@ -555,6 +536,18 @@ Item {
         }
         function onVectorGroupChanged() {
             console.log("Vector group changed to:", calculator.vectorGroup)
+        }
+        function onImpedancePercentChanged() {
+            // Only update if the user is not editing
+            if (!impedanceInput.activeFocus) {
+                impedanceInput.text = calculator.impedancePercent.toFixed(2)
+            }
+        }
+        function onResistancePercentChanged() {
+            // Only update if the user is not editing
+            if (!resistanceInput.activeFocus) {
+                resistanceInput.text = calculator.resistancePercent.toFixed(2)
+            }
         }
     }
 }

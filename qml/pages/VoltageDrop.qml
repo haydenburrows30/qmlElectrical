@@ -25,13 +25,6 @@ Page {
 
     property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
 
-    Connections {
-        target: voltageDrop
-        function onVoltageDropCalculated(value) {
-            root.currentVoltageDropValue = value
-        }
-    }
-
     Popup {
         id: tipsPopup
         width: 600
@@ -259,6 +252,10 @@ Page {
 
     Connections {
         target: voltageDrop
+
+        function onVoltageDropCalculated(value) {
+            root.currentVoltageDropValue = value
+        }
         
         function onGrabRequested(filepath, scale) {
             loadingIndicator.show()

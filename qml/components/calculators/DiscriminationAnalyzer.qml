@@ -410,16 +410,6 @@ Item {
                         createRelaySeries()
                         updateMarginLine()
                     }
-
-                    Connections {
-                        target: calculator
-                        function onRelayCountChanged() {
-                            marginChart.createRelaySeries()
-                        }
-                        function onMarginChanged() {
-                            marginChart.updateMarginLine()
-                        }
-                    }
                 }
             }
         }
@@ -446,6 +436,13 @@ Item {
                     })
                 }
             }
+        }
+
+        function onRelayCountChanged() {
+            marginChart.createRelaySeries()
+        }
+        function onMarginChanged() {
+            marginChart.updateMarginLine()
         }
     }
 }

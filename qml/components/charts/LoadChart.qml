@@ -115,11 +115,6 @@ Item {
             console.log("Load chart: circuit count changed, updating chart");
             root.updateLoadDistribution();
         }
-    }
-    
-    // Listen for changes to total load
-    Connections {
-        target: manager
         function onTotalLoadChanged() {
             console.log("Load chart: total load changed, updating chart");
             root.updateLoadDistribution();

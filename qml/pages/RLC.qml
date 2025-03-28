@@ -73,6 +73,23 @@ Page {
             circuitModeTabs.currentIndex = mode
             currentMode = mode
         }
+        function onGrabRequested(filepath, scale) {
+            loadingIndicator.visible = true
+            console.log("Grabbing image to:", filepath, "with scale:", scale)
+            rlcChartView.grabToImage(function(result) {
+                loadingIndicator.visible = false
+                if (result) {
+                    var saved = result.saveToFile(filepath)
+                    if (saved) {
+                        messagePopup.showSuccess("Chart saved successfully")
+                    } else {
+                        messagePopup.showError("Failed to save chart")
+                    }
+                } else {
+                    messagePopup.showError("Failed to grab chart image")
+                }
+            }, Qt.size(rlcChartView.width * scale, rlcChartView.height * scale))
+        }
     }
 
     ScrollView {
@@ -686,27 +703,6 @@ Page {
 
         onAccepted: {
             rlcChart.saveChart(selectedFile, currentScale)
-        }
-    }
-
-    Connections {
-        target: rlcChart
-        function onGrabRequested(filepath, scale) {
-            loadingIndicator.visible = true
-            console.log("Grabbing image to:", filepath, "with scale:", scale)
-            rlcChartView.grabToImage(function(result) {
-                loadingIndicator.visible = false
-                if (result) {
-                    var saved = result.saveToFile(filepath)
-                    if (saved) {
-                        messagePopup.showSuccess("Chart saved successfully")
-                    } else {
-                        messagePopup.showError("Failed to save chart")
-                    }
-                } else {
-                    messagePopup.showError("Failed to grab chart image")
-                }
-            }, Qt.size(rlcChartView.width * scale, rlcChartView.height * scale))
         }
     }
 
