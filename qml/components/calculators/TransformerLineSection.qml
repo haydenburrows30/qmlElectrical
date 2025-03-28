@@ -8,7 +8,7 @@ import "../backgrounds"
 
 Item {
     id: transformerLineSection
-    
+
     // Properties passed from parent
     property var calculator
     property bool calculatorReady
@@ -18,9 +18,9 @@ Item {
     // Move function to component level
     function updateDisplayValues() {
         if (!calculatorReady) return
-        
+
         loadMVAField.text = calculator.loadMVA.toFixed(3);
-        
+
         // Update transformer/line values
         transformerZOhmsText.text = safeValueFunction(calculator.transformerZOhms, 0).toFixed(3)
         transformerROhmsText.text = safeValueFunction(calculator.transformerROhms, 0).toFixed(3)
@@ -29,13 +29,13 @@ Item {
         voltageDropText.text = safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2)
         faultCurrentLVText.text = safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2)
         faultCurrentHVText.text = safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2)
-        
+
         // Update protection settings
         relayPickupCurrentText.text = safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2)
         relayTimeDialText.text = safeValueFunction(calculator.relayTimeDial, 0).toFixed(2)
         relayCtRatioText.text = calculator.relayCtRatio
         relayCurveTypeText.text = calculator.relayCurveType
-        
+
         // Update regulator values
         regulatedVoltageText.text = safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2)
         regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
@@ -62,7 +62,7 @@ Item {
         id: scrollView
         anchors.fill: parent
         clip: true
-        
+
         Flickable {
             contentWidth: parent.width
             contentHeight: mainLayout.height + 40
@@ -79,22 +79,22 @@ Item {
 
                     Layout.maximumWidth: 400
                     Layout.minimumWidth: 400
-                    
+
                     Layout.alignment: Qt.AlignTop
-            
+
                         // Transformer parameters section
                     WaveCard {
                         title: "Transformer Parameters (400V to 11kV)"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 180
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Transformer Rating (kVA):" }
                             SpinBox {
                                 id: transformerRatingSpinBox
@@ -106,7 +106,7 @@ Item {
                                 Layout.fillWidth: true
                                 onValueModified: if (calculatorReady) calculator.setTransformerRating(value)
                             }
-                            
+
                             Label { text: "Transformer Impedance (%):" }
                             SpinBox {
                                 id: transformerImpedanceSpinBox
@@ -117,18 +117,18 @@ Item {
                                 editable: true
                                 Layout.fillWidth: true
                                 property real realValue: value / 10.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 10.0).toFixed(1);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setTransformerImpedance(realValue)
                             }
-                            
+
                             Label { text: "Transformer X/R Ratio:" }
                             SpinBox {
                                 id: transformerXRRatioSpinBox
@@ -139,33 +139,33 @@ Item {
                                 editable: true
                                 Layout.fillWidth: true
                                 property real realValue: value / 10.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 10.0).toFixed(1);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setTransformerXRRatio(realValue)
                             }
                         }
                     }
-                    
+
                         // Line parameters section
                     WaveCard {
                         title: "Line Parameters (5km Cable)"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 180
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Line Length (km):" }
                             SpinBox {
                                 id: lineLengthSpinBox
@@ -176,18 +176,18 @@ Item {
                                 editable: true
                                 Layout.fillWidth: true
                                 property real realValue: value / 10.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 10.0).toFixed(1);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setLineLength(realValue)
                             }
-                            
+
                             Label { text: "Line Resistance (Ohm/km):" }
                             SpinBox {
                                 id: lineRSpinBox
@@ -198,18 +198,18 @@ Item {
                                 editable: true
                                 Layout.fillWidth: true
                                 property real realValue: value / 100.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 100.0).toFixed(2);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 100);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setLineR(realValue)
                             }
-                            
+
                             Label { text: "Line Reactance (Ohm/km):" }
                             SpinBox {
                                 id: lineXSpinBox
@@ -220,33 +220,33 @@ Item {
                                 editable: true
                                 Layout.fillWidth: true
                                 property real realValue: value / 100.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 100.0).toFixed(2);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 100);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setLineX(realValue)
                             }
                         }
                     }
-                    
+
                         // Load parameters updated by wind turbine output
                     WaveCard {
                         title: "Load Parameters (From Wind Turbine Output)"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 180
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Wind Turbine Output (MW):" }
                             TextField {
                                 readOnly: true
@@ -254,7 +254,7 @@ Item {
                                 text: (totalGeneratedPower / 1000).toFixed(3)
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Load (MVA):" }
                             TextField {
                                 id: loadMVAField
@@ -263,7 +263,7 @@ Item {
                                 text: { calculator.loadMVA.toFixed(3) }
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Power Factor:" }
                             SpinBox {
                                 id: loadPowerFactorSpinBox
@@ -274,23 +274,23 @@ Item {
                                 editable: true
                                 Layout.fillWidth: true
                                 property real realValue: value / 100.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 100.0).toFixed(2);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 100);
                                 }
-                                
+
                                 onValueModified: {
                                     if (calculatorReady) {
                                         console.log("Setting power factor to:", realValue);
                                         calculator.setLoadPowerFactorMaintainPower(realValue);
-                                        
+
                                         // Update MVA field after power factor change
                                         loadMVAField.text = calculator.loadMVA.toFixed(3);
-                                        
+
                                         // Force UI update immediately
                                         transformerLineSection.updateDisplayValues();
                                     }
@@ -313,7 +313,7 @@ Item {
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             // Enable/disable regulator
                             Label { text: "Enable Voltage Regulator:" }
                             Switch {
@@ -321,7 +321,7 @@ Item {
                                 checked: calculatorReady ? calculator.voltageRegulatorEnabled : true
                                 onToggled: if (calculatorReady) calculator.setVoltageRegulatorEnabled(checked)
                             }
-                            
+
                             // Regulator type - specific to Eaton
                             Label { text: "Regulator Type:" }
                             TextField {
@@ -332,7 +332,7 @@ Item {
                                 enabled: regulatorEnabledSwitch.checked
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             // Regulator model - specific to VR-32
                             Label { text: "Regulator Model:" }
                             TextField {
@@ -347,7 +347,7 @@ Item {
                                     radius: 2
                                 }
                             }
-                            
+
                             // Connection type - delta
                             Label { text: "Connection Type:" }
                             TextField {
@@ -358,7 +358,7 @@ Item {
                                 enabled: regulatorEnabledSwitch.checked
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             // Capacity per phase
                             Label { text: "Capacity per Phase (kVA):" }
                             TextField {
@@ -369,7 +369,7 @@ Item {
                                 enabled: regulatorEnabledSwitch.checked
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             // Target voltage setting
                             Label { text: "Target Voltage (kV):" }
                             SpinBox {
@@ -382,18 +382,18 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 property real realValue: value / 10.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 10.0).toFixed(1);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setVoltageRegulatorTarget(realValue)
                             }
-                            
+
                             // Bandwidth
                             Label { text: "Bandwidth (%):" }
                             SpinBox {
@@ -406,18 +406,18 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 property real realValue: value / 10.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 10.0).toFixed(1);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setVoltageRegulatorBandwidth(realValue)
                             }
-                            
+
                             // Regulator range
                             Label { text: "Range (±%):" }
                             SpinBox {
@@ -430,18 +430,18 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 property real realValue: value / 10.0
-                                
+
                                 textFromValue: function(value) {
                                     return (value / 10.0).toFixed(1);
                                 }
-                                
+
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
+
                                 onValueModified: if (calculatorReady) calculator.setVoltageRegulatorRange(realValue)
                             }
-                            
+
                             // Number of steps
                             Label { text: "Number of Steps:" }
                             TextField {
@@ -459,20 +459,20 @@ Item {
                     Layout.minimumWidth: 400
                     Layout.maximumWidth: 400
                     Layout.alignment: Qt.AlignTop
-                    
+
                     // System results section
                     WaveCard {
                         title: "Electrical System Results"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 450
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Transformer Z (Ohms):" }
                             TextField {
                                 id: transformerZOhmsText
@@ -481,7 +481,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Transformer R (Ohms):" }
                             TextField {
                                 id: transformerROhmsText
@@ -490,7 +490,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.transformerROhms, 0).toFixed(3) : "0.000"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Transformer X (Ohms):" }
                             TextField {
                                 id: transformerXOhmsText
@@ -499,7 +499,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Line Total Z (Ohms):" }
                             TextField {
                                 id: lineTotalZText
@@ -508,7 +508,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Natural Voltage Drop (%):" }
                             TextField {
                                 id: voltageDropText
@@ -517,7 +517,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2) : "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Fault Current at LV Side (kA):" }
                             TextField {
                                 id: faultCurrentLVText
@@ -526,7 +526,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Fault Current at HV Side (kA):" }
                             TextField {
                                 id: faultCurrentHVText
@@ -535,7 +535,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Unregulated Voltage (kV):" }
                             TextField {
                                 readOnly: true
@@ -550,19 +550,23 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 defaultFileName: "transformer_report.pdf"
-                                // Use the new signal name
-                                onFileSelected: function(fileUrl) {
+                                onExport: function(fileUrl) {
+
                                     if (calculatorReady) {
-                                        let tempImagePath = applicationDirPath + "/temp_transformer_chart.png";
-                                        lineChartView.saveChartImage(tempImagePath);
-                                        
-                                        let timer = Qt.createQmlObject("import QtQuick; Timer {}", transformerLineSection);
-                                        timer.interval = 200;
-                                        timer.repeat = false;
-                                        timer.triggered.connect(function() {
-                                            calculator.exportTransformerReport(fileUrl, tempImagePath);
-                                        });
-                                        timer.start();
+                                        let data = {
+                                            "transformer_rating": calculator.transformerRating,
+                                            "transformer_impedance": calculator.transformerImpedance,
+                                            "transformer_xr_ratio": calculator.transformerXRRatio,
+                                            "transformer_z": calculator.transformerZOhms,
+                                            "transformer_r": calculator.transformerROhms,
+                                            "transformer_x": calculator.transformerXOhms,
+                                            "ground_fault_current": calculator.groundFaultCurrent,
+                                            "ct_ratio": calculator.relayCtRatio,
+                                            "relay_pickup_current": calculator.relayPickupCurrent,
+                                            "relay_curve_type": calculator.relayCurveType,
+                                            "time_dial": calculator.relayTimeDial
+                                        }
+                                        calculator.exportTransformerReport(data, fileUrl)
                                     }
                                 }
                             }
@@ -575,14 +579,14 @@ Item {
                         title: "Transformer Protection Settings"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 260
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Relay Pickup Current (A):" }
                             TextField {
                                 id: relayPickupCurrentText
@@ -591,7 +595,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "CT Ratio:" }
                             TextField {
                                 id: relayCtRatioText
@@ -600,7 +604,7 @@ Item {
                                 text: calculatorReady ? calculator.relayCtRatio : "300/1"  // Updated default value
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Relay Curve Type:" }
                             TextField {
                                 id: relayCurveTypeText
@@ -609,7 +613,7 @@ Item {
                                 text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Time Dial Setting:" }
                             TextField {
                                 id: relayTimeDialText
@@ -618,7 +622,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Button {
                                 text: "Expert Settings..."
                                 Layout.columnSpan: 2
@@ -657,21 +661,21 @@ Item {
                     Layout.minimumWidth: 400
                     Layout.maximumWidth: 400
                     Layout.alignment: Qt.AlignTop
-                                    
+
                     // Cable selection guide
                     WaveCard {
                         title: "Cable Selection Guide for Wind Turbine Connection"
                         Layout.fillWidth: true
                         Layout.preferredHeight: 150
                         Layout.alignment: Qt.AlignTop
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Recommended HV Cable Size:" }
                             TextField {
                                 readOnly: true
@@ -679,7 +683,7 @@ Item {
                                 text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Recommended LV Cable Size:" }
                             TextField {
                                 readOnly: true
@@ -696,14 +700,14 @@ Item {
                         Layout.preferredHeight: 280
                         visible: regulatorEnabledSwitch.checked
                         Layout.alignment: Qt.AlignTop
-                        
+
                         GridLayout {
                             anchors.fill: parent
                             anchors.margins: 10
                             columns: 2
                             columnSpacing: 20
                             rowSpacing: 10
-                            
+
                             Label { text: "Unregulated Voltage (kV):" }
                             TextField {
                                 readOnly: true
@@ -713,7 +717,7 @@ Item {
                                     "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Regulated Voltage (kV):" }
                             TextField {
                                 id: regulatedVoltageText
@@ -722,7 +726,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2) : "0.00"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Tap Position:" }
                             TextField {
                                 id: regulatorTapPositionText
@@ -731,7 +735,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.regulatorTapPosition, 0).toString() : "0"
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Step Size (%):" }
                             TextField {
                                 readOnly: true
@@ -739,7 +743,7 @@ Item {
                                 text: (calculator.voltageRegulatorRange / 16).toFixed(3)
                                 background: ProtectionRectangle {}
                             }
-                            
+
                             Label { text: "Total 3-Phase Capacity (kVA):" }
                             TextField {
                                 readOnly: true

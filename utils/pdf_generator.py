@@ -254,7 +254,7 @@ class PDFGenerator:
         fault_params = [
             ["Parameter", "Value"],
             ["LV Fault Current", f"{data.get('fault_current_lv', 0):.2f} kA"],
-            ["HV Fault Current", f"{data.get('fault_current_hv', 0)::.2f} kA"],
+            ["HV Fault Current", f"{data.get('fault_current_hv', 0):.2f} kA"],
             ["Ground Fault Current", f"{data['ground_fault_current']:.2f} A"],
         ]
         story.append(Table(fault_params, style=self._get_table_style()))
