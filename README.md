@@ -44,17 +44,24 @@ git clone https://github.com/yourusername/electrical-calculator.git
 cd electrical-calculator
 ```
 
-2. Install dependencies:
+2. Install virtual environment via virtualenv:
+
+```bash
+virtualenv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Generate resources:
+4. Generate resources:
 ```bash
 pyside6-rcc resources.qrc -o data/rc_resources.py
 ```
 
-4. Run the application:
+5. Run the application:
 ```bash
 python main.py
 ```
