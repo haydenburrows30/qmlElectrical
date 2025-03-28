@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 import QtQuick.Controls.Universal
-import QtQuick.Effects
 import QtQuick.Dialogs
 
 import "../"
@@ -39,6 +38,52 @@ Item {
     WindPopup {
         id: v27StatsPopup
     }
+    
+    // Add FileDialog component here instead of creating it dynamically
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Report"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["PDF files (*.pdf)"]
+        // Use defaultSuffix to ensure .pdf extension
+        defaultSuffix: "pdf"
+        
+        onAccepted: {
+            // Create a platform-independent temporary file path
+            let tempDir = applicationDirPath;
+            let tempImagePath = tempDir + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png");
+            
+            console.log("Saving chart to: " + tempImagePath);
+            
+            // Save chart to image first
+            powerCurveChart.saveChartImage(tempImagePath);
+            
+            // Small delay to ensure image is saved
+            let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
+            timer.interval = 200;
+            timer.repeat = false;
+            timer.triggered.connect(function() {
+                // Process the file URL to ensure it's properly formatted for the Python backend
+                let filePath = exportFileDialog.selectedFile.toString();
+                
+                // Remove the "file://" prefix properly based on platform
+                if (filePath.startsWith("file:///") && Qt.platform.os === "windows") {
+                    // On Windows, file:///C:/path becomes C:/path
+                    filePath = filePath.substring(8);
+                } else if (filePath.startsWith("file:///")) {
+                    // On Unix-like systems, file:///path becomes /path
+                    filePath = filePath.substring(7); 
+                } else if (filePath.startsWith("file://")) {
+                    // Alternative format
+                    filePath = filePath.substring(5);
+                }
+                
+                console.log("Exporting to file path: " + filePath);
+                calculator.exportWindTurbineReport(filePath, tempImagePath);
+            });
+            timer.start();
+        }
+    }
         
     ScrollView {
         id: scrollView
@@ -68,109 +113,21 @@ Item {
                         Layout.alignment: Qt.AlignRight
                         text: "Export"
                         
-                        background: Rectangle {
-                            id: exportButtonBg
-                            implicitWidth: 80
-                            implicitHeight: 36
-                            radius: 4
-                            color: parent.down ? Qt.darker("#673AB7", 1.2) : 
-                                   parent.hovered ? Qt.lighter("#673AB7", 1.1) : "#673AB7"
-                            
-                            Behavior on color {
-                                ColorAnimation { duration: 150 }
-                            }
-                        }
-                        
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
-                        }
-                        
-                        // Use MultiEffect instead of DropShadow
-                        MultiEffect {
-                            source: exportButtonBg
-                            anchors.fill: exportButtonBg
-                            shadowEnabled: true
-                            shadowBlur: 0.5
-                            shadowColor: "#30000000"
-                            shadowHorizontalOffset: parent.down ? 1 : 2
-                            shadowVerticalOffset: parent.down ? 1 : 2
-                        }
-                        
                         property string defaultFileName: "wind_turbine_report.pdf"
                         
                         onClicked: {
                             if (calculatorReady) {
-                                let fileDialog = FileDialog.createObject(windTurbineSection, {
-                                    title: "Export Report",
-                                    fileMode: FileDialog.SaveFile,
-                                    nameFilters: ["PDF files (*.pdf)"],
-                                    currentFile: "file:///" + defaultFileName
-                                });
-                                
-                                fileDialog.accepted.connect(function() {
-                                    // Use native path separators and system temp directory for better compatibility
-                                    let tempImagePath = applicationDirPath + "/temp_wind_chart.png";
-                                    
-                                    console.log("Saving chart to: " + tempImagePath);
-                                    
-                                    // Save chart to image first
-                                    powerCurveChart.saveChartImage(tempImagePath);
-                                    
-                                    // Small delay to ensure image is saved
-                                    let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
-                                    timer.interval = 200;
-                                    timer.repeat = false;
-                                    timer.triggered.connect(function() {
-                                        calculator.exportWindTurbineReport(fileDialog.selectedFile, tempImagePath);
-                                    });
-                                    timer.start();
-                                });
-                                
-                                fileDialog.open();
+                                // Don't set a specific directory, let the system choose the default
+                                // Set initial file name without a specific path
+                                exportFileDialog.currentFile = defaultFileName;
+                                // Open the predefined FileDialog
+                                exportFileDialog.open();
                             }
                         }
                     }
 
                     Button {
                         icon.name: "Reset"
-                        
-                        background: Rectangle {
-                            id: resetButtonBg
-                            implicitWidth: 36
-                            implicitHeight: 36
-                            radius: 18
-                            color: parent.down ? Qt.darker("#f44336", 1.2) :
-                                   parent.hovered ? Qt.lighter("#f44336", 1.1) : "#f44336"
-                            
-                            Behavior on color {
-                                ColorAnimation { duration: 150 }
-                            }
-                        }
-                        
-                        contentItem: Text {
-                            text: parent.icon.name
-                            font.family: "FontAwesome"
-                            font.pixelSize: 16
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        
-                        // Use MultiEffect instead of DropShadow
-                        MultiEffect {
-                            source: resetButtonBg
-                            anchors.fill: resetButtonBg
-                            shadowEnabled: true
-                            shadowBlur: 0.5
-                            shadowColor: "#30000000"
-                            shadowHorizontalOffset: parent.down ? 1 : 2
-                            shadowVerticalOffset: parent.down ? 1 : 2
-                        }
                         
                         ToolTip.text: "Reset to default values"
                         ToolTip.delay: 500
@@ -347,39 +304,6 @@ Item {
                                     text: "Vestas V27"
                                     Layout.alignment: Qt.AlignRight
                                     
-                                    background: Rectangle {
-                                        id: vestasButtonBg
-                                        implicitWidth: 80
-                                        implicitHeight: 36
-                                        radius: 4
-                                        color: parent.down ? Qt.darker("#4CAF50", 1.2) : 
-                                               parent.hovered ? Qt.lighter("#4CAF50", 1.1) : "#4CAF50"
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
-                                    }
-                                    
-                                    contentItem: Text {
-                                        text: parent.text
-                                        font: parent.font
-                                        color: "white"
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        elide: Text.ElideRight
-                                    }
-                                    
-                                    // Use MultiEffect instead of DropShadow
-                                    MultiEffect {
-                                        source: vestasButtonBg
-                                        anchors.fill: vestasButtonBg
-                                        shadowEnabled: true
-                                        shadowBlur: 0.5
-                                        shadowColor: "#30000000"
-                                        shadowHorizontalOffset: parent.down ? 1 : 2
-                                        shadowVerticalOffset: parent.down ? 1 : 2
-                                    }
-                                    
                                     onClicked: {
                                         if (calculatorReady) {
                                             calculator.loadVestasV27Parameters()
@@ -396,39 +320,6 @@ Item {
                                 Button {
                                     text: "V27 Info"
                                     Layout.alignment: Qt.AlignRight
-                                    
-                                    background: Rectangle {
-                                        id: infoButtonBg
-                                        implicitWidth: 80
-                                        implicitHeight: 36
-                                        radius: 4
-                                        color: parent.down ? Qt.darker("#2196F3", 1.2) : 
-                                               parent.hovered ? Qt.lighter("#2196F3", 1.1) : "#2196F3"
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
-                                    }
-                                    
-                                    contentItem: Text {
-                                        text: parent.text
-                                        font: parent.font
-                                        color: "white"
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        elide: Text.ElideRight
-                                    }
-                                    
-                                    // Use MultiEffect instead of DropShadow
-                                    MultiEffect {
-                                        source: infoButtonBg
-                                        anchors.fill: infoButtonBg
-                                        shadowEnabled: true
-                                        shadowBlur: 0.5
-                                        shadowColor: "#30000000"
-                                        shadowHorizontalOffset: parent.down ? 1 : 2
-                                        shadowVerticalOffset: parent.down ? 1 : 2
-                                    }
                                     
                                     onClicked: v27StatsPopup.open()
                                     ToolTip.text: "View Vestas V27 statistics"
@@ -620,39 +511,6 @@ Item {
                             anchors.right: parent.right
                             anchors.margins: 10
                             
-                            background: Rectangle {
-                                id: updateButtonBg
-                                implicitWidth: 140
-                                implicitHeight: 36
-                                radius: 4
-                                color: parent.down ? Qt.darker("#FF9800", 1.2) : 
-                                       parent.hovered ? Qt.lighter("#FF9800", 1.1) : "#FF9800"
-                                
-                                Behavior on color {
-                                    ColorAnimation { duration: 150 }
-                                }
-                            }
-                            
-                            contentItem: Text {
-                                text: parent.text
-                                font: parent.font
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                            }
-                            
-                            // Use MultiEffect instead of DropShadow
-                            MultiEffect {
-                                source: updateButtonBg
-                                anchors.fill: updateButtonBg
-                                shadowEnabled: true
-                                shadowBlur: 0.5
-                                shadowColor: "#30000000"
-                                shadowHorizontalOffset: parent.down ? 1 : 2
-                                shadowVerticalOffset: parent.down ? 1 : 2
-                            }
-                            
                             ToolTip.text: "Show power curve"
                             ToolTip.delay: 500
                             ToolTip.visible: hovered
@@ -764,6 +622,11 @@ Item {
             console.error("Error updating power curve:", e)
             console.error("Error stack:", e.stack)
         }
+    }
+    
+    // Add a helper function to create platform-independent file paths
+    function platformPath(path) {
+        return Qt.platform.os === "windows" ? path.replace(/\//g, "\\") : path;
     }
     
     Timer {

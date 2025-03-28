@@ -410,12 +410,20 @@ class WindTurbineCalculator(QObject):
             chart_image_path: Optional path to the chart image
         """
         try:
+            import os
+            import platform
+            
             # Clean up filename - handle QML URL format
             clean_path = filename.strip()
             
             # Remove the file:/// prefix if present
             if clean_path.startswith('file:///'):
-                clean_path = clean_path[8:]  # Remove 'file:///'
+                # On Windows, file:///C:/path becomes C:/path
+                if platform.system() == "Windows":
+                    clean_path = clean_path[8:]
+                else:
+                    # On Unix-like systems, file:///path becomes /path
+                    clean_path = clean_path[8:] if clean_path[8:10].startswith(":/") else clean_path[7:]
 
             # Handle the case with extra leading slash on Windows paths
             if clean_path.startswith('/') and ':' in clean_path[1:3]:  # Like '/C:/'
@@ -424,7 +432,13 @@ class WindTurbineCalculator(QObject):
             # Ensure it has .pdf extension
             if not clean_path.lower().endswith('.pdf'):
                 clean_path += '.pdf'
+            
+            print(f"Processing export to: {clean_path}")
                 
+            # Clean up chart image path
+            if chart_image_path:
+                chart_image_path = os.path.normpath(chart_image_path)
+            
             # Make sure the power curve is up-to-date
             self._generate_power_curve()
             
@@ -460,6 +474,9 @@ class WindTurbineCalculator(QObject):
         except Exception as e:
             print(f"Error exporting wind turbine report: {e}")
             print(f"Attempted filename: {filename}")
+            # Print more details for debugging
+            import traceback
+            traceback.print_exc()
 
     # Advanced analysis methods
     @Slot(float, float, result=float)
