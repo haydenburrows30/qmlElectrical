@@ -296,34 +296,41 @@ Item {
                     axisX: currentAxis
                     axisY: timeAxis
                 }
-
-                Connections {
-                    target: relay
-                    function onCalculationsComplete() {
-                        tripCurve.clear()
-                        var points = relay.curvePoints
-                        for (var i = 0; i < points.length; i++) {
-                            tripCurve.append(points[i].current, points[i].time)
-                        }
-                    }
-                }
             }
         }
     }
 
+    // Combined connection that handles both general and device-specific curves
     Connections {
         target: relay
         function onCalculationsComplete() {
-            let curvePoints = relay.getCurvePoints(
-                deviceType.currentText,
-                parseFloat(pickupCurrent.text) || 0
-            )
-            tripCurve.clear()
-            for (let point of curvePoints) {
-                tripCurve.append(
-                    point.multiplier * parseFloat(pickupCurrent.text), 
-                    point.time
+            // Try to get device-specific curve points first
+            let deviceSpecificPoints = []
+            
+            if (deviceType.currentIndex >= 0 && pickupCurrent.text) {
+                deviceSpecificPoints = relay.getCurvePoints(
+                    deviceType.currentText,
+                    parseFloat(pickupCurrent.text) || 0
                 )
+            }
+            
+            // Clear the existing curve
+            tripCurve.clear()
+            
+            // If we have device-specific points, use those
+            if (deviceSpecificPoints.length > 0) {
+                for (let point of deviceSpecificPoints) {
+                    tripCurve.append(
+                        point.multiplier * parseFloat(pickupCurrent.text), 
+                        point.time
+                    )
+                }
+            } else {
+                // Otherwise fall back to the general curve points
+                let generalPoints = relay.curvePoints
+                for (let i = 0; i < generalPoints.length; i++) {
+                    tripCurve.append(generalPoints[i].current, generalPoints[i].time)
+                }
             }
         }
     }

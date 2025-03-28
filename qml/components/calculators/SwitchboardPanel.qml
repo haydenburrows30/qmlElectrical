@@ -243,6 +243,7 @@ Item {
                                     console.log("ListView created with circuit count:", model)
                                 }
 
+                                // This connection must remain with the ListView as it updates its model property
                                 Connections {
                                     target: manager
                                     function onCircuitCountChanged() {
@@ -369,9 +370,12 @@ Item {
 
                             property var circuitsList: []
 
+                            // This connection must remain with the SwitchboardDiagram as it updates its circuits property
+                            // Cannot be combined with the ListView's connection since they operate on different components
                             Connections {
                                 target: manager
                                 function onCircuitCountChanged() {
+                                    // Update the circuits list for the diagram when circuit count changes
                                     let circuits = [];
                                     for (let i = 0; i < manager.circuitCount; i++) {
                                         circuits.push(manager.getCircuitAt(i));
