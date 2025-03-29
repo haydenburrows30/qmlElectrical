@@ -9,6 +9,8 @@ import "../backgrounds"
 import "../style"
 import "../backgrounds"
 
+
+
 import OhmsLaw 1.0
 
 Item {
@@ -16,6 +18,11 @@ Item {
 
     property OhmsLawCalculator calculator: OhmsLawCalculator {}
     property bool calculatorReady: calculator !== null
+
+    FontLoader {
+        id: iconFont
+        source: "../../../icons/MaterialIcons-Regular.ttf"
+    }
 
     function calculateOhmsLaw() {
         if (!calculatorReady) return;
@@ -126,7 +133,7 @@ Item {
                 id: results
                 title: "Input Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 210
                 Layout.minimumWidth: 350
                 Layout.maximumWidth: 350
                 Layout.alignment: Qt.AlignTop
@@ -188,10 +195,11 @@ Item {
                     }
                     
                     Button {
-                        text: "Calculate"
+                        text: "Calculate " + '\ue5ca'
                         Layout.columnSpan: 3
                         Layout.alignment: Qt.AlignRight
                         onClicked: calculateOhmsLaw()
+                        
                     }
                 }
             }
@@ -199,7 +207,7 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 210
                 Layout.minimumWidth: 250
                 Layout.maximumWidth: 250
                 Layout.alignment: Qt.AlignTop

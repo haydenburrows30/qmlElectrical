@@ -11,7 +11,7 @@ Rectangle {
     color: Universal.background
     border.width: 1
     border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("#cccccc",1.1)
-    radius: 4
+    radius: 15
     
     property string title: ""
     property bool showSettings: false
@@ -19,7 +19,7 @@ Rectangle {
 
     default property alias content: contentItem.data
 
-    Button {
+    RoundButton {
         id: helpButton
         text: "i"
         anchors.right: parent.right
@@ -30,7 +30,7 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 10
+        anchors.margins: 20
         spacing: Style.spacing
 
         Label {
@@ -38,6 +38,7 @@ Rectangle {
             text: controlRect.title
             font.bold: true
             font.pixelSize: 16
+            bottomPadding: 10
         }
 
         Item {

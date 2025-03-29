@@ -50,7 +50,7 @@ Item {
 
         ColumnLayout {
             id: inputLayout
-            Layout.preferredWidth: 400
+            Layout.preferredWidth: 410
             Layout.alignment: Qt.AlignTop
             spacing: Style.spacing
 
@@ -59,7 +59,7 @@ Item {
                 id: results
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 260
+                Layout.minimumHeight: 280
 
                 showSettings: true
                     
@@ -130,7 +130,7 @@ Item {
             }
             // Results
             WaveCard {
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 220
                 title: "Results"
                 Layout.fillWidth: true
 

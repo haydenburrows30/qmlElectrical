@@ -64,7 +64,7 @@ Item {
                 id: results
                 title: "Input Parameters"
                 Layout.preferredWidth: 300
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 230
 
                 showSettings: true
                 
@@ -132,7 +132,7 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.preferredWidth: 300
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 230
                 
                 GridLayout {
                     anchors.fill: parent

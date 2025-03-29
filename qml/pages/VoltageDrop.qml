@@ -73,8 +73,8 @@ Page {
                         id: results
                         showSettings: true
                         title: "Cable Selection"
-                        Layout.minimumHeight: 560
-                        Layout.minimumWidth: 400
+                        Layout.minimumHeight: 580
+                        Layout.minimumWidth: 420
 
                         CableSelectionSettings {
                             id: cableSettings
@@ -91,8 +91,8 @@ Page {
                     
                     WaveCard {
                         title: "Results"
-                        Layout.minimumHeight: 350
-                        Layout.minimumWidth: 400
+                        Layout.minimumHeight: 370
+                        Layout.minimumWidth: 420
 
                         ResultsPanel {
                             id: resultsPanel

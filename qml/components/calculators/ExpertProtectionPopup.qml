@@ -7,8 +7,8 @@ import "../style"
 Popup {
     id: expertPopup
     modal: true
-    padding: 10
-    width: 400
+    padding: 25
+    width: 600
     height: 600
     
     property var calculator

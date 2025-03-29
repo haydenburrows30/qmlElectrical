@@ -88,8 +88,8 @@ Item {
         // Left side inputs and results
         ColumnLayout {
             id: leftColumn
-            Layout.minimumWidth: 350
-            Layout.maximumWidth: 350
+            Layout.minimumWidth: 380
+            Layout.maximumWidth: 380
             spacing: Style.spacing
             Layout.alignment: Qt.AlignTop
 
@@ -98,7 +98,7 @@ Item {
                 id: results
                 title: "Current Transformer"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 380
+                Layout.minimumHeight: 400
                 
                 showSettings: true
 
@@ -252,7 +252,7 @@ Item {
             // VT Section
             WaveCard {
                 Layout.fillWidth: true
-                Layout.minimumHeight: 180
+                Layout.minimumHeight: 200
                 title: "Voltage Transformer"
 
                 GridLayout {
@@ -300,7 +300,7 @@ Item {
             // Results Section
             WaveCard {
                 Layout.fillWidth: true
-                Layout.minimumHeight: 450
+                Layout.minimumHeight: 470
                 title: "Results"
 
                 GridLayout {

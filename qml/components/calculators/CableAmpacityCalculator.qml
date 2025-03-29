@@ -55,6 +55,7 @@ Item {
         
         // Left side - inputs and results
         ColumnLayout {
+            id: leftColumn
             Layout.maximumWidth: 350
             spacing: Style.spacing
             Layout.alignment: Qt.AlignTop
@@ -62,7 +63,7 @@ Item {
             WaveCard {
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: 310
 
                 id: results
                 showSettings: true
@@ -130,7 +131,7 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 210
 
                 GridLayout {
                     columns: 2

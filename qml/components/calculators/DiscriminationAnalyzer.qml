@@ -61,7 +61,7 @@ Item {
             WaveCard {
                 title: "Configuration"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 120
+                Layout.minimumHeight: 130
 
                 id: results
                 showSettings: true
@@ -174,7 +174,7 @@ Item {
             WaveCard {  
                 title: "Fault Current Analysis"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 90
+                Layout.minimumHeight: 120
 
                 RowLayout {
                     spacing: Style.spacing
@@ -203,7 +203,7 @@ Item {
             WaveCard {
                 title: "Added Relays"
                 Layout.fillWidth: true
-                Layout.preferredHeight: 150
+                Layout.preferredHeight: 180
 
                 ListView {
                     anchors.fill: parent

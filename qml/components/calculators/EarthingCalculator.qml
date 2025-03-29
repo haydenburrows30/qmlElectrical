@@ -69,7 +69,7 @@ Item {
             WaveCard {
                 title: "Grid Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 200
+                Layout.minimumHeight: 220
 
                 id: results
                 showSettings: true
@@ -120,7 +120,7 @@ Item {
             // Rod Parameters
             WaveCard {
                 title: "Ground Rods"
-                Layout.minimumHeight: 130
+                Layout.minimumHeight: 150
                 Layout.fillWidth: true
 
                 GridLayout {
@@ -152,7 +152,7 @@ Item {
             // Fault Parameters
             WaveCard {
                 title: "Fault Parameters"
-                Layout.minimumHeight: 130
+                Layout.minimumHeight: 150
                 Layout.fillWidth: true
 
                 GridLayout {
@@ -183,7 +183,7 @@ Item {
             // Results Section
             WaveCard {
                 title: "Results"
-                Layout.minimumHeight: 220
+                Layout.minimumHeight: 250
                 Layout.fillWidth: true
 
                 GridLayout {

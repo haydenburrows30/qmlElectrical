@@ -230,7 +230,7 @@ Item {
 
         WaveCard {
             Layout.minimumWidth: 300
-            Layout.minimumHeight: 230
+            Layout.minimumHeight: 250
             Layout.alignment: Qt.AlignTop
             title: "Results"
 

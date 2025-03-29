@@ -258,7 +258,7 @@ Item {
                 WaveCard {
                     title: "Load Parameters"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 130
+                    Layout.minimumHeight: 150
                     
                     GridLayout {
                         columns: 2
@@ -322,7 +322,7 @@ Item {
                 WaveCard {
                     title: "System Calculation Results"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 320
+                    Layout.minimumHeight: 350
                     
                     GridLayout {
                         columns: 2
@@ -426,7 +426,7 @@ Item {
                 WaveCard {
                     title: "Protection Settings"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 200
+                    Layout.minimumHeight: 230
                     
                     GridLayout {
                         columns: 2

@@ -86,7 +86,7 @@ Item {
                     WaveCard {
                         title: "Transformer Parameters (400V to 11kV)"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 180
+                        Layout.preferredHeight: 200
 
                         GridLayout {
                             anchors.fill: parent
@@ -157,7 +157,7 @@ Item {
                     WaveCard {
                         title: "Line Parameters (5km Cable)"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 180
+                        Layout.preferredHeight: 200
 
                         GridLayout {
                             anchors.fill: parent
@@ -238,7 +238,7 @@ Item {
                     WaveCard {
                         title: "Load Parameters (From Wind Turbine Output)"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 180
+                        Layout.preferredHeight: 200
 
                         GridLayout {
                             anchors.fill: parent
@@ -578,7 +578,7 @@ Item {
                         id: transformerProtectionCard
                         title: "Transformer Protection Settings"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 260
+                        Layout.preferredHeight: 280
 
                         GridLayout {
                             anchors.fill: parent

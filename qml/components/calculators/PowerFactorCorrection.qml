@@ -48,7 +48,7 @@ Item {
         // Input Section
         ColumnLayout {
             id: inputColumn
-            Layout.minimumWidth: 350
+            Layout.minimumWidth: 370
             spacing: Style.spacing
 
             WaveCard {

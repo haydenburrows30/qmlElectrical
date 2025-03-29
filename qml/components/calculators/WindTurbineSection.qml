@@ -153,8 +153,8 @@ Item {
                     WaveCard {
                         id: windTurbineCard
                         title: "Wind Turbine Parameters"
-                        Layout.minimumHeight: 460
-                        Layout.minimumWidth: 330
+                        Layout.minimumHeight: 490
+                        Layout.minimumWidth: 350
 
                         showSettings: true
 
@@ -332,8 +332,8 @@ Item {
                     
                     WaveCard {
                         title: "Wind Turbine Output"
-                        Layout.minimumHeight: 460
-                        Layout.minimumWidth: 410
+                        Layout.minimumHeight: 490
+                        Layout.minimumWidth: 430
                         Layout.alignment: Qt.AlignTop
                         
                         GridLayout {
