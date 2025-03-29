@@ -18,13 +18,13 @@ import RealTimeChart 1.0
 
 Pane {
     id: root
+    anchors.fill: parent
+    property bool isActive: false
+    property bool showTracker: !realTimeChart.isRunning
 
     background: Rectangle {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
-
-    property bool isActive: false
-    property bool showTracker: !realTimeChart.isRunning
     
     onIsActiveChanged: {
         if (isActive) {
@@ -42,8 +42,6 @@ Pane {
     RealTimePopup {
         id: tipsPopup
     }
-
-    anchors.fill: parent
 
     RowLayout {
         anchors.fill: parent

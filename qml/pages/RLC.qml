@@ -14,6 +14,8 @@ import "../components/style"
 Page {
     id: phasor
 
+    property int currentMode: 0
+
     background: Rectangle {
         color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
     }
@@ -44,8 +46,6 @@ Page {
             wrapMode: Text.WordWrap
         }
     }
-
-    property int currentMode: 0
 
     Connections {
         target: rlcChart

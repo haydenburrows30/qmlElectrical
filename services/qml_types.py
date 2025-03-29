@@ -1,9 +1,9 @@
 from PySide6.QtCore import QUrl
 from PySide6.QtQml import qmlRegisterSingletonType
+
 from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
-
 from models.calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
 from models.transformer_calculator import TransformerCalculator
 from models.voltage_drop_calculator import VoltageDropCalc
@@ -55,7 +55,7 @@ def register_qml_types(engine, current_dir):
         (RLCChart, "RLC", 1, 0, "RLCChart"),
         (VoltageDropCalculator, "VDrop", 1, 0, "VoltageDrop"),
         (ResultsManager, "Results", 1, 0, "ResultsManager"),
-        (RealTimeChart, "RealTimeChart", 1, 0, "RealTimeChart"),
+        (RealTimeChart, "RealTime", 1, 0, "RealTimeChart"),
         (ThreePhaseSineWaveModel, "Sine", 1, 0, "SineWaveModel"),
         (VoltageDropCalc, "VoltageDrop", 1, 0, "VoltageDropCalc"),
         (BatteryCalculator, "Battery", 1, 0, "BatteryCalculator"),

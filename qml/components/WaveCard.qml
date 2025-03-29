@@ -11,7 +11,7 @@ Rectangle {
     color: Universal.background
     border.width: 1
     border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("#cccccc",1.1)
-    radius: 15
+    radius: 10
     
     property string title: ""
     property bool showSettings: false
