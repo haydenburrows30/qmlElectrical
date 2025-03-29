@@ -60,3 +60,12 @@ Popup {
         wrapMode: Text.WordWrap
     }
 }
+
+// Fonts
+
+FontLoader {
+    id: iconFont
+    source: "../../icons/MaterialIcons-Regular.ttf"
+}
+
+import "../../scripts/MaterialDesignRegular.js" as MD

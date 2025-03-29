@@ -55,7 +55,7 @@ class TransformerLineCalculator(QObject):
         self._frequency_relay_settings = {
             "under_freq": 47.5,  # Hz
             "over_freq": 51.5,   # Hz
-            "df_dt": 0.5         # Hz/s
+            "df_dt": 0.5         # /s
         }
         self._voltage_relay_settings = {
             "under_voltage": 0.8,  # per unit

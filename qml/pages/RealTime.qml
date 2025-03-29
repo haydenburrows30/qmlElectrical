@@ -72,13 +72,20 @@ Page {
                                 implicitHeight: 52
                                 implicitWidth: 52
                                 radius: implicitHeight / 2
+
                                 ImageButton {
+                                    id: pauseButton
                                     anchors.centerIn: parent
                                     iconName: calculator.isRunning ? '\ue034' : '\ue037'
                                     iconWidth: 24
                                     iconHeight: 24
                                     color: calculator.isRunning ? Style.red : Style.green
                                     backgroundColor: Style.alphaColor(color,0.1)
+
+                                    ToolTip.text: "Pause/Run"
+                                    ToolTip.visible: pauseButton.hovered
+                                    ToolTip.delay: 500
+
                                     onClicked: {
                                         calculator.toggleRunning()
                                     }
@@ -89,13 +96,20 @@ Page {
                                 implicitHeight: 52
                                 implicitWidth: 52
                                 radius: implicitHeight / 2
+
                                 ImageButton {
+                                    id: resetButton
                                     anchors.centerIn: parent
                                     iconName: '\uf053'
                                     iconWidth: 24
                                     iconHeight: 24
                                     color: Style.blueGreen
                                     backgroundColor: Style.alphaColor(color,0.1)
+
+                                    ToolTip.text: "Reset"
+                                    ToolTip.visible: resetButton.hovered
+                                    ToolTip.delay: 500
+                                    
                                     onClicked: {
                                         calculator.restart()
                                     }
@@ -107,23 +121,32 @@ Page {
                                 implicitHeight: 52
                                 implicitWidth: 52
                                 radius: implicitHeight / 2
+
                                 ImageButton {
+                                    id: saveButton
                                     anchors.centerIn: parent
                                     iconName: '\ue161'
                                     iconWidth: 24
                                     iconHeight: 24
                                     color: Style.black
                                     backgroundColor: Style.alphaColor(color,0.1)
+
+                                    ToolTip.text: "Save parameters"
+                                    ToolTip.visible: saveButton.hovered
+                                    ToolTip.delay: 500
+
                                     onClicked: {
                                         calculator.saveConfiguration()
                                     }
                                 }
                             }
                             ShadowRectangle {
+                                id: loadButton
                                 Layout.alignment: Qt.AlignRight
                                 implicitHeight: 52
                                 implicitWidth: 52
                                 radius: implicitHeight / 2
+
                                 ImageButton {
                                     anchors.centerIn: parent
                                     iconName: '\ue2c6'
@@ -131,6 +154,11 @@ Page {
                                     iconHeight: 24
                                     color: Style.charcoalGrey
                                     backgroundColor: Style.alphaColor(color,0.1)
+
+                                    ToolTip.text: "Load parameters"
+                                    ToolTip.visible: loadButton.hovered
+                                    ToolTip.delay: 500
+
                                     onClicked: {
                                         calculator.loadConfiguration()
                                     }
