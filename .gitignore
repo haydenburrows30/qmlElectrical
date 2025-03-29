@@ -5,4 +5,4 @@ venv/
 .venv
 build
 dist
-logs
+logs/
