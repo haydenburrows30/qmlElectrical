@@ -32,6 +32,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 import data.rc_resources as rc_resources
 
 from services.qml_types import register_qml_types
+from utils.qml_debug import register_debug_helper
 
 class ResourceManager:
     """Manages application resources and caching."""
@@ -68,6 +69,9 @@ class Application:
         self.model_factory = self.container.resolve(IModelFactory)
 
         self.qml_engine.initialize(self.app)
+        
+        # Add debug helper
+        self.debug_helper = register_debug_helper(self.qml_engine.engine)
         
         self.qml_engine.engine.addImportPath(os.path.dirname(CURRENT_DIR))
         self.qml_engine.engine.addImportPath(CURRENT_DIR)

@@ -14,8 +14,9 @@ Rectangle {
     radius: 10
     
     property string title: ""
-    property bool showSettings: false
+    property bool showSettings: false //show help button
     property bool open: false
+    property bool titleVisible: true  //enable/disable the title
 
     default property alias content: contentItem.data
 
@@ -30,7 +31,7 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.margins: titleVisible ? 20 : 10 // change margins if title not visible
         spacing: Style.spacing
 
         Label {
@@ -39,6 +40,7 @@ Rectangle {
             font.bold: true
             font.pixelSize: 16
             bottomPadding: 10
+            visible: titleVisible
         }
 
         Item {

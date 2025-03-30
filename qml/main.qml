@@ -7,8 +7,6 @@ import QtQuick.Controls.Universal
 import QtQuick.Controls.Material
 import QtQuick.Effects
 
-import RLC 1.0
-
 import "components"
 import "components/calculators"
 import "components/buttons"
@@ -23,7 +21,6 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
-    RLCChart {id: rlcChart}
     SineWaveModel {id: sineModel}
     VoltageDrop {id: voltageDrop}
     ResultsManager {id: resultsManager}

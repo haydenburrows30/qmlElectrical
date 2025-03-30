@@ -6,6 +6,7 @@ Switch {
     id: control
 
     rightPadding: 0
+    
     indicator: Rectangle {
         implicitHeight: 32
         implicitWidth: 56

@@ -1,6 +1,8 @@
 from PySide6.QtCore import QUrl
 from PySide6.QtQml import qmlRegisterSingletonType
 
+import os
+
 from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
 from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
@@ -28,10 +30,8 @@ from models.ref_rgf_calculator import RefRgfCalculator
 from models.voltage_divider_calculator import VoltageDividerCalculator
 from models.ohms_law_calculator import OhmsLawCalculator
 from models.series_helper import SeriesHelper
-
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import RLCChart
-import os
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -52,7 +52,6 @@ def register_qml_types(engine, current_dir):
         (HarmonicAnalysisCalculator, "HarmonicAnalysis", 1, 0, "HarmonicAnalysisCalculator"),
         (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
         (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
-        (RLCChart, "RLC", 1, 0, "RLCChart"),
         (VoltageDropCalculator, "VDrop", 1, 0, "VoltageDrop"),
         (ResultsManager, "Results", 1, 0, "ResultsManager"),
         (RealTimeChart, "RealTime", 1, 0, "RealTimeChart"),
@@ -72,5 +71,6 @@ def register_qml_types(engine, current_dir):
         (OhmsLawCalculator, "OhmsLaw", 1, 0, "OhmsLawCalculator"),
         (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator"),
         (FaultCurrentCalculator, "FaultCurrent", 1, 0, "FaultCurrentCalculator"),
-        (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator")
+        (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
+        (RLCChart, "RLC", 1, 0, "RLCChart")
     ]

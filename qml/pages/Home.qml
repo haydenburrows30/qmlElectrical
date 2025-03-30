@@ -10,12 +10,12 @@ import "../components/buttons/"
 Page {
     id: home
 
-    Text {
+    Label {
         id: welcomeHeader
         text: "Electrical Engineering Tools"
         font.pixelSize: 32
         font.bold: true
-        color: palette.text
+        // color: palette.text
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: parent.top
@@ -23,11 +23,11 @@ Page {
         }
     }
     
-    Text {
+    Label {
         id: welcomeSubtitle
         text: "Select a tool to get started"
         font.pixelSize: 16
-        color: palette.text
+        // color: palette.text
         opacity: 0.7
         anchors {
             horizontalCenter: parent.horizontalCenter

@@ -16,7 +16,6 @@ import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import RealTime 1.0
 
-
 Pane {
     anchors.fill: parent
 
@@ -24,6 +23,7 @@ Pane {
     property bool isActive: false
     property bool showTracker: !calculator.isRunning
     
+
     onIsActiveChanged: {
         if (isActive) {
             calculator.activate(true)
