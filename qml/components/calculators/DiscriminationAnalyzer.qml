@@ -284,17 +284,14 @@ Item {
                             }
 
                             RowLayout {
-                                // Layout.minimumHeight: 60
                                 Label {
                                     text: "Fault Level: "
-                                    // Layout.minimumHeight: 60
                                     Layout.alignment: Qt.AlignVCenter
                                 }
 
                                 TextField {
                                     id: faultCurrent
                                     Layout.fillWidth: true
-                                    // Layout.minimumHeight: 60
                                     Layout.alignment: Qt.AlignVCenter
 
                                     placeholderText: "Add Fault Current Level (A)"
@@ -303,8 +300,7 @@ Item {
                                 }
 
                                 MessageButton {
-                                    // title: "Add Relay"
-                                    // Layout.minimumHeight: 60
+                                    id: addFaultLevel
                                     Layout.alignment: Qt.AlignBottom
                                     
                                     ToolTip.text: "Add Fault Level"
@@ -313,27 +309,25 @@ Item {
 
                                     defaultMessage: ""
                                     successMessage: "Adding fault level:" + parseFloat(faultCurrent.text)
-                                    errorMessage: ""
+                                    errorMessage: "Please add: " + (2 - calculator.relayCount) + " more relays"
 
                                     onButtonClicked: {
-                                        startOperation()
 
-                                        console.log("Adding fault level:", parseFloat(faultCurrent.text))
-                                        calculator.addFaultLevel(parseFloat(faultCurrent.text))
+                                        if (calculator.relayCount < 2) {
+                                            operationFailed(2000)
+                                        } else if (calculator.relayCount >= 2 && !faultCurrent.text) {
+                                            addFaultLevel.errorMessage = "Please enter a number"
+                                            operationFailed(2000)
+                                        } else {
+                                            startOperation()
 
-                                        operationSucceeded(2000)
+                                            console.log("Adding fault level:", parseFloat(faultCurrent.text))
+                                            calculator.addFaultLevel(parseFloat(faultCurrent.text))
+
+                                            operationSucceeded(2000)
+                                        }
                                     }
                                 }
-                                // Button {
-                                //     text: "Add"
-                                //     enabled: calculator.relayCount >= 2
-                                //     onClicked: {
-                                //         console.log("Adding fault level:", parseFloat(faultCurrent.text))
-                                //         calculator.addFaultLevel(
-                                //             parseFloat(faultCurrent.text)
-                                //         )
-                                //     }
-                                // }
                             }
                         }
                     }
