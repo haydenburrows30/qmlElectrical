@@ -11,6 +11,9 @@ InlineMessage {
     opacity: 0
     visible: opacity > 0
     
+    // Add high z-value to appear above parent elements
+    z: 9999
+    
     // Set message type and text based on properties
     messageType: msgType
     

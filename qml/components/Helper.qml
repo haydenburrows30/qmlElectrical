@@ -84,3 +84,37 @@ TextField {
     
     background: ProtectionRectangle {}
 }
+
+// buttons
+
+MessageButton {
+    id: saveButton
+    
+    ToolTip.text: "Add Relay"
+    buttonIcon: '\ue145'
+    buttonColor: Style.blueGreen
+
+    defaultMessage: ""
+    successMessage: "Adding relay:" + relayName.text
+    errorMessage: "Please fill in all relay fields"
+
+    onButtonClicked: {
+
+        startOperation()
+
+        if (!relayName.text || !pickupCurrent.text || !tds.text) {
+            console.log("Please fill all relay fields")
+            operationFailed(2000)
+        } else {
+            console.log("Adding relay:", relayName.text)
+
+            calculator.addRelay({
+                "name": relayName.text,
+                "pickup": parseFloat(pickupCurrent.text),
+                "tds": parseFloat(tds.text),
+                "curve_constants": calculator.getCurveConstants(curveType.currentText)
+                })
+            operationSucceeded(2000)
+        }
+    }
+}

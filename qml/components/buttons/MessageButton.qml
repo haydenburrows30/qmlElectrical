@@ -1,96 +1,143 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Dialogs
+import QtQuick.Layouts
+
+import "../style"
 
 Item {
     id: root
     width: button.width
-    height: button.height + 30 // Fixed height to accommodate messages
-    
-    property string buttonText: "Click Me"
-    property string defaultMessage: "Click for action"
+    height: button.height //+ 30 // Fixed height to accommodate messages
+
+    property string title: ""
+    property string buttonText: ""
+    property string defaultMessage: ""
     property string successMessage: "Operation successful!"
     property string errorMessage: "Operation failed!"
-    property string waitingMessage: "P"
+    property string waitingMessage: ""
     property string currentState: "none" // "none", "default", "waiting", "success", "error"
-    
+
+    property string buttonColor: Style.blueGreen
+    property string buttonIcon: "\ue145"
+
     // Add properties to control button behavior during operations
     property bool disableDuringOperation: true
     property bool isProcessing: false
+
+    ToolTip.text: ""
+    ToolTip.visible: buttonBackground.hovered
+    ToolTip.delay: 1000
+    ToolTip.timeout: 1000
     
     // Add a signal that can be connected to external logic
     signal buttonClicked()
     
     // Start processing - show waiting message
     function startOperation() {
-        hideAllMessages()
-        currentState = "waiting"
-        isProcessing = true
-        messageItems["waiting"].show()
+        showMessage("waiting")
     }
     
     // Operation completed successfully
     function operationSucceeded(duration) {
-        hideAllMessages()
-        currentState = "success"
-        isProcessing = false
-        messageItems["success"].show()
-        
-        if (duration && duration > 0) {
-            hideMessageTimer.interval = duration
-            hideMessageTimer.start()
-        }
+        showMessage("success", duration)
     }
     
     // Operation failed
     function operationFailed(duration) {
-        hideAllMessages()
-        currentState = "error"
-        isProcessing = false
-        messageItems["error"].show()
+        showMessage("error", duration)
+    }
+    
+    // Helper function to show a specific message type
+    function showMessage(type, duration) {
+        hideMessage()
+        currentState = type
+        isProcessing = (type === "waiting")
         
-        if (duration && duration > 0) {
+        // Prepare the message properties
+        var msgProps = {
+            msgType: type === "waiting" ? "info" : type,
+            msgText: root[type + "Message"]
+        }
+        
+        // Create and show the message
+        messageLoader.setSource("MessageItem.qml", msgProps)
+        messageLoader.item.show()
+        
+        if (duration && duration > 0 && type !== "waiting") {
             hideMessageTimer.interval = duration
             hideMessageTimer.start()
         }
     }
     
     // Helper function to hide all messages
-    function hideAllMessages() {
+    function hideMessage() {
         hideMessageTimer.stop()
-        for (var key in messageItems) {
-            messageItems[key].hide()
+        if (messageLoader.item) {
+            messageLoader.item.hide()
         }
     }
-    
-    Button {
+
+    // Button
+    ColumnLayout {
         id: button
-        text: buttonText
-        anchors.top: parent.top
-        enabled: !root.disableDuringOperation || !root.isProcessing
-        
-        onFocusChanged: {
-            if (focus && !isProcessing) {
-                hideAllMessages()
-                currentState = "default"
-                messageItems["default"].show()
-            } else if (!isProcessing) {
-                hideAllMessages()
-                currentState = "none"
+        anchors.centerIn: parent
+        spacing: 10
+       
+        ShadowRectangle {
+            id: buttonBackground
+
+            Layout.alignment: Qt.AlignHCenter
+
+            implicitHeight: 52
+            implicitWidth: 52
+            radius: implicitHeight / 2
+            
+            ImageButton {
+                text: buttonText
+                enabled: !root.disableDuringOperation || !root.isProcessing
+
+                anchors.centerIn: parent
+
+                iconName: buttonIcon
+                iconWidth: 24
+                iconHeight: 24
+                color: buttonColor
+                backgroundColor: Style.alphaColor(color,0.1)
+
+                onFocusChanged: {
+                    if (focus && !isProcessing) {
+                        showMessage("default")
+                    } else if (!isProcessing) {
+                        hideMessage()
+                        currentState = "none"
+                    }
+                }
+                
+                onClicked: {
+                    root.buttonClicked()
+                }
             }
         }
-        
-        onClicked: {
-            root.buttonClicked()
+
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: 10
+            font.pixelSize: 14
+            font.bold: Font.Bold
+            font.weight: Font.Medium
+            text: root.title
         }
     }
-    
+
     // Timer to hide messages after duration
     Timer {
         id: hideMessageTimer
         interval: 3000
         repeat: false
         onTriggered: {
-            hideAllMessages()
+            hideMessage()
             currentState = "none"
         }
     }
@@ -98,54 +145,74 @@ Item {
     // Common positioning for all messages
     QtObject {
         id: messageLayout
-        property point position: Qt.point(button.right + 5, button.top)
+        function getOverlayPosition() {
+            // Get the absolute position of the button in the window coordinates
+            var buttonGlobalPos = button.mapToItem(null, 0, 0);
+            // Get the absolute position of root in the window coordinates
+            var rootGlobalPos = root.mapToItem(null, 0, 0);
+            
+            // Calculate the position beside the button
+            var targetX = rootGlobalPos.x + button.width + 10;
+            var targetY = rootGlobalPos.y + (button.height - 30) / 2; // Center vertically
+            
+            // Return the position adjusted for overlay coordinates
+            return {x: targetX, y: targetY};
+        }
+        
+        // Add a window reference for position updates
+        property var window: Window.window
     }
     
-    // Create property to hold message items
+    // Single Loader for all message types
+    Loader {
+        id: messageLoader
+        parent: Overlay.overlay
+        
+        // Update position whenever any relevant property changes
+        function updatePosition() {
+            if (item) {
+                var pos = messageLayout.getOverlayPosition()
+                x = pos.x
+                y = pos.y
+            }
+        }
+        
+        // Keep position updated with connections
+        Connections {
+            target: messageLayout.window
+            function onWidthChanged() { messageLoader.updatePosition() }
+            function onHeightChanged() { messageLoader.updatePosition() }
+            function onXChanged() { messageLoader.updatePosition() }
+            function onYChanged() { messageLoader.updatePosition() }
+        }
+        
+        Connections {
+            target: root
+            function onXChanged() { messageLoader.updatePosition() }
+            function onYChanged() { messageLoader.updatePosition() }
+            function onWidthChanged() { messageLoader.updatePosition() }
+            function onHeightChanged() { messageLoader.updatePosition() }
+        }
+        
+        Connections {
+            target: button
+            function onXChanged() { messageLoader.updatePosition() }
+            function onYChanged() { messageLoader.updatePosition() }
+            function onWidthChanged() { messageLoader.updatePosition() }
+            function onHeightChanged() { messageLoader.updatePosition() }
+        }
+        
+        // Update position when component is loaded
+        onLoaded: {
+            updatePosition()
+        }
+    }
+    
+    // Create property to hold message items for backward compatibility
     property var messageItems: ({
-        "default": defaultMsg,
-        "waiting": waitingMsg,
-        "success": successMsg,
-        "error": errorMsg
+        "default": { show: function() { showMessage("default"); }, hide: function() { hideMessage(); } },
+        "waiting": { show: function() { showMessage("waiting"); }, hide: function() { hideMessage(); } },
+        "success": { show: function() { showMessage("success"); }, hide: function() { hideMessage(); } },
+        "error": { show: function() { showMessage("error"); }, hide: function() { hideMessage(); } }
     })
-    
-    // Default message
-    MessageItem {
-        id: defaultMsg
-        anchors.top: button.top
-        anchors.leftMargin: 5
-        anchors.left: button.right
-        msgType: "default"
-        msgText: root.defaultMessage
-    }
-    
-    // Waiting message
-    MessageItem {
-        id: waitingMsg
-        anchors.top: button.top
-        anchors.leftMargin: 5
-        anchors.left: button.right
-        msgType: "info"
-        msgText: root.waitingMessage
-    }
-    
-    // Success message
-    MessageItem {
-        id: successMsg
-        anchors.top: button.top
-        anchors.leftMargin: 5
-        anchors.left: button.right
-        msgType: "success"
-        msgText: root.successMessage
-    }
-    
-    // Error message
-    MessageItem {
-        id: errorMsg
-        anchors.top: button.top
-        anchors.leftMargin: 5
-        anchors.left: button.right
-        msgType: "error" 
-        msgText: root.errorMessage
-    }
 }

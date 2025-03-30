@@ -22,7 +22,7 @@ Page {
 
         anchors.centerIn: parent
 
-        // CalculatorPad {}
+        CalculatorPad {}
 
         Rectangle {
             width: 400
@@ -63,31 +63,31 @@ Page {
             }
         }
 
-        // RowLayout {
+        RowLayout {
 
-        //     PrefsTabButton {
-        //         title: "Rotate"
-        //         textIcon: '\ue030'
-        //     }
+            PrefsTabButton {
+                title: "Rotate"
+                textIcon: '\ue030'
+            }
 
-        //     DevicesTile {
-        //         iconImage: "qrc:/icons/gallery/24x24/Reset.svg"
-        //     }
+            DevicesTile {
+                iconImage: "qrc:/icons/gallery/24x24/Reset.svg"
+            }
 
-        //     ShadowRectangle {
-        //         Layout.alignment: Qt.AlignHCenter
-        //         implicitHeight: 52
-        //         implicitWidth: 52
+            ShadowRectangle {
+                Layout.alignment: Qt.AlignHCenter
+                implicitHeight: 52
+                implicitWidth: 52
 
-        //         ImageButton {
-        //             anchors.centerIn: parent
-        //             iconName: '\ue5d2'
-        //             iconWidth: 24
-        //             iconHeight: 24
-        //             color: sideBar.toggle1 ? Style.blue : Style.red
-        //             backgroundColor: sideBar.toggle1 ? Style.alphaColor(color,0.6) : Style.alphaColor(color,0.1)
-        //         }
-        //     }
-        // }
+                ImageButton {
+                    anchors.centerIn: parent
+                    iconName: '\ue5d2'
+                    iconWidth: 24
+                    iconHeight: 24
+                    color: sideBar.toggle1 ? Style.blue : Style.red
+                    backgroundColor: sideBar.toggle1 ? Style.alphaColor(color,0.6) : Style.alphaColor(color,0.1)
+                }
+            }
+        }
     }
 }

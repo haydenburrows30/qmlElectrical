@@ -66,65 +66,54 @@ Item {
                     Layout.minimumWidth: 400
                     spacing: Style.spacing
 
+                    // Controls
                     ButtonCard {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 80
+                        Layout.minimumHeight: 100
 
                         RowLayout {
                             anchors.centerIn: parent
 
-                            ShadowRectangle {
-                                Layout.alignment: Qt.AlignLeft
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
+                            MessageButton {
 
-                                ImageButton {
-                                    id: resetButton
-                                    anchors.centerIn: parent
-                                    iconName: '\uf053'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: Style.blueGreen
-                                    backgroundColor: Style.alphaColor(color,0.1)
+                                title: "Clear"
+                                buttonIcon: '\uf053'
+                                buttonColor: Style.blueGreen
+                                defaultMessage: ""
+                                successMessage: "Cleared relays"
+                                errorMessage: ""
 
-                                    ToolTip.text: "Reset"
-                                    ToolTip.visible: resetButton.hovered
-                                    ToolTip.delay: 500
-                                    
-                                    onClicked: {
-                                        calculator.reset()
-                                        relayName.text = ""
-                                        pickupCurrent.text = ""
-                                        tds.text = ""
-                                        faultCurrent.text = ""
-                                        marginPoints.clear()
-                                    }
+                                ToolTip.visible: false
+
+                                onButtonClicked: {
+
+                                    startOperation()
+                                    calculator.reset()
+                                    relayName.text = ""
+                                    pickupCurrent.text = ""
+                                    tds.text = ""
+                                    faultCurrent.text = ""
+                                    marginPoints.clear()
+                                    operationSucceeded(1000)
                                 }
                             }
 
-                            ShadowRectangle {
-                                id: loadButton
-                                Layout.alignment: Qt.AlignRight
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
+                            MessageButton {
 
-                                ImageButton {
-                                    anchors.centerIn: parent
-                                    iconName: '\ue88e'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: Style.charcoalGrey
-                                    backgroundColor: Style.alphaColor(color,0.1)
+                                title: "Info"
+                                buttonIcon: '\ue88e'
+                                buttonColor: Style.charcoalGrey
+                                defaultMessage: ""
+                                successMessage: ""
+                                errorMessage: ""
 
-                                    ToolTip.text: "Info"
-                                    ToolTip.visible: loadButton.hovered
-                                    ToolTip.delay: 500
+                                ToolTip.visible: false
 
-                                    onClicked: {
-                                        tipsPopup.open()
-                                    }
+                                onButtonClicked: {
+
+                                    startOperation()
+                                    operationSucceeded(1/100)
+                                    tipsPopup.open()
                                 }
                             }
                         }
@@ -135,87 +124,80 @@ Item {
                         title: "Add New Relay"
 
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 300
+                        Layout.minimumHeight: 240
 
-                        GridLayout {
-                            columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
-                            uniformCellWidths: true
+                        RowLayout {
                             anchors.fill: parent
 
-                            Label {
-                                Layout.columnSpan: 2
-                                text: "Relays added: " + calculator.relayCount + " (minimum 2 needed)"
-                                color: calculator.relayCount < 2 ? 
-                                    Universal.theme === Universal.Dark ? "#ff8080" : "red" : 
-                                    Universal.theme === Universal.Dark ? "#90EE90" : "green"
-                                font.bold: true
+                            ColumnLayout {
+
+                                Label {
+                                    Layout.columnSpan: 2
+                                    text: "Relays added: " + calculator.relayCount + " (minimum 2 needed)"
+                                    color: calculator.relayCount < 2 ? 
+                                        Universal.theme === Universal.Dark ? "#ff8080" : "red" : 
+                                        Universal.theme === Universal.Dark ? "#90EE90" : "green"
+                                    font.bold: true
+                                }
+                                
+                                ComboBox {
+                                    id: curveType
+                                    Layout.fillWidth: true
+                                    Layout.columnSpan: 2
+                                    model: calculator.curveTypes
+                                    currentIndex: 0
+                                }
+
+                                TextField {
+                                    id: relayName
+                                    Layout.fillWidth: true
+                                    placeholderText: "Relay Name"
+                                }
+
+                                TextField {
+                                    id: pickupCurrent
+                                    Layout.fillWidth: true
+                                    placeholderText: "Pickup Current (A)"
+                                    validator: DoubleValidator { bottom: 0 }
+                                }
+                                
+                                TextField {
+                                    id: tds
+                                    Layout.fillWidth: true
+                                    placeholderText: "Time Dial Setting"
+                                    validator: DoubleValidator { bottom: 0 }
+                                }
                             }
-                            
-                            ComboBox {
-                                id: curveType
-                                Layout.fillWidth: true
-                                Layout.columnSpan: 2
-                                model: calculator.curveTypes
-                                currentIndex: 0
-                            }
 
-                            TextField {
-                                id: relayName
-                                Layout.fillWidth: true
-                                placeholderText: "Relay Name"
-                            }
+                            MessageButton {
+                                // title: "Add Relay"
+                                Layout.alignment: Qt.AlignBottom
+                                
+                                ToolTip.text: "Add Relay"
+                                buttonIcon: '\ue145'
+                                buttonColor: Style.blueGreen
 
-                            Label {}
+                                defaultMessage: ""
+                                successMessage: "Adding relay:" + relayName.text
+                                errorMessage: "Please fill in all relay fields"
 
-                            TextField {
-                                id: pickupCurrent
-                                Layout.fillWidth: true
-                                placeholderText: "Pickup Current (A)"
-                                validator: DoubleValidator { bottom: 0 }
-                            }
+                                onButtonClicked: {
 
-                            Label {}
-                            
-                            TextField {
-                                id: tds
-                                Layout.fillWidth: true
-                                placeholderText: "Time Dial Setting"
-                                validator: DoubleValidator { bottom: 0 }
-                            }
+                                    startOperation()
 
-                            Label {}
+                                    if (!relayName.text || !pickupCurrent.text || !tds.text) {
+                                        console.log("Please fill all relay fields")
+                                        operationFailed(2000)
+                                    } else {
+                                        console.log("Adding relay:", relayName.text)
 
-                            RowLayout {
-                                id: buttonRow
-                                Layout.columnSpan: 2
-
-                                MessageButton {
-                                    id: saveButton
-                                    buttonText: "Add Relay"
-                                    defaultMessage: ""
-                                    successMessage: "Adding relay:" + relayName.text
-                                    errorMessage: "Please fill in all relay fields"
-
-                                    onButtonClicked: {
-
-                                        startOperation()
-
-                                        if (!relayName.text || !pickupCurrent.text || !tds.text) {
-                                            console.log("Please fill all relay fields")
-                                            operationFailed(2000)
-                                        } else {
-                                            console.log("Adding relay:", relayName.text)
-
-                                            calculator.addRelay({
-                                                "name": relayName.text,
-                                                "pickup": parseFloat(pickupCurrent.text),
-                                                "tds": parseFloat(tds.text),
-                                                "curve_constants": calculator.getCurveConstants(curveType.currentText)
-                                                })
-                                            operationSucceeded(2000)
-                                        }
+                                        calculator.addRelay({
+                                            "name": relayName.text,
+                                            "pickup": parseFloat(pickupCurrent.text),
+                                            "tds": parseFloat(tds.text),
+                                            "curve_constants": calculator.getCurveConstants(curveType.currentText)
+                                            })
+                                        operationSucceeded(2000)
                                     }
                                 }
                             }
@@ -302,25 +284,56 @@ Item {
                             }
 
                             RowLayout {
-                                Label {text: "Fault Level: "}
+                                // Layout.minimumHeight: 60
+                                Label {
+                                    text: "Fault Level: "
+                                    // Layout.minimumHeight: 60
+                                    Layout.alignment: Qt.AlignVCenter
+                                }
 
                                 TextField {
                                     id: faultCurrent
                                     Layout.fillWidth: true
+                                    // Layout.minimumHeight: 60
+                                    Layout.alignment: Qt.AlignVCenter
+
                                     placeholderText: "Add Fault Current Level (A)"
                                     validator: DoubleValidator { bottom: 0 }
                                     enabled: calculator.relayCount >= 2
                                 }
-                                Button {
-                                    text: "Add"
-                                    enabled: calculator.relayCount >= 2
-                                    onClicked: {
+
+                                MessageButton {
+                                    // title: "Add Relay"
+                                    // Layout.minimumHeight: 60
+                                    Layout.alignment: Qt.AlignBottom
+                                    
+                                    ToolTip.text: "Add Fault Level"
+                                    buttonIcon: '\ue145'
+                                    buttonColor: Style.blueGreen
+
+                                    defaultMessage: ""
+                                    successMessage: "Adding fault level:" + parseFloat(faultCurrent.text)
+                                    errorMessage: ""
+
+                                    onButtonClicked: {
+                                        startOperation()
+
                                         console.log("Adding fault level:", parseFloat(faultCurrent.text))
-                                        calculator.addFaultLevel(
-                                            parseFloat(faultCurrent.text)
-                                        )
+                                        calculator.addFaultLevel(parseFloat(faultCurrent.text))
+
+                                        operationSucceeded(2000)
                                     }
                                 }
+                                // Button {
+                                //     text: "Add"
+                                //     enabled: calculator.relayCount >= 2
+                                //     onClicked: {
+                                //         console.log("Adding fault level:", parseFloat(faultCurrent.text))
+                                //         calculator.addFaultLevel(
+                                //             parseFloat(faultCurrent.text)
+                                //         )
+                                //     }
+                                // }
                             }
                         }
                     }
