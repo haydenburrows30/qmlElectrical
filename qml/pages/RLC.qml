@@ -53,16 +53,49 @@ Page {
 
             RowLayout {
                 id: mainLayout
+                width: scrollView.width
                 spacing: Style.spacing
-                anchors.fill: parent
 
                 ColumnLayout {
 
-                    //Buttons
-                    SwitchLabel {
-                        Layout.minimumHeight: 60
-                        Layout.minimumWidth: 400
-                        id: changeMode
+                    RowLayout {
+                        //Buttons
+                        SwitchLabel {
+                            Layout.minimumHeight: 60
+                            Layout.minimumWidth: 350
+                            id: changeMode
+                        }
+
+                        ShadowRectangle {
+                            Layout.alignment: Qt.AlignRight
+                            implicitHeight: 52
+                            implicitWidth: 52
+                            radius: implicitHeight / 2
+                            Layout.columnSpan: 2
+                            
+
+                            ImageButton {
+                                id: resetButton
+                                anchors.centerIn: parent
+                                iconName: '\ueade'
+                                iconWidth: 24
+                                iconHeight: 24
+                                color: Style.red
+                                backgroundColor: Style.alphaColor(color,0.1)
+                                ToolTip.text: "Reset Parameters"
+                                ToolTip.visible: resetButton.hovered
+                                ToolTip.delay: 500
+
+                                onClicked: {
+                                    calculator.resetValues()
+                                    resistanceInput.text = "10"
+                                    inductanceInput.text = "0.1"
+                                    capacitanceInput.text = "0.0001013"
+                                    minFreqInput.text = "0"
+                                    maxFreqInput.text = "100"
+                                }
+                            }
+                        }
                     }
 
                     //Visuals
@@ -463,37 +496,6 @@ Page {
                                 Layout.fillWidth: true
                                 background: ProtectionRectangle {}
                                 readOnly: true
-                            }
-
-                            ShadowRectangle {
-                                Layout.alignment: Qt.AlignRight
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
-                                Layout.columnSpan: 2
-                                
-
-                                ImageButton {
-                                    id: resetButton
-                                    anchors.centerIn: parent
-                                    iconName: '\ueade'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: Style.red
-                                    backgroundColor: Style.alphaColor(color,0.1)
-                                    ToolTip.text: "Reset Parameters"
-                                    ToolTip.visible: resetButton.hovered
-                                    ToolTip.delay: 500
-
-                                    onClicked: {
-                                        calculator.resetValues()
-                                        resistanceInput.text = "10"
-                                        inductanceInput.text = "0.1"
-                                        capacitanceInput.text = "0.0001013"
-                                        minFreqInput.text = "0"
-                                        maxFreqInput.text = "100"
-                                    }
-                                }
                             }
                         }
                     }

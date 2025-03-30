@@ -49,7 +49,7 @@ ShadowRectangle {
                 }
                 rlcPage.react()  //send signal to parent
             }
-        }      
+        }
     }
 }
 

@@ -47,10 +47,15 @@ Page {
         Flickable {
             contentWidth: parent.width
             contentHeight: mainLayout.height + 10
+            bottomMargin : 5
+            leftMargin : 5
+            rightMargin : 5
+            topMargin : 5
 
             RowLayout {
                 id: mainLayout
-                anchors.fill: parent
+                width: scrollView.width
+                anchors.left: parent.left
                 spacing: Style.spacing
 
                 //Settings
@@ -190,6 +195,7 @@ Page {
                                         text: modelData.name
                                         color: modelData.color
                                         Layout.minimumWidth: 80
+                                        font.bold: true
                                     }
                                     ComboBox {
                                         model: ["Sine", "Square", "Sawtooth", "Triangle"]
@@ -205,7 +211,7 @@ Page {
                     WaveCard {
                         title: "Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 600
+                        Layout.minimumHeight: 650
                         
                         ColumnLayout {
                             Layout.fillWidth: true
@@ -222,6 +228,7 @@ Page {
                                         text: modelData
                                         color: parent.waveColor 
                                         font.bold: true
+                                        bottomPadding: 10
                                     }
                                     
                                     Grid {
