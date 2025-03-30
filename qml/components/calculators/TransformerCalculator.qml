@@ -132,13 +132,13 @@ Item {
                 width: scrollView.width
 
                 ColumnLayout {
-                    Layout.maximumWidth: 300
+                    Layout.maximumWidth: 330
                     spacing: Style.spacing
-                    Layout.alignment: Qt.AlignTop
 
+                    // Inputs
                     WaveCard {
                         title: "Transformer Rating"
-                        Layout.minimumHeight: 120
+                        Layout.minimumHeight: 140
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -181,7 +181,7 @@ Item {
                     // Primary Side
                     WaveCard {
                         title: "Primary Side"
-                        Layout.minimumHeight: 120
+                        Layout.minimumHeight: 140
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -234,7 +234,7 @@ Item {
                     // Secondary Side
                     WaveCard {
                         title: "Secondary Side"
-                        Layout.minimumHeight: 130
+                        Layout.minimumHeight: 150
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -275,7 +275,7 @@ Item {
                     //Impedance
                     WaveCard {
                         title: "Impedance & Construction"
-                        Layout.minimumHeight: 360
+                        Layout.minimumHeight: 380
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -434,7 +434,7 @@ Item {
                     WaveCard {
                         id: results
                         title: "Results"
-                        Layout.minimumHeight: 220
+                        Layout.minimumHeight: 280
                         Layout.fillWidth: true
                         showSettings: true
 
@@ -447,42 +447,36 @@ Item {
                                 text: "Turns Ratio:"
                                 Layout.minimumWidth: 120
                             }
-                            Label { 
+                            TextFieldBlue {
+                                Layout.minimumWidth: 120
                                 text: calculator.turnsRatio.toFixed(1)
-                                color: Universal.foreground
-                                Layout.minimumWidth: 150
+                                ToolTip.text: "Turns ratio"
                             }
                             Label { 
                                 text: "Vector-corrected Ratio:"
-                                color: Universal.foreground
                             }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.correctedRatio.toFixed(1)
-                                color: Universal.foreground
-                                font.italic: true
+                                ToolTip.text: "Vector-corrected turns ratio"
                             }
                             Label { 
                                 text: "Efficiency:"
-                                color: Universal.foreground
                             }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.efficiency.toFixed(0) + "%"
-                                color: Universal.foreground
+                                ToolTip.text: "Efficiency"
                             }
                             Label {
                                 text: "Vector Group:"
-                                color: Universal.foreground
                             }
-                            Label {
+                            TextFieldBlue {
                                 text: calculator.vectorGroup
-                                color: Universal.foreground
+                                ToolTip.text: "Vector Group"
                             }
                             Label {
                                 text: calculator.vectorGroupDescription
-                                color: Universal.foreground
                                 font.pixelSize: 12
                                 wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
                                 Layout.columnSpan: 2
                             }
                             Label {

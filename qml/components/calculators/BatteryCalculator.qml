@@ -141,38 +141,28 @@ Item {
                     Layout.fillWidth: true
 
                     Label { text: "Current Draw:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.currentDraw.toFixed(2) + " A"
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                         Layout.minimumWidth: 180
-                        readOnly: true
                     }
 
                     Label { text: "Required Capacity:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.requiredCapacity.toFixed(1) + " Ah"
                         background: ProtectionRectangle {}
-                        Layout.fillWidth: true
-                        readOnly: true
                     }
                     
                     Label { text: "Recommended Capacity:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.recommendedCapacity.toFixed(1) + " Ah"
-                        font.bold: true 
                         color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
                         background: ProtectionRectangle {}
-                        Layout.fillWidth: true
-                        readOnly: true
                     }
                     
                     Label { text: "Energy Storage:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.energyStorage.toFixed(2) + " kWh"
                         background: ProtectionRectangle {}
-                        Layout.fillWidth: true
-                        readOnly: true
                     }
                 }
             }

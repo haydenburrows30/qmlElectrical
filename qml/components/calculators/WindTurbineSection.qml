@@ -497,6 +497,8 @@ Item {
                         antialiasing: true
                         legend.visible: true
 
+                        theme: Universal.theme
+
                         // Add method to save chart as image
                         function saveChartImage(filePath) {
                             return powerCurveChart.grabToImage(function(result) {

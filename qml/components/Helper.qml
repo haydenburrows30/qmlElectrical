@@ -69,3 +69,18 @@ FontLoader {
 }
 
 import "../../scripts/MaterialDesignRegular.js" as MD
+
+// Results
+
+TextField {
+    Layout.fillWidth: true
+    readOnly: true
+
+    text: ""
+
+    ToolTip.text: "Estimated temperature rise above ambient"
+    ToolTip.visible: hovered
+    ToolTip.delay: 500
+    
+    background: ProtectionRectangle {}
+}

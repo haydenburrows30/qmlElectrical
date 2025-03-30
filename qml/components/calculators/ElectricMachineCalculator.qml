@@ -14,7 +14,7 @@ Item {
 
     property MachineCalculator calculator: MachineCalculator {}
     property color textColor: Universal.foreground
-    property int waveHeight: 300
+    property int waveHeight: 310
 
     Popup {
         id: tipsPopup
@@ -75,8 +75,7 @@ Item {
 
                 // Left side - Controls and Results
                 ColumnLayout {
-                    Layout.maximumWidth: 300
-                    Layout.alignment: Qt.AlignTop
+                    Layout.maximumWidth: 340
                     spacing: Style.spacing
 
                     // Machine Type Selection
@@ -84,7 +83,7 @@ Item {
                         id: results
                         title: "Machine Selection"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 90
+                        Layout.minimumHeight: 110
 
                         showSettings: true
                         
@@ -150,17 +149,16 @@ Item {
                                 columns: 2
                                 rowSpacing: 10
                                 columnSpacing: 15
-                                Layout.leftMargin: 10
-                                Layout.rightMargin: 10
 
-                                Label { text: "Rated Voltage (V):"; Layout.minimumWidth: 130}
+                                Label { text: "Rated Voltage (V):"; Layout.minimumWidth: 150}
                                 TextField {
                                     id: ratedVoltageInput
                                     placeholderText: "Enter voltage"
                                     text: "400"
                                     onTextChanged: if(text) calculator.setRatedVoltage(parseFloat(text))
-                                    Layout.minimumWidth: 120
                                     validator: DoubleValidator { bottom: 0.1; decimals: 2 }
+                                    Layout.minimumWidth: 130
+                                    Layout.fillWidth: true
                                 }
 
                                 Label { text: "Rated Current (A):" }
@@ -224,7 +222,7 @@ Item {
                     WaveCard {
                         title: "Mechanical Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 170
+                        Layout.minimumHeight: 190
 
                         GridLayout {
                             id: mechanicalParamsGrid
@@ -232,7 +230,7 @@ Item {
                             rowSpacing: 10
                             columnSpacing: 15
 
-                            Label { text: "Number of Poles:" ; Layout.minimumWidth: 130}
+                            Label { text: "Number of Poles:" ; Layout.minimumWidth: 150}
                             SpinBox {
                                 id: polesSpinBox
                                 from: 2
@@ -274,14 +272,14 @@ Item {
                     WaveCard {
                         title: "Thermal Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 160
+                        Layout.minimumHeight: 180
 
                         GridLayout {
                             columns: 2
                             rowSpacing: 10
                             columnSpacing: 15
 
-                            Label { text: "Temperature Class:" ; Layout.minimumWidth: 130}
+                            Label { text: "Temperature Class:" ; Layout.minimumWidth: 150}
                             ComboBox {
                                 id: tempClassCombo
                                 model: calculator.temperatureClasses
@@ -298,9 +296,8 @@ Item {
                             }
 
                             Label { text: "Temperature Rise:" }
-                            Label {
+                            TextFieldBlue {
                                 text: calculator.temperatureRise.toFixed(1) + " °C"
-                                Layout.fillWidth: true
                                 color: calculator.temperatureRise > 80 ? 
                                     Universal.theme === Universal.Dark ? "#FF8080" : "red" :
                                     Universal.foreground
@@ -312,52 +309,42 @@ Item {
                     WaveCard {
                         title: "Results"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 220
+                        Layout.minimumHeight: 270
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 15
-                            columnSpacing: 10
+                            rowSpacing: 10
+                            columnSpacing: 15
 
-                            Label { text: "Rated Power:" }
-                            Label { 
+                            Label { text: "Rated Power:" ; Layout.minimumWidth: 150}
+                            TextFieldBlue { 
                                 text: calculator.ratedPower.toFixed(2) + " kW"
-                                color: Universal.foreground
-                                Layout.fillWidth: true
-                                Layout.minimumWidth: 100
+                                Layout.minimumWidth: 130
                             }
                             
                             Label { text: "Power with Derating:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: (calculator.ratedPower * calculator.efficiency).toFixed(2) + " kW"
-                                Layout.minimumWidth: 100
-                                Layout.fillWidth: true
                                 color: calculator.temperatureRise > 80 ? 
                                     Universal.theme === Universal.Dark ? "#FF8080" : "red" :
                                     Universal.foreground
                             }
 
                             Label { text: "Torque:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.torque.toFixed(2) + " N·m"
                                 Layout.minimumWidth: 100
-                                Layout.fillWidth: true
-                                color: Universal.foreground
                             }
 
                             Label { text: "Losses:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.losses.toFixed(2) + " kW"
-                                Layout.minimumWidth: 100
-                                Layout.fillWidth: true
                                 color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
                             }
 
                             Label { text: "Efficiency:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: (calculator.efficiency * 100).toFixed(1) + "%"
-                                Layout.minimumWidth: 100
-                                Layout.fillWidth: true
                                 color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
                             }
                         }

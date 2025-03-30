@@ -126,16 +126,19 @@ Item {
         anchors.margins: 10
 
         RowLayout {
+
+            // Inputs
             WaveCard {
                 id: results
                 title: "Motor Parameters"
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: 350
                 Layout.minimumWidth: 410
 
                 showSettings: true
             
                 GridLayout {
                     columns: 2
+                    rowSpacing: 10
                     
                     Label {
                         text: "Motor Type:"
@@ -266,7 +269,7 @@ Item {
                     Button {
                         text: "Calculate"
                         Layout.columnSpan: 2
-                        Layout.alignment: Qt.AlignCenter
+                        Layout.alignment: Qt.AlignRight
                         Layout.topMargin: 5
                         enabled: hasValidInputs
                         
@@ -284,21 +287,22 @@ Item {
                 }
             }
 
+            // Results
             WaveCard {
                 title: "Results"
                 Layout.minimumWidth: 350
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: results.height
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 15
+                    rowSpacing: 10
 
                     Label {
                         text: "Motor Type:"
                         Layout.preferredWidth: 150
                     }
                     
-                    Label {
+                    TextFieldBlue {
                         text: motorType.currentText
                         Layout.preferredWidth: 150
                         font.bold: true
@@ -306,57 +310,57 @@ Item {
                     
                     Label {
                         text: "Full Load Current:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
-                    Label {
+                    TextFieldBlue {
                         text: !isNaN(calculator.startingCurrent / getStartingMultiplier()) ? 
                                 (calculator.startingCurrent / getStartingMultiplier()).toFixed(1) + " A" : "0.0 A"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                 
                     Label {
                         text: "Starting Current:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
-                    Label {
+                    TextFieldBlue {
                         text: !isNaN(calculator.startingCurrent) ? 
                                 calculator.startingCurrent.toFixed(1) + " A" : "0.0 A"
                         color: "red"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
                     Label {
                         text: "Current Multiplier:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
-                    Label {
+                    TextFieldBlue {
                         text: getStartingMultiplier().toFixed(1) + "x"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
                     Label {
                         text: "Starting Torque:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
-                    Label {
+                    TextFieldBlue {
                         text: !isNaN(calculator.startingTorque) ? 
                                 (calculator.startingTorque * 100).toFixed(0) + "% FLT" : "0% FLT"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
                     Label {
                         text: "Nominal Torque:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                     
-                    Label {
+                    TextFieldBlue {
                         text: !isNaN(calculator.startingTorque) ? 
                                 (calculator.startingTorque / (calculator.startingTorque * 100 / 100)).toFixed(1) + " Nm" : "0.0 Nm"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
                 }
             }

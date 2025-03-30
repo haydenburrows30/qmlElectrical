@@ -26,6 +26,8 @@ QtObject {
 
     // width
     readonly property int spacing: 5
+    readonly property int rowSpacing: 10
+    readonly property int columnSpacing: 15
 
 
     // devicestile
