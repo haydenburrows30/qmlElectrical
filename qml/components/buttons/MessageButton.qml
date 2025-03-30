@@ -16,11 +16,12 @@ Item {
     property string defaultMessage: ""
     property string successMessage: "Operation successful!"
     property string errorMessage: "Operation failed!"
-    property string waitingMessage: ""
+    property string waitingMessage: "Waiting"
     property string currentState: "none" // "none", "default", "waiting", "success", "error"
 
     property string buttonColor: Style.blueGreen
     property string buttonIcon: "\ue145"
+    property bool textVisible: true
 
     // Add properties to control button behavior during operations
     property bool disableDuringOperation: true
@@ -128,6 +129,7 @@ Item {
             font.bold: Font.Bold
             font.weight: Font.Medium
             text: root.title
+            visible: textVisible
         }
     }
 

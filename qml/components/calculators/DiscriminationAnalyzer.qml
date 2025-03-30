@@ -171,11 +171,13 @@ Item {
 
                             MessageButton {
                                 // title: "Add Relay"
-                                Layout.alignment: Qt.AlignBottom
+                                Layout.alignment: Qt.AlignVCenter
                                 
                                 ToolTip.text: "Add Relay"
                                 buttonIcon: '\ue145'
                                 buttonColor: Style.blueGreen
+
+                                textVisible: false
 
                                 defaultMessage: ""
                                 successMessage: "Adding relay:" + relayName.text
@@ -259,73 +261,71 @@ Item {
                         Layout.fillWidth: true
                         Layout.minimumHeight: 180
                         
-                        ColumnLayout {
+                        GridLayout {
+                            columns: 3
                             anchors.fill: parent
+                            // uniformCellHeights: true
 
-                            RowLayout {
-                                Label {text: "Margin: "}
+                            Label {text: "Margin: "}
 
-                                Slider {
-                                    id: marginSlider
-                                    Layout.minimumWidth: 200
-                                    Layout.fillWidth: true
-                                    from: 0.1
-                                    to: 1.0
-                                    value: calculator.minimumMargin
-                                    stepSize: 0.05
-                                    onValueChanged: calculator.minimumMargin = value
-                                }
-
-                                Label {
-                                    text: marginSlider.value.toFixed(2) + "s"
-                                    font.bold: true
-                                    Layout.fillWidth: true
-                                }
+                            Slider {
+                                id: marginSlider
+                                Layout.minimumWidth: 200
+                                Layout.fillWidth: true
+                                from: 0.1
+                                to: 1.0
+                                value: calculator.minimumMargin
+                                stepSize: 0.05
+                                onValueChanged: calculator.minimumMargin = value
                             }
 
-                            RowLayout {
-                                Label {
-                                    text: "Fault Level: "
-                                    Layout.alignment: Qt.AlignVCenter
-                                }
+                            Label {
+                                text: marginSlider.value.toFixed(2) + "s"
+                                font.bold: true
+                                Layout.fillWidth: true
+                            }
 
-                                TextField {
-                                    id: faultCurrent
-                                    Layout.fillWidth: true
-                                    Layout.alignment: Qt.AlignVCenter
+                            Label {
+                                text: "Fault Level: "
+                                Layout.alignment: Qt.AlignVCenter
+                            }
 
-                                    placeholderText: "Add Fault Current Level (A)"
-                                    validator: DoubleValidator { bottom: 0 }
-                                    enabled: calculator.relayCount >= 2
-                                }
+                            TextField {
+                                id: faultCurrent
+                                Layout.fillWidth: true
 
-                                MessageButton {
-                                    id: addFaultLevel
-                                    Layout.alignment: Qt.AlignBottom
-                                    
-                                    ToolTip.text: "Add Fault Level"
-                                    buttonIcon: '\ue145'
-                                    buttonColor: Style.blueGreen
+                                placeholderText: "Add Fault Current Level (A)"
+                                validator: DoubleValidator { bottom: 0 }
+                                enabled: calculator.relayCount >= 2
+                            }
 
-                                    defaultMessage: ""
-                                    successMessage: "Adding fault level:" + parseFloat(faultCurrent.text)
-                                    errorMessage: "Please add: " + (2 - calculator.relayCount) + " more relays"
+                            MessageButton {
+                                id: addFaultLevel
+                                Layout.alignment: Qt.AlignHCenter
+                                
+                                ToolTip.text: "Add Fault Level"
+                                buttonIcon: '\ue145'
+                                buttonColor: Style.blueGreen
+                                textVisible: false
 
-                                    onButtonClicked: {
+                                defaultMessage: ""
+                                successMessage: "Adding fault level:" + parseFloat(faultCurrent.text)
+                                errorMessage: "Please add: " + (2 - calculator.relayCount) + " more relays"
 
-                                        if (calculator.relayCount < 2) {
-                                            operationFailed(2000)
-                                        } else if (calculator.relayCount >= 2 && !faultCurrent.text) {
-                                            addFaultLevel.errorMessage = "Please enter a number"
-                                            operationFailed(2000)
-                                        } else {
-                                            startOperation()
+                                onButtonClicked: {
 
-                                            console.log("Adding fault level:", parseFloat(faultCurrent.text))
-                                            calculator.addFaultLevel(parseFloat(faultCurrent.text))
+                                    if (calculator.relayCount < 2) {
+                                        operationFailed(2000)
+                                    } else if (calculator.relayCount >= 2 && !faultCurrent.text) {
+                                        addFaultLevel.errorMessage = "Please enter a number"
+                                        operationFailed(2000)
+                                    } else {
+                                        startOperation()
 
-                                            operationSucceeded(2000)
-                                        }
+                                        console.log("Adding fault level:", parseFloat(faultCurrent.text))
+                                        calculator.addFaultLevel(parseFloat(faultCurrent.text))
+
+                                        operationSucceeded(2000)
                                     }
                                 }
                             }

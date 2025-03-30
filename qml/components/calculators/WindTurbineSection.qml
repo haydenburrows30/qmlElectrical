@@ -9,6 +9,7 @@ import "../"
 import "../buttons"
 import "../popups"
 import "../backgrounds"
+import "../style"
 
 Item {
     id: windTurbineSection
@@ -19,6 +20,8 @@ Item {
     property var safeValueFunction
     // Add property for application directory path
     property string applicationDirPath: Qt.application.directoryPath || "."
+
+    property bool saveSuccess: false
 
     signal calculate()
 
@@ -82,6 +85,9 @@ Item {
                 calculator.exportWindTurbineReport(filePath, tempImagePath);
             });
             timer.start();
+
+            saveSuccess = true
+            console.log("saved")
         }
     }
         
@@ -109,30 +115,54 @@ Item {
 
                     Label {Layout.fillWidth: true}
 
-                    Button {
+                    MessageButton {
+                        ToolTip.text: "Export"
+                        buttonIcon: '\ue171'
+                        buttonColor: Style.blueGreen
                         Layout.alignment: Qt.AlignRight
-                        text: "Export"
-                        
+
                         property string defaultFileName: "wind_turbine_report.pdf"
-                        
-                        onClicked: {
+
+                        textVisible: false
+
+                        defaultMessage: ""
+                        successMessage: "PDF exported successfully"
+                        errorMessage: "PDF export failed"
+
+                        onButtonClicked: {
+                            startOperation()
+
                             if (calculatorReady) {
                                 // Don't set a specific directory, let the system choose the default
                                 // Set initial file name without a specific path
                                 exportFileDialog.currentFile = defaultFileName;
                                 // Open the predefined FileDialog
                                 exportFileDialog.open();
+                                
                             }
+                            operationSucceeded(2000)
                         }
                     }
 
-                    Button {
-                        icon.name: "Reset"
-                        
+                    Text {
+                        text: calculator.exportSuccess
+                    }
+
+                    MessageButton {
                         ToolTip.text: "Reset to default values"
-                        ToolTip.delay: 500
-                        ToolTip.visible: hovered
-                        onClicked: {
+                        buttonIcon: '\ue166'
+                        buttonColor: Style.blueGreen
+                        Layout.alignment: Qt.AlignRight
+
+                        textVisible: false
+
+                        defaultMessage: ""
+                        successMessage: "Parameters reset"
+                        errorMessage: "PDF export failed"
+
+                        onButtonClicked: {
+                            startOperation()
+
                             if (calculatorReady) {
                                 calculator.resetToGenericTurbine()
                                 bladeRadiusSpinBox.value = calculator.bladeRadius
@@ -142,6 +172,8 @@ Item {
                                 efficiencySpinBox.value = calculator.efficiency * 100
                                 updatePowerCurve()
                             }
+
+                            operationSucceeded(2000)
                         }
                     }
                 }

@@ -15,6 +15,7 @@ class WindTurbineCalculator(QObject):
     cutInSpeedChanged = Signal()
     cutOutSpeedChanged = Signal()
     efficiencyChanged = Signal()
+    pdfSaved = Signal()
     
     # Add both signal names for compatibility
     calculationCompleted = Signal()  # Standard name
@@ -40,6 +41,8 @@ class WindTurbineCalculator(QObject):
         self._rated_capacity = 0.0         # kVA
         self._output_current = 0.0         # A
         self._power_curve = []         # List of (wind_speed, power) tuples
+
+        self._pdf = "Success"
         
         # Initialize calculations
         self._calculate()
@@ -470,13 +473,19 @@ class WindTurbineCalculator(QObject):
             generator = PDFGenerator()
             generator.generate_wind_turbine_report(data, clean_path)
             print(f"Wind turbine report exported to: {clean_path}")
-            
+            self._pdf = "Success"
+            self.pdfSaved.emit()
+
         except Exception as e:
             print(f"Error exporting wind turbine report: {e}")
             print(f"Attempted filename: {filename}")
             # Print more details for debugging
             import traceback
             traceback.print_exc()
+
+    @Property(str, notify=pdfSaved)
+    def exportSuccess(self):
+        return self._pdf
 
     # Advanced analysis methods
     @Slot(float, float, result=float)
