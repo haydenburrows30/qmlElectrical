@@ -67,21 +67,24 @@ Item {
                     spacing: Style.spacing
 
                     // Controls
-                    ButtonCard {
+                    ShadowRectangle {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 100
+                        Layout.minimumHeight: 80
 
                         RowLayout {
-                            anchors.centerIn: parent
+                            // anchors.centerIn: parent
+                            anchors.right: parent.right
 
                             MessageButton {
 
-                                title: "Clear"
+                                // title: "Clear"
                                 buttonIcon: '\uf053'
                                 buttonColor: Style.blueGreen
                                 defaultMessage: ""
                                 successMessage: "Cleared relays"
                                 errorMessage: ""
+
+                                textVisible: false
 
                                 ToolTip.visible: false
 
@@ -100,7 +103,7 @@ Item {
 
                             MessageButton {
 
-                                title: "Info"
+                                // title: "Info"
                                 buttonIcon: '\ue88e'
                                 buttonColor: Style.charcoalGrey
                                 defaultMessage: ""
@@ -108,6 +111,7 @@ Item {
                                 errorMessage: ""
 
                                 ToolTip.visible: false
+                                textVisible: false
 
                                 onButtonClicked: {
 

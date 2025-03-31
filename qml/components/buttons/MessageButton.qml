@@ -17,7 +17,8 @@ Item {
     property string successMessage: "Operation successful!"
     property string errorMessage: "Operation failed!"
     property string waitingMessage: "Waiting"
-    property string currentState: "none" // "none", "default", "waiting", "success", "error"
+    property string infoMessage: "Information"
+    property string currentState: "none" // "none", "default", "waiting", "success", "error", "info"s
 
     property string buttonColor: Style.blueGreen
     property string buttonIcon: "\ue145"
@@ -48,6 +49,11 @@ Item {
     // Operation failed
     function operationFailed(duration) {
         showMessage("error", duration)
+    }
+
+    // Operation info
+    function operationInfo(duration) {
+        showMessage("info", duration)
     }
     
     // Helper function to show a specific message type
@@ -215,6 +221,7 @@ Item {
         "default": { show: function() { showMessage("default"); }, hide: function() { hideMessage(); } },
         "waiting": { show: function() { showMessage("waiting"); }, hide: function() { hideMessage(); } },
         "success": { show: function() { showMessage("success"); }, hide: function() { hideMessage(); } },
-        "error": { show: function() { showMessage("error"); }, hide: function() { hideMessage(); } }
+        "error": { show: function() { showMessage("error"); }, hide: function() { hideMessage(); } },
+        "info": { show: function() { showMessage("info"); }, hide: function() { hideMessage(); } }
     })
 }

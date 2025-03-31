@@ -7,6 +7,7 @@ import "../../components"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../buttons"
 
 import InstrumentTransformer 1.0
 
@@ -106,14 +107,66 @@ Item {
                     spacing: Style.spacing
                     Layout.alignment: Qt.AlignTop
 
+                    // Controls
+                    ButtonCard {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: 100
+
+                        RowLayout {
+                            anchors.right: parent.right
+
+                            MessageButton {
+                                title: "Reset"
+                                ToolTip.text: "Reset to default values"
+                                buttonIcon: '\uf053'
+                                buttonColor: Style.blueGreen
+                                Layout.alignment: Qt.AlignRight
+                                Layout.columnSpan: 2
+
+                                // textVisible: false
+
+                                defaultMessage: ""
+                                successMessage: "Parameters reset"
+                                errorMessage: "PDF export failed"
+
+                                onButtonClicked: {
+                                    startOperation()
+
+                                    calculator.resetToDefaults()
+
+                                    operationSucceeded(2000)
+                                }
+                            }
+
+                            MessageButton {
+
+                                title: "Info"
+                                buttonIcon: '\ue88e'
+                                buttonColor: Style.charcoalGrey
+                                defaultMessage: ""
+                                successMessage: ""
+                                errorMessage: ""
+
+                                ToolTip.visible: false
+
+                                onButtonClicked: {
+
+                                    startOperation()
+                                    tipsPopup.open()
+                                    operationSucceeded(1/100)
+                                }
+                            }
+                        }
+                    }
+
                     // CT Section
                     WaveCard {
                         id: results
                         title: "Current Transformer"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 400
+                        Layout.minimumHeight: 380
                         
-                        showSettings: true
+                        showSettings: false
 
                         GridLayout {
                             columns: 2
@@ -226,11 +279,25 @@ Item {
                                         regularExpression: /^\d+\/\d+$/
                                     }
                                 }
-                                
-                                Button {
-                                    text: "Apply"
+
+                                MessageButton {
                                     Layout.alignment: Qt.AlignRight
-                                    onClicked: {
+                                    
+                                    ToolTip.text: "Add Relay"
+                                    buttonIcon: '\ue145'
+                                    buttonColor: Style.blueGreen
+
+                                    textVisible: false
+
+                                    defaultMessage: ""
+                                    successMessage: "Custom CT ratio added: " + customRatio.text
+                                    errorMessage: "Invalid ratio format. Please use format like '100/5'"
+                                    infoMessage: "CT ratio found in list"
+
+                                    onButtonClicked: {
+
+                                        startOperation()
+
                                         if (customRatio.acceptableInput) {
                                             calculator.setCtRatio(customRatio.text)
                                             let found = false
@@ -238,26 +305,20 @@ Item {
                                                 if (ctRatio.model[i] === customRatio.text) {
                                                     ctRatio.currentIndex = i
                                                     found = true
+                                                    operationInfo(2000)
                                                     break
                                                 }
                                             }
                                             if (!found) {
                                                 ctRatio.model.push(customRatio.text)
                                                 ctRatio.currentIndex = ctRatio.model.length - 1
+                                                operationSucceeded(2000)
                                             }
                                         } else {
-                                            errorPopup.errorMessage = "Invalid ratio format. Please use format like '100/5'"
-                                            errorPopup.open()
+                                            operationFailed(2000)
                                         }
                                     }
                                 }
-                            }
-                            
-                            Button {
-                                text: "Reset to Defaults"
-                                Layout.columnSpan: 2
-                                Layout.alignment: Qt.AlignRight
-                                onClicked: calculator.resetToDefaults()
                             }
                         }
                     }

@@ -5,7 +5,7 @@ import Qt5Compat.GraphicalEffects
 
 Pane {
     id: control
-    padding: 0
+    padding: 10
     property real radius: 16
     property var gradient: null
     property color color: Style.white

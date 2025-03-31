@@ -73,11 +73,10 @@ Page {
                             radius: implicitHeight / 2
                             Layout.columnSpan: 2
                             
-
                             ImageButton {
                                 id: resetButton
                                 anchors.centerIn: parent
-                                iconName: '\ueade'
+                                iconName: '\uf053'
                                 iconWidth: 24
                                 iconHeight: 24
                                 color: Style.red

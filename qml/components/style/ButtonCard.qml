@@ -7,9 +7,9 @@ import "../style"
 import "../backgrounds"
 
 Rectangle {
-    border.width: 1
-    border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("#cccccc",1.1)
-    radius: 50
+    // border.width: 1
+    // border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("#cccccc",1.1)
+    radius: 20
 
     color: Universal.background
 

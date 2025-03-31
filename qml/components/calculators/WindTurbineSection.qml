@@ -85,9 +85,6 @@ Item {
                 calculator.exportWindTurbineReport(filePath, tempImagePath);
             });
             timer.start();
-
-            saveSuccess = true
-            console.log("saved")
         }
     }
         
@@ -144,13 +141,9 @@ Item {
                         }
                     }
 
-                    Text {
-                        text: calculator.exportSuccess
-                    }
-
                     MessageButton {
                         ToolTip.text: "Reset to default values"
-                        buttonIcon: '\ue166'
+                        buttonIcon: '\uf053'
                         buttonColor: Style.blueGreen
                         Layout.alignment: Qt.AlignRight
 
@@ -176,6 +169,29 @@ Item {
                             operationSucceeded(2000)
                         }
                     }
+
+                    MessageButton {
+
+                        title: "Info"
+                        buttonIcon: '\ue88e'
+                        buttonColor: Style.charcoalGrey
+                        defaultMessage: ""
+                        successMessage: ""
+                        errorMessage: ""
+
+                        textVisible: false
+
+                        ToolTip.text: "Info"
+                    
+
+                        onButtonClicked: {
+
+                            startOperation()
+                            lVPopup.open()
+                            operationSucceeded(1/100)
+
+                        }
+                    }
                 }
                 
                 RowLayout {
@@ -188,7 +204,7 @@ Item {
                         Layout.minimumHeight: 490
                         Layout.minimumWidth: 350
 
-                        showSettings: true
+                        // showSettings: true
 
                         GridLayout {
                             columns: 2
