@@ -224,7 +224,6 @@ Item {
                                 Label {
                                     text: calculator.primaryCurrent.toFixed(2)
                                     visible: parseFloat(kvaInput.text || "0") > 0
-                                    color: Universal.foreground
                                     Layout.fillWidth: true
                                 }
                             }

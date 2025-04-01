@@ -25,13 +25,8 @@ Button {
     property int iconHeight: 24
     property string iconName: '\ue161'
 
-    // font.pixelSize: 20
     implicitHeight: 42
     implicitWidth: 42
-
-    // icon.name: iconImage
-    // icon.width: 30
-    // icon.height: 30
 
     Text {
         anchors.centerIn: parent

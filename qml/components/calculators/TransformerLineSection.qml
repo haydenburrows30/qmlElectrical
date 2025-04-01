@@ -601,7 +601,7 @@ Item {
                                 id: relayCtRatioText
                                 readOnly: true
                                 Layout.fillWidth: true
-                                text: calculatorReady ? calculator.relayCtRatio : "300/1"  // Updated default value
+                                text: calculatorReady ? calculator.relayCtRatio : "300/1"
                                 background: ProtectionRectangle {}
                             }
 

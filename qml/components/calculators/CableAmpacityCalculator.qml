@@ -141,7 +141,6 @@ Item {
                     Label { text: "Base Ampacity:" ;Layout.minimumWidth: 180}
                     Label { 
                         text: calculator.baseAmpacity.toFixed(1) + " A" 
-                        color: Universal.foreground
                         font.bold: true
                         Layout.minimumWidth: 100
                     }
@@ -149,7 +148,6 @@ Item {
                     Label { text: "Derated Ampacity:" }
                     Label { 
                         text: calculator.deratedAmpacity.toFixed(1) + " A" 
-                        color: Universal.foreground
                         font.bold: true
                         Layout.fillWidth: true
                     }
@@ -157,7 +155,6 @@ Item {
                     Label { text: "Voltage Drop per 100m:" }
                     Label { 
                         text: calculator.voltageDropPer100m.toFixed(1) + " V" 
-                        color: Universal.foreground
                         font.bold: true
                         Layout.fillWidth: true
                     }
@@ -165,7 +162,6 @@ Item {
                     Label { text: "Economic Size:" }
                     Label { 
                         text: calculator.recommendedSize.toFixed(1) + " mm²" 
-                        color: Universal.foreground
                         font.bold: true
                         Layout.fillWidth: true
                     }

@@ -3,7 +3,7 @@ import QtQml
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.Controls.Universal
+// import QtQuick.Controls.Universal
 import QtCharts
 
 import "../components"

@@ -13,8 +13,6 @@ Rectangle {
     property string currentMessage: defaultMessage
     property string messageType: "default" // can be "default", "success", "error", "warning", "info"
     
-    // property bool visible: false
-    
     width: messageText.width + 20
     height: messageText.height + 10
     radius: 5

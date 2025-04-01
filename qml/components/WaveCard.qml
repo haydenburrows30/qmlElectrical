@@ -8,7 +8,7 @@ import "backgrounds"
 
 Rectangle {
     id: controlRect
-    color: Universal.background
+    color: sideBar.toggle1 ? Style.mainBackgroundDark : Style.mainBackgroundLight
     border.width: 1
     border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("#cccccc",1.1)
     radius: 10

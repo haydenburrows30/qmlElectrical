@@ -30,7 +30,6 @@ ShadowRectangle {
             text: control.on ? title : subTitle
             font.pixelSize: 16
             font.bold: Font.DemiBold
-            // color: "#505050"
             Layout.alignment: Qt.AlignRight
         }
 

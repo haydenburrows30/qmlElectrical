@@ -109,7 +109,7 @@ Item {
             
             ToolButton {
                 text: "Reset"
-                icon.source: "qrc:/icons/reset.svg" // Use your own icon or remove this line
+                icon.source: "qrc:/icons/reset.svg"
                 ToolTip.text: "Reset calculator"
                 ToolTip.visible: hovered
                 onClicked: {
