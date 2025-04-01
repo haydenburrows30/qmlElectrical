@@ -28,7 +28,7 @@ Item {
         onAboutToHide: {
             results.open = false
         }
-        Text {
+        Label {
             anchors.fill: parent
             text: {"REF/RGF Calculator\n\n" +
                 "The REF/RGF calculator is used to calculate the REF (Restricted Earth Fault) and RGF (Restricted Ground Fault) values based on transformer parameters and CT ratios. The calculator takes into account the transformer MVA, HV and LV voltages, connection type, impedance, CT phase and neutral ratios, and CT secondary type to calculate the REF and RGF values.\n\n" +
@@ -38,7 +38,7 @@ Item {
         }
     }
 
-    Text {
+    Label {
         anchors.bottom: mainLayout.top
         anchors.horizontalCenter: parent.horizontalCenter
         text: "REF/RGF Calculator"
@@ -82,9 +82,9 @@ Item {
                         font.bold: true
                         Layout.columnSpan: 2
                     }
-                    Text { 
+                    Label { 
                         text: "Phase Ratio:"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: phCtRatio
@@ -93,9 +93,9 @@ Item {
                         Layout.preferredWidth: 100
                         onTextChanged: if(text) refCalculator.setPhCtRatio(parseFloat(text))
                     }
-                    Text { 
+                    Label { 
                         text: "Neutral Ratio:"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: nCtRatio
@@ -104,9 +104,9 @@ Item {
                         Layout.preferredWidth: 100
                         onTextChanged: if(text) refCalculator.setNCtRatio(parseFloat(text))
                     }
-                    Text { 
+                    Label { 
                         text: "CT Secondary:"
-                        color: textColor
+                        
                     }
                     ComboBox {
                         id: ctSecondaryType
@@ -135,9 +135,9 @@ Item {
                         Layout.columnSpan: 2
                     }
 
-                    Text { 
+                    Label { 
                         text: "MVA:"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: transformerMva
@@ -148,9 +148,9 @@ Item {
                         onTextChanged: if(text) refCalculator.setTransformerMva(parseFloat(text))
                     }
                     
-                    Text { 
+                    Label { 
                         text: "HV Voltage:"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: hvtransformerVoltage
@@ -160,9 +160,9 @@ Item {
                         onTextChanged: if(text) refCalculator.setHvTransformerVoltage(parseFloat(text))
                     }
 
-                    Text { 
+                    Label { 
                         text: "LV Voltage:"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: lvTransformerVoltage
@@ -171,9 +171,9 @@ Item {
                         Layout.preferredWidth: 100
                         onTextChanged: if(text) refCalculator.setLvTransformerVoltage(parseFloat(text))
                     }
-                    Text { 
+                    Label { 
                         text: "Connection:"
-                        color: textColor
+                        
                     }
                     ComboBox {
                         id: connectionType
@@ -182,9 +182,9 @@ Item {
                         onCurrentTextChanged: refCalculator.setConnectionType(currentText)
                         Layout.preferredWidth: 100
                     }
-                    Text { 
+                    Label { 
                         text: "Impedance (%):"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: impedances
@@ -213,9 +213,9 @@ Item {
                         Layout.columnSpan: 2
                     }
 
-                    Text { 
+                    Label { 
                         text: "Fault Point (%):"
-                        color: textColor
+                        
                     }
                     TextField {
                         id: faultPoint
@@ -230,7 +230,7 @@ Item {
 
         WaveCard {
             Layout.minimumWidth: 300
-            Layout.minimumHeight: 250
+            Layout.minimumHeight: 300
             Layout.alignment: Qt.AlignTop
             title: "Results"
 
@@ -248,37 +248,32 @@ Item {
                     color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
                 }
 
-                Text { text: "Load Current"; color: textColor}
-                Text { 
+                Label { text: "Load Current"}
+                TextFieldBlue { 
                     text: refCalculator.loadCurrent.toFixed(1)
-                    font.bold: true
-                    color: textColor
                     }
-                Text { text: "Fault Current"; color: textColor}
-                Text { 
+                Label { text: "Fault Current"}
+                TextFieldBlue { 
                     text: refCalculator.faultCurrent.toFixed(1)
-                    font.bold: true
-                    color: textColor
+                    
                 }
-                Text { text: "Fault Point"; color: textColor}
-                Text { 
+                Label { text: "Fault Point"; }
+                TextFieldBlue { 
                     text: refCalculator.faultPointFive.toFixed(1)
-                    font.bold: true
-                    color: textColor
+                    
                 }
-                Text { text: "G Diff Pickup"; color: textColor}
-                Text { 
+                Label { text: "G Diff Pickup"; }
+                TextFieldBlue { 
                     text: refCalculator.gDiffPickup.toFixed(2)
-                    font.bold: true
-                    color: textColor
+                    
                 }
-                Text {
+                Label {
                     Layout.fillWidth: true
                     Layout.columnSpan: 2
                     text: "REF (Restricted Earth Fault) and RGF (Restricted Ground Fault) values based on transformer parameters and CT ratios."
                     wrapMode: Text.WordWrap
                     font.pixelSize: 12
-                    color: textColor
+                    
                 }
             }
         }

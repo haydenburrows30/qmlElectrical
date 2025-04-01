@@ -48,7 +48,7 @@ Item {
         ColumnLayout {
             id: inputLayout
             spacing: Style.spacing
-            Layout.preferredWidth: 400
+            Layout.preferredWidth: 300
 
             WaveCard {
                 id: results
@@ -61,8 +61,8 @@ Item {
                 GridLayout {
                     id: cableParamsLayout
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 15
+                    rowSpacing: Style.spacing
+                    columnSpacing: Style.spacing
 
                     Label { text: "Cable Size (mm²):" }
                     ComboBox {
@@ -117,19 +117,19 @@ Item {
                 GridLayout {
                     id: resultsLayout
                     columns: 2
-                    rowSpacing: 15
-                    columnSpacing: 10
+                    rowSpacing: Style.spacing
+                    columnSpacing: Style.spacing
 
-                    Label { text: "Voltage Drop:" }
-                    Label { 
+                    Label { text: "Voltage Drop:" ; Layout.minimumWidth: 135}
+                    TextFieldBlue { 
                         text: calculator.voltageDrop.toFixed(2) + " V"
-                        font.bold: true 
+                        Layout.minimumWidth: 120
+                        Layout.fillWidth: true
                     }
 
                     Label { text: "Drop Percentage:" }
-                    Label { 
+                    TextFieldBlue { 
                         text: calculator.dropPercentage.toFixed(2) + "%"
-                        font.bold: true 
                         color: calculator.dropPercentage > 3 ? "red" : "green"
                     }
                 }
@@ -146,7 +146,7 @@ Item {
             Canvas {
                 id: dropVizCanvas
                 anchors.fill: parent
-                anchors.margins: 10
+                anchors.margins: Style.spacing
                 
                 onPaint: {
                     var ctx = getContext("2d");

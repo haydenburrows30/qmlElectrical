@@ -7,6 +7,7 @@ import "../../components"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Transmission 1.0
 
@@ -42,69 +43,11 @@ Item {
         nominalVoltage.text = calculator.nominalVoltage.toString()
     }
 
-    Popup {
+    TransmissionPopUp {
         id: tipsPopup
-        width: parent.width * 0.8
-        height: parent.height * 0.8
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
+    }
 
-        onAboutToHide: {
-            results.open = false
-        }
-        ScrollView {
-            width: parent.width
-            height: parent.height
-            
-            Text {
-                anchors.fill: parent
-                text: {"Transmission Line Calculator\n\n" +
-                    "This calculator is used to calculate the characteristic impedance, attenuation constant, phase constant, and ABCD parameters of a transmission line.\n\n" +
-                    "The following parameters are required:\n" +
-                    "1. Length (km): The length of the transmission line in kilometers.\n" +
-                    "2. Resistance (Ω/km): The resistance of the transmission line in ohms per kilometer.\n" +
-                    "3. Inductance (mH/km): The inductance of the transmission line in millihenries per kilometer.\n" +
-                    "4. Capacitance (µF/km): The capacitance of the transmission line in microfarads per kilometer.\n" +
-                    "5. Conductance (S/km): The conductance of the transmission line in siemens per kilometer.\n" +
-                    "6. Frequency (Hz): The frequency of the transmission line in hertz.\n" +
-                    "7. Bundle Configuration: The number of sub-conductors in the transmission line bundle.\n" +
-                    "8. Bundle Spacing (m): The spacing between the sub-conductors in the transmission line bundle in meters.\n" +
-                    "9. Conductor Temperature (°C): The temperature of the transmission line conductor in degrees Celsius.\n" +
-                    "10. Earth Resistivity (Ω⋅m): The resistivity of the earth in ohm-meters.\n\n" +
-                    "The following results are calculated:\n" +
-                    "1. Characteristic Impedance: The characteristic impedance of the transmission line.\n" +
-                    "2. Attenuation Constant: The attenuation constant of the transmission line in nepers per kilometer.\n" +
-                    "3. Phase Constant: The phase constant of the transmission line in radians per kilometer.\n" +
-                    "4. ABCD Parameters: The ABCD parameters of the transmission line.\n" +
-                    "5. Surge Impedance Loading: The surge impedance loading of the transmission line in megawatts.\n\n" +
-                    "The visualization on the right side shows the transmission line parameters graphically.\n\n" +
-                    "The calculator uses the following formulas:\n" +
-                    "1. Characteristic Impedance: Zc = sqrt((R + jωL) / (G + jωC))\n" +
-                    "2. Attenuation Constant: α = sqrt((R + jωL)(G + jωC))\n" +
-                    "3. Phase Constant: β = sqrt((R + jωL)(G + jωC))\n" +
-                    "4. ABCD Parameters: A = cosh(γl), B = Zc * sinh(γl), C = (1 / Zc) * sinh(γl), D = cosh(γl)\n" +
-                    "5. Surge Impedance Loading: SIL = sqrt((R + jωL) / (G + jωC))\n\n" +
-                    "Where:\n" +
-                    "Zc = Characteristic Impedance α = Attenuation Constant\n" +
-                    "β = Phase Constant\n" +
-                    "γ = sqrt((R + jωL)(G + jωC))\n" +
-                    "l = Length of the transmission line\n" +
-                    "R = Resistance\n" +
-                    "L = Inductance\n" +
-                    "G = Conductance\n" +
-                    "C = Capacitance\n" +
-                    "ω = 2πf\n" +
-                    "f = Frequency\n" +
-                    "SIL = Surge Impedance Loading\n\n" +
-                    "The calculator is based on the transmission line theory and is used in electrical engineering to analyze the behavior of transmission lines.\n\n" +
-                    "For more information, refer to the IEEE Standard 141-1993 (Red Book) and the IEEE Standard 242-2001 (Gold Book)."}
-                wrapMode: Text.WordWrap
-            }
-        }
+    ABCD {
     }
 
     ScrollView {
@@ -125,39 +68,34 @@ Item {
                 width: scrollView.width
 
                 ColumnLayout {
-                    Layout.maximumWidth: 350
-                    Layout.alignment: Qt.AlignTop
-                    spacing: Style.spacing
+                    Layout.maximumWidth: 370
 
                     // Basic Line Parameters
                     WaveCard {
-                        id: results
+                        id: parametersCard
                         title: "Line Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 380
+                        Layout.minimumHeight: 320
                         showSettings: true
 
                         ColumnLayout {
-                            spacing: Style.spacing
-                            anchors.fill: parent
-                            anchors.margins: 5
 
                             GridLayout {
                                 columns: 2
-                                rowSpacing: 10
-                                columnSpacing: 15
                                 Layout.fillWidth: true
 
                                 Label { 
                                     text: "Length (km):"
-                                    Layout.minimumWidth: colWidth
+                                    Layout.minimumWidth: 200
+                                    Layout.alignment: Qt.AlignRight
                                 }
                                 TextField {
                                     id: lengthInput
                                     text: "100"
                                     validator: DoubleValidator { bottom: 0 }
                                     onTextChanged: if(text && acceptableInput) calculator.setLength(parseFloat(text))
-                                    Layout.minimumWidth: 100
+                                    Layout.minimumWidth: 120
+                                    Layout.alignment: Qt.AlignRight
                                 }
 
                                 Label { text: "Resistance (Ω/km):" }
@@ -221,19 +159,15 @@ Item {
                     WaveCard {
                         title: "Advanced Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 280
+                        Layout.minimumHeight: 250
                         Layout.minimumWidth: 300
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 15
-                            anchors.fill: parent
-                            anchors.margins: 5
 
                             Label { 
                                 text: "Bundle Configuration:" 
-                                Layout.minimumWidth: colWidth
+                                Layout.minimumWidth: 200
                             }
                             SpinBox {
                                 id: subConductors
@@ -241,7 +175,7 @@ Item {
                                 to: 4
                                 value: 2
                                 onValueChanged: calculator.setSubConductors(value)
-                                Layout.minimumWidth: 100
+                                Layout.minimumWidth: 120
                                 Layout.fillWidth: true
                             }
 
@@ -287,95 +221,74 @@ Item {
                     WaveCard {
                         title: "Results"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 200
+                        Layout.minimumHeight: 220
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 15
-                            columnSpacing: 10
-                            anchors.fill: parent
-                            anchors.margins: 5
 
-                            Label { text: "Characteristic Impedance:" }
                             Label { 
+                                text: "Characteristic Impedance:"
+                                Layout.minimumWidth: 200
+                                Layout.alignment: Qt.AlignRight
+                            }
+
+                            TextFieldBlue { 
                                 text: calculator.zMagnitude.toFixed(2) + " Ω ∠" + 
                                     calculator.zAngle.toFixed(1) + "°"
-                                font.bold: true
+                                Layout.minimumWidth: 120
+                                Layout.alignment: Qt.AlignRight
                             }
 
                             Label { text: "Attenuation Constant:" }
-                            Label { text: calculator.attenuationConstant.toFixed(6) + " Np/km" ; font.bold: true}
+                            TextFieldBlue { text: calculator.attenuationConstant.toFixed(6) + " Np/km"}
 
                             Label { text: "Phase Constant:" }
-                            Label { text: calculator.phaseConstant.toFixed(4) + " rad/km" ; font.bold: true}
+                            TextFieldBlue { text: calculator.phaseConstant.toFixed(4) + " rad/km"}
                             
                             Label { text: "Surge Impedance Loading:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.surgeImpedanceLoading.toFixed(1) + " MW"
-                                color: Universal.accent
-                                font.bold: true
                             }
                         }
                     }
 
                     // ABCD Results
                     WaveCard {
+                        id: results
                         title: "ABCD Parameters"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 350
+                        Layout.minimumHeight: 230
+
+                        showSettings: true
                     
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 15
-                            anchors.fill: parent
-                            anchors.margins: 5
 
-                            Label { text: "A Parameter:" }
                             Label { 
-                                text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°" 
-                                font.bold: true
+                                text: "A Parameter:" ; 
+                                // Layout.minimumWidth: 150
+                            }
+
+                            TextFieldBlue { 
+                                text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°"
+                                // Layout.minimumWidth: 150
+                                Layout.alignment: Qt.AlignRight
                             }
                             
                             Label { text: "B Parameter:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°"
-                                font.bold: true
+                                Layout.alignment: Qt.AlignRight
                             }
                             
                             Label { text: "C Parameter:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.cMagnitude.toFixed(6) + " ∠" + calculator.cAngle.toFixed(1) + "°"
-                                font.bold: true
                             }
                             
                             Label { text: "D Parameter:" }
-                            Label { 
+                            TextFieldBlue { 
                                 text: calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°"
-                                font.bold: true
-                            }
-                            
-                            // Info about ABCD parameters
-                            Rectangle {
-                                color: "transparent"
-                                height: 1
-                                Layout.columnSpan: 2
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label {
-                                text: "ABCD Parameter Interpretation:"
-                                font.bold: true
-                                Layout.columnSpan: 2
-                            }
-                            
-                            TextArea {
-                                text: "A = Open circuit voltage ratio\nB = Transfer impedance\n" +
-                                      "C = Transfer admittance\nD = Short circuit current ratio"
-                                readOnly: true
-                                background: null
-                                Layout.columnSpan: 2
-                                Layout.fillWidth: true
                             }
                         }
                     }

@@ -131,38 +131,34 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 210
+                Layout.minimumHeight: 220
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 20
+                    rowSpacing: 10
                     columnSpacing: 10
 
                     Label { text: "Base Ampacity:" ;Layout.minimumWidth: 180}
-                    Label { 
+                    TextFieldBlue { 
                         text: calculator.baseAmpacity.toFixed(1) + " A" 
-                        font.bold: true
                         Layout.minimumWidth: 100
                     }
 
                     Label { text: "Derated Ampacity:" }
-                    Label { 
+                    TextFieldBlue { 
                         text: calculator.deratedAmpacity.toFixed(1) + " A" 
-                        font.bold: true
                         Layout.fillWidth: true
                     }
 
                     Label { text: "Voltage Drop per 100m:" }
-                    Label { 
+                    TextFieldBlue { 
                         text: calculator.voltageDropPer100m.toFixed(1) + " V" 
-                        font.bold: true
                         Layout.fillWidth: true
                     }
 
                     Label { text: "Economic Size:" }
-                    Label { 
+                    TextFieldBlue { 
                         text: calculator.recommendedSize.toFixed(1) + " mm²" 
-                        font.bold: true
                         Layout.fillWidth: true
                     }
                 }

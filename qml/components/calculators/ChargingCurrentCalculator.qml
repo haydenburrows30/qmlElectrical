@@ -59,7 +59,7 @@ Item {
 
         WaveCard {
             title: "System Parameters"
-            Layout.minimumWidth: 330
+            Layout.minimumWidth: 350
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
 
@@ -68,41 +68,42 @@ Item {
 
             ColumnLayout {
             
-                RowLayout {
-                    spacing: Style.spacing
+                GridLayout {
+                    columns: 2
 
-                    Label {
-                        text: "Voltage (kV):"
-                        Layout.preferredWidth: 80
-                    }
-                    ComboBox {
-                        id: voltagePresets
-                        model: ["Custom", "11 kV", "22 kV", "33 kV", "66 kV", "220 kV"]
-                        Layout.preferredWidth: 100
-                        onCurrentTextChanged: {
-                            if (currentText !== "Custom") {
-                                voltage_input.text = currentText.replace(" kV", "")
+                    RowLayout {
+                        Layout.columnSpan: 2
+
+                        Label {
+                            text: "Voltage (kV):"
+                            Layout.preferredWidth: 100
+                        }
+                        ComboBox {
+                            id: voltagePresets
+                            model: ["Custom", "11 kV", "22 kV", "33 kV", "66 kV", "220 kV"]
+                            Layout.preferredWidth: 100
+                            onCurrentTextChanged: {
+                                if (currentText !== "Custom") {
+                                    voltage_input.text = currentText.replace(" kV", "")
+                                }
                             }
                         }
+                        TextField {
+                            id: voltage_input
+                            Layout.preferredWidth: 100
+                            Layout.alignment: Qt.AlignRight
+                            enabled: voltagePresets.currentText === "Custom"
+                            opacity: enabled ? 1.0 : 0.5
+                            placeholderText: "Enter kV"
+                            validator: DoubleValidator { bottom: 0; decimals: 3 }
+                            color: acceptableInput ? Universal.foreground : "red"
+                            onTextChanged: if (acceptableInput) calculator.voltage = parseFloat(text)
+                        }
                     }
-                    TextField {
-                        id: voltage_input
-                        Layout.preferredWidth: 100
-                        Layout.alignment: Qt.AlignRight
-                        enabled: voltagePresets.currentText === "Custom"
-                        opacity: enabled ? 1.0 : 0.5
-                        placeholderText: "Enter kV"
-                        validator: DoubleValidator { bottom: 0; decimals: 3 }
-                        color: acceptableInput ? Universal.foreground : "red"
-                        onTextChanged: if (acceptableInput) calculator.voltage = parseFloat(text)
-                    }
-                }
 
-                RowLayout {
-                    spacing: Style.spacing
                     Label {
                         text: "Cable Type:"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
                     ComboBox {
                         id: cablePresets
@@ -120,13 +121,10 @@ Item {
                             }
                         }
                     }
-                }
 
-                RowLayout {
-                    spacing: Style.spacing
                     Label {
                         text: "uF/km (1ph):"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
                     TextField {
                         id: capacitanceInput
@@ -137,13 +135,10 @@ Item {
                         placeholderText: "Enter Capacitance"
                         onTextChanged: calculator.capacitance = parseFloat(text)
                     }
-                }
 
-                RowLayout {
-                    spacing: Style.spacing
                     Label {
                         text: "Freq (Hz):"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
                     ComboBox {
                         id: freqPresets
@@ -153,13 +148,10 @@ Item {
                             calculator.frequency = parseFloat(currentText.replace(" Hz", ""))
                         }
                     }
-                }
 
-                RowLayout {
-                    spacing: Style.spacing
                     Label {
                         text: "Length (km):"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
                     TextField {
                         id: lengthInput
@@ -168,29 +160,18 @@ Item {
                         placeholderText: "Enter Length"
                         onTextChanged: calculator.length = parseFloat(text)
                     }
-                }
 
-                RowLayout {
-                    spacing: Style.spacing
-                    Layout.topMargin: 5
-                    Label {
-                        text: "Current:"
-                        Layout.preferredWidth: 80
-                    }
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-                        color: Universal.background
-                        border.color: Universal.foreground
-                        border.width: 1
-                        radius: 4
+                    RowLayout {
+                        Layout.columnSpan: 2
+                        Label {
+                            text: "Current:"
+                            Layout.preferredWidth: 100
+                        }
 
                         RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: 4
                             spacing: 4
 
-                            Text {
+                            TextFieldBlue {
                                 id: chargingCurrentOutput
                                 Layout.fillWidth: true
                                 horizontalAlignment: Text.AlignRight
@@ -207,9 +188,7 @@ Item {
 
                             Button {
                                 Layout.preferredWidth: 50
-                                Layout.preferredHeight: 22
                                 text: "Copy"
-                                font.pointSize: 8
                                 onClicked: {
                                     clipboardHelper.text = chargingCurrentOutput.text
                                     clipboardHelper.selectAll()
