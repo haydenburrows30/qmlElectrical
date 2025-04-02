@@ -22,7 +22,7 @@ Item {
         
         Flickable {
             contentWidth: parent.width
-            contentHeight: parent.height + 40 //mainLayout.height + 40
+            contentHeight: parent.height + 40
             bottomMargin: 5
             leftMargin: 5
             rightMargin: 5

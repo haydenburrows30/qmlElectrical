@@ -20,9 +20,7 @@ import RLC 1.0
 Page {
     id: rlcPage
 
-    // Create the calculator property with explicit type and id
     property RLCChart calculator: RLCChart {id: rlcChart}
-
     property int currentMode: changeMode.on ? 1 : 0
 
     background: Rectangle {
@@ -33,7 +31,6 @@ Page {
         target: calculator
     }
 
-    // set current mode from the SwitchLabel{}
     function react() {
         currentMode ? calculator.setCircuitMode(1) : calculator.setCircuitMode(0)
     }
@@ -55,7 +52,6 @@ Page {
                 id: mainLayout
                 width: scrollView.width
                 
-
                 ColumnLayout {
 
                     RowLayout {
@@ -99,12 +95,12 @@ Page {
 
                     //Visuals
                     WaveCard {
+                        id: results
                         title: currentMode === 0 ? 'Series RLC Parameters' : 'Parallel RLC Parameters'
                         Layout.minimumHeight: 600
                         Layout.minimumWidth: 400
                         Layout.fillHeight: true
 
-                        id: results
                         showSettings: true
                         
                         ColumnLayout {
@@ -574,7 +570,14 @@ Page {
         }
     }
 
-    RLCPopup {
-        id: tipsPopup
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>RLC Circuit</h3><br>"
+            + "This page simulates the response of a series or parallel RLC circuit to an input frequency. "
+            + "The circuit consists of a resistor (R), inductor (L), and capacitor (C) in series or parallel. "
+            + "The circuit parameters can be adjusted to see how they affect the impedance and gain of the circuit. "
+            + "The resonant frequency and quality factor (Q) are also calculated based on the circuit parameters. "
+            + "The circuit response is displayed in a chart showing the gain or impedance vs. frequency. "
+            + "The phase vector diagram shows the phase angle of the impedance and the current in the circuit. "
     }
 }
