@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Universal
+
 import "../"
 import "../buttons"
 
@@ -18,7 +20,14 @@ Popup {
     onAboutToHide: {
         results.open = false
     }
-    Text {
+
+    background: Rectangle {
+            color: Universal.background
+            radius: 10
+            anchors.fill: parent
+    }
+
+    Label {
         anchors.fill: parent
         text: {"<h1>Real Time Chart</h1><br>\
             This example demonstrates a real-time chart that displays three waveforms \

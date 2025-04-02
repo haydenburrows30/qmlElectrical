@@ -25,17 +25,8 @@ Item {
 
     signal calculate()
 
-    Popup {
+    Gen400VPopup {
         id: lVPopup
-        x: Math.round((windTurbineSection.width - width) / 2)
-        y: Math.round((windTurbineSection.height - height) / 2)
-
-        contentItem: Gen400VPopup {}
-
-        visible: windTurbineCard.open
-        onClosed: {
-            windTurbineCard.open = false
-        }
     }
     
     WindPopup {

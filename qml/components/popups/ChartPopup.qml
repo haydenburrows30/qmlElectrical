@@ -10,6 +10,12 @@ Popup {
     anchors.centerIn: Overlay.overlay
     width: 700
     height: 700
+
+    background: Rectangle {
+            color: Universal.background
+            radius: 10
+            anchors.fill: parent
+    }
     
     property real percentage: 0
     property string cableSize: "0"

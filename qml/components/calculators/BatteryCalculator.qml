@@ -2,11 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "../"
 import "../../components"
 import "../style"
 import "../backgrounds"
 import "../visualizers"
+import "../popups"
 
 import Battery 1.0
 
@@ -15,33 +17,22 @@ Item {
 
     property BatteryCalculator calculator: BatteryCalculator {}
 
-    Popup {
-        id: tipsPopup
-        width: 500
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
+    // BatteryPopup {
+    //     id: tipsPopup
+    // }
 
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: { "<h3>Battery Calculator</h3><br>" +
-                    "This calculator estimates the battery capacity required for a given load and backup time.<br><br>" +
-                    "<b>Load:</b> The power consumption in watts.<br>" +
-                    "<b>System Voltage:</b> The voltage of the battery system.<br>" +
-                    "<b>Backup Time:</b> The duration for which the battery should provide power.<br>" +
-                    "<b>Depth of Discharge:</b> The percentage of battery capacity that can be used.<br>" +
-                    "<b>Battery Type:</b> The type of battery used.<br><br>" +
-                    "The calculator estimates the current draw, required capacity, recommended capacity, and energy storage.<br>" +
-                    "The battery visualization shows the depth of discharge and recommended capacity." }
-            wrapMode: Text.WordWrap
-        }
+    PopUpText {
+        widthFactor: 0.5
+        heightFactor: 0.5
+        popupText: "<h3>Battery Calculator</h3><br>" +
+                "This calculator estimates the battery capacity required for a given load and backup time.<br><br>" +
+                "<b>Load:</b> The power consumption in watts.<br>" +
+                "<b>System Voltage:</b> The voltage of the battery system.<br>" +
+                "<b>Backup Time:</b> The duration for which the battery should provide power.<br>" +
+                "<b>Depth of Discharge:</b> The percentage of battery capacity that can be used.<br>" +
+                "<b>Battery Type:</b> The type of battery used.<br><br>" +
+                "The calculator estimates the current draw, required capacity, recommended capacity, and energy storage.<br>" +
+                "The battery visualization shows the depth of discharge and recommended capacity."
     }
         
     RowLayout {

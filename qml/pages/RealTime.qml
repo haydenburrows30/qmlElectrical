@@ -198,6 +198,7 @@ Page {
                                         font.bold: true
                                     }
                                     ComboBox {
+                                        id: waveTypeCombo
                                         model: ["Sine", "Square", "Sawtooth", "Triangle"]
                                         Layout.fillWidth: true
                                         onCurrentIndexChanged: calculator.setWaveType(index, currentIndex)
