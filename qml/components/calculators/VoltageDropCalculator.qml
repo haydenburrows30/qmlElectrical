@@ -43,11 +43,9 @@ Item {
     RowLayout {
         id: layoutt
         anchors.centerIn: parent
-        spacing: Style.spacing
 
         ColumnLayout {
             id: inputLayout
-            spacing: Style.spacing
             Layout.preferredWidth: 300
 
             WaveCard {
@@ -61,8 +59,6 @@ Item {
                 GridLayout {
                     id: cableParamsLayout
                     columns: 2
-                    rowSpacing: Style.spacing
-                    columnSpacing: Style.spacing
 
                     Label { text: "Cable Size (mm²):" }
                     ComboBox {
@@ -113,12 +109,9 @@ Item {
                 Layout.fillWidth: true
                 Layout.minimumHeight: 130
                 
-
                 GridLayout {
                     id: resultsLayout
                     columns: 2
-                    rowSpacing: Style.spacing
-                    columnSpacing: Style.spacing
 
                     Label { text: "Voltage Drop:" ; Layout.minimumWidth: 135}
                     TextFieldBlue { 
@@ -146,7 +139,6 @@ Item {
             Canvas {
                 id: dropVizCanvas
                 anchors.fill: parent
-                anchors.margins: Style.spacing
                 
                 onPaint: {
                     var ctx = getContext("2d");

@@ -54,8 +54,6 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
-        anchors.margins: Style.spacing
-        spacing: Style.spacing
         
         RowLayout {
             id: header
@@ -70,11 +68,7 @@ Item {
                 
                 GridLayout {
                     anchors.fill: parent
-                    anchors.margins: Style.spacing
-                    columnSpacing: Style.spacing
-                    rowSpacing: Style.spacing
                     columns: 2
-                    Layout.fillWidth: true
                     
                     Label { text: "Input Voltage (V):" }
                     TextField {
@@ -136,65 +130,32 @@ Item {
                 
                 GridLayout {
                     anchors.fill: parent
-                    anchors.margins: Style.spacing
                     columns: 2
-                    columnSpacing: Style.spacing
-                    rowSpacing: Style.spacing
-                    Layout.fillWidth: true
-                    
                     Label { text: "Output Voltage (V):" }
-                    TextField {
+
+                    TextFieldBlue {
                         id: voutField
-                        readOnly: true
                         text: calculatorReady ? calculator.outputVoltage.toFixed(3) : "0.000"
-                        Layout.fillWidth: true
-                        background: Rectangle {
-                            color: "#e8f6ff"
-                            border.color: "#0078d7"
-                            radius: 2
-                        }
                     }
                     
                     Label { text: "Current (mA):" }
-                    TextField {
+                    TextFieldBlue {
                         id: currentField
-                        readOnly: true
                         text: calculatorReady ? (calculator.current * 1000).toFixed(3) : "0.000"
-                        Layout.fillWidth: true
-                        background: Rectangle {
-                            color: "#e8f6ff"
-                            border.color: "#0078d7"
-                            radius: 2
-                        }
                     }
                     
                     Label { text: "Power in R1 (mW):" }
-                    TextField {
+                    TextFieldBlue {
                         id: powerR1Field
-                        readOnly: true
                         text: calculatorReady ? (calculator.powerR1 * 1000).toFixed(3) : "0.000"
                         Layout.fillWidth: true
-                        background: Rectangle {
-                            color: "#e8f6ff"
-                            border.color: "#0078d7"
-                            radius: 2
-                        }
                     }
                     
                     Label { text: "Power in R2 (mW):" }
-                    TextField {
+                    TextFieldBlue {
                         id: powerR2Field
-                        readOnly: true
                         text: calculatorReady ? (calculator.powerR2 * 1000).toFixed(3) : "0.000"
-                        Layout.fillWidth: true
-                        background: Rectangle {
-                            color: "#e8f6ff"
-                            border.color: "#0078d7"
-                            radius: 2
-                        }
                     }
-
-                    Label { Layout.fillHeight: true }
                 }
             }
         }
@@ -208,7 +169,6 @@ Item {
             CircuitVisualizer {
                 id: circuitCanvas
                 anchors.fill: parent
-                anchors.margins: Style.spacing
                 
                 // Pass values from calculator to the visualizer
                 inputVoltage: vinField.text

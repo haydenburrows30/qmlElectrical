@@ -11,23 +11,23 @@ ColumnLayout {
     anchors.margins: Style.spacing
     width: parent.width
     
-    Text {
+    Label {
         text: "<b>Voltage Divider Equation:</b>"
         font.pixelSize: 14
     }
     
-    Text {
+    Label {
         text: "Vout = Vin × (R2 / (R1 + R2))"
         font.italic: true
     }
     
-    Text {
+    Label {
         text: "<b>Applications:</b>"
         font.pixelSize: 14
         Layout.topMargin: 10
     }
     
-    Text {
+    Label {
         text: "• Level shifting for ADC inputs\n" +
             "• Reference voltage generation\n" +
             "• Biasing circuits\n" +
@@ -37,7 +37,7 @@ ColumnLayout {
         Layout.fillWidth: true
     }
     
-    Text {
+    Label {
         text: "<b>Note:</b> For high impedance loads, the output voltage closely follows the theoretical value. " +
             "For low impedance loads, loading effects must be considered."
         wrapMode: Text.WordWrap

@@ -50,8 +50,6 @@ Item {
             results.open = false
         }
         ColumnLayout {
-                width: parent.width
-                spacing: Style.spacing
                 
                 Text {
                     text: "<b>Protection Settings Notes:</b><br>" +
@@ -92,7 +90,6 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.centerIn: parent
-        spacing: Style.spacing
        
         TransformerLineViz {
 
@@ -114,8 +111,6 @@ Item {
                     
                     GridLayout {
                         columns: 2
-                        columnSpacing: 10
-                        rowSpacing: 10
                         
                         Label { text: "Transformer Rating (kVA):" ; Layout.minimumWidth: 200}
                         SpinBox {
@@ -183,8 +178,6 @@ Item {
                     
                     GridLayout {
                         columns: 2
-                        columnSpacing: 10
-                        rowSpacing: 10
                         
                         Label { text: "Line Length (km):" ; Layout.minimumWidth: 200}
                         SpinBox {
@@ -262,8 +255,6 @@ Item {
                     
                     GridLayout {
                         columns: 2
-                        columnSpacing: 10
-                        rowSpacing: 10
                         
                         Label { text: "Load (MVA):" ; Layout.minimumWidth: 200}
                         SpinBox {
@@ -326,8 +317,6 @@ Item {
                     
                     GridLayout {
                         columns: 2
-                        columnSpacing: 10
-                        rowSpacing: 10
                         
                         Label { text: "Transformer Z (Ohms):" ; Layout.minimumWidth: 200}
                         TextField {
@@ -430,8 +419,6 @@ Item {
                     
                     GridLayout {
                         columns: 2
-                        columnSpacing: 10
-                        rowSpacing: 10
                         
                         Label { text: "Relay Pickup Current (A):" ; Layout.minimumWidth: 200}
                         TextField {

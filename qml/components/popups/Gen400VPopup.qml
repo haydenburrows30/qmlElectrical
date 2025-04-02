@@ -32,7 +32,7 @@ Popup {
         columns: 2
         Layout.fillWidth: true
 
-        Text {
+        Label {
             text: "<b>400V Generator Protection Requirements:</b><br>" +
                 "• Over/Under Voltage Protection (27/59)<br>" +
                 "• Over/Under Frequency Protection (81O/81U)<br>" +
@@ -47,7 +47,7 @@ Popup {
             Layout.columnSpan: 2
         }
 
-        Text {
+        Label {
             text: "<b>Wind Turbine Power Formula:</b><br>" +
                 "P = ½ × ρ × A × Cp × v³ × η<br>" +
                 "Where:<br>" +
@@ -61,7 +61,7 @@ Popup {
             Layout.fillWidth: true
             Layout.columnSpan: 2
         }
-        Text {
+        Label {
             text: "<b>Notes:</b><br>" +
                 "• The Betz limit sets the maximum theoretical Cp at 0.593<br>" +
                 "• Air density varies with altitude and temperature<br>" +
