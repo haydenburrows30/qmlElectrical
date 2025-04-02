@@ -57,14 +57,14 @@ Item {
                 id: mainLayout
                 width: scrollView.width
                 anchors.left: parent.left
-                spacing: Style.spacing
+                
 
                 // Left Column - Controls and Results
                 ColumnLayout {
                     id: leftColumn
                     Layout.maximumWidth: 400
                     Layout.minimumWidth: 400
-                    spacing: Style.spacing
+                    
 
                     // Controls
                     ShadowRectangle {
@@ -219,7 +219,7 @@ Item {
                         ListView {
                             anchors.fill: parent
                             model: calculator.relayList
-                            spacing: Style.spacing
+                            
                             clip: true
 
                             delegate: Rectangle {
@@ -401,7 +401,7 @@ Item {
                     Column {
                         anchors.fill: parent
                         anchors.margins: 10
-                        spacing: Style.spacing
+                        
 
                         Label {
                             width: parent.width

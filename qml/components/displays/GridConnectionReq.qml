@@ -11,7 +11,7 @@ ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.margins: 50
-    spacing: Style.spacing
+    
 
     Label {
         text: "Wind Turbine Grid Integration Requirements"

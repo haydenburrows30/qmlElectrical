@@ -159,7 +159,7 @@ Item {
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: Style.spacing
+        
 
         WaveCard {
             id: results
@@ -172,16 +172,16 @@ Item {
             ColumnLayout {
                 id: waveCardLayout
                 anchors.centerIn: parent
-                spacing: Style.spacing * 1.5  // Increase spacing for better readability
+                 * 1.5  // Increase spacing for better readability
 
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.minimumHeight: 140
-                    spacing: Style.spacing * 1.5  // Increase spacing
+                     * 1.5  // Increase spacing
 
                     ColumnLayout {
                         id: conversionTypeLayout
-                        spacing: Style.spacing * 1.2
+                         * 1.2
 
                         // Styled category headers with icon
                         Rectangle {
@@ -525,7 +525,7 @@ Item {
                     
                     RowLayout {
                         anchors.centerIn: parent
-                        spacing: Style.spacing
+                        
 
                         Label {
                             text: converter.result.toFixed(2)

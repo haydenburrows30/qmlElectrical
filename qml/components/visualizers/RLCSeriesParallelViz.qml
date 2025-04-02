@@ -3,7 +3,7 @@ import "../backgrounds"
 
 ColumnLayout {
     anchors.fill: parent
-    spacing: Style.spacing
+    
     
     PhaseVector {
         id: phaseVector

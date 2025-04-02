@@ -10,7 +10,7 @@ ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.margins: 50
-    spacing: Style.spacing
+    
 
     GridLayout {
         columns: 2

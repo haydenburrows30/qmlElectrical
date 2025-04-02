@@ -45,7 +45,7 @@ Popup {
         ColumnLayout {
             id: detailsContent
             width: parent.width
-            spacing: Style.spacing
+            
 
             Label {
                 text: "Calculation Results"
@@ -120,7 +120,7 @@ Popup {
 
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: Style.spacing
+                
                 
                 Button {
                     text: "Save to PDF"

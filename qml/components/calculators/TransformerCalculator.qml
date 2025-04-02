@@ -31,7 +31,7 @@ Item {
         }
             
         ColumnLayout {
-            spacing: Style.spacing
+            
             
             Label {
                 text: "Transformer Tips & Explanations"
@@ -133,7 +133,7 @@ Item {
 
                 ColumnLayout {
                     Layout.maximumWidth: 330
-                    spacing: Style.spacing
+                    
 
                     // Inputs
                     WaveCard {

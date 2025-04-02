@@ -6,7 +6,7 @@ import "../style"
 import "../backgrounds"
 
 ColumnLayout {
-    spacing: Style.spacing
+    
 
     GridLayout {
         Layout.fillWidth: true

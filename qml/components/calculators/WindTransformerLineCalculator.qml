@@ -56,7 +56,7 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
-        spacing: Style.spacing
+        
         
         TabBar {
             id: tabBar

@@ -97,7 +97,7 @@ GridLayout {
         Layout.columnSpan: 2
         Layout.fillWidth: true
         Layout.topMargin: 10
-        spacing: Style.spacing
+        
 
         Button {
             text: "Save Results"

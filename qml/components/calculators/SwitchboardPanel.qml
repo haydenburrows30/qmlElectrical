@@ -51,7 +51,7 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
-        spacing: Style.spacing
+        
 
         // Header section with general switchboard info
         WaveCard {
@@ -129,7 +129,7 @@ Item {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: Style.spacing
+                
 
                 TabBar {
                     id: tabBar
@@ -162,7 +162,7 @@ Item {
                         
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: Style.spacing
+                            
 
                             Rectangle {
                                 Layout.fillWidth: true
@@ -405,7 +405,7 @@ Item {
                 // 3. Finally the buttons at the bottom
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Style.spacing
+                    
                     
                     Button {
                         text: "Add Circuit"

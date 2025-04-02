@@ -41,7 +41,7 @@ Item {
     }
 
     RowLayout {
-        spacing: Style.spacing
+        
         anchors.centerIn: parent
         anchors.margins: Style.spacing
 
@@ -49,7 +49,7 @@ Item {
         ColumnLayout {
             id: inputColumn
             Layout.minimumWidth: 370
-            spacing: Style.spacing
+            
 
             WaveCard {
                 id: results

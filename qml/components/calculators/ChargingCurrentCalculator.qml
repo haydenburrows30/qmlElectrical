@@ -54,8 +54,6 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        spacing: Style.spacing
-        anchors.margins: 10
 
         WaveCard {
             title: "System Parameters"
@@ -169,7 +167,6 @@ Item {
                         }
 
                         RowLayout {
-                            spacing: 4
 
                             TextFieldBlue {
                                 id: chargingCurrentOutput

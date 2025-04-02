@@ -58,7 +58,7 @@ Item {
         property string errorMessage: ""
         
         contentItem: ColumnLayout {
-            spacing: Style.spacing
+            
             
             Label {
                 text: "Input Error"
@@ -97,14 +97,14 @@ Item {
             RowLayout {
                 id: mainLayout
                 width: scrollView.width
-                spacing: Style.spacing
+                
 
                 // Left side inputs and results
                 ColumnLayout {
                     id: leftColumn
                     Layout.minimumWidth: 380
                     Layout.maximumWidth: 380
-                    spacing: Style.spacing
+                    
                     Layout.alignment: Qt.AlignTop
 
                     // Controls

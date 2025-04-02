@@ -27,7 +27,7 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: Style.spacing
+        
         
         Label {
             text: "Expert Protection Settings"
@@ -226,7 +226,7 @@ Popup {
         RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight
-            spacing: Style.spacing
+            
 
             Button {
                 text: "Refresh Values"

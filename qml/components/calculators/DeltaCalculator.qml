@@ -47,12 +47,12 @@ Item {
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: Style.spacing
+        
 
         ColumnLayout {
             id: inputLayout
             Layout.minimumWidth: 400
-            spacing: Style.spacing
+            
 
             WaveCard {
                 id: results
@@ -61,7 +61,7 @@ Item {
                 showSettings: true
 
                 ColumnLayout {
-                    spacing: Style.spacing
+                    
                     anchors.fill: parent
                     
 
@@ -158,7 +158,7 @@ Item {
 
                         ColumnLayout {
                             width: parent.width
-                            spacing: Style.spacing
+                            
 
                             Label {
                                 id: phaseVoltageText

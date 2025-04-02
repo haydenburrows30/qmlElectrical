@@ -71,7 +71,7 @@ Item {
             anchors.fill: parent
             anchors.margins: Style.spacing
             width: parent.width
-            spacing: Style.spacing
+            
             
             Text {
                 text: "<b>Basic Ohm's Law Equations:</b>"
@@ -124,10 +124,10 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: Style.spacing
-        spacing: Style.spacing
+        
 
         RowLayout {
-            spacing: Style.spacing
+            
 
             WaveCard {
                 id: results

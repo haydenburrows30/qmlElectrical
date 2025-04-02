@@ -32,7 +32,7 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: titleVisible ? 20 : 10 // change margins if title not visible
-        spacing: Style.spacing
+        
 
         Label {
             Layout.fillWidth: true

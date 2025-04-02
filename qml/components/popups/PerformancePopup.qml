@@ -14,7 +14,7 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: Style.spacing
+        
         
         Label {
             text: "Performance Settings"
@@ -28,7 +28,7 @@ Popup {
             
             ColumnLayout {
                 width: parent.width
-                spacing: Style.spacing
+                
 
                 ComboBox {
                     id: performanceMode
@@ -89,7 +89,7 @@ Popup {
             
             ColumnLayout {
                 width: parent.width
-                spacing: Style.spacing
+                
                 
                 CheckBox {
                     id: profilingCheckbox

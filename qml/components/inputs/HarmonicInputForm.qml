@@ -7,13 +7,13 @@ import "../backgrounds"
 
 ColumnLayout {
     id: harmonicInputForm
-    spacing: Style.spacing
+    
     
     property var calculator
     signal resetTriggered
 
     RowLayout {
-        spacing: Style.spacing
+        
         Label { text: "Harmonic"; Layout.preferredWidth: 120; font.bold: true }
         Label { text: "Magnitude"; Layout.preferredWidth: 120; font.bold: true }
         Label { text: "Phase"; Layout.preferredWidth: 120; font.bold: true }
@@ -22,7 +22,7 @@ ColumnLayout {
     Repeater {
         model: [1, 3, 5, 7, 11, 13]
         delegate: RowLayout {
-            spacing: Style.spacing
+            
             Label { 
                 text: `${modelData}${modelData === 1 ? "st" : modelData === 3 ? "rd" : "th"} Harmonic:` 
                 Layout.preferredWidth: 120 

@@ -70,14 +70,14 @@ Item {
     }
 
     RowLayout {
-        spacing: Style.spacing
+        
         anchors.margins: 10
         anchors.fill: parent
 
         ColumnLayout {
             Layout.maximumWidth: 400
             Layout.alignment: Qt.AlignTop
-            spacing: Style.spacing
+            
 
             WaveCard {
                 id: results
@@ -88,7 +88,7 @@ Item {
                 showSettings: true
 
                 ColumnLayout {
-                    spacing: Style.spacing
+                    
 
                     HarmonicInputForm {
                         id: harmonicForm
@@ -131,7 +131,7 @@ Item {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Style.spacing
+            
 
             // Waveform Chart
             WaveCard {

@@ -18,6 +18,7 @@ Item {
     property color textColor: Universal.foreground
 
     PopUpText {
+        parentCard: results
         popupText: "<h3>Cable Ampacity Calculator</h3><br>" +
                             "This calculator estimates the current carrying capacity of a cable based on various parameters.<br><br>" +
                             "<b>Cable Size:</b> The cross-sectional area of the cable in mm².<br>" +
@@ -33,14 +34,11 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: 10
-        spacing: Style.spacing
         
         // Left side - inputs and results
         ColumnLayout {
             id: leftColumn
             Layout.maximumWidth: 350
-            spacing: Style.spacing
             Layout.alignment: Qt.AlignTop
 
             WaveCard {
@@ -53,8 +51,6 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 15
 
                     Label { text: "Cable Size (mm²):" ;Layout.minimumWidth: 180}
                     ComboBox {
@@ -118,8 +114,6 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
 
                     Label { text: "Base Ampacity:" ;Layout.minimumWidth: 180}
                     TextFieldBlue { 

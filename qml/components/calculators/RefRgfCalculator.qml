@@ -50,7 +50,7 @@ Item {
     RowLayout {
         id: mainLayout
         anchors.margins: 10
-        spacing: Style.spacing
+        
         anchors.centerIn: parent
 
         WaveCard {
@@ -62,7 +62,7 @@ Item {
             showSettings: true
 
             ColumnLayout{
-                spacing: Style.spacing
+                
 
                 GridLayout {
                     id: ctTransformerGrid

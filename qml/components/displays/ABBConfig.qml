@@ -9,7 +9,7 @@ ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.margins: 50
-    spacing: Style.spacing
+    
 
     GridLayout {
         columns: 2
@@ -327,7 +327,7 @@ ColumnLayout {
             Layout.columnSpan: 2
             Layout.fillWidth: true
             Layout.leftMargin: 10
-            spacing: Style.spacing
+            
             
             Label {
                 text: "• Ensure SF6 gas pressure monitoring is connected to alarm"

@@ -445,7 +445,7 @@ Item {
                     Grid {
                         anchors.centerIn: parent
                         columns: 3
-                        spacing: Style.spacing
+                        
                         
                         // CT Status
                         Rectangle {

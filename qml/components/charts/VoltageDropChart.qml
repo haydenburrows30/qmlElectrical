@@ -30,7 +30,7 @@ Item {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: Style.spacing
+        
         
         Label {
             text: "Voltage Drop Comparison by Cable Size"
@@ -42,7 +42,7 @@ Item {
 
         Row {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Style.spacing
+            
             
             CheckBox {
                 id: thresholdCheck
@@ -71,7 +71,7 @@ Item {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Style.spacing
+            
             
             TextField {
                 id: xAxisTitle
@@ -393,7 +393,7 @@ Item {
         
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Style.spacing
+            
             
             Button {
                 text: "Close"

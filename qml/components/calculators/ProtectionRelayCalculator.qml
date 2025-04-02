@@ -54,7 +54,7 @@ Item {
     }
 
     RowLayout {
-        spacing: Style.spacing
+        
         anchors.centerIn: parent
 
         ColumnLayout {

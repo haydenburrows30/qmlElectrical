@@ -122,7 +122,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Style.spacing
+        
         anchors.margins: 10
 
         RowLayout {

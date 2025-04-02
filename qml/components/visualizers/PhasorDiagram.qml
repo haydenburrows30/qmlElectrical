@@ -296,11 +296,11 @@ Item {
     Column {
         x: 10
         y: 10
-        spacing: Style.spacing
+        
         visible: showCurrentPhasors
         
         Row {
-            spacing: Style.spacing
+            
             Rectangle {
                 width: 15
                 height: 3
@@ -314,7 +314,7 @@ Item {
         }
         
         Row {
-            spacing: Style.spacing
+            
             Rectangle {
                 width: 15
                 height: 3

@@ -26,7 +26,7 @@ Popup {
         
         Column {
             anchors.centerIn: parent
-            spacing: Style.spacing
+            
 
             Image {
                 source: "qrc:/icons/gallery/24x24/Calculator.svg"

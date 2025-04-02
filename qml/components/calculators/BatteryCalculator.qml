@@ -37,13 +37,11 @@ Item {
         
     RowLayout {
         anchors.centerIn: parent
-        spacing: Style.spacing
 
         ColumnLayout {
             id: inputLayout
             Layout.preferredWidth: 410
             Layout.alignment: Qt.AlignTop
-            spacing: Style.spacing
 
             //Inputs
             WaveCard {
@@ -56,8 +54,6 @@ Item {
                     
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
                     
                     Label { text: "Load (watts):" }
                     TextField {
@@ -127,8 +123,6 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
                     Layout.fillWidth: true
 
                     Label { text: "Current Draw:" }

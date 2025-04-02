@@ -76,7 +76,7 @@ Item {
                 // Left side - Controls and Results
                 ColumnLayout {
                     Layout.maximumWidth: 340
-                    spacing: Style.spacing
+                    
 
                     // Machine Type Selection
                     WaveCard {
@@ -88,7 +88,7 @@ Item {
                         showSettings: true
                         
                         ColumnLayout {
-                            spacing: Style.spacing
+                            
                             ComboBox {
                                 id: machineTypeCombo
                                 model: calculator.machineTypes
@@ -106,14 +106,14 @@ Item {
 
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: Style.spacing
+                            
                             
                             // Input Mode Selection
                             RowLayout {
                                 Layout.fillWidth: true
                                 Layout.topMargin: 5
                                 Layout.leftMargin: 10
-                                spacing: Style.spacing
+                                
 
                                 RadioButton {
                                     id: vcModeRadio

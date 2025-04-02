@@ -66,7 +66,7 @@ Item {
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: Style.spacing
+        
 
         WaveCard {
             id: results
@@ -86,7 +86,7 @@ Item {
 
                     ColumnLayout {
                         id: conversionTypeLayout
-                        spacing: Style.spacing
+                        
 
                         RowLayout {
                             Label {
@@ -219,7 +219,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.minimumHeight: 80
 
-                    spacing: Style.spacing
+                    
 
                     Label {
                         text: converter.result.toFixed(2)

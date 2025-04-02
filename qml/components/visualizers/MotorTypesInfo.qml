@@ -49,7 +49,7 @@ WaveCard {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: Style.spacing
+        
         
         TabBar {
             id: motorInfoTabs

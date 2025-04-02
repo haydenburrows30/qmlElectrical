@@ -101,11 +101,11 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        spacing: Style.spacing
+        
 
         RowLayout {
             id: firstRow
-            spacing: Style.spacing
+            
 
             WaveCard {
                 title: "System Parameters"
@@ -119,7 +119,7 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 10
-                    spacing: Style.spacing
+                    
                     
                     // Main input parameters
                     GridLayout {
