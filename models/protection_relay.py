@@ -569,3 +569,16 @@ class ProtectionRelayCalculator(QObject):
         fault_current = voltage / total_r if total_r > 0 else float('inf')
         
         return fault_current
+
+    @Slot()
+    def clearSettings(self):
+        """Clear all saved settings."""
+        try:
+            self._saved_settings = []
+            # Remove the settings file if it exists
+            if os.path.exists(self._settings_file):
+                os.remove(self._settings_file)
+            self.savedSettingsChanged.emit()
+            print("All saved settings cleared")
+        except Exception as e:
+            print(f"Error clearing settings: {e}")
