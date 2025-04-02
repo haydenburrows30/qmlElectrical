@@ -17,8 +17,6 @@ Window {
             id: saveButton
             buttonText: "Save"
             defaultMessage: "Click to save your document"
-            // successMessage: "Document saved successfully!"
-            // errorMessage: "Failed to save document!"
         }
         
         MessageButton {

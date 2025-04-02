@@ -55,7 +55,7 @@ Item {
                 anchors.centerIn: parent
                 columns: 2
                 columnSpacing: 20
-                rowSpacing: 10
+                
 
                 Label {
                     text: "Resistance(R):"

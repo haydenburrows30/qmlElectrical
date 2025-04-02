@@ -44,7 +44,7 @@ Popup {
                 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
+                    
                     columnSpacing: 20
                     Layout.fillWidth: true
                     

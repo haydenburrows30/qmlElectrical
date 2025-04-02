@@ -23,7 +23,7 @@ Page {
         
         ColumnLayout {
             width: scrollView.width
-            spacing: Style.spacing
+            
 
             Rectangle {
                 Layout.fillWidth: true
@@ -33,7 +33,7 @@ Page {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 15
-                    spacing: Style.spacing
+                    
                     
                     Label {
                         text: "Cable Database"
@@ -55,7 +55,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.margins: 10
-                spacing: Style.spacing
+                
                 
                 // Cable data editor
                 CableDataEditor {
@@ -68,7 +68,7 @@ Page {
                 ColumnLayout {
                     Layout.preferredWidth: 350
                     Layout.fillHeight: true
-                    spacing: Style.spacing
+                    
                     
                     // Cable reference data
                     WaveCard {
@@ -79,7 +79,7 @@ Page {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 10
-                            spacing: Style.spacing
+                            
                             
                             Label {
                                 text: "Cable Types and Standards"
@@ -120,7 +120,7 @@ Page {
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 10
-                            spacing: Style.spacing
+                            
                             
                             Label {
                                 text: "Conductor Material Properties"
@@ -211,7 +211,7 @@ Page {
         
         ColumnLayout {
             anchors.fill: parent
-            spacing: Style.spacing
+            
             
             Label {
                 text: messagePopup.isError ? "Error" : "Success"

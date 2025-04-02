@@ -47,7 +47,7 @@ Item {
         id: tipsPopup
     }
 
-    ABCD {
+    PopUpText {
     }
 
     ScrollView {

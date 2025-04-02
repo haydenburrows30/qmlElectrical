@@ -5,8 +5,8 @@ import QtQuick.Layouts
 GridLayout {
     id: resultsDisplay
     columns: 2
-    rowSpacing: 10
-    columnSpacing: 10
+    
+    
     
     property var calculator
     

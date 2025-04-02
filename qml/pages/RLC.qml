@@ -54,7 +54,7 @@ Page {
             RowLayout {
                 id: mainLayout
                 width: scrollView.width
-                spacing: Style.spacing
+                
 
                 ColumnLayout {
 
@@ -109,7 +109,7 @@ Page {
                         
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: Style.spacing
+                            
                             
                             // Circuit diagram
                             Item {

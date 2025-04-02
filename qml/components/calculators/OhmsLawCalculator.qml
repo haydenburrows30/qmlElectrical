@@ -9,8 +9,6 @@ import "../backgrounds"
 import "../style"
 import "../backgrounds"
 
-
-
 import OhmsLaw 1.0
 
 Item {
@@ -69,7 +67,6 @@ Item {
         }
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Style.spacing
             width: parent.width
             
             
@@ -81,7 +78,7 @@ Item {
             GridLayout {
                 columns: 2
                 Layout.fillWidth: true
-                columnSpacing: Style.spacing
+                
                 
                 Text { text: "Voltage (V):" }
                 Text { text: "V = I × R" }
@@ -123,11 +120,8 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
-        anchors.margins: Style.spacing
-        
 
         RowLayout {
-            
 
             WaveCard {
                 id: results
@@ -141,10 +135,8 @@ Item {
                 showSettings: true
                 
                 GridLayout {
-                    anchors.margins: Style.spacing
+                    
                     columns: 3
-                    columnSpacing: Style.spacing
-                    rowSpacing: Style.spacing
                     Layout.fillWidth: true
                     
                     Label { text: "Select Two Known Parameters:"; Layout.columnSpan: 3 }
@@ -216,7 +208,7 @@ Item {
                     id: resultGrid
                     columns: 2
                     anchors.fill: parent
-                    anchors.margins: Style.spacing
+                    
                     
                     Label { text: "Voltage (V):" ; Layout.minimumWidth: 100}
                     TextField { 

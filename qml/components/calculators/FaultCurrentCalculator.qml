@@ -124,8 +124,8 @@ Item {
                     // Main input parameters
                     GridLayout {
                         columns: 2
-                        rowSpacing: 10
-                        columnSpacing: 10
+                        
+                        
                         Layout.fillWidth: true
 
                         // System parameters
@@ -349,8 +349,8 @@ Item {
             GridLayout {
                 id: advancedPanel
                 columns: 2
-                rowSpacing: 10
-                columnSpacing: 10
+                
+                
                 Layout.minimumHeight: 500
                 Layout.minimumWidth: 300
                 Layout.fillWidth: true

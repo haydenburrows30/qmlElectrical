@@ -232,8 +232,6 @@ Item {
                                 Column {
                                     id: relayInfo
                                     width: parent.width
-                                    anchors.margins: 5
-                                    spacing: 2
 
                                     Text {
                                         width: parent.width

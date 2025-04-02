@@ -27,12 +27,6 @@ QtObject {
     readonly property real fadeOpacity: 0.8
     readonly property real highlightOpacity: 0.1
 
-    // width
-    readonly property int spacing: 5
-    readonly property int rowSpacing: 10
-    readonly property int columnSpacing: 15
-
-
     // devicestile
 
     readonly property color background: "#e2e2e2"

@@ -57,7 +57,7 @@ Popup {
                 id: detailsGrid
                 columns: 2
                 columnSpacing: 20
-                rowSpacing: 10
+                
                 Layout.fillWidth: true
 
                 // System Configuration

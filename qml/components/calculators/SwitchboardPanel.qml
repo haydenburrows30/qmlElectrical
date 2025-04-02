@@ -64,7 +64,7 @@ Item {
             GridLayout {
                 anchors.fill: parent
                 columns: 4
-                rowSpacing: 10
+                
                 columnSpacing: 15
 
                 Label { text: "Switchboard Name:" }
@@ -597,7 +597,7 @@ Item {
         
         contentItem: GridLayout {
             columns: 2
-            rowSpacing: 10
+            
             columnSpacing: 15
             
             Label { text: "Destination:" }

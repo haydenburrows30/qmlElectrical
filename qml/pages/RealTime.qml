@@ -56,14 +56,14 @@ Page {
                 id: mainLayout
                 width: scrollView.width
                 anchors.left: parent.left
-                spacing: Style.spacing
+                
 
                 //Settings
                 ColumnLayout {
                     Layout.fillHeight: true
                     Layout.minimumWidth: 350
                     Layout.maximumWidth: 350
-                    spacing: Style.spacing
+                    
 
                     ButtonCard {
                         Layout.fillWidth: true
@@ -181,7 +181,7 @@ Page {
                         showSettings: true
 
                         ColumnLayout {
-                            spacing: Style.spacing
+                            
                             Layout.fillWidth: true
                             
                             Repeater {
@@ -190,7 +190,7 @@ Page {
                                     {name: "Gamma", color: "#0000ff"}]
                                 RowLayout {
                                     Layout.minimumWidth: 300
-                                    spacing: Style.spacing
+                                    
                                     Label { 
                                         text: modelData.name
                                         color: modelData.color
@@ -234,7 +234,7 @@ Page {
                                     
                                     Grid {
                                         columns: 2
-                                        spacing: Style.spacing
+                                        
                                         width: parent.width
 
                                         Label { text: "Frequency:" }

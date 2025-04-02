@@ -76,7 +76,7 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
+                    
                     columnSpacing: 15
 
                     Label { text: "Soil Resistivity (Ω⋅m):" ; Layout.minimumWidth: 150}
@@ -125,8 +125,8 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+                    
+                    
 
                     Label { text: "Rod Length (m):" ; Layout.minimumWidth: 150}
                     TextField {
@@ -157,8 +157,8 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+                    
+                    
 
                     Label { text: "Fault Current (A):" ;Layout.minimumWidth: 150}
                     TextField {

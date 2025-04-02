@@ -44,7 +44,7 @@ Popup {
                 width: parent.width
                 columns: 2
                 columnSpacing: 20
-                rowSpacing: 10
+                
 
                 Label { text: "Detailed System Calculations"; font.bold: true }
                 Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }

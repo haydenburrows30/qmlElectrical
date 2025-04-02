@@ -8,7 +8,7 @@ import "../backgrounds"
 
 ColumnLayout {
     anchors.fill: parent
-    anchors.margins: Style.spacing
+    
     width: parent.width
     
     Label {

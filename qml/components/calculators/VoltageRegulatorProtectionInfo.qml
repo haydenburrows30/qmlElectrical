@@ -35,7 +35,6 @@ Item {
                 GridLayout {
                     columns: 2
                     Layout.fillWidth: true
-                    columnSpacing: 15
                     
                     Text { text: "<b>Current Transformers:</b>" }
                     Text { text: "<b>Specifications:</b>" }

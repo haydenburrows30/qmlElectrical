@@ -73,8 +73,8 @@ Item {
 
                     GridLayout {
                         columns: 2
-                        columnSpacing: 10
-                        rowSpacing: 10
+                        
+                        
 
                         Label { text: "Primary Voltage (V):" }
                         TextField {

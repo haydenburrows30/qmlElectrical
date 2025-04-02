@@ -147,7 +147,7 @@ Item {
                             GridLayout {
                                 Layout.fillWidth: true
                                 columns: 2
-                                rowSpacing: 10
+                                
                                 columnSpacing: 15
 
                                 Label { text: "Rated Voltage (V):"; Layout.minimumWidth: 150}
@@ -227,7 +227,7 @@ Item {
                         GridLayout {
                             id: mechanicalParamsGrid
                             columns: 2
-                            rowSpacing: 10
+                            
                             columnSpacing: 15
 
                             Label { text: "Number of Poles:" ; Layout.minimumWidth: 150}
@@ -276,7 +276,7 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
+                            
                             columnSpacing: 15
 
                             Label { text: "Temperature Class:" ; Layout.minimumWidth: 150}
@@ -313,7 +313,7 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
+                            
                             columnSpacing: 15
 
                             Label { text: "Rated Power:" ; Layout.minimumWidth: 150}

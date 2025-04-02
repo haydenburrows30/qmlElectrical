@@ -43,7 +43,7 @@ Item {
     RowLayout {
         
         anchors.centerIn: parent
-        anchors.margins: Style.spacing
+        
 
         // Input Section
         ColumnLayout {
@@ -61,8 +61,8 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: Style.spacing
-                    columnSpacing: Style.spacing
+                    
+                    
                     
                     Label { text: "Active Power (kW):" ; Layout.minimumWidth: 170}
                     TextField {
@@ -99,8 +99,8 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: Style.spacing
-                    columnSpacing: Style.spacing
+                    
+                    
 
                     Label { text: "Required Capacitor:" ; Layout.minimumWidth: 170}
                     TextField { 

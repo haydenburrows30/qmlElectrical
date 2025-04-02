@@ -237,8 +237,8 @@ Item {
             GridLayout {
                 anchors.fill: parent
                 columns: 2
-                columnSpacing: 10
-                rowSpacing: 10
+                
+                
 
                 Rectangle {
                     Layout.fillWidth: true

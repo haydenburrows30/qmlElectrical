@@ -90,10 +90,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Transformer Rating (kVA):" }
                             SpinBox {
@@ -161,10 +158,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Line Length (km):" }
                             SpinBox {
@@ -242,10 +236,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Wind Turbine Output (MW):" }
                             TextField {
@@ -309,10 +300,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             // Enable/disable regulator
                             Label { text: "Enable Voltage Regulator:" }
@@ -468,10 +456,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Transformer Z (Ohms):" }
                             TextField {
@@ -582,10 +567,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Relay Pickup Current (A):" }
                             TextField {
@@ -671,10 +653,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Recommended HV Cable Size:" }
                             TextField {
@@ -703,10 +682,7 @@ Item {
 
                         GridLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Unregulated Voltage (kV):" }
                             TextField {

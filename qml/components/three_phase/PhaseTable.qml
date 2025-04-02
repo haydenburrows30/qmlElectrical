@@ -12,7 +12,7 @@ ColumnLayout {
         Layout.fillWidth: true
         columns: 4
         columnSpacing: 20
-        rowSpacing: 10
+        
 
         // Headers
         Label { text: "Phase"; font.bold: true }

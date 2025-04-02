@@ -70,8 +70,8 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
+                    
+                    
 
                     Label { text: "Device Type:" }
                     ComboBox {

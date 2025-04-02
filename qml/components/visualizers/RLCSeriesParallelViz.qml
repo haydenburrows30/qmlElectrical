@@ -15,7 +15,7 @@ ColumnLayout {
     GridLayout {
         Layout.fillWidth: true
         columns: 4
-        rowSpacing: 10
+        
         columnSpacing: 20
         
         Text { 

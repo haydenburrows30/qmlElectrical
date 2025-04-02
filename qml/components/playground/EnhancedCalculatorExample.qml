@@ -168,7 +168,7 @@ Item {
                         id: paramGrid
                         width: parent.width
                         columns: 2
-                        columnSpacing: 10
+                        
                         rowSpacing: 8
                         
                         // The parameter fields will be created dynamically

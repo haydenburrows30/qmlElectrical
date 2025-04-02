@@ -138,7 +138,7 @@ Item {
             
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
+                    
                     
                     Label {
                         text: "Motor Type:"
@@ -295,7 +295,7 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 10
+                    
 
                     Label {
                         text: "Motor Type:"

@@ -44,7 +44,7 @@ Page {
                 id: mainLayout
                 width: scrollView.width
                 anchors.left: parent.left
-                spacing: Style.spacing
+                
 
                 ColumnLayout {
                     RowLayout {
@@ -66,7 +66,7 @@ Page {
                             ColumnLayout {
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                spacing: Style.spacing
+                                
 
                                 PhaseTable {
                                     Layout.fillWidth: true

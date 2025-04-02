@@ -143,8 +143,8 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            
+                            
                             
                             Label {
                                 text: "KVA:" 
@@ -186,8 +186,8 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            
+                            
 
                             Label { 
                                 text: "Line Voltage (V):"
@@ -238,8 +238,6 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
 
                             Label { 
                                 text: "Line Voltage (V):"
@@ -279,8 +277,6 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
 
                             Label { 
                                 text: "Impedance (%):" 
@@ -439,8 +435,8 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            
+                            
 
                             Label { 
                                 text: "Turns Ratio:"

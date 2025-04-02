@@ -170,8 +170,8 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            
+                            
 
                             Label { text: "CT Type:" ; Layout.minimumWidth: 160}
                             ComboBox {
@@ -331,8 +331,8 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            
+                            
 
                             Label { text: "VT Ratio:" ; Layout.minimumWidth: 160}
                             ComboBox {
@@ -379,8 +379,8 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            rowSpacing: 10
-                            columnSpacing: 10
+                            
+                            
 
                             Label { text: "CT Knee Point:" ; Layout.minimumWidth: 160}
                             TextField { 

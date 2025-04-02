@@ -199,8 +199,6 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
                             
                             Label { text: "Blade Radius (m):" }
                             SpinBox {
@@ -377,8 +375,6 @@ Item {
                         
                         GridLayout {
                             columns: 2
-                            columnSpacing: 20
-                            rowSpacing: 10
 
                             Label { text: "Swept Area (m²):" }
                             TextField {
