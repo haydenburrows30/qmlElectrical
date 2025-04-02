@@ -6,6 +6,7 @@ import "../"
 import "../../components"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import ProtectionRelay 1.0
 
@@ -14,23 +15,9 @@ Item {
 
     property ProtectionRelayCalculator relay: ProtectionRelayCalculator {}
 
-    Popup {
-        id: tipsPopup
-        width: 700
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: { "<h3>Protection Relay Calculator</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Protection Relay Calculator</h3><br>" +
                     "This calculator estimates the operating time of a protection relay for a given fault current and settings.<br><br>" +
                     "<b>Pickup Current:</b> The current at which the relay should trip.<br>" +
                     "<b>Time Dial Setting:</b> The time dial setting of the relay.<br>" +
@@ -48,9 +35,7 @@ Item {
                     "<b>References:</b><br>" +
                     "IEEE Standard C37.112-1996<br>" +
                     "IEC 60255-151:2009<br>" +
-                    "ANSI/IEEE C37.112-1996<br>"}
-            wrapMode: Text.WordWrap
-        }
+                    "ANSI/IEEE C37.112-1996<br>"
     }
 
     RowLayout {
@@ -64,14 +49,12 @@ Item {
             WaveCard {
                 title: "Relay Settings"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 500
+                Layout.minimumHeight: 520
                 id: results
                 showSettings: true
 
                 GridLayout {
                     columns: 2
-                    
-                    
 
                     Label { text: "Device Type:" }
                     ComboBox {
@@ -85,9 +68,19 @@ Item {
                                 let ratings = relay.getUniqueDeviceRatings(device.type)
                                 ratingCombo.model = ratings
                                 breakingCapacity.text = device.breaking_capacity
+                                
+                                // Update breakerCurveCombo visibility immediately
+                                breakerCurveCombo.visible = device.type === "MCB"
                             }
                         }
                         Layout.fillWidth: true
+                        
+                        // Initialize default selection
+                        Component.onCompleted: {
+                            if (count > 0) {
+                                currentIndex = 0
+                            }
+                        }
                     }
 
                     Label { text: "Rating:" }
@@ -113,10 +106,13 @@ Item {
                         Layout.fillWidth: true
                     }
 
-                    Label { text: "Breaker Curve:" }
+                    Label { 
+                        text: "Breaker Curve:" 
+                        visible: breakerCurveCombo.visible
+                    }
                     ComboBox {
                         id: breakerCurveCombo
-                        visible: deviceType.currentText === "MCB"
+                        visible: false // Initialize as invisible, will be set by deviceType selection
                         model: ["B", "C", "D"]
                         onCurrentTextChanged: {
                             if (currentText) {
@@ -253,17 +249,129 @@ Item {
 
                     Label { text: "Operating Time:" }
                     Label {
+                        id: operatingTimeLabel
                         text: relay.operatingTime.toFixed(2) + " s"
                         font.bold: true
+                        color: {
+                            const time = relay.operatingTime;
+                            if (time <= 0.1) return "red"; // Immediate trip - danger
+                            if (time <= 1.0) return "orange"; // Fast trip - warning
+                            return "green"; // Slow trip - good
+                        }
+                    }
+
+                    // Add trip assessment
+                    Label { text: "Trip Assessment:" }
+                    Label {
+                        text: {
+                            const time = relay.operatingTime;
+                            if (time <= 0.1) return "Instantaneous Trip";
+                            if (time <= 1.0) return "Fast Trip";
+                            if (time <= 10.0) return "Normal Trip";
+                            return "Delayed Trip";
+                        }
+                        color: operatingTimeLabel.color
                     }
                 }
+
+                // Add save button to bottom of card
+                Button {
+                    id: saveSettingsButton
+                    text: "Save Settings"
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    anchors.margins: 10
+                    
+                    onClicked: {
+                        // Ensure all fields have valid values before saving
+                        const pickupVal = parseFloat(pickupCurrent.text) || 0;
+                        const timeDialVal = parseFloat(timeDial.text) || 0.5;
+                        
+                        // Save current settings and add them to the comparison list
+                        let settings = {
+                            deviceType: deviceType.currentText || "",
+                            rating: pickupVal.toString(),
+                            timeDial: timeDialVal.toString(),
+                            curveType: curveType.currentText || "IEC Standard Inverse",
+                            operatingTime: relay.operatingTime
+                        };
+                        relay.saveSettings(settings);
+                        savedSettingsPopup.open();
+                    }
+                }
+            }
+            
+            // Additional card for circuit parameters
+            WaveCard {
+                title: "Circuit Parameters"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 240
+                visible: advancedMode.checked
+                
+                GridLayout {
+                    columns: 2
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    
+                    Label { text: "Supply Voltage (V):" }
+                    TextField {
+                        id: supplyVoltage
+                        placeholderText: "Enter voltage"
+                        validator: IntValidator { bottom: 110; top: 1000 }
+                        text: "400"
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "Cable Length (m):" }
+                    TextField {
+                        id: cableLength
+                        placeholderText: "Enter length"
+                        validator: DoubleValidator { bottom: 0 }
+                        text: "100"
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "Cable Size (mm²):" }
+                    ComboBox {
+                        id: cableSize
+                        model: ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", "120"]
+                        currentIndex: 2
+                        Layout.fillWidth: true
+                    }
+                    
+                    Button {
+                        text: "Calculate Fault Current"
+                        Layout.columnSpan: 2
+                        Layout.fillWidth: true
+                        onClicked: {
+                            // Calculate fault current based on circuit parameters
+                            let voltage = parseFloat(supplyVoltage.text);
+                            let length = parseFloat(cableLength.text);
+                            let size = parseFloat(cableSize.currentText);
+                            
+                            // Simple calculation (more sophisticated one would be in Python)
+                            let impedance = 0.018 * length / size; // Simplified impedance calculation
+                            let calculatedFaultCurrent = voltage / impedance;
+                            
+                            // Update fault current field
+                            faultCurrent.text = calculatedFaultCurrent.toFixed(1);
+                        }
+                    }
+                }
+            }
+            
+            // Toggle for advanced mode
+            CheckBox {
+                id: advancedMode
+                text: "Show Advanced Circuit Parameters"
+                checked: false
             }
         }
 
         WaveCard {
             title: "Time-Current Curve"
             Layout.minimumHeight: settingsColumn.height
-            Layout.minimumWidth: settingsColumn.height * 1.5
+            Layout.minimumWidth: settingsColumn.height // * 1.5
 
 
             // Time-Current Curve Chart
@@ -271,6 +379,9 @@ Item {
                 id: relayChart
                 theme: Universal.theme
                 anchors.fill: parent
+                anchors.margins: 10
+                legend.visible: true
+                legend.alignment: Qt.AlignBottom
 
                 antialiasing: true
                 
@@ -296,6 +407,137 @@ Item {
                     axisX: currentAxis
                     axisY: timeAxis
                 }
+                
+                // Add a point marker for the current fault current
+                ScatterSeries {
+                    id: faultPoint
+                    name: "Fault Point"
+                    color: operatingTimeLabel.color
+                    markerSize: 15
+                    axisX: currentAxis
+                    axisY: timeAxis
+                }
+                
+                // Add saved settings series (will be populated from saved settings)
+                LineSeries {
+                    id: savedCurve
+                    name: "Saved Settings"
+                    visible: false
+                    axisX: currentAxis
+                    axisY: timeAxis
+                    color: "gray"
+                    width: 2
+                    style: Qt.DashLine
+                }
+            }
+            
+            // Add legend toggle
+            CheckBox {
+                text: "Show Legend"
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 10
+                checked: true
+                onCheckedChanged: relayChart.legend.visible = checked
+            }
+        }
+    }
+
+    // Popup for saved settings
+    Popup {
+        id: savedSettingsPopup
+        width: 300
+        height: 400
+        anchors.centerIn: parent
+        modal: true
+        
+        ColumnLayout {
+            anchors.fill: parent
+            
+            Label {
+                text: "Saved Settings"
+                font.bold: true
+                font.pixelSize: 16
+            }
+            
+            ListView {
+                id: savedSettingsList
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                model: relay.savedSettings
+                delegate: ItemDelegate {
+                    width: parent.width
+                    text: modelData.deviceType + " " + modelData.rating + "A"
+                    highlighted: index === savedSettingsList.currentIndex
+                    onClicked: {
+                        savedSettingsList.currentIndex = index;
+                        relay.loadSavedCurve(index);
+                        savedCurve.visible = true;
+                    }
+                }
+            }
+            
+            RowLayout {
+                Layout.fillWidth: true
+                
+                Button {
+                    text: "Compare"
+                    enabled: savedSettingsList.currentIndex >= 0
+                    onClicked: {
+                        // Show the saved curve for comparison
+                        savedCurve.visible = true;
+                    }
+                }
+                
+                Button {
+                    text: "Load"
+                    enabled: savedSettingsList.currentIndex >= 0
+                    onClicked: {
+                        try {
+                            // Load the selected settings
+                            let settings = relay.savedSettings[savedSettingsList.currentIndex];
+                            
+                            // Find and set deviceType
+                            for (let i = 0; i < deviceType.count; i++) {
+                                if (deviceType.model[i].type === settings.deviceType) {
+                                    deviceType.currentIndex = i;
+                                    break;
+                                }
+                            }
+                            
+                            // Set other fields with safe defaults
+                            pickupCurrent.text = settings.rating || "1.0";
+                            timeDial.text = settings.timeDial || "0.5";
+                            
+                            // Find and set curveType
+                            let curveTypeFound = false;
+                            for (let i = 0; i < curveType.count; i++) {
+                                if (curveType.model[i] === settings.curveType) {
+                                    curveType.currentIndex = i;
+                                    curveTypeFound = true;
+                                    break;
+                                }
+                            }
+                            
+                            // Set default curve type if not found
+                            if (!curveTypeFound && curveType.count > 0) {
+                                curveType.currentIndex = 0;
+                            }
+                            
+                            savedSettingsPopup.close();
+                        } catch (e) {
+                            console.error("Error loading settings:", e);
+                        }
+                    }
+                }
+                
+                Button {
+                    text: "Close"
+                    onClicked: {
+                        savedCurve.visible = false;
+                        savedSettingsPopup.close();
+                    }
+                }
             }
         }
     }
@@ -316,6 +558,7 @@ Item {
             
             // Clear the existing curve
             tripCurve.clear()
+            faultPoint.clear()
             
             // If we have device-specific points, use those
             if (deviceSpecificPoints.length > 0) {
@@ -331,6 +574,28 @@ Item {
                 for (let i = 0; i < generalPoints.length; i++) {
                     tripCurve.append(generalPoints[i].current, generalPoints[i].time)
                 }
+            }
+            
+            // Add point for current fault current and operating time
+            if (faultCurrent.text && relay.operatingTime < 100) {
+                faultPoint.append(
+                    parseFloat(faultCurrent.text),
+                    relay.operatingTime
+                )
+            }
+        }
+        
+        function onSavedCurveReady(points) {
+            savedCurve.clear();
+            
+            if (points && points.length > 0) {
+                for (let i = 0; i < points.length; i++) {
+                    savedCurve.append(points[i].current, points[i].time);
+                }
+                savedCurve.visible = true;
+            } else {
+                console.warn("Received empty curve points");
+                savedCurve.visible = false;
             }
         }
     }

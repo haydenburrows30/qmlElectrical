@@ -45,28 +45,12 @@ Item {
         }
     }
 
-    Popup {
-        id: tipsPopup
-        width: 300
-        height: 200
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Harmonic Analyzer</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Harmonic Analyzer</h3><br>" +
                 "Analyze the harmonic components of a waveform. " +
                 "You can adjust the amplitude and phase of each harmonic component to see how it affects the waveform. <br>" +
-                "You can also export the harmonic data to a CSV file for further analysis."}
-            wrapMode: Text.WordWrap
-        }
+                "You can also export the harmonic data to a CSV file for further analysis."
     }
 
     RowLayout {
@@ -78,17 +62,15 @@ Item {
             Layout.maximumWidth: 400
             Layout.alignment: Qt.AlignTop
             
-
             WaveCard {
                 id: results
                 title: "Harmonic Components"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 550
+                Layout.minimumHeight: 480
 
                 showSettings: true
 
                 ColumnLayout {
-                    
 
                     HarmonicInputForm {
                         id: harmonicForm

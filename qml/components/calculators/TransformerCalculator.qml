@@ -31,8 +31,7 @@ Item {
         }
             
         ColumnLayout {
-            
-            
+
             Label {
                 text: "Transformer Tips & Explanations"
                 font.pixelSize: 18
@@ -133,7 +132,6 @@ Item {
 
                 ColumnLayout {
                     Layout.maximumWidth: 330
-                    
 
                     // Inputs
                     WaveCard {
@@ -143,9 +141,7 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            
-                            
-                            
+
                             Label {
                                 text: "KVA:" 
                                 Layout.minimumWidth: 120
@@ -186,8 +182,6 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            
-                            
 
                             Label { 
                                 text: "Line Voltage (V):"
@@ -272,7 +266,7 @@ Item {
                     //Impedance
                     WaveCard {
                         title: "Impedance & Construction"
-                        Layout.minimumHeight: 380
+                        Layout.minimumHeight: 350
                         Layout.fillWidth: true
 
                         GridLayout {
@@ -429,14 +423,12 @@ Item {
                     WaveCard {
                         id: results
                         title: "Results"
-                        Layout.minimumHeight: 280
+                        Layout.minimumHeight: 260
                         Layout.fillWidth: true
                         showSettings: true
 
                         GridLayout {
                             columns: 2
-                            
-                            
 
                             Label { 
                                 text: "Turns Ratio:"

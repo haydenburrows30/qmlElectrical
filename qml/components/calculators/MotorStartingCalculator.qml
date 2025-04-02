@@ -7,6 +7,7 @@ import "../../components"
 import "../visualizers"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import MotorStarting 1.0
 
@@ -56,30 +57,12 @@ Item {
         showMessage("Motor Type Info", calculator.motorDescription)
     }
 
-    Popup {
-        id: tipsPopup
-        width: parent.width * 0.6
-        height: parent.height * 0.6
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-            
-        Text {
-            anchors.fill: parent
-            text: { "<h3>Motor Starting Calculator </h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Motor Starting Calculator </h3><br>" +
                 "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. <br>" +
                 "You can also select the starting method to see how the current profile changes. <br>" +
                 "The starting current profile is displayed below the results."
-            }
-            wrapMode: Text.WordWrap
-        }
     }
 
     Popup {
@@ -131,15 +114,14 @@ Item {
             WaveCard {
                 id: results
                 title: "Motor Parameters"
-                Layout.minimumHeight: 350
+                Layout.minimumHeight: 330
                 Layout.minimumWidth: 410
 
                 showSettings: true
             
                 GridLayout {
                     columns: 2
-                    
-                    
+
                     Label {
                         text: "Motor Type:"
                         Layout.preferredWidth: 150
@@ -295,7 +277,6 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    
 
                     Label {
                         text: "Motor Type:"

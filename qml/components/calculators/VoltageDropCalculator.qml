@@ -52,7 +52,7 @@ Item {
                 id: results
                 title: "Voltage Drop Calculator"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 260
+                Layout.minimumHeight: 250
 
                 showSettings: true
 
@@ -107,7 +107,7 @@ Item {
             WaveCard {
                 title: "Results"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 130
+                Layout.minimumHeight: 140
                 
                 GridLayout {
                     id: resultsLayout

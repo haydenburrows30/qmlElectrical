@@ -17,10 +17,6 @@ Item {
 
     property BatteryCalculator calculator: BatteryCalculator {}
 
-    // BatteryPopup {
-    //     id: tipsPopup
-    // }
-
     PopUpText {
         widthFactor: 0.5
         heightFactor: 0.5
@@ -49,7 +45,7 @@ Item {
                 id: results
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 280
+                Layout.minimumHeight: 260
 
                 showSettings: true
                     
@@ -118,7 +114,7 @@ Item {
             }
             // Results
             WaveCard {
-                Layout.minimumHeight: 220
+                Layout.minimumHeight: 210
                 title: "Results"
                 Layout.fillWidth: true
 

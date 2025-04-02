@@ -174,7 +174,6 @@ Item {
 
                         ToolTip.text: "Info"
                     
-
                         onButtonClicked: {
 
                             startOperation()
@@ -192,7 +191,7 @@ Item {
                     WaveCard {
                         id: windTurbineCard
                         title: "Wind Turbine Parameters"
-                        Layout.minimumHeight: 490
+                        Layout.minimumHeight: 440
                         Layout.minimumWidth: 350
 
                         // showSettings: true
@@ -369,7 +368,7 @@ Item {
                     
                     WaveCard {
                         title: "Wind Turbine Output"
-                        Layout.minimumHeight: 490
+                        Layout.minimumHeight: windTurbineCard.height
                         Layout.minimumWidth: 430
                         Layout.alignment: Qt.AlignTop
                         

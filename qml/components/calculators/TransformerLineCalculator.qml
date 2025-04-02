@@ -7,6 +7,7 @@ import "../../components"
 import "../visualizers"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import TransformerLine 1.0
 
@@ -35,65 +36,34 @@ Item {
         return value;
     }
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        ColumnLayout {
-                
-                Text {
-                    text: "<b>Protection Settings Notes:</b><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<b>Protection Settings Notes:</b><br>" +
                             "• Relay pickup is set at 120% of transformer rated current<br>" +
                             "• CT ratio is selected based on the pickup current<br>" +
                             "• Very Inverse curve is recommended for transformer protection<br>" +
                             "• Time dial setting depends on coordination with upstream and downstream devices<br>" +
-                            "• Actual settings should be confirmed with a coordination study"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Text {
-                    text: "<b>Recommended Additional Protection:</b><br>" +
+                            "• Actual settings should be confirmed with a coordination study<br><br>" +
+                            "<b>Recommended Additional Protection:</b><br>" +
                             "• Differential protection for transformer > 5 MVA<br>" +
                             "• Earth fault protection (typically 10-20% of CT primary rating)<br>" +
                             "• Restricted Earth Fault (REF) protection<br>" +
                             "• Thermal overload protection<br>" +
                             "• Buchholz relay for oil-filled transformers<br>" +
-                            "• Standby earth fault protection for the cable"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Text {
-                    text: "<b>Cable Selection Considerations:</b><br>" +
+                            "• Standby earth fault protection for the cable<br><br>" +
+                            "<b>Cable Selection Considerations:</b><br>" +
                             "• Cable should be rated for at least 125% of full load current<br>" +
                             "• Voltage drop should typically be kept below 5%<br>" +
                             "• Cable must withstand fault current for protection clearing time<br>" +
                             "• Standard 11kV cables include: 3-core XLPE with copper or aluminum conductors<br>" +
                             "• Typical sizes for 1000 kVA transformer: 70-120 mm² depending on installation conditions"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-            }
     }
 
     ColumnLayout {
         id: mainLayout
         anchors.centerIn: parent
        
-        TransformerLineViz {
-
-        }
+        TransformerLineViz {}
 
         RowLayout {
             ColumnLayout {
@@ -313,7 +283,7 @@ Item {
                 WaveCard {
                     title: "System Calculation Results"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 350
+                    Layout.minimumHeight: 320
                     
                     GridLayout {
                         columns: 2
@@ -415,7 +385,7 @@ Item {
                 WaveCard {
                     title: "Protection Settings"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 230
+                    Layout.minimumHeight: 210
                     
                     GridLayout {
                         columns: 2

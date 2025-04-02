@@ -44,7 +44,7 @@ Item {
             WaveCard {
                 title: "System Parameters"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 310
+                Layout.minimumHeight: 290
 
                 id: results
                 showSettings: true

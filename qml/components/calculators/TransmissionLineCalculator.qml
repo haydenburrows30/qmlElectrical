@@ -48,6 +48,9 @@ Item {
     }
 
     PopUpText {
+        parentCard: results
+        popupText: "A = Open circuit voltage ratio\nB = Transfer impedance\n" +
+                                      "C = Transfer admittance\nD = Short circuit current ratio"
     }
 
     ScrollView {
@@ -266,12 +269,12 @@ Item {
 
                             Label { 
                                 text: "A Parameter:" ; 
-                                // Layout.minimumWidth: 150
+                                Layout.minimumWidth: 180
                             }
 
                             TextFieldBlue { 
                                 text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°"
-                                // Layout.minimumWidth: 150
+                                Layout.minimumWidth: 150
                                 Layout.alignment: Qt.AlignRight
                             }
                             
@@ -295,27 +298,22 @@ Item {
                 }
 
                 // Right side - Visualization
-                ColumnLayout {
+                WaveCard {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    
-                    WaveCard {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                        title: "Line Parameters Visualization"
+                    title: "Line Parameters Visualization"
 
-                        TransmissionLineViz {
-                            anchors.fill: parent
-                            anchors.margins: 5
-                            
-                            length: parseFloat(lengthInput.text || "100")
-                            characteristicImpedance: calculator.characteristicImpedance
-                            attenuationConstant: calculator.attenuationConstant
-                            phaseConstant: calculator.phaseConstant
-                            
-                            darkMode: Universal.theme === Universal.Dark
-                            textColor: transmissionCard.textColor
-                        }
+                    TransmissionLineViz {
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        
+                        length: parseFloat(lengthInput.text || "100")
+                        characteristicImpedance: calculator.characteristicImpedance
+                        attenuationConstant: calculator.attenuationConstant
+                        phaseConstant: calculator.phaseConstant
+                        
+                        darkMode: Universal.theme === Universal.Dark
+                        textColor: transmissionCard.textColor
                     }
                 }
             }

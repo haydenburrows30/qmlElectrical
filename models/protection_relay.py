@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import os
 import sqlite3
+import json
 
 class ProtectionRelayCalculator(QObject):
     """Protection relay calculator and database interface."""
@@ -12,6 +13,8 @@ class ProtectionRelayCalculator(QObject):
     calculationsComplete = Signal()
     curveTypesChanged = Signal()  # Add new signal
     deviceTypesChanged = Signal()  # Add new signal
+    savedSettingsChanged = Signal()
+    savedCurveReady = Signal(list)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -42,10 +45,18 @@ class ProtectionRelayCalculator(QObject):
         self._init_database()
         self._load_device_data()
         
+        # Add storage for saved settings
+        self._saved_settings = []
+        
+        # Load saved settings from file if it exists
+        self._settings_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'saved_relay_settings.json')
+        self._load_saved_settings()
+        
         self._calculate()
 
     def _init_database(self):
         """Initialize required database tables if they don't exist."""
+        conn = None
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -104,12 +115,45 @@ class ProtectionRelayCalculator(QObject):
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, default_breakers)
             
+            # Add protection curves to database if needed
+            cursor.execute("SELECT COUNT(*) FROM protection_curves")
+            if cursor.fetchone()[0] == 0:
+                # Add typical MCB curve points (B, C, D curves)
+                mcb_curve_points = [
+                    # B Curve (3-5x In)
+                    ("MCB", 6, 1.05, 3600, "B", "25°C", "No trip region"),
+                    ("MCB", 6, 2.5, 1800, "B", "25°C", "May trip region"),
+                    ("MCB", 6, 3.0, 0.2, "B", "25°C", "Trip region start"),
+                    ("MCB", 6, 5.0, 0.05, "B", "25°C", "Must trip region"),
+                    ("MCB", 6, 10.0, 0.01, "B", "25°C", "Fast trip region"),
+                    
+                    # C Curve (5-10x In)
+                    ("MCB", 6, 1.05, 3600, "C", "25°C", "No trip region"),
+                    ("MCB", 6, 3.0, 1800, "C", "25°C", "May trip region"),
+                    ("MCB", 6, 5.0, 0.2, "C", "25°C", "Trip region start"),
+                    ("MCB", 6, 10.0, 0.05, "C", "25°C", "Must trip region"),
+                    ("MCB", 6, 20.0, 0.01, "C", "25°C", "Fast trip region"),
+                    
+                    # D Curve (10-20x In)
+                    ("MCB", 6, 1.05, 3600, "D", "25°C", "No trip region"),
+                    ("MCB", 6, 5.0, 1800, "D", "25°C", "May trip region"),
+                    ("MCB", 6, 10.0, 0.2, "D", "25°C", "Trip region start"),
+                    ("MCB", 6, 20.0, 0.05, "D", "25°C", "Must trip region"),
+                    ("MCB", 6, 50.0, 0.01, "D", "25°C", "Fast trip region"),
+                ]
+                
+                cursor.executemany("""
+                    INSERT INTO protection_curves 
+                    (device_type, rating, current_multiplier, tripping_time, curve_type, temperature, notes)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, mcb_curve_points)
+            
             conn.commit()
             
         except sqlite3.Error as e:
             print(f"Database initialization error: {e}")
         finally:
-            if 'conn' in locals():
+            if conn:
                 conn.close()
 
     def _load_device_data(self):
@@ -209,6 +253,25 @@ class ProtectionRelayCalculator(QObject):
             if 'conn' in locals():
                 conn.close()
 
+    def _load_saved_settings(self):
+        """Load saved settings from JSON file."""
+        try:
+            if os.path.exists(self._settings_file):
+                with open(self._settings_file, 'r') as f:
+                    self._saved_settings = json.load(f)
+                self.savedSettingsChanged.emit()
+        except Exception as e:
+            print(f"Error loading saved settings: {e}")
+            self._saved_settings = []
+
+    def _save_settings_to_file(self):
+        """Save settings to JSON file."""
+        try:
+            with open(self._settings_file, 'w') as f:
+                json.dump(self._saved_settings, f)
+        except Exception as e:
+            print(f"Error saving settings: {e}")
+
     # Properties and setters...
     @Property(float, notify=pickupCurrentChanged)
     def pickupCurrent(self):
@@ -273,6 +336,57 @@ class ProtectionRelayCalculator(QObject):
     def curveTypes(self):
         """Get list of available curve types."""
         return self._curve_types
+
+    @Property('QVariantList', notify=savedSettingsChanged)
+    def savedSettings(self):
+        """Get list of saved settings."""
+        return self._saved_settings
+
+    @Slot(dict)  # Changed QVariant to dict
+    def saveSettings(self, settings):
+        """Save current settings."""
+        self._saved_settings.append(settings)
+        self._save_settings_to_file()
+        self.savedSettingsChanged.emit()
+
+    @Slot(int)
+    def loadSavedCurve(self, index):
+        """Load saved curve for comparison."""
+        if 0 <= index < len(self._saved_settings):
+            settings = self._saved_settings[index]
+            
+            try:
+                # Try to parse values with proper error handling
+                pickup = float(settings.get('rating', 0)) or 1.0  # Default to 1.0 if missing or invalid
+                
+                # Handle empty or invalid timeDial
+                td_value = settings.get('timeDial', '')
+                td = float(td_value) if td_value and td_value.strip() else 0.5  # Default to 0.5
+                
+                curve_type = settings.get('curveType', "IEC Standard Inverse")
+                
+                # Get curve constants for the specified type
+                constants = self._curve_constants.get(curve_type, 
+                                              self._curve_constants["IEC Standard Inverse"])
+                
+                # Generate curve points
+                curve_points = []
+                current = pickup * 1.1  # Start just above pickup
+                
+                while current <= 10000:
+                    m = current / pickup
+                    if m > 1:
+                        t = (constants["a"] * td) / ((m ** constants["b"]) - 1)
+                        curve_points.append({"current": current, "time": t})
+                    current *= 1.1  # Logarithmic steps
+                
+                # Emit signal with the curve points
+                self.savedCurveReady.emit(curve_points)
+                
+            except Exception as e:
+                print(f"Error loading saved curve: {e}")
+                # Emit empty curve points to prevent UI errors
+                self.savedCurveReady.emit([])
 
     @Slot(str, result='QVariantList')
     def getDeviceRatings(self, device_type):
@@ -416,3 +530,42 @@ class ProtectionRelayCalculator(QObject):
     @Slot(float)
     def setFaultCurrent(self, current):
         self.faultCurrent = current
+
+    # Add capability to calculate fault current based on circuit parameters
+    @Slot(float, float, float, result=float)
+    def calculateFaultCurrent(self, voltage, length, cable_size):
+        """Calculate fault current based on circuit parameters.
+        
+        Args:
+            voltage: Supply voltage in volts
+            length: Cable length in meters
+            cable_size: Cable cross-sectional area in mm²
+            
+        Returns:
+            Estimated fault current in amps
+        """
+        # Approximate resistance per meter (ohm/m) based on cable size
+        resistivity = {
+            1.5: 0.0183,
+            2.5: 0.0109,
+            4: 0.00683,
+            6: 0.00455,
+            10: 0.00273,
+            16: 0.00171,
+            25: 0.00110,
+            35: 0.000786,
+            50: 0.000550,
+            70: 0.000393,
+            95: 0.000289,
+            120: 0.000229
+        }
+        
+        # Calculate circuit resistance (simple model)
+        r_cable = resistivity.get(cable_size, 0.01) * length * 2  # Go and return path
+        r_source = 0.05  # Approximate source impedance in ohms
+        
+        # Calculate fault current using Ohm's law (V=IR)
+        total_r = r_cable + r_source
+        fault_current = voltage / total_r if total_r > 0 else float('inf')
+        
+        return fault_current
