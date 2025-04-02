@@ -26,8 +26,6 @@ Popup {
             
             ColumnLayout {
                 width: parent.width
-                anchors.margins: 20
-                spacing: 10
                 
                 Label {
                     text: "Vestas V27 Wind Turbine Statistics"

@@ -90,7 +90,6 @@ Item {
     ColumnLayout {
         id: button
         anchors.centerIn: parent
-        spacing: 10
        
         ShadowRectangle {
             id: buttonBackground

@@ -172,12 +172,12 @@ Item {
             ColumnLayout {
                 id: waveCardLayout
                 anchors.centerIn: parent
-                 * 1.5  // Increase spacing for better readability
+                 * 1.5
 
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.minimumHeight: 140
-                     * 1.5  // Increase spacing
+                     * 1.5
 
                     ColumnLayout {
                         id: conversionTypeLayout

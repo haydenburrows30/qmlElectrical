@@ -64,8 +64,6 @@ ColumnLayout {
         }
     }
 
-    spacing: 8
-
     Label {
         text: "Phase " + phase
         font.pixelSize: 16
@@ -74,10 +72,8 @@ ColumnLayout {
     }
 
     RowLayout {
-        spacing: 8
 
         ColumnLayout {
-            spacing: 12
             Label { 
                 text: "Amplitude"
                 Layout.minimumWidth: minWidth
@@ -98,7 +94,6 @@ ColumnLayout {
             }
         }
         ColumnLayout {
-            spacing: 12
             Label { 
                 text: "Angle" 
                 Layout.minimumWidth: minWidth
@@ -127,7 +122,6 @@ ColumnLayout {
             }
         }
         ColumnLayout {
-            spacing: 12
             Label { 
                 text: "Magnitude" 
                 Layout.minimumWidth: minWidth
@@ -158,7 +152,6 @@ ColumnLayout {
             }
         }
         ColumnLayout {
-            spacing: 12
             Label { 
                 text: "Angle" 
                 Layout.minimumWidth: minWidth
