@@ -47,6 +47,8 @@ Item {
 
     PopUpText {
         parentCard: results
+        widthFactor: 0.3
+        heightFactor: 0.3
         popupText: "<h3>Harmonic Analyzer</h3><br>" +
                 "Analyze the harmonic components of a waveform. " +
                 "You can adjust the amplitude and phase of each harmonic component to see how it affects the waveform. <br>" +
@@ -54,8 +56,6 @@ Item {
     }
 
     RowLayout {
-        
-        anchors.margins: 10
         anchors.fill: parent
 
         ColumnLayout {
@@ -114,7 +114,6 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             
-
             // Waveform Chart
             WaveCard {
                 id: waveformCard

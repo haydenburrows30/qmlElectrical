@@ -7,6 +7,7 @@ import "../../components"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Charging 1.0
 
@@ -21,23 +22,9 @@ Item {
         visible: false
     }
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Charging Current Calculator</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Charging Current Calculator</h3><br>" +
                     "This calculator estimates the charging current for a cable based on various parameters.<br><br>" +
                     "<b>Voltage:</b> The voltage level of the cable in kV.<br>" +
                     "<b>Cable Type:</b> The type of cable insulation.<br>" +
@@ -47,9 +34,6 @@ Item {
                     "The calculator provides the charging current in amperes based on the selected parameters.<br><br>" +
                     "The visualization shows the charging current distribution along the cable.<br><br>" +
                     "Developed by <b>Wave</b>."
-            }
-            wrapMode: Text.WordWrap
-        }
     }
 
     RowLayout {

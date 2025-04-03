@@ -6,6 +6,7 @@ import "../"
 import "../../components"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Conversion 1.0
 
@@ -40,33 +41,8 @@ Item {
     
     property string activeComboBox: "conversionType"
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Unit Converter </h3><br>" +
-                "The unit converter helps you convert units of voltage, current, frequency, power, and temperature. The converter provides you with a simple and easy-to-use interface to convert units between different systems of measurement. Simply select the conversion type, enter the value you want to convert, and the converter will provide you with the converted value.<br>" +
-                "The unit converter supports a wide range of conversion types, including line to phase voltage, phase to line voltage, line to phase current, phase to line current, watts to dBmW, dBmW to watts, rad/s to Hz, horsepower to watts, RPM to Hz, radians to Hz, Hz to RPM, watts to horsepower, Celsius to Fahrenheit, and Fahrenheit to Celsius. The converter also provides you with a visual representation of the conversion formula, helping you understand the relationship between the different units of measurement."}
-            wrapMode: Text.WordWrap
-        }
-    }
-
     RowLayout {
         anchors.centerIn: parent
-        anchors.margins: 10
-        
 
         WaveCard {
             id: results
@@ -87,7 +63,6 @@ Item {
                     ColumnLayout {
                         id: conversionTypeLayout
                         
-
                         RowLayout {
                             Label {
                                 text: "Voltage"
@@ -218,8 +193,6 @@ Item {
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.minimumHeight: 80
-
-                    
 
                     Label {
                         text: converter.result.toFixed(2)

@@ -40,27 +40,14 @@ anchors.margins: 10
 id: results
 showSettings: true
 
-Popup {
-    id: tipsPopup
-    width: 500
-    height: 300
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2
-    modal: true
-    focus: true
-    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    visible: results.open
+import "../popups"
 
-    onAboutToHide: {
-        results.open = false
+PopUpText {
+        parentCard: results
+        popupText: 
+        widthFactor: 0.5
+        heightFactor: 0.5
     }
-    Text {
-        anchors.fill: parent
-        text: { ""}
-        wrapMode: Text.WordWrap
-    }
-}
-
 // Fonts
 
 FontLoader {

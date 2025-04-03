@@ -15,7 +15,7 @@ Popup {
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    visible: parentCard.open
+    visible: parentCard.open | parentCard.onButtonClicked
 
     property string popupText: ""
     property double widthFactor: 0.5
@@ -23,7 +23,9 @@ Popup {
     property var parentCard: {}
 
     onAboutToHide: {
+        if (parentCard.open) {
         parentCard.open = false
+        }
     }
 
     background: Rectangle {

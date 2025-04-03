@@ -2,11 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "../"
 import "../../components"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Impedance 1.0
 
@@ -15,6 +17,16 @@ Item {
 
     property ImpedanceCalculator calculator: ImpedanceCalculator {}
     property color textColor: Universal.foreground
+
+    PopUpText {
+        parentCard: results
+        popupText: "<h3> Impedance Calculator </h3><br>" +
+                "Impedance is the total opposition to the flow of alternating current in a circuit. <br>" + 
+                "It is the vector sum of resistance and reactance. The impedance is calculated using the formula Z = √(R² + X²) where R is the resistance and X is the reactance. <br>" + 
+                "The phase angle is calculated using the formula θ = arctan(X / R) where θ is the phase angle, R is the resistance, and X is the reactance."
+        widthFactor: 0.4
+        heightFactor: 0.4
+    }
 
     Popup {
         id: tipsPopup

@@ -5,6 +5,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../backgrounds"
 import "../style"
+import "../popups"
 
 import FaultCurrent 1.0
 
@@ -62,24 +63,9 @@ Item {
         }
     }
 
-    Popup {
-        id: tipsPopup
-        width: 500
-        height: 300
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Fault Current Calculator</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Fault Current Calculator</h3><br>" +
                   "This calculator estimates fault currents in an electrical system based on:" +
                   "<ul>" +
                   "<li>System voltage and MVA</li>" +
@@ -92,20 +78,17 @@ Item {
                   "• Initial symmetrical fault current<br>" + 
                   "• Peak fault current<br>" +
                   "• Breaking current<br>" +
-                  "• Thermal equivalent current"}
-            wrapMode: Text.WordWrap
-        }
+                  "• Thermal equivalent current"
+        widthFactor: 0.4
+        heightFactor: 0.4
     }
 
     // Left side inputs and results
     ColumnLayout {
         anchors.centerIn: parent
-        anchors.margins: 10
         
-
         RowLayout {
             id: firstRow
-            
 
             WaveCard {
                 title: "System Parameters"
@@ -118,14 +101,11 @@ Item {
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 10
-                    
-                    
+
                     // Main input parameters
                     GridLayout {
                         columns: 2
-                        
-                        
+
                         Layout.fillWidth: true
 
                         // System parameters
@@ -238,7 +218,6 @@ Item {
                 GridLayout {
                     anchors.fill: parent
                     columns: 2
-                    anchors.margins: 10
 
                     // Main results
                     Label { 
@@ -349,8 +328,7 @@ Item {
             GridLayout {
                 id: advancedPanel
                 columns: 2
-                
-                
+
                 Layout.minimumHeight: 500
                 Layout.minimumWidth: 300
                 Layout.fillWidth: true

@@ -6,6 +6,7 @@ import "../"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Machine 1.0
 
@@ -16,27 +17,9 @@ Item {
     property color textColor: Universal.foreground
     property int waveHeight: 310
 
-    Popup {
-        id: tipsPopup
-        width: parent.width * 0.8
-        height: parent.height * 0.8
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        ScrollView {
-            width: parent.width
-            height: parent.height
-            
-            Text {
-                anchors.fill: parent
-                text: {"<h3>Electric Machine Calculator</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Electric Machine Calculator</h3><br>" +
                     "This calculator is used to estimate the electrical and mechanical parameters of an electric machine.<br><br>" +
                     "<b>Machine Selection:</b><br>" +
                     "Select the type of machine from the drop-down list.<br><br>" +
@@ -50,10 +33,9 @@ Item {
                     "The calculator will display the rated power, power with derating, torque, losses, and efficiency.<br><br>" +
                     "<b>Visualization:</b><br>" +
                     "The right side of the calculator displays a visualization of the electric machine based on the input parameters.<br>" +
-                    "Note: The calculator is for estimation purposes only and may not be accurate for all scenarios."}
-                wrapMode: Text.WordWrap
-            }
-        }
+                    "Note: The calculator is for estimation purposes only and may not be accurate for all scenarios."
+        widthFactor: 0.7
+        heightFactor: 0.7
     }
 
     ScrollView {

@@ -9,6 +9,7 @@ import "../../components"
 import "../style"
 import "../backgrounds"
 import "../buttons"
+import "../popups"
 
 import DiscriminationAnalyzer 1.0
 
@@ -16,28 +17,16 @@ Item {
     id: discriminationAnalyzerCard
 
     property DiscriminationAnalyzer calculator: DiscriminationAnalyzer {}
-
-    Popup {
+    
+    PopUpText {
         id: tipsPopup
-        width: 500
-        height: 300
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Discrimination Analyzer</h3><br>" +
+        parentCard: results
+        popupText: "<h3>Discrimination Analyzer</h3><br>" +
                     "This tool analyzes the discrimination between relays in a protection system.<br><br>" +
                     "The user can add multiple relays with their pickup current and time dial setting (TDS).<br>" +
                     "The tool calculates the minimum margin between the primary and backup relays for different fault levels.<br><br>" +
                     "The visualization shows the margin analysis chart with the relay curves and margin points.<br><br>" +
                     "Developed by <b>Wave</b>."
-            }
-            wrapMode: Text.WordWrap
-        }
     }
 
     ScrollView {
@@ -102,6 +91,7 @@ Item {
                             }
 
                             MessageButton {
+                                id: results
 
                                 // title: "Info"
                                 buttonIcon: '\ue88e'

@@ -7,41 +7,24 @@ import "../"
 import "../../components"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import VoltageDrop 1.0
-
 
 Item {
     id: voltageDropCard
 
     property VoltageDropCalc calculator: VoltageDropCalc {}
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Voltage Drop Calculator </h3><br>" +
-                "Voltage drop is the reduction in voltage that occurs when current flows through a conductor. Voltage drop can cause electrical equipment to malfunction, reduce the efficiency of the system, and increase the risk of fire. Voltage drop is calculated using the formula VD = I * R * L / 1000, where VD is the voltage drop, I is the current, R is the resistance of the conductor, and L is the length of the conductor.<br>" +
-                "The voltage drop calculator helps you calculate the voltage drop in a circuit based on the cable size, length, current, conductor material, and system voltage. Simply enter the required parameters, and the calculator will provide you with the voltage drop and drop percentage in the circuit. The calculator also highlights the drop percentage in red if it exceeds 3%, indicating that the voltage drop is too high and may cause issues in the system.<br>" +
-                "The voltage drop visualization provides you with a visual representation of the voltage drop in the circuit. The source voltage is shown in blue, and the load voltage is shown in red. The drop percentage is displayed at the bottom of the visualization, with the drop percentage highlighted in red if it exceeds 3%. The visualization helps you understand the impact of voltage drop on the system and identify areas where voltage drop is too high."}
-            wrapMode: Text.WordWrap
-        }
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Voltage Drop Calculator </h3><br>" +
+                "Voltage drop is the reduction in voltage that occurs when current flows through a conductor. Voltage drop can cause electrical equipment to malfunction, reduce the efficiency of the system, and increase the risk of fire. Voltage drop is calculated using the formula VD = I * R * L / 1000, where VD is the voltage drop, I is the current, R is the resistance of the conductor, and L is the length of the conductor.<br><br>" +
+                "The voltage drop calculator helps you calculate the voltage drop in a circuit based on the cable size, length, current, conductor material, and system voltage. Simply enter the required parameters, and the calculator will provide you with the voltage drop and drop percentage in the circuit. The calculator also highlights the drop percentage in red if it exceeds 3%, indicating that the voltage drop is too high and may cause issues in the system.<br><br>" +
+                "The voltage drop visualization provides you with a visual representation of the voltage drop in the circuit. The source voltage is shown in blue, and the load voltage is shown in red. The drop percentage is displayed at the bottom of the visualization, with the drop percentage highlighted in red if it exceeds 3%. The visualization helps you understand the impact of voltage drop on the system and identify areas where voltage drop is too high."
     }
 
     RowLayout {
-        id: layoutt
         anchors.centerIn: parent
 
         ColumnLayout {

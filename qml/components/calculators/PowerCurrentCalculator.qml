@@ -5,6 +5,7 @@ import "../"
 import "../../components"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import PCalculator 1.0
 import KwFromCurrent 1.0
@@ -20,56 +21,26 @@ Item {
         visible: false
     }
 
-    Popup {
-        id: tipsPopup
-        width: 300
-        height: 200
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Transformer Calculator </h3><br> Helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: <br><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Transformer Calculator </h3><br> Helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: <br><br>" +
                    "Single Phase: I = kVA / V <br>" +
-                   "Three Phase: I = kVA / (V × √3)"}
-            wrapMode: Text.WordWrap
-        }
+                   "Three Phase: I = kVA / (V × √3)"
+        widthFactor: 0.3
+        heightFactor: 0.3
     }
 
-    Popup {
-        id: tipsPopup1
-        width: 300
-        height: 200
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results1.open
-
-        onAboutToHide: {
-            results1.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3> Current->Power Calculator </h3><br> Calculate the power consumed by a device based on the current and power factor. The formula used is: <br><br>" +
+    PopUpText {
+        parentCard: results1
+        popupText: "<h3> Current->Power Calculator </h3><br> Calculate the power consumed by a device based on the current and power factor. The formula used is: <br><br>" +
                      "Single Phase: P = V × I × PF / 1000<br>" +
-                     "Three Phase: P = √3 × V × I × PF / 1000"}
-            wrapMode: Text.WordWrap
-        }
+                     "Three Phase: P = √3 × V × I × PF / 1000"
+        widthFactor: 0.3
+        heightFactor: 0.3
     }
 
     RowLayout {
         anchors.centerIn: parent
-        
-        anchors.margins: 10
 
         WaveCard {
             id: results
@@ -82,7 +53,6 @@ Item {
          
             ColumnLayout {
                 anchors.centerIn: parent
-                
                 Layout.maximumWidth: 300
 
                 RowLayout {
@@ -266,10 +236,9 @@ Item {
          
             ColumnLayout {
                 anchors.centerIn: parent
-                
                 Layout.maximumWidth: 300
 
-                Text {
+                Label {
                     text: "Single Phase: 230V | Three Phase: 415V"
                     font.italic: true
                     color: "gray"
@@ -363,13 +332,13 @@ Item {
                 }
 
                 RowLayout {
-                    
                     Layout.topMargin: 15
                     
                     Label {
                         text: "Power (kW):"
                         Layout.preferredWidth: 100
                     }
+
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 30
@@ -411,7 +380,7 @@ Item {
                     }
                 }
 
-                Text {
+                Label {
                     text: phaseSelector1.currentText === "Single Phase" ? 
                           "Formula: P = V × I × PF / 1000" : 
                           "Formula: P = √3 × V × I × PF / 1000"
@@ -420,7 +389,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                 }
 
-                Text {
+                Label {
                     id: errorMessage1
                     color: "red"
                     visible: (!currentInput.acceptableInput && currentInput.text !== "") ||

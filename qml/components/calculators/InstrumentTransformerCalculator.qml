@@ -8,6 +8,7 @@ import "../visualizers/"
 import "../style"
 import "../backgrounds"
 import "../buttons"
+import "../popups"
 
 import InstrumentTransformer 1.0
 
@@ -17,32 +18,16 @@ Item {
     property InstrumentTransformerCalculator calculator: InstrumentTransformerCalculator {}
     property color textColor: Universal.foreground
 
-    Popup {
+    PopUpText {
         id: tipsPopup
-        width: 500
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Instrument Transformer Calculator</h3><br>" +
+        parentCard: info
+        popupText: "<h3>Instrument Transformer Calculator</h3><br>" +
                     "This calculator estimates the performance of current and voltage transformers based on various parameters.<br><br>" +
                     "<b>Current Transformer:</b> The type, ratio, burden, power factor, temperature, and accuracy class.<br>" +
                     "<b>Voltage Transformer:</b> The ratio, burden, rated voltage factor, and burden status.<br><br>" +
                     "The calculator provides the knee point voltage, maximum fault current, minimum CT burden, error margin, temperature effect, VT rated voltage, VT impedance, and burden utilization.<br><br>" +
                     "The visualization shows the transformer connections and the current and voltage waveforms.<br><br>" +
                     "Developed by <b>Wave</b>."
-            }
-            wrapMode: Text.WordWrap
-        }
     }
 
     Popup {
@@ -97,14 +82,12 @@ Item {
             RowLayout {
                 id: mainLayout
                 width: scrollView.width
-                
 
                 // Left side inputs and results
                 ColumnLayout {
                     id: leftColumn
                     Layout.minimumWidth: 380
                     Layout.maximumWidth: 380
-                    
                     Layout.alignment: Qt.AlignTop
 
                     // Controls
@@ -123,8 +106,6 @@ Item {
                                 Layout.alignment: Qt.AlignRight
                                 Layout.columnSpan: 2
 
-                                // textVisible: false
-
                                 defaultMessage: ""
                                 successMessage: "Parameters reset"
                                 errorMessage: "PDF export failed"
@@ -139,7 +120,7 @@ Item {
                             }
 
                             MessageButton {
-
+                                id: info
                                 title: "Info"
                                 buttonIcon: '\ue88e'
                                 buttonColor: Style.charcoalGrey
@@ -331,8 +312,6 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            
-                            
 
                             Label { text: "VT Ratio:" ; Layout.minimumWidth: 160}
                             ComboBox {
@@ -379,8 +358,6 @@ Item {
 
                         GridLayout {
                             columns: 2
-                            
-                            
 
                             Label { text: "CT Knee Point:" ; Layout.minimumWidth: 160}
                             TextField { 

@@ -45,15 +45,6 @@ Item {
                     Text { text: "• Protection CTs:" }
                     Text { text: "300/1A, 5P20, 10VA" }
                     
-                    Text { text: "• Test Windings:" }
-                    Text { text: "3 turns, Class 0.5" }
-                    
-                    Text { text: "<b>Protective Devices:</b>" }
-                    Text { text: "<b>Settings:</b>" }
-                    
-                    Text { text: "• Current-Limiting Fuses:" }
-                    Text { text: "200A, Type K" }
-                    
                     Text { text: "• Voltage Sensing Circuit Fuses:" }
                     Text { text: "2A, Type D" }
                     

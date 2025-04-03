@@ -8,6 +8,7 @@ import "../visualizers"
 import "../backgrounds"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import OhmsLaw 1.0
 
@@ -205,74 +206,16 @@ Item {
         return `Recommended power supply: ${recommendedVoltage.toFixed(1)}V @ ${recommendedCurrent.toFixed(1)}A`;
     }
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-
-        contentItem: ColumnLayout {
-            id: tipsLayout
-            width: tipsPopup.width
-            height: tipsPopup.height
-            anchors.fill: parent
-            spacing: 10
-            
-            Text {
-                text: "<b>Basic Ohm's Law Equations:</b>"
-                font.pixelSize: 14
-            }
-            
-            GridLayout {
-                columns: 2
-                Layout.fillWidth: true
-                
-                Text { text: "Voltage (V):" }
-                Text { text: "V = I × R" }
-                
-                Text { text: "Current (I):" }
-                Text { text: "I = V / R" }
-                
-                Text { text: "Resistance (R):" }
-                Text { text: "R = V / I" }
-                
-                Text { text: "Power (P):" }
-                Text { text: "P = V × I = I² × R = V² / R" }
-            }
-            
-            Text {
-                text: "<b>Applications:</b>"
-                font.pixelSize: 14
-                Layout.topMargin: 10
-            }
-            
-            Text {
-                text: "Ohm's Law is the foundation of electrical engineering and is used for circuit analysis, " +
-                    "component selection, power calculations, fuse and circuit protection sizing, voltage " +
-                    "regulation, and more. Understanding these relationships is essential for designing and " +
-                    "troubleshooting electrical and electronic circuits."
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-            }
-            
-            Text {
-                text: "<b>Note:</b> Ohm's Law applies to resistive elements in DC circuits and to the magnitude " +
-                    "of voltage, current, and impedance in sinusoidal AC circuits."
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                Layout.topMargin: 10
-            }
-        }
+    PopUpText {
+        widthFactor: 0.2
+        heightFactor: 0.4
+        parentCard: results
+        
+        popupText: "<h3>Basic Ohm's Law Equations:</h3><br>" +
+                "<h4> Voltage (V): </h4> V = I × R<br>" +
+                "<h4> Current (I): </h4> I = V / R <br>" +
+                "<h4> Resistance (R): </h4> R = V / I <br>" +
+                "<h4> Power (P): </h4> P = V × I = I² × R = V² / R"
     }
 
     Dialog {
@@ -353,14 +296,6 @@ Item {
             Layout.maximumWidth: 450
 
             showSettings: true
-            
-            onOpenChanged: {
-                if (open) {
-                    tipsPopup.open()
-                } else {
-                    tipsPopup.close()
-                }
-            }
             
             GridLayout {
                 anchors.fill: parent

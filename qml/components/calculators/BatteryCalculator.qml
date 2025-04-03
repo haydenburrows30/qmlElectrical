@@ -18,8 +18,6 @@ Item {
     property BatteryCalculator calculator: BatteryCalculator {}
 
     PopUpText {
-        widthFactor: 0.5
-        heightFactor: 0.5
         parentCard: results
         popupText: "<h3>Battery Calculator</h3><br>" +
                 "This calculator estimates the battery capacity required for a given load and backup time.<br><br>" +

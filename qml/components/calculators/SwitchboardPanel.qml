@@ -10,6 +10,7 @@ import "../charts/"
 import "../visualizers/"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Switchboard 1.0
 
@@ -19,23 +20,9 @@ Item {
     property SwitchboardManager manager: SwitchboardManager {}
     property color textColor: Universal.foreground
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Switchboard Designer</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Switchboard Designer</h3><br>" +
                    "This tool helps you design electrical switchboards by entering circuit data such as:<br><br>" +
                    "• Breaker details (size, poles, type)<br>" +
                    "• Circuit destination and load<br>" +
@@ -43,15 +30,12 @@ Item {
                    "• Load characteristics<br><br>" +
                    "The tool will calculate loading, verify compliance, and enable export of the full switchboard schedule.<br><br>" +
                    "Double-click any row to edit circuit details, or use the + button to add a new circuit."
-            }
-            wrapMode: Text.WordWrap
-        }
+        widthFactor: 0.5
+        heightFactor: 0.5
     }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 10
-        
 
         // Header section with general switchboard info
         WaveCard {
@@ -64,8 +48,6 @@ Item {
             GridLayout {
                 anchors.fill: parent
                 columns: 4
-                
-                columnSpacing: 15
 
                 Label { text: "Switchboard Name:" }
                 TextField {

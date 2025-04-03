@@ -8,6 +8,7 @@ import "../visualizers/"
 import "../backgrounds"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import Earthing 1.0
 
@@ -17,23 +18,11 @@ Item {
     property EarthingCalculator calculator: EarthingCalculator {}
     property color textColor: Universal.foreground
 
-    Popup {
-        id: tipsPopup
-        width: 700
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Earthing System Calculator</h3><br>" +
+    PopUpText {
+            parentCard: results
+            widthFactor: 0.5
+            heightFactor: 0.6
+            popupText: "<h3>Earthing System Calculator</h3><br>" +
                     "This calculator estimates the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for an earthing system.<br><br>" +
                     "<b>Grid Parameters:</b><br>" +
                     "<b>Soil Resistivity:</b> The resistivity of the soil in Ω⋅m.<br>" +
@@ -49,10 +38,7 @@ Item {
                     "The calculator provides the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for the earthing system.<br><br>" +
                     "The visualization shows the earthing system with the grid and ground rods.<br><br>" +
                     "Developed by <b>Wave</b>."
-            }
-            wrapMode: Text.WordWrap
         }
-    }
 
     RowLayout {
         anchors.fill: parent

@@ -35,21 +35,20 @@ Item {
         circuitCanvas.requestPaint();
     }
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        VoltageDividerPopup {}
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Voltage Divider Equation:</h3><br>" +
+                    "<b>Vout</b> = Vin × (R2 / (R1 + R2))<br><br>" +
+                    "<b>Applications:</b><br>" +
+                    "• Level shifting for ADC inputs<br>" +
+                        "• Reference voltage generation<br>" +
+                        "• Biasing circuits<br>" +
+                        "• Attenuators<br>" +
+                        "• Potential dividers for measurement<br><br>" +
+                        "<b>Note:</b> For high impedance loads, the output voltage closely follows the theoretical value. " +
+                        "For low impedance loads, loading effects must be considered."
+        // widthFactor: 0.5
+        // heightFactor: 0.5
     }
 
     ColumnLayout {

@@ -6,6 +6,7 @@ import "../"
 import "../../components"
 import "../style"
 import "../backgrounds"
+import "../popups"
 
 import PFCorrection 1.0
 
@@ -15,35 +16,19 @@ Item {
     property PowerFactorCorrectionCalculator calculator: PowerFactorCorrectionCalculator {}
     property color textColor: Universal.foreground
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 500
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<h3>Power Factor Correction</h3><br>" +
+    PopUpText {
+        parentCard: results
+        popupText: "<h3>Power Factor Correction</h3><br>" +
                 "Power factor correction is a technique used to improve the power factor of a power system by adding capacitors to the system. This helps to reduce the reactive power drawn from the grid, which in turn reduces the losses in the system and improves the efficiency of the system.<br><br>" +
                 "The power factor is the ratio of the real power (kW) to the apparent power (kVA) in the system. A power factor of 1 indicates that all the power is being used effectively, while a power factor of 0 indicates that all the power is being wasted. Power factor correction is used to bring the power factor closer to 1, which reduces the reactive power and improves the efficiency of the system.<br><br>" +
                 "The power factor correction calculator helps you calculate the required capacitor size and capacitance needed to improve the power factor of a system. Simply enter the active power (kW), current power factor, and target power factor, and the calculator will provide you with the required capacitor size and capacitance needed to achieve the target power factor.<br><br>" +
-                "The calculator also provides you with the annual savings that can be achieved by improving the power factor of the system. Power factor correction can help reduce the losses in the system, improve the efficiency of the system, and save you money on your electricity bills."}
-            wrapMode: Text.WordWrap
-        }
+                "The calculator also provides you with the annual savings that can be achieved by improving the power factor of the system. Power factor correction can help reduce the losses in the system, improve the efficiency of the system, and save you money on your electricity bills."
+        widthFactor: 0.5
+        heightFactor: 0.6
     }
 
     RowLayout {
-        
         anchors.centerIn: parent
-        
 
         // Input Section
         ColumnLayout {
@@ -61,9 +46,7 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    
-                    
-                    
+
                     Label { text: "Active Power (kW):" ; Layout.minimumWidth: 170}
                     TextField {
                         id: activePowerInput
@@ -99,8 +82,6 @@ Item {
 
                 GridLayout {
                     columns: 2
-                    
-                    
 
                     Label { text: "Required Capacitor:" ; Layout.minimumWidth: 170}
                     TextField { 
