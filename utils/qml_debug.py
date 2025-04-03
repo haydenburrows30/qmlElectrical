@@ -1,5 +1,5 @@
-from PySide6.QtCore import QObject, Signal, Slot, Property
-from PySide6.QtQml import QQmlApplicationEngine, QJSValue
+from PySide6.QtCore import QObject, Slot
+from PySide6.QtQml import QJSValue
 
 class QmlDebugHelper(QObject):
     def __init__(self, parent=None):

@@ -1,9 +1,6 @@
 from PySide6.QtCore import Slot, Signal, Property
 from models.calculators.BaseCalculator import BaseCalculator
 
-from PySide6.QtCore import *
-from PySide6.QtCharts import *
-
 import math
 
 class PowerCalculator(BaseCalculator):

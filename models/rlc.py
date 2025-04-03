@@ -1,6 +1,5 @@
-from PySide6.QtCore import *
-from PySide6.QtCharts import *
-
+from PySide6.QtCore import QObject, Slot, QPointF, Signal, Property, QUrl
+from PySide6.QtCharts import QXYSeries
 import numpy as np
 
 class RLCChart(QObject):

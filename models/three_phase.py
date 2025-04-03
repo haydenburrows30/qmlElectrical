@@ -1,7 +1,5 @@
-from PySide6.QtCore import Slot, Signal, Property, QObject
-
-from PySide6.QtCore import *
-from PySide6.QtCharts import *
+from PySide6.QtCore import Slot, Signal, Property, QObject, QPointF
+from PySide6.QtCharts import QXYSeries
 
 import numpy as np
 
