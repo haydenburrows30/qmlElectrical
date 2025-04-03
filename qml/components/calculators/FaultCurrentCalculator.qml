@@ -90,6 +90,7 @@ Item {
         RowLayout {
             id: firstRow
 
+            // Inputs
             WaveCard {
                 title: "System Parameters"
                 Layout.fillWidth: true
@@ -99,112 +100,105 @@ Item {
                 id: results
                 showSettings: true
 
-                ColumnLayout {
+                GridLayout {
+                    columns: 2
                     anchors.fill: parent
 
-                    // Main input parameters
-                    GridLayout {
-                        columns: 2
-
+                    // System parameters
+                    Label { text: "System Voltage (kV):" }
+                    TextField {
+                        id: systemVoltage
+                        text: "11"
+                        validator: DoubleValidator { bottom: 0.4; decimals: 1 }
+                        onTextChanged: if(acceptableInput) calculator.setSystemVoltage(parseFloat(text))
                         Layout.fillWidth: true
-
-                        // System parameters
-                        Label { text: "System Voltage (kV):" }
-                        TextField {
-                            id: systemVoltage
-                            text: "11"
-                            validator: DoubleValidator { bottom: 0.4; decimals: 1 }
-                            onTextChanged: if(acceptableInput) calculator.setSystemVoltage(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        Label { text: "System MVA:" }
-                        TextField {
-                            id: systemMva
-                            text: "500"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setSystemMva(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        Label { text: "System X/R Ratio:" }
-                        TextField {
-                            id: systemXrRatio
-                            text: "15"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setSystemXrRatio(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        // Transformer parameters
-                        Label { text: "Transformer Rating (MVA):" }
-                        TextField {
-                            id: transformerMva
-                            text: "5"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setTransformerMva(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        Label { text: "Transformer Z%:" }
-                        TextField {
-                            id: transformerZ
-                            text: "6"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setTransformerZ(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        // Cable parameters
-                        Label { text: "Cable Length (km):" }
-                        TextField {
-                            id: cableLength
-                            text: "0.5"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setCableLength(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        Label { text: "Cable R (Ω/km):" }
-                        TextField {
-                            id: cableR
-                            text: "0.2"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setCableR(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        Label { text: "Cable X (Ω/km):" }
-                        TextField {
-                            id: cableX
-                            text: "0.15"
-                            validator: DoubleValidator { bottom: 0 }
-                            onTextChanged: if(acceptableInput) calculator.setCableX(parseFloat(text))
-                            Layout.fillWidth: true
-                        }
-
-                        // Fault parameters
-                        Label { text: "Fault Type:" }
-                        ComboBox {
-                            id: faultType
-                            model: ["3-Phase", "Line-Line", "Line-Ground", "Line-Line-Ground"]
-                            onCurrentTextChanged: calculator.setFaultType(currentText)
-                            Layout.fillWidth: true
-                        }
                     }
 
+                    Label { text: "System MVA:" }
+                    TextField {
+                        id: systemMva
+                        text: "500"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setSystemMva(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "System X/R Ratio:" }
+                    TextField {
+                        id: systemXrRatio
+                        text: "15"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setSystemXrRatio(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    // Transformer parameters
+                    Label { text: "Transformer Rating (MVA):" }
+                    TextField {
+                        id: transformerMva
+                        text: "5"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setTransformerMva(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Transformer Z%:" }
+                    TextField {
+                        id: transformerZ
+                        text: "6"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setTransformerZ(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    // Cable parameters
+                    Label { text: "Cable Length (km):" }
+                    TextField {
+                        id: cableLength
+                        text: "0.5"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setCableLength(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Cable R (Ω/km):" }
+                    TextField {
+                        id: cableR
+                        text: "0.2"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setCableR(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    Label { text: "Cable X (Ω/km):" }
+                    TextField {
+                        id: cableX
+                        text: "0.15"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setCableX(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    // Fault parameters
+                    Label { text: "Fault Type:" }
+                    ComboBox {
+                        id: faultType
+                        model: ["3-Phase", "Line-Line", "Line-Ground", "Line-Line-Ground"]
+                        onCurrentTextChanged: calculator.setFaultType(currentText)
+                        Layout.fillWidth: true
+                    }
                     Button {
                         id: advancedButton
                         text: "Advanced Settings"
                         checkable: true
-                        Layout.alignment: Qt.AlignHCenter
+                        Layout.alignment: Qt.AlignRight
+                        Layout.columnSpan: 2
+
                         onClicked: {
                             advancedPanel.visible = !advancedPanel.visible
                             checked = advancedPanel.visible
                         }
                     }
-
-                    Label {Layout.fillHeight: true}
                 }
             }
 
@@ -305,85 +299,82 @@ Item {
             }
            
             // Advanced parameters
-            GridLayout {
+            WaveCard {
                 id: advancedPanel
-                columns: 2
+                title: "Advanced Settings" 
 
                 Layout.minimumHeight: 500
                 Layout.minimumWidth: 300
-                Layout.fillWidth: true
-
                 visible: false
-                
-                Label { 
-                    text: "Advanced Settings" 
-                    font.bold: true
-                    Layout.columnSpan: 2
-                    Layout.alignment: Qt.AlignHCenter
-                }
 
-                Rectangle {
-                    height: 1
-                    color: Universal.accent
-                    opacity: 0.3
-                    Layout.columnSpan: 2
-                    Layout.fillWidth: true
-                    Layout.topMargin: 5
-                    Layout.bottomMargin: 10
-                }
-                
-                Label { text: "Transformer X/R Ratio:" }
-                TextField {
-                    id: transformerXrRatio
-                    text: "10"
-                    validator: DoubleValidator { bottom: 0 }
-                    onTextChanged: if(acceptableInput) calculator.setTransformerXrRatio(parseFloat(text))
-                    Layout.fillWidth: true
-                }
-                
-                Label { text: "Fault Resistance (Ω):" }
-                TextField {
-                    id: faultResistance
-                    text: "0"
-                    validator: DoubleValidator { bottom: 0 }
-                    onTextChanged: if(acceptableInput) calculator.setFaultResistance(parseFloat(text))
-                    Layout.fillWidth: true
-                }
-                
-                Label { text: "Include Motors:" }
-                CheckBox {
-                    id: includeMotors
-                    checked: false
-                    onCheckedChanged: calculator.setIncludeMotors(checked)
-                }
-                
-                Label { 
-                    text: "Motor Rating (MVA):" 
-                    enabled: includeMotors.checked
-                }
-                TextField {
-                    id: motorMva
-                    text: "1"
-                    enabled: includeMotors.checked
-                    validator: DoubleValidator { bottom: 0 }
-                    onTextChanged: if(acceptableInput) calculator.setMotorMva(parseFloat(text))
-                    Layout.fillWidth: true
-                }
-                
-                Label { 
-                    text: "Motor Contribution Factor:" 
-                    enabled: includeMotors.checked
-                }
-                TextField {
-                    id: motorContributionFactor
-                    text: "4"
-                    enabled: includeMotors.checked
-                    validator: DoubleValidator { bottom: 0 }
-                    onTextChanged: if(acceptableInput) calculator.setMotorContributionFactor(parseFloat(text))
-                    Layout.fillWidth: true
-                }
+                GridLayout {
+                    columns: 2
+                    anchors.fill: parent
+                    anchors.top: parent.top
 
-                Label{Layout.fillHeight: true}
+                    Rectangle {
+                        height: 1
+                        color: Universal.accent
+                        opacity: 0.3
+                        Layout.columnSpan: 2
+                        Layout.fillWidth: true
+                        Layout.topMargin: 5
+                        Layout.bottomMargin: 10
+                    }
+                    
+                    Label { text: "Transformer X/R Ratio:" }
+                    TextField {
+                        id: transformerXrRatio
+                        text: "10"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setTransformerXrRatio(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "Fault Resistance (Ω):" }
+                    TextField {
+                        id: faultResistance
+                        text: "0"
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setFaultResistance(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "Include Motors:" }
+                    CheckBox {
+                        id: includeMotors
+                        checked: false
+                        onCheckedChanged: calculator.setIncludeMotors(checked)
+                    }
+                    
+                    Label { 
+                        text: "Motor Rating (MVA):" 
+                        enabled: includeMotors.checked
+                    }
+                    TextField {
+                        id: motorMva
+                        text: "1"
+                        enabled: includeMotors.checked
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setMotorMva(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { 
+                        text: "Motor Contribution Factor:" 
+                        enabled: includeMotors.checked
+                    }
+                    TextField {
+                        id: motorContributionFactor
+                        text: "4"
+                        enabled: includeMotors.checked
+                        validator: DoubleValidator { bottom: 0 }
+                        onTextChanged: if(acceptableInput) calculator.setMotorContributionFactor(parseFloat(text))
+                        Layout.fillWidth: true
+                    }
+
+                    Label{Layout.fillHeight: true}
+                }
             }
         }
 

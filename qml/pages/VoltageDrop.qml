@@ -88,20 +88,26 @@ Page {
                             current: voltageDrop.current || 0.0
                             
                             onSaveResultsClicked: {
+                                // Add validation function to handle NaN values
+                                function safeValue(value, defaultValue = 0) {
+                                    return (value === undefined || value === null || isNaN(value)) ? 
+                                           defaultValue : value;
+                                }
+                                
                                 resultsManager.save_calculation({
                                     "voltage_system": cableSettings.voltageSelect.currentText,
-                                    "kva_per_house": parseFloat(cableSettings.kvaPerHouseInput.text),
-                                    "num_houses": parseInt(cableSettings.numberOfHousesInput.text),
-                                    "diversity_factor": voltageDrop.diversityFactor,
-                                    "total_kva": voltageDrop.totalKva,
-                                    "current": voltageDrop.current,
-                                    "cable_size": cableSettings.cableSelect.currentText,
-                                    "conductor": cableSettings.conductorSelect.currentText,
-                                    "core_type": cableSettings.coreTypeSelect.currentText,
-                                    "length": parseFloat(cableSettings.lengthInput.text),
-                                    "voltage_drop": root.currentVoltageDropValue,
-                                    "drop_percent": resultsPanel.dropPercentage,
-                                    "admd_enabled": cableSettings.admdCheckBox.checked
+                                    "kva_per_house": safeValue(parseFloat(cableSettings.kvaPerHouseInput.text)),
+                                    "num_houses": safeValue(parseInt(cableSettings.numberOfHousesInput.text), 1),
+                                    "diversity_factor": safeValue(voltageDrop.diversityFactor, 1),
+                                    "total_kva": safeValue(voltageDrop.totalKva),
+                                    "current": safeValue(voltageDrop.current),
+                                    "cable_size": cableSettings.cableSelect.currentText || "Unknown",
+                                    "conductor": cableSettings.conductorSelect.currentText || "Unknown",
+                                    "core_type": cableSettings.coreTypeSelect.currentText || "Unknown",
+                                    "length": safeValue(parseFloat(cableSettings.lengthInput.text)),
+                                    "voltage_drop": safeValue(root.currentVoltageDropValue),
+                                    "drop_percent": safeValue(resultsPanel.dropPercentage),
+                                    "admd_enabled": !!cableSettings.admdCheckBox.checked
                                 });
                             }
                             
