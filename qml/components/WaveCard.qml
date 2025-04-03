@@ -7,7 +7,7 @@ import "style"
 
 Rectangle {
     id: controlRect
-    color: sideBar.modeToggled ? Style.mainBackgroundDark : Style.mainBackgroundLight
+    color: sideBar.modeToggled ? "#000000" : "#ffffff"
     border.width: 1
     border.color: sideBar.modeToggled ? Universal.Dark : Qt.lighter("#cccccc",1.1)
     radius: 10
@@ -32,7 +32,6 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: titleVisible ? 20 : 10 // change margins if title not visible
         
-
         Label {
             Layout.fillWidth: true
             text: controlRect.title

@@ -22,7 +22,6 @@ Page {
         ColumnLayout {
             width: scrollView.width
             
-
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 80
@@ -54,7 +53,6 @@ Page {
                 Layout.fillHeight: true
                 Layout.margins: 10
                 
-                
                 // Cable data editor
                 CableDataEditor {
                     Layout.fillWidth: true
@@ -66,7 +64,6 @@ Page {
                 ColumnLayout {
                     Layout.preferredWidth: 350
                     Layout.fillHeight: true
-                    
                     
                     // Cable reference data
                     WaveCard {
@@ -119,7 +116,6 @@ Page {
                             anchors.fill: parent
                             anchors.margins: 10
                             
-                            
                             Label {
                                 text: "Conductor Material Properties"
                                 font.bold: true
@@ -129,8 +125,6 @@ Page {
                             GridLayout {
                                 Layout.fillWidth: true
                                 columns: 3
-                                columnSpacing: 10
-                                rowSpacing: 10
                                 
                                 Label { text: "Property"; font.bold: true }
                                 Label { text: "Copper"; font.bold: true }

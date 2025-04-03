@@ -96,14 +96,12 @@ Page {
                 width: scrollView.width
                 anchors.left: parent.left
                 
-
                 //Settings
                 ColumnLayout {
                     Layout.fillHeight: true
                     Layout.minimumWidth: 350
                     Layout.maximumWidth: 350
                     
-
                     ButtonCard {
                         Layout.fillWidth: true
                         Layout.minimumHeight: 80
@@ -220,7 +218,6 @@ Page {
                         showSettings: true
 
                         ColumnLayout {
-                            
                             Layout.fillWidth: true
                             
                             Repeater {

@@ -22,26 +22,12 @@ Page {
 
     property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
 
-    Popup {
-        id: tipsPopup
-        width: 600
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: {"<b>Overview</b><br> This tool is used to calculate the voltage drop in a cable system. The tool calculates the voltage drop based on the cable size, length, current, and other factors. The tool also provides a comparison of different cable sizes and their voltage drop values. <br> " +
-            "<br> <b>Results</b><br> The tool displays the voltage drop, current, and other results of the calculation. You can save the results and view the details of the calculation."}
-            wrapMode: Text.WordWrap
-        }
+    PopUpText {
+        parentCard: results
+        popupText: "<b>Overview</b><br> This tool is used to calculate the voltage drop in a cable system. The tool calculates the voltage drop based on the cable size, length, current, and other factors. The tool also provides a comparison of different cable sizes and their voltage drop values. <br> " +
+            "<br> <b>Results</b><br> The tool displays the voltage drop, current, and other results of the calculation. You can save the results and view the details of the calculation."
+        widthFactor: 0.3
+        heightFactor: 0.3
     }
 
     background: Rectangle {

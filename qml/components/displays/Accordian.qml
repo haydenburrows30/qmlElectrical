@@ -8,6 +8,20 @@ import "../displays"
 import "../style"
 
 Pane {
+    id: accordionPane
+    property var accordionSections: []
+    
+    // Model for the accordion sections
+    ListModel {
+        id: accordionModel
+        ListElement { title: "LV Wind Generator Protection (400V)"; component: "WindGenProtectionResults" }
+        ListElement { title: "Line Protection (11kV)"; component: "LineProtectionResults" }
+        ListElement { title: "Transformer Protection"; component: "ProtectionRequirementsResults" }
+        ListElement { title: "Voltage Regulator Protection"; component: "VoltageRegResults" }
+        ListElement { title: "ABB REF615"; component: "ABBConfig" }
+        ListElement { title: "Grid Protection Requirements"; component: "GridConnectionReq" }
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -25,7 +39,6 @@ Pane {
                 anchors.left: parent.left
 
                 RowLayout {
-
                     Button {
                         text: "Calculate Complete System"
                         Layout.alignment: Qt.AlignHCenter
@@ -42,12 +55,9 @@ Pane {
                         Layout.bottomMargin: 15
                         font.pixelSize: 14
                         onClicked: {
-                            paneSettingsList.shown = false
-                            paneSettingsList1.shown = false
-                            paneSettingsList2.shown = false
-                            paneSettingsList3.shown = false
-                            paneSettingsList4.shown = false
-                            paneSettingsList5.shown = false
+                            for (let i = 0; i < accordionSections.length; i++) {
+                                accordionSections[i].shown = false;
+                            }
                         }
                     }
 
@@ -58,282 +68,84 @@ Pane {
                         Layout.bottomMargin: 15
                         font.pixelSize: 14
                         onClicked: { 
-                            paneSettingsList.shown = true
-                            paneSettingsList1.shown = true
-                            paneSettingsList2.shown = true
-                            paneSettingsList3.shown = true
-                            paneSettingsList4.shown = true
-                            paneSettingsList5.shown = true
-                        }
-                    }
-                }
-
-                // LV Wind Generator Protection (400V)
-                Column {
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-
-                    property bool showList: false
-
-                    Button {
-                        id: button1
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        text: "LV Wind Generator Protection (400V)"
-                        onClicked: paneSettingsList.shown = !paneSettingsList.shown
-                    }
-
-                    Pane {
-                        id: paneSettingsList
-
-                        property bool shown: false
-                        visible: height > 0
-                        height: shown ? implicitHeight : 0
-                        Behavior on height {
-                            NumberAnimation {
-                                easing.type: Easing.InOutQuad
+                            for (let i = 0; i < accordionSections.length; i++) {
+                                accordionSections[i].shown = true;
                             }
                         }
-
-                        clip: true
-
-                        padding: 0
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        ColumnLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            
-
-                            WindGenProtectionResults {}
-                        }
                     }
                 }
 
-                //Line Protection
-                Column {
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-
-                    property bool showList: false
-
-                    Button {
-                        id: button2
-                        anchors.left: parent.left
+                // Repeater for accordion sections
+                Repeater {
+                    id: accordionRepeater
+                    model: accordionModel
+                    
+                    Column {
                         anchors.right: parent.right
-                        text: "Line Protection (11kV)"
-                        onClicked: paneSettingsList1.shown = !paneSettingsList1.shown
-                        
-                    }
+                        anchors.left: parent.left
+                        property bool showList: false
 
-                    Pane {
-                        id: paneSettingsList1
+                        Button {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            text: model.title
+                            onClicked: accordionPane.accordionSections[index].shown = !accordionPane.accordionSections[index].shown
+                        }
 
-                        property bool shown: false
-                        visible: height > 0
-                        height: shown ? implicitHeight : 0
-                        Behavior on height {
-                            NumberAnimation {
-                                easing.type: Easing.InOutQuad
+                        Pane {
+                            id: paneSection
+                            Component.onCompleted: {
+                                // Add this pane to the list of accordion sections
+                                let sections = accordionPane.accordionSections;
+                                sections.push(paneSection);
+                                accordionPane.accordionSections = sections;
+                            }
+
+                            property bool shown: false
+                            visible: height > 0
+                            height: shown ? implicitHeight : 0
+                            Behavior on height {
+                                NumberAnimation {
+                                    easing.type: Easing.InOutQuad
+                                }
+                            }
+
+                            clip: true
+                            padding: 15
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+
+                            ColumnLayout {
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                
+                                // Dynamically create component based on model
+                                Loader {
+                                    sourceComponent: {
+                                        switch(model.component) {
+                                            case "WindGenProtectionResults": return windGenComponent;
+                                            case "LineProtectionResults": return lineProtectionComponent;
+                                            case "ProtectionRequirementsResults": return protectionReqComponent;
+                                            case "VoltageRegResults": return voltageRegComponent;
+                                            case "ABBConfig": return abbConfigComponent;
+                                            case "GridConnectionReq": return gridConnectionComponent;
+                                            default: return null;
+                                        }
+                                    }
+                                }
                             }
                         }
-
-                        clip: true
-
-                        padding: 0
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        ColumnLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            
-
-                            LineProtectionResults {}
-                        }
                     }
                 }
-
-                //Transformer Protection
-                Column {
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-
-                    property bool showList: false
-
-                    Button {
-                        id: button3
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        text: "Transformer Protection"
-                        onClicked: paneSettingsList2.shown = !paneSettingsList2.shown
-                        
-                    }
-
-                    Pane {
-                        id: paneSettingsList2
-
-                        property bool shown: false
-                        visible: height > 0
-                        height: shown ? implicitHeight : 0
-                        Behavior on height {
-                            NumberAnimation {
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-
-                        clip: true
-
-                        padding: 0
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        ColumnLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            
-
-                            ProtectionRequirementsResults {}
-                        }
-                    }
-                }
-
-                //Voltage Regulator 
-                Column {
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-
-                    property bool showList: false
-
-                    Button {
-                        id: button4
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        text: "Voltage Regulator Protection"
-                        onClicked: paneSettingsList3.shown = !paneSettingsList3.shown
-                        
-                    }
-
-                    Pane {
-                        id: paneSettingsList3
-
-                        property bool shown: false
-                        visible: height > 0
-                        height: shown ? implicitHeight : 0
-                        Behavior on height {
-                            NumberAnimation {
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-
-                        clip: true
-
-                        padding: 0
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        ColumnLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            
-
-                            VoltageRegResults {}
-                        }
-                    }
-                }
-
-                Column {
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-
-                    property bool showList: false
-
-                    Button {
-                        id: button5
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        text: "ABB REF615"
-                        onClicked: paneSettingsList4.shown = !paneSettingsList4.shown
-                    }
-
-                    Pane {
-                        id: paneSettingsList4
-
-                        property bool shown: false
-                        visible: height > 0
-                        height: shown ? implicitHeight : 0
-                        Behavior on height {
-                            NumberAnimation {
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-
-                        clip: true
-
-                        padding: 0
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        ColumnLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            
-
-                            ABBConfig {}
-                        }
-                    }
-                }
-
-                // Grid requirements
-                Column {
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-
-                    property bool showList: false
-
-                    Button {
-                        id: button6
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        text: "Grid Protection Requirements"
-                        onClicked: paneSettingsList5.shown = !paneSettingsList5.shown
-                        
-                    }
-
-                    Pane {
-                        id: paneSettingsList5
-
-                        property bool shown: false
-                        visible: height > 0
-                        height: shown ? implicitHeight : 0
-                        Behavior on height {
-                            NumberAnimation {
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-
-                        clip: true
-
-                        padding: 0
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        ColumnLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            
-
-                            GridConnectionReq {}
-                        }
-                    }
-                }
+                
+                // Component definitions
+                Component { id: windGenComponent; WindGenProtectionResults {} }
+                Component { id: lineProtectionComponent; LineProtectionResults {} }
+                Component { id: protectionReqComponent; ProtectionRequirementsResults {} }
+                Component { id: voltageRegComponent; VoltageRegResults {} }
+                Component { id: abbConfigComponent; ABBConfig {} }
+                Component { id: gridConnectionComponent; GridConnectionReq {} }
             }
         }
     }

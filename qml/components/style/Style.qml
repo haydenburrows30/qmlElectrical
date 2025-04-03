@@ -4,8 +4,6 @@ import QtQuick
 QtObject {
     // Colors
 
-    readonly property color mainBackgroundLight: "#ffffff"
-    readonly property color mainBackgroundDark: "#000000"
     readonly property color transparent: "transparent"
     readonly property color buttonBackground: "#606060"
     readonly property color buttonHovered: "#505050"

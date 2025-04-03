@@ -301,19 +301,9 @@ ColumnLayout {
             Layout.leftMargin: 10
 
             Label {
-                text: "• Ensure SF6 gas pressure monitoring is connected to alarm"
-                wrapMode: Text.WordWrap
-                width: parent.width
-            }
-
-            Label {
-                text: "• Configure local/remote control mode selection"
-                wrapMode: Text.WordWrap
-                width: parent.width
-            }
-
-            Label {
-                text: "• Connect motor operators for remote circuit breaker control"
+                text: "• Ensure SF6 gas pressure monitoring is connected to alarm<br>" +
+                "• Configure local/remote control mode selection<br>" +
+                "• Connect motor operators for remote circuit breaker control"
                 wrapMode: Text.WordWrap
                 width: parent.width
             }

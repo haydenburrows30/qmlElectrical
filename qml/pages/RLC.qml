@@ -11,7 +11,6 @@ import "../components"
 import "../components/charts/"
 import "../components/style"
 import "../components/popups"
-
 import "../components/charts"
 import "../components/visualizers"
 
@@ -105,7 +104,6 @@ Page {
                         
                         ColumnLayout {
                             anchors.fill: parent
-                            
                             
                             // Circuit diagram
                             Item {
@@ -224,7 +222,6 @@ Page {
                         GridLayout {
                             columns: 2
                             anchors.fill: parent
-                            // uniformCellHeights: true
                             uniformCellWidths: true
 
                             Label {

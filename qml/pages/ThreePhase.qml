@@ -119,11 +119,8 @@ Page {
                                 anchors.top: parent.top
                                 anchors.left: parent.left
                                 anchors.right: parent.right
-                                anchors.margins: 10
 
                                 columns: 3
-                                rowSpacing: 10
-                                columnSpacing: 15
                                 
                                 // Headers
                                 Label { text: "Component"; font.bold: true }
