@@ -8,16 +8,13 @@ import QtCharts
 
 import components 1.0
 import "../components"
-import "../components/buttons/"
 import "../components/calculators/"
 import "../components/charts/"
 import "../components/exports/"
-import "../components/inputs/"
 import "../components/monitors/"
 import "../components/popups/"
 import "../components/visualizers/"
 import "../components/voltage_drop/"
-import "../components/three_phase/"
 
 Page {
     id: root

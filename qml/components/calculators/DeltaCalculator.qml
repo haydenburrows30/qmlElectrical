@@ -5,7 +5,6 @@ import QtQuick.Layouts
 import DeltaTransformer 1.0
 
 import "../"
-import "../../components"
 import "../style"
 import "../popups"
 

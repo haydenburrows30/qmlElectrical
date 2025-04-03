@@ -1,10 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../"
-import "../../components"
-import "../style"
 
+import "../"
+import "../style"
 import "../popups"
 
 import PCalculator 1.0

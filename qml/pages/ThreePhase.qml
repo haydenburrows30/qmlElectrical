@@ -10,8 +10,6 @@ import "../components"
 import "../components/visualizers/"
 import "../components/charts/"
 import "../components/three_phase/"
-import "../components/style"
-
 import "../components/popups"
 
 Page {

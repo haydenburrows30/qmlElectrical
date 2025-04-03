@@ -8,7 +8,6 @@ import QtQuick.Dialogs
 import "../"
 import "../buttons"
 import "../popups"
-
 import "../style"
 
 Item {

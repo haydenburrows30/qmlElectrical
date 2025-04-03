@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../"
-import "../../components"
 import "../style"
 import "../visualizers"
 import "../popups"

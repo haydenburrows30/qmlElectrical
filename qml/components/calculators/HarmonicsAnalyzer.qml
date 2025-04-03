@@ -2,15 +2,14 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
+
 import "../"
-import "../../components"
 import "../visualizers"
 import "../inputs"
 import "../displays"
 import "../monitors"
 import "../popups/"
 import "../style"
-
 
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0

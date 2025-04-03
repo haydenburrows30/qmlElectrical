@@ -5,9 +5,7 @@ import QtCharts
 import QtQuick.Controls.Universal
 
 import "../"
-import "../../components"
 import "../style"
-
 import "../buttons"
 import "../popups"
 

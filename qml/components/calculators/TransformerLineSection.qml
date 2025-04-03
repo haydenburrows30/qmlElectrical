@@ -1,10 +1,10 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+
 import "../"
 import "../buttons"
 import "../popups"
-
 import "../style"
 
 Item {

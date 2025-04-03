@@ -5,9 +5,7 @@ import QtCharts
 
 import "../"
 import "../visualizers"
-
 import "../style"
-
 import "../popups"
 
 import OhmsLaw 1.0

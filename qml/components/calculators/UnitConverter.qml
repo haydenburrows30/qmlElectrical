@@ -2,10 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
-import "../"
-import "../../components"
-import "../style"
 
+import "../"
+import "../style"
 import "../popups"
 
 import Conversion 1.0

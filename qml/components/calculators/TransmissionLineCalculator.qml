@@ -2,11 +2,10 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "../"
-import "../../components"
 import "../visualizers/"
 import "../style"
-
 import "../popups"
 
 import Transmission 1.0

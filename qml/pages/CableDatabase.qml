@@ -5,8 +5,6 @@ import QtCharts
 
 import components 1.0
 import "../components"
-import "../components/style"
-
 
 Page {
     id: root

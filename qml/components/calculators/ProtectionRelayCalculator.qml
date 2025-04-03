@@ -2,10 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
-import "../"
-import "../../components"
-import "../style"
 
+import "../"
+import "../style"
 import "../popups"
 
 import ProtectionRelay 1.0

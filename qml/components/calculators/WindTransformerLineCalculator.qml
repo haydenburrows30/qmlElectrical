@@ -4,7 +4,6 @@ import QtQuick.Layouts
 
 import "../style"
 
-
 import TransformerLine 1.0
 import WindTurbine 1.0
 

@@ -4,12 +4,11 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtQuick.Dialogs
 import QtCharts
+
 import "../"
-import "../../components"
 import "../charts/"
 import "../visualizers/"
 import "../style"
-
 import "../popups"
 
 import Switchboard 1.0

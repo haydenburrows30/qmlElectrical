@@ -4,9 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../"
-import "../../components"
 import "../style"
-
 import "../popups"
 
 import VoltageDrop 1.0
