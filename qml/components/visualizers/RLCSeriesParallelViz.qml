@@ -1,7 +1,6 @@
 ColumnLayout {
     anchors.fill: parent
     
-    
     PhaseVector {
         id: phaseVector
         Layout.fillWidth: true

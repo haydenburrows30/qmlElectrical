@@ -4,7 +4,6 @@ import QtQuick.Layouts
 
 import "../style"
 
-
 ColumnLayout {
     
     GridLayout {

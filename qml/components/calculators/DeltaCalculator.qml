@@ -2,11 +2,12 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import DeltaTransformer 1.0
-
 import "../"
 import "../style"
 import "../popups"
+
+import DeltaTransformer 1.0
+
 
 Item {
 
