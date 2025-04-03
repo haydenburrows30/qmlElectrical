@@ -15,8 +15,6 @@ import "../components/popups/"
 import "../components/visualizers/"
 import "../components/voltage_drop/"
 
-import components 1.0
-
 Page {
     id: root
     padding: 0

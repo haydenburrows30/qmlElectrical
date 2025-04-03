@@ -46,8 +46,6 @@ Item {
                         "• Potential dividers for measurement<br><br>" +
                         "<b>Note:</b> For high impedance loads, the output voltage closely follows the theoretical value. " +
                         "For low impedance loads, loading effects must be considered."
-        // widthFactor: 0.5
-        // heightFactor: 0.5
     }
 
     ColumnLayout {
@@ -55,7 +53,7 @@ Item {
         
         RowLayout {
             id: header
-            // Input parameters
+            
             WaveCard {
                 id: results
                 title: "Input Parameters"

@@ -43,7 +43,6 @@ Item {
         
         contentItem: ColumnLayout {
             
-            
             Label {
                 text: "Input Error"
                 font.bold: true
@@ -144,14 +143,12 @@ Item {
                         id: results
                         title: "Current Transformer"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 380
+                        Layout.minimumHeight: 340
                         
                         showSettings: false
 
                         GridLayout {
                             columns: 2
-                            
-                            
 
                             Label { text: "CT Type:" ; Layout.minimumWidth: 160}
                             ComboBox {
@@ -306,7 +303,7 @@ Item {
                     // VT Section
                     WaveCard {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 200
+                        Layout.minimumHeight: 180
                         title: "Voltage Transformer"
 
                         GridLayout {
@@ -352,7 +349,7 @@ Item {
                     // Results Section
                     WaveCard {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 470
+                        Layout.minimumHeight: 430
                         title: "Results"
 
                         GridLayout {

@@ -26,30 +26,6 @@ Item {
         heightFactor: 0.4
     }
 
-    Popup {
-        id: tipsPopup
-        width: 400
-        height: 200
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        visible: results.open
-
-        onAboutToHide: {
-            results.open = false
-        }
-        Text {
-            anchors.fill: parent
-            text: { "<h3> Impedance Calculator </h3><br>" +
-                "Impedance is the total opposition to the flow of alternating current in a circuit. <br>" + 
-                "It is the vector sum of resistance and reactance. The impedance is calculated using the formula Z = √(R² + X²) where R is the resistance and X is the reactance. <br>" + 
-                "The phase angle is calculated using the formula θ = arctan(X / R) where θ is the phase angle, R is the resistance, and X is the reactance."}
-            wrapMode: Text.WordWrap
-        }
-    }
-
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10

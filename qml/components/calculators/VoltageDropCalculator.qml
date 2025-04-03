@@ -108,7 +108,6 @@ Item {
                     }
                 }
             }
-
         }
 
         WaveCard {

@@ -40,174 +40,161 @@ Item {
 
         WaveCard {
             id: results
-            Layout.minimumWidth: 250
+            Layout.minimumWidth: 300
             Layout.minimumHeight: 540
             title: "Parameters"
 
             showSettings: true
 
-            ColumnLayout{
+            GridLayout {
+                id: ctTransformerGrid
+                columns: 2
+                Layout.alignment: Qt.AlignTop
 
-                GridLayout {
-                    id: ctTransformerGrid
-                    columns: 2
-                    Layout.alignment: Qt.AlignTop
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.bottomMargin: 10
-                        height: 1
-                        color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
-                    }
-
-                    Label { 
-                        text: "Current Transformer" 
-                        font.bold: true
-                        Layout.columnSpan: 2
-                    }
-                    Label { 
-                        text: "Phase Ratio:"
-                        
-                    }
-                    TextField {
-                        id: phCtRatio
-                        placeholderText: "200"
-                        text: "200"
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setPhCtRatio(parseFloat(text))
-                    }
-                    Label { 
-                        text: "Neutral Ratio:"
-                        
-                    }
-                    TextField {
-                        id: nCtRatio
-                        placeholderText: "200"
-                        text: "200"
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setNCtRatio(parseFloat(text))
-                    }
-                    Label { 
-                        text: "CT Secondary:"
-                        
-                    }
-                    ComboBox {
-                        id: ctSecondaryType
-                        model: ["5A", "1A"]
-                        currentIndex: 0
-                        onCurrentTextChanged: refCalculator.setCtSecondaryType(currentText)
-                        Layout.preferredWidth: 100
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.margins: 10
-                        height: 1
-                        color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
-                    }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.columnSpan: 2
+                    Layout.bottomMargin: 10
+                    height: 1
+                    color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
                 }
 
-                GridLayout {
-                    columns: 2
-                    Layout.alignment: Qt.AlignTop
-                
-                    Label { 
-                        text: "Transformer" 
-                        font.bold: true
-                        Layout.columnSpan: 2
-                    }
-
-                    Label { 
-                        text: "MVA:"
-                        
-                    }
-                    TextField {
-                        id: transformerMva
-                        placeholderText: "2.5"
-                        text: "2.5"
-                        validator: DoubleValidator { bottom: 0.1; decimals: 2 }
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setTransformerMva(parseFloat(text))
-                    }
+                Label { 
+                    text: "Current Transformer" 
+                    font.bold: true
+                    Layout.columnSpan: 2
+                }
+                Label { 
+                    text: "Phase Ratio:"
+                    Layout.preferredWidth: 110
                     
-                    Label { 
-                        text: "HV Voltage:"
-                        
-                    }
-                    TextField {
-                        id: hvtransformerVoltage
-                        placeholderText: "55"
-                        text: "55"
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setHvTransformerVoltage(parseFloat(text))
-                    }
-
-                    Label { 
-                        text: "LV Voltage:"
-                        
-                    }
-                    TextField {
-                        id: lvTransformerVoltage
-                        placeholderText: "11"
-                        text: "11"
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setLvTransformerVoltage(parseFloat(text))
-                    }
-                    Label { 
-                        text: "Connection:"
-                        
-                    }
-                    ComboBox {
-                        id: connectionType
-                        model: ["Wye", "Delta"]
-                        currentIndex: 0
-                        onCurrentTextChanged: refCalculator.setConnectionType(currentText)
-                        Layout.preferredWidth: 100
-                    }
-                    Label { 
-                        text: "Impedance (%):"
-                        
-                    }
-                    TextField {
-                        id: impedances
-                        placeholderText: "5.5"
-                        text: "5.5"
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setImpedance(parseFloat(text))
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.columnSpan: 2
-                        Layout.margins: 10
-                        height: 1
-                        color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
-                    }
+                }
+                TextField {
+                    id: phCtRatio
+                    placeholderText: "200"
+                    text: "200"
+                    Layout.preferredWidth: 140
+                    onTextChanged: if(text) refCalculator.setPhCtRatio(parseFloat(text))
+                }
+                Label { 
+                    text: "Neutral Ratio:"
+                }
+                TextField {
+                    id: nCtRatio
+                    placeholderText: "200"
+                    text: "200"
+                    Layout.fillWidth: true
+                    onTextChanged: if(text) refCalculator.setNCtRatio(parseFloat(text))
+                }
+                Label { 
+                    text: "CT Secondary:"
+                }
+                ComboBox {
+                    id: ctSecondaryType
+                    model: ["5A", "1A"]
+                    currentIndex: 0
+                    onCurrentTextChanged: refCalculator.setCtSecondaryType(currentText)
+                    Layout.fillWidth: true
                 }
 
-                GridLayout {
-                    columns: 2
-                    Layout.alignment: Qt.AlignTop
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.columnSpan: 2
+                    Layout.margins: 10
+                    height: 1
+                    color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                }
 
-                    Label { 
-                        text: "Fault Point"
-                        font.bold: true
-                        Layout.columnSpan: 2
-                    }
+                Label { 
+                    text: "Transformer" 
+                    font.bold: true
+                    Layout.columnSpan: 2
+                }
 
-                    Label { 
-                        text: "Fault Point (%):"
-                        
-                    }
-                    TextField {
-                        id: faultPoint
-                        placeholderText: "5.0"
-                        text: "5.0"
-                        Layout.preferredWidth: 100
-                        onTextChanged: if(text) refCalculator.setFaultPoint(parseFloat(text))
-                    }
+                Label { 
+                    text: "MVA:"
+                    Layout.fillWidth: true
+                    
+                }
+                TextField {
+                    id: transformerMva
+                    placeholderText: "2.5"
+                    text: "2.5"
+                    validator: DoubleValidator { bottom: 0.1; decimals: 2 }
+                    Layout.fillWidth: true
+                    onTextChanged: if(text) refCalculator.setTransformerMva(parseFloat(text))
+                }
+                
+                Label { 
+                    text: "HV Voltage:"
+                    
+                }
+                TextField {
+                    id: hvtransformerVoltage
+                    placeholderText: "55"
+                    text: "55"
+                    Layout.fillWidth: true
+                    onTextChanged: if(text) refCalculator.setHvTransformerVoltage(parseFloat(text))
+                }
+
+                Label { 
+                    text: "LV Voltage:"
+                    
+                }
+                TextField {
+                    id: lvTransformerVoltage
+                    placeholderText: "11"
+                    text: "11"
+                    Layout.fillWidth: true
+                    onTextChanged: if(text) refCalculator.setLvTransformerVoltage(parseFloat(text))
+                }
+                Label { 
+                    text: "Connection:"
+                    
+                }
+                ComboBox {
+                    id: connectionType
+                    model: ["Wye", "Delta"]
+                    currentIndex: 0
+                    onCurrentTextChanged: refCalculator.setConnectionType(currentText)
+                    Layout.fillWidth: true
+                }
+                Label { 
+                    text: "Impedance (%):"
+                    
+                }
+                TextField {
+                    id: impedances
+                    placeholderText: "5.5"
+                    text: "5.5"
+                    Layout.fillWidth: true
+                    onTextChanged: if(text) refCalculator.setImpedance(parseFloat(text))
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.columnSpan: 2
+                    Layout.margins: 10
+                    height: 1
+                    color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                }
+
+                Label { 
+                    text: "Fault Point"
+                    font.bold: true
+                    Layout.columnSpan: 2
+                }
+
+                Label { 
+                    text: "Fault Point (%):"
+                    
+                }
+                TextField {
+                    id: faultPoint
+                    placeholderText: "5.0"
+                    text: "5.0"
+                    Layout.fillWidth: true
+                    onTextChanged: if(text) refCalculator.setFaultPoint(parseFloat(text))
                 }
             }
         }

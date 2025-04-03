@@ -10,8 +10,6 @@ import "../components/three_phase/"
 import "../components/popups"
 
 import Sine 1.0
-import components 1.0
-
 
 Page {
     id: root

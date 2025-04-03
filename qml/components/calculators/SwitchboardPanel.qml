@@ -111,7 +111,6 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
                 
-
                 TabBar {
                     id: tabBar
                     width: parent.width
