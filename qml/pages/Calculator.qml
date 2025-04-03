@@ -4,12 +4,12 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
-import '../components'
+import "../components"
 
 Page {
 
     background: Rectangle {
-        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     Popup {

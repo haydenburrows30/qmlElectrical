@@ -330,7 +330,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: sideBar.toggle1 ? "black":"#f0f0f0"
+                                    color: sideBar.modeToggled ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }

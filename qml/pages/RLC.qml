@@ -24,7 +24,7 @@ Page {
     property int currentMode: changeMode.on ? 1 : 0
 
     background: Rectangle {
-        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     Connections {
@@ -114,8 +114,8 @@ Page {
                                 
                                 Rectangle {
                                     anchors.fill: parent
-                                    color: sideBar.toggle1 ? "#2a2a2a" : "#f0f0f0"
-                                    border.color: sideBar.toggle1 ? "#3a3a3a" : "#d0d0d0"
+                                    color: sideBar.modeToggled ? "#2a2a2a" : "#f0f0f0"
+                                    border.color: sideBar.modeToggled ? "#3a3a3a" : "#d0d0d0"
                                     border.width: 1
                                     radius: 4
                                 }
@@ -125,7 +125,7 @@ Page {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     circuitType: currentMode
-                                    darkMode: sideBar.toggle1
+                                    darkMode: sideBar.modeToggled
 
                                     highlightR: resistanceInput.activeFocus
                                     highlightL: inductanceInput.activeFocus
@@ -143,8 +143,8 @@ Page {
                                 
                                 Rectangle {
                                     anchors.fill: parent
-                                    color: sideBar.toggle1 ? "#2a2a2a" : "#f0f0f0"
-                                    border.color: sideBar.toggle1 ? "#3a3a3a" : "#d0d0d0"
+                                    color: sideBar.modeToggled ? "#2a2a2a" : "#f0f0f0"
+                                    border.color: sideBar.modeToggled ? "#3a3a3a" : "#d0d0d0"
                                     border.width: 1
                                     radius: 4
                                 }
@@ -154,7 +154,7 @@ Page {
                                     anchors.fill: parent
                                     anchors.margins: 10
                                     circuitType: currentMode
-                                    darkMode: sideBar.toggle1
+                                    darkMode: sideBar.modeToggled
                                     resistance: Number(resistanceInput.text)
                                     inductance: Number(inductanceInput.text)
                                     capacitance: Number(capacitanceInput.text)
@@ -558,7 +558,7 @@ Page {
             Label {
                 text: messagePopup.messageText
                 wrapMode: Text.WordWrap
-                color: messagePopup.isError ? "red" : (sideBar.toggle1 ? "#ffffff" : "#000000")
+                color: messagePopup.isError ? "red" : (sideBar.modeToggled ? "#ffffff" : "#000000")
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
             }

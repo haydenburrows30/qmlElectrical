@@ -179,7 +179,7 @@ Rectangle {
                     ctx.font = "14px sans-serif";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
-                    ctx.fillStyle = sideBar.toggle1 ? "#ffffff" : "#000000";
+                    ctx.fillStyle = sideBar.modeToggled ? "#ffffff" : "#000000";
                     
                     // Draw text aligned with the hypotenuse
                     ctx.fillText(powerText, 0, 0);

@@ -4,8 +4,6 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
-import QtQuick.Controls.Material
-import QtQuick.Effects
 
 import "components"
 import "components/calculators"
@@ -93,6 +91,6 @@ ApplicationWindow {
         property real menuY
     }
 
-    Universal.theme: sideBar.toggle1 ? Universal.Dark : Universal.Light
-    Universal.accent: sideBar.toggle1 ? Universal.Red : Universal.Cyan
+    Universal.theme: sideBar.modeToggled ? Universal.Dark : Universal.Light
+    Universal.accent: sideBar.modeToggled ? Universal.Red : Universal.Cyan
 }

@@ -29,7 +29,7 @@ Popup {
         Label {
             text: root.messageText
             wrapMode: Text.WordWrap
-            color: root.isError ? "red" : (sideBar.toggle1 ? "#ffffff" : "#000000")
+            color: root.isError ? "red" : (sideBar.modeToggled ? "#ffffff" : "#000000")
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
         }

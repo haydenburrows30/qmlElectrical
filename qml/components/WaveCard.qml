@@ -8,9 +8,9 @@ import "backgrounds"
 
 Rectangle {
     id: controlRect
-    color: sideBar.toggle1 ? Style.mainBackgroundDark : Style.mainBackgroundLight
+    color: sideBar.modeToggled ? Style.mainBackgroundDark : Style.mainBackgroundLight
     border.width: 1
-    border.color: sideBar.toggle1 ? Universal.Dark : Qt.lighter("#cccccc",1.1)
+    border.color: sideBar.modeToggled ? Universal.Dark : Qt.lighter("#cccccc",1.1)
     radius: 10
     
     property string title: ""

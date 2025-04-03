@@ -13,7 +13,7 @@ Drawer {
     property int drawerWidth: Style.sideBarWidth
     property int delegateHeight: Style.delegateHeight
     property bool menuMoved: false
-    property bool toggle1: false
+    property bool modeToggled: false
     property int hide: 0
     property int show: 0
 
@@ -127,7 +127,7 @@ Drawer {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     onClicked: {
-                        action.checked ? toggle1 = true : toggle1= false
+                        action.checked ? modeToggled = true : modeToggled = false
                     }
                 }
         }

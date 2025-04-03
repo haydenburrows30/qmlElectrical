@@ -45,8 +45,8 @@ WaveCard {
             delegate: Rectangle {
                 implicitWidth: 120
                 implicitHeight: 40
-                color: row % 2 ? (sideBar.toggle1 ? "#2d2d2d" : "#f5f5f5") 
-                              : (sideBar.toggle1 ? "#1d1d1d" : "#ffffff")
+                color: row % 2 ? (sideBar.modeToggled ? "#2d2d2d" : "#f5f5f5") 
+                              : (sideBar.modeToggled ? "#1d1d1d" : "#ffffff")
 
                 Label {
                     text: display || ""
@@ -55,7 +55,7 @@ WaveCard {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
-                    color: sideBar.toggle1 ? "#ffffff" : "#000000"
+                    color: sideBar.modeToggled ? "#ffffff" : "#000000"
                 }
             }
 

@@ -325,7 +325,7 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.margins: 10
                                 height: 1
-                                color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                                color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
                             }
 
                             Label { 
@@ -464,7 +464,7 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.margins: 10
                                 height: 1
-                                color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                                color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
                             }
 
                             Label { 

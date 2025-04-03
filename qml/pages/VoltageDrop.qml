@@ -48,7 +48,7 @@ Page {
     }
 
     background: Rectangle {
-        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     ScrollView {
@@ -97,7 +97,7 @@ Page {
                         ResultsPanel {
                             id: resultsPanel
                             anchors.fill: parent
-                            darkMode: sideBar.toggle1
+                            darkMode: sideBar.modeToggled
                             voltageDropValue: root.currentVoltageDropValue
                             selectedVoltage: voltageDrop.selectedVoltage
                             diversityFactor: voltageDrop.diversityFactor
@@ -164,7 +164,7 @@ Page {
                         ComparisonTable {
                             id: comparisonTable
                             anchors.fill: parent
-                            darkMode: sideBar.toggle1
+                            darkMode: sideBar.modeToggled
                             tableModel: voltageDrop.tableModel
                             
                             onExportRequest: function(format) {

@@ -102,7 +102,7 @@ Popup {
                 Label {
                     text: combinedRatingInfo 
                     color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
-                           "blue" : (text === "Error" ? "red" : sideBar.toggle1 ? "#ffffff" : "#000000")
+                           "blue" : (text === "Error" ? "red" : sideBar.modeToggled ? "#ffffff" : "#000000")
                     font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
                 }
                 Label { text: "Voltage Drop:" }

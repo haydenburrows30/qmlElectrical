@@ -17,7 +17,7 @@ Popup {
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     
     contentItem: Rectangle {
-        color: sideBar.toggle1 ? "#303030" : "#f0f0f0"
+        color: sideBar.modeToggled ? "#303030" : "#f0f0f0"
         
         ScrollView {
             anchors.fill: parent
@@ -37,7 +37,7 @@ Popup {
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: sideBar.toggle1 ? "#505050" : "#d0d0d0"
+                    color: sideBar.modeToggled ? "#505050" : "#d0d0d0"
                 }
                 
                 GridLayout {
@@ -162,7 +162,7 @@ Popup {
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: sideBar.toggle1 ? "#505050" : "#d0d0d0"
+                    color: sideBar.modeToggled ? "#505050" : "#d0d0d0"
                     Layout.topMargin: 10
                 }
                 
@@ -227,7 +227,7 @@ Popup {
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: sideBar.toggle1 ? "#505050" : "#d0d0d0"
+                    color: sideBar.modeToggled ? "#505050" : "#d0d0d0"
                     Layout.topMargin: 10
                 }
                 
@@ -284,7 +284,7 @@ Popup {
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: sideBar.toggle1 ? "#505050" : "#d0d0d0"
+                    color: sideBar.modeToggled ? "#505050" : "#d0d0d0"
                     Layout.topMargin: 10
                 }
                 
@@ -355,7 +355,7 @@ Popup {
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: v27StatsPopup.close()
                     background: Rectangle {
-                        color: sideBar.toggle1 ? "black" : "#e8f6ff"
+                        color: sideBar.modeToggled ? "black" : "#e8f6ff"
                         radius: 2
                     }
                 }

@@ -17,10 +17,10 @@ import "../components/popups"
 Page {
     id: root
 
-    property color textColorPhase: sideBar.toggle1 ? "#ffffff" : "#000000"
+    property color textColorPhase: sideBar.modeToggled ? "#ffffff" : "#000000"
 
     background: Rectangle {
-        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     PopUpText {
@@ -78,7 +78,7 @@ Page {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     height: 1
-                                    color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+                                    color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
                                 }
 
                                 GridLayout {
@@ -203,7 +203,7 @@ Page {
                                     apparentPower: sineModel.apparentPower
                                     powerFactor: sineModel.averagePowerFactor
                                     triangleScale: 100
-                                    color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+                                    color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
                                     textColor: textColorPhase
                                 }
 

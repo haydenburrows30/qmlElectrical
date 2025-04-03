@@ -39,7 +39,7 @@ GridLayout {
         Layout.topMargin: 5
         Layout.bottomMargin: 5
         height: 1
-        color: sideBar.toggle1 ? "#404040" : "#e0e0e0"
+        color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
     }
 
     Label { 

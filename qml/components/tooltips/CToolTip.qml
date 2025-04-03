@@ -14,7 +14,7 @@ ToolTip {
     contentItem: Text {
         text: control.text
         font: control.font
-        color: sideBar.toggle1? "white": "black"
+        color: sideBar.modeToggled? "white": "black"
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
     }
@@ -22,7 +22,7 @@ ToolTip {
     background: Rectangle{
                     width : 110
                     height: 60
-                    color: sideBar.toggle1 ? Qt.darker(palette.dark,5): palette.light
+                    color: sideBar.modeToggled ? Qt.darker(palette.dark,5): palette.light
 
                     anchors {
                         leftMargin: 5

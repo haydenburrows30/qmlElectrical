@@ -84,8 +84,8 @@ Page {
                     iconName: '\ue5d2'
                     iconWidth: 24
                     iconHeight: 24
-                    color: sideBar.toggle1 ? Style.blue : Style.red
-                    backgroundColor: sideBar.toggle1 ? Style.alphaColor(color,0.6) : Style.alphaColor(color,0.1)
+                    color: sideBar.modeToggled ? Style.blue : Style.red
+                    backgroundColor: sideBar.modeToggled ? Style.alphaColor(color,0.6) : Style.alphaColor(color,0.1)
                 }
             }
         }

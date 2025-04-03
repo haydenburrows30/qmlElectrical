@@ -9,6 +9,7 @@
     <file>qml/pages/ThreePhase.qml</file>
     <file>qml/pages/RLC.qml</file>
     <file>qml/pages/RealTime.qml</file>
+    <file>qml/pages/Playground.qml</file>
     
     <!-- Icons -->
     <file>icons/gallery/24x24/LightBar.svg</file>
@@ -34,7 +35,103 @@
     <file>icons/gallery/24x24/Wave_dark.ico</file>
     <file>icons/gallery/24x24/flash.svg</file>
     <file>icons/gallery/index.theme</file>
+    
+    <!-- Component Base Files -->
+    <file>qml/components/SideBarModel.qml</file>
+    <file>qml/components/CalculatorMenu.qml</file>
+    <file>qml/components/Helper.qml</file>
+    <file>qml/components/WaveCard.qml</file>
+    
+    <!-- Visualizers -->
+    <file>qml/components/visualizers/SwitchboardDiagram.qml</file>
+    <file>qml/components/visualizers/EarthingViz.qml</file>
+    <file>qml/components/visualizers/RLCSeriesParallelViz.qml</file>
+    <file>qml/components/visualizers/PhasorDiagram.qml</file>
+    <file>qml/components/visualizers/PhaseVector.qml</file>
+    <file>qml/components/visualizers/MotorTypesInfo.qml</file>
+    <file>qml/components/visualizers/InstrumentTransformerVisualization.qml</file>
+    <file>qml/components/visualizers/CircuitVisualizer.qml</file>
+    <file>qml/components/visualizers/CircuitDiagram.qml</file>
+    <file>qml/components/visualizers/ImpedanceVectorViz.qml</file>
+    <file>qml/components/visualizers/BatteryViz.qml</file>
+    <file>qml/components/visualizers/ElectricMachineViz.qml</file>
+    <file>qml/components/visualizers/MotorStartingViz.qml</file>
+    <file>qml/components/visualizers/CableAmpacityViz.qml</file>
+    <file>qml/components/visualizers/TransformerLineViz.qml</file>
+    <file>qml/components/visualizers/WaveformVisualizer.qml</file>
+    
+    <!-- Calculators -->
+    <file>qml/components/calculators/TransformerLineSection.qml</file>
+    <file>qml/components/calculators/RefRgfCalculator.qml</file>
+    <file>qml/components/calculators/ProtectionRequirementsSection.qml</file>
+    <file>qml/components/calculators/ExpertProtectionPopup.qml</file>
+    <file>qml/components/calculators/TransformerLineCalculator.qml</file>
+    <file>qml/components/calculators/WindTransformerLineCalculator.qml</file>
+    <file>qml/components/calculators/VoltageRegulatorProtectionInfo.qml</file>
+    <file>qml/components/calculators/TransformerCalculator.qml</file>
+    <file>qml/components/calculators/SwitchboardPanel.qml</file>
+    <file>qml/components/calculators/ProtectionRelayCalculator.qml</file>
+    <file>qml/components/calculators/PowerCurrentCalculator.qml</file>
+    <file>qml/components/calculators/OhmsLawCalculator.qml</file>
+    <file>qml/components/calculators/MotorStartingCalculator.qml</file>
+    <file>qml/components/calculators/InstrumentTransformerCalculator.qml</file>
+    <file>qml/components/calculators/ImpedanceCalculator.qml</file>
+    <file>qml/components/calculators/HarmonicsAnalyzer.qml</file>
+    <file>qml/components/calculators/FaultCurrentCalculator.qml</file>
+    <file>qml/components/calculators/ElectricMachineCalculator.qml</file>
+    <file>qml/components/calculators/DiscriminationAnalyzer.qml</file>
+    <file>qml/components/calculators/CableAmpacityCalculator.qml</file>
+    <file>qml/components/calculators/BatteryCalculator.qml</file>
+    
+    <!-- Displays -->
+    <file>qml/components/displays/Accordian.qml</file>
+    <file>qml/components/displays/ABBConfig.qml</file>
+    <file>qml/components/displays/GridConnectionReq.qml</file>
+    <file>qml/components/displays/ResultsDisplay.qml</file>
+    <file>qml/components/displays/LineProtectionResults.qml</file>
+    <file>qml/components/displays/WindGenProtectionResults.qml</file>
+    <file>qml/components/displays/ProtectionRequirementsResults.qml</file>
+    <file>qml/components/displays/VoltageRegResults.qml</file>
+    
+    <!-- Inputs -->
+    <file>qml/components/inputs/HarmonicInputForm.qml</file>
+    
+    <!-- Playground -->
+    <file>qml/components/playground/TryoutStyle.qml</file>
+    <file>qml/components/playground/ScientificCalculator.qml</file>
+    <file>qml/components/playground/EnhancedCalculatorExample.qml</file>
+    <file>qml/components/playground/CalculatorPad.qml</file>
+    
+    <!-- Three Phase -->
+    <file>qml/components/three_phase/WaveControls.qml</file>
+    
+    <!-- Charts -->
+    <file>qml/components/charts/LoadChart.qml</file>
+    
+    <!-- Popups -->
+    <file>qml/components/popups/PerformancePopup.qml</file>
+    <file>qml/components/popups/PopUpText.qml</file>
 
+    <!-- Buttons -->
+    <file>qml/components/buttons/MessageButton.qml</file>
+
+    <!-- Style -->
+    <file>qml/components/style/TextFieldBlue.qml</file>
+    <file>qml/components/style/ShadowRectangle.qml</file>
+    <file>qml/components/style/ImageButton.qml</file>
+    <file>qml/components/style/Style.qml</file>
+    <file>qml/components/style/DevicesTile.qml</file>
+    <file>qml/components/style/ButtonCard.qml</file>
+    <file>qml/components/style/IconLabel.qml</file>
+    <file>qml/components/style/OutlinedLabel.qml</file>
+    <file>qml/components/style/PrefsSwitch.qml</file>
+    <file>qml/components/style/PrefsTabButton.qml</file>
+    <file>qml/components/style/SwitchLabel.qml</file>
+    <file>qml/components/backgrounds/ProtectionRectangle.qml</file>
+
+
+    <file>qml/components/monitors/CalculationMonitor.qml</file>
+    
     <!-- Data Files -->
     <file>data/cable_data_mv.csv</file>
     <file>data/cable_data_cu_1c.csv</file>
@@ -45,5 +142,8 @@
 
     <!-- Configuration -->
     <file>data/qtquickcontrols2.conf</file>
+    
+    <!-- JavaScript -->
+    <file>scripts/MaterialDesignRegular.js</file>
 </qresource>
 </RCC>

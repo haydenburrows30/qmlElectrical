@@ -18,10 +18,10 @@ Page {
     id: realTime
 
     property RealTimeChart calculator: RealTimeChart {}
-    property color textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
+    property color textColor: sideBar.modeToggled ? "#ffffff" : "#000000"
 
     background: Rectangle {
-        color: sideBar.toggle1 ? "#1a1a1a" : "#f5f5f5"
+        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     FontLoader {
@@ -324,7 +324,7 @@ Page {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    color: sideBar.toggle1 ? "black" : "white"
+                    color: sideBar.modeToggled ? "black" : "white"
 
                     RealChart {
                         id: rtChart
