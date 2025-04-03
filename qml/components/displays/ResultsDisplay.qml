@@ -5,9 +5,7 @@ import QtQuick.Layouts
 GridLayout {
     id: resultsDisplay
     columns: 2
-    
-    
-    
+
     property var calculator
     
     Label { 

@@ -56,7 +56,7 @@ Item {
         }
     }
 
-    Text {
+    Label {
         font.italic: true
         font.pixelSize: 10;
         color: "gray"

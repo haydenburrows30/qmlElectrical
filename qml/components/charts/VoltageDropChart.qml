@@ -31,7 +31,6 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         
-        
         Label {
             text: "Voltage Drop Comparison by Cable Size"
             font.pixelSize: 16
@@ -42,7 +41,6 @@ Item {
 
         Row {
             Layout.alignment: Qt.AlignHCenter
-            
             
             CheckBox {
                 id: thresholdCheck
@@ -71,7 +69,6 @@ Item {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            
             
             TextField {
                 id: xAxisTitle

@@ -11,12 +11,9 @@ WaveCard {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 10
-        
 
         RowLayout {
             Layout.fillWidth: true
-            
 
             Button {
                 text: "Clear All"

@@ -23,8 +23,6 @@ GridLayout {
     signal viewDetailsClicked()
     signal saveResultsClicked()
     signal viewChartClicked()
-
-    property color textColor: sideBar.toggle1 ? "#ffffff" : "#000000"
     
     // Calculate percentage as local property for efficiency
     property real dropPercentage: currentVoltageDropValue / (parseFloat(selectedVoltage.slice(0, -1)) || 1) * 100
@@ -53,11 +51,11 @@ GridLayout {
 
     // Network Fuse Size display
     Label { text: "Network Fuse / Rating:" }
-    Text {
+    Label {
         id: networkFuseSizeText
         text: combinedRatingInfo || "N/A"
         color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
-               "blue" : (text === "Error" ? "red" : textColor)
+               "blue" : (text === "Error" ? "red" : Universal.foreground)
         font.bold: text !== "N/A" && text !== "Not specified" && text !== "Error"
         Layout.fillWidth: true
     }
@@ -98,7 +96,6 @@ GridLayout {
         Layout.fillWidth: true
         Layout.topMargin: 10
         
-
         Button {
             text: "Save Results"
             icon.name: "Save"

@@ -8,7 +8,6 @@ import "../backgrounds"
 ColumnLayout {
     id: harmonicInputForm
     
-    
     property var calculator
     signal resetTriggered
 

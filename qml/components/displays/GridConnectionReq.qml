@@ -24,40 +24,14 @@ ColumnLayout {
         spacing: 8
         
         Label { 
-            text: "• Compliance with G59/G99 or equivalent grid connection standards"
+            text: "• Compliance with G59/G99 or equivalent grid connection standards<br>" +
+            "• Low Voltage Ride Through (LVRT) capability<br>" +
+            "• Active power control for frequency regulation<br>" +
+            "• Reactive power capability (power factor control)<br>" +
+            "• Harmonics and flicker within acceptable limits<br>" +
+            "• Fault level contribution within grid limits"
             width: parent.width
             wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Low Voltage Ride Through (LVRT) capability"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Active power control for frequency regulation"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Reactive power capability (power factor control)"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Harmonics and flicker within acceptable limits"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Fault level contribution within grid limits"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
         }
     }
     
@@ -71,7 +45,6 @@ ColumnLayout {
         text: "SCADA and Communication"
         font.bold: true
         font.pixelSize: 14
-        
     }
     
     Column {
@@ -79,28 +52,12 @@ ColumnLayout {
         spacing: 8
         
         Label { 
-            text: "• Remote monitoring and control capabilities"
+            text: "• Remote monitoring and control capabilities<br>" +
+            "• Generation forecasting<br>" +
+            "• Communication with grid operator (if required)<br>" +
+            "• Data logging for regulatory compliance"
             width: parent.width
             wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Generation forecasting"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Communication with grid operator (if required)"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
-        }
-        Label { 
-            text: "• Data logging for regulatory compliance"
-            width: parent.width
-            wrapMode: Text.WordWrap
-            
         }
     }
 }

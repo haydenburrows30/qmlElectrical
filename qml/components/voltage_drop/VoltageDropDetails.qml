@@ -46,7 +46,6 @@ Popup {
             id: detailsContent
             width: parent.width
             
-
             Label {
                 text: "Calculation Results"
                 font.bold: true
@@ -56,7 +55,7 @@ Popup {
             GridLayout {
                 id: detailsGrid
                 columns: 2
-                columnSpacing: 20
+                columnSpacing: 10
                 
                 Layout.fillWidth: true
 

@@ -7,13 +7,11 @@ import "../backgrounds"
 
 ColumnLayout {
     
-
     GridLayout {
         Layout.fillWidth: true
         columns: 4
         columnSpacing: 20
         
-
         // Headers
         Label { text: "Phase"; font.bold: true }
         Label { text: "RMS (V)"; font.bold: true }
