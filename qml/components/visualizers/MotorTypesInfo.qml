@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "../"
 import "../style"
-
 
 WaveCard {
     id: motorTypesInfo

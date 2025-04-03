@@ -12,7 +12,6 @@ Popup {
     ColumnLayout {
         anchors.fill: parent
         
-        
         Label {
             text: "Performance Settings"
             font.bold: true
@@ -26,7 +25,6 @@ Popup {
             ColumnLayout {
                 width: parent.width
                 
-
                 ComboBox {
                     id: performanceMode
                     Layout.fillWidth: true
@@ -86,7 +84,6 @@ Popup {
             
             ColumnLayout {
                 width: parent.width
-                
                 
                 CheckBox {
                     id: profilingCheckbox

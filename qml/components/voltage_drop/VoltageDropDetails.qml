@@ -6,7 +6,6 @@ import QtQuick.Controls.Universal
 
 import "../style"
 
-
 Popup {
     id: detailsPopup
     modal: true

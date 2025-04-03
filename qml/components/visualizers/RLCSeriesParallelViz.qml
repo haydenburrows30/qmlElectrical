@@ -1,6 +1,3 @@
-import "../style"
-
-
 ColumnLayout {
     anchors.fill: parent
     

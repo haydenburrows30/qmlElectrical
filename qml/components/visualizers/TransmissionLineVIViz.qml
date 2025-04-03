@@ -2,7 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
-import "../"    
+
+import "../"
+
 import Transmission 1.0
 
 // Add voltage/current profile visualization

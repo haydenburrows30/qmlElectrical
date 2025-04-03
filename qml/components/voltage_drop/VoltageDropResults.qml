@@ -5,7 +5,6 @@ import QtQuick.Controls.Universal
 
 import "../style"
 
-
 GridLayout {
     id: resultsLayout
     columns: 2

@@ -3,8 +3,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 
-import components 1.0
 import "../components"
+
+import components 1.0
 
 Page {
     id: root

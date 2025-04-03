@@ -4,7 +4,6 @@ import QtQuick.Layouts
 
 import "../style"
 
-
 Item {
     id: root
     

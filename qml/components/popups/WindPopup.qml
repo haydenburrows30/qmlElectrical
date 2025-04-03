@@ -11,7 +11,7 @@ Popup {
     x: Math.round((windTurbineSection.width - width) / 2)
     y: Math.round((windTurbineSection.height - height) / 2)
     width: 500
-    height: 450  // Increased height to accommodate new content
+    height: 450
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
@@ -42,8 +42,6 @@ Popup {
                 
                 GridLayout {
                     columns: 2
-                    
-                    columnSpacing: 20
                     Layout.fillWidth: true
                     
                     Label { 
@@ -53,7 +51,6 @@ Popup {
                     Label { 
                         text: "1989" 
                     }
-                    
                     Label { 
                         text: "Rated Power:" 
                         font.bold: true
@@ -61,7 +58,6 @@ Popup {
                     Label { 
                         text: "225 kW" 
                     }
-                    
                     Label { 
                         text: "Rotor Diameter:" 
                         font.bold: true
@@ -69,7 +65,6 @@ Popup {
                     Label { 
                         text: "27 meters" 
                     }
-                    
                     Label { 
                         text: "Hub Height:" 
                         font.bold: true
@@ -77,7 +72,6 @@ Popup {
                     Label { 
                         text: "31.5-40 meters" 
                     }
-                    
                     Label { 
                         text: "Cut-in Wind Speed:" 
                         font.bold: true
@@ -85,7 +79,6 @@ Popup {
                     Label { 
                         text: "3.5-4.0 m/s" 
                     }
-                    
                     Label { 
                         text: "Cut-out Wind Speed:" 
                         font.bold: true
@@ -93,7 +86,6 @@ Popup {
                     Label { 
                         text: "25 m/s" 
                     }
-                    
                     Label { 
                         text: "Units Produced:" 
                         font.bold: true
@@ -101,7 +93,6 @@ Popup {
                     Label { 
                         text: "Over 1,500 worldwide" 
                     }
-                    
                     Label { 
                         text: "Production Years:" 
                         font.bold: true
@@ -109,7 +100,6 @@ Popup {
                     Label { 
                         text: "1989-1995" 
                     }
-                    
                     Label { 
                         text: "Blade Material:" 
                         font.bold: true
@@ -117,7 +107,6 @@ Popup {
                     Label { 
                         text: "Fiberglass reinforced polyester" 
                     }
-                    
                     Label { 
                         text: "Generator Type:" 
                         font.bold: true
@@ -125,7 +114,6 @@ Popup {
                     Label { 
                         text: "Asynchronous (Induction)" 
                     }
-                    
                     Label { 
                         text: "Gearbox Type:" 
                         font.bold: true
@@ -133,7 +121,6 @@ Popup {
                     Label { 
                         text: "2-speed with planetary gear stage" 
                     }
-                    
                     Label { 
                         text: "Gearbox Ratio:" 
                         font.bold: true
@@ -141,7 +128,6 @@ Popup {
                     Label { 
                         text: "1:23.6 (low) / 1:31.5 (high)" 
                     }
-                    
                     Label { 
                         text: "Generator Speed:" 
                         font.bold: true
@@ -149,7 +135,6 @@ Popup {
                     Label { 
                         text: "1000/1500 RPM (50Hz systems)" 
                     }
-                    
                     Label { 
                         text: "Control System:" 
                         font.bold: true
@@ -181,8 +166,6 @@ Popup {
                 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 8
-                    columnSpacing: 20
                     Layout.fillWidth: true
                     
                     Label { 
@@ -200,7 +183,6 @@ Popup {
                     Label { 
                         text: ">5 m/s (1500 RPM generator)" 
                     }
-                    
                     Label { 
                         text: "Speed Transition:" 
                         font.bold: true
@@ -208,7 +190,6 @@ Popup {
                     Label { 
                         text: "Automatic based on wind speed" 
                     }
-                    
                     Label { 
                         text: "Efficiency Impact:" 
                         font.bold: true
@@ -246,8 +227,6 @@ Popup {
                 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 8
-                    columnSpacing: 20
                     Layout.fillWidth: true
                     
                     Label { 
@@ -303,8 +282,6 @@ Popup {
                 
                 GridLayout {
                     columns: 2
-                    rowSpacing: 8
-                    columnSpacing: 20
                     Layout.fillWidth: true
                     
                     Label { 
@@ -314,7 +291,6 @@ Popup {
                     Label { 
                         text: "Alaska, Northern Canada, Arctic regions" 
                     }
-                    
                     Label { 
                         text: "Island Installations:" 
                         font.bold: true
@@ -322,7 +298,6 @@ Popup {
                     Label { 
                         text: "Small islands, hybrid power systems" 
                     }
-                    
                     Label { 
                         text: "Chatham Islands:" 
                         font.bold: true
@@ -330,7 +305,6 @@ Popup {
                     Label { 
                         text: "No specific data available" 
                     }
-                    
                     Label { 
                         text: "Repowering Projects:" 
                         font.bold: true

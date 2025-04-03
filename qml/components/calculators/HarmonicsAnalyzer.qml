@@ -10,6 +10,7 @@ import "../displays"
 import "../monitors"
 import "../popups/"
 import "../style"
+import "../charts"
 
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0
@@ -191,7 +192,7 @@ Item {
                 Layout.fillWidth: true
                 title: "Harmonic Spectrum"
 
-                HarmonicSpectrum {
+                HarmonicSpectrumChart {
                     id: harmonicSpectrum
                     anchors.fill: parent
                     calculator: harmonicsCard.calculator

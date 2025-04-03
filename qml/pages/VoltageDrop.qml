@@ -6,7 +6,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtCharts
 
-import components 1.0
 import "../components"
 import "../components/calculators/"
 import "../components/charts/"
@@ -15,6 +14,8 @@ import "../components/monitors/"
 import "../components/popups/"
 import "../components/visualizers/"
 import "../components/voltage_drop/"
+
+import components 1.0
 
 Page {
     id: root

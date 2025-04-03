@@ -6,7 +6,6 @@ import QtCharts
 
 import "../style"
 
-
 Item {
     id: root
     

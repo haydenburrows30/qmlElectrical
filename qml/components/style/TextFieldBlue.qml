@@ -3,8 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-
-
 TextField {
     id: textField
     readOnly: true
@@ -18,6 +16,6 @@ TextField {
     background: Rectangle {
         color: sideBar.modeToggled ? "black":"#e8f6ff"
         border.color: "#0078d7"
-        radius: 2
+        radius: 3
     }
 }

@@ -25,7 +25,6 @@ Popup {
         Column {
             anchors.centerIn: parent
             
-
             Image {
                 source: "qrc:/icons/gallery/24x24/Calculator.svg"
                 width: 64

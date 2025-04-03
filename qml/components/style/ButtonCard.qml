@@ -5,9 +5,7 @@ import QtQuick.Controls.Universal
 
 Rectangle {
     radius: 20
-
     color: Universal.background
-
     default property alias content: contentItem.data
 
     Item {

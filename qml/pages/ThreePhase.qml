@@ -3,14 +3,15 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
-import Sine 1.0
-import components 1.0
-
 import "../components"
 import "../components/visualizers/"
 import "../components/charts/"
 import "../components/three_phase/"
 import "../components/popups"
+
+import Sine 1.0
+import components 1.0
+
 
 Page {
     id: root
