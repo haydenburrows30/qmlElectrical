@@ -6,7 +6,7 @@ import "../"
 import "../../components"
 import "../visualizers"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import MotorStarting 1.0

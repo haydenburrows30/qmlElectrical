@@ -6,7 +6,6 @@ import "../"
 import "../../components"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
 import "../popups"
 
 import CableAmpacity 1.0

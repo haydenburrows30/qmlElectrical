@@ -7,7 +7,6 @@ import DeltaTransformer 1.0
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
 import "../popups"
 
 Item {

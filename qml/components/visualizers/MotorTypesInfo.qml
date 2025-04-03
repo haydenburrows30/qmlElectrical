@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../style"
-import "../backgrounds"
+
 
 WaveCard {
     id: motorTypesInfo

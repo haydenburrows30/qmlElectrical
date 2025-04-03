@@ -5,7 +5,7 @@ import QtCharts
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import ProtectionRelay 1.0

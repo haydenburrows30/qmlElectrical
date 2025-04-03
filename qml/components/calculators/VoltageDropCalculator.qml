@@ -6,7 +6,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import VoltageDrop 1.0

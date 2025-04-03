@@ -5,9 +5,9 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../visualizers/"
-import "../backgrounds"
+
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import Earthing 1.0
@@ -176,45 +176,31 @@ Item {
                     columns: 2
 
                     Label { text: "Grid Resistance:" ; Layout.minimumWidth: 150}
-                    TextField{ 
+                    TextFieldBlue { 
                         text: calculator.gridResistance.toFixed(3) + " Ω"
                         Layout.minimumWidth: 100
-                        readOnly: true
-                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Ground Rise:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.voltageRise.toFixed(1) + " V"
-                        Layout.fillWidth: true
-                        readOnly: true
-                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Touch Voltage:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.touchVoltage.toFixed(1) + " V"
                         color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
-                        Layout.fillWidth: true
-                        readOnly: true
-                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Step Voltage:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.stepVoltage.toFixed(1) + " V"
                         color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
-                        Layout.fillWidth: true
-                        readOnly: true
-                        background: ProtectionRectangle {}
                     }
 
                     Label { text: "Min. Conductor Size:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.conductorSize.toFixed(1) + " mm²"
-                        Layout.fillWidth: true
-                        readOnly: true
-                        background: ProtectionRectangle {}
                     }
                 }
             }

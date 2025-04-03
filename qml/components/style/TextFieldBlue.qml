@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-import "../backgrounds"
+
 
 TextField {
     id: textField
@@ -12,9 +12,12 @@ TextField {
 
     text: ""
 
-    // ToolTip.text: textField.text
     ToolTip.visible: hovered
     ToolTip.delay: 500
     
-    background: ProtectionRectangle {}
+    background: Rectangle {
+        color: sideBar.modeToggled ? "black":"#e8f6ff"
+        border.color: "#0078d7"
+        radius: 2
+    }
 }

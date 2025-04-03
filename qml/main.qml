@@ -9,7 +9,6 @@ import "components"
 import "components/calculators"
 import "components/buttons"
 import "components/style"
-import "components/backgrounds"
 import "components/popups"
 
 ApplicationWindow {

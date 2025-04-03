@@ -11,7 +11,7 @@ import "../components/visualizers/"
 import "../components/charts/"
 import "../components/three_phase/"
 import "../components/style"
-import "../components/backgrounds"
+
 import "../components/popups"
 
 Page {

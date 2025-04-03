@@ -6,7 +6,7 @@ import QtCharts
 import components 1.0
 import "../components"
 import "../components/style"
-import "../components/backgrounds"
+
 
 Page {
     id: root

@@ -5,7 +5,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
+
 
 Item {
     id: calculatorCard

@@ -6,7 +6,7 @@ import "../"
 import "../../components"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
+
 
 import Transformer 1.0
 
@@ -253,12 +253,9 @@ Item {
                             }
 
                             Label { text: "Current (A):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: secondaryCurrent
                                 text: calculator.secondaryCurrent.toFixed(2)
-                                Layout.fillWidth: true
-                                readOnly: true
-                                background: ProtectionRectangle {}
                             }
                         }
                     }
@@ -354,41 +351,29 @@ Item {
                             }
 
                             Label { text: "Reactance (%):" }
-                            TextField {
+                            TextFieldBlue {
                                 text: calculator.reactancePercent.toFixed(2)
-                                Layout.fillWidth: true
-                                readOnly: true
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Short-circuit MVA:" }
-                            TextField {
+                            TextFieldBlue {
                                 text: calculator.shortCircuitPower.toFixed(2)
-                                Layout.fillWidth: true
-                                readOnly: true
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Voltage Drop (%):" }
                                 
-                            TextField {
+                            TextFieldBlue {
                                 id: voltageDrop
                                 text: calculator.voltageDrop.toFixed(2)
-                                readOnly: true
-                                Layout.fillWidth: true
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Temperature Rise:" }
-                            TextField {
+                            TextFieldBlue {
                                 text: calculator.temperatureRise.toFixed(1) + "°C"
                                 color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
                                 ToolTip.text: "Estimated temperature rise above ambient"
                                 ToolTip.visible: hovered
-                                Layout.fillWidth: true
                                 ToolTip.delay: 500
-                                readOnly: true
-                                background: ProtectionRectangle {}
                             }
 
                             Rectangle {

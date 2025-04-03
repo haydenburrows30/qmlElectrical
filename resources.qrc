@@ -127,9 +127,6 @@
     <file>qml/components/style/PrefsSwitch.qml</file>
     <file>qml/components/style/PrefsTabButton.qml</file>
     <file>qml/components/style/SwitchLabel.qml</file>
-    <file>qml/components/backgrounds/ProtectionRectangle.qml</file>
-
-
     <file>qml/components/monitors/CalculationMonitor.qml</file>
     
     <!-- Data Files -->

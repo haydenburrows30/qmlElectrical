@@ -4,7 +4,8 @@ import QtQuick.Layouts
 import "../"
 import "../buttons"
 import "../popups"
-import "../backgrounds"
+
+import "../style"
 
 Item {
     id: transformerLineSection
@@ -239,20 +240,14 @@ Item {
                             columns: 2
 
                             Label { text: "Wind Turbine Output (MW):" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: (totalGeneratedPower / 1000).toFixed(3)
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Load (MVA):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: loadMVAField
-                                readOnly: false
-                                Layout.fillWidth: true
                                 text: { calculator.loadMVA.toFixed(3) }
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Power Factor:" }
@@ -312,13 +307,10 @@ Item {
 
                             // Regulator type - specific to Eaton
                             Label { text: "Regulator Type:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: regulatorTypeText
                                 text: "Eaton Single-Phase"
-                                readOnly: true
-                                Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: ProtectionRectangle {}
                             }
 
                             // Regulator model - specific to VR-32
@@ -338,24 +330,18 @@ Item {
 
                             // Connection type - delta
                             Label { text: "Connection Type:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: regulatorConnectionText
                                 text: "Delta"
-                                readOnly: true
-                                Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: ProtectionRectangle {}
                             }
 
                             // Capacity per phase
                             Label { text: "Capacity per Phase (kVA):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: regulatorCapacityText
                                 text: "185"
-                                readOnly: true
-                                Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: ProtectionRectangle {}
                             }
 
                             // Target voltage setting
@@ -432,13 +418,10 @@ Item {
 
                             // Number of steps
                             Label { text: "Number of Steps:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: regulatorStepsText
                                 text: "32"
-                                readOnly: true
-                                Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
-                                background: ProtectionRectangle {}
                             }
                         }
                     }
@@ -459,76 +442,52 @@ Item {
                             columns: 2
 
                             Label { text: "Transformer Z (Ohms):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: transformerZOhmsText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Transformer R (Ohms):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: transformerROhmsText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.transformerROhms, 0).toFixed(3) : "0.000"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Transformer X (Ohms):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: transformerXOhmsText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Line Total Z (Ohms):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: lineTotalZText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Natural Voltage Drop (%):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: voltageDropText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Fault Current at LV Side (kA):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: faultCurrentLVText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Fault Current at HV Side (kA):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: faultCurrentHVText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Unregulated Voltage (kV):" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: calculatorReady ? 
                                     safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
                                     "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             ExportButton {
@@ -570,39 +529,27 @@ Item {
                             columns: 2
 
                             Label { text: "Relay Pickup Current (A):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: relayPickupCurrentText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "CT Ratio:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: relayCtRatioText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? calculator.relayCtRatio : "300/1"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Relay Curve Type:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: relayCurveTypeText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Time Dial Setting:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: relayTimeDialText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
-                                background: ProtectionRectangle {}
                             }
 
                             Button {
@@ -656,19 +603,13 @@ Item {
                             columns: 2
 
                             Label { text: "Recommended HV Cable Size:" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: calculatorReady ? calculator.recommendedHVCable : "25 mm²"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Recommended LV Cable Size:" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: calculatorReady ? calculator.recommendedLVCable : "25 mm²"
-                                background: ProtectionRectangle {}
                             }
                         }
                     }
@@ -685,47 +626,32 @@ Item {
                             columns: 2
 
                             Label { text: "Unregulated Voltage (kV):" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: calculatorReady ? 
                                     ((11 * (1 - safeValueFunction(calculator.voltageDrop, 0) / 100))).toFixed(2) : 
                                     "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Regulated Voltage (kV):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: regulatedVoltageText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.regulatedVoltage, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Tap Position:" }
-                            TextField {
+                            TextFieldBlue {
                                 id: regulatorTapPositionText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.regulatorTapPosition, 0).toString() : "0"
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Step Size (%):" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: (calculator.voltageRegulatorRange / 16).toFixed(3)
-                                background: ProtectionRectangle {}
                             }
 
                             Label { text: "Total 3-Phase Capacity (kVA):" }
-                            TextField {
-                                readOnly: true
-                                Layout.fillWidth: true
+                            TextFieldBlue {
                                 text: calculatorReady ? safeValueFunction(calculator.regulatorThreePhaseCapacity, 0).toFixed(0) : "555"
-                                background: ProtectionRectangle {}
                             }
                         }
                     }

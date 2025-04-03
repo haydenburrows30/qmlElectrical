@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import RefRgf 1.0

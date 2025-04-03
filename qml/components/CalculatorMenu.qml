@@ -3,13 +3,11 @@ import QtQml
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-// import QtQuick.Controls.Universal
 import QtCharts
 
+import "../"
 import "../components"
 import "../components/calculators"
-
-import "../"
 
 WaveCard {
 

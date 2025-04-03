@@ -5,7 +5,7 @@ import QtQuick.Shapes
 import QtCharts
 
 import "../style"
-import "../backgrounds"
+
 
 Item {
     id: root

@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../"
 import "../style"
-import "../backgrounds"
+
 
 Item {
     id: root

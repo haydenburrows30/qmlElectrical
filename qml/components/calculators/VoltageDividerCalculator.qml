@@ -6,7 +6,7 @@ import QtCharts
 import "../"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import VoltDivider 1.0

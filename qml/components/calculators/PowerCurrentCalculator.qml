@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import PCalculator 1.0

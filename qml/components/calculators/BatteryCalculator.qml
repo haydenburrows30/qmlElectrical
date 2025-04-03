@@ -6,7 +6,6 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
 import "../visualizers"
 import "../popups"
 
@@ -129,20 +128,17 @@ Item {
                     Label { text: "Required Capacity:" }
                     TextFieldBlue { 
                         text: calculator.requiredCapacity.toFixed(1) + " Ah"
-                        background: ProtectionRectangle {}
                     }
                     
                     Label { text: "Recommended Capacity:" }
                     TextFieldBlue { 
                         text: calculator.recommendedCapacity.toFixed(1) + " Ah"
                         color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
-                        background: ProtectionRectangle {}
                     }
                     
                     Label { text: "Energy Storage:" }
                     TextFieldBlue { 
                         text: calculator.energyStorage.toFixed(2) + " kWh"
-                        background: ProtectionRectangle {}
                     }
                 }
             }

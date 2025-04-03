@@ -1,5 +1,5 @@
 import "../style"
-import "../backgrounds"
+
 
 ColumnLayout {
     anchors.fill: parent

@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../style"
-import "../backgrounds"
+
 
 GridLayout {
     id: resultsLayout

@@ -5,7 +5,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../style"
-import "../backgrounds"
+
 
 Popup {
     id: detailsPopup

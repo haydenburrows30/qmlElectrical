@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import "../style"
-import "../backgrounds"
+
 
 import TransformerLine 1.0
 import WindTurbine 1.0

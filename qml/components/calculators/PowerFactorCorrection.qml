@@ -5,7 +5,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import PFCorrection 1.0
@@ -84,30 +84,21 @@ Item {
                     columns: 2
 
                     Label { text: "Required Capacitor:" ; Layout.minimumWidth: 170}
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.capacitorSize.toFixed(2) + " kVAR"
                         Layout.minimumWidth: 150
-                        Layout.fillWidth: true
-                        background: ProtectionRectangle {}
-                        readOnly: true
 
                     }
 
                     Label { text: "Capacitance Required:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.capacitance.toFixed(2) + " μF"
-                        Layout.fillWidth: true
-                        background: ProtectionRectangle {}
-                        readOnly: true
                     }
 
                     Label { text: "Annual Savings:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: "$" + calculator.annualSavings.toFixed(2)
                         color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
-                        Layout.fillWidth: true
-                        background: ProtectionRectangle {}
-                        readOnly: true
                     }
                 }
             }

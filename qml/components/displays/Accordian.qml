@@ -2,12 +2,12 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "../"
 import "../displays"
 import "../style"
 
 Pane {
-
     ScrollView {
         id: scrollView
         anchors.fill: parent

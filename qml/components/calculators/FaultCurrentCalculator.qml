@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import "../"
-import "../backgrounds"
+
 import "../style"
 import "../popups"
 
@@ -224,32 +224,24 @@ Item {
                         text: "Initial Sym. Current:" 
                         Layout.minimumWidth: 100
                     }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.initialSymCurrent.toFixed(1) + " kA"
-                        background: ProtectionRectangle {}
                         Layout.minimumWidth: 100
-                        Layout.fillWidth: true
                     }
 
                     Label { text: "Peak Fault Current:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.peakFaultCurrent.toFixed(1) + " kA"
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
 
                     Label { text: "Breaking Current:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.breakingCurrent.toFixed(1) + " kA"
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
 
                     Label { text: "Thermal Current:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.thermalCurrent.toFixed(1) + " kA"
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
 
                     // Impedance details
@@ -267,24 +259,18 @@ Item {
                     }
 
                     Label { text: "Total Impedance:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.totalImpedance.toFixed(3) + " Ω"
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
                     
                     Label { text: "R / X Components:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.totalR.toFixed(3) + " / " + calculator.totalX.toFixed(3) + " Ω"
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
                     
                     Label { text: "Effective X/R Ratio:" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.effectiveXrRatio.toFixed(1)
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
                     
                     // Per-unit values 
@@ -302,24 +288,18 @@ Item {
                     }
                     
                     Label { text: "System Z (p.u.):" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.systemPuZ.toFixed(3) 
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
                     
                     Label { text: "Transformer Z (p.u.):" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.transformerPuZ.toFixed(3)
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
                     
                     Label { text: "Cable Z (p.u.):" }
-                    TextField { 
+                    TextFieldBlue { 
                         text: calculator.cablePuZ.toFixed(3)
-                        background: ProtectionRectangle {}
-                        Layout.fillWidth: true
                     }
                 }
             }

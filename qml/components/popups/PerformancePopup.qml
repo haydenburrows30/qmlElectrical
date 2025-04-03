@@ -2,9 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import "../style"
-import "../backgrounds"
-
 Popup {
     id: performancePopup
     modal: true

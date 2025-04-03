@@ -7,7 +7,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../../components"
 import "../style"
-import "../backgrounds"
+
 import "../buttons"
 import "../popups"
 

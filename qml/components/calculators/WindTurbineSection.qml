@@ -8,7 +8,7 @@ import QtQuick.Dialogs
 import "../"
 import "../buttons"
 import "../popups"
-import "../backgrounds"
+
 import "../style"
 
 Item {
@@ -376,13 +376,9 @@ Item {
                             columns: 2
 
                             Label { text: "Swept Area (m²):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: sweptAreaText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: safeValue(calculator.sweptArea, 0).toFixed(2)
-                                background: ProtectionRectangle {}
-
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
@@ -391,13 +387,9 @@ Item {
                             }
 
                             Label { text: "Theoretical Power (kW):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: theoreticalPowerText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: safeValue(calculator.theoreticalPower, 0).toFixed(2)
-                                background: ProtectionRectangle {}
-
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
@@ -406,13 +398,9 @@ Item {
                             }
 
                             Label { text: "Actual Power Output (kW):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: actualPowerText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.actualPower, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
-
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
@@ -421,42 +409,29 @@ Item {
                             }
                             
                             Label { text: "Generator Rated Capacity (kVA):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: genCapacityText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.ratedCapacity, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
-
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
-
                                 ToolTip.text: "self._rated_capacity =  self._actual_power * 1.2 / 1000"
                             }
                             
                             Label { text: "Generator Output Current (A):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: genCurrentText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.outputCurrent, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
-
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
-
                                 ToolTip.text: "self._output_current =  (self._actual_power / 1000) / (math.sqrt(3) * 0.4)"
                             }
                             
                             Label { text: "Annual Energy Production (MWh/year):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: annualEnergyText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: calculatorReady ? safeValueFunction(calculator.annualEnergy, 0).toFixed(2) : "0.00"
-                                background: ProtectionRectangle {}
                             }
 
                             Rectangle {
@@ -508,12 +483,9 @@ Item {
                             }
                             
                             Label { text: "Estimated AEP (MWh/year):" }
-                            TextField {
+                            TextFieldBlue {
                                 id: advancedAepText
-                                readOnly: true
-                                Layout.fillWidth: true
                                 text: "0.00"
-                                background: ProtectionRectangle {}
                             }
                         }
                     }

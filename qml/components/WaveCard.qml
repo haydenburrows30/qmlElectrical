@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "style"
-import "backgrounds"
 
 Rectangle {
     id: controlRect

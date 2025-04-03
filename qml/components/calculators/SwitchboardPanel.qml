@@ -9,7 +9,7 @@ import "../../components"
 import "../charts/"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import Switchboard 1.0

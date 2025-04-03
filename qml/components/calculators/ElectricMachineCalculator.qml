@@ -5,7 +5,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import Machine 1.0

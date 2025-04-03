@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import "style"
 
+import "style"
 import "buttons"
 import "tooltips"
 

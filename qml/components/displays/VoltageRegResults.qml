@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import "../"
 import "../buttons"
 import "../style"
-import "../backgrounds"
+
 
 ColumnLayout {
     Layout.fillWidth: true

@@ -6,7 +6,7 @@ import "../"
 import "../../components"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
+
 import "../buttons"
 import "../popups"
 
@@ -360,75 +360,53 @@ Item {
                             columns: 2
 
                             Label { text: "CT Knee Point:" ; Layout.minimumWidth: 160}
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.kneePointVoltage) ? calculator.kneePointVoltage.toFixed(1) + " V" : "0.0 V"
-                                readOnly: true
-                                background: ProtectionRectangle {}
                                 Layout.minimumWidth: 150
                             }
 
                             Label { text: "Maximum Fault Current:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.maxFaultCurrent) ? calculator.maxFaultCurrent.toFixed(1) + " A" : "0.0 A"
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
 
                             Label { text: "Minimum CT Burden:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.minAccuracyBurden) ? calculator.minAccuracyBurden.toFixed(2) + " Ω" : "0.0 Ω"
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
 
                             Label { text: "Error Margin:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.errorMargin) ? calculator.errorMargin.toFixed(2) + "%" : "0.0%"
                                 color: calculator.errorMargin > parseFloat(accuracyClass.currentText) ? "red" : Universal.foreground
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
 
                             Label { text: "Temperature Effect:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.temperatureEffect) ? calculator.temperatureEffect.toFixed(2) + "%" : "0.0%"
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
 
                             Label { text: "VT Rated Voltage:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.vtRatedVoltage) ? calculator.vtRatedVoltage.toFixed(1) + " V" : "0.0 V"
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
 
                             Label { text: "VT Impedance:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: isFinite(calculator.vtImpedance) ? calculator.vtImpedance.toFixed(1) + " Ω" : "0.0 Ω"
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
 
                             Label { text: "VT Burden Status:" }
-                            TextField { 
+                            TextFieldBlue { 
                                 text: calculator.vtBurdenStatus
                                 color: calculator.vtBurdenWithinRange ? "green" : "red"
-                                readOnly: true
-                                background: ProtectionRectangle {}
                                 Layout.minimumHeight: 60
                                 Layout.minimumWidth: 150
                                 wrapMode: Text.WordWrap
                             }
 
                             Label { text: "Burden Utilization:" }
-                            TextField {
+                            TextFieldBlue {
                                 text: isFinite(calculator.vtBurdenUtilization) ? 
                                         calculator.vtBurdenUtilization.toFixed(1) + "%" : "0.0%"
                                 color: {
@@ -436,9 +414,6 @@ Item {
                                     if (calculator.vtBurdenUtilization < 80) return "orange"
                                     return "red"
                                 }
-                                readOnly: true
-                                background: ProtectionRectangle {}
-                                Layout.fillWidth: true
                             }
                         }
                     }

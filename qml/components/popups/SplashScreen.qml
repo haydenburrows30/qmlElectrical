@@ -7,8 +7,6 @@ import QtQuick.Controls.Universal
 import QtQuick.Controls.Material
 import QtQuick.Effects
 
-import "../style"
-
 Popup {
     id: splashScreen
     modal: true

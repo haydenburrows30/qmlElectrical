@@ -11,8 +11,6 @@ import "../"
 import "../style"
 import "../popups"
 
-// import RLC 1.0
-
 Item {
     id: root
     anchors.fill: parent

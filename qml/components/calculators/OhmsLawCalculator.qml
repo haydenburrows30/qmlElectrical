@@ -5,9 +5,9 @@ import QtCharts
 
 import "../"
 import "../visualizers"
-import "../backgrounds"
+
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import OhmsLaw 1.0
@@ -437,37 +437,29 @@ Item {
                 anchors.fill: parent
                 
                 Label { text: "Voltage:" ; Layout.minimumWidth: 100}
-                TextField { 
+                TextFieldBlue { 
                     text: getFormattedValue(calculator.voltage, "voltage")
-                    background: ProtectionRectangle {}
-                    Layout.fillWidth: true
                     ToolTip.visible: hovered
                     ToolTip.text: "V = I × R = √(P × R)"
                 }
                 
                 Label { text: "Current:" ;}
-                TextField { 
+                TextFieldBlue { 
                     text: getFormattedValue(calculator.current, "current")
-                    background: ProtectionRectangle {}
-                    Layout.fillWidth: true
                     ToolTip.visible: hovered
                     ToolTip.text: "I = V / R = √(P / R)"
                 }
                 
                 Label { text: "Resistance:" ;}
-                TextField {
+                TextFieldBlue {
                     text: getFormattedValue(calculator.resistance, "resistance")
-                    background: ProtectionRectangle {}
-                    Layout.fillWidth: true
                     ToolTip.visible: hovered
                     ToolTip.text: "R = V / I = V² / P"
                 }
                 
                 Label { text: "Power:" ;}
-                TextField { 
+                TextFieldBlue { 
                     text: getFormattedValue(calculator.power, "power")
-                    background: ProtectionRectangle {}
-                    Layout.fillWidth: true
                     ToolTip.visible: hovered
                     ToolTip.text: "P = V × I = I² × R = V² / R"
                 }

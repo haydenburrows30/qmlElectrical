@@ -7,7 +7,7 @@ import "../"
 import "../../components"
 import "../visualizers/"
 import "../style"
-import "../backgrounds"
+
 import "../popups"
 
 import Impedance 1.0
@@ -105,11 +105,8 @@ Item {
                     text: "Impedance (Z):"
                     Layout.preferredWidth: 110
                 }
-                 TextField {
+                 TextFieldBlue {
                     text: calculator && !isNaN(calculator.impedance) ? calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
-                    Layout.fillWidth: true
-                    background: ProtectionRectangle {}
-                    readOnly: true
                 }
             }
         }

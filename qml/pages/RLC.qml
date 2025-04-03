@@ -11,7 +11,7 @@ import "../components"
 import "../components/charts/"
 import "../components/style"
 import "../components/popups"
-import "../components/backgrounds"
+
 import "../components/charts"
 import "../components/visualizers"
 
@@ -463,15 +463,11 @@ Page {
                                 Layout.fillWidth: true
                             }
 
-                            TextField {
+                            TextFieldBlue {
                                 text: calculator.resonantFreq.toFixed(2) + " Hz"
                                 Layout.alignment: Qt.AlignHCenter
-                                Layout.fillWidth: true
                                 font.bold: isAtResonance()
                                 font.pixelSize: isAtResonance() ? 14 : 12
-                                background: ProtectionRectangle {}
-                                readOnly: true
-
                                 function isAtResonance() {
                                     var minF = Number(minFreqInput.text)
                                     var maxF = Number(maxFreqInput.text)
@@ -485,12 +481,9 @@ Page {
                                 Layout.fillWidth: true
                             }
 
-                            TextField {
+                            TextFieldBlue {
                                 text: calculator.qualityFactor.toFixed(2)
                                 Layout.alignment: Qt.AlignHCenter
-                                Layout.fillWidth: true
-                                background: ProtectionRectangle {}
-                                readOnly: true
                             }
                         }
                     }

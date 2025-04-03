@@ -5,7 +5,7 @@ import QtCharts
 import QtQuick.Controls.Universal
 
 import "../style"
-import "../backgrounds"
+
 
 Item {
     id: chartComponent
