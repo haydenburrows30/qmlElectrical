@@ -4,6 +4,8 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
+import "../buttons"
+
 GridLayout {
     id: cableSelectionSettings
     columns: 2
@@ -207,7 +209,7 @@ GridLayout {
         }
     }
 
-    Button {
+    StyledButton {
         text: "Reset"
         icon.name: "Reset"
         Layout.fillWidth: true

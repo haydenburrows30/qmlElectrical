@@ -552,7 +552,7 @@ Item {
                                 text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
                             }
 
-                            Button {
+                            StyledButton {
                                 text: "Expert Settings..."
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight

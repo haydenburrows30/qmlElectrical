@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtCharts
 
 import "../components"
+import "../buttons"
 
 import components 1.0
 
@@ -227,7 +228,7 @@ Page {
                 }
             }
             
-            Button {
+            StyledButton {
                 text: "Close"
                 Layout.alignment: Qt.AlignHCenter
                 onClicked: messagePopup.close()

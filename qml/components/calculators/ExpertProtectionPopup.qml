@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import "../style"
+import "../buttons"
 
 Popup {
     id: expertPopup
@@ -179,13 +180,13 @@ Popup {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight
             
-            Button {
+            StyledButton {
                 text: "Refresh Values"
                 Layout.alignment: Qt.AlignRight
                 onClicked: calculator.refreshCalculations();
             }
             
-            Button {
+            StyledButton {
                 text: "Close"
                 Layout.alignment: Qt.AlignRight
                 onClicked: expertPopup.close()

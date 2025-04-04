@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../style"
+import "../buttons"
 
 Popup {
     id: detailsPopup
@@ -120,13 +121,13 @@ Popup {
                 Layout.alignment: Qt.AlignHCenter
                 
                 
-                Button {
+                StyledButton {
                     text: "Save to PDF"
                     icon.name: "document-save"
                     onClicked: detailsPopup.saveToPdfRequested()
                 }
                 
-                Button {
+                StyledButton {
                     text: "Close"
                     onClicked: detailsPopup.closeRequested()
                 }

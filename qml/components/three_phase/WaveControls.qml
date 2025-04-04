@@ -7,6 +7,7 @@ import QtQuick.Controls.Universal
 import QtCharts
 
 import "../"
+import "../buttons"
 
 WaveCard {
     id: root
@@ -71,7 +72,7 @@ WaveCard {
                 color: sideBar.modeToggled ? "#b0b0b0" : "#606060"
             }
 
-            Button {
+            StyledButton {
                 Layout.alignment: Qt.AlignRight
                 icon.name: "Reset"
                 

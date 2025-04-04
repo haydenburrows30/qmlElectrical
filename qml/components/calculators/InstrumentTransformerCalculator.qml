@@ -56,7 +56,7 @@ Item {
                 Layout.fillWidth: true
             }
             
-            Button {
+            StyledButton {
                 text: "OK"
                 Layout.alignment: Qt.AlignRight
                 onClicked: errorPopup.close()

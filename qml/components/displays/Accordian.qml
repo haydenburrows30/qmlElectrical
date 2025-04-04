@@ -6,6 +6,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../displays"
 import "../style"
+import "../buttons"
 
 Pane {
     id: accordionPane
@@ -39,7 +40,7 @@ Pane {
                 anchors.left: parent.left
 
                 RowLayout {
-                    Button {
+                    StyledButton {
                         text: "Calculate Complete System"
                         Layout.alignment: Qt.AlignHCenter
                         Layout.preferredWidth: 250
@@ -48,7 +49,7 @@ Pane {
                         onClicked: calculate()
                     }
 
-                    Button {
+                    StyledButton {
                         text: "Close All"
                         Layout.alignment: Qt.AlignHCenter
                         Layout.preferredWidth: 250
@@ -61,7 +62,7 @@ Pane {
                         }
                     }
 
-                    Button {
+                    StyledButton {
                         text: "Open All"
                         Layout.alignment: Qt.AlignHCenter
                         Layout.preferredWidth: 250
@@ -85,7 +86,7 @@ Pane {
                         anchors.left: parent.left
                         property bool showList: false
 
-                        Button {
+                        StyledButton {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             text: model.title

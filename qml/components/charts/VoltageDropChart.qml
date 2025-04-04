@@ -5,6 +5,7 @@ import QtCharts
 import QtQuick.Controls.Universal
 
 import "../style"
+import "../buttons"
 
 Item {
     id: chartComponent
@@ -391,12 +392,12 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             
             
-            Button {
+            StyledButton {
                 text: "Close"
                 onClicked: chartComponent.closeRequested()
             }
 
-            Button {
+            StyledButton {
                 text: "Reset View"
                 onClicked: resetView()
             }

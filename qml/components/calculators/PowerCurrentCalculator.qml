@@ -6,6 +6,7 @@ import "../"
 import "../style"
 import "../popups"
 import "../style"
+import "../buttons"
 
 import PCalculator 1.0
 import KwFromCurrent 1.0
@@ -171,7 +172,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    StyledButton {
                         Layout.preferredWidth: 60
                         text: "Copy"
                         ToolTip.text: "Copy to clipboard"
@@ -318,7 +319,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    StyledButton {
                         Layout.preferredWidth: 60
                         text: "Copy"
                         ToolTip.text: "Copy to clipboard"

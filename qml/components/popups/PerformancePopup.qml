@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../buttons"
+
 Popup {
     id: performancePopup
     modal: true
@@ -100,14 +102,14 @@ Popup {
                 }
 
                 RowLayout {
-                    Button {
+                    StyledButton {
                         text: "Clear Data"
                         enabled: profilingCheckbox.checked
                         onClicked: calculator.clearProfilingData()
                         Layout.fillWidth: true
                     }
                     
-                    Button {
+                    StyledButton {
                         text: "Show Report"
                         enabled: profilingCheckbox.checked
                         onClicked: calculator.printProfilingSummary()

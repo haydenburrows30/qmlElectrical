@@ -7,6 +7,7 @@ import "../"
 import "../visualizers/"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import Charging 1.0
 
@@ -166,7 +167,7 @@ Item {
                                 }
                             }
 
-                            Button {
+                            StyledButton {
                                 Layout.preferredWidth: 50
                                 text: "Copy"
                                 onClicked: {

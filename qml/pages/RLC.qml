@@ -13,6 +13,7 @@ import "../components/style"
 import "../components/popups"
 import "../components/charts"
 import "../components/visualizers"
+import "../components/buttons"
 
 import RLC 1.0
 
@@ -552,7 +553,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
             }
-            Button {
+            StyledButton {
                 text: "OK"
                 Layout.alignment: Qt.AlignHCenter
                 onClicked: messagePopup.close()

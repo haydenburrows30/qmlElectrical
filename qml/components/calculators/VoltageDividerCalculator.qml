@@ -7,6 +7,7 @@ import "../"
 import "../visualizers/"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import VoltDivider 1.0
 
@@ -107,7 +108,7 @@ Item {
                     
                     Item { Layout.columnSpan: 2; Layout.preferredHeight: 10 }
                     
-                    Button {
+                    StyledButton {
                         text: "Calculate"
                         Layout.columnSpan: 2
                         Layout.alignment: Qt.AlignRight

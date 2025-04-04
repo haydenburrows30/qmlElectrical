@@ -7,6 +7,7 @@ import "../"
 import "../visualizers"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import OhmsLaw 1.0
 
@@ -261,7 +262,7 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
 
-        Button {
+        StyledButton {
             text: "View History"
             onClicked: historyDialog.open()
             Layout.columnSpan: 2
@@ -395,7 +396,7 @@ Item {
                     font.italic: true
                 }
 
-                Button {
+                StyledButton {
                     text: "Calculate"
                     Layout.minimumWidth: 100
                     Layout.columnSpan: 2
@@ -462,7 +463,7 @@ Item {
                     ToolTip.text: "P = V × I = I² × R = V² / R"
                 }
 
-                Button {
+                StyledButton {
                     Layout.columnSpan: 2
                     Layout.minimumWidth: 100
                     Layout.alignment: Qt.AlignRight

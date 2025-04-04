@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../buttons"
+
 Item {
     id: root
     
@@ -189,7 +191,7 @@ Item {
             }
         }
 
-        Button {
+        StyledButton {
             text: "Export Table"
             icon.name: "document-save"
             enabled: root.tableModel && root.tableModel.rowCount && root.tableModel.rowCount() > 0

@@ -363,7 +363,7 @@ Item {
 
                             RowLayout {
 
-                                Button {
+                                StyledButton {
                                     text: "Vestas V27"
                                     Layout.alignment: Qt.AlignRight
                                     
@@ -380,7 +380,7 @@ Item {
                                     }
                                 }
                                 
-                                Button {
+                                StyledButton {
                                     text: "V27 Info"
                                     Layout.alignment: Qt.AlignRight
                                     
@@ -540,7 +540,7 @@ Item {
                             });
                         }
                                                                                 
-                        Button {
+                        StyledButton {
                             text: "Update Power Curve"
                             anchors.top: parent.top
                             anchors.right: parent.right

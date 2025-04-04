@@ -5,6 +5,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 
 import "../components"
+import "../components/buttons"
 
 Page {
 
@@ -76,7 +77,7 @@ Page {
         height: menuBar.height
         anchors.horizontalCenter : parent.horizontalCenter
 
-        Button {
+        StyledButton {
             id: control
             text: "Home"
             width: 100

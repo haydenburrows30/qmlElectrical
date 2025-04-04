@@ -5,6 +5,7 @@ import QtCharts
 import QtQuick.Controls.Universal
 
 import "../"
+import "../buttons"
 
 Popup {
     id: v27StatsPopup
@@ -324,7 +325,7 @@ Popup {
                     Layout.fillHeight: true
                 }
                 
-                Button {
+                StyledButton {
                     text: "Close"
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: v27StatsPopup.close()

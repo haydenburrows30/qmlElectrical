@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../buttons"
+
 Popup {
     id: root
     modal: true
@@ -33,7 +35,7 @@ Popup {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
         }
-        Button {
+        StyledButton {
             text: "OK"
             Layout.alignment: Qt.AlignHCenter
             onClicked: root.close()

@@ -7,6 +7,7 @@ import "../"
 import "../visualizers"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import MotorStarting 1.0
 
@@ -94,7 +95,7 @@ Item {
             
             Item { Layout.fillHeight: true }
             
-            Button {
+            StyledButton {
                 text: "Close"
                 Layout.alignment: Qt.AlignRight
                 onClicked: messagePopup.close()
@@ -141,7 +142,7 @@ Item {
                             }
                         }
                         
-                        Button {
+                        StyledButton {
                             text: "ⓘ"
                             implicitWidth: 30
                             onClicked: showMotorInfo()
@@ -247,7 +248,7 @@ Item {
                         }
                     }
                     
-                    Button {
+                    StyledButton {
                         text: "Calculate"
                         Layout.columnSpan: 2
                         Layout.alignment: Qt.AlignRight

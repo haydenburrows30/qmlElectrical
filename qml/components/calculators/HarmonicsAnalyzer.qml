@@ -11,6 +11,7 @@ import "../monitors"
 import "../popups/"
 import "../style"
 import "../charts"
+import "../buttons"
 
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0
@@ -88,7 +89,7 @@ Item {
             }
             
             // Export buttons
-            Button {
+            StyledButton {
                 text: "Export Data"
                 Layout.fillWidth: true
                 onClicked: {
@@ -144,7 +145,7 @@ Item {
                     }
                 }
                 
-                Button {
+                StyledButton {
                     id: performanceButton
                     anchors {
                         right: parent.right

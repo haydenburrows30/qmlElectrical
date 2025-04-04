@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "../buttons"
+
 Item {
     id: calculationMonitor
     
@@ -41,7 +43,7 @@ Item {
         }
     }
 
-    Button {
+    StyledButton {
         anchors {
             right: parent.right
             top: parent.top

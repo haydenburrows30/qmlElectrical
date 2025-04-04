@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import "../style"
+import "../buttons"
 
 Item {
     id: root
@@ -96,7 +97,7 @@ Item {
             
             uniformCellSizes: true
 
-            Button {
+            StyledButton {
                 text: "Save Results"
                 icon.name: "document-save"
                 enabled: root.voltageDropValue > 0
@@ -104,7 +105,7 @@ Item {
                 onClicked: root.saveResultsClicked()
             }
 
-            Button {
+            StyledButton {
                 text: "Details"
                 icon.name: "Info"
                 enabled: root.voltageDropValue > 0
@@ -112,7 +113,7 @@ Item {
                 onClicked: root.viewDetailsClicked()
             }
 
-            Button {
+            StyledButton {
                 text: "View Chart"
                 icon.name: "Chart"
                 enabled: root.voltageDropValue > 0

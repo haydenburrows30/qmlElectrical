@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../style"
+import "../buttons"
 
 GridLayout {
     id: resultsLayout
@@ -95,21 +96,21 @@ GridLayout {
         Layout.fillWidth: true
         Layout.topMargin: 10
         
-        Button {
+        StyledButton {
             text: "Save Results"
             icon.name: "Save"
             enabled: currentVoltageDropValue > 0
             onClicked: saveResultsClicked()
         }
 
-        Button {
+        StyledButton {
             text: "Show Details"
             icon.name: "Info"
             enabled: currentVoltageDropValue > 0
             onClicked: viewDetailsClicked()
         }
 
-        Button {
+        StyledButton {
             text: "View Chart"
             icon.name: "Chart"
             enabled: currentVoltageDropValue > 0

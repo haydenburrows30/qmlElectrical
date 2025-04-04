@@ -6,6 +6,7 @@ import QtQuick.Controls.Universal
 import "../"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import FaultCurrent 1.0
 
@@ -187,7 +188,7 @@ Item {
                         onCurrentTextChanged: calculator.setFaultType(currentText)
                         Layout.fillWidth: true
                     }
-                    Button {
+                    StyledButton {
                         id: advancedButton
                         text: "Advanced Settings"
                         checkable: true

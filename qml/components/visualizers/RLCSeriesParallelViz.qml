@@ -1,3 +1,5 @@
+import "../buttons"
+
 ColumnLayout {
     anchors.fill: parent
     
@@ -27,7 +29,7 @@ ColumnLayout {
         Text {
             text: freqSlider.value.toFixed(1)
         }
-        Button {
+        StyledButton {
             text: phaseVector.isAnimating ? "Stop Animation" : "Start Animation"
             onClicked: phaseVector.isAnimating = !phaseVector.isAnimating
         }

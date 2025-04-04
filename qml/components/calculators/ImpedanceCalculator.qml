@@ -7,6 +7,7 @@ import "../"
 import "../visualizers/"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import Impedance 1.0
 
@@ -29,7 +30,6 @@ Item {
     RowLayout {
         anchors.centerIn: parent
         anchors.margins: 10
-        
 
         WaveCard {
             title: "Impedance Calculator"
@@ -40,8 +40,6 @@ Item {
             GridLayout {
                 anchors.centerIn: parent
                 columns: 2
-                columnSpacing: 20
-                
 
                 Label {
                     text: "Resistance(R):"

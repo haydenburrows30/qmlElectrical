@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import "../"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import DeltaTransformer 1.0
 
@@ -113,7 +114,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    StyledButton {
                         text: "Open Reference Guide"
                         Layout.fillWidth: true
                         onClicked: {
@@ -121,7 +122,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    StyledButton {
                         text: "Calculate"
                         Layout.fillWidth: true
                         onClicked: {

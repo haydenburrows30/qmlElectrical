@@ -6,6 +6,7 @@ import QtCharts
 import "../"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import ProtectionRelay 1.0
 
@@ -262,7 +263,7 @@ Item {
                                 color: operatingTimeLabel.color
                             }
 
-                            Button {
+                            StyledButton {
                                 id: saveSettingsButton
                                 text: "Save Settings"
                                 Layout.columnSpan: 2
@@ -326,7 +327,7 @@ Item {
                                 Layout.fillWidth: true
                             }
                             
-                            Button {
+                            StyledButton {
                                 text: "Calculate Fault Current"
                                 Layout.columnSpan: 2
                                 Layout.fillWidth: true
@@ -492,7 +493,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
                 
-                Button {
+                StyledButton {
                     text: "Compare"
                     enabled: savedSettingsList.currentIndex >= 0
                     onClicked: {
@@ -501,7 +502,7 @@ Item {
                     }
                 }
                 
-                Button {
+                StyledButton {
                     text: "Load"
                     enabled: savedSettingsList.currentIndex >= 0
                     onClicked: {
@@ -543,7 +544,7 @@ Item {
                     }
                 }
                 
-                Button {
+                StyledButton {
                     text: "Close"
                     onClicked: {
                         savedCurve.visible = false;
@@ -553,7 +554,7 @@ Item {
             }
             
             // Add Clear Settings button
-            Button {
+            StyledButton {
                 text: "Clear All Settings"
                 Layout.fillWidth: true
                 Layout.topMargin: 10

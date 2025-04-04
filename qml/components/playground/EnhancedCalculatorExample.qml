@@ -2,10 +2,11 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "../"
 import "../../components"
 import "../style"
-
+import "../buttons"
 
 Item {
     id: calculatorCard
@@ -94,7 +95,7 @@ Item {
                 
                 Item { Layout.fillWidth: true }
                 
-                Button {
+                StyledButton {
                     text: "Add"
                     icon.name: "add"
                     ToolTip.text: "Add new parameter"
@@ -109,7 +110,7 @@ Item {
                     }
                 }
                 
-                Button {
+                StyledButton {
                     text: "Remove"
                     icon.name: "remove"
                     enabled: parameters.length > 1
@@ -127,7 +128,7 @@ Item {
                     }
                 }
                 
-                Button {
+                StyledButton {
                     text: "Reset"
                     icon.name: "refresh"
                     ToolTip.text: "Reset all parameters to zero"
@@ -294,7 +295,7 @@ Item {
                         opacity: 0.5
                     }
                     
-                    Button {
+                    StyledButton {
                         text: "Clear All"
                         Layout.fillWidth: true
                         onClicked: {

@@ -10,6 +10,7 @@ import "../charts/"
 import "../visualizers/"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import Switchboard 1.0
 
@@ -387,7 +388,7 @@ Item {
                     Layout.fillWidth: true
                     
                     
-                    Button {
+                    StyledButton {
                         text: "Add Circuit"
                         icon.name: "add"
                         onClicked: {
@@ -396,7 +397,7 @@ Item {
                         }
                     }
                     
-                    Button {
+                    StyledButton {
                         text: "Export Schedule"
                         icon.name: "document-save"
                         onClicked: exportMenu.open()
@@ -438,7 +439,7 @@ Item {
                         }
                     }
                     
-                    Button {
+                    StyledButton {
                         text: "Load Schedule"
                         icon.name: "folder-open"
                         onClicked: fileDialog.open()

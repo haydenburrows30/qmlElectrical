@@ -4,6 +4,7 @@ import QtQuick.Controls.impl as Impl
 import QtQuick.Layouts
 
 import "../../../scripts/MaterialDesignRegular.js" as MD
+import "../buttons"
 
 Button {
     id: control

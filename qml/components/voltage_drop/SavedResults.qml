@@ -4,6 +4,7 @@ import QtQuick.Layouts
 
 import "../"
 import "../style"
+import "../buttons"
 
 WaveCard {
     id: root
@@ -15,13 +16,13 @@ WaveCard {
         RowLayout {
             Layout.fillWidth: true
 
-            Button {
+            StyledButton {
                 text: "Clear All"
                 icon.name: "Delete"
                 onClicked: resultsManager.clear_all_results()
             }
 
-            Button {
+            StyledButton {
                 text: "Refresh"
                 icon.name: "Refresh"
                 onClicked: resultsManager.refresh_results()
