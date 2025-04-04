@@ -17,7 +17,6 @@ Item {
     property bool calculatorReady
     property real totalGeneratedPower
     property var safeValueFunction
-    // Add property for application directory path
     property string applicationDirPath: Qt.application.directoryPath || "."
 
     property bool saveSuccess: false
@@ -220,8 +219,6 @@ Item {
                         title: "Wind Turbine Parameters"
                         Layout.minimumHeight: 440
                         Layout.minimumWidth: 350
-
-                        // showSettings: true
 
                         GridLayout {
                             columns: 2
@@ -532,7 +529,6 @@ Item {
 
                         theme: Universal.theme
 
-                        // Add method to save chart as image
                         function saveChartImage(filePath) {
                             return powerCurveChart.grabToImage(function(result) {
                                 result.saveToFile(filePath);

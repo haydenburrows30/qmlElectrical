@@ -122,7 +122,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                WaveformVisualizer {
+                WaveformVisualizerChart {
                     id: waveformVisualizer
                     anchors.fill: parent
                     calculator: harmonicsCard.calculator
