@@ -9,7 +9,7 @@ Popup {
     id: expertPopup
     modal: true
     padding: 25
-    width: 600
+    width: 400
     height: 600
     
     property var calculator
@@ -28,12 +28,14 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
+        spacing: 20
         
         Label {
             text: "Expert Protection Settings"
             font.bold: true
-            font.pixelSize: 16
+            font.pixelSize: 20
         }
+        Rectangle { height: 1; Layout.fillWidth: true; color: "gray"}
         
         ScrollView {
             Layout.fillWidth: true
@@ -44,8 +46,17 @@ Popup {
                 width: parent.width
                 columns: 2
                 
-                Label { text: "Detailed System Calculations"; font.bold: true }
-                Rectangle { height: 1; Layout.fillWidth: true; color: "gray" }
+                Label { 
+                    text: "Detailed System Calculations"
+                    font.bold: true
+                    Layout.bottomMargin: 10
+                }
+                Rectangle {
+                    height: 1
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 10
+                    color: "gray"
+                }
                 
                 Label { text: "Z0 Transformer (Ω):" }
                 TextFieldBlue {
@@ -129,16 +140,21 @@ Popup {
                         `${safeValueFunction(calculator.unregulatedVoltage, 11).toFixed(2)} kV` : 
                         "11.00 kV"
                 }
-                
-                // Separator before protection settings
-                Rectangle { 
-                    Layout.columnSpan: 2
-                    Layout.fillWidth: true
-                    height: 2
-                    color: "darkgray"
+
+                Label { 
+                    text: "Protection Settings"
+                    font.bold: true
+                    Layout.topMargin: 10
+                    Layout.bottomMargin: 10
                 }
 
-                Label { text: "Protection Settings"; font.bold: true ; Layout.columnSpan: 2 }
+                Rectangle { 
+                    Layout.fillWidth: true
+                    height: 1
+                    color: "darkgray"
+                    Layout.topMargin: 10
+                    Layout.bottomMargin: 10
+                }
                 
                 Label { text: "Relay Pickup Current (A):" }
                 TextFieldBlue {

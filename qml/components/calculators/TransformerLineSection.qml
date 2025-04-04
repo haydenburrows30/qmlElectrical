@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
+import QtCore
 
 import "../"
 import "../buttons"
@@ -15,6 +17,8 @@ Item {
     property bool calculatorReady
     property real totalGeneratedPower
     property var safeValueFunction
+
+    signal calculate()
 
     // Move function to component level
     function updateDisplayValues() {
@@ -42,22 +46,20 @@ Item {
         regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
     }
 
+    // Enhanced safeValueFunction implementation directly in the component
+    function safeValueFunction(value, defaultVal) {
+        // Enhanced safe value function that handles null, undefined, NaN
+        if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
+            return defaultVal;
+        }
+        return value;
+    }
+
     onTotalGeneratedPowerChanged: {
         if (calculatorReady) {
             calculator.setLoadMVA(totalGeneratedPower / 1000000)
         }
     }
-
-    Connections {
-        target: calculator
-        function loadChanged() {
-            if (calculatorReady) {
-                transformerLineSection.updateDisplayValues()
-            }
-        }
-    }
-
-    signal calculate()
 
     ScrollView {
         id: scrollView
@@ -80,10 +82,9 @@ Item {
 
                     Layout.maximumWidth: 400
                     Layout.minimumWidth: 400
-
                     Layout.alignment: Qt.AlignTop
 
-                        // Transformer parameters section
+                    // Transformer parameters section
                     WaveCard {
                         title: "Transformer Parameters (400V to 11kV)"
                         Layout.fillWidth: true
@@ -151,7 +152,7 @@ Item {
                         }
                     }
 
-                        // Line parameters section
+                    // Line parameters section
                     WaveCard {
                         title: "Line Parameters (5km Cable)"
                         Layout.fillWidth: true
@@ -229,7 +230,7 @@ Item {
                         }
                     }
 
-                        // Load parameters updated by wind turbine output
+                    // Load parameters updated by wind turbine output
                     WaveCard {
                         title: "Load Parameters (From Wind Turbine Output)"
                         Layout.fillWidth: true
@@ -286,7 +287,7 @@ Item {
                         }
                     }
 
-                        // Voltage Regulator parameters
+                    // Voltage Regulator parameters
                     WaveCard {
                         id: regulatorCard
                         title: "Voltage Regulator"
@@ -426,6 +427,7 @@ Item {
                         }
                     }
                 }
+                
                 ColumnLayout {
                     Layout.minimumWidth: 400
                     Layout.maximumWidth: 400
@@ -490,28 +492,14 @@ Item {
                                     "0.00"
                             }
 
-                            ExportButton {
+                            StyledButton {
+                                id: exportButton
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
-                                defaultFileName: "transformer_report.pdf"
-                                onExport: function(fileUrl) {
+                                text: "Export"
 
-                                    if (calculatorReady) {
-                                        let data = {
-                                            "transformer_rating": calculator.transformerRating,
-                                            "transformer_impedance": calculator.transformerImpedance,
-                                            "transformer_xr_ratio": calculator.transformerXRRatio,
-                                            "transformer_z": calculator.transformerZOhms,
-                                            "transformer_r": calculator.transformerROhms,
-                                            "transformer_x": calculator.transformerXOhms,
-                                            "ground_fault_current": calculator.groundFaultCurrent,
-                                            "ct_ratio": calculator.relayCtRatio,
-                                            "relay_pickup_current": calculator.relayPickupCurrent,
-                                            "relay_curve_type": calculator.relayCurveType,
-                                            "time_dial": calculator.relayTimeDial
-                                        }
-                                        calculator.exportTransformerReport(data, fileUrl)
-                                    }
+                                onClicked: {
+                                    saveDialog.open()
                                 }
                             }
                         }
@@ -613,7 +601,7 @@ Item {
                             }
                         }
                     }
-
+                    // Regulator results
                     WaveCard {
                         title: "Voltage Regulation Results"
                         Layout.fillWidth: true
@@ -656,12 +644,6 @@ Item {
                         }
                     }
                 }
-
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 20
-                }
-                // Spacer to push content to the top
             }
         }
     }
@@ -678,12 +660,54 @@ Item {
         }
     }
 
-    // Enhanced safeValueFunction implementation directly in the component
-    function safeValueFunction(value, defaultVal) {
-        // Enhanced safe value function that handles null, undefined, NaN
-        if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
-            return defaultVal;
+    FileDialog {
+        id: saveDialog
+        title: "Save PDF Report"
+        nameFilters: ["PDF files (*.pdf)"]
+        fileMode: FileDialog.SaveFile
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+
+        onAccepted: {
+            if (calculatorReady) {
+                let data = {
+                    "transformer_rating": calculator.transformerRating,
+                    "transformer_impedance": calculator.transformerImpedance,
+                    "transformer_xr_ratio": calculator.transformerXRRatio,
+                    "transformer_z": calculator.transformerZOhms,
+                    "transformer_r": calculator.transformerROhms,
+                    "transformer_x": calculator.transformerXOhms,
+                    "ground_fault_current": calculator.groundFaultCurrent,
+                    "ct_ratio": calculator.relayCtRatio,
+                    "relay_pickup_current": calculator.relayPickupCurrent,
+                    "relay_curve_type": calculator.relayCurveType,
+                    "time_dial": calculator.relayTimeDial
+                }
+            }
+
+            let filePath = saveDialog.selectedFile.toString();
+                
+            // Remove the "file://" prefix properly based on platform
+            if (filePath.startsWith("file:///") && Qt.platform.os === "windows") {
+                // On Windows, file:///C:/path becomes C:/path
+                filePath = filePath.substring(8);
+            } else if (filePath.startsWith("file:///")) {
+                // On Unix-like systems, file:///path becomes /path
+                filePath = filePath.substring(7); 
+            } else if (filePath.startsWith("file://")) {
+                // Alternative format
+                filePath = filePath.substring(5);
+            }
+
+            calculator.exportTransformerReport(data, filePath)
         }
-        return value;
+    }
+
+    Connections {
+        target: calculator
+        function loadChanged() {
+            if (calculatorReady) {
+                transformerLineSection.updateDisplayValues()
+            }
+        }
     }
 }
