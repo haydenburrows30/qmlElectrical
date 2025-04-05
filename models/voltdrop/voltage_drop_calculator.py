@@ -649,7 +649,7 @@ class VoltageDropCalculator(QObject):
         """Calculate voltage drop using mV/A/m method."""
         try:
             logger = logging.getLogger("qmltest")
-            print("Calculating voltage drop...")
+            # print("Calculating voltage drop...")
             
             logger.info("\n=== Starting Voltage Drop Calculations ===")
             logger.info(f"Input Parameters:")

@@ -108,11 +108,11 @@ class Application:
             return model
         
         # Load models concurrently
-        [self.sine_wave, self.voltage_drop, self.results_manager] = await asyncio.gather(
-            load_model("three_phase", 0.3),
-            load_model("voltage_drop", 0.6),
-            load_model("results_manager", 1.0)
-        )
+        # [self.sine_wave, self.voltage_drop, self.results_manager] = await asyncio.gather(
+        #     load_model("three_phase", 0.3),
+        #     load_model("voltage_drop", 0.6),
+        #     load_model("results_manager", 1.0)
+        # )
         
         self.loading_manager._loading = False
         self.loading_manager.loadingChanged.emit()
@@ -134,9 +134,9 @@ class Application:
     def load_models(self):
         """Initialize and configure application models using factories."""
         # Load core models immediately
-        self.sine_wave = self.model_factory.create_model("three_phase")
-        self.voltage_drop = self.model_factory.create_model("voltage_drop")
-        self.results_manager = self.model_factory.create_model("results_manager")
+        # self.sine_wave = self.model_factory.create_model("three_phase")
+        # self.voltage_drop = self.model_factory.create_model("voltage_drop")
+        # self.results_manager = self.model_factory.create_model("results_manager")
 
         # Defer calculator creation until needed
         self._calculators = {}
