@@ -7,6 +7,7 @@ import "../style"
 import "../popups"
 import "../style"
 import "../buttons"
+import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import PCalculator 1.0
 import KwFromCurrent 1.0
@@ -20,6 +21,11 @@ Item {
     TextEdit {
         id: clipboardHelper
         visible: false
+    }
+
+    FontLoader {
+        id: iconFont
+        source: "../../../icons/MaterialIcons-Regular.ttf"
     }
 
     PopUpText {
@@ -173,8 +179,8 @@ Item {
                     }
 
                     StyledButton {
-                        Layout.preferredWidth: 60
-                        text: "Copy"
+                        Layout.preferredWidth: 80
+                        text: "Copy  " + MD.icons["copy_all"]
                         ToolTip.text: "Copy to clipboard"
                         ToolTip.visible: hovered
                         onClicked: {
@@ -216,7 +222,7 @@ Item {
          
             GridLayout {
                 anchors.centerIn: parent
-                Layout.maximumWidth: 300
+                Layout.maximumWidth: 400
                 columns: 3
 
                 Label {
@@ -226,7 +232,7 @@ Item {
                 ComboBox {
                     id: phaseSelector1
                     model: ["Single Phase", "Three Phase"]
-                    Layout.minimumWidth: 150
+                    Layout.minimumWidth: 200
                     Layout.fillWidth: true
                     Layout.columnSpan: 2
                     onCurrentTextChanged: {
@@ -268,7 +274,7 @@ Item {
                 ComboBox {
                     id: pfPresets
                     model: ["Custom", "0.8", "0.85", "0.9", "0.95", "1.0"]
-                    Layout.preferredWidth: 110
+                    Layout.preferredWidth: 120
                     onCurrentTextChanged: {
                         if (currentText !== "Custom") {
                             pfInput.text = currentText
@@ -282,7 +288,7 @@ Item {
                 
                 TextField {
                     id: pfInput
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: 80
                     enabled: pfPresets.currentText === "Custom"
                     opacity: enabled ? 1.0 : 0.5
                     placeholderText: "0.8-1.0"
@@ -311,7 +317,7 @@ Item {
                     TextFieldBlue {
                         id: kwOutput
                         Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignRight
+                        horizontalAlignment: Text.AlignLeft
                         font.bold: true
                         text: {
                             if (!calculator1 || isNaN(calculator1.kw)) return "0.00 kW"
@@ -320,8 +326,8 @@ Item {
                     }
 
                     StyledButton {
-                        Layout.preferredWidth: 60
-                        text: "Copy"
+                        Layout.preferredWidth: 80
+                        text: "Copy  " + MD.icons["copy_all"]
                         ToolTip.text: "Copy to clipboard"
                         ToolTip.visible: hovered
                         onClicked: {
@@ -343,13 +349,6 @@ Item {
                     Layout.columnSpan: 3
                     Layout.topMargin: 5
                 }
-
-                // Label {
-                //     text: "Single Phase: 230V | Three Phase: 415V"
-                //     font.italic: true
-                //     color: "gray"
-                //     Layout.columnSpan: 3
-                // }
 
                 Label {
                     id: errorMessage1

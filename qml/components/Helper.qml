@@ -52,10 +52,12 @@ PopUpText {
 
 FontLoader {
     id: iconFont
-    source: "../../icons/MaterialIcons-Regular.ttf"
+    source: "../../../icons/MaterialIcons-Regular.ttf"
 }
 
-import "../../scripts/MaterialDesignRegular.js" as MD
+MD.icons["copy"]
+
+import "../../../scripts/MaterialDesignRegular.js" as MD
 
 // Results
 

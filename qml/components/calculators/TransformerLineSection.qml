@@ -541,7 +541,7 @@ Item {
                             }
 
                             StyledButton {
-                                text: "Expert Settings..."
+                                text: "Expert Settings"
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 onClicked: {

@@ -14,15 +14,20 @@ Button {
     verticalPadding: padding - 4
     spacing: 8
 
-    contentItem: Text {
-        text: control.text
-        font: control.font
-        opacity: enabled ? 1.0 : 0.3
-        color: Universal.foreground
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        elide: Text.ElideRight
-    }
+    // icon.width: 20
+    // icon.height: 20
+
+    // contentItem: Text {
+    //     text: control.text
+    //     font: control.font
+    //     // icon: control.icon
+
+    //     opacity: enabled ? 1.0 : 0.3
+    //     color: Universal.foreground
+    //     horizontalAlignment: Text.AlignHCenter
+    //     verticalAlignment: Text.AlignVCenter
+    //     elide: Text.ElideRight
+    // }
 
     background: Rectangle {
         implicitWidth: 32
@@ -40,8 +45,8 @@ Button {
             height: parent.height
             color: "transparent"
             visible: enabled && control.hovered
-            border.width: 2 // ButtonBorderThemeThickness
-            border.color: control.Universal.accent //control.Universal.baseMediumLowColor
+            border.width: 2
+            border.color: control.Universal.accent
 
             radius: 4
         }

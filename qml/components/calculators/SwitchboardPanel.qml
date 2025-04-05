@@ -11,6 +11,7 @@ import "../visualizers/"
 import "../style"
 import "../popups"
 import "../buttons"
+import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import Switchboard 1.0
 
@@ -19,6 +20,11 @@ Item {
     
     property SwitchboardManager manager: SwitchboardManager {}
     property color textColor: Universal.foreground
+
+    FontLoader {
+        id: iconFont
+        source: "../../../icons/MaterialIcons-Regular.ttf"
+    }
 
     PopUpText {
         parentCard: results
@@ -386,8 +392,7 @@ Item {
                 // 3. Finally the buttons at the bottom
                 RowLayout {
                     Layout.fillWidth: true
-                    
-                    
+
                     StyledButton {
                         text: "Add Circuit"
                         icon.name: "add"
@@ -398,8 +403,7 @@ Item {
                     }
                     
                     StyledButton {
-                        text: "Export Schedule"
-                        icon.name: "document-save"
+                        text: '\ue161' + "Export Schedule"
                         onClicked: exportMenu.open()
                         
                         Menu {

@@ -8,6 +8,7 @@ import "../visualizers"
 import "../style"
 import "../popups"
 import "../buttons"
+import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import OhmsLaw 1.0
 
@@ -206,7 +207,7 @@ Item {
     }
 
     PopUpText {
-        widthFactor: 0.2
+        widthFactor: 0.3
         heightFactor: 0.4
         parentCard: results
         
@@ -263,27 +264,11 @@ Item {
         anchors.centerIn: parent
 
         StyledButton {
-            text: "View History"
+            text: "View History  " + MD.icons["history"]
             onClicked: historyDialog.open()
             Layout.columnSpan: 2
             Layout.minimumWidth: 100
             Layout.alignment: Qt.AlignLeft
-            
-            contentItem: Row {
-                spacing: 5
-                anchors.centerIn: parent
-                
-                Text {
-                    text: "View History"
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                
-                Text {
-                    text: "\ue889"  // history icon from Material Icons
-                    font.family: iconFont.name
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
         }
 
         WaveCard {
@@ -383,13 +368,12 @@ Item {
                 ComboBox {
                     id: param2Unit
                     Layout.maximumWidth: 60
-                    // Layout.fillWidth: true
                     model: getUnitModel(selectedParam2.currentIndex)
                     onCurrentTextChanged: calculateOhmsLaw()
                 }
 
                 Text {
-                    id: statusMessageText // Fix: renamed from statusMessage to statusMessageText
+                    id: statusMessageText
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
@@ -397,30 +381,15 @@ Item {
                 }
 
                 StyledButton {
-                    text: "Calculate"
+                    text: "Calculate  " + MD.icons["receipt"]
                     Layout.minimumWidth: 100
                     Layout.columnSpan: 2
                     Layout.alignment: Qt.AlignRight
+                    font.pixelSize: 16
                     
                     onClicked: calculateOhmsLaw()
-                    
-                    contentItem: Row {
-                        spacing: 5
-                        anchors.centerIn: parent
-                        
-                        Text {
-                            text: "Calculate"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        
-                        Text {
-                            text: "\ue8b0"  // calculator icon from Material Icons
-                            font.family: iconFont.name
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+
                 }
-                
             }
         }
 
@@ -467,28 +436,11 @@ Item {
                     Layout.columnSpan: 2
                     Layout.minimumWidth: 100
                     Layout.alignment: Qt.AlignRight
-                    text: "Clear"
+                    text: "Clear  " + MD.icons["clear"]
                     onClicked: {
-                        param1Value.text = "";
-                        param2Value.text = "";
-                        // Fix: update text property directly on the statusMessage element
-                        statusMessageText.text = "";
-                    }
-                    
-                    contentItem: Row {
-                        spacing: 5
-                        anchors.centerIn: parent
-                        
-                        Text {
-                            text: "Clear"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        
-                        Text {
-                            text: "\ue14c"  // clear icon from Material Icons
-                            font.family: iconFont.name
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                        param1Value.text = ""
+                        param2Value.text = ""
+                        statusMessageText.text = ""
                     }
                 }
             }
