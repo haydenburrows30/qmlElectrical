@@ -49,8 +49,6 @@ Item {
             Layout.minimumWidth: 600
             title: "Unit Converter"
 
-            showSettings: true
-
             ColumnLayout {
                 id: waveCardLayout
                 anchors.centerIn: parent
@@ -127,7 +125,7 @@ Item {
                                     rfocusChanged()
                                 }
 
-                                contentItem: Text {
+                                contentItem: Label {
                                     id: wHRPMText
                                     leftPadding: 10
                                     text: wHRPM.displayText
@@ -160,7 +158,7 @@ Item {
                                     rfocusChanged()
                                 }
 
-                                contentItem: Text {
+                                contentItem: Label {
                                     id: tempText
                                     leftPadding: 10
                                     text: temp.displayText

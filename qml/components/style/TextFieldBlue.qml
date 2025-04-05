@@ -9,12 +9,12 @@ TextField {
     Layout.fillWidth: true
 
     text: ""
-
-    ToolTip.visible: hovered
-    ToolTip.delay: 500
+    color: textField.activeFocus ? sideBar.modeToggled ? "white" : "black" : sideBar.modeToggled ? "white" : "black"
+    // ToolTip.visible: hovered
+    // ToolTip.delay: 500
     
     background: Rectangle {
-        color: sideBar.modeToggled ? "black":"#e8f6ff"
+        color: sideBar.modeToggled ? "transparent":"#e8f6ff"
         border.color: "#0078d7"
         radius: 3
     }

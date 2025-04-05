@@ -233,23 +233,22 @@ Item {
             clip: true
             model: ListModel { id: historyModel }
             delegate: ItemDelegate {
-                // width: parent.width
                 height: 80
                 
                 ColumnLayout {
                     anchors.fill: parent
                     spacing: 2
                     
-                    Text {
+                    Label {
                         text: Qt.formatDateTime(model.timestamp, "yyyy-MM-dd HH:mm:ss")
                         font.bold: true
                     }
-                    Text {
+                    Label {
                         text: "Inputs: " + model.param1.name + " = " + model.param1.value + " " + 
                               model.param1.unit + ", " + model.param2.name + " = " + model.param2.value + 
                               " " + model.param2.unit
                     }
-                    Text {
+                    Label {
                         text: "Results: V=" + getFormattedValue(model.results.voltage, "voltage") + 
                               ", I=" + getFormattedValue(model.results.current, "current") +
                               ", R=" + getFormattedValue(model.results.resistance, "resistance") + 
@@ -309,17 +308,6 @@ Item {
                         notation: DoubleValidator.StandardNotation
                     }
                     onEditingFinished: calculateOhmsLaw()
-                    
-                    // Highlight invalid input
-                    background: Rectangle {
-                        color: "white"
-                        border.color: {
-                            if (param1Value.text === "") return "#cccccc";
-                            return param1Value.acceptableInput ? "#81c784" : "#e57373";
-                        }
-                        border.width: 1
-                        radius: 2
-                    }
                 }
 
                 ComboBox {
@@ -352,17 +340,6 @@ Item {
                         notation: DoubleValidator.StandardNotation
                     }
                     onEditingFinished: calculateOhmsLaw()
-                    
-                    // Highlight invalid input
-                    background: Rectangle {
-                        color: "white"
-                        border.color: {
-                            if (param2Value.text === "") return "#cccccc";
-                            return param2Value.acceptableInput ? "#81c784" : "#e57373";
-                        }
-                        border.width: 1
-                        radius: 2
-                    }
                 }
 
                 ComboBox {
