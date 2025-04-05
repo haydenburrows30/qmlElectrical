@@ -55,7 +55,7 @@ Page {
                         id: results
                         showSettings: true
                         title: "Cable Selection"
-                        Layout.minimumHeight: 580
+                        Layout.minimumHeight: 540
                         Layout.minimumWidth: 420
 
                         CableSelectionSettings {

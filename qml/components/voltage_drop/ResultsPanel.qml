@@ -27,30 +27,29 @@ Item {
     GridLayout {
         anchors.fill: parent
         columns: 2
-        rowSpacing: 18
 
         Label { text: "Voltage Drop: " }
 
-        Label {
+        TextFieldBlue {
             text: root.voltageDropValue.toFixed(2) + " V"
             font.weight: Font.Medium
         }
 
         Label { text: "Percentage Drop: " }
 
-        Label {
+        TextFieldBlue {
             text: root.dropPercentage.toFixed(2) + "%"
             color: root.dropPercentage > 5 ? "red" : "green"
         }
 
         Label { text: "Diversity Factor Applied: " }
 
-        Label {
+        TextFieldBlue {
             text: root.diversityFactor.toFixed(2)
         }
 
         Label { text: "Network Fuse / Rating:" }
-        Text {
+        TextFieldBlue {
             id: networkFuseSizeText
             text: root.combinedRatingInfo
             color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
@@ -60,7 +59,7 @@ Item {
         }
 
         Label { text: "Total Load (kVA):" }
-        Text {
+        TextFieldBlue {
             text: root.totalLoad.toFixed(1)
             font.bold: true
             Layout.fillWidth: true
@@ -68,7 +67,7 @@ Item {
         }
 
         Label { text: "Current (A):" }
-        Text {
+        TextFieldBlue {
             text: root.current.toFixed(1)
             font.bold: true
             color: root.darkMode ? "#ffffff" : "#000000"

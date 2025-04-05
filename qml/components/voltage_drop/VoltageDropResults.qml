@@ -29,7 +29,7 @@ GridLayout {
     
     Label { text: "Voltage Drop: " }
 
-    Label {
+    TextFieldBlue {
         id: dropValue
         text: currentVoltageDropValue.toFixed(2) + " V"
         font.weight: Font.Medium
@@ -37,7 +37,7 @@ GridLayout {
 
     Label { text: "Percentage Drop: " }
 
-    Label {
+    TextFieldBlue {
         id: dropPercent
         text: dropPercentage.toFixed(2) + "%"
         color: dropPercentage > 5 ? "red" : "green"
@@ -45,13 +45,13 @@ GridLayout {
 
     Label { text: "Diversity Factor Applied: " }
 
-    Label {
+    TextFieldBlue {
         text: diversityFactor.toFixed(2)
     }
 
     // Network Fuse Size display
     Label { text: "Network Fuse / Rating:" }
-    Label {
+    TextFieldBlue {
         id: networkFuseSizeText
         text: combinedRatingInfo || "N/A"
         color: text !== "N/A" && text !== "Not specified" && text !== "Error" ? 
@@ -61,7 +61,7 @@ GridLayout {
     }
 
     Label { text: "Total Load (kVA):" }
-    Label {
+    TextFieldBlue {
         id: totalLoadText
         text: totalLoad.toFixed(1)
         font.bold: true
@@ -69,7 +69,7 @@ GridLayout {
     }
 
     Label { text: "Current (A):" }
-    Label {
+    TextFieldBlue {
         id: currentText
         text: current.toFixed(1)
         font.bold: true

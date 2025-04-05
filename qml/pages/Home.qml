@@ -296,12 +296,8 @@ Page {
 
     Button {
         id: aboutProgram
-        contentItem: 
-            Text {
-                text: calculator.version
-                // color: aboutProgram.hovered ? "pink" : "green" //palette.buttonText
-            }
-        font.pixelSize: 12
+        contentItem: Label {text: calculator.version}
+        font.pixelSize: 14
 
         anchors {
             bottom: parent.bottom

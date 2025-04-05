@@ -6,12 +6,9 @@ import QtQuick.Controls.Universal
 
 import "../buttons"
 
-GridLayout {
+Item {
     id: cableSelectionSettings
-    columns: 2
-    columnSpacing: 16
-    rowSpacing: 16
-    
+
     property alias voltageSelect: voltageSelect
     property alias admdCheckBox: admdCheckBox
     property alias conductorSelect: conductorSelect
@@ -71,151 +68,156 @@ GridLayout {
         voltageDrop.calculateTotalLoad(kva, houses)
     }
 
-    Label { text: "System Voltage:" }
-    RowLayout {
+    GridLayout {
+        anchors.fill: parent
+        columns: 2
+
+        Label { text: "System Voltage:" }
+        RowLayout {
+            ComboBox {
+                id: voltageSelect
+                model: voltageDrop.voltageOptions
+                currentIndex: voltageDrop.selectedVoltage === "230V" ? 0 : 1
+                onCurrentTextChanged: {
+                    if (currentText) {
+                        voltageDrop.setSelectedVoltage(currentText)
+                        // Disable ADMD checkbox for 230V
+                        admdCheckBox.enabled = (currentText === "415V")
+                        if (currentText !== "415V") {
+                            admdCheckBox.checked = false
+                        }
+                    }
+                }
+                Layout.fillWidth: true
+            }
+            
+            CheckBox {
+                id: admdCheckBox
+                text: "ADMD (neutral)"
+                enabled: voltageSelect.currentText === "415V"
+                onCheckedChanged: voltageDrop.setADMDEnabled(checked)
+                ToolTip.visible: hovered
+                ToolTip.text: "Apply 1.5 factor for neutral calculations"
+            }
+            Layout.fillWidth: true
+        }
+
+        Label { text: "Conductor:" }
         ComboBox {
-            id: voltageSelect
-            model: voltageDrop.voltageOptions
-            currentIndex: voltageDrop.selectedVoltage === "230V" ? 0 : 1
+            id: conductorSelect
+            model: voltageDrop.conductorTypes
+            currentIndex: 1
             onCurrentTextChanged: {
                 if (currentText) {
-                    voltageDrop.setSelectedVoltage(currentText)
-                    // Disable ADMD checkbox for 230V
-                    admdCheckBox.enabled = (currentText === "415V")
-                    if (currentText !== "415V") {
-                        admdCheckBox.checked = false
-                    }
+                    voltageDrop.setConductorMaterial(currentText)
                 }
             }
             Layout.fillWidth: true
         }
-        
-        CheckBox {
-            id: admdCheckBox
-            text: "ADMD (neutral)"
-            enabled: voltageSelect.currentText === "415V"
-            onCheckedChanged: voltageDrop.setADMDEnabled(checked)
-            ToolTip.visible: hovered
-            ToolTip.text: "Apply 1.5 factor for neutral calculations"
-        }
-        Layout.fillWidth: true
-    }
 
-    Label { text: "Conductor:" }
-    ComboBox {
-        id: conductorSelect
-        model: voltageDrop.conductorTypes
-        currentIndex: 1
-        onCurrentTextChanged: {
-            if (currentText) {
-                voltageDrop.setConductorMaterial(currentText)
+        Label { text: "Cable Type:" }
+        ComboBox {
+            id: coreTypeSelect
+            model: voltageDrop.coreConfigurations
+            currentIndex: 1
+            onCurrentTextChanged: {
+                if (currentText) {
+                    voltageDrop.setCoreType(currentText)
+                }
+            }
+            Layout.fillWidth: true
+        }
+
+        Label { text: "Cable Size:" }
+        ComboBox {
+            id: cableSelect
+            model: voltageDrop.availableCables
+            currentIndex: 13
+            onCurrentTextChanged: {
+                if (currentText) {
+                    voltageDrop.selectCable(currentText)
+                }
+            }
+            Component.onCompleted: {
+                if (currentText) {
+                    voltageDrop.selectCable(currentText)
+                }
+            }
+            Layout.fillWidth: true
+        }
+
+        Label { text: "Length (m):" }
+        TextField {
+            id: lengthInput
+            placeholderText: "Enter length"
+            onTextChanged: voltageDrop.setLength(parseFloat(text) || 0)
+            Layout.fillWidth: true
+            validator: DoubleValidator { bottom: 0 }
+        }
+
+        Label { text: "Installation Method:" }
+        ComboBox {
+            id: installationMethodCombo
+            currentIndex: 6
+            model: voltageDrop.installationMethods
+            onCurrentTextChanged: voltageDrop.setInstallationMethod(currentText)
+            Layout.fillWidth: true
+        }
+
+        Label { text: "Temperature (°C):" }
+        TextField {
+            id: temperatureInput
+            text: "25"
+            onTextChanged: voltageDrop.setTemperature(parseFloat(text) || 75)
+            Layout.fillWidth: true
+            validator: DoubleValidator { bottom: 0; top: 120 }
+        }
+
+        Label { text: "Grouping Factor:" }
+        TextField {
+            id: groupingFactorInput
+            text: "1.0"
+            onTextChanged: voltageDrop.setGroupingFactor(parseFloat(text) || 1.0)
+            Layout.fillWidth: true
+            validator: DoubleValidator { bottom: 0; top: 2 }
+        }
+
+        Label { text: "KVA per House:" }
+        TextField {
+            id: kvaPerHouseInput
+            placeholderText: "Enter kVA"
+            text: "7"  // Default 7kVA per house
+            onTextChanged: {
+                let kva = parseFloat(text) || 0
+                let houses = parseInt(numberOfHousesInput.text) || 0
+                voltageDrop.calculateTotalLoad(kva, houses)
+            }
+            Layout.fillWidth: true
+            validator: DoubleValidator { bottom: 0 }
+        }
+
+        Label { text: "Number of Houses:" }
+        SpinBox {
+            id: numberOfHousesInput
+            Layout.fillWidth: true
+            from: 1
+            to: 1000
+            value: 1
+            onValueChanged: {
+                voltageDrop.setNumberOfHouses(value)
+                let kva = parseFloat(kvaPerHouseInput.text) || 0
+                voltageDrop.calculateTotalLoad(kva, value)
             }
         }
-        Layout.fillWidth: true
-    }
 
-    Label { text: "Cable Type:" }
-    ComboBox {
-        id: coreTypeSelect
-        model: voltageDrop.coreConfigurations
-        currentIndex: 1
-        onCurrentTextChanged: {
-            if (currentText) {
-                voltageDrop.setCoreType(currentText)
+        StyledButton {
+            text: "Reset"
+            icon.name: "Reset"
+            Layout.fillWidth: true
+            onClicked: {
+                resetAllValues()
+                resetRequested()  // Signal to parent that a reset was performed
             }
-        }
-        Layout.fillWidth: true
-    }
-
-    Label { text: "Cable Size:" }
-    ComboBox {
-        id: cableSelect
-        model: voltageDrop.availableCables
-        currentIndex: 13
-        onCurrentTextChanged: {
-            if (currentText) {
-                voltageDrop.selectCable(currentText)
-            }
-        }
-        Component.onCompleted: {
-            if (currentText) {
-                voltageDrop.selectCable(currentText)
-            }
-        }
-        Layout.fillWidth: true
-    }
-
-    Label { text: "Length (m):" }
-    TextField {
-        id: lengthInput
-        placeholderText: "Enter length"
-        onTextChanged: voltageDrop.setLength(parseFloat(text) || 0)
-        Layout.fillWidth: true
-        validator: DoubleValidator { bottom: 0 }
-    }
-
-    Label { text: "Installation Method:" }
-    ComboBox {
-        id: installationMethodCombo
-        currentIndex: 6
-        model: voltageDrop.installationMethods
-        onCurrentTextChanged: voltageDrop.setInstallationMethod(currentText)
-        Layout.fillWidth: true
-    }
-
-    Label { text: "Temperature (°C):" }
-    TextField {
-        id: temperatureInput
-        text: "25"
-        onTextChanged: voltageDrop.setTemperature(parseFloat(text) || 75)
-        Layout.fillWidth: true
-        validator: DoubleValidator { bottom: 0; top: 120 }
-    }
-
-    Label { text: "Grouping Factor:" }
-    TextField {
-        id: groupingFactorInput
-        text: "1.0"
-        onTextChanged: voltageDrop.setGroupingFactor(parseFloat(text) || 1.0)
-        Layout.fillWidth: true
-        validator: DoubleValidator { bottom: 0; top: 2 }
-    }
-
-    Label { text: "KVA per House:" }
-    TextField {
-        id: kvaPerHouseInput
-        placeholderText: "Enter kVA"
-        text: "7"  // Default 7kVA per house
-        onTextChanged: {
-            let kva = parseFloat(text) || 0
-            let houses = parseInt(numberOfHousesInput.text) || 0
-            voltageDrop.calculateTotalLoad(kva, houses)
-        }
-        Layout.fillWidth: true
-        validator: DoubleValidator { bottom: 0 }
-    }
-
-    Label { text: "Number of Houses:" }
-    SpinBox {
-        id: numberOfHousesInput
-        Layout.preferredWidth: 120
-        from: 1
-        to: 1000
-        value: 1
-        onValueChanged: {
-            voltageDrop.setNumberOfHouses(value)
-            let kva = parseFloat(kvaPerHouseInput.text) || 0
-            voltageDrop.calculateTotalLoad(kva, value)
-        }
-    }
-
-    StyledButton {
-        text: "Reset"
-        icon.name: "Reset"
-        Layout.fillWidth: true
-        onClicked: {
-            resetAllValues()
-            resetRequested()  // Signal to parent that a reset was performed
         }
     }
 }

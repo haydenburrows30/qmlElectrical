@@ -7,61 +7,105 @@ import ConfigBridge 1.0
 Popup {
     id: aboutProgram
 
-    width: 400
+    width: 600
     height: 300
 
     anchors.centerIn: Overlay.overlay
 
     property ConfigBridge calculator: ConfigBridge {}
 
-    ColumnLayout {
+    GridLayout {
         anchors.fill: parent
         anchors.margins: 20
-        spacing: 10
+        columns: 2
 
         Label {
             id: title
-            text: calculator.appName
+            text: "About"
             font.pixelSize: 20
+            font.bold: true
+            Layout.columnSpan: 2
+            Layout.bottomMargin: 10
+        }
+
+        Label {
+            text: "App Name:"
+            font.pixelSize: 16
+        }
+
+        Label {
+            text: calculator.appName
+            font.pixelSize: 16
             font.bold: true
         }
 
         Label {
-            id: version
-            text: "Version: " + calculator.version
+            text: "Version:"
             font.pixelSize: 16
         }
 
         Label {
-            id: style
-            text: "Style: " + calculator.style
+            text: calculator.version
+            font.pixelSize: 16
+            font.bold: true
+        }
+
+        Label {
+            text: "Style:"
             font.pixelSize: 16
         }
 
         Label {
-            id: system
-            text: "Platform: " + calculator.system
+            text: calculator.style
+            font.pixelSize: 16
+            font.bold: true
+        }
+
+        Label {
+            text: "Platform:"
             font.pixelSize: 16
         }
 
         Label {
-            id: systemVersion
-            Layout.maximumWidth: 360
-            text: "System: " + calculator.system_version
+            text: calculator.system
+            font.pixelSize: 16
+            font.bold: true
+        }
+
+        Label {
+            text: "System:"
+            font.pixelSize: 16
+            Layout.alignment: Qt.AlignTop
+        }
+
+        Label {
+            Layout.maximumWidth: 440
+            text: calculator.system_version
             font.pixelSize: 16
             wrapMode: Text.WordWrap
+            font.bold: true
         }
 
         Label {
-            id: pythonVersion
-            text: "Python Version: " + calculator.python_version
+            text: "Python Version:"
             font.pixelSize: 16
         }
 
         Label {
-            id: qtVersion
-            text: "Qt Version: " + calculator.qt_version
+            text: calculator.python_version
             font.pixelSize: 16
+            font.bold: true
+        }
+
+        Label {
+            text: "Qt Version:"
+            font.pixelSize: 16
+        }
+
+        Label {
+            text: calculator.qt_version
+            font.pixelSize: 16
+            font.bold: true
         }
     }
 }
