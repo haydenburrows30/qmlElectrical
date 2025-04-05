@@ -77,7 +77,7 @@ Page {
     ]
 
     property var info: [
-        { name: qsTr("Info"), source: "../About.qml" }
+        { name: qsTr("Info"), source: "../components/popups/About.qml" }
     ]
 
     Row {
@@ -157,17 +157,6 @@ Page {
                 title: "Renewables"
                 Repeater {
                     model: renewables
-
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
-                    }
-                }
-            }
-            Menu {
-                title: "Info"
-                Repeater {
-                    model: info
 
                     MenuItem {
                         text: modelData.name

@@ -6,9 +6,16 @@ import QtQuick.Layouts
 
 import "../components"
 import "../components/buttons/"
+import "../components/popups"
+
+import ConfigBridge 1.0
 
 Page {
     id: home
+
+    property ConfigBridge calculator: ConfigBridge {}
+
+    About {id: about}
 
     Label {
         id: welcomeHeader
@@ -287,15 +294,15 @@ Page {
         }
     }
 
-    Text {
-        text: "v1.0.0"
+    Button {
+        text: calculator.version
         font.pixelSize: 12
-        color: palette.text
-        opacity: 0.5
+        background: Rectangle {anchors.fill: parent; color: "transparent"}
         anchors {
             bottom: parent.bottom
             right: parent.right
             margins: 10
         }
-    }
+        onClicked: about.open()
+    } 
 }

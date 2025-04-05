@@ -9,9 +9,7 @@ import "../"
 import "../components"
 import "../components/calculators"
 
-WaveCard {
-
-    border.color: "transparent"
+Item {
 
     ColumnLayout {
         anchors.centerIn: parent

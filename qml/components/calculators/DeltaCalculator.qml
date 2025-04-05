@@ -9,7 +9,6 @@ import "../buttons"
 
 import DeltaTransformer 1.0
 
-
 Item {
 
     property DeltaTransformerCalculator calculator: DeltaTransformerCalculator {}

@@ -32,7 +32,7 @@ from models.ohms_law_calculator import OhmsLawCalculator
 from models.series_helper import SeriesHelper
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import RLCChart
-from models.AboutProgram import ConfigBridge
+from utils.AboutProgram import ConfigBridge
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
