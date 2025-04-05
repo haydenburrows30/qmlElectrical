@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractTableModel,
 import pandas as pd
 from dataclasses import dataclass
 from typing import Dict, Any
-from .logger import setup_logger
+from utils.logger import setup_logger
 
 # Set up logger for this module
 logger = setup_logger("ResultsManager")

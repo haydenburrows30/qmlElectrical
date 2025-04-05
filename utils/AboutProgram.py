@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Property
-from models.config import AppConfig  # Using relative import since both are in the models package
+from utils.config import AppConfig  # Using relative import since both are in the models package
 import platform
 
 class ConfigBridge(QObject):

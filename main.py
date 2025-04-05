@@ -19,7 +19,7 @@ from services.interfaces import (
 )
 from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
-from models.config import app_config
+from utils.config import app_config
 
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 
