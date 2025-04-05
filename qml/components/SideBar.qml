@@ -15,9 +15,9 @@ Drawer {
     property bool modeToggled: false
     property int hide: 0
     property int show: 0
-    property int buttonMargin: buttonMargin
 
     width: drawerWidth
+    height: parent.height
     
     modal: false
     interactive: false
@@ -67,70 +67,63 @@ Drawer {
             GradientStop { position: 1.0; color: palette.base }
         }
     }
+    ListView {
+        id: listView
+        currentIndex: 0
+        Layout.preferredWidth: 60
+        anchors.fill: parent
+        anchors.topMargin: 10
 
-    RowLayout {
-        id: rowLayout
-        height: parent.height - 10
+        clip: true
+        footerPositioning : ListView.OverlayFooter
 
-        Layout.alignment: Qt.AlignHCenter
+        delegate: ItemDelegate {
+            implicitHeight: sideBar.delegateHeight
+            implicitWidth: sideBar.drawerWidth
 
-        ListView {
-            id: listView
-            currentIndex: 0
-            Layout.preferredWidth: 60
-            Layout.fillHeight: true
-
-            clip: true
-            footerPositioning : ListView.OverlayFooter
-
-            delegate: ItemDelegate {
-                implicitHeight: sideBar.delegateHeight
-                implicitWidth: sideBar.drawerWidth
-
-                background: Rectangle {
-                    color: parent.hovered ? palette.highlight.alpha(Style.highlightOpacity) : Style.transparent
-                    Behavior on color {
-                        ColorAnimation { duration: Style.colorAnimationDuration }
-                    }
-                }
-
-                highlighted: ListView.isCurrentItem
-
-                icon.name: model.icon
-                icon.width: 30
-                icon.height: 30
-
-                CToolTip {
-                    id: toolTip
-                    text: model.title
-                    width: Style.tooltipWidth
-                }
-
-                onClicked: {
-                    stackView.push(model.source,StackView.Immediate)
-                    listView.currentIndex = index
-                    toolTip.close()
+            background: Rectangle {
+                color: parent.hovered ? palette.highlight.alpha(Style.highlightOpacity) : Style.transparent
+                Behavior on color {
+                    ColorAnimation { duration: Style.colorAnimationDuration }
                 }
             }
 
-            model: SideBarModel {}
+            highlighted: ListView.isCurrentItem
 
-            // footer:
-            DarkLightButton {
-                id: modeButton
-                icon_name1: "Dark"
-                icon_name2: "Light"
-                mode_1: "Light Mode"
-                mode_2: "Dark Mode"
-                implicitHeight: 50
-                implicitWidth: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: buttonMargin
+            icon.name: model.icon
+            icon.width: 30
+            icon.height: 30
 
-                onClicked: {
-                    modeButton.checked ? modeToggled = true : modeToggled = false
-                }
+            CToolTip {
+                id: toolTip
+                text: model.title
+                width: Style.tooltipWidth
+            }
+
+            onClicked: {
+                stackView.push(model.source,StackView.Immediate)
+                listView.currentIndex = index
+                toolTip.close()
+            }
+        }
+
+        model: SideBarModel {}
+
+        // footer:
+        DarkLightButton {
+            id: modeButton
+            icon_name1: "Dark"
+            icon_name2: "Light"
+            mode_1: "Light Mode"
+            mode_2: "Dark Mode"
+            implicitHeight: 50
+            implicitWidth: 50
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+
+            onClicked: {
+                modeButton.checked ? modeToggled = true : modeToggled = false
             }
         }
     }

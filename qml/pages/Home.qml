@@ -295,14 +295,29 @@ Page {
     }
 
     Button {
-        text: calculator.version
+        id: aboutProgram
+        contentItem: 
+            Text {
+                text: calculator.version
+                // color: aboutProgram.hovered ? "pink" : "green" //palette.buttonText
+            }
         font.pixelSize: 12
-        background: Rectangle {anchors.fill: parent; color: "transparent"}
+
         anchors {
             bottom: parent.bottom
             right: parent.right
             margins: 10
         }
+
+        background: 
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.width: 1
+                border.color: aboutProgram.hovered ? "blue" : "transparent"
+                radius: 5
+            }
+
         onClicked: about.open()
     } 
 }
