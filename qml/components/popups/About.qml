@@ -57,5 +57,11 @@ Popup {
             text: "Python Version: " + calculator.python_version
             font.pixelSize: 16
         }
+
+        Label {
+            id: qtVersion
+            text: "Qt Version: " + calculator.qt_version
+            font.pixelSize: 16
+        }
     }
 }
