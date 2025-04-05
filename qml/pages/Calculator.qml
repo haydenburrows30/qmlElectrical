@@ -32,6 +32,10 @@ Page {
         }
     }
 
+    property var home: [
+        {name: qsTr("Home"), source: "../components/CalculatorMenu.qml"}
+    ]
+
     property var basic: [
         { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml" },
         { name: qsTr("kVA / kw / A"), source: "../components/calculators/PowerCurrentCalculator.qml" },
@@ -72,18 +76,14 @@ Page {
         { name: qsTr("Wind & Grid Connection"), source: "../components/calculators/WindTransformerLineCalculator.qml" }
     ]
 
+    property var info: [
+        { name: qsTr("Info"), source: "../About.qml" }
+    ]
+
     Row {
         id: menuBar1
         height: menuBar.height
         anchors.horizontalCenter : parent.horizontalCenter
-
-        StyledButton {
-            id: control
-            text: "Home"
-            width: 100
-            height: menuBar.height
-            onClicked: calculatorLoader.source = "../components/CalculatorMenu.qml"
-        }
 
         MenuBar {
             id: menuBar
@@ -95,6 +95,18 @@ Page {
                     height: 1
                     anchors.bottom: parent.bottom
                 }
+
+            Menu {
+                title: "Home"
+                Repeater {
+                    model: home
+
+                    MenuItem {
+                        text: modelData.name
+                        onTriggered: calculatorLoader.source = modelData.source
+                    }
+                }
+            }
 
             Menu {
                 title: "Basic Calculators"
@@ -154,9 +166,13 @@ Page {
             }
             Menu {
                 title: "Info"
-                MenuItem {
-                    text: "i"
-                    onTriggered: tipsPopup.open()
+                Repeater {
+                    model: info
+
+                    MenuItem {
+                        text: modelData.name
+                        onTriggered: calculatorLoader.source = modelData.source
+                    }
                 }
             }
         }

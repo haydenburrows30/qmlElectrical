@@ -21,51 +21,76 @@ Page {
 
         anchors.centerIn: parent
 
-        CalculatorPad {}
+        ColumnLayout {
+        spacing: 12
 
-        Rectangle {
-            width: 400
-            height: 300
+        Label {
+            text: qsTr("Slate %1").arg(Qt.application.version)
+            font.bold: true
+            font.pixelSize: Qt.application.font.pixelSize * 1.1
+            Layout.fillWidth: true
+        }
+
+        Label {
+            text: qsTr("Built from %1").arg(BuildInfo.version)
+            font.pixelSize: Qt.application.font.pixelSize
+            Layout.fillWidth: true
+        }
+
+        Label {
+            text: qsTr("Built with Qt %1").arg(qtVersion)
+        }
+
+        Label {
+            text: qsTr("Copyright 2023, Mitch Curtis")
+        }
+    }
+
+        // CalculatorPad {}
+
+        // Rectangle {
+        //     width: 400
+        //     height: 300
             
-            MessageButton {
-                id: saveButton
-                anchors.centerIn: parent
-                buttonText: "Save Document"
-                defaultMessage: "Click to save"
-                successMessage: "Document saved successfully!"
-                errorMessage: "Save operation failed!"
-                waitingMessage: "Saving document..."
+        //     MessageButton {
+        //         id: saveButton
+        //         anchors.centerIn: parent
+        //         buttonText: "Save Document"
+        //         defaultMessage: "Click to save"
+        //         successMessage: "Document saved successfully!"
+        //         errorMessage: "Save operation failed!"
+        //         waitingMessage: "Saving document..."
                 
-                // Connect to the signal
-                onButtonClicked: {
-                    // Start waiting state
-                    startOperation()
+        //         // Connect to the signal
+        //         onButtonClicked: {
+        //             // Start waiting state
+        //             startOperation()
                     
-                    // Simulate an asynchronous operation (like an API call)
-                    simulatedOperation.start()
-                }
-            }
+        //             // Simulate an asynchronous operation (like an API call)
+        //             simulatedOperation.start()
+        //         }
+        //     }
             
-            // Simulate async operation
-            Timer {
-                id: simulatedOperation
-                interval: 2000 // 2 seconds
-                repeat: false
-                onTriggered: {
-                    // Simulate success or failure (random for demo)
-                    if (Math.random() > 0.3) {
-                        saveButton.operationSucceeded(3000)
-                    } else {
-                        saveButton.operationFailed(3000)
-                    }
-                }
-            }
-        }
+        //     // Simulate async operation
+        //     Timer {
+        //         id: simulatedOperation
+        //         interval: 2000 // 2 seconds
+        //         repeat: false
+        //         onTriggered: {
+        //             // Simulate success or failure (random for demo)
+        //             if (Math.random() > 0.3) {
+        //                 saveButton.operationSucceeded(3000)
+        //             } else {
+        //                 saveButton.operationFailed(3000)
+        //             }
+        //         }
+        //     }
+        // }
 
-        StyledButton {
-            text: "Button"
-        }
-        RoundButton {text: "Button"}
+        // StyledButton {
+        //     text: "Button"
+        // }
+        // RoundButton {text: "Button"}
 
         // RowLayout {
 

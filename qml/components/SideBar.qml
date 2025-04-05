@@ -2,23 +2,22 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtQuick.Controls.Universal
 
 import "style"
 import "buttons"
 import "tooltips"
 
 Drawer {
-    id: sideBar
 
     property int drawerWidth: Style.sideBarWidth
     property int delegateHeight: Style.delegateHeight
-    property bool menuMoved: false
     property bool modeToggled: false
     property int hide: 0
     property int show: 0
+    property int buttonMargin: buttonMargin
 
     width: drawerWidth
-    height: parent ? (menuMoved ? parent.height : parent.height - 60) : 0
     
     modal: false
     interactive: false
@@ -57,13 +56,14 @@ Drawer {
     Rectangle {
         id: fade
         width: parent.width
+        visible: sideBar.menuMoved
         anchors.bottom: parent.bottom
-        height: 20
+        height: 100
         opacity: 0.8
         gradient: Gradient {
             orientation: Gradient.Vertical
-            GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.5; color: palette.base.alpha(0.5) }
+            GradientStop { position: 0.0; color:"transparent"}
+            GradientStop { position: 0.5; color: palette.base.alpha(0.5)}
             GradientStop { position: 1.0; color: palette.base }
         }
     }
@@ -115,21 +115,23 @@ Drawer {
 
             model: SideBarModel {}
 
-            footer:
-                DarkLightButton {
-                    id: action
-                    icon_name1: "Dark"
-                    icon_name2: "Light"
-                    mode_1: "Light Mode"
-                    mode_2: "Dark Mode"
-                    implicitHeight: 50
-                    implicitWidth: 50
-                    anchors.horizontalCenter: parent.horizontalCenter
+            // footer:
+            DarkLightButton {
+                id: modeButton
+                icon_name1: "Dark"
+                icon_name2: "Light"
+                mode_1: "Light Mode"
+                mode_2: "Dark Mode"
+                implicitHeight: 50
+                implicitWidth: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: buttonMargin
 
-                    onClicked: {
-                        action.checked ? modeToggled = true : modeToggled = false
-                    }
+                onClicked: {
+                    modeButton.checked ? modeToggled = true : modeToggled = false
                 }
+            }
         }
     }
 }

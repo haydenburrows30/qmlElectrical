@@ -32,6 +32,7 @@ from models.ohms_law_calculator import OhmsLawCalculator
 from models.series_helper import SeriesHelper
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import RLCChart
+from models.AboutProgram import ConfigBridge
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -72,5 +73,6 @@ def register_qml_types(engine, current_dir):
         (TransformerLineCalculator, "TransformerLine", 1, 0, "TransformerLineCalculator"),
         (FaultCurrentCalculator, "FaultCurrent", 1, 0, "FaultCurrentCalculator"),
         (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
-        (RLCChart, "RLC", 1, 0, "RLCChart")
+        (RLCChart, "RLC", 1, 0, "RLCChart"),
+        (ConfigBridge, "ConfigBridge", 1, 0, "ConfigBridge")
     ]

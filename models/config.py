@@ -59,7 +59,8 @@ class AppConfig:
             "style": "Universal",
             "app_name": "Electrical",
             "org_name": "QtProject",
-            "icon_path": "icons/gallery/24x24/Wave_dark.ico"
+            "icon_path": "icons/gallery/24x24/Wave_dark.ico",
+            "version": "1.0.1"
         }
 
         conn = sqlite3.connect(self.db_path)

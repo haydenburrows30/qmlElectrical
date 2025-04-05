@@ -8,20 +8,18 @@ import "../style"
 
 RoundButton {
     id: control
-    icon.width: Style.iconSize
-    icon.height: Style.iconSize
-    icon.name: icon_name
+    
     width: 60
     height: 60
-
-    property bool inOriginalPosition: x === 0 && y === parent.height - height
-    
+    z:999
     x: 0
     y: parent.height - height
 
-    property var icon_name : ""
+    icon.width: Style.iconSize
+    icon.height: Style.iconSize
+
+    property bool inOriginalPosition: x === 0 && y === parent.height - height
     property string tooltip_text: ""
-    z:99
 
     ToolTip {
         id: toolTip
@@ -33,7 +31,7 @@ RoundButton {
     }
     
     background: Rectangle {
-        radius: control.radius
+        radius: control.radius //inOriginalPosition ? 0 : control.radius
         color: {
             if (control.down) return Style.buttonPressed
             if (control.hovered) return Style.buttonHovered
