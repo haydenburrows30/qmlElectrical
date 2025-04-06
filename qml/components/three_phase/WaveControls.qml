@@ -74,7 +74,7 @@ WaveCard {
 
             StyledButton {
                 Layout.alignment: Qt.AlignRight
-                icon.name: "Reset"
+                icon.source: "../../../icons/svg/restart_alt/baseline.svg"
                 
                 onClicked: {
                     sineModel.reset()  

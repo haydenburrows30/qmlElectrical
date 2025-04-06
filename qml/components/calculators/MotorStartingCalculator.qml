@@ -254,6 +254,7 @@ Item {
                         Layout.alignment: Qt.AlignRight
                         Layout.topMargin: 5
                         enabled: hasValidInputs
+                        icon.source: "../../../icons/svg/calculate/baseline.svg"
                         
                         onClicked: {
                             if (hasValidInputs) {

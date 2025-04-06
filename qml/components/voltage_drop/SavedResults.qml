@@ -18,13 +18,13 @@ WaveCard {
 
             StyledButton {
                 text: "Clear All"
-                icon.name: "Delete"
+                icon.source: "../../../icons/svg/clear/baseline.svg"
                 onClicked: resultsManager.clear_all_results()
             }
 
             StyledButton {
                 text: "Refresh"
-                icon.name: "Refresh"
+                icon.source: "../../../icons/svg/restart_alt/baseline.svg"
                 onClicked: resultsManager.refresh_results()
             }
         }

@@ -395,7 +395,7 @@ Item {
 
                     StyledButton {
                         text: "Add Circuit"
-                        icon.name: "add"
+                        icon.source: "../../../icons/svg/add/baseline.svg"
                         onClicked: {
                             circuitEditor.reset1()
                             circuitEditor.open()
@@ -403,7 +403,8 @@ Item {
                     }
                     
                     StyledButton {
-                        text: '\ue161' + "Export Schedule"
+                        text: "Export Schedule"
+                        icon.source: "../../../icons/svg/file_download/baseline.svg"
                         onClicked: exportMenu.open()
                         
                         Menu {
@@ -445,7 +446,7 @@ Item {
                     
                     StyledButton {
                         text: "Load Schedule"
-                        icon.name: "folder-open"
+                        icon.source: "../../../icons/svg/folder_open/baseline.svg"
                         onClicked: fileDialog.open()
                     }
                     

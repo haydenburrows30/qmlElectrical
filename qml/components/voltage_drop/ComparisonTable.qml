@@ -193,7 +193,7 @@ Item {
 
         StyledButton {
             text: "Export Table"
-            icon.name: "document-save"
+            icon.source: "../../../icons/svg/file_download/baseline.svg"
             enabled: root.tableModel && root.tableModel.rowCount && root.tableModel.rowCount() > 0
             Layout.alignment: Qt.AlignRight
             Layout.margins: 5

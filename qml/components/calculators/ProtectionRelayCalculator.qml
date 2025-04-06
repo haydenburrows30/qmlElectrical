@@ -266,6 +266,7 @@ Item {
                             StyledButton {
                                 id: saveSettingsButton
                                 text: "Save Settings"
+                                icon.source: "../../../icons/svg/save/baseline.svg"
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 
@@ -329,6 +330,7 @@ Item {
                             
                             StyledButton {
                                 text: "Calculate Fault Current"
+                                icon.source: "../../../icons/svg/bolt/baseline.svg"
                                 Layout.columnSpan: 2
                                 Layout.fillWidth: true
                                 onClicked: {

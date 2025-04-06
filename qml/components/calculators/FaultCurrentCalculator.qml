@@ -191,6 +191,7 @@ Item {
                     StyledButton {
                         id: advancedButton
                         text: "Advanced Settings"
+                        icon.source: "../../../icons/svg/settings/baseline.svg"
                         checkable: true
                         Layout.alignment: Qt.AlignRight
                         Layout.columnSpan: 2

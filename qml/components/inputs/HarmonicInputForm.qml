@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import "../style"
+import "../buttons"
 
 ColumnLayout {
     id: harmonicInputForm
@@ -136,8 +137,9 @@ ColumnLayout {
         color: sideBar && sideBar.modeToggled ? "#404040" : "#e0e0e0"
     }
 
-    Button {
-        text: "Reset to Defaults"
+    StyledButton {
+        text: "Reset"
+        icon.source: "../../../icons/svg/refresh/baseline.svg"
         Layout.alignment: Qt.AlignHCenter
         onClicked: {
             calculator.resetHarmonics()

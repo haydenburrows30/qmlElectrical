@@ -97,8 +97,8 @@ Item {
             uniformCellSizes: true
 
             StyledButton {
-                text: "Save Results"
-                icon.name: "document-save"
+                text: "Save"
+                icon.source: "../../../icons/svg/save/baseline.svg"
                 enabled: root.voltageDropValue > 0
                 Layout.fillWidth: true
                 onClicked: root.saveResultsClicked()
@@ -106,7 +106,7 @@ Item {
 
             StyledButton {
                 text: "Details"
-                icon.name: "Info"
+                icon.source: "../../../icons/svg/info/baseline.svg"
                 enabled: root.voltageDropValue > 0
                 Layout.fillWidth: true
                 onClicked: root.viewDetailsClicked()
@@ -114,7 +114,7 @@ Item {
 
             StyledButton {
                 text: "View Chart"
-                icon.name: "Chart"
+                icon.source: "../../../icons/svg/show_chart/baseline.svg"
                 enabled: root.voltageDropValue > 0
                 Layout.fillWidth: true
                 onClicked: root.viewChartClicked()

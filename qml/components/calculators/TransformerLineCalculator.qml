@@ -288,94 +288,46 @@ Item {
                         columns: 2
                         
                         Label { text: "Transformer Z (Ohms):" ; Layout.minimumWidth: 200}
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: transformerZOhmsText
-                            readOnly: true
                             Layout.minimumWidth: 150
                             text: calculatorReady ? safeValue(calculator.transformerZOhms, 0).toFixed(3) : "0.000"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Transformer R (Ohms):" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: transformerROhmsText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.transformerROhms, 0).toFixed(3) : "0.000"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Transformer X (Ohms):" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: transformerXOhmsText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Line Total Z (Ohms):" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: lineTotalZText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.lineTotalZ, 0).toFixed(3) : "0.000"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Voltage Drop (%):" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: voltageDropText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.voltageDrop, 0).toFixed(2) : "0.00"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Fault Current at LV Side (kA):" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: faultCurrentLVText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.faultCurrentLV, 0).toFixed(2) : "0.00"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Fault Current at HV Side (kA):" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: faultCurrentHVText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                     }
                 }
@@ -390,55 +342,27 @@ Item {
                         columns: 2
                         
                         Label { text: "Relay Pickup Current (A):" ; Layout.minimumWidth: 200}
-                        TextFieldRound {
-                            id: relayPickupCurrentText
-                            readOnly: true
-                            ; Layout.minimumWidth: 150
+                        TextFieldBlue {
+                            Layout.minimumWidth: 150
                             text: calculatorReady ? safeValue(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "CT Ratio:" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: relayCtRatioText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? calculator.relayCtRatio : "300/5"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Relay Curve Type:" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: relayCurveTypeText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                         
                         Label { text: "Time Dial Setting:" }
-                        TextFieldRound {
+                        TextFieldBlue {
                             id: relayTimeDialText
-                            readOnly: true
-                            Layout.fillWidth: true
                             text: calculatorReady ? safeValue(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
-                            background: Rectangle {
-                                color: "#e8f6ff"
-                                border.color: "#0078d7"
-                                radius: 2
-                            }
                         }
                     }
                 }
