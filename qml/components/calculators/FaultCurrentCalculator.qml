@@ -107,7 +107,7 @@ Item {
 
                     // System parameters
                     Label { text: "System Voltage (kV):" }
-                    TextField {
+                    TextFieldRound {
                         id: systemVoltage
                         text: "11"
                         validator: DoubleValidator { bottom: 0.4; decimals: 1 }
@@ -116,7 +116,7 @@ Item {
                     }
 
                     Label { text: "System MVA:" }
-                    TextField {
+                    TextFieldRound {
                         id: systemMva
                         text: "500"
                         validator: DoubleValidator { bottom: 0 }
@@ -125,7 +125,7 @@ Item {
                     }
 
                     Label { text: "System X/R Ratio:" }
-                    TextField {
+                    TextFieldRound {
                         id: systemXrRatio
                         text: "15"
                         validator: DoubleValidator { bottom: 0 }
@@ -135,7 +135,7 @@ Item {
 
                     // Transformer parameters
                     Label { text: "Transformer Rating (MVA):" }
-                    TextField {
+                    TextFieldRound {
                         id: transformerMva
                         text: "5"
                         validator: DoubleValidator { bottom: 0 }
@@ -144,7 +144,7 @@ Item {
                     }
 
                     Label { text: "Transformer Z%:" }
-                    TextField {
+                    TextFieldRound {
                         id: transformerZ
                         text: "6"
                         validator: DoubleValidator { bottom: 0 }
@@ -154,7 +154,7 @@ Item {
 
                     // Cable parameters
                     Label { text: "Cable Length (km):" }
-                    TextField {
+                    TextFieldRound {
                         id: cableLength
                         text: "0.5"
                         validator: DoubleValidator { bottom: 0 }
@@ -163,7 +163,7 @@ Item {
                     }
 
                     Label { text: "Cable R (Ω/km):" }
-                    TextField {
+                    TextFieldRound {
                         id: cableR
                         text: "0.2"
                         validator: DoubleValidator { bottom: 0 }
@@ -172,7 +172,7 @@ Item {
                     }
 
                     Label { text: "Cable X (Ω/km):" }
-                    TextField {
+                    TextFieldRound {
                         id: cableX
                         text: "0.15"
                         validator: DoubleValidator { bottom: 0 }
@@ -324,7 +324,7 @@ Item {
                     }
                     
                     Label { text: "Transformer X/R Ratio:" }
-                    TextField {
+                    TextFieldRound {
                         id: transformerXrRatio
                         text: "10"
                         validator: DoubleValidator { bottom: 0 }
@@ -333,7 +333,7 @@ Item {
                     }
                     
                     Label { text: "Fault Resistance (Ω):" }
-                    TextField {
+                    TextFieldRound {
                         id: faultResistance
                         text: "0"
                         validator: DoubleValidator { bottom: 0 }
@@ -352,7 +352,7 @@ Item {
                         text: "Motor Rating (MVA):" 
                         enabled: includeMotors.checked
                     }
-                    TextField {
+                    TextFieldRound {
                         id: motorMva
                         text: "1"
                         enabled: includeMotors.checked
@@ -365,7 +365,7 @@ Item {
                         text: "Motor Contribution Factor:" 
                         enabled: includeMotors.checked
                     }
-                    TextField {
+                    TextFieldRound {
                         id: motorContributionFactor
                         text: "4"
                         enabled: includeMotors.checked

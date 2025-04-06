@@ -15,11 +15,6 @@ Item {
         id: converter
     }
 
-    Component.onCompleted: {
-        conversionTypeText.color = "blue"
-        conversionTypeText.font.bold = true
-    }
-
     function rfocusChanged() {
         const textElements = {
             'conversionType': conversionTypeText,
@@ -27,14 +22,13 @@ Item {
             'temp': tempText
         }
         
-        // Reset all to default
+        // // Reset all to default
         Object.values(textElements).forEach(element => {
-            element.color = Universal.foreground
-            element.font.bold = false
+                element.font.bold = false
         })
         
         // Highlight active one
-        textElements[activeComboBox].color = "blue"
+        // textElements[activeComboBox].color = "blue"
         textElements[activeComboBox].font.bold = true
     }
     
@@ -86,7 +80,7 @@ Item {
                                     rfocusChanged()
                                 }
 
-                                contentItem: Text {
+                                contentItem: Label {
                                     id: conversionTypeText
                                     leftPadding: 10
                                     text: conversionType.displayText

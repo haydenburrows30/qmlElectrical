@@ -14,26 +14,11 @@ Button {
     verticalPadding: padding - 4
     spacing: 8
 
-    // icon.width: 20
-    // icon.height: 20
-
-    // contentItem: Text {
-    //     text: control.text
-    //     font: control.font
-    //     // icon: control.icon
-
-    //     opacity: enabled ? 1.0 : 0.3
-    //     color: Universal.foreground
-    //     horizontalAlignment: Text.AlignHCenter
-    //     verticalAlignment: Text.AlignVCenter
-    //     elide: Text.ElideRight
-    // }
-
     background: Rectangle {
         implicitWidth: 32
         implicitHeight: 32
 
-        radius: 4
+        radius: 3
 
         visible: !control.flat || control.down || control.checked || control.highlighted
         color: control.down ? control.Universal.baseMediumLowColor :

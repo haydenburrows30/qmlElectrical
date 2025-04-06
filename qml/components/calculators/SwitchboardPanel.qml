@@ -56,7 +56,7 @@ Item {
                 columns: 4
 
                 Label { text: "Switchboard Name:" }
-                TextField {
+                TextFieldRound {
                     id: switchboardName
                     placeholderText: "Enter name (e.g., MSB-1)"
                     Layout.preferredWidth: 180
@@ -64,7 +64,7 @@ Item {
                 }
 
                 Label { text: "Location:" }
-                TextField {
+                TextFieldRound {
                     id: switchboardLocation
                     placeholderText: "Enter location"
                     Layout.fillWidth: true
@@ -90,7 +90,7 @@ Item {
                 }
 
                 Label { text: "Main Incomer Rating:" }
-                TextField {
+                TextFieldRound {
                     id: mainRating
                     placeholderText: "Enter amps"
                     validator: IntValidator { bottom: 0 }
@@ -586,7 +586,7 @@ Item {
             columnSpacing: 15
             
             Label { text: "Destination:" }
-            TextField {
+            TextFieldRound {
                 id: destinationField
                 placeholderText: "e.g., Lighting Circuit 1"
                 Layout.fillWidth: true
@@ -615,7 +615,7 @@ Item {
             }
             
             Label { text: "Load (kW):" }
-            TextField {
+            TextFieldRound {
                 id: loadField
                 placeholderText: "Enter load"
                 validator: DoubleValidator { bottom: 0 }
@@ -637,7 +637,7 @@ Item {
             }
             
             Label { text: "Cable Length (m):" }
-            TextField {
+            TextFieldRound {
                 id: lengthField
                 placeholderText: "Enter length"
                 validator: DoubleValidator { bottom: 0 }

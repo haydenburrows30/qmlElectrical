@@ -70,7 +70,7 @@ Item {
                                 }
                             }
                         }
-                        TextField {
+                        TextFieldRound {
                             id: voltage_input
                             Layout.preferredWidth: 100
                             Layout.alignment: Qt.AlignRight
@@ -108,7 +108,7 @@ Item {
                         text: "uF/km (1ph):"
                         Layout.preferredWidth: 100
                     }
-                    TextField {
+                    TextFieldRound {
                         id: capacitanceInput
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
@@ -135,7 +135,7 @@ Item {
                         text: "Length (km):"
                         Layout.preferredWidth: 100
                     }
-                    TextField {
+                    TextFieldRound {
                         id: lengthInput
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight

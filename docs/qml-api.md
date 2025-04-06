@@ -123,7 +123,7 @@ CheckBox {
 }
 
 // Load Configuration
-TextField {
+TextFieldRound {
     placeholderText: "Enter kVA"
     onTextChanged: {
         let kva = parseFloat(text) || 0
@@ -131,7 +131,7 @@ TextField {
     }
 }
 
-TextField {
+TextFieldRound {
     placeholderText: "Number of houses"
     onTextChanged: {
         let houses = parseInt(text) || 1

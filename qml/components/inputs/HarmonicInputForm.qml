@@ -33,7 +33,7 @@ ColumnLayout {
                 }
             }
             
-            TextField {
+            TextFieldRound {
                 id: magnitudeField
                 placeholderText: modelData === 1 ? "100%" : "0%"
                 enabled: modelData !== 1
@@ -79,7 +79,7 @@ ColumnLayout {
                 }
             }
             
-            TextField {
+            TextFieldRound {
                 id: phaseField
                 placeholderText: "0°"
                 enabled: modelData !== 1

@@ -45,7 +45,7 @@ Item {
                     text: "Resistance(R):"
                     Layout.preferredWidth: 100
                 }
-                TextField {
+                TextFieldRound {
                     id: rInput
                     placeholderText: "Enter Resistance"
                     onTextChanged: {
@@ -61,7 +61,7 @@ Item {
                     text: "Reactance (X):"
                     Layout.preferredWidth: 100
                 }
-                TextField {
+                TextFieldRound {
                     id: reactanceInput
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignRight
@@ -77,7 +77,7 @@ Item {
                     text: "Impedance (Z):"
                     Layout.preferredWidth: 110
                 }
-                 TextFieldBlue {
+                TextFieldBlue {
                     text: calculator && !isNaN(calculator.impedance) ? calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
                 }
             }

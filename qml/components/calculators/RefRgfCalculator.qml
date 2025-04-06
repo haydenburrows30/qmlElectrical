@@ -69,7 +69,7 @@ Item {
                     Layout.preferredWidth: 110
                     
                 }
-                TextField {
+                TextFieldRound {
                     id: phCtRatio
                     placeholderText: "200"
                     text: "200"
@@ -79,7 +79,7 @@ Item {
                 Label { 
                     text: "Neutral Ratio:"
                 }
-                TextField {
+                TextFieldRound {
                     id: nCtRatio
                     placeholderText: "200"
                     text: "200"
@@ -116,7 +116,7 @@ Item {
                     Layout.fillWidth: true
                     
                 }
-                TextField {
+                TextFieldRound {
                     id: transformerMva
                     placeholderText: "2.5"
                     text: "2.5"
@@ -129,7 +129,7 @@ Item {
                     text: "HV Voltage:"
                     
                 }
-                TextField {
+                TextFieldRound {
                     id: hvtransformerVoltage
                     placeholderText: "55"
                     text: "55"
@@ -141,7 +141,7 @@ Item {
                     text: "LV Voltage:"
                     
                 }
-                TextField {
+                TextFieldRound {
                     id: lvTransformerVoltage
                     placeholderText: "11"
                     text: "11"
@@ -163,7 +163,7 @@ Item {
                     text: "Impedance (%):"
                     
                 }
-                TextField {
+                TextFieldRound {
                     id: impedances
                     placeholderText: "5.5"
                     text: "5.5"
@@ -189,7 +189,7 @@ Item {
                     text: "Fault Point (%):"
                     
                 }
-                TextField {
+                TextFieldRound {
                     id: faultPoint
                     placeholderText: "5.0"
                     text: "5.0"

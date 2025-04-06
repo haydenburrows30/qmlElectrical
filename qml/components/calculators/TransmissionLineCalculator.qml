@@ -91,7 +91,7 @@ Item {
                                     Layout.minimumWidth: 200
                                     Layout.alignment: Qt.AlignRight
                                 }
-                                TextField {
+                                TextFieldRound {
                                     id: lengthInput
                                     text: "100"
                                     validator: DoubleValidator { bottom: 0 }
@@ -101,7 +101,7 @@ Item {
                                 }
 
                                 Label { text: "Resistance (Ω/km):" }
-                                TextField {
+                                TextFieldRound {
                                     id: resistanceInput
                                     text: "0.1"
                                     validator: DoubleValidator { bottom: 0 }
@@ -110,7 +110,7 @@ Item {
                                 }
 
                                 Label { text: "Inductance (mH/km):" }
-                                TextField {
+                                TextFieldRound {
                                     id: inductanceInput
                                     text: "1.0"
                                     validator: DoubleValidator { bottom: 0 }
@@ -119,7 +119,7 @@ Item {
                                 }
 
                                 Label { text: "Capacitance (µF/km):" }
-                                TextField {
+                                TextFieldRound {
                                     id: capacitanceInput
                                     text: "0.01"
                                     validator: DoubleValidator { bottom: 0 }
@@ -128,7 +128,7 @@ Item {
                                 }
 
                                 Label { text: "Conductance (S/km):" }
-                                TextField {
+                                TextFieldRound {
                                     id: conductanceInput
                                     text: "0"
                                     validator: DoubleValidator { bottom: 0 }
@@ -137,7 +137,7 @@ Item {
                                 }
 
                                 Label { text: "Frequency (Hz):" }
-                                TextField {
+                                TextFieldRound {
                                     id: frequencyInput
                                     text: "50"
                                     validator: DoubleValidator { bottom: 0 }
@@ -146,7 +146,7 @@ Item {
                                 }
                                 
                                 Label { text: "Nominal Voltage (kV):" }
-                                TextField {
+                                TextFieldRound {
                                     id: nominalVoltage
                                     text: "400"
                                     validator: DoubleValidator { bottom: 0 }
@@ -182,7 +182,7 @@ Item {
                             }
 
                             Label { text: "Bundle Spacing (m):" }
-                            TextField {
+                            TextFieldRound {
                                 id: bundleSpacing
                                 text: "0.4"
                                 validator: DoubleValidator { bottom: 0 }
@@ -191,7 +191,7 @@ Item {
                             }
 
                             Label { text: "Conductor GMR (m):" }
-                            TextField {
+                            TextFieldRound {
                                 id: conductorGMR
                                 text: "0.0078"
                                 validator: DoubleValidator { bottom: 0 }
@@ -200,7 +200,7 @@ Item {
                             }
 
                             Label { text: "Conductor Temperature (°C):" }
-                            TextField {
+                            TextFieldRound {
                                 id: conductorTemp
                                 text: "75"
                                 validator: DoubleValidator { bottom: 0 }
@@ -209,7 +209,7 @@ Item {
                             }
 
                             Label { text: "Earth Resistivity (Ω⋅m):" }
-                            TextField {
+                            TextFieldRound {
                                 id: earthResistivity
                                 text: "100"
                                 validator: DoubleValidator { bottom: 0 }

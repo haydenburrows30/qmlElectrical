@@ -288,7 +288,7 @@ Item {
                         columns: 2
                         
                         Label { text: "Transformer Z (Ohms):" ; Layout.minimumWidth: 200}
-                        TextField {
+                        TextFieldRound {
                             id: transformerZOhmsText
                             readOnly: true
                             Layout.minimumWidth: 150
@@ -301,7 +301,7 @@ Item {
                         }
                         
                         Label { text: "Transformer R (Ohms):" }
-                        TextField {
+                        TextFieldRound {
                             id: transformerROhmsText
                             readOnly: true
                             Layout.fillWidth: true
@@ -314,7 +314,7 @@ Item {
                         }
                         
                         Label { text: "Transformer X (Ohms):" }
-                        TextField {
+                        TextFieldRound {
                             id: transformerXOhmsText
                             readOnly: true
                             Layout.fillWidth: true
@@ -327,7 +327,7 @@ Item {
                         }
                         
                         Label { text: "Line Total Z (Ohms):" }
-                        TextField {
+                        TextFieldRound {
                             id: lineTotalZText
                             readOnly: true
                             Layout.fillWidth: true
@@ -340,7 +340,7 @@ Item {
                         }
                         
                         Label { text: "Voltage Drop (%):" }
-                        TextField {
+                        TextFieldRound {
                             id: voltageDropText
                             readOnly: true
                             Layout.fillWidth: true
@@ -353,7 +353,7 @@ Item {
                         }
                         
                         Label { text: "Fault Current at LV Side (kA):" }
-                        TextField {
+                        TextFieldRound {
                             id: faultCurrentLVText
                             readOnly: true
                             Layout.fillWidth: true
@@ -366,7 +366,7 @@ Item {
                         }
                         
                         Label { text: "Fault Current at HV Side (kA):" }
-                        TextField {
+                        TextFieldRound {
                             id: faultCurrentHVText
                             readOnly: true
                             Layout.fillWidth: true
@@ -390,7 +390,7 @@ Item {
                         columns: 2
                         
                         Label { text: "Relay Pickup Current (A):" ; Layout.minimumWidth: 200}
-                        TextField {
+                        TextFieldRound {
                             id: relayPickupCurrentText
                             readOnly: true
                             ; Layout.minimumWidth: 150
@@ -403,7 +403,7 @@ Item {
                         }
                         
                         Label { text: "CT Ratio:" }
-                        TextField {
+                        TextFieldRound {
                             id: relayCtRatioText
                             readOnly: true
                             Layout.fillWidth: true
@@ -416,7 +416,7 @@ Item {
                         }
                         
                         Label { text: "Relay Curve Type:" }
-                        TextField {
+                        TextFieldRound {
                             id: relayCurveTypeText
                             readOnly: true
                             Layout.fillWidth: true
@@ -429,7 +429,7 @@ Item {
                         }
                         
                         Label { text: "Time Dial Setting:" }
-                        TextField {
+                        TextFieldRound {
                             id: relayTimeDialText
                             readOnly: true
                             Layout.fillWidth: true

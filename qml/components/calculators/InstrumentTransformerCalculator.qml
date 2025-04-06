@@ -168,7 +168,7 @@ Item {
                             }
 
                             Label { text: "Burden (VA):" }
-                            TextField {
+                            TextFieldRound {
                                 id: ctBurden
                                 text: "15.0"
                                 validator: DoubleValidator {
@@ -202,7 +202,7 @@ Item {
                             RowLayout {
                                 Layout.fillWidth: true
                                 
-                                TextField {
+                                TextFieldRound {
                                     id: temperature
                                     text: "25.0"
                                     Layout.fillWidth: true
@@ -248,7 +248,7 @@ Item {
                             RowLayout {
                                 Layout.fillWidth: true
                                 
-                                TextField {
+                                TextFieldRound {
                                     id: customRatio
                                     placeholderText: "e.g., 150/5"
                                     Layout.fillWidth: true
@@ -319,7 +319,7 @@ Item {
                             }
 
                             Label { text: "VT Burden (VA):" }
-                            TextField {
+                            TextFieldRound {
                                 id: vtBurden
                                 text: "100.0"
                                 validator: DoubleValidator {

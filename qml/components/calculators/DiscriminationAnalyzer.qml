@@ -141,20 +141,20 @@ Item {
                                     currentIndex: 0
                                 }
 
-                                TextField {
+                                TextFieldRound {
                                     id: relayName
                                     Layout.fillWidth: true
                                     placeholderText: "Relay Name"
                                 }
 
-                                TextField {
+                                TextFieldRound {
                                     id: pickupCurrent
                                     Layout.fillWidth: true
                                     placeholderText: "Pickup Current (A)"
                                     validator: DoubleValidator { bottom: 0 }
                                 }
                                 
-                                TextField {
+                                TextFieldRound {
                                     id: tds
                                     Layout.fillWidth: true
                                     placeholderText: "Time Dial Setting"
@@ -280,7 +280,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter
                             }
 
-                            TextField {
+                            TextFieldRound {
                                 id: faultCurrent
                                 Layout.fillWidth: true
 

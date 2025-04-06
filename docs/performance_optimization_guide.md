@@ -109,7 +109,7 @@ renderStrategy: ChartView.HardwareAcceleration
 Replace the TextField's `onTextChanged` handler with a throttled version:
 
 ```qml
-TextField {
+TextFieldRound {
     id: magnitudeField
     placeholderText: modelData === 1 ? "100%" : "0%"
     enabled: modelData !== 1

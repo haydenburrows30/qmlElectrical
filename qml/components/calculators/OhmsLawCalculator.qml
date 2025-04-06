@@ -5,6 +5,7 @@ import QtCharts
 
 import "../"
 import "../visualizers"
+import "../inputs"
 import "../style"
 import "../popups"
 import "../buttons"
@@ -285,7 +286,7 @@ Item {
                 columns: 4
                 
                 Label { text: "1:"}
-                ComboBox {
+                CustomComboBox {
                     id: selectedParam1
                     Layout.fillWidth: true
                     model: ["Voltage (V)", "Current (I)", "Resistance (R)", "Power (P)"]
@@ -297,7 +298,7 @@ Item {
                     }
                 }
 
-                TextField {
+                TextFieldRound {
                     id: param1Value
                     Layout.minimumWidth: 100
                     Layout.fillWidth: true
@@ -310,7 +311,7 @@ Item {
                     onEditingFinished: calculateOhmsLaw()
                 }
 
-                ComboBox {
+                CustomComboBox {
                     id: param1Unit
                     Layout.maximumWidth: 60
                     model: getUnitModel(selectedParam1.currentIndex)
@@ -318,7 +319,7 @@ Item {
                 }
                 
                 Label { text: "2:"}
-                ComboBox {
+                CustomComboBox {
                     id: selectedParam2
                     Layout.fillWidth: true
                     model: ["Voltage (V)", "Current (I)", "Resistance (R)", "Power (P)"]
@@ -330,7 +331,7 @@ Item {
                     }
                 }
 
-                TextField {
+                TextFieldRound {
                     id: param2Value
                     Layout.fillWidth: true
                     placeholderText: "Enter value"
@@ -342,7 +343,7 @@ Item {
                     onEditingFinished: calculateOhmsLaw()
                 }
 
-                ComboBox {
+                CustomComboBox {
                     id: param2Unit
                     Layout.maximumWidth: 60
                     model: getUnitModel(selectedParam2.currentIndex)

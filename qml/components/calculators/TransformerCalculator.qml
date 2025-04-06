@@ -50,7 +50,7 @@ Item {
                                 text: "KVA:" 
                                 Layout.minimumWidth: 120
                             }
-                            TextField {
+                            TextFieldRound {
                                 id: kvaInput
                                 placeholderText: "Enter KVA"
                                 Layout.minimumWidth: 150
@@ -91,7 +91,7 @@ Item {
                                 text: "Line Voltage (V):"
                                 Layout.minimumWidth: 120
                             }
-                            TextField {
+                            TextFieldRound {
                                 id: primaryVoltage
                                 Layout.minimumWidth: 150
                                 placeholderText: "Enter line voltage"
@@ -107,7 +107,7 @@ Item {
                             RowLayout {
                                 Layout.minimumWidth: 150
                                 
-                                TextField {
+                                TextFieldRound {
                                     id: primaryCurrentInput
                                     placeholderText: "Enter current"
                                     Layout.fillWidth: true
@@ -141,7 +141,7 @@ Item {
                                 text: "Line Voltage (V):"
                                 Layout.minimumWidth: 120
                             }
-                            TextField {
+                            TextFieldRound {
                                 id: secondaryVoltage
                                 placeholderText: "Enter line voltage"
                                 onTextChanged: {
@@ -177,7 +177,7 @@ Item {
                                 text: "Impedance (%):" 
                                 Layout.minimumWidth: 120
                             }
-                            TextField {
+                            TextFieldRound {
                                 id: impedanceInput
                                 placeholderText: "Enter impedance %"
                                 text: calculator.impedancePercent.toFixed(2)
@@ -200,7 +200,7 @@ Item {
                             }
 
                             Label { text: "Cu Losses (W):" }
-                            TextField {
+                            TextFieldRound {
                                 id: copperLossesInput
                                 placeholderText: "Enter Cu losses"
                                 Layout.minimumWidth: 150
@@ -218,7 +218,7 @@ Item {
                             }
 
                             Label { text: "Resistance (%):" }
-                            TextField {
+                            TextFieldRound {
                                 id: resistanceInput
                                 placeholderText: "Enter resistance %"
                                 Layout.minimumWidth: 150
@@ -238,7 +238,7 @@ Item {
                             }
 
                             Label { text: "Iron Losses (W):" }
-                            TextField {
+                            TextFieldRound {
                                 id: ironLossesInput
                                 placeholderText: "Enter Fe losses"
                                 Layout.minimumWidth: 150

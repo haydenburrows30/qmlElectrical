@@ -147,7 +147,7 @@ Item {
         }
 
         Label { text: "Length (m):" }
-        TextField {
+        TextFieldRound {
             id: lengthInput
             placeholderText: "Enter length"
             onTextChanged: voltageDrop.setLength(parseFloat(text) || 0)
@@ -165,7 +165,7 @@ Item {
         }
 
         Label { text: "Temperature (°C):" }
-        TextField {
+        TextFieldRound {
             id: temperatureInput
             text: "25"
             onTextChanged: voltageDrop.setTemperature(parseFloat(text) || 75)
@@ -174,7 +174,7 @@ Item {
         }
 
         Label { text: "Grouping Factor:" }
-        TextField {
+        TextFieldRound {
             id: groupingFactorInput
             text: "1.0"
             onTextChanged: voltageDrop.setGroupingFactor(parseFloat(text) || 1.0)
@@ -183,7 +183,7 @@ Item {
         }
 
         Label { text: "KVA per House:" }
-        TextField {
+        TextFieldRound {
             id: kvaPerHouseInput
             placeholderText: "Enter kVA"
             text: "7"  // Default 7kVA per house

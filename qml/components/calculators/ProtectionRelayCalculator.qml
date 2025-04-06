@@ -123,7 +123,7 @@ Item {
                             }
 
                             Label { text: "Breaking Capacity:" }
-                            TextField {
+                            TextFieldRound {
                                 id: breakingCapacity
                                 placeholderText: "Enter breaking capacity"
                                 validator: IntValidator { bottom: 0 }
@@ -167,14 +167,14 @@ Item {
                             }
 
                             Label { text: "Description:" }
-                            TextField {
+                            TextFieldRound {
                                 id: deviceDescription
                                 readOnly: true
                                 Layout.fillWidth: true
                             }
 
                             Label { text: "Pickup Current (A):" }
-                            TextField {
+                            TextFieldRound {
                                 id: pickupCurrent
                                 placeholderText: "Enter current"
                                 validator: DoubleValidator { bottom: 0 }
@@ -183,7 +183,7 @@ Item {
                             }
 
                             Label { text: "Time Dial:" }
-                            TextField {
+                            TextFieldRound {
                                 id: timeDial
                                 placeholderText: "Enter TDS"
                                 validator: DoubleValidator { bottom: 0; top: 1 }
@@ -229,7 +229,7 @@ Item {
                             Label { text: "Results:" ; Layout.columnSpan: 2 ; font.bold: true ; font.pixelSize: 16}
 
                             Label { text: "Fault Current (A):" }
-                            TextField {
+                            TextFieldRound {
                                 id: faultCurrent
                                 placeholderText: "Enter fault current"
                                 validator: DoubleValidator { bottom: 0 }
@@ -302,7 +302,7 @@ Item {
                             anchors.margins: 10
                             
                             Label { text: "Supply Voltage (V):" }
-                            TextField {
+                            TextFieldRound {
                                 id: supplyVoltage
                                 placeholderText: "Enter voltage"
                                 validator: IntValidator { bottom: 110; top: 1000 }
@@ -311,7 +311,7 @@ Item {
                             }
                             
                             Label { text: "Cable Length (m):" }
-                            TextField {
+                            TextFieldRound {
                                 id: cableLength
                                 placeholderText: "Enter length"
                                 validator: DoubleValidator { bottom: 0 }

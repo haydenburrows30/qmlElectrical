@@ -154,7 +154,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
 
-                    TextField {
+                    TextFieldRound {
                         id: motorPower
                         placeholderText: "Enter Power"
                         onTextChanged: if(text.length > 0) calculator.setMotorPower(parseFloat(text))
@@ -169,7 +169,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
 
-                    TextField {
+                    TextFieldRound {
                         id: motorVoltage
                         placeholderText: "Enter Voltage"
                         text: "400"
@@ -184,7 +184,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
 
-                    TextField {
+                    TextFieldRound {
                         id: motorEfficiency
                         placeholderText: "Enter Efficiency"
                         text: "90"
@@ -200,7 +200,7 @@ Item {
                         Layout.preferredWidth: 150
                     }
 
-                    TextField {
+                    TextFieldRound {
                         id: motorPowerFactor
                         placeholderText: "Enter PF"
                         text: "0.85"

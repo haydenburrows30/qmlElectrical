@@ -133,7 +133,7 @@ Item {
                                 columnSpacing: 15
 
                                 Label { text: "Rated Voltage (V):"; Layout.minimumWidth: 150}
-                                TextField {
+                                TextFieldRound {
                                     id: ratedVoltageInput
                                     placeholderText: "Enter voltage"
                                     text: "400"
@@ -144,7 +144,7 @@ Item {
                                 }
 
                                 Label { text: "Rated Current (A):" }
-                                TextField {
+                                TextFieldRound {
                                     id: ratedCurrentInput
                                     placeholderText: "Enter current"
                                     text: "10"
@@ -154,7 +154,7 @@ Item {
                                 }
 
                                 Label { text: "Rated Power (kW):" }
-                                TextField {
+                                TextFieldRound {
                                     id: ratedPowerInput
                                     placeholderText: "Enter power"
                                     text: calculator.ratedPower.toFixed(2)
@@ -179,7 +179,7 @@ Item {
                                 }
 
                                 Label { text: "Power Factor:" }
-                                TextField {
+                                TextFieldRound {
                                     id: powerFactorInput
                                     placeholderText: "Enter PF"
                                     text: "0.85"
@@ -189,7 +189,7 @@ Item {
                                 }
 
                                 Label { text: "Efficiency (%):" }
-                                TextField {
+                                TextFieldRound {
                                     id: efficiencyInput
                                     placeholderText: "Enter efficiency"
                                     text: "90"
@@ -225,7 +225,7 @@ Item {
                             }
 
                             Label { text: "Frequency (Hz):" }
-                            TextField {
+                            TextFieldRound {
                                 id: frequencyInput
                                 text: "50"
                                 enabled: !machineTypeCombo.currentText.includes("DC")
@@ -234,7 +234,7 @@ Item {
                             }
 
                             Label { text: machineTypeCombo.currentText === "Induction Motor" ? "Slip (%):" : "Speed (RPM):" }
-                            TextField {
+                            TextFieldRound {
                                 id: speedInput
                                 text: machineTypeCombo.currentText === "Induction Motor" ? "3.3" : "1500"
                                 Layout.fillWidth: true

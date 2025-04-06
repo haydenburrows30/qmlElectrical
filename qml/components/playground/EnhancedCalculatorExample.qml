@@ -181,7 +181,7 @@ Item {
                             Layout.column: 0
                         }
                         
-                        TextField {
+                        TextFieldRound {
                             id: resultField
                             Layout.fillWidth: true
                             Layout.row: 3

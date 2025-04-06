@@ -68,7 +68,7 @@ Item {
                     columns: 2
                     
                     Label { text: "Input Voltage (V):" }
-                    TextField {
+                    TextFieldRound {
                         id: vinField
                         placeholderText: "e.g., 12"
                         text: "12"
@@ -81,7 +81,7 @@ Item {
                     }
                     
                     Label { text: "Resistor R1 (Ω):" }
-                    TextField {
+                    TextFieldRound {
                         id: r1Field
                         placeholderText: "e.g., 10000"
                         text: "10000"
@@ -94,7 +94,7 @@ Item {
                     }
                     
                     Label { text: "Resistor R2 (Ω):" }
-                    TextField {
+                    TextFieldRound {
                         id: r2Field
                         placeholderText: "e.g., 10000"
                         text: "10000"

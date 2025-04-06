@@ -101,7 +101,7 @@ Item {
                     }
                 }
                 
-                TextField {
+                TextFieldRound {
                     id: kvaInput
                     Layout.preferredWidth: 100
                     Layout.alignment: Qt.AlignRight
@@ -140,7 +140,7 @@ Item {
                     }
                 }
 
-                TextField {
+                TextFieldRound {
                     id: voltageInput
                     Layout.fillWidth: true
                     enabled: voltagePresets.currentText === "Custom"
@@ -249,7 +249,7 @@ Item {
                     Layout.preferredWidth: 100
                 }
 
-                TextField {
+                TextFieldRound {
                     id: currentInput
                     Layout.fillWidth: true
                     Layout.columnSpan: 2
@@ -286,7 +286,7 @@ Item {
                     currentIndex: 1  // Default to 0.8
                 }
                 
-                TextField {
+                TextFieldRound {
                     id: pfInput
                     Layout.preferredWidth: 80
                     enabled: pfPresets.currentText === "Custom"

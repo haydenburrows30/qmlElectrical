@@ -70,7 +70,7 @@ Item {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             
-            TextField {
+            TextFieldRound {
                 id: xAxisTitle
                 placeholderText: "X-Axis Title"
                 text: "Cable Size (mm²)"
@@ -78,7 +78,7 @@ Item {
                 Layout.preferredWidth: 150
             }
             
-            TextField {
+            TextFieldRound {
                 id: yAxisTitle
                 placeholderText: "Y-Axis Title"
                 text: "Voltage Drop (%)"
@@ -390,7 +390,6 @@ Item {
         
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            
             
             StyledButton {
                 text: "Close"

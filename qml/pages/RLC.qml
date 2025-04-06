@@ -230,7 +230,7 @@ Page {
                                 Layout.fillWidth: true
                             }
 
-                            TextField {
+                            TextFieldRound {
                                 id: resistanceInput
                                 placeholderText: "Enter Resistance"
                                 text: "10"
@@ -286,7 +286,7 @@ Page {
                                 Layout.fillWidth: true
                             }
 
-                            TextField {
+                            TextFieldRound {
                                 id: inductanceInput
                                 placeholderText: "Enter Inductance"
                                 text: "0.1"
@@ -342,7 +342,7 @@ Page {
                                 Layout.fillWidth: true
                             }
 
-                            TextField {
+                            TextFieldRound {
                                 id: capacitanceInput
                                 placeholderText: "Enter Capacitance"
                                 text: "0.0001013"  // 101.3µF
@@ -401,7 +401,7 @@ Page {
                             RowLayout {
                                 Layout.fillWidth: true
 
-                                TextField {
+                                TextFieldRound {
                                     id: minFreqInput
                                     placeholderText: "Min"
                                     text: "0"
@@ -437,7 +437,7 @@ Page {
                                     Layout.minimumWidth: 20
                                 }
 
-                                TextField {
+                                TextFieldRound {
                                     id: maxFreqInput
                                     placeholderText: "Max"
                                     text: "100"

@@ -61,7 +61,7 @@ Item {
                         
 
                         Label { text: "Primary Voltage (V):" }
-                        TextField {
+                        TextFieldRound {
                             id: primaryVoltage
                             validator: DoubleValidator { bottom: 0 }
                             Layout.fillWidth: true
@@ -75,7 +75,7 @@ Item {
                         }
 
                         Label { text: "Secondary Voltage (V):" }
-                        TextField {
+                        TextFieldRound {
                             id: secondaryVoltage
                             validator: DoubleValidator { bottom: 0 }
                             Layout.fillWidth: true
@@ -91,7 +91,7 @@ Item {
                         }
 
                         Label { text: "Power Rating (VA):" }
-                        TextField {
+                        TextFieldRound {
                             id: powerRating
                             validator: DoubleValidator { bottom: 0 }
                             Layout.fillWidth: true

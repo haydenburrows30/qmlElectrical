@@ -47,7 +47,7 @@ Item {
                     columns: 2
 
                     Label { text: "Active Power (kW):" ; Layout.minimumWidth: 170}
-                    TextField {
+                    TextFieldRound {
                         id: activePowerInput
                         placeholderText: "Enter power"
                         onTextChanged: if(text) calculator.activePower = parseFloat(text)
@@ -55,7 +55,7 @@ Item {
                     }
 
                     Label { text: "Current PF:" }
-                    TextField {
+                    TextFieldRound {
                         id: currentPFInput
                         placeholderText: "Enter current PF"
                         onTextChanged: if(text) calculator.currentPF = parseFloat(text)
@@ -63,7 +63,7 @@ Item {
                     }
 
                     Label { text: "Target PF:" }
-                    TextField {
+                    TextFieldRound {
                         id: targetPFInput
                         placeholderText: "Enter target PF"
                         text: "0.95"

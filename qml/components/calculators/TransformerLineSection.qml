@@ -316,7 +316,7 @@ Item {
 
                             // Regulator model - specific to VR-32
                             Label { text: "Regulator Model:" }
-                            TextField {
+                            TextFieldRound {
                                 id: regulatorModelText
                                 text: "Cooper VR-32"
                                 readOnly: true

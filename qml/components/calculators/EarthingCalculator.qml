@@ -64,7 +64,7 @@ Item {
                     columnSpacing: 15
 
                     Label { text: "Soil Resistivity (Ω⋅m):" ; Layout.minimumWidth: 150}
-                    TextField {
+                    TextFieldRound {
                         id: soilResistivityInput
                         text: "100"
                         validator: DoubleValidator { bottom: 0 }
@@ -73,7 +73,7 @@ Item {
                     }
 
                     Label { text: "Grid Depth (m):" }
-                    TextField {
+                    TextFieldRound {
                         id: gridDepthInput
                         text: "0.5"
                         validator: DoubleValidator { bottom: 0 }
@@ -82,7 +82,7 @@ Item {
                     }
 
                     Label { text: "Grid Length (m):" }
-                    TextField {
+                    TextFieldRound {
                         id: gridLengthInput
                         text: "20"
                         validator: DoubleValidator { bottom: 0 }
@@ -91,7 +91,7 @@ Item {
                     }
 
                     Label { text: "Grid Width (m):" }
-                    TextField {
+                    TextFieldRound {
                         id: gridWidthInput
                         text: "20"
                         validator: DoubleValidator { bottom: 0 }
@@ -113,7 +113,7 @@ Item {
                     
 
                     Label { text: "Rod Length (m):" ; Layout.minimumWidth: 150}
-                    TextField {
+                    TextFieldRound {
                         id: rodLengthInput
                         text: "3"
                         validator: DoubleValidator { bottom: 0 }
@@ -145,7 +145,7 @@ Item {
                     
 
                     Label { text: "Fault Current (A):" ;Layout.minimumWidth: 150}
-                    TextField {
+                    TextFieldRound {
                         id: faultCurrentInput
                         text: "10000"
                         validator: DoubleValidator { bottom: 0 }
@@ -154,7 +154,7 @@ Item {
                     }
 
                     Label { text: "Fault Duration (s):" }
-                    TextField {
+                    TextFieldRound {
                         id: faultDurationInput
                         text: "0.5"
                         validator: DoubleValidator { bottom: 0 }

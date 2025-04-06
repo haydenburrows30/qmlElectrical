@@ -67,6 +67,7 @@ Drawer {
             GradientStop { position: 1.0; color: palette.base }
         }
     }
+    
     ListView {
         id: listView
         currentIndex: 0

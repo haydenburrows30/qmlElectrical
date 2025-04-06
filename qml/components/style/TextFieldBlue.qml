@@ -8,10 +8,7 @@ TextField {
     readOnly: true
     Layout.fillWidth: true
 
-    text: ""
     color: textField.activeFocus ? sideBar.modeToggled ? "white" : "black" : sideBar.modeToggled ? "white" : "black"
-    // ToolTip.visible: hovered
-    // ToolTip.delay: 500
     
     background: Rectangle {
         color: sideBar.modeToggled ? "transparent":"#e8f6ff"

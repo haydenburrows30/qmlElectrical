@@ -165,7 +165,7 @@ The application follows a modular design pattern where components are broken dow
 ## Error Handling
 1. **Input Validation**
    ```qml
-   TextField {
+   TextFieldRound {
        validator: DoubleValidator {
            bottom: 0.0
            top: 1000.0

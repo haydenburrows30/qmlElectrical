@@ -49,7 +49,7 @@ Item {
                     columns: 2
                     
                     Label { text: "Load (watts):" }
-                    TextField {
+                    TextFieldRound {
                         id: loadInput
                         placeholderText: "Enter load"
                         validator: DoubleValidator { bottom: 0 }
@@ -67,7 +67,7 @@ Item {
                     }
                     
                     Label { text: "Backup Time (hours):" }
-                    TextField {
+                    TextFieldRound {
                         id: backupTimeInput
                         placeholderText: "Enter hours"
                         text: "4"

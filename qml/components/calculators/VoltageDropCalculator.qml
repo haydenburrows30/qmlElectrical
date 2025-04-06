@@ -50,7 +50,7 @@ Item {
                     }
 
                     Label { text: "Length (m):" }
-                    TextField {
+                    TextFieldRound {
                         id: lengthInput
                         placeholderText: "Enter length"
                         validator: DoubleValidator { bottom: 0 }
@@ -59,7 +59,7 @@ Item {
                     }
 
                     Label { text: "Current (A):" }
-                    TextField {
+                    TextFieldRound {
                         id: currentInput
                         placeholderText: "Enter current"
                         validator: DoubleValidator { bottom: 0 }
@@ -76,7 +76,7 @@ Item {
                     }
 
                     Label { text: "System Voltage (V):" }
-                    TextField {
+                    TextFieldRound {
                         id: systemVoltage
                         text: "230"
                         onTextChanged: if(text) calculator.setSystemVoltage(parseFloat(text))
