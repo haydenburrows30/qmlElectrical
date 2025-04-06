@@ -68,7 +68,7 @@ pip install -r build_requirements.txt
 
 2. Run the build script:
 ```bash
-python build_scripts/windows_build.py
+python scripts/windows_build.py
 ```
 
 3. Create installer (requires NSIS):

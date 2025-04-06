@@ -46,68 +46,32 @@ Item {
                 width: scrollView.width
                 anchors.left: parent.left
                 
-
                 // Left Column - Controls and Results
                 ColumnLayout {
                     id: leftColumn
                     Layout.maximumWidth: 400
                     Layout.minimumWidth: 400
-                    
 
-                    // Controls
-                    ShadowRectangle {
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 80
+                    RowLayout {
 
-                        RowLayout {
-                            // anchors.centerIn: parent
-                            anchors.right: parent.right
+                        StyledButton {
+                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
 
-                            MessageButton {
-
-                                // title: "Clear"
-                                buttonIcon: '\uf053'
-                                buttonColor: Style.blueGreen
-                                defaultMessage: ""
-                                successMessage: "Cleared relays"
-                                errorMessage: ""
-
-                                textVisible: false
-
-                                ToolTip.visible: false
-
-                                onButtonClicked: {
-
-                                    startOperation()
-                                    calculator.reset()
-                                    relayName.text = ""
-                                    pickupCurrent.text = ""
-                                    tds.text = ""
-                                    faultCurrent.text = ""
-                                    marginChart.scatterSeries.clear()
-                                    operationSucceeded(1000)
-                                }
+                            onClicked: {
+                                calculator.reset()
+                                relayName.text = ""
+                                pickupCurrent.text = ""
+                                tds.text = ""
+                                faultCurrent.text = ""
+                                marginChart.scatterSeries.clear()
                             }
+                        }
 
-                            MessageButton {
-                                id: results
-
-                                // title: "Info"
-                                buttonIcon: '\ue88e'
-                                buttonColor: Style.charcoalGrey
-                                defaultMessage: ""
-                                successMessage: ""
-                                errorMessage: ""
-
-                                ToolTip.visible: false
-                                textVisible: false
-
-                                onButtonClicked: {
-
-                                    startOperation()
-                                    operationSucceeded(1/100)
-                                    tipsPopup.open()
-                                }
+                        StyledButton {
+                            id: results
+                            icon.source: "../../../icons/svg/info/baseline.svg"
+                            onClicked: {
+                                tipsPopup.open()
                             }
                         }
                     }
@@ -162,26 +126,16 @@ Item {
                                 }
                             }
 
-                            MessageButton {
+                            StyledButton {
                                 Layout.alignment: Qt.AlignVCenter
                                 
                                 ToolTip.text: "Add Relay"
-                                buttonIcon: '\ue145'
-                                buttonColor: Style.blueGreen
+                                icon.source: "../../../icons/svg/add/baseline.svg"
 
-                                textVisible: false
-
-                                defaultMessage: ""
-                                successMessage: "Adding relay:" + relayName.text
-                                errorMessage: "Please fill in all relay fields"
-
-                                onButtonClicked: {
-
-                                    startOperation()
+                                onClicked: {
 
                                     if (!relayName.text || !pickupCurrent.text || !tds.text) {
                                         console.log("Please fill all relay fields")
-                                        operationFailed(2000)
                                     } else {
                                         console.log("Adding relay:", relayName.text)
 
@@ -191,7 +145,6 @@ Item {
                                             "tds": parseFloat(tds.text),
                                             "curve_constants": calculator.getCurveConstants(curveType.currentText)
                                             })
-                                        operationSucceeded(2000)
                                     }
                                 }
                             }
@@ -289,33 +242,22 @@ Item {
                                 enabled: calculator.relayCount >= 2
                             }
 
-                            MessageButton {
+                            StyledButton {
                                 id: addFaultLevel
                                 Layout.alignment: Qt.AlignHCenter
                                 
                                 ToolTip.text: "Add Fault Level"
-                                buttonIcon: '\ue145'
-                                buttonColor: Style.blueGreen
-                                textVisible: false
+                                icon.source: "../../../icons/svg/add/baseline.svg"
 
-                                defaultMessage: ""
-                                successMessage: "Adding fault level:" + parseFloat(faultCurrent.text)
-                                errorMessage: "Please add: " + (2 - calculator.relayCount) + " more relays"
-
-                                onButtonClicked: {
+                                onClicked: {
 
                                     if (calculator.relayCount < 2) {
-                                        operationFailed(2000)
+                                        console.log ("Please add at least 2 relays")
                                     } else if (calculator.relayCount >= 2 && !faultCurrent.text) {
-                                        addFaultLevel.errorMessage = "Please enter a number"
-                                        operationFailed(2000)
+                                        console.log("Please enter a number")
                                     } else {
-                                        startOperation()
-
                                         console.log("Adding fault level:", parseFloat(faultCurrent.text))
                                         calculator.addFaultLevel(parseFloat(faultCurrent.text))
-
-                                        operationSucceeded(2000)
                                     }
                                 }
                             }

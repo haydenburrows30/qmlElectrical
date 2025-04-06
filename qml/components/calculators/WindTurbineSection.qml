@@ -128,49 +128,30 @@ Item {
 
                     Label {Layout.fillWidth: true}
 
-                    MessageButton {
+                    StyledButton {
                         ToolTip.text: "Export"
-                        buttonIcon: '\ue171'
-                        buttonColor: Style.blueGreen
                         Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/svg/file_download/baseline.svg"
 
                         property string defaultFileName: "wind_turbine_report.pdf"
 
-                        textVisible: false
-
-                        defaultMessage: ""
-                        successMessage: "PDF exported successfully"
-                        errorMessage: "PDF export failed"
-
-                        onButtonClicked: {
-                            startOperation()
-
+                        onClicked: {
                             if (calculatorReady) {
                                 // Don't set a specific directory, let the system choose the default
                                 // Set initial file name without a specific path
                                 exportFileDialog.currentFile = defaultFileName;
                                 // Open the predefined FileDialog
                                 exportFileDialog.open();
-                                
                             }
-                            operationSucceeded(2000)
                         }
                     }
 
-                    MessageButton {
+                    StyledButton {
                         ToolTip.text: "Reset to default values"
-                        buttonIcon: '\uf053'
-                        buttonColor: Style.blueGreen
                         Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/svg/restart_alt/baseline.svg"
 
-                        textVisible: false
-
-                        defaultMessage: ""
-                        successMessage: "Parameters reset"
-                        errorMessage: "PDF export failed"
-
-                        onButtonClicked: {
-                            startOperation()
+                        onClicked: {
 
                             if (calculatorReady) {
                                 calculator.resetToGenericTurbine()
@@ -181,31 +162,16 @@ Item {
                                 efficiencySpinBox.value = calculator.efficiency * 100
                                 updatePowerCurve()
                             }
-
-                            operationSucceeded(2000)
                         }
                     }
 
-                    MessageButton {
+                    StyledButton {
                         id: infoButton
-
-                        title: "Info"
-                        buttonIcon: '\ue88e'
-                        buttonColor: Style.charcoalGrey
-                        defaultMessage: ""
-                        successMessage: ""
-                        errorMessage: ""
-
-                        textVisible: false
-
+                        icon.source: "../../../icons/svg/info/baseline.svg"
                         ToolTip.text: "Info"
                     
-                        onButtonClicked: {
-
-                            startOperation()
+                        onClicked: {
                             lVPopup.open()
-                            operationSucceeded(1/100)
-
                         }
                     }
                 }

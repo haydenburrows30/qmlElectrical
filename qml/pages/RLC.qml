@@ -21,7 +21,7 @@ Page {
     id: rlcPage
 
     property RLCChart calculator: RLCChart {id: rlcChart}
-    property int currentMode: changeMode.on ? 1 : 0
+    property int currentMode: switchOn.checked ? 1 : 0
 
     background: Rectangle {
         color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
@@ -32,7 +32,7 @@ Page {
     }
 
     function react() {
-        currentMode ? calculator.setCircuitMode(1) : calculator.setCircuitMode(0)
+        switchOn.checked ? calculator.setCircuitMode(1) : calculator.setCircuitMode(0)
     }
 
     ScrollView {
@@ -55,40 +55,54 @@ Page {
                 ColumnLayout {
                     //Buttons
                     RowLayout {
-                        
-                        SwitchLabel {
-                            Layout.minimumHeight: 60
-                            Layout.minimumWidth: 340
-                            id: changeMode
-                        }
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 400
 
-                        ShadowRectangle {
-                            Layout.alignment: Qt.AlignRight
-                            implicitHeight: 52
-                            implicitWidth: 52
-                            radius: implicitHeight / 2
-                            Layout.columnSpan: 2
-                            
-                            ImageButton {
-                                id: resetButton
-                                anchors.centerIn: parent
-                                iconName: '\uf053'
-                                iconWidth: 24
-                                iconHeight: 24
-                                color: Style.red
-                                backgroundColor: Style.alphaColor(color,0.1)
-                                ToolTip.text: "Reset Parameters"
-                                ToolTip.visible: resetButton.hovered
+                        Row {
+                            height: parent.height
+
+                            Label {
+                                text: switchOn.checked ? "Parallel" : "Series"
+                                font.pixelSize: 16
+                                font.bold: Font.DemiBold
+                                width: 80
+                                height: parent.height
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+
+                            Switch {
+                                id: switchOn
+                                ToolTip.visible: switchOn.hovered
+                                ToolTip.text: switchOn.checked ? "Change to series" : "Change to parallel"
                                 ToolTip.delay: 500
 
-                                onClicked: {
-                                    calculator.resetValues()
-                                    resistanceInput.text = "10"
-                                    inductanceInput.text = "0.1"
-                                    capacitanceInput.text = "0.0001013"
-                                    minFreqInput.text = "0"
-                                    maxFreqInput.text = "100"
+                                onToggled: {
+                                    react()
                                 }
+                            }
+                        }
+
+                         Label {}
+                        
+                        StyledButton {
+                            id: resetButton
+                            Layout.alignment: Qt.AlignRight
+                            Layout.maximumWidth: 50
+
+                            icon.source: "../../icons/svg/restart_alt/baseline.svg"
+                            
+                            ToolTip.text: "Reset Parameters"
+                            ToolTip.visible: resetButton.hovered
+                            ToolTip.delay: 500
+
+                            onClicked: {
+                                calculator.resetValues()
+                                resistanceInput.text = "10"
+                                inductanceInput.text = "0.1"
+                                capacitanceInput.text = "0.0001013"
+                                minFreqInput.text = "0"
+                                maxFreqInput.text = "100"
                             }
                         }
                     }
@@ -96,7 +110,7 @@ Page {
                     //Visuals
                     WaveCard {
                         id: results
-                        title: currentMode === 0 ? 'Series RLC Parameters' : 'Parallel RLC Parameters'
+                        title: switchOn.checked ? 'Parallel RLC Parameters' : 'Series RLC Parameters'
                         Layout.minimumHeight: 600
                         Layout.minimumWidth: 400
                         Layout.fillHeight: true
