@@ -164,7 +164,7 @@ Item {
             
             Item { Layout.fillWidth: true } // Spacer
             
-            ComboBox {
+            ComboBoxRound {
                 id: functionMenu
                 model: [
                     "Functions", 

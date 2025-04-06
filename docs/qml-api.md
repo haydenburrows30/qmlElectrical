@@ -85,7 +85,7 @@ Slider {
 Control for voltage amplitude.
 
 ```qml
-SpinBox {
+SpinBoxRound {
     from: 0
     to: 1000
     value: 230
@@ -97,7 +97,7 @@ SpinBox {
 Control for phase angle adjustment.
 
 ```qml
-SpinBox {
+SpinBoxRound {
     from: -360
     to: 360
     onValueChanged: model.setPhaseAngleA(value)

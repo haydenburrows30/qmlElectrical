@@ -286,7 +286,7 @@ Item {
                 columns: 4
                 
                 Label { text: "1:"}
-                CustomComboBox {
+                ComboBoxRound {
                     id: selectedParam1
                     Layout.fillWidth: true
                     model: ["Voltage (V)", "Current (I)", "Resistance (R)", "Power (P)"]
@@ -311,7 +311,7 @@ Item {
                     onEditingFinished: calculateOhmsLaw()
                 }
 
-                CustomComboBox {
+                ComboBoxRound {
                     id: param1Unit
                     Layout.maximumWidth: 60
                     model: getUnitModel(selectedParam1.currentIndex)
@@ -319,7 +319,7 @@ Item {
                 }
                 
                 Label { text: "2:"}
-                CustomComboBox {
+                ComboBoxRound {
                     id: selectedParam2
                     Layout.fillWidth: true
                     model: ["Voltage (V)", "Current (I)", "Resistance (R)", "Power (P)"]
@@ -343,7 +343,7 @@ Item {
                     onEditingFinished: calculateOhmsLaw()
                 }
 
-                CustomComboBox {
+                ComboBoxRound {
                     id: param2Unit
                     Layout.maximumWidth: 60
                     model: getUnitModel(selectedParam2.currentIndex)

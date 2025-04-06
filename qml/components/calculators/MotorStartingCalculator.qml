@@ -130,7 +130,7 @@ Item {
                     RowLayout {
                         Layout.preferredWidth: 200
                         
-                        ComboBox {
+                        ComboBoxRound {
                             id: motorType
                             model: ["Induction Motor", "Synchronous Motor", "Wound Rotor Motor", 
                                     "Permanent Magnet Motor", "Single Phase Motor"]
@@ -220,7 +220,7 @@ Item {
                     RowLayout {
                         Layout.preferredWidth: 200
                         
-                        ComboBox {
+                        ComboBoxRound {
                             id: startingMethod
                             model: ["DOL", "Star-Delta", "Soft Starter", "VFD"]
                             Layout.fillWidth: true

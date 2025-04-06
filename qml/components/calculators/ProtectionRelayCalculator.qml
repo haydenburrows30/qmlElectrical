@@ -47,7 +47,7 @@ Item {
                             columns: 2
 
                             Label { text: "Device Type:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: deviceType
                                 model: relay.deviceTypes
                                 textRole: "type"
@@ -74,7 +74,7 @@ Item {
                             }
 
                             Label { text: "Rating:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: ratingCombo
                                 textRole: "rating"
                                 onCurrentIndexChanged: {
@@ -100,7 +100,7 @@ Item {
                                 text: "Breaker Curve:" 
                                 visible: breakerCurveCombo.visible
                             }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: breakerCurveCombo
                                 visible: false // Initialize as invisible, will be set by deviceType selection
                                 model: ["B", "C", "D"]
@@ -192,7 +192,7 @@ Item {
                             }
 
                             Label { text: "Curve Type:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: curveType
                                 Layout.fillWidth: true
                                 model: {
@@ -320,7 +320,7 @@ Item {
                             }
                             
                             Label { text: "Cable Size (mm²):" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: cableSize
                                 model: ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", "120"]
                                 currentIndex: 2

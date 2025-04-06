@@ -133,7 +133,7 @@ Item {
                                     font.bold: true
                                 }
                                 
-                                ComboBox {
+                                ComboBoxRound {
                                     id: curveType
                                     Layout.fillWidth: true
                                     Layout.columnSpan: 2

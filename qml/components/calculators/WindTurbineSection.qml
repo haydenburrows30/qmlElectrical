@@ -224,7 +224,7 @@ Item {
                             columns: 2
                             
                             Label { text: "Blade Radius (m):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: bladeRadiusSpinBox
                                 from: 1
                                 to: 100
@@ -240,7 +240,7 @@ Item {
                             }
                             
                             Label { text: "Wind Speed (m/s):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: windSpeedSpinBox
                                 from: 1
                                 to: 30
@@ -256,7 +256,7 @@ Item {
                             }
 
                             Label { text: "Air Density (kg/m³):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: airDensitySpinBox
                                 from: 100
                                 to: 150
@@ -279,7 +279,7 @@ Item {
                             }
 
                             Label { text: "Cut-in Wind Speed (m/s):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: cutInSpinBox
                                 from: 1
                                 to: 10
@@ -291,7 +291,7 @@ Item {
                             }
                             
                             Label { text: "Cut-out Wind Speed (m/s):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: cutOutSpinBox
                                 from: 15
                                 to: 35
@@ -303,7 +303,7 @@ Item {
                             }
                             
                             Label { text: "Power Coefficient (Cp):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: powerCoefficientSpinBox
                                 from: 0
                                 to: 60
@@ -329,7 +329,7 @@ Item {
                             }
                             
                             Label { text: "Generator Efficiency (%):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: efficiencySpinBox
                                 from: 50
                                 to: 100
@@ -473,7 +473,7 @@ Item {
                             }
 
                             Label { text: "Average Wind Speed (m/s):" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: avgWindSpeedSpinBox
                                 from: 1
                                 to: 20
@@ -485,7 +485,7 @@ Item {
                             }
                             
                             Label { text: "Weibull Shape Parameter:" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: weibullKSpinBox
                                 from: 15
                                 to: 30

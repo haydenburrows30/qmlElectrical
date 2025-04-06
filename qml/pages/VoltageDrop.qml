@@ -14,6 +14,7 @@ import "../components/monitors/"
 import "../components/popups/"
 import "../components/visualizers/"
 import "../components/voltage_drop/"
+import "../components/style/"
 
 Page {
     id: root

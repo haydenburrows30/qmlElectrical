@@ -233,7 +233,7 @@ Page {
                                         Layout.minimumWidth: 80
                                         font.bold: true
                                     }
-                                    ComboBox {
+                                    ComboBoxRound {
                                         id: waveTypeCombo
                                         model: ["Sine", "Square", "Sawtooth", "Triangle"]
                                         Layout.fillWidth: true

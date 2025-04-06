@@ -62,7 +62,7 @@ Item {
                                 font.pixelSize: 16
                             }
 
-                            ComboBox {
+                            ComboBoxRound {
                                 id: conversionType
                                 Layout.minimumWidth: 200
                                 model: [
@@ -97,7 +97,7 @@ Item {
                                 Layout.minimumWidth: 100
                             }
 
-                            ComboBox {
+                            ComboBoxRound {
                                 id: wHRPM
                                 Layout.minimumWidth: 200
                                 model: [
@@ -136,7 +136,7 @@ Item {
                                 Layout.minimumWidth: 100
                             }
 
-                            ComboBox {
+                            ComboBoxRound {
                                 id: temp
                                 Layout.minimumWidth: 200
                                 model: [

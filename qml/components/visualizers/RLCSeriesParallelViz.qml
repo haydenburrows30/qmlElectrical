@@ -37,7 +37,7 @@ ColumnLayout {
         Text { 
             text: "Circuit Type:" 
         }
-        ComboBox {
+        ComboBoxRound {
             model: ["Series", "Parallel"]
             onCurrentIndexChanged: phaseVector.circuitType = currentIndex
         }

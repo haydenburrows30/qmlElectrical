@@ -71,7 +71,7 @@ Item {
                         
                         ColumnLayout {
                             
-                            ComboBox {
+                            ComboBoxRound {
                                 id: machineTypeCombo
                                 model: calculator.machineTypes
                                 onCurrentTextChanged: calculator.setMachineType(currentText)
@@ -213,7 +213,7 @@ Item {
                             columnSpacing: 15
 
                             Label { text: "Number of Poles:" ; Layout.minimumWidth: 150}
-                            SpinBox {
+                            SpinBoxRound {
                                 id: polesSpinBox
                                 from: 2
                                 to: 12
@@ -262,7 +262,7 @@ Item {
                             columnSpacing: 15
 
                             Label { text: "Temperature Class:" ; Layout.minimumWidth: 150}
-                            ComboBox {
+                            ComboBoxRound {
                                 id: tempClassCombo
                                 model: calculator.temperatureClasses
                                 onCurrentTextChanged: if(currentText) calculator.setTemperatureClass(currentText)
@@ -270,7 +270,7 @@ Item {
                             }
 
                             Label { text: "Cooling Method:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: coolingMethodCombo
                                 model: calculator.coolingMethods
                                 onCurrentTextChanged: if(currentText) calculator.setCoolingMethod(currentText)

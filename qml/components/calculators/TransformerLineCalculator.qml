@@ -82,7 +82,7 @@ Item {
                         columns: 2
                         
                         Label { text: "Transformer Rating (kVA):" ; Layout.minimumWidth: 200}
-                        SpinBox {
+                        SpinBoxRound {
                             id: transformerRatingSpinBox
                             from: 100
                             to: 5000
@@ -94,7 +94,7 @@ Item {
                         }
                         
                         Label { text: "Transformer Impedance (%):" }
-                        SpinBox {
+                        SpinBoxRound {
                             id: transformerImpedanceSpinBox
                             from: 30
                             to: 100
@@ -116,7 +116,7 @@ Item {
                         }
                         
                         Label { text: "Transformer X/R Ratio:" }
-                        SpinBox {
+                        SpinBoxRound {
                             id: transformerXRRatioSpinBox
                             from: 30
                             to: 150
@@ -149,7 +149,7 @@ Item {
                         columns: 2
                         
                         Label { text: "Line Length (km):" ; Layout.minimumWidth: 200}
-                        SpinBox {
+                        SpinBoxRound {
                             id: lineLengthSpinBox
                             from: 1
                             to: 50
@@ -171,7 +171,7 @@ Item {
                         }
                         
                         Label { text: "Line Resistance (Ohm/km):" }
-                        SpinBox {
+                        SpinBoxRound {
                             id: lineRSpinBox
                             from: 1
                             to: 100
@@ -193,7 +193,7 @@ Item {
                         }
                         
                         Label { text: "Line Reactance (Ohm/km):" }
-                        SpinBox {
+                        SpinBoxRound {
                             id: lineXSpinBox
                             from: 1
                             to: 100
@@ -226,7 +226,7 @@ Item {
                         columns: 2
                         
                         Label { text: "Load (MVA):" ; Layout.minimumWidth: 200}
-                        SpinBox {
+                        SpinBoxRound {
                             id: loadMVASpinBox
                             from: 1
                             to: 100
@@ -251,7 +251,7 @@ Item {
                         }
                         
                         Label { text: "Power Factor:" }
-                        SpinBox {
+                        SpinBoxRound {
                             id: loadPowerFactorSpinBox
                             from: 70
                             to: 100

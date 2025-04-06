@@ -59,7 +59,7 @@ Item {
                     }
 
                     Label { text: "System Voltage (V):" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: systemVoltageCombo
                         model: [12, 24, 48]
                         onCurrentTextChanged: calculator.systemVoltage = parseInt(currentText)
@@ -100,7 +100,7 @@ Item {
                     }
                     
                     Label { text: "Battery Type:" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: batteryType
                         model: ["Lead Acid", "Lithium Ion", "AGM"]
                         onCurrentTextChanged: calculator.batteryType = currentText

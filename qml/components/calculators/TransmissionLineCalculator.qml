@@ -171,7 +171,7 @@ Item {
                                 text: "Bundle Configuration:" 
                                 Layout.minimumWidth: 200
                             }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: subConductors
                                 from: 1
                                 to: 4

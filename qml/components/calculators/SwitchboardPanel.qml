@@ -72,7 +72,7 @@ Item {
                 }
 
                 Label { text: "Supply Voltage:" }
-                ComboBox {
+                ComboBoxRound {
                     id: supplyVoltage
                     model: ["230V", "400V", "415V", "11kV"]
                     currentIndex: 1
@@ -81,7 +81,7 @@ Item {
                 }
 
                 Label { text: "Phases:" }
-                ComboBox {
+                ComboBoxRound {
                     id: phaseConfig
                     model: ["1Ø + N", "3Ø + N", "3Ø"]
                     currentIndex: 1
@@ -99,7 +99,7 @@ Item {
                 }
 
                 Label { text: "Switchboard Type:" }
-                ComboBox {
+                ComboBoxRound {
                     id: switchboardType
                     model: ["Main Switchboard", "Distribution Board", "Motor Control Center", "Sub-Board"]
                     Layout.fillWidth: true
@@ -593,14 +593,14 @@ Item {
             }
             
             Label { text: "Breaker Rating (A):" }
-            ComboBox {
+            ComboBoxRound {
                 id: ratingCombo
                 model: ["6", "10", "16", "20", "25", "32", "40", "50", "63", "80", "100", "125", "160", "200", "250"]
                 Layout.fillWidth: true
             }
             
             Label { text: "Poles:" }
-            ComboBox {
+            ComboBoxRound {
                 id: polesCombo
                 model: ["1P", "2P", "3P", "4P"]
                 currentIndex: 1  // Default to 2P
@@ -608,7 +608,7 @@ Item {
             }
             
             Label { text: "Protection Type:" }
-            ComboBox {
+            ComboBoxRound {
                 id: typeCombo
                 model: ["MCB", "MCCB", "RCD", "RCBO", "Fuse"]
                 Layout.fillWidth: true
@@ -623,14 +623,14 @@ Item {
             }
             
             Label { text: "Cable Size:" }
-            ComboBox {
+            ComboBoxRound {
                 id: cableSizeCombo
                 model: ["1.5mm²", "2.5mm²", "4mm²", "6mm²", "10mm²", "16mm²", "25mm²", "35mm²", "50mm²", "70mm²", "95mm²"]
                 Layout.fillWidth: true
             }
             
             Label { text: "Cable Cores:" }
-            ComboBox {
+            ComboBoxRound {
                 id: cableCoresCombo
                 model: ["2C", "2C+E", "3C", "3C+E", "4C", "4C+E"]
                 Layout.fillWidth: true

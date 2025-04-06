@@ -64,7 +64,7 @@ Item {
                             }
                             
                             Label { text: "Vector Group:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: vectorGroupCombo
                                 Layout.minimumWidth: 150
                                 model: ["Dyn11", "Yyn0", "Dyn1", "Yzn1", "Yd1", "Dd0", "Yy0"]

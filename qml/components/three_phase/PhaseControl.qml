@@ -7,6 +7,7 @@ import QtQuick.Controls.Universal
 import QtCharts
 
 import "../"
+import "../style"
 
 ColumnLayout {
     id: control
@@ -79,7 +80,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
             }
             
-            SpinBox {
+            SpinBoxRound {
                 id: amplitudeSpinBox
                 Layout.minimumWidth: minWidth
                 from: 0
@@ -99,7 +100,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
             }
             
-            SpinBox {
+            SpinBoxRound {
                 id: angleSpinBox
                 Layout.minimumWidth: minWidth
                 from: -360
@@ -127,7 +128,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
             }
             
-            SpinBox {
+            SpinBoxRound {
                 id: amplitudeSpinBox1
                 Layout.minimumWidth: minWidth
                 from: 0
@@ -157,7 +158,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
             }
             
-            SpinBox {
+            SpinBoxRound {
                 id: angleSpinBox1
                 Layout.minimumWidth: minWidth
                 from: -360

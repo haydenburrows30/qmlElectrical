@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../buttons"
+import "../style"
 
 Item {
     id: cableSelectionSettings
@@ -74,7 +75,7 @@ Item {
 
         Label { text: "System Voltage:" }
         RowLayout {
-            ComboBox {
+            ComboBoxRound {
                 id: voltageSelect
                 model: voltageDrop.voltageOptions
                 currentIndex: voltageDrop.selectedVoltage === "230V" ? 0 : 1
@@ -103,7 +104,7 @@ Item {
         }
 
         Label { text: "Conductor:" }
-        ComboBox {
+        ComboBoxRound {
             id: conductorSelect
             model: voltageDrop.conductorTypes
             currentIndex: 1
@@ -116,7 +117,7 @@ Item {
         }
 
         Label { text: "Cable Type:" }
-        ComboBox {
+        ComboBoxRound {
             id: coreTypeSelect
             model: voltageDrop.coreConfigurations
             currentIndex: 1
@@ -129,7 +130,7 @@ Item {
         }
 
         Label { text: "Cable Size:" }
-        ComboBox {
+        ComboBoxRound {
             id: cableSelect
             model: voltageDrop.availableCables
             currentIndex: 13
@@ -156,7 +157,7 @@ Item {
         }
 
         Label { text: "Installation Method:" }
-        ComboBox {
+        ComboBoxRound {
             id: installationMethodCombo
             currentIndex: 6
             model: voltageDrop.installationMethods
@@ -197,7 +198,7 @@ Item {
         }
 
         Label { text: "Number of Houses:" }
-        SpinBox {
+        SpinBoxRound {
             id: numberOfHousesInput
             Layout.fillWidth: true
             from: 1

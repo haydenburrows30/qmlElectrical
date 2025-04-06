@@ -244,7 +244,7 @@ Item {
                     spacing: 8
                     
                     // Function dropdown
-                    ComboBox {
+                    ComboBoxRound {
                         id: functionSelector
                         Layout.fillWidth: true
                         model: ["Select function...", "Sum All", "Average", "Max", "Min", "Multiply All"]

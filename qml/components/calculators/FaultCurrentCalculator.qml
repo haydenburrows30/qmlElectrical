@@ -182,7 +182,7 @@ Item {
 
                     // Fault parameters
                     Label { text: "Fault Type:" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: faultType
                         model: ["3-Phase", "Line-Line", "Line-Ground", "Line-Line-Ground"]
                         onCurrentTextChanged: calculator.setFaultType(currentText)

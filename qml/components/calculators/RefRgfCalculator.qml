@@ -89,7 +89,7 @@ Item {
                 Label { 
                     text: "CT Secondary:"
                 }
-                ComboBox {
+                ComboBoxRound {
                     id: ctSecondaryType
                     model: ["5A", "1A"]
                     currentIndex: 0
@@ -152,7 +152,7 @@ Item {
                     text: "Connection:"
                     
                 }
-                ComboBox {
+                ComboBoxRound {
                     id: connectionType
                     model: ["Wye", "Delta"]
                     currentIndex: 0

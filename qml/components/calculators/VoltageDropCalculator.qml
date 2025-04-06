@@ -42,7 +42,7 @@ Item {
                     columns: 2
 
                     Label { text: "Cable Size (mm²):" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: cableSizeCombo
                         model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
                         onCurrentTextChanged: calculator.cableSize = parseFloat(currentText)
@@ -68,7 +68,7 @@ Item {
                     }
 
                     Label { text: "Conductor Material:" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: conductorMaterial
                         model: ["Copper", "Aluminum"]
                         onCurrentTextChanged: calculator.conductorMaterial = currentText

@@ -60,7 +60,7 @@ Item {
                             text: "Voltage (kV):"
                             Layout.preferredWidth: 100
                         }
-                        ComboBox {
+                        ComboBoxRound {
                             id: voltagePresets
                             model: ["Custom", "11 kV", "22 kV", "33 kV", "66 kV", "220 kV"]
                             Layout.preferredWidth: 100
@@ -87,7 +87,7 @@ Item {
                         text: "Cable Type:"
                         Layout.preferredWidth: 100
                     }
-                    ComboBox {
+                    ComboBoxRound {
                         id: cablePresets
                         model: ["Custom", "XLPE 1C", "XLPE 3C", "Paper 1C", "Paper 3C"]
                         Layout.fillWidth: true
@@ -122,7 +122,7 @@ Item {
                         text: "Freq (Hz):"
                         Layout.preferredWidth: 100
                     }
-                    ComboBox {
+                    ComboBoxRound {
                         id: freqPresets
                         model: ["50 Hz", "60 Hz"]
                         Layout.fillWidth: true

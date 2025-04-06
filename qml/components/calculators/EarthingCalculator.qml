@@ -122,7 +122,7 @@ Item {
                     }
 
                     Label { text: "Number of Rods:" }
-                    SpinBox {
+                    SpinBoxRound {
                         id: rodCountInput
                         from: 0
                         to: 20

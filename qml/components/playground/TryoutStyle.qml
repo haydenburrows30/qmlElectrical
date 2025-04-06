@@ -209,7 +209,7 @@ Item {
                             }
 
                             // Styled ComboBox
-                            ComboBox {
+                            ComboBoxRound {
                                 id: conversionType
                                 Layout.minimumWidth: 200
                                 model: [
@@ -293,7 +293,7 @@ Item {
                                 color: Qt.darker(Universal.foreground, activeComboBox === "wHRPM" ? 1.2 : 1.0)
                             }
 
-                            ComboBox {
+                            ComboBoxRound {
                                 id: wHRPM
                                 Layout.minimumWidth: 200
                                 model: [
@@ -381,7 +381,7 @@ Item {
                                 color: Qt.darker(Universal.foreground, activeComboBox === "temp" ? 1.2 : 1.0)
                             }
 
-                            ComboBox {
+                            ComboBoxRound {
                                 id: temp
                                 Layout.minimumWidth: 200
                                 model: [

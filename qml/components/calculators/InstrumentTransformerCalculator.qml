@@ -151,7 +151,7 @@ Item {
                             columns: 2
 
                             Label { text: "CT Type:" ; Layout.minimumWidth: 160}
-                            ComboBox {
+                            ComboBoxRound {
                                 id: ctType
                                 model: ["Measurement", "Protection", "Combined"]
                                 onCurrentTextChanged: calculator.currentCtType = currentText.toLowerCase()
@@ -160,7 +160,7 @@ Item {
                             }
 
                             Label { text: "CT Ratio:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: ctRatio
                                 model: calculator.standardCtRatios
                                 onCurrentTextChanged: if (currentText) calculator.setCtRatio(currentText)
@@ -187,7 +187,7 @@ Item {
                             }
 
                             Label { text: "Power Factor:" }
-                            SpinBox {
+                            SpinBoxRound {
                                 id: powerFactor
                                 from: 50
                                 to: 100
@@ -220,7 +220,7 @@ Item {
                                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                                 }
                                 
-                                ComboBox {
+                                ComboBoxRound {
                                     id: tempUnit
                                     model: ["°C", "°F"]
                                     currentIndex: 0
@@ -237,7 +237,7 @@ Item {
                             }
 
                             Label { text: "Accuracy Class:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: accuracyClass
                                 model: calculator.availableAccuracyClasses
                                 onCurrentTextChanged: if (currentText) calculator.accuracyClass = currentText
@@ -310,7 +310,7 @@ Item {
                             columns: 2
 
                             Label { text: "VT Ratio:" ; Layout.minimumWidth: 160}
-                            ComboBox {
+                            ComboBoxRound {
                                 id: vtRatio
                                 model: calculator.standardVtRatios
                                 onCurrentTextChanged: if (currentText) calculator.setVtRatio(currentText)
@@ -337,7 +337,7 @@ Item {
                             }
 
                             Label { text: "Rated Voltage Factor:" }
-                            ComboBox {
+                            ComboBoxRound {
                                 id: ratedVoltageFactor
                                 model: ["continuous", "30s", "ground_fault"]
                                 onCurrentTextChanged: calculator.ratedVoltageFactor = currentText

@@ -52,7 +52,7 @@ Item {
                     columns: 2
 
                     Label { text: "Cable Size (mm²):" ;Layout.minimumWidth: 180}
-                    ComboBox {
+                    ComboBoxRound {
                         id: cableSizeCombo
                         model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
                         onCurrentTextChanged: calculator.cableSize = parseFloat(currentText)
@@ -60,7 +60,7 @@ Item {
                     }
 
                     Label { text: "Insulation Type:" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: insulationCombo
                         model: ["PVC", "XLPE"]
                         onCurrentTextChanged: calculator.insulationType = currentText
@@ -68,7 +68,7 @@ Item {
                     }
 
                     Label { text: "Installation Method:" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: installMethodCombo
                         model: ["Conduit", "Tray", "Direct Buried", "Free Air", "Wall Surface"]
                         onCurrentTextChanged: calculator.installMethod = currentText
@@ -76,7 +76,7 @@ Item {
                     }
 
                     Label { text: "Ambient Temperature (°C):" }
-                    SpinBox {
+                    SpinBoxRound {
                         id: ambientTemp
                         from: 25
                         to: 55
@@ -87,7 +87,7 @@ Item {
                     }
 
                     Label { text: "Number of Circuits:" }
-                    SpinBox {
+                    SpinBoxRound {
                         id: groupingNumber
                         from: 1
                         to: 20
@@ -97,7 +97,7 @@ Item {
                     }
 
                     Label { text: "Conductor Material:" }
-                    ComboBox {
+                    ComboBoxRound {
                         id: conductorMaterial
                         model: ["Copper", "Aluminum"]
                         onCurrentTextChanged: calculator.conductorMaterial = currentText

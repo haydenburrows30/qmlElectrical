@@ -27,7 +27,7 @@ Popup {
             ColumnLayout {
                 width: parent.width
                 
-                ComboBox {
+                ComboBoxRound {
                     id: performanceMode
                     Layout.fillWidth: true
                     model: ["Maximum Performance", "Balanced", "Maximum Quality"]
@@ -62,7 +62,7 @@ Popup {
                     ToolTip.delay: 500
                 }
 
-                ComboBox {
+                ComboBoxRound {
                     id: resolutionSelector
                     Layout.fillWidth: true
                     model: ["High (500 points)", "Medium (250 points)", "Low (100 points)"]

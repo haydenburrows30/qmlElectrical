@@ -68,7 +68,7 @@ Item {
                     Layout.preferredWidth: 80
                 }
 
-                ComboBox {
+                ComboBoxRound {
                     id: phaseSelector
                     model: ["Single Phase", "Three Phase"]
                     Layout.columnSpan: 2
@@ -86,7 +86,7 @@ Item {
                     Layout.preferredWidth: 80
                 }
 
-                ComboBox {
+                ComboBoxRound {
                     id: kvaPresets
                     model: ["Custom", "15 kVA", "30 kVA", "50 kVA", "75 kVA", "100 kVA", "200 kVA", "300 kVA", "500 kVA", "750 kVA", "1000 kVA", "1500 kVA"] 
                     Layout.preferredWidth: 120
@@ -125,7 +125,7 @@ Item {
                     Layout.preferredWidth: 80
                 }
 
-                ComboBox {
+                ComboBoxRound {
                     id: voltagePresets
                     model: ["Custom", "230V", "400V", "415V", "11000V"]
                     Layout.preferredWidth: 120
@@ -229,7 +229,7 @@ Item {
                     text: "Phase Type:"
                     Layout.preferredWidth: 80
                 }
-                ComboBox {
+                ComboBoxRound {
                     id: phaseSelector1
                     model: ["Single Phase", "Three Phase"]
                     Layout.minimumWidth: 200
@@ -271,7 +271,7 @@ Item {
                     Layout.preferredWidth: 100
                 }
                 
-                ComboBox {
+                ComboBoxRound {
                     id: pfPresets
                     model: ["Custom", "0.8", "0.85", "0.9", "0.95", "1.0"]
                     Layout.preferredWidth: 120
