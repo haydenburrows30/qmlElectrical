@@ -7,7 +7,6 @@ import "../style"
 import "../popups"
 import "../style"
 import "../buttons"
-import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import PCalculator 1.0
 import KwFromCurrent 1.0
@@ -21,11 +20,6 @@ Item {
     TextEdit {
         id: clipboardHelper
         visible: false
-    }
-
-    FontLoader {
-        id: iconFont
-        source: "../../../icons/MaterialIcons-Regular.ttf"
     }
 
     PopUpText {
@@ -180,9 +174,10 @@ Item {
 
                     StyledButton {
                         Layout.preferredWidth: 80
-                        text: "Copy  " + MD.icons["copy_all"]
+                        text: "Copy"
                         ToolTip.text: "Copy to clipboard"
                         ToolTip.visible: hovered
+                        icon.source: "../../../icons/svg/copy_all/baseline.svg"
                         onClicked: {
                             if (calculator && !isNaN(calculator.current)) {
                                 clipboardHelper.text = currentOutput.text
@@ -327,9 +322,10 @@ Item {
 
                     StyledButton {
                         Layout.preferredWidth: 80
-                        text: "Copy  " + MD.icons["copy_all"]
+                        text: "Copy"
                         ToolTip.text: "Copy to clipboard"
                         ToolTip.visible: hovered
+                        icon.source: "../../../icons/svg/copy_all/baseline.svg"
                         onClicked: {
                             if (calculator1 && !isNaN(calculator1.kw)) {
                                 clipboardHelper.text = kwOutput.text

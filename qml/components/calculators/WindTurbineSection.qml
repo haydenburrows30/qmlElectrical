@@ -538,6 +538,7 @@ Item {
                                                                                 
                         StyledButton {
                             text: "Update Power Curve"
+                            icon.source: "../../../icons/svg/update/baseline.svg"
                             anchors.top: parent.top
                             anchors.right: parent.right
                             anchors.margins: 10

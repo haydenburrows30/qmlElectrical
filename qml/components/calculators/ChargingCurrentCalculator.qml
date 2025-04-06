@@ -168,8 +168,9 @@ Item {
                             }
 
                             StyledButton {
-                                Layout.preferredWidth: 50
+                                Layout.preferredWidth: 80
                                 text: "Copy"
+                                icon.source: "../../../icons/svg/copy_all/baseline.svg"
                                 onClicked: {
                                     clipboardHelper.text = chargingCurrentOutput.text
                                     clipboardHelper.selectAll()

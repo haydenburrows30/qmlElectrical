@@ -188,7 +188,7 @@ Item {
                     Label {
                         text: converter.result.toFixed(2)
                         font.pixelSize: 34
-                        color: "blue"
+                        color: Style.textFieldBorder
                     }
 
                     Label {
@@ -223,7 +223,7 @@ Item {
                             return ""
                         }
                         font.pixelSize: 34
-                        color: "blue"
+                        color: Style.textFieldBorder
                     }
                 }
 

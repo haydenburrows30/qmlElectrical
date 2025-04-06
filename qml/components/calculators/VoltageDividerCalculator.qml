@@ -16,7 +16,7 @@ Item {
 
     property VoltageDividerCalculator calculator: VoltageDividerCalculator {}
     property bool calculatorReady: calculator !== null
-    
+
     // Simplified safeValue function
     function safeValue(value, defaultVal) {
         return (value === undefined || value === null || isNaN(value) || !isFinite(value)) ? defaultVal : value;
@@ -113,6 +113,7 @@ Item {
                         Layout.columnSpan: 2
                         Layout.alignment: Qt.AlignRight
                         onClicked: calculateVoltageDivider()
+                        icon.source: "../../../icons/svg/calculate/baseline.svg"
                     }
 
                     Label { Layout.fillHeight: true }

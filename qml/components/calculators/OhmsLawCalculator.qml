@@ -9,7 +9,6 @@ import "../inputs"
 import "../style"
 import "../popups"
 import "../buttons"
-import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import OhmsLaw 1.0
 
@@ -20,11 +19,6 @@ Item {
     property bool calculatorReady: calculator !== null
     property var calculationHistory: []
     property int maxHistoryItems: 10
-
-    FontLoader {
-        id: iconFont
-        source: "../../../icons/MaterialIcons-Regular.ttf"
-    }
 
     function calculateOhmsLaw() {
         if (!calculatorReady) return;
@@ -264,7 +258,8 @@ Item {
         anchors.centerIn: parent
 
         StyledButton {
-            text: "View History  " + MD.icons["history"]
+            text: "View History"
+            icon.source: "../../../icons/svg/history/baseline.svg"
             onClicked: historyDialog.open()
             Layout.columnSpan: 2
             Layout.minimumWidth: 100
@@ -359,7 +354,8 @@ Item {
                 }
 
                 StyledButton {
-                    text: "Calculate  " + MD.icons["receipt"]
+                    text: "Calculate"
+                    icon.source: "../../../icons/svg/calculate/baseline.svg"
                     Layout.minimumWidth: 100
                     Layout.columnSpan: 2
                     Layout.alignment: Qt.AlignRight
@@ -414,7 +410,8 @@ Item {
                     Layout.columnSpan: 2
                     Layout.minimumWidth: 100
                     Layout.alignment: Qt.AlignRight
-                    text: "Clear  " + MD.icons["clear"]
+                    icon.source: "../../../icons/svg/clear/baseline.svg"
+                    text: "Clear"
                     onClicked: {
                         param1Value.text = ""
                         param2Value.text = ""

@@ -50,6 +50,8 @@ PopUpText {
     }
 // Fonts
 
+icon.source: "../../../icons/svg/copy_all/baseline.svg"
+
 FontLoader {
     id: iconFont
     source: "../../../icons/MaterialIcons-Regular.ttf"

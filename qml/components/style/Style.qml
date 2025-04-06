@@ -9,6 +9,7 @@ QtObject {
     readonly property color buttonHovered: "#505050"
     readonly property color buttonPressed: "#404040"
     readonly property color buttonBorder: "#808080"
+    readonly property color textFieldBorder: "#0078d7"
     
     // Dimensions
     readonly property int iconSize: 30
