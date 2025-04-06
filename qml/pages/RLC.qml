@@ -53,12 +53,12 @@ Page {
                 width: scrollView.width
                 
                 ColumnLayout {
-
+                    //Buttons
                     RowLayout {
-                        //Buttons
+                        
                         SwitchLabel {
                             Layout.minimumHeight: 60
-                            Layout.minimumWidth: 350
+                            Layout.minimumWidth: 340
                             id: changeMode
                         }
 
@@ -216,7 +216,7 @@ Page {
                     //Settings
                     WaveCard {
                         title: currentMode === 0 ? 'Series RLC Parameters' : 'Parallel RLC Parameters'
-                        Layout.minimumHeight: 340
+                        Layout.minimumHeight: 280
                         Layout.minimumWidth: 400
                         Layout.fillHeight: true
                             

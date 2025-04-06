@@ -56,10 +56,10 @@ Item {
         id: mainLayout
         anchors.fill: parent
         
-        
         TabBar {
             id: tabBar
             Layout.fillWidth: true
+            Layout.topMargin: 5
             
             TabButton {
                 text: "Wind Turbine"

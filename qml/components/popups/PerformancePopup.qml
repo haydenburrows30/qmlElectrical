@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import "../buttons"
+import "../style"
 
 Popup {
     id: performancePopup

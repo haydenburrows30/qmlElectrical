@@ -27,6 +27,7 @@ Item {
     }
 
     RowLayout {
+        id: mainLayout
         anchors.centerIn: parent
 
         // Input Section

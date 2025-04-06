@@ -6,30 +6,12 @@ import QtQuick.Layouts
 
 import "../components"
 import "../components/buttons"
+import "../components/style"
 
 Page {
 
     background: Rectangle {
         color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
-    }
-
-    Popup {
-        id: tipsPopup
-        width: 500
-        height: 300
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-        Text {
-            anchors.fill: parent
-            text: {"Placeholder text for information"}
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
     }
 
     property var home: [
@@ -80,87 +62,100 @@ Page {
         { name: qsTr("Info"), source: "../components/popups/About.qml" }
     ]
 
-    Row {
-        id: menuBar1
-        height: menuBar.height
+    MenuBar {
+        id: menuBar
         anchors.horizontalCenter : parent.horizontalCenter
+        
+        background: 
+            Rectangle {
+                color: "#21be2b"
+                width: parent.width
+                height: 1
+                anchors.bottom: parent.bottom
+            }
 
-        MenuBar {
-            id: menuBar
-            
-            background: 
-                Rectangle {
-                    color: "#21be2b"
-                    width: parent.width
-                    height: 1
-                    anchors.bottom: parent.bottom
-                }
+        Menu {
+            title: "Home"
+            Repeater {
+                model: home
 
-            Menu {
-                title: "Home"
-                Repeater {
-                    model: home
-
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: {
+                        calculatorLoader.source = modelData.source
+                        
                     }
                 }
             }
+        }
 
-            Menu {
-                title: "Basic Calculators"
-                Repeater {
-                    model: basic
+        Menu {
+            title: "Basic Calculators"
+            Repeater {
+                model: basic
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: { 
+                        calculatorLoader.source = modelData.source
+                        
                     }
                 }
             }
+        }
 
-            Menu {
-                title: "Protection"
-                Repeater {
-                    model: protection
+        Menu {
+            title: "Protection"
+            Repeater {
+                model: protection
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: {
+                        calculatorLoader.source = modelData.source
+                        
                     }
                 }
             }
-            Menu {
-                title: "Cable"
-                Repeater {
-                    model: cable
+        }
+        Menu {
+            title: "Cable"
+            Repeater {
+                model: cable
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: {
+                        calculatorLoader.source = modelData.source
+                        
                     }
                 }
             }
-            Menu {
-                title: "Theory"
-                Repeater {
-                    model: theory
+        }
+        Menu {
+            title: "Theory"
+            Repeater {
+                model: theory
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: {
+                        calculatorLoader.source = modelData.source
+                        
                     }
                 }
             }
-            Menu {
-                title: "Renewables"
-                Repeater {
-                    model: renewables
+        }
+        Menu {
+            title: "Renewables"
+            Repeater {
+                model: renewables
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: calculatorLoader.source = modelData.source
+                MenuItem {
+                    text: modelData.name
+                    onTriggered: {
+                        calculatorLoader.source = modelData.source
+                        
                     }
                 }
             }
@@ -170,9 +165,10 @@ Page {
     Loader {
         id: calculatorLoader
         anchors.left: parent.left
-        anchors.top: menuBar1.bottom
+        anchors.top: menuBar.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right
+        anchors.topMargin: 5
         source: "../components/CalculatorMenu.qml"
     }
 }

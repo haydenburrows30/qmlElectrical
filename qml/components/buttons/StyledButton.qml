@@ -3,16 +3,6 @@ import QtQuick.Controls.Universal
 
 Button {
     id: control
-    text: qsTr("Button")
-
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            implicitContentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             implicitContentHeight + topPadding + bottomPadding)
-
-    padding: 8
-    verticalPadding: padding - 4
-    spacing: 8
 
     background: Rectangle {
         implicitWidth: 32
@@ -33,7 +23,7 @@ Button {
             border.width: 2
             border.color: control.Universal.accent
 
-            radius: 4
+            radius: 3
         }
     }
 }

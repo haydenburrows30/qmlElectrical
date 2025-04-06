@@ -176,6 +176,8 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
+        Layout.topMargin: 10
+        Layout.bottomMargin: 10
         height: 2
         color: phaseColor
         opacity: 0.3

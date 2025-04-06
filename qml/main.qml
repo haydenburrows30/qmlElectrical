@@ -93,9 +93,8 @@ ApplicationWindow {
             anchors.bottomMargin: - border.width
 
             height: 80
-            // opacity: 0.8
             border.width: 1
-            border.color: sideBar.modeToggled ? "#767676" : "#cccccc" // "#767676"
+            border.color: sideBar.modeToggled ? "#767676" : "#cccccc"
 
             gradient: Gradient {
                 orientation: Gradient.Vertical
