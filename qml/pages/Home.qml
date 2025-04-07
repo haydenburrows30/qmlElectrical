@@ -315,5 +315,50 @@ Page {
             }
 
         onClicked: about.open()
-    } 
+    }
+    
+    // Add a logs button near the about button
+    Button {
+        id: logsButton
+        contentItem: Label {
+            text: "View Logs"
+            font.pixelSize: 14
+        }
+        
+        anchors {
+            bottom: parent.bottom
+            right: aboutProgram.left
+            margins: 10
+        }
+        
+        background: 
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.width: 1
+                border.color: logsButton.hovered ? "blue" : "transparent"
+                radius: 5
+            }
+        
+        onClicked: {
+            console.log("Log button clicked")
+            // The issue is here - we need to access the logViewerPopup from the application window
+            var appWindow = window || applicationWindow
+            if (appWindow && appWindow.logViewerPopup) {
+                console.log("Opening log viewer popup")
+                appWindow.logViewerPopup.open()
+            } else {
+                console.error("Could not find log viewer popup")
+            }
+            
+            // Log that the user viewed logs if logManager is available
+            if (typeof logManager !== "undefined") {
+                logManager.log("INFO", "User opened log viewer from home page")
+            } else if (appWindow && appWindow.logManagerInstance) {
+                appWindow.logManagerInstance.log("INFO", "User opened log viewer from home page")
+            } else {
+                console.log("No log manager available")
+            }
+        }
+    }
 }

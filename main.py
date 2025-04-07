@@ -9,6 +9,8 @@ from typing import Optional
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
+# Add this import for qmlRegisterType
+from PySide6.QtQml import qmlRegisterType
 
 # Application imports
 from services.interfaces import (
@@ -33,6 +35,9 @@ import data.rc_resources as rc_resources
 
 from services.qml_types import register_qml_types
 from utils.qml_debug import register_debug_helper
+
+# Import QLogManager from utils.logger
+from utils.logger import QLogManager
 
 class ResourceManager:
     """Manages application resources and caching."""
@@ -156,6 +161,13 @@ class Application:
         qml_types = register_qml_types(self.qml_engine.engine, CURRENT_DIR)
         for type_info in qml_types:
             self.qml_engine.register_type(*type_info)
+        
+        # Register the QLogManager type with QML
+        QML_IMPORT_NAME = "Logger"
+        QML_IMPORT_MAJOR_VERSION = 1
+        # Use the imported qmlRegisterType function instead of trying to call it as a method
+        qmlRegisterType(QLogManager, QML_IMPORT_NAME, 
+                        QML_IMPORT_MAJOR_VERSION, 0, "LogManager")
 
     def load_qml(self):
         self.qml_engine.load_qml(os.path.join(CURRENT_DIR, "qml", "main.qml"))
@@ -163,6 +175,10 @@ class Application:
         # Add platform helper registration
         from utils.platform_helper import PlatformHelper
         self.qml_engine.engine.rootContext().setContextProperty("PlatformHelper", PlatformHelper())
+        
+        # Create and expose log manager to QML
+        self.log_manager = QLogManager()
+        self.qml_engine.engine.rootContext().setContextProperty("logManager", self.log_manager)
 
     def setup(self):
         """Configure application components and initialize subsystems."""
@@ -177,6 +193,11 @@ class Application:
         try:
             sys.exit(self.app.exec())
         finally:
+            # Clean up resources when application exits
+            if hasattr(self, 'log_manager') and hasattr(self.log_manager, '_async_handler'):
+                # Stop the async log handler to allow thread to exit
+                self.log_manager._async_handler.stop()
+            
             self.loop.close()
             self.worker_pool.shutdown()
 
