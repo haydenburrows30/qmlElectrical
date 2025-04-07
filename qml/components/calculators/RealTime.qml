@@ -7,11 +7,11 @@ import QtQuick.Controls.Universal
 import QtCharts
 import QtQuick.Window
 
-import "../components"
-import "../components/charts/"
-import "../components/style"
-import "../components/popups"
-import "../components/buttons"
+import "../"
+import "../charts/"
+import "../style"
+import "../popups"
+import "../buttons"
 
 import RealTime 1.0
 
@@ -110,7 +110,7 @@ Page {
                             ToolTip.visible: pauseButton.hovered
                             ToolTip.delay: 500
 
-                            icon.source: calculator.isRunning ? "../../icons/svg/pause/baseline.svg" : "../../icons/svg/play_arrow/baseline.svg"
+                            icon.source: calculator.isRunning ? "../../../icons/svg/pause/baseline.svg" : "../../../icons/svg/play_arrow/baseline.svg"
 
                             onClicked: {
                                 calculator.toggleRunning()
@@ -123,7 +123,7 @@ Page {
                             ToolTip.text: "Reset"
                             ToolTip.visible: resetButton.hovered
                             ToolTip.delay: 500
-                            icon.source: "../../icons/svg/restart_alt/baseline.svg"
+                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
                             
                             onClicked: {
                                 calculator.restart()
@@ -136,7 +136,7 @@ Page {
                             ToolTip.text: "Save parameters"
                             ToolTip.visible: saveButton.hovered
                             ToolTip.delay: 500
-                            icon.source: "../../icons/svg/save/baseline.svg"
+                            icon.source: "../../../icons/svg/save/baseline.svg"
 
                             onClicked: {
                                 calculator.saveConfiguration()
@@ -149,7 +149,7 @@ Page {
                             ToolTip.text: "Load parameters"
                             ToolTip.visible: loadButton.hovered
                             ToolTip.delay: 500
-                            icon.source: "../../icons/svg/folder_open/baseline.svg"
+                            icon.source: "../../../icons/svg/folder_open/baseline.svg"
 
                             onClicked: {
                                 calculator.loadConfiguration()

@@ -7,13 +7,13 @@ import QtQuick.Controls.Universal
 import QtCharts
 import QtCore
 
-import "../components"
-import "../components/charts/"
-import "../components/style"
-import "../components/popups"
-import "../components/charts"
-import "../components/visualizers"
-import "../components/buttons"
+import "../"
+import "../charts/"
+import "../style"
+import "../popups"
+import "../charts"
+import "../visualizers"
+import "../buttons"
 
 import RLC 1.0
 
@@ -90,7 +90,7 @@ Page {
                             Layout.alignment: Qt.AlignRight
                             Layout.maximumWidth: 50
 
-                            icon.source: "../../icons/svg/restart_alt/baseline.svg"
+                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
                             
                             ToolTip.text: "Reset Parameters"
                             ToolTip.visible: resetButton.hovered

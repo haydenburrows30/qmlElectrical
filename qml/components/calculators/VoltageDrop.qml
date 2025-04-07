@@ -6,15 +6,14 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtCharts
 
-import "../components"
-import "../components/calculators/"
-import "../components/charts/"
-import "../components/exports/"
-import "../components/monitors/"
-import "../components/popups/"
-import "../components/visualizers/"
-import "../components/voltage_drop/"
-import "../components/style/"
+import "../"
+import "../charts/"
+import "../exports/"
+import "../monitors/"
+import "../popups/"
+import "../visualizers/"
+import "../voltage_drop/"
+import "../style/"
 
 import VDrop 1.0
 

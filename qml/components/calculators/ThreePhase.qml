@@ -3,11 +3,11 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
-import "../components"
-import "../components/visualizers/"
-import "../components/charts/"
-import "../components/three_phase/"
-import "../components/popups"
+import "../"
+import "../visualizers/"
+import "../charts/"
+import "../three_phase/"
+import "../popups"
 
 import Sine 1.0
 

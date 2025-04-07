@@ -58,14 +58,18 @@ ApplicationWindow {
         { name: qsTr("Charging Current"), source: "components/calculators/ChargingCurrentCalculator.qml" },
         { name: qsTr("Voltage Drop"), source: "components/calculators/VoltageDropCalculator.qml" },
         { name: qsTr("Transmission Line"), source: "components/calculators/TransmissionLineCalculator.qml" },
-        { name: qsTr("Switchboard"), source: "components/calculators/SwitchboardPanel.qml" }
+        { name: qsTr("Switchboard"), source: "components/calculators/SwitchboardPanel.qml" },
+        { name: qsTr("Voltage Drop Orion"), source: "components/calculators/VoltageDrop.qml" }
     ]
     
     property var theory: [
         { name: qsTr("Transformer Calculator"), source: "components/calculators/TransformerCalculator.qml" },
         { name: qsTr("Harmonics Analysis"), source: "components/calculators/HarmonicsAnalyzer.qml" },
         { name: qsTr("Machine Calculator"), source: "components/calculators/ElectricMachineCalculator.qml" },
-        { name: qsTr("Motor Starting"), source: "components/calculators/MotorStartingCalculator.qml" }
+        { name: qsTr("Motor Starting"), source: "components/calculators/MotorStartingCalculator.qml" },
+        { name: qsTr("RLC"), source: "components/calculators/RLC.qml" },
+        { name: qsTr("Three Phase Waveforms"), source: "components/calculators/ThreePhase.qml" },
+        { name: qsTr("Real Time Chart"), source: "components/calculators/RealTime.qml" }
     ]
     
     property var renewables: [
@@ -140,7 +144,7 @@ ApplicationWindow {
                     MenuItem {
                         text: modelData.name
                         onTriggered: {
-                            calculatorLoader.source = modelData.source
+                            calculatorLoader.push(modelData.source)
                             
                         }
                     }
@@ -155,7 +159,7 @@ ApplicationWindow {
                     MenuItem {
                         text: modelData.name
                         onTriggered: { 
-                            calculatorLoader.source = modelData.source
+                            calculatorLoader.push(modelData.source)
                             
                         }
                     }
@@ -170,7 +174,7 @@ ApplicationWindow {
                     MenuItem {
                         text: modelData.name
                         onTriggered: {
-                            calculatorLoader.source = modelData.source
+                            calculatorLoader.push(modelData.source)
                             
                         }
                     }
@@ -184,7 +188,7 @@ ApplicationWindow {
                     MenuItem {
                         text: modelData.name
                         onTriggered: {
-                            calculatorLoader.source = modelData.source
+                            calculatorLoader.push(modelData.source)
                             
                         }
                     }
@@ -198,7 +202,7 @@ ApplicationWindow {
                     MenuItem {
                         text: modelData.name
                         onTriggered: {
-                            calculatorLoader.source = modelData.source
+                            calculatorLoader.push(modelData.source)
                             
                         }
                     }
@@ -212,7 +216,7 @@ ApplicationWindow {
                     MenuItem {
                         text: modelData.name
                         onTriggered: {
-                            calculatorLoader.source = modelData.source
+                            calculatorLoader.push(modelData.source)
                             
                         }
                     }
@@ -245,7 +249,7 @@ ApplicationWindow {
             }
         }
 
-        Loader {
+        StackView {
             id: calculatorLoader
             objectName: "calculatorLoader"
             anchors {
@@ -255,7 +259,7 @@ ApplicationWindow {
                 right: parent.right
             }
             z: 1
-            Component.onCompleted: calculatorLoader.source = ("pages/Home.qml")
+            Component.onCompleted: calculatorLoader.push("pages/Home.qml")
         }
     }
 

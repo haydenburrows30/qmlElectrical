@@ -9,7 +9,6 @@ import WindTurbine 1.0
 
 Item {
     id: root
-    anchors.fill: parent
 
     property var transformerCalculator
     property var windTurbineCalculator

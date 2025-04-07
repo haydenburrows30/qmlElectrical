@@ -16,11 +16,12 @@ Page {
     }
 
     property var cable: [
-        { name: qsTr("Cable Ampacity"), source: "components/calculators/CableAmpacityCalculator.qml", icon: "air" },
-        { name: qsTr("Charging Current"), source: "components/calculators/ChargingCurrentCalculator.qml", icon: "air" },
-        { name: qsTr("Voltage Drop"), source: "components/calculators/VoltageDropCalculator.qml", icon: "air" },
-        { name: qsTr("Transmission Line"), source: "components/calculators/TransmissionLineCalculator.qml", icon: "air" },
-        { name: qsTr("Switchboard"), source: "components/calculators/SwitchboardPanel.qml", icon: "air" }
+        { name: qsTr("Cable Ampacity"), source: "../components/calculators/CableAmpacityCalculator.qml", icon: "air" },
+        { name: qsTr("Charging Current"), source: "../components/calculators/ChargingCurrentCalculator.qml", icon: "air" },
+        { name: qsTr("Voltage Drop"), source: "../components/calculators/VoltageDropCalculator.qml", icon: "air" },
+        { name: qsTr("Transmission Line"), source: "../components/calculators/TransmissionLineCalculator.qml", icon: "air" },
+        { name: qsTr("Switchboard"), source: "../components/calculators/SwitchboardPanel.qml", icon: "air" },
+        { name: qsTr("Voltage Drop Orion"), source: "../components/calculators/VoltageDrop.qml", icon: "air" }
     ]
 
     ColumnLayout {
@@ -75,7 +76,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.source = modelData.source
+                        calculatorLoader.push(modelData.source)
                     }
 
                     HoverHandler {

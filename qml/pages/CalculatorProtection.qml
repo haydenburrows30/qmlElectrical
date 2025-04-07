@@ -15,15 +15,15 @@ Page {
     }
 
     property var protection: [
-        { name: qsTr("Discrimination Analysis"), source: "components/calculators/DiscriminationAnalyzer.qml", icon: "show_chart"},
-        { name: qsTr("Protection Relay"), source: "components/calculators/ProtectionRelayCalculator.qml", icon: "devices" },
-        { name: qsTr("Instrument Transformer"), source: "components/calculators/InstrumentTransformerCalculator.qml", icon: "transform" },
-        { name: qsTr("Earthing Calculator"), source: "components/calculators/EarthingCalculator.qml", icon: "public" },
-        { name: qsTr("Battery Calculator"), source: "components/calculators/BatteryCalculator.qml", icon: "battery_charging_full" },
-        { name: qsTr("Open Delta"), source: "components/calculators/DeltaCalculator.qml", icon: "change_history" },
-        { name: qsTr("RGF"), source: "components/calculators/RefRgfCalculator.qml", icon: "calculate" },
-        { name: qsTr("Fault Current"), source: "components/calculators/FaultCurrentCalculator.qml", icon: "electric_bolt" },
-        { name: qsTr("Transformer & Line"), source: "components/calculators/TransformerLineCalculator.qml", icon: "cell_tower" }
+        { name: qsTr("Discrimination Analysis"), source: "../components/calculators/DiscriminationAnalyzer.qml", icon: "show_chart"},
+        { name: qsTr("Protection Relay"), source: "../components/calculators/ProtectionRelayCalculator.qml", icon: "devices" },
+        { name: qsTr("Instrument Transformer"), source: "../components/calculators/InstrumentTransformerCalculator.qml", icon: "transform" },
+        { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml", icon: "public" },
+        { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml", icon: "battery_charging_full" },
+        { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml", icon: "change_history" },
+        { name: qsTr("RGF"), source: "../components/calculators/RefRgfCalculator.qml", icon: "calculate" },
+        { name: qsTr("Fault Current"), source: "../components/calculators/FaultCurrentCalculator.qml", icon: "electric_bolt" },
+        { name: qsTr("Transformer & Line"), source: "../components/calculators/TransformerLineCalculator.qml", icon: "cell_tower" }
     ]
 
     ColumnLayout {
@@ -78,7 +78,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.source = modelData.source
+                        calculatorLoader.push(modelData.source)
                     }
 
                     HoverHandler {

@@ -85,7 +85,7 @@ Page {
                 }
                 
                 onClicked: {
-                    calculatorLoader.source = "pages/CalculatorBasic.qml"
+                    calculatorLoader.push("CalculatorBasic.qml")
                 }
                 
                 HoverHandler {
@@ -134,7 +134,7 @@ Page {
                 }
                 
                 onClicked: {
-                    calculatorLoader.source = "pages/CalculatorProtection.qml"
+                    calculatorLoader.push("CalculatorProtection.qml")
                 }
 
                 HoverHandler {
@@ -182,7 +182,7 @@ Page {
                 }
                 
                 onClicked: {
-                    calculatorLoader.source = "pages/CalculatorCable.qml"
+                    calculatorLoader.push("CalculatorCable.qml")
                 }
                 
                 HoverHandler {
@@ -230,7 +230,7 @@ Page {
                 }
                 
                 onClicked: {
-                    calculatorLoader.source = "pages/CalculatorTheory.qml"
+                    calculatorLoader.push("CalculatorTheory.qml")
                 }
                 
                 HoverHandler {
@@ -277,7 +277,7 @@ Page {
                 }
                 
                 onClicked: {
-                    calculatorLoader.source = "pages/CalculatorRenewables.qml"
+                    calculatorLoader.push("CalculatorRenewables.qml")
                 }
                 
                 HoverHandler {

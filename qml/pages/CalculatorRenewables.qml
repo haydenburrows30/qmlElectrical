@@ -15,7 +15,7 @@ Page {
     }
 
     property var renewables: [
-        { name: qsTr("Wind & Grid Connection"), source: "components/calculators/WindTransformerLineCalculator.qml", icon: "air"}
+        { name: qsTr("Wind & Grid Connection"), source: "../components/calculators/WindTransformerLineCalculator.qml", icon: "air"}
     ]
 
     ColumnLayout {
@@ -70,7 +70,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.source = modelData.source
+                        calculatorLoader.push(modelData.source)
                     }
 
                     HoverHandler {
