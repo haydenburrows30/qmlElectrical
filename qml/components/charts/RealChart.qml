@@ -10,7 +10,6 @@ import QtQuick.Window
 import "../"
 import "../style"
 import "../popups"
-import "../../../scripts/MaterialDesignRegular.js" as MD
 
 import RealTime 1.0
 
