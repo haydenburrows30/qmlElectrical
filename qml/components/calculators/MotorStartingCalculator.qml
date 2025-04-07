@@ -97,6 +97,7 @@ Item {
             
             StyledButton {
                 text: "Close"
+                icon.source: "../../../icons/rounded/close.svg"
                 Layout.alignment: Qt.AlignRight
                 onClicked: messagePopup.close()
             }
@@ -254,7 +255,7 @@ Item {
                         Layout.alignment: Qt.AlignRight
                         Layout.topMargin: 5
                         enabled: hasValidInputs
-                        icon.source: "../../../icons/svg/calculate/baseline.svg"
+                        icon.source: "../../../icons/rounded/calculate.svg"
                         
                         onClicked: {
                             if (hasValidInputs) {

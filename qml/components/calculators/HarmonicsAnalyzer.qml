@@ -91,7 +91,7 @@ Item {
             // Export buttons
             StyledButton {
                 text: "Export Data"
-                icon.source: "../../../icons/svg/file_download/baseline.svg"
+                icon.source: "../../../icons/rounded/download.svg"
                 Layout.fillWidth: true
                 onClicked: {
                     calculator.exportData()
@@ -155,7 +155,7 @@ Item {
                     }
                     text: "Performance Settings"
                     onClicked: performancePopup.open()
-                    icon.source: "../../../icons/svg/speed/baseline.svg"
+                    icon.source: "../../../icons/rounded/speed.svg"
                 }
 
                 CheckBox {

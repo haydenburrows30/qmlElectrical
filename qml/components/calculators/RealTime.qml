@@ -110,7 +110,7 @@ Page {
                             ToolTip.visible: pauseButton.hovered
                             ToolTip.delay: 500
 
-                            icon.source: calculator.isRunning ? "../../../icons/svg/pause/baseline.svg" : "../../../icons/svg/play_arrow/baseline.svg"
+                            icon.source: calculator.isRunning ? "../../../icons/rounded/pause.svg" : "../../../icons/rounded/play_arrow.svg"
 
                             onClicked: {
                                 calculator.toggleRunning()
@@ -123,7 +123,7 @@ Page {
                             ToolTip.text: "Reset"
                             ToolTip.visible: resetButton.hovered
                             ToolTip.delay: 500
-                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
+                            icon.source: "../../../icons/rounded/restart_alt.svg"
                             
                             onClicked: {
                                 calculator.restart()
@@ -136,7 +136,7 @@ Page {
                             ToolTip.text: "Save parameters"
                             ToolTip.visible: saveButton.hovered
                             ToolTip.delay: 500
-                            icon.source: "../../../icons/svg/save/baseline.svg"
+                            icon.source: "../../../icons/rounded/save.svg"
 
                             onClicked: {
                                 calculator.saveConfiguration()
@@ -149,7 +149,7 @@ Page {
                             ToolTip.text: "Load parameters"
                             ToolTip.visible: loadButton.hovered
                             ToolTip.delay: 500
-                            icon.source: "../../../icons/svg/folder_open/baseline.svg"
+                            icon.source: "../../../icons/rounded/folder_open.svg"
 
                             onClicked: {
                                 calculator.loadConfiguration()

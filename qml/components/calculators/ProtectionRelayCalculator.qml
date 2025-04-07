@@ -266,7 +266,7 @@ Item {
                             StyledButton {
                                 id: saveSettingsButton
                                 text: "Save Settings"
-                                icon.source: "../../../icons/svg/save/baseline.svg"
+                                icon.source: "../../../icons/rounded/save.svg"
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 
@@ -330,7 +330,7 @@ Item {
                             
                             StyledButton {
                                 text: "Calculate Fault Current"
-                                icon.source: "../../../icons/svg/bolt/baseline.svg"
+                                icon.source: "../../../icons/rounded/bolt.svg"
                                 Layout.columnSpan: 2
                                 Layout.fillWidth: true
                                 onClicked: {
@@ -497,6 +497,7 @@ Item {
                 
                 StyledButton {
                     text: "Compare"
+                    icon.source: "../../../icons/rounded/compare.svg"
                     enabled: savedSettingsList.currentIndex >= 0
                     onClicked: {
                         // Show the saved curve for comparison
@@ -506,6 +507,7 @@ Item {
                 
                 StyledButton {
                     text: "Load"
+                    icon.source: "../../../icons/rounded/folder_open.svg"
                     enabled: savedSettingsList.currentIndex >= 0
                     onClicked: {
                         try {
@@ -548,6 +550,7 @@ Item {
                 
                 StyledButton {
                     text: "Close"
+                    icon.source: "../../../icons/rounded/close.svg"
                     onClicked: {
                         savedCurve.visible = false;
                         savedSettingsPopup.close();
@@ -558,6 +561,7 @@ Item {
             // Add Clear Settings button
             StyledButton {
                 text: "Clear All Settings"
+                icon.source: "../../../icons/rounded/close.svg"
                 Layout.fillWidth: true
                 Layout.topMargin: 10
                 

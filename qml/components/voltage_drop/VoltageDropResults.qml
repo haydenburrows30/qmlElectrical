@@ -98,21 +98,21 @@ GridLayout {
         
         StyledButton {
             text: "Save Results"
-            icon.name: "Save"
+            icon.source: "../../../icons/rounded/save.svg"
             enabled: currentVoltageDropValue > 0
             onClicked: saveResultsClicked()
         }
 
         StyledButton {
             text: "Show Details"
-            icon.name: "Info"
+            icon.source: "../../../icons/rounded/info.svg"
             enabled: currentVoltageDropValue > 0
             onClicked: viewDetailsClicked()
         }
 
         StyledButton {
             text: "View Chart"
-            icon.name: "Chart"
+            icon.source: "../../../icons/rounded/show_chart.svg"
             enabled: currentVoltageDropValue > 0
             onClicked: viewChartClicked()
         }

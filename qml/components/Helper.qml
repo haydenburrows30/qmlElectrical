@@ -50,12 +50,24 @@ PopUpText {
     }
 // Fonts
 
-icon.source: "../../../icons/svg/copy_all/baseline.svg"
-icon.source: "../../../icons/svg/restart_alt/baseline.svg"
-icon.source: "../../../icons/svg/file_download/baseline.svg"
-icon.source: "../../../icons/svg/info/baseline.svg"
-icon.source: "../../../icons/svg/pause/baseline.svg"
-icon.source: "../../../icons/svg/save/baseline.svg"
+icon.source: "../../../icons/rounded/download.svg"
+icon.source: "../../../icons/rounded/settings.svg"
+icon.source: "../../../icons/rounded/speed.svg"
+icon.source: "../../../icons/rounded/restart_alt.svg"
+icon.source: "../../../icons/rounded/check.svg"
+icon.source: "../../../icons/rounded/info.svg"
+icon.source: "../../../icons/rounded/add.svg"
+icon.source: "../../../icons/rounded/close.svg"
+icon.source: "../../../icons/rounded/calculate.svg"
+icon.source: "../../../icons/rounded/history.svg"
+icon.source: "../../../icons/rounded/copy_all.svg"
+icon.source: "../../../icons/rounded/save.svg"
+icon.source: "../../../icons/rounded/bolt.svg"
+icon.source: "../../../icons/rounded/compare.svg"
+icon.source: "../../../icons/rounded/folder_open.svg"
+icon.source: "../../../icons/rounded/pause.svg"
+icon.source: "../../../icons/rounded/play_arrow.svg"
+icon.source: "../../../icons/rounded/show_chart.svg"
 
 FontLoader {
     id: iconFont

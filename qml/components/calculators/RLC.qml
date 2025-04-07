@@ -90,7 +90,7 @@ Page {
                             Layout.alignment: Qt.AlignRight
                             Layout.maximumWidth: 50
 
-                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
+                            icon.source: "../../../icons/rounded/restart_alt.svg"
                             
                             ToolTip.text: "Reset Parameters"
                             ToolTip.visible: resetButton.hovered
@@ -569,6 +569,7 @@ Page {
             }
             StyledButton {
                 text: "OK"
+                icon.source: "../../../icons/rounded/check.svg"
                 Layout.alignment: Qt.AlignHCenter
                 onClicked: messagePopup.close()
             }

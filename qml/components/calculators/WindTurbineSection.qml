@@ -131,7 +131,7 @@ Item {
                     StyledButton {
                         ToolTip.text: "Export"
                         Layout.alignment: Qt.AlignRight
-                        icon.source: "../../../icons/svg/file_download/baseline.svg"
+                        icon.source: "../../../icons/rounded/download.svg"
 
                         property string defaultFileName: "wind_turbine_report.pdf"
 
@@ -149,7 +149,7 @@ Item {
                     StyledButton {
                         ToolTip.text: "Reset to default values"
                         Layout.alignment: Qt.AlignRight
-                        icon.source: "../../../icons/svg/restart_alt/baseline.svg"
+                        icon.source: "../../../icons/rounded/restart_alt.svg"
 
                         onClicked: {
 
@@ -167,7 +167,7 @@ Item {
 
                     StyledButton {
                         id: infoButton
-                        icon.source: "../../../icons/svg/info/baseline.svg"
+                        icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Info"
                     
                         onClicked: {
@@ -504,7 +504,7 @@ Item {
                                                                                 
                         StyledButton {
                             text: "Update Power Curve"
-                            icon.source: "../../../icons/svg/refresh/baseline.svg"
+                            icon.source: "../../../icons/rounded/restart_alt.svg"
                             anchors.top: parent.top
                             anchors.right: parent.right
                             anchors.margins: 10

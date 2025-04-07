@@ -113,7 +113,7 @@ Item {
                         Layout.columnSpan: 2
                         Layout.alignment: Qt.AlignRight
                         onClicked: calculateVoltageDivider()
-                        icon.source: "../../../icons/svg/calculate/baseline.svg"
+                        icon.source: "../../../icons/rounded/calculate.svg"
                     }
 
                     Label { Layout.fillHeight: true }

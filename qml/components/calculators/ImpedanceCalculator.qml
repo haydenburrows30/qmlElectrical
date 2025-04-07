@@ -7,7 +7,6 @@ import "../"
 import "../visualizers/"
 import "../style"
 import "../popups"
-import "../buttons"
 
 import Impedance 1.0
 

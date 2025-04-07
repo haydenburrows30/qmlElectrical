@@ -177,7 +177,7 @@ Item {
                         text: "Copy"
                         ToolTip.text: "Copy to clipboard"
                         ToolTip.visible: hovered
-                        icon.source: "../../../icons/svg/copy_all/baseline.svg"
+                        icon.source: "../../../icons/rounded/copy_all.svg"
                         onClicked: {
                             if (calculator && !isNaN(calculator.current)) {
                                 clipboardHelper.text = currentOutput.text
@@ -325,7 +325,7 @@ Item {
                         text: "Copy"
                         ToolTip.text: "Copy to clipboard"
                         ToolTip.visible: hovered
-                        icon.source: "../../../icons/svg/copy_all/baseline.svg"
+                        icon.source: "../../../icons/rounded/copy_all.svg"
                         onClicked: {
                             if (calculator1 && !isNaN(calculator1.kw)) {
                                 clipboardHelper.text = kwOutput.text

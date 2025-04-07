@@ -57,6 +57,7 @@ Item {
             }
             
             StyledButton {
+                icon.source: "../../../icons/rounded/check.svg"
                 text: "OK"
                 Layout.alignment: Qt.AlignRight
                 onClicked: errorPopup.close()
@@ -97,7 +98,7 @@ Item {
                             ToolTip.text: "Reset to default values"
                             Layout.alignment: Qt.AlignRight
                             Layout.columnSpan: 2
-                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
+                            icon.source: "../../../icons/rounded/restart_alt.svg"
 
                             onClicked: {
                                 calculator.resetToDefaults()
@@ -108,7 +109,7 @@ Item {
                             id: info
 
                             ToolTip.visible: false
-                            icon.source: "../../../icons/svg/info/baseline.svg"
+                            icon.source: "../../../icons/rounded/info.svg"
 
                             onClicked: {
                                 tipsPopup.open()
@@ -238,7 +239,7 @@ Item {
                                 StyledButton {
                                     Layout.alignment: Qt.AlignRight
                                     ToolTip.text: "Add Relay"
-                                    icon.source: "../../../icons/svg/add/baseline.svg"
+                                    icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
 

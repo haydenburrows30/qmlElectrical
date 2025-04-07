@@ -213,7 +213,7 @@ Item {
 
         StyledButton {
             text: "Reset"
-            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
+            icon.source: "../../../icons/rounded/restart_alt.svg"
             Layout.fillWidth: true
             onClicked: {
                 resetAllValues()

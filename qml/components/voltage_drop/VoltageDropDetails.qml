@@ -123,11 +123,12 @@ Popup {
                 
                 StyledButton {
                     text: "Save to PDF"
-                    icon.name: "document-save"
+                    icon.source: "../../../icons/rounded/save.svg"
                     onClicked: detailsPopup.saveToPdfRequested()
                 }
                 
                 StyledButton {
+                    icon.source: "../../../icons/rounded/close.svg"
                     text: "Close"
                     onClicked: detailsPopup.closeRequested()
                 }

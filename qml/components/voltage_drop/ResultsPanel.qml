@@ -98,7 +98,7 @@ Item {
 
             StyledButton {
                 text: "Save"
-                icon.source: "../../../icons/svg/save/baseline.svg"
+                icon.source: "../../../icons/rounded/save.svg"
                 enabled: root.voltageDropValue > 0
                 Layout.fillWidth: true
                 onClicked: root.saveResultsClicked()
@@ -106,7 +106,7 @@ Item {
 
             StyledButton {
                 text: "Details"
-                icon.source: "../../../icons/svg/info/baseline.svg"
+                icon.source: "../../../icons/rounded/info.svg"
                 enabled: root.voltageDropValue > 0
                 Layout.fillWidth: true
                 onClicked: root.viewDetailsClicked()
@@ -114,7 +114,7 @@ Item {
 
             StyledButton {
                 text: "View Chart"
-                icon.source: "../../../icons/svg/show_chart/baseline.svg"
+                icon.source: "../../../icons/rounded/show_chart.svg"
                 enabled: root.voltageDropValue > 0
                 Layout.fillWidth: true
                 onClicked: root.viewChartClicked()

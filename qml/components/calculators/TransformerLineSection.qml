@@ -497,7 +497,7 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 text: "Export"
-                                icon.source: "../../../icons/svg/file_download/baseline.svg"
+                                icon.source: "../../../icons/rounded/download.svg"
 
                                 onClicked: {
                                     saveDialog.open()
@@ -543,7 +543,7 @@ Item {
 
                             StyledButton {
                                 text: "Expert Settings"
-                                icon.source: "../../../icons/svg/settings/baseline.svg"
+                                icon.source: "../../../icons/rounded/settings.svg"
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 onClicked: {

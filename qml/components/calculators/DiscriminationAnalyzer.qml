@@ -69,7 +69,7 @@ Item {
 
                         StyledButton {
                             id: results
-                            icon.source: "../../../icons/svg/info/baseline.svg"
+                            icon.source: "../../../icons/rounded/info.svg"
                             onClicked: {
                                 tipsPopup.open()
                             }
@@ -130,7 +130,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter
                                 
                                 ToolTip.text: "Add Relay"
-                                icon.source: "../../../icons/svg/add/baseline.svg"
+                                icon.source: "../../../icons/rounded/add.svg"
 
                                 onClicked: {
 
@@ -247,7 +247,7 @@ Item {
                                 Layout.alignment: Qt.AlignHCenter
                                 
                                 ToolTip.text: "Add Fault Level"
-                                icon.source: "../../../icons/svg/add/baseline.svg"
+                                icon.source: "../../../icons/rounded/add.svg"
 
                                 onClicked: {
 

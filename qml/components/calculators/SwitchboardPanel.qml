@@ -389,7 +389,7 @@ Item {
 
                     StyledButton {
                         text: "Add Circuit"
-                        icon.source: "../../../icons/svg/add/baseline.svg"
+                        icon.source: "../../../icons/rounded/add.svg"
                         onClicked: {
                             circuitEditor.reset1()
                             circuitEditor.open()
@@ -398,7 +398,7 @@ Item {
                     
                     StyledButton {
                         text: "Export Schedule"
-                        icon.source: "../../../icons/svg/file_download/baseline.svg"
+                        icon.source: "../../../icons/rounded/download.svg"
                         onClicked: exportMenu.open()
                         
                         Menu {
@@ -440,7 +440,7 @@ Item {
                     
                     StyledButton {
                         text: "Load Schedule"
-                        icon.source: "../../../icons/svg/folder_open/baseline.svg"
+                        icon.source: "../../../icons/rounded/folder_open.svg"
                         onClicked: fileDialog.open()
                     }
                     

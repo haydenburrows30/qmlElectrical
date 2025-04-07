@@ -259,7 +259,7 @@ Item {
 
         StyledButton {
             text: "View History"
-            icon.source: "../../../icons/svg/history/baseline.svg"
+            icon.source: "../../../icons/rounded/history.svg"
             onClicked: historyDialog.open()
             Layout.columnSpan: 2
             Layout.minimumWidth: 100
@@ -355,7 +355,7 @@ Item {
 
                 StyledButton {
                     text: "Calculate"
-                    icon.source: "../../../icons/svg/calculate/baseline.svg"
+                    icon.source: "../../../icons/rounded/calculate.svg"
                     Layout.minimumWidth: 100
                     Layout.columnSpan: 2
                     Layout.alignment: Qt.AlignRight
@@ -410,7 +410,7 @@ Item {
                     Layout.columnSpan: 2
                     Layout.minimumWidth: 100
                     Layout.alignment: Qt.AlignRight
-                    icon.source: "../../../icons/svg/clear/baseline.svg"
+                    icon.source: "../../../icons/rounded/close.svg"
                     text: "Clear"
                     onClicked: {
                         param1Value.text = ""

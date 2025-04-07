@@ -193,7 +193,7 @@ Item {
 
         StyledButton {
             text: "Export Table"
-            icon.source: "../../../icons/svg/file_download/baseline.svg"
+            icon.source: "../../../icons/rounded/download.svg"
             enabled: root.tableModel && root.tableModel.rowCount && root.tableModel.rowCount() > 0
             Layout.alignment: Qt.AlignRight
             Layout.margins: 5

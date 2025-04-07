@@ -198,12 +198,14 @@ Popup {
             
             StyledButton {
                 text: "Refresh Values"
+                icon.source: "../../../icons/rounded/restart_alt.svg"
                 Layout.alignment: Qt.AlignRight
                 onClicked: calculator.refreshCalculations();
             }
             
             StyledButton {
                 text: "Close"
+                icon.source: "../../../icons/rounded/close.svg"
                 Layout.alignment: Qt.AlignRight
                 onClicked: expertPopup.close()
             }
