@@ -14,10 +14,10 @@ import Sine 1.0
 Page {
     id: root
 
-    property color textColorPhase: sideBar.modeToggled ? "#ffffff" : "#000000"
-
+    property color textColorPhase: window.modeToggled ? "#ffffff" : "#000000"
+    property ThreePhaseSineWaveModel calculator: ThreePhaseSineWaveModel{}
     background: Rectangle {
-        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
+        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     PopUpText {
@@ -53,6 +53,7 @@ Page {
                             Layout.minimumHeight: 460
                             Layout.minimumWidth: 500
                             onRequestAutoScale: waveChart.autoScale()
+                            calculator: root.calculator //pass calculator to controls
                         }
 
                         WaveCard {
@@ -70,12 +71,13 @@ Page {
 
                                 PhaseTable {
                                     Layout.fillWidth: true
+                                    calculator: root.calculator //pass calculator to chart
                                 }
 
                                 Rectangle {
                                     Layout.fillWidth: true
                                     height: 1
-                                    color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                                    color: window.modeToggled ? "#404040" : "#e0e0e0"
                                 }
 
                                 GridLayout {
@@ -88,19 +90,19 @@ Page {
                                     Label { text: "Voltage (V)"; font.bold: true }
 
                                     Label { text: "VAB" }
-                                    Label { text: sineModel.rmsAB.toFixed(1) }
+                                    Label { text: calculator.rmsAB.toFixed(1) }
 
                                     Label { text: "VBC" }
-                                    Label { text: sineModel.rmsBC.toFixed(1) }
+                                    Label { text: calculator.rmsBC.toFixed(1) }
 
                                     Label { text: "VCA" }
-                                    Label { text: sineModel.rmsCA.toFixed(1) }
+                                    Label { text: calculator.rmsCA.toFixed(1) }
 
                                     Item { Layout.columnSpan: 2; Layout.preferredHeight: 10 }
 
                                     Label { text: "Average Power Factor"; font.bold: true }
                                     Label { 
-                                        text: sineModel.averagePowerFactor.toFixed(3)
+                                        text: calculator.averagePowerFactor.toFixed(3)
                                         font.bold: true 
                                     }
                                 }
@@ -129,51 +131,51 @@ Page {
                                 // Positive Sequence
                                 Label { text: "Positive:" }
                                 Label { 
-                                    text: sineModel.positiveSeq.toFixed(1) + " V" 
+                                    text: calculator.positiveSeq.toFixed(1) + " V" 
                                     font.bold: true
                                 }
                                 Label { 
-                                    text: sineModel.positiveSeqCurrent.toFixed(1) + " A" 
+                                    text: calculator.positiveSeqCurrent.toFixed(1) + " A" 
                                     font.bold: true
                                 }
                                 
                                 // Negative Sequence
                                 Label { text: "Negative:" }
                                 Label { 
-                                    text: sineModel.negativeSeq.toFixed(1) + " V"
+                                    text: calculator.negativeSeq.toFixed(1) + " V"
                                     font.bold: true 
-                                    color: sineModel.negativeSeq > 5 ? "#ff4444" : textColorPhase
+                                    color: calculator.negativeSeq > 5 ? "#ff4444" : textColorPhase
                                 }
                                 Label { 
-                                    text: sineModel.negativeSeqCurrent.toFixed(1) + " A"
+                                    text: calculator.negativeSeqCurrent.toFixed(1) + " A"
                                     font.bold: true
-                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
+                                    color: calculator.negativeSeqCurrent / calculator.positiveSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
                                 }
                                 
                                 // Zero Sequence
                                 Label { text: "Zero:" }
                                 Label { 
-                                    text: sineModel.zeroSeq.toFixed(1) + " V"
+                                    text: calculator.zeroSeq.toFixed(1) + " V"
                                     font.bold: true
-                                    color: sineModel.zeroSeq > 5 ? "#ff4444" : textColorPhase
+                                    color: calculator.zeroSeq > 5 ? "#ff4444" : textColorPhase
                                 }
                                 Label { 
-                                    text: sineModel.zeroSeqCurrent.toFixed(1) + " A"
+                                    text: calculator.zeroSeqCurrent.toFixed(1) + " A"
                                     font.bold: true
-                                    color: sineModel.zeroSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
+                                    color: calculator.zeroSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
                                 }
                                 
                                 // Unbalance
                                 Label { text: "Unbalance (%):" }
                                 Label { 
-                                    text: (sineModel.negativeSeq / sineModel.positiveSeq * 100).toFixed(1) + "%"
+                                    text: (calculator.negativeSeq / calculator.positiveSeq * 100).toFixed(1) + "%"
                                     font.bold: true
-                                    color: sineModel.negativeSeq / sineModel.positiveSeq > 0.02 ? "#ff4444" : textColorPhase
+                                    color: calculator.negativeSeq / calculator.positiveSeq > 0.02 ? "#ff4444" : textColorPhase
                                 }
                                 Label { 
-                                    text: (sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent * 100).toFixed(1) + "%"
+                                    text: (calculator.negativeSeqCurrent / calculator.positiveSeqCurrent * 100).toFixed(1) + "%"
                                     font.bold: true
-                                    color: sineModel.negativeSeqCurrent / sineModel.positiveSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
+                                    color: calculator.negativeSeqCurrent / calculator.positiveSeqCurrent > 0.1 ? "#ff4444" : textColorPhase
                                 }
                             }
                         }
@@ -192,13 +194,15 @@ Page {
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 250
                                     Layout.minimumWidth: 250
-                                    activePower: sineModel.activePower
-                                    reactivePower: sineModel.reactivePower
-                                    apparentPower: sineModel.apparentPower
-                                    powerFactor: sineModel.averagePowerFactor
+                                    activePower: calculator.activePower
+                                    reactivePower: calculator.reactivePower
+                                    apparentPower: calculator.apparentPower
+                                    powerFactor: calculator.averagePowerFactor
                                     triangleScale: 100
-                                    color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
+                                    color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
                                     textColor: textColorPhase
+
+                                    
                                 }
 
                                 GridLayout {
@@ -207,16 +211,16 @@ Page {
                                     Layout.minimumHeight: 100
                                     
                                     Label { text: "Total Apparent Power (S):" }
-                                    Label { text: sineModel.apparentPower.toFixed(2) + " kVA" }
+                                    Label { text: calculator.apparentPower.toFixed(2) + " kVA" }
                                     
                                     Label { text: "Total Active Power (P):" }
-                                    Label { text: sineModel.activePower.toFixed(2) + " kW" }
+                                    Label { text: calculator.activePower.toFixed(2) + " kW" }
                                     
                                     Label { text: "Total Reactive Power (Q):" }
-                                    Label { text: sineModel.reactivePower.toFixed(2) + " kVAR" }
+                                    Label { text: calculator.reactivePower.toFixed(2) + " kVAR" }
                                     
                                     Label { text: "System Power Factor:" }
-                                    Label { text: sineModel.averagePowerFactor.toFixed(3) }
+                                    Label { text: calculator.averagePowerFactor.toFixed(3) }
                                 }
                             }
                         }
@@ -233,6 +237,8 @@ Page {
                             WaveChart {
                                 id: waveChart
                                 anchors.fill: parent
+
+                                calculator: root.calculator //pass calculator to chart
                             }
                         }
 
@@ -246,39 +252,39 @@ Page {
                                 anchors.fill: parent
                                 // Update to include both voltage and current phasors
                                 phaseAngles: [
-                                    sineModel.phaseAngleA,
-                                    sineModel.phaseAngleB,
-                                    sineModel.phaseAngleC
+                                    calculator.phaseAngleA,
+                                    calculator.phaseAngleB,
+                                    calculator.phaseAngleC
                                 ]
                                 // Add current phasor angles
                                 currentPhaseAngles: [
-                                    sineModel.currentAngleA,
-                                    sineModel.currentAngleB,
-                                    sineModel.currentAngleC
+                                    calculator.currentAngleA,
+                                    calculator.currentAngleB,
+                                    calculator.currentAngleC
                                 ]
                                 // Add current magnitudes to scale the current phasors properly
                                 currentMagnitudes: [
-                                    sineModel.currentA / 100, // Scale down for visibility
-                                    sineModel.currentB / 100,
-                                    sineModel.currentC / 100
+                                    calculator.currentA / 100, // Scale down for visibility
+                                    calculator.currentB / 100,
+                                    calculator.currentC / 100
                                 ]
                                 showCurrentPhasors: true // Flag to enable current phasors
                                 
                                 // Handle voltage angle changes
                                 onAngleChanged: function(index, angle) {
                                     switch(index) {
-                                        case 0: sineModel.setPhaseAngleA(angle); break;
-                                        case 1: sineModel.setPhaseAngleB(angle); break;
-                                        case 2: sineModel.setPhaseAngleC(angle); break;
+                                        case 0: calculator.setPhaseAngleA(angle); break;
+                                        case 1: calculator.setPhaseAngleB(angle); break;
+                                        case 2: calculator.setPhaseAngleC(angle); break;
                                     }
                                 }
                                 
                                 // Handle current angle changes
                                 onCurrentAngleChanged: function(index, angle) {
                                     switch(index) {
-                                        case 0: sineModel.setCurrentAngleA(angle); break;
-                                        case 1: sineModel.setCurrentAngleB(angle); break;
-                                        case 2: sineModel.setCurrentAngleC(angle); break;
+                                        case 0: calculator.setCurrentAngleA(angle); break;
+                                        case 1: calculator.setCurrentAngleB(angle); break;
+                                        case 2: calculator.setCurrentAngleC(angle); break;
                                     }
                                 }
                             }

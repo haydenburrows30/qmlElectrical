@@ -7,9 +7,9 @@ import "style"
 
 Rectangle {
     id: controlRect
-    color: sideBar.modeToggled ? "#000000" : "#ffffff"
+    color: window.modeToggled ? "#000000" : "#ffffff"
     border.width: 1
-    border.color: sideBar.modeToggled ? Universal.Dark : Qt.lighter("#cccccc",1.1)
+    border.color: window.modeToggled ? Universal.Dark : Qt.lighter("#cccccc",1.1)
     radius: 10
     
     property string title: ""

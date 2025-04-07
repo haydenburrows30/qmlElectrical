@@ -323,7 +323,7 @@ Item {
                                 Layout.fillWidth: true
                                 enabled: regulatorEnabledSwitch.checked
                                 background: Rectangle {
-                                    color: sideBar.modeToggled ? "black":"#f0f0f0"
+                                    color: window.modeToggled ? "black":"#f0f0f0"
                                     border.color: "#c0c0c0"
                                     radius: 2
                                 }

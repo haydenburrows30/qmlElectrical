@@ -223,7 +223,7 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.margins: 10
                                 height: 1
-                                color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                                color: window.modeToggled ? "#404040" : "#e0e0e0"
                             }
 
                             Label { text: "Results:" ; Layout.columnSpan: 2 ; font.bold: true ; font.pixelSize: 16}

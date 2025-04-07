@@ -16,9 +16,13 @@ import "../components/visualizers/"
 import "../components/voltage_drop/"
 import "../components/style/"
 
+import VDrop 1.0
+
 Page {
     id: root
     padding: 0
+
+    property VoltageDropCalculator calculator: VoltageDropCalculator {id: voltageDrop}
 
     property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
 
@@ -31,7 +35,7 @@ Page {
     }
 
     background: Rectangle {
-        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
+        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     ScrollView {
@@ -80,7 +84,7 @@ Page {
                         ResultsPanel {
                             id: resultsPanel
                             anchors.fill: parent
-                            darkMode: sideBar.modeToggled
+                            darkMode: window.modeToggled
                             voltageDropValue: root.currentVoltageDropValue
                             selectedVoltage: voltageDrop.selectedVoltage
                             diversityFactor: voltageDrop.diversityFactor
@@ -153,7 +157,7 @@ Page {
                         ComparisonTable {
                             id: comparisonTable
                             anchors.fill: parent
-                            darkMode: sideBar.modeToggled
+                            darkMode: window.modeToggled
                             tableModel: voltageDrop.tableModel
                             
                             onExportRequest: function(format) {

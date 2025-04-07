@@ -18,6 +18,7 @@ ColumnLayout {
     property real defaultAngle1: 30
     property real defaultAmplitude1: 100
     property int minWidth: 110
+    property var calculator
     
     signal amplitudeChanged(real value)
     signal amplitudeChanged1(real value)
@@ -26,41 +27,41 @@ ColumnLayout {
 
     function resetPhase() {
         if (phase === "A") {
-            sineModel.setAmplitudeA(325.27)  // 230V RMS
-            sineModel.setPhaseAngleA(0)
-            sineModel.setCurrentA(100)
-            sineModel.setCurrentAngleA(0)
+            calculator.setAmplitudeA(325.27)  // 230V RMS
+            calculator.setPhaseAngleA(0)
+            calculator.setCurrentA(100)
+            calculator.setCurrentAngleA(0)
         } else if (phase === "B") {
-            sineModel.setAmplitudeB(325.27)
-            sineModel.setPhaseAngleB(-120)
-            sineModel.setCurrentB(100)
-            sineModel.setCurrentAngleB(-120)
+            calculator.setAmplitudeB(325.27)
+            calculator.setPhaseAngleB(-120)
+            calculator.setCurrentB(100)
+            calculator.setCurrentAngleB(-120)
         } else {
-            sineModel.setAmplitudeC(325.27)
-            sineModel.setPhaseAngleC(120)
-            sineModel.setCurrentC(100)
-            sineModel.setCurrentAngleC(120)
+            calculator.setAmplitudeC(325.27)
+            calculator.setPhaseAngleC(120)
+            calculator.setCurrentC(100)
+            calculator.setCurrentAngleC(120)
         }
     }
 
     Connections {
-        target: sineModel
+        target: calculator
         function onDataChanged() {
             if (phase === "A") {
-                amplitudeSpinBox.value = sineModel.rmsA
-                angleSpinBox.value = sineModel.phaseAngleA
-                amplitudeSpinBox1.value = sineModel.currentA
-                angleSpinBox1.value = sineModel.currentAngleA
+                amplitudeSpinBox.value = calculator.rmsA
+                angleSpinBox.value = calculator.phaseAngleA
+                amplitudeSpinBox1.value = calculator.currentA
+                angleSpinBox1.value = calculator.currentAngleA
             } else if (phase === "B") {
-                amplitudeSpinBox.value = sineModel.rmsB
-                angleSpinBox.value = sineModel.phaseAngleB
-                amplitudeSpinBox1.value = sineModel.currentB
-                angleSpinBox1.value = sineModel.currentAngleB
+                amplitudeSpinBox.value = calculator.rmsB
+                angleSpinBox.value = calculator.phaseAngleB
+                amplitudeSpinBox1.value = calculator.currentB
+                angleSpinBox1.value = calculator.currentAngleB
             } else {
-                amplitudeSpinBox.value = sineModel.rmsC
-                angleSpinBox.value = sineModel.phaseAngleC
-                amplitudeSpinBox1.value = sineModel.currentC
-                angleSpinBox1.value = sineModel.currentAngleC
+                amplitudeSpinBox.value = calculator.rmsC
+                angleSpinBox.value = calculator.phaseAngleC
+                amplitudeSpinBox1.value = calculator.currentC
+                angleSpinBox1.value = calculator.currentAngleC
             }
         }
     }
@@ -85,7 +86,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
                 from: 0
                 to: 1000
-                value: phase === "A" ? sineModel.rmsA : phase === "B" ? sineModel.rmsB : phase === "C" ? sineModel.rmsC : defaultAmplitude
+                value: phase === "A" ? calculator.rmsA : phase === "B" ? calculator.rmsB : phase === "C" ? calculator.rmsC : defaultAmplitude
                 editable: true
                 stepSize: 1
                 
@@ -105,7 +106,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
                 from: -360
                 to: 360
-                value: phase === "A" ? sineModel.phaseAngleA : phase === "B" ? sineModel.phaseAngleB : phase === "C" ? sineModel.phaseAngleC : defaultAngle
+                value: phase === "A" ? calculator.phaseAngleA : phase === "B" ? calculator.phaseAngleB : phase === "C" ? calculator.phaseAngleC : defaultAngle
                 editable: true
                 stepSize: 1
 
@@ -113,11 +114,11 @@ ColumnLayout {
 
                 onValueChanged: function() {
                     if (phase === "A") {
-                        sineModel.setPhaseAngleA(angleSpinBox.value)
+                        calculator.setPhaseAngleA(angleSpinBox.value)
                     } else if (phase === "B") {
-                        sineModel.setPhaseAngleB(angleSpinBox.value)
+                        calculator.setPhaseAngleB(angleSpinBox.value)
                     } else if (phase === "C") {
-                        sineModel.setPhaseAngleC(angleSpinBox.value)
+                        calculator.setPhaseAngleC(angleSpinBox.value)
                     }
                 }
             }
@@ -133,9 +134,9 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
                 from: 0
                 to: 1000
-                value: phase === "A" ? sineModel.currentA : 
-                       phase === "B" ? sineModel.currentB : 
-                       phase === "C" ? sineModel.currentC : defaultAmplitude1
+                value: phase === "A" ? calculator.currentA : 
+                       phase === "B" ? calculator.currentB : 
+                       phase === "C" ? calculator.currentC : defaultAmplitude1
                 editable: true
                 stepSize: 1
                 
@@ -163,7 +164,7 @@ ColumnLayout {
                 Layout.minimumWidth: minWidth
                 from: -360
                 to: 360
-                value: phase === "A" ? sineModel.currentAngleA : phase === "B" ? sineModel.currentAngleB : phase === "C" ? sineModel.currentAngleC : defaultAngle1
+                value: phase === "A" ? calculator.currentAngleA : phase === "B" ? calculator.currentAngleB : phase === "C" ? calculator.currentAngleC : defaultAngle1
                 editable: true
                 stepSize: 1
                 

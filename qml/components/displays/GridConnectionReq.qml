@@ -37,7 +37,7 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         height: 1
-        color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+        color: window.modeToggled ? "#404040" : "#e0e0e0"
     }
     
     Label {

@@ -17,402 +17,339 @@ Page {
 
     About {id: about}
 
-    MenuBar {
-        id: menuBar
-        anchors.horizontalCenter : parent.horizontalCenter
+    ColumnLayout {
+        id: menuText
+        anchors.centerIn: parent
+
+        Label {
+            id: welcomeHeader
+            text: "Electrical Engineering Tools"
+            font.pixelSize: 32
+            font.bold: true
+            Layout.alignment: Qt.AlignHCenter
+        }
         
-        background: 
-            Rectangle {
-                color: "#21be2b"
-                width: parent.width
-                height: 1
-                anchors.bottom: parent.bottom
-            }
-
-        Menu {
-            title: "Home"
+        Label {
+            id: welcomeSubtitle
+            text: "Select a tool to get started"
+            font.pixelSize: 16
+            opacity: 0.7
+            Layout.alignment: Qt.AlignHCenter
         }
 
-        Menu {
-            title: "Basic Calculators"
-        }
+        // Main buttons
+        GridLayout {
+            id: buttonGrid
+            Layout.minimumWidth: Math.min(parent.width * 0.9, 600)
+            columns: home.width > 500 ? 3 : 2
+            rowSpacing: 20
+            columnSpacing: 20
 
-        Menu {
-            title: "Protection"
-        }
-        Menu {
-            title: "Cable"
-        }
-        Menu {
-            title: "Theory"
-        }
-        Menu {
-            title: "Renewables"
-        }
-    }
-
-    Label {
-        id: welcomeHeader
-        text: "Electrical Engineering Tools"
-        font.pixelSize: 32
-        font.bold: true
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 30
-        }
-    }
-    
-    Label {
-        id: welcomeSubtitle
-        text: "Select a tool to get started"
-        font.pixelSize: 16
-        opacity: 0.7
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: welcomeHeader.bottom
-            topMargin: 10
-        }
-    }
-
-    GridLayout {
-        id: buttonGrid
-        anchors {
-            top: welcomeSubtitle.bottom
-            topMargin: 40
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: Math.min(parent.width * 0.9, 600)
-        columns: width > 500 ? 3 : 2
-        rowSpacing: 20
-        columnSpacing: 20
-
-        HButton {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-            icon.name: "Voltage Drop"
-            back: Qt.lighter(palette.accent, 1.5)
-            fore: Qt.lighter(palette.accent, 1.0)
-
-            Behavior on scale { NumberAnimation { duration: 100 } }
-
-            Item {
-                anchors.fill: parent                
-                Text {
-                    text: "Voltage Drop"
-                    font.bold: true
-                    font.pixelSize: 16
-                    color: palette.buttonText
-                    anchors {
-                        top: parent.top
-                        topMargin: 8
-                        horizontalCenter: parent.horizontalCenter
+            // Basic
+            HButton {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120
+                icon.name: "Calculator" 
+                back: Qt.lighter(palette.accent, 1.5)
+                fore: Qt.lighter(palette.accent, 1.0)
+                
+                Item {
+                    anchors.fill: parent
+                    
+                    Text {
+                        text: "Basic"
+                        font.bold: true
+                        font.pixelSize: 16
+                        color: palette.buttonText
+                        anchors {
+                            top: parent.top
+                            topMargin: 8
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    
+                    Text {
+                        text: "Ohms Law, Voltage Divider"
+                        font.pixelSize: 12
+                        color: palette.buttonText
+                        opacity: 0.8
+                        anchors {
+                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                            bottomMargin: 15
+                        }
+                        width: parent.width - 20
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
                     }
                 }
                 
-                Text {
-                    text: "Calculate voltage drop"
-                    font.pixelSize: 12
-                    color: palette.buttonText
-                    opacity: 0.8
-                    anchors {
-                        bottom: parent.bottom
-                        horizontalCenter: parent.horizontalCenter
-                        bottomMargin: 15
-                    }
-                    width: parent.width - 20
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
+                onClicked: {
+                    calculatorLoader.source = "pages/CalculatorBasic.qml"
+                }
+                
+                HoverHandler {
+                    onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
                 }
             }
             
-            onClicked: {
-                stackView.push("../pages/VoltageDrop.qml")
-                sideBar.change(1)
+            // Protection
+            HButton {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120
+                icon.source: "../../icons/svg/security/baseline.svg"
+                back: Qt.lighter(palette.accent, 1.5)
+                fore: Qt.lighter(palette.accent, 1.0)
+
+                Behavior on scale { NumberAnimation { duration: 100 } }
+
+                Item {
+                    anchors.fill: parent                
+                    Text {
+                        text: "Protection"
+                        font.bold: true
+                        font.pixelSize: 16
+                        color: palette.buttonText
+                        anchors {
+                            top: parent.top
+                            topMargin: 8
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    
+                    Text {
+                        text: "Relay, Battery, Fault Current"
+                        font.pixelSize: 12
+                        color: palette.buttonText
+                        opacity: 0.8
+                        anchors {
+                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                            bottomMargin: 15
+                        }
+                        width: parent.width - 20
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                    }
+                }
+                
+                onClicked: {
+                    calculatorLoader.source = "pages/CalculatorProtection.qml"
+                }
+
+                HoverHandler {
+                    onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+                }
             }
 
-            HoverHandler {
-                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+            // Cable
+            HButton {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120
+                icon.source: "../../icons/svg/cable/baseline.svg"
+                back: Qt.lighter(palette.accent, 1.5)
+                fore: Qt.lighter(palette.accent, 1.0)
+                
+                Item {
+                    anchors.fill: parent
+                    
+                    Text {
+                        text: "Cable"
+                        font.bold: true
+                        font.pixelSize: 16
+                        color: palette.buttonText
+                        anchors {
+                            top: parent.top
+                            topMargin: 8
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    
+                    Text {
+                        text: "Volt Drop, Charging Current"
+                        font.pixelSize: 12
+                        color: palette.buttonText
+                        opacity: 0.8
+                        anchors {
+                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                            bottomMargin: 15
+                        }
+                        width: parent.width - 20
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                    }
+                }
+                
+                onClicked: {
+                    calculatorLoader.source = "pages/CalculatorCable.qml"
+                }
+                
+                HoverHandler {
+                    onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+                }
             }
-        }
 
-        HButton {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-            icon.name: "Calculator" 
-            back: Qt.lighter(palette.accent, 1.5)
-            fore: Qt.lighter(palette.accent, 1.0)
-            
-            Item {
-                anchors.fill: parent
+            // Theory
+            HButton {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120
+                icon.source: "../../icons/svg/book/baseline.svg"
+                back: Qt.lighter(palette.accent, 1.5)
+                fore: Qt.lighter(palette.accent, 1.0)
                 
-                Text {
-                    text: "Calculators"
-                    font.bold: true
-                    font.pixelSize: 16
-                    color: palette.buttonText
-                    anchors {
-                        top: parent.top
-                        topMargin: 8
-                        horizontalCenter: parent.horizontalCenter
+                Item {
+                    anchors.fill: parent
+                    
+                    Text {
+                        text: "Theory"
+                        font.bold: true
+                        font.pixelSize: 16
+                        color: palette.buttonText
+                        anchors {
+                            top: parent.top
+                            topMargin: 8
+                            horizontalCenter: parent.horizontalCenter
+                        }
                     }
-                }
-                
-                Text {
-                    text: "Electrical calculation tools"
-                    font.pixelSize: 12
-                    color: palette.buttonText
-                    opacity: 0.8
-                    anchors {
-                        bottom: parent.bottom
-                        horizontalCenter: parent.horizontalCenter
-                        bottomMargin: 15
-                    }
-                    width: parent.width - 20
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                }
-            }
-            
-            onClicked: {
-                stackView.push("../pages/Calculator.qml")
-                sideBar.change(2)
-            }
-            
-            HoverHandler {
-                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
-            }
-        }
-
-        HButton {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-            icon.name: "Wave"
-            back: Qt.lighter(palette.accent, 1.5)
-            fore: Qt.lighter(palette.accent, 1.0)
-            
-            Item {
-                anchors.fill: parent
-                
-                Text {
-                    text: "3 Phase"
-                    font.bold: true
-                    font.pixelSize: 16
-                    color: palette.buttonText
-                    anchors {
-                        top: parent.top
-                        topMargin: 8
-                        horizontalCenter: parent.horizontalCenter
+                    
+                    Text {
+                        text: "Harmonics, Transformers"
+                        font.pixelSize: 12
+                        color: palette.buttonText
+                        opacity: 0.8
+                        anchors {
+                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                            bottomMargin: 15
+                        }
+                        width: parent.width - 20
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
                     }
                 }
                 
-                Text {
-                    text: "Three phase power calculations"
-                    font.pixelSize: 12
-                    color: palette.buttonText
-                    opacity: 0.8
-                    anchors {
-                        bottom: parent.bottom
-                        horizontalCenter: parent.horizontalCenter
-                        bottomMargin: 15
-                    }
-                    width: parent.width - 20
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                }
-            }
-            
-            onClicked: {
-                stackView.push("../pages/ThreePhase.qml")
-                sideBar.change(3)
-            }
-            
-            HoverHandler {
-                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
-            }
-        }
-
-        HButton {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-            icon.name: "RLC"
-            back: Qt.lighter(palette.accent, 1.5)
-            fore: Qt.lighter(palette.accent, 1.0)
-            
-            Item {
-                anchors.fill: parent
-                
-                Text {
-                    text: "RLC"
-                    font.bold: true
-                    font.pixelSize: 16
-                    color: palette.buttonText
-                    anchors {
-                        top: parent.top
-                        topMargin: 8
-                        horizontalCenter: parent.horizontalCenter
-                    }
+                onClicked: {
+                    calculatorLoader.source = "pages/CalculatorTheory.qml"
                 }
                 
-                Text {
-                    text: "Ohm-mH-uF circuit analysis"
-                    font.pixelSize: 12
-                    color: palette.buttonText
-                    opacity: 0.8
-                    anchors {
-                        bottom: parent.bottom
-                        horizontalCenter: parent.horizontalCenter
-                        bottomMargin: 15
-                    }
-                    width: parent.width - 20
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
+                HoverHandler {
+                    onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
                 }
             }
             
-            onClicked: {
-                stackView.push("../pages/RLC.qml")
-                sideBar.change(4)
-            }
-            
-            HoverHandler {
-                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
-            }
-        }
-
-        HButton {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-            icon.name: "RealTime"
-            back: Qt.lighter(palette.accent, 1.5)
-            fore: Qt.lighter(palette.accent, 1.0)
-            
-            Item {
-                anchors.fill: parent
-                Text {
-                    text: "Real Time Chart"
-                    font.bold: true
-                    font.pixelSize: 16
-                    color: palette.buttonText
-                    anchors {
-                        top: parent.top
-                        topMargin: 8
-                        horizontalCenter: parent.horizontalCenter
+            // Renewables
+            HButton {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120
+                icon.source: "../../icons/svg/wind_power/baseline.svg"
+                back: Qt.lighter(palette.accent, 1.5)
+                fore: Qt.lighter(palette.accent, 1.0)
+                
+                Item {
+                    anchors.fill: parent
+                    Text {
+                        text: "Renewables"
+                        font.bold: true
+                        font.pixelSize: 16
+                        color: palette.buttonText
+                        anchors {
+                            top: parent.top
+                            topMargin: 8
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    
+                    Text {
+                        text: "Wind Calculator"
+                        font.pixelSize: 12
+                        color: palette.buttonText
+                        opacity: 0.8
+                        anchors {
+                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                            bottomMargin: 15
+                        }
+                        width: parent.width - 20
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
                     }
                 }
                 
-                Text {
-                    text: "Live data visualization tools"
-                    font.pixelSize: 12
-                    color: palette.buttonText
-                    opacity: 0.8
-                    anchors {
-                        bottom: parent.bottom
-                        horizontalCenter: parent.horizontalCenter
-                        bottomMargin: 15
-                    }
-                    width: parent.width - 20
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
+                onClicked: {
+                    calculatorLoader.source = "pages/CalculatorRenewables.qml"
                 }
-            }
-            
-            onClicked: {
-                stackView.push("../pages/RealTime.qml")
-                sideBar.change(5)
-            }
-            
-            HoverHandler {
-                onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+                
+                HoverHandler {
+                    onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
+                }
             }
         }
     }
-
-    Button {
-        id: aboutProgram
-        contentItem: Label {text: calculator.version}
-        font.pixelSize: 14
-
+    // Buttons bottom right
+    RowLayout {
         anchors {
             bottom: parent.bottom
             right: parent.right
             margins: 10
         }
 
-        background: 
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border.width: 1
-                border.color: aboutProgram.hovered ? "blue" : "transparent"
-                radius: 5
-            }
+        height: 70
 
-        onClicked: about.open()
-    }
-    
-    // logs button
-    Button {
-        id: logsButton
-        contentItem: Label {
-            text: "View Logs"
+        // About button
+        Button {
+            id: aboutProgram
+            contentItem: Label {text: calculator.version}
             font.pixelSize: 14
+
+            background: 
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: 1
+                    border.color: aboutProgram.hovered ? "blue" : "transparent"
+                    radius: 5
+                }
+
+            onClicked: about.open()
         }
         
-        anchors {
-            bottom: parent.bottom
-            right: aboutProgram.left
-            margins: 10
-        }
-        
-        background: 
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border.width: 1
-                border.color: logsButton.hovered ? "blue" : "transparent"
-                radius: 5
-            }
-        
-        onClicked: {
-            console.log("Log button clicked")
-            // access the logViewerPopup from the application window
-            var appWindow = window || applicationWindow
-            if (appWindow && appWindow.logViewerPopup) {
-                console.log("Opening log viewer popup")
-                appWindow.logViewerPopup.open()
-            } else {
-                console.error("Could not find log viewer popup")
+        // Logs button
+        Button {
+            id: logsButton
+            contentItem: Label {
+                text: "View Logs"
+                font.pixelSize: 14
             }
             
-            // Log that the user viewed logs if logManager is available
-            if (typeof logManager !== "undefined") {
-                logManager.log("INFO", "User opened log viewer from home page")
-            } else if (appWindow && appWindow.logManagerInstance) {
-                appWindow.logManagerInstance.log("INFO", "User opened log viewer from home page")
-            } else {
-                console.log("No log manager available")
-            }
-        }
-    }
-
-    Rectangle {
-        id: sideBar
-
-        DarkLightButton {
-            id: modeButton
-            icon_name1: "Dark"
-            icon_name2: "Light"
-            mode_1: "Light Mode"
-            mode_2: "Dark Mode"
-            implicitHeight: 50
-            implicitWidth: 50
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 10
-
+            background: 
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: 1
+                    border.color: logsButton.hovered ? "blue" : "transparent"
+                    radius: 5
+                }
+            
             onClicked: {
-                modeButton.checked ? modeToggled = true : modeToggled = false
+                console.log("Log button clicked")
+                // access the logViewerPopup from the application window
+                var appWindow = window || applicationWindow
+                if (appWindow && appWindow.logViewerPopup) {
+                    console.log("Opening log viewer popup")
+                    appWindow.logViewerPopup.open()
+                } else {
+                    console.error("Could not find log viewer popup")
+                }
+                
+                // Log that the user viewed logs if logManager is available
+                if (typeof logManager !== "undefined") {
+                    logManager.log("INFO", "User opened log viewer from home page")
+                } else if (appWindow && appWindow.logManagerInstance) {
+                    appWindow.logManagerInstance.log("INFO", "User opened log viewer from home page")
+                } else {
+                    console.log("No log manager available")
+                }
             }
         }
     }

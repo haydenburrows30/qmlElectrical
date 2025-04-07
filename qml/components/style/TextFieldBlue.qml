@@ -8,10 +8,10 @@ TextField {
     readOnly: true
     Layout.fillWidth: true
 
-    color: textField.activeFocus ? sideBar.modeToggled ? "white" : "black" : sideBar.modeToggled ? "white" : "black"
+    color: textField.activeFocus ? window.modeToggled ? "white" : "black" : window.modeToggled ? "white" : "black"
     
     background: Rectangle {
-        color: sideBar.modeToggled ? "transparent":"#e8f6ff"
+        color: window.modeToggled ? "transparent":"#e8f6ff"
         border.color: "#0078d7"
         radius: 3
     }

@@ -19,10 +19,10 @@ Page {
     id: realTime
 
     property RealTimeChart calculator: RealTimeChart {}
-    property color textColor: sideBar.modeToggled ? "#ffffff" : "#000000"
+    property color textColor: window.modeToggled ? "#ffffff" : "#000000"
 
     background: Rectangle {
-        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
+        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     PopUpText {
@@ -269,7 +269,7 @@ Page {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    color: sideBar.modeToggled ? "black" : "white"
+                    color: window.modeToggled ? "black" : "white"
 
                     RealChart {
                         id: rtChart

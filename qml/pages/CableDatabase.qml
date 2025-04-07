@@ -13,7 +13,7 @@ Page {
     padding: 0
     
     background: Rectangle {
-        color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
+        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
     
     ScrollView {
@@ -27,7 +27,7 @@ Page {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 80
-                color: sideBar.modeToggled ? "#2d2d2d" : "#e0e0e0"
+                color: window.modeToggled ? "#2d2d2d" : "#e0e0e0"
                 
                 ColumnLayout {
                     anchors.fill: parent
@@ -38,13 +38,13 @@ Page {
                         text: "Cable Database"
                         font.pixelSize: 22
                         font.bold: true
-                        color: sideBar.modeToggled ? "#ffffff" : "#000000"
+                        color: window.modeToggled ? "#ffffff" : "#000000"
                     }
                     
                     Label {
                         text: "Manage cable data, import and export cables, and view cable properties."
                         Layout.fillWidth: true
-                        color: sideBar.modeToggled ? "#cccccc" : "#444444"
+                        color: window.modeToggled ? "#cccccc" : "#444444"
                     }
                 }
             }

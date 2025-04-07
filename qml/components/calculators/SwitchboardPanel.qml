@@ -148,7 +148,7 @@ Item {
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 40
-                                color: sideBar.modeToggled ? "#303030" : "#e0e0e0"
+                                color: window.modeToggled ? "#303030" : "#e0e0e0"
 
                                 RowLayout {
                                     anchors.fill: parent
@@ -251,8 +251,8 @@ Item {
                                     Rectangle {
                                         anchors.fill: parent
                                         color: index % 2 ? 
-                                            (sideBar.modeToggled ? "#262626" : "#f5f5f5") : 
-                                            (sideBar.modeToggled ? "#1a1a1a" : "#ffffff")
+                                            (window.modeToggled ? "#262626" : "#f5f5f5") : 
+                                            (window.modeToggled ? "#1a1a1a" : "#ffffff")
                                     }
 
                                     Text {
@@ -331,7 +331,7 @@ Item {
                         LoadChart {
                             anchors.fill: parent
                             manager: switchboardPanel.manager
-                            darkMode: sideBar.modeToggled
+                            darkMode: window.modeToggled
                         }
                     }
                     
@@ -377,7 +377,7 @@ Item {
                                 console.log("Single line diagram initialized with", circuits.length, "circuits");
                             }
                             
-                            darkMode: sideBar.modeToggled
+                            darkMode: window.modeToggled
                         }
                     }
 
@@ -643,7 +643,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.columnSpan: 2
                 height: 1
-                color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                color: window.modeToggled ? "#404040" : "#e0e0e0"
             }
             
             Label { 

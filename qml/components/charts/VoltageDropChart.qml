@@ -36,7 +36,7 @@ Item {
             font.pixelSize: 16
             font.bold: true
             Layout.alignment: Qt.AlignHCenter
-            color: sideBar.modeToggled ? "#ffffff" : "#000000"
+            color: window.modeToggled ? "#ffffff" : "#000000"
         }
 
         Row {
@@ -96,7 +96,7 @@ Item {
             legend.visible: true
             theme: Universal.theme
 
-            backgroundColor: sideBar.modeToggled ? "#2d2d2d" : "#ffffff"
+            backgroundColor: window.modeToggled ? "#2d2d2d" : "#ffffff"
             
             ValueAxis {
                 id: axisY
@@ -104,12 +104,12 @@ Item {
                 max: 10
                 tickCount: 11
                 titleText: "Voltage Drop (%)"
-                labelsColor: sideBar.modeToggled ? "#ffffff" : "#000000"
+                labelsColor: window.modeToggled ? "#ffffff" : "#000000"
                 gridVisible: true
                 labelFormat: "%.1f"
                 minorGridVisible: true
                 minorTickCount: 1
-                gridLineColor: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                gridLineColor: window.modeToggled ? "#404040" : "#e0e0e0"
                 labelsVisible: true
                 lineVisible: true
             }
@@ -120,11 +120,11 @@ Item {
                 max: 18
                 labelsPosition: CategoryAxis.AxisLabelsPositionOnValue
                 titleText: "Cable Size (mm²)"
-                labelsColor: sideBar.modeToggled ? "#ffffff" : "#000000"
+                labelsColor: window.modeToggled ? "#ffffff" : "#000000"
                 gridVisible: true
                 labelsVisible: true   // Explicitly show labels
                 lineVisible: true     // Show axis line
-                gridLineColor: sideBar.modeToggled ? "#404040" : "#e0e0e0"  // Add grid line color
+                gridLineColor: window.modeToggled ? "#404040" : "#e0e0e0"  // Add grid line color
                 
                 // Show only common sizes to avoid crowding
                 CategoryRange {
@@ -245,8 +245,8 @@ Item {
             // Show a tooltip when points are clicked
             Rectangle {
                 id: pointTooltip
-                color: sideBar.modeToggled ? "#404040" : "#f0f0f0"
-                border.color: sideBar.modeToggled ? "#909090" : "#a0a0a0"
+                color: window.modeToggled ? "#404040" : "#f0f0f0"
+                border.color: window.modeToggled ? "#909090" : "#a0a0a0"
                 border.width: 1
                 width: tooltipText.width + 16
                 height: tooltipText.height + 8
@@ -258,7 +258,7 @@ Item {
                     id: tooltipText
                     anchors.centerIn: parent
                     text: ""
-                    color: sideBar.modeToggled ? "#ffffff" : "#000000"
+                    color: window.modeToggled ? "#ffffff" : "#000000"
                 }
 
                 MouseArea {

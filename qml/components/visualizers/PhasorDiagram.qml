@@ -46,7 +46,7 @@ Item {
             var radius = Math.min(centerX, centerY) - 20
 
             // Draw reference circles with theme support
-            ctx.strokeStyle = sideBar.modeToggled ? "#404040" : "#e0e0e0"
+            ctx.strokeStyle = window.modeToggled ? "#404040" : "#e0e0e0"
             ctx.lineWidth = 1
             
             // Use for loop instead of forEach
@@ -96,7 +96,7 @@ Item {
                     ctx.strokeStyle = colors[i]
                     ctx.lineWidth = 3
                     ctx.shadowColor = colors[i]
-                    ctx.shadowBlur = sideBar.modeToggled ? 8 : 4
+                    ctx.shadowBlur = window.modeToggled ? 8 : 4
                     ctx.beginPath()
                     ctx.moveTo(centerX, centerY)
                     ctx.lineTo(x, y)
@@ -125,7 +125,7 @@ Item {
                         ctx.strokeStyle = currentColors[j]
                         ctx.lineWidth = 2
                         ctx.shadowColor = currentColors[j]
-                        ctx.shadowBlur = sideBar.modeToggled ? 6 : 3
+                        ctx.shadowBlur = window.modeToggled ? 6 : 3
                         
                         // Set dashed line style
                         ctx.setLineDash([5, 3])
@@ -288,7 +288,7 @@ Item {
             y: parent.height/2 + Math.sin(-index * 30 * Math.PI / 180) * 
                (parent.height/2 - 30) - height/2
             font.pixelSize: 12
-            color: sideBar.modeToggled ? "#b0b0b0" : "#606060"
+            color: window.modeToggled ? "#b0b0b0" : "#606060"
         }
     }
 

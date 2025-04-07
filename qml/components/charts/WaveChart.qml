@@ -10,6 +10,7 @@ ChartView {
     legend.visible: false
 
     theme: Universal.theme
+    property var calculator
 
     property bool showRmsA: false
     property bool showRmsB: false
@@ -21,15 +22,15 @@ ChartView {
     property var trackerValues: []
 
     Component.onCompleted: {
-        if (sineModel) {
-            sineModel.fill_series(seriesA, seriesB, seriesC)
+        if (calculator) {
+            calculator.fill_series(seriesA, seriesB, seriesC)
         }
     }
 
     Connections {
-        target: sineModel
+        target: calculator
         function onDataChanged() {
-            sineModel.fill_series(seriesA, seriesB, seriesC)
+            calculator.fill_series(seriesA, seriesB, seriesC)
         }
     }
 
@@ -68,7 +69,7 @@ ChartView {
         axisY: axisY
         color: "#f44336"
         width: 2
-        name: "Phase A" + (chartView.showRmsA ? " (RMS: " + sineModel.rmsA.toFixed(1) + "V)" : "")
+        name: "Phase A" + (chartView.showRmsA ? " (RMS: " + calculator.rmsA.toFixed(1) + "V)" : "")
     }
 
     LineSeries {
@@ -77,7 +78,7 @@ ChartView {
         axisY: axisY
         color: "#4caf50"
         width: 2
-        name: "Phase B" + (chartView.showRmsB ? " (RMS: " + sineModel.rmsB.toFixed(1) + "V)" : "")
+        name: "Phase B" + (chartView.showRmsB ? " (RMS: " + calculator.rmsB.toFixed(1) + "V)" : "")
     }
 
     LineSeries {
@@ -86,7 +87,7 @@ ChartView {
         axisY: axisY
         color: "#2196f3"
         width: 2
-        name: "Phase C" + (chartView.showRmsC ? " (RMS: " + sineModel.rmsC.toFixed(1) + "V)" : "")
+        name: "Phase C" + (chartView.showRmsC ? " (RMS: " + calculator.rmsC.toFixed(1) + "V)" : "")
     }
 
 
@@ -227,7 +228,7 @@ ChartView {
             }
 
             onPositionChanged: (mouse) => {
-            if (!mouse || !sineModel) {
+            if (!mouse || !calculator) {
                 hideTracker();
                 return;
             }
@@ -241,7 +242,7 @@ ChartView {
             let xValue = axisX.min + (chartPoint / chartView.plotArea.width) * (axisX.max - axisX.min)
             trackerX = chartPoint + chartView.plotArea.x
 
-            let values = sineModel.calculate_values_at(xValue)
+            let values = calculator.calculate_values_at(xValue)
 
             if (!values || values.length !== 3) {
                 console.log("Invalid values returned from Python");

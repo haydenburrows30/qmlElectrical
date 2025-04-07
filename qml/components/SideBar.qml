@@ -12,7 +12,7 @@ Drawer {
 
     property int drawerWidth: Style.sideBarWidth
     property int delegateHeight: Style.delegateHeight
-    property bool modeToggled: false
+    // property bool modeToggled: false
     property int hide: 0
     property int show: 0
 

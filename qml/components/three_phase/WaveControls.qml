@@ -14,6 +14,7 @@ WaveCard {
     title: "Wave Controls"
     property var model
     property var phaseControls: []
+    property var calculator
     
     signal requestAutoScale()
 
@@ -31,8 +32,8 @@ WaveCard {
                 value: 50
                 stepSize: 1
                 onValueChanged: function() {
-                    if (!sineModel) return;
-                    sineModel.setFrequency(freqSlider.value)
+                    if (!calculator) return;
+                    calculator.setFrequency(freqSlider.value)
                 }
 
                 background: Rectangle {
@@ -41,7 +42,7 @@ WaveCard {
                     width: parent.availableWidth
                     height: 4
                     radius: 2
-                    color: sideBar.modeToggled ? "#404040" : "#e0e0e0"
+                    color: window.modeToggled ? "#404040" : "#e0e0e0"
 
                     Rectangle {
                         width: parent.width * parent.visualPosition
@@ -69,7 +70,7 @@ WaveCard {
             Label {
                 text: freqSlider.value.toFixed(1) + " Hz"
                 font.pixelSize: 12
-                color: sideBar.modeToggled ? "#b0b0b0" : "#606060"
+                color: window.modeToggled ? "#b0b0b0" : "#606060"
             }
 
             StyledButton {
@@ -77,7 +78,7 @@ WaveCard {
                 icon.source: "../../../icons/svg/restart_alt/baseline.svg"
                 
                 onClicked: {
-                    sineModel.reset()  
+                    calculator.reset()  
                     freqSlider.value = 50
                     for (let control of phaseControls) {
                         control.resetPhase()
@@ -102,26 +103,28 @@ WaveCard {
                 defaultAmplitude: 230
                 defaultAmplitude1: 100
                 defaultAngle1: 30
+
+                calculator: root.calculator //pass calculator to controls
                 
                 onAmplitudeChanged: function(value) {
-                    if (phase === "A") sineModel.setAmplitudeA(value)
-                    else if (phase === "B") sineModel.setAmplitudeB(value)
-                    else sineModel.setAmplitudeC(value)
+                    if (phase === "A") calculator.setAmplitudeA(value)
+                    else if (phase === "B") calculator.setAmplitudeB(value)
+                    else calculator.setAmplitudeC(value)
                 }
                 onAngleChanged: function(value) {
-                    if (phase === "A") sineModel.setPhaseAngleA(value)
-                    else if (phase === "B") sineModel.setPhaseAngleB(value)
-                    else sineModel.setPhaseAngleC(value)
+                    if (phase === "A") calculator.setPhaseAngleA(value)
+                    else if (phase === "B") calculator.setPhaseAngleB(value)
+                    else calculator.setPhaseAngleC(value)
                 }
                 onAmplitudeChanged1: function(value) {
-                    if (phase === "A") sineModel.setCurrentA(value)
-                    else if (phase === "B") sineModel.setCurrentB(value)
-                    else sineModel.setCurrentC(value)
+                    if (phase === "A") calculator.setCurrentA(value)
+                    else if (phase === "B") calculator.setCurrentB(value)
+                    else calculator.setCurrentC(value)
                 }
                 onAngleChanged1: function(value) {
-                    if (phase === "A") sineModel.setCurrentAngleA(value)
-                    else if (phase === "B") sineModel.setCurrentAngleB(value)
-                    else sineModel.setCurrentAngleC(value)
+                    if (phase === "A") calculator.setCurrentAngleA(value)
+                    else if (phase === "B") calculator.setCurrentAngleB(value)
+                    else calculator.setCurrentAngleC(value)
                 }
             }
         }

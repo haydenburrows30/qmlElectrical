@@ -5,6 +5,8 @@ import QtQuick.Layouts
 import "../style"
 
 ColumnLayout {
+
+    property var calculator
     
     GridLayout {
         Layout.fillWidth: true
@@ -19,20 +21,20 @@ ColumnLayout {
 
         // Phase A
         Label { text: "A"; color: "#f44336" }
-        Label { text: sineModel.rmsA.toFixed(1) }
-        Label { text: sineModel.powerFactorA.toFixed(3) }
-        Label { text: (sineModel.rmsA * sineModel.currentA * sineModel.powerFactorA / 1000).toFixed(2) }
+        Label { text: calculator.rmsA.toFixed(1) }
+        Label { text: calculator.powerFactorA.toFixed(3) }
+        Label { text: (calculator.rmsA * calculator.currentA * calculator.powerFactorA / 1000).toFixed(2) }
 
         // Phase B
         Label { text: "B"; color: "#4caf50" }
-        Label { text: sineModel.rmsB.toFixed(1) }
-        Label { text: sineModel.powerFactorB.toFixed(3) }
-        Label { text: (sineModel.rmsB * sineModel.currentB * sineModel.powerFactorB / 1000).toFixed(2) }
+        Label { text: calculator.rmsB.toFixed(1) }
+        Label { text: calculator.powerFactorB.toFixed(3) }
+        Label { text: (calculator.rmsB * calculator.currentB * calculator.powerFactorB / 1000).toFixed(2) }
 
         // Phase C
         Label { text: "C"; color: "#2196f3" }
-        Label { text: sineModel.rmsC.toFixed(1) }
-        Label { text: sineModel.powerFactorC.toFixed(3) }
-        Label { text: (sineModel.rmsC * sineModel.currentC * sineModel.powerFactorC / 1000).toFixed(2) }
+        Label { text: calculator.rmsC.toFixed(1) }
+        Label { text: calculator.powerFactorC.toFixed(3) }
+        Label { text: (calculator.rmsC * calculator.currentC * calculator.powerFactorC / 1000).toFixed(2) }
     }
 }
