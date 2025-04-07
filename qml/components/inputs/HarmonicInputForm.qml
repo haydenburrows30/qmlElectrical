@@ -139,7 +139,7 @@ ColumnLayout {
 
     StyledButton {
         text: "Reset"
-        icon.source: "../../../icons/svg/refresh/baseline.svg"
+        icon.source: "../../../icons/rounded/restart_alt.svg"
         Layout.alignment: Qt.AlignHCenter
         onClicked: {
             calculator.resetHarmonics()
