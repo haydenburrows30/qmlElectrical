@@ -120,131 +120,151 @@ ApplicationWindow {
         }
     }
 
-    // Menu, Dark/Light Button, Loader
+    // Menu, Dark/Light Button, StackView
     Item {
         anchors.fill: parent
 
-        MenuBar {
+        RowLayout {
             id: menuBar
-            anchors.horizontalCenter : parent.horizontalCenter
-            
-            background: 
-                Rectangle {
-                    color: "#21be2b"
-                    width: parent.width
-                    height: 1
-                    anchors.bottom: parent.bottom
+            height: mainMenu.height
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            // Backbutton
+            RoundButton {
+                id: backButton
+                visible: calculatorLoader.depth > 1
+                text: "<"
+                    onClicked: {
+                        if (calculatorLoader.depth > 1) {
+                        calculatorLoader.pop()
+                    }
+                }
+                ToolTip.text: qsTr("Back")
+                ToolTip.visible: backButton.hovered
+                ToolTip.delay: 500
+            }
+
+            // Main menu
+            MenuBar {
+                id: mainMenu
+
+                background: 
+                    Rectangle {
+                        color: "#21be2b"
+                        width: parent.width
+                        height: 1
+                        anchors.bottom: parent.bottom
+                    }
+
+                Menu {
+                    title: "Home"
+                    Repeater {
+                        model: home
+
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: {
+                                calculatorLoader.push(modelData.source)
+                                
+                            }
+                        }
+                    }
                 }
 
-            Menu {
-                title: "Home"
-                Repeater {
-                    model: home
+                Menu {
+                    title: "Basic Calculators"
+                    Repeater {
+                        model: basic
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: {
-                            calculatorLoader.push(modelData.source)
-                            
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: { 
+                                calculatorLoader.push(modelData.source)
+                                
+                            }
+                        }
+                    }
+                }
+
+                Menu {
+                    title: "Protection"
+                    Repeater {
+                        model: protection
+
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: {
+                                calculatorLoader.push(modelData.source)
+                                
+                            }
+                        }
+                    }
+                }
+                Menu {
+                    title: "Cable"
+                    Repeater {
+                        model: cable
+
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: {
+                                calculatorLoader.push(modelData.source)
+                                
+                            }
+                        }
+                    }
+                }
+                Menu {
+                    title: "Theory"
+                    Repeater {
+                        model: theory
+
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: {
+                                calculatorLoader.push(modelData.source)
+                                
+                            }
+                        }
+                    }
+                }
+                Menu {
+                    title: "Renewables"
+                    Repeater {
+                        model: renewables
+
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: {
+                                calculatorLoader.push(modelData.source)
+                                
+                            }
                         }
                     }
                 }
             }
 
-            Menu {
-                title: "Basic Calculators"
-                Repeater {
-                    model: basic
+            // Dark/light mode button
+            Rectangle {
+                id: sideBar
+                width: 40
+                height: 40
+                color: "transparent"
 
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: { 
-                            calculatorLoader.push(modelData.source)
-                            
-                        }
+                DarkLightButton {
+                    id: modeButton
+                    anchors.centerIn: parent
+
+                    icon_name1: "Dark"
+                    icon_name2: "Light"
+                    mode_1: "Light Mode"
+                    mode_2: "Dark Mode"
+                    implicitHeight: 40
+                    implicitWidth: 40
+
+                    onClicked: {
+                        modeButton.checked ? modeToggled = true : modeToggled = false
                     }
-                }
-            }
-
-            Menu {
-                title: "Protection"
-                Repeater {
-                    model: protection
-
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: {
-                            calculatorLoader.push(modelData.source)
-                            
-                        }
-                    }
-                }
-            }
-            Menu {
-                title: "Cable"
-                Repeater {
-                    model: cable
-
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: {
-                            calculatorLoader.push(modelData.source)
-                            
-                        }
-                    }
-                }
-            }
-            Menu {
-                title: "Theory"
-                Repeater {
-                    model: theory
-
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: {
-                            calculatorLoader.push(modelData.source)
-                            
-                        }
-                    }
-                }
-            }
-            Menu {
-                title: "Renewables"
-                Repeater {
-                    model: renewables
-
-                    MenuItem {
-                        text: modelData.name
-                        onTriggered: {
-                            calculatorLoader.push(modelData.source)
-                            
-                        }
-                    }
-                }
-            }
-        }
-
-        // Dark/light mode button
-        Rectangle {
-            id: sideBar
-            width: 40
-            height: 40
-            anchors.right: parent.right
-            color: "transparent"
-
-            DarkLightButton {
-                id: modeButton
-                anchors.centerIn: parent
-
-                icon_name1: "Dark"
-                icon_name2: "Light"
-                mode_1: "Light Mode"
-                mode_2: "Dark Mode"
-                implicitHeight: 40
-                implicitWidth: 40
-
-                onClicked: {
-                    modeButton.checked ? modeToggled = true : modeToggled = false
                 }
             }
         }

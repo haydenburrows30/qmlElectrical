@@ -31,10 +31,11 @@ Page {
         
         Label {
             id: welcomeSubtitle
-            text: "Select a tool to get started"
+            text: "Select a category to get started"
             font.pixelSize: 16
             opacity: 0.7
             Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: 50
         }
 
         // Main buttons
@@ -49,7 +50,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.name: "Calculator" 
+                icon.source: "../../icons/rounded/calculate.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
                 
@@ -97,7 +98,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.source: "../../icons/svg/security/baseline.svg"
+                icon.source: "../../icons/rounded/waves.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
 
@@ -146,7 +147,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.source: "../../icons/svg/cable/baseline.svg"
+                icon.source: "../../icons/rounded/cable.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
                 
@@ -194,7 +195,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.source: "../../icons/svg/book/baseline.svg"
+                icon.source: "../../icons/rounded/book.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
                 
@@ -242,7 +243,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.source: "../../icons/svg/wind_power/baseline.svg"
+                icon.source: "../../icons/rounded/energy.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
                 

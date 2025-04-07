@@ -12,7 +12,6 @@ import TransformerLine 1.0
 
 Item {
     id: root
-    anchors.fill: parent
 
     property var calculator
 

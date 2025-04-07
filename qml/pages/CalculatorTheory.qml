@@ -51,7 +51,7 @@ Page {
                     id: hbuttonParent
                     Layout.fillWidth: true
                     Layout.preferredHeight: 120
-                    icon.source: "../../icons/svg/" + modelData.icon + "/baseline.svg"
+                    icon.source: "../../icons/rounded/" + modelData.icon + ".svg"
                     back: Qt.lighter(palette.accent, 1.5)
                     fore: Qt.lighter(palette.accent, 1.0)
 

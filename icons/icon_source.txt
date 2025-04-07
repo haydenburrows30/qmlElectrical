@@ -1,0 +1,3 @@
+400 weight icons
+
+https://github.com/marella/material-symbols/tree/main/svg/400/rounded

@@ -115,7 +115,7 @@ Item {
 
                     StyledButton {
                         text: "Open Reference Guide"
-                        icon.source: "../../../icons/svg/folder_open/baseline.svg"
+                        icon.source: "../../../icons/rounded/folder.svg"
                         Layout.fillWidth: true
                         onClicked: {
                             Qt.openUrlExternally("file://" + calculator.getPdfPath())
@@ -125,7 +125,7 @@ Item {
                     StyledButton {
                         text: "Calculate"
                         Layout.fillWidth: true
-                        icon.source: "../../../icons/svg/calculate/baseline.svg"
+                        icon.source: "../../../icons/rounded/calculate.svg"
                         onClicked: {
                             if (primaryVoltage.text && secondaryVoltage.text && powerRating.text) {
                                 calculator.calculateResistor(
