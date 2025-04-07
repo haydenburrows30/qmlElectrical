@@ -10,14 +10,12 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 - Vector and phase visualisations
 - Basic electrical calculations
 
-![Image](https://github.com/user-attachments/assets/f2734efa-f96f-4f01-9cd6-35df12b2fbf6)
-![Image](https://github.com/user-attachments/assets/5748f6ca-7cea-4896-bc9e-5c1a2e17a565)
-![Image](https://github.com/user-attachments/assets/6f489dce-3c63-48fc-9f2f-5167be7a6f9f)
-![Image](https://github.com/user-attachments/assets/4a53ba84-026c-4c35-9289-10652ce8f46c)
-![Image](https://github.com/user-attachments/assets/9e418a1b-a71c-49a3-b3ce-9db46a913df8)
-![Image](https://github.com/user-attachments/assets/0c82ee1e-533c-4d93-ad72-62e15e71564d)
-![Image](https://github.com/user-attachments/assets/3bfa5dd9-1f3a-45ab-a482-391b0430ffa2)
-![Image](https://github.com/user-attachments/assets/fa3487c9-cba0-4ce8-ac33-183f19180b32)
+![Image](https://github.com/user-attachments/assets/a59f2e46-1c77-402b-8ef7-f4e9b468f8f7)
+![Image](https://github.com/user-attachments/assets/55df32f7-eb97-4b5a-adcb-7b953f03f7e3)
+![Image](https://github.com/user-attachments/assets/2800a40b-3aab-44ba-bc8d-65af5d492782)
+![Image](https://github.com/user-attachments/assets/39c85fdb-5829-4b61-9c09-a9daf8dd1aaf)
+![Image](https://github.com/user-attachments/assets/d7e5c702-ed8e-47ea-98f3-62b8fbe2faf0)
+![Image](https://github.com/user-attachments/assets/352c094d-3de1-4467-a3b9-e44cf0b96199)
 
 ## Getting Started
 
