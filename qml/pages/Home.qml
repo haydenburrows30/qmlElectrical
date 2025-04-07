@@ -317,7 +317,7 @@ Page {
         onClicked: about.open()
     }
     
-    // Add a logs button near the about button
+    // logs button
     Button {
         id: logsButton
         contentItem: Label {
@@ -342,7 +342,7 @@ Page {
         
         onClicked: {
             console.log("Log button clicked")
-            // The issue is here - we need to access the logViewerPopup from the application window
+            // access the logViewerPopup from the application window
             var appWindow = window || applicationWindow
             if (appWindow && appWindow.logViewerPopup) {
                 console.log("Opening log viewer popup")

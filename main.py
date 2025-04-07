@@ -9,7 +9,6 @@ from typing import Optional
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtQuickControls2 import QQuickStyle
-# Add this import for qmlRegisterType
 from PySide6.QtQml import qmlRegisterType
 
 # Application imports
@@ -21,23 +20,19 @@ from services.interfaces import (
 )
 from services.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
-from utils.config import app_config
-
-from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
-
-
+from services.qml_types import register_qml_types
 from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+from utils.config import app_config
+from utils.qml_debug import register_debug_helper
+from utils.logger import QLogManager
+
+from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 
 import data.rc_resources as rc_resources
 
-from services.qml_types import register_qml_types
-from utils.qml_debug import register_debug_helper
-
-# Import QLogManager from utils.logger
-from utils.logger import QLogManager
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class ResourceManager:
     """Manages application resources and caching."""
