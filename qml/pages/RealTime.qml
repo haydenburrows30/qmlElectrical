@@ -11,6 +11,7 @@ import "../components"
 import "../components/charts/"
 import "../components/style"
 import "../components/popups"
+import "../components/buttons"
 
 import RealTime 1.0
 
@@ -22,11 +23,6 @@ Page {
 
     background: Rectangle {
         color: sideBar.modeToggled ? "#1a1a1a" : "#f5f5f5"
-    }
-
-    FontLoader {
-        id: iconFont
-        source: "../../icons/MaterialIcons-Regular.ttf"
     }
 
     PopUpText {
@@ -101,110 +97,62 @@ Page {
                     Layout.fillHeight: true
                     Layout.minimumWidth: 350
                     Layout.maximumWidth: 350
-                    
-                    ButtonCard {
+
+                    RowLayout {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 80
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.minimumHeight: 50
 
-                        RowLayout {
-                            anchors.centerIn: parent
+                        StyledButton {
+                            id: pauseButton
+                            
+                            ToolTip.text: "Pause/Run"
+                            ToolTip.visible: pauseButton.hovered
+                            ToolTip.delay: 500
 
-                            ShadowRectangle {
-                                Layout.alignment: Qt.AlignLeft
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
+                            icon.source: calculator.isRunning ? "../../icons/svg/pause/baseline.svg" : "../../icons/svg/play_arrow/baseline.svg"
 
-                                ImageButton {
-                                    id: pauseButton
-                                    anchors.centerIn: parent
-                                    iconName: calculator.isRunning ? '\ue034' : '\ue037'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: calculator.isRunning ? Style.red : Style.green
-                                    backgroundColor: Style.alphaColor(color,0.1)
-
-                                    ToolTip.text: "Pause/Run"
-                                    ToolTip.visible: pauseButton.hovered
-                                    ToolTip.delay: 500
-
-                                    onClicked: {
-                                        calculator.toggleRunning()
-                                    }
-                                }
+                            onClicked: {
+                                calculator.toggleRunning()
                             }
-                            ShadowRectangle {
-                                Layout.alignment: Qt.AlignLeft
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
+                        }
 
-                                ImageButton {
-                                    id: resetButton
-                                    anchors.centerIn: parent
-                                    iconName: '\uf053'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: Style.blueGreen
-                                    backgroundColor: Style.alphaColor(color,0.1)
+                        StyledButton {
+                            id: resetButton
 
-                                    ToolTip.text: "Reset"
-                                    ToolTip.visible: resetButton.hovered
-                                    ToolTip.delay: 500
-                                    
-                                    onClicked: {
-                                        calculator.restart()
-                                    }
-                                }
+                            ToolTip.text: "Reset"
+                            ToolTip.visible: resetButton.hovered
+                            ToolTip.delay: 500
+                            icon.source: "../../icons/svg/restart_alt/baseline.svg"
+                            
+                            onClicked: {
+                                calculator.restart()
                             }
+                        }
 
-                            ShadowRectangle {
-                                Layout.alignment: Qt.AlignRight
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
+                        StyledButton {
+                            id: saveButton
 
-                                ImageButton {
-                                    id: saveButton
-                                    anchors.centerIn: parent
-                                    iconName: '\ue161'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: Style.black
-                                    backgroundColor: Style.alphaColor(color,0.1)
+                            ToolTip.text: "Save parameters"
+                            ToolTip.visible: saveButton.hovered
+                            ToolTip.delay: 500
+                            icon.source: "../../icons/svg/save/baseline.svg"
 
-                                    ToolTip.text: "Save parameters"
-                                    ToolTip.visible: saveButton.hovered
-                                    ToolTip.delay: 500
-
-                                    onClicked: {
-                                        calculator.saveConfiguration()
-                                    }
-                                }
+                            onClicked: {
+                                calculator.saveConfiguration()
                             }
-                            ShadowRectangle {
-                                id: loadButton
-                                Layout.alignment: Qt.AlignRight
-                                implicitHeight: 52
-                                implicitWidth: 52
-                                radius: implicitHeight / 2
+                        }
 
-                                ImageButton {
-                                    anchors.centerIn: parent
-                                    iconName: '\ue2c6'
-                                    iconWidth: 24
-                                    iconHeight: 24
-                                    color: Style.charcoalGrey
-                                    backgroundColor: Style.alphaColor(color,0.1)
+                        StyledButton {
+                            id: loadButton
 
-                                    ToolTip.text: "Load parameters"
-                                    ToolTip.visible: loadButton.hovered
-                                    ToolTip.delay: 500
+                            ToolTip.text: "Load parameters"
+                            ToolTip.visible: loadButton.hovered
+                            ToolTip.delay: 500
+                            icon.source: "../../icons/svg/folder_open/baseline.svg"
 
-                                    onClicked: {
-                                        calculator.loadConfiguration()
-                                    }
-                                }
+                            onClicked: {
+                                calculator.loadConfiguration()
                             }
                         }
                     }

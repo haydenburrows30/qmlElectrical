@@ -53,6 +53,9 @@ PopUpText {
 icon.source: "../../../icons/svg/copy_all/baseline.svg"
 icon.source: "../../../icons/svg/restart_alt/baseline.svg"
 icon.source: "../../../icons/svg/file_download/baseline.svg"
+icon.source: "../../../icons/svg/info/baseline.svg"
+icon.source: "../../../icons/svg/pause/baseline.svg"
+icon.source: "../../../icons/svg/save/baseline.svg"
 
 FontLoader {
     id: iconFont

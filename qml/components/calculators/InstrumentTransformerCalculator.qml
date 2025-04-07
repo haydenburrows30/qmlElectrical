@@ -89,51 +89,29 @@ Item {
                     Layout.alignment: Qt.AlignTop
 
                     // Controls
-                    ButtonCard {
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 100
+                    RowLayout {
+                        Layout.minimumWidth: 50
+                        Layout.alignment: Qt.AlignHCenter
 
-                        RowLayout {
-                            anchors.right: parent.right
+                        StyledButton {
+                            ToolTip.text: "Reset to default values"
+                            Layout.alignment: Qt.AlignRight
+                            Layout.columnSpan: 2
+                            icon.source: "../../../icons/svg/restart_alt/baseline.svg"
 
-                            MessageButton {
-                                title: "Reset"
-                                ToolTip.text: "Reset to default values"
-                                buttonIcon: '\uf053'
-                                buttonColor: Style.blueGreen
-                                Layout.alignment: Qt.AlignRight
-                                Layout.columnSpan: 2
-
-                                defaultMessage: ""
-                                successMessage: "Parameters reset"
-                                errorMessage: "PDF export failed"
-
-                                onButtonClicked: {
-                                    startOperation()
-
-                                    calculator.resetToDefaults()
-
-                                    operationSucceeded(2000)
-                                }
+                            onClicked: {
+                                calculator.resetToDefaults()
                             }
+                        }
 
-                            MessageButton {
-                                id: info
-                                title: "Info"
-                                buttonIcon: '\ue88e'
-                                buttonColor: Style.charcoalGrey
-                                defaultMessage: ""
-                                successMessage: ""
-                                errorMessage: ""
+                        StyledButton {
+                            id: info
 
-                                ToolTip.visible: false
+                            ToolTip.visible: false
+                            icon.source: "../../../icons/svg/info/baseline.svg"
 
-                                onButtonClicked: {
-
-                                    startOperation()
-                                    tipsPopup.open()
-                                    operationSucceeded(1/100)
-                                }
+                            onClicked: {
+                                tipsPopup.open()
                             }
                         }
                     }
@@ -257,23 +235,12 @@ Item {
                                     }
                                 }
 
-                                MessageButton {
+                                StyledButton {
                                     Layout.alignment: Qt.AlignRight
-                                    
                                     ToolTip.text: "Add Relay"
-                                    buttonIcon: '\ue145'
-                                    buttonColor: Style.blueGreen
+                                    icon.source: "../../../icons/svg/add/baseline.svg"
 
-                                    textVisible: false
-
-                                    defaultMessage: ""
-                                    successMessage: "Custom CT ratio added: " + customRatio.text
-                                    errorMessage: "Invalid ratio format. Please use format like '100/5'"
-                                    infoMessage: "CT ratio found in list"
-
-                                    onButtonClicked: {
-
-                                        startOperation()
+                                    onClicked: {
 
                                         if (customRatio.acceptableInput) {
                                             calculator.setCtRatio(customRatio.text)
@@ -282,17 +249,17 @@ Item {
                                                 if (ctRatio.model[i] === customRatio.text) {
                                                     ctRatio.currentIndex = i
                                                     found = true
-                                                    operationInfo(2000)
+                                                    console.log("Custom ratio already exists in the model.")
                                                     break
                                                 }
                                             }
                                             if (!found) {
                                                 ctRatio.model.push(customRatio.text)
                                                 ctRatio.currentIndex = ctRatio.model.length - 1
-                                                operationSucceeded(2000)
+                                                console.log("Custom ratio added to the model.")
                                             }
                                         } else {
-                                            operationFailed(2000)
+                                            console.log("Invalid custom ratio format.")
                                         }
                                     }
                                 }
