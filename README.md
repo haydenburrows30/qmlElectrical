@@ -9,7 +9,7 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 - Voltage drop analysis
 - Vector and phase visualisations
 - Basic electrical calculations
-![Image](https://github.com/user-attachments/assets/d7e5c702-ed8e-47ea-98f3-62b8fbe2faf0)
+
 ![Image](https://github.com/user-attachments/assets/d7e5c702-ed8e-47ea-98f3-62b8fbe2faf0)
 ![Image](https://github.com/user-attachments/assets/a59f2e46-1c77-402b-8ef7-f4e9b468f8f7)
 ![Image](https://github.com/user-attachments/assets/55df32f7-eb97-4b5a-adcb-7b953f03f7e3)
