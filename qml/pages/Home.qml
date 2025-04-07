@@ -17,6 +17,40 @@ Page {
 
     About {id: about}
 
+    MenuBar {
+        id: menuBar
+        anchors.horizontalCenter : parent.horizontalCenter
+        
+        background: 
+            Rectangle {
+                color: "#21be2b"
+                width: parent.width
+                height: 1
+                anchors.bottom: parent.bottom
+            }
+
+        Menu {
+            title: "Home"
+        }
+
+        Menu {
+            title: "Basic Calculators"
+        }
+
+        Menu {
+            title: "Protection"
+        }
+        Menu {
+            title: "Cable"
+        }
+        Menu {
+            title: "Theory"
+        }
+        Menu {
+            title: "Renewables"
+        }
+    }
+
     Label {
         id: welcomeHeader
         text: "Electrical Engineering Tools"
@@ -358,6 +392,27 @@ Page {
                 appWindow.logManagerInstance.log("INFO", "User opened log viewer from home page")
             } else {
                 console.log("No log manager available")
+            }
+        }
+    }
+
+    Rectangle {
+        id: sideBar
+
+        DarkLightButton {
+            id: modeButton
+            icon_name1: "Dark"
+            icon_name2: "Light"
+            mode_1: "Light Mode"
+            mode_2: "Dark Mode"
+            implicitHeight: 50
+            implicitWidth: 50
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+
+            onClicked: {
+                modeButton.checked ? modeToggled = true : modeToggled = false
             }
         }
     }
