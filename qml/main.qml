@@ -100,7 +100,7 @@ ApplicationWindow {
             // Set the log manager instance if it's available
             if (typeof logManager !== 'undefined') {
                 logManagerInstance = logManager
-                console.log("Log manager initialized")
+                // console.log("Log manager initialized")
                 // Log app startup
                 logManager.log("INFO", "Application started successfully")
             } else {
@@ -128,21 +128,7 @@ ApplicationWindow {
             id: menuBar
             height: mainMenu.height
             anchors.horizontalCenter: parent.horizontalCenter
-
-            // Backbutton
-            RoundButton {
-                id: homeButton
-                icon.source: "../icons/rounded/home_app_logo.svg"
-                    onClicked: {
-                        calculatorLoader.push("pages/Home.qml")
-                        calculatorLoader.popToIndex(0) //return to home page
-                    }
-                ToolTip.text: qsTr("Home")
-                ToolTip.visible: homeButton.hovered
-                ToolTip.delay: 500
-            }
-
-            // Backbutton
+            // Back button
             RoundButton {
                 id: backButton
                 visible: calculatorLoader.depth > 1
@@ -157,6 +143,18 @@ ApplicationWindow {
                 ToolTip.delay: 500
             }
 
+            // Home button
+            RoundButton {
+                id: homeButton
+                icon.source: "../icons/rounded/home_app_logo.svg"
+                    onClicked: {
+                        calculatorLoader.popToIndex(0) //return to home page
+                    }
+                ToolTip.text: qsTr("Home")
+                ToolTip.visible: homeButton.hovered
+                ToolTip.delay: 500
+            }
+
             // Main menu
             MenuBar {
                 id: mainMenu
@@ -168,21 +166,6 @@ ApplicationWindow {
                         height: 1
                         anchors.bottom: parent.bottom
                     }
-
-                Menu {
-                    title: "Home"
-                    Repeater {
-                        model: home
-
-                        MenuItem {
-                            text: modelData.name
-                            onTriggered: {
-                                calculatorLoader.push(modelData.source)
-                                
-                            }
-                        }
-                    }
-                }
 
                 Menu {
                     title: "Basic Calculators"

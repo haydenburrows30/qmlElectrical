@@ -2,7 +2,6 @@ from PySide6.QtCore import QObject, Property
 from utils.config import AppConfig  # Using relative import since both are in the models package
 import platform
 import PySide6.QtCore
-import os
 
 class ConfigBridge(QObject):
     """Bridge to expose AppConfig properties to QML."""
