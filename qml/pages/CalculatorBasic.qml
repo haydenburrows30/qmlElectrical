@@ -16,12 +16,12 @@ Page {
     }
 
     property var basic: [
-        { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml", icon: "waves" },
+        { name: qsTr("Impedance Calculator"), source: "../components/calculators/ImpedanceCalculator.qml", icon: "function" },
         { name: qsTr("kVA / kw / A"), source: "../components/calculators/PowerCurrentCalculator.qml", icon: "electric_meter" },
         { name: qsTr("Unit Converter"), source: "../components/calculators/UnitConverter.qml", icon: "change_circle" },
         { name: qsTr("Power Factor Correction"), source: "../components/calculators/PowerFactorCorrection.qml", icon: "trending_down" },
         { name: qsTr("Ohm's Law"), source: "../components/calculators/OhmsLawCalculator.qml", icon: "calculate" },
-        { name: qsTr("Voltage Divider"), source: "../components/calculators/VoltageDividerCalculator.qml", icon: "calculate" }
+        { name: qsTr("Voltage Divider"), source: "../components/calculators/VoltageDividerCalculator.qml", icon: "call_split" }
     ]
 
     ColumnLayout {

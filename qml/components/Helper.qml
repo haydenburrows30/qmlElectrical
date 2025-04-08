@@ -68,7 +68,9 @@ icon.source: "../../../icons/rounded/folder_open.svg"
 icon.source: "../../../icons/rounded/pause.svg"
 icon.source: "../../../icons/rounded/play_arrow.svg"
 icon.source: "../../../icons/rounded/show_chart.svg"
-
+icon.source: "../../../icons/rounded/lightbulb.svg"
+icon.source: "../../../icons/rounded/home_app_logo.svg"
+analytics
 FontLoader {
     id: iconFont
     source: "../../../icons/MaterialIcons-Regular.ttf"

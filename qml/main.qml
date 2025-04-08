@@ -131,6 +131,19 @@ ApplicationWindow {
 
             // Backbutton
             RoundButton {
+                id: homeButton
+                icon.source: "../icons/rounded/home_app_logo.svg"
+                    onClicked: {
+                        calculatorLoader.push("pages/Home.qml")
+                        calculatorLoader.popToIndex(0) //return to home page
+                    }
+                ToolTip.text: qsTr("Home")
+                ToolTip.visible: homeButton.hovered
+                ToolTip.delay: 500
+            }
+
+            // Backbutton
+            RoundButton {
                 id: backButton
                 visible: calculatorLoader.depth > 1
                 text: "<"

@@ -98,7 +98,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.source: "../../icons/rounded/waves.svg"
+                icon.source: "../../icons/rounded/shield.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
 
@@ -195,7 +195,7 @@ Page {
             HButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
-                icon.source: "../../icons/rounded/book.svg"
+                icon.source: "../../icons/rounded/book_5.svg"
                 back: Qt.lighter(palette.accent, 1.5)
                 fore: Qt.lighter(palette.accent, 1.0)
                 

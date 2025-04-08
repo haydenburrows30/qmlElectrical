@@ -16,7 +16,7 @@ Page {
 
     property var protection: [
         { name: qsTr("Discrimination Analysis"), source: "../components/calculators/DiscriminationAnalyzer.qml", icon: "show_chart"},
-        { name: qsTr("Protection Relay"), source: "../components/calculators/ProtectionRelayCalculator.qml", icon: "devices" },
+        { name: qsTr("Protection Relay"), source: "../components/calculators/ProtectionRelayCalculator.qml", icon: "computer" },
         { name: qsTr("Instrument Transformer"), source: "../components/calculators/InstrumentTransformerCalculator.qml", icon: "transform" },
         { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml", icon: "public" },
         { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml", icon: "battery_charging_full" },

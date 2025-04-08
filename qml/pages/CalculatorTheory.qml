@@ -16,13 +16,13 @@ Page {
     }
 
     property var theory: [
-        { name: qsTr("Transformer Calculator"), source: "../components/calculators/TransformerCalculator.qml", icon: "air" },
-        { name: qsTr("Harmonics Analysis"), source: "../components/calculators/HarmonicsAnalyzer.qml", icon: "air" },
-        { name: qsTr("Machine Calculator"), source: "../components/calculators/ElectricMachineCalculator.qml", icon: "air" },
-        { name: qsTr("Motor Starting"), source: "../components/calculators/MotorStartingCalculator.qml", icon: "air" },
-        { name: qsTr("RLC"), source: "../components/calculators/RLC.qml", icon: "air" },
-        { name: qsTr("Realtime"), source: "../components/calculators/RealTime.qml", icon: "air" },
-        { name: qsTr("Three Phase"), source: "../components/calculators/ThreePhase.qml", icon: "air" }
+        { name: qsTr("Transformer Calculator"), source: "../components/calculators/TransformerCalculator.qml", icon: "calculate" },
+        { name: qsTr("Harmonics Analysis"), source: "../components/calculators/HarmonicsAnalyzer.qml", icon: "troubleshoot" },
+        { name: qsTr("Machine Calculator"), source: "../components/calculators/ElectricMachineCalculator.qml", icon: "forward_circle" },
+        { name: qsTr("Motor Starting"), source: "../components/calculators/MotorStartingCalculator.qml", icon: "show_chart" },
+        { name: qsTr("RLC"), source: "../components/calculators/RLC.qml", icon: "general_device" },
+        { name: qsTr("Realtime"), source: "../components/calculators/RealTime.qml", icon: "timeline" },
+        { name: qsTr("Three Phase"), source: "../components/calculators/ThreePhase.qml", icon: "density_medium" }
     ]
 
     ColumnLayout {
