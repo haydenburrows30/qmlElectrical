@@ -12,7 +12,7 @@ Popup {
 
     anchors.centerIn: Overlay.overlay
 
-    property ConfigBridge calculator: ConfigBridge {}
+    property ConfigBridge configBridge
 
     GridLayout {
         anchors.fill: parent
@@ -34,7 +34,7 @@ Popup {
         }
 
         Label {
-            text: calculator.appName
+            text: configBridge.appName
             font.pixelSize: 16
             font.bold: true
         }
@@ -45,7 +45,7 @@ Popup {
         }
 
         Label {
-            text: calculator.version
+            text: configBridge.version
             font.pixelSize: 16
             font.bold: true
         }
@@ -56,7 +56,7 @@ Popup {
         }
 
         Label {
-            text: calculator.style
+            text: configBridge.style
             font.pixelSize: 16
             font.bold: true
         }
@@ -67,7 +67,7 @@ Popup {
         }
 
         Label {
-            text: calculator.platform
+            text: configBridge.platform
             font.pixelSize: 16
             font.bold: true
         }
@@ -80,7 +80,7 @@ Popup {
 
         Label {
             Layout.maximumWidth: 440
-            text: calculator.system_version
+            text: configBridge.system_version
             font.pixelSize: 16
             wrapMode: Text.WordWrap
             font.bold: true
@@ -92,7 +92,7 @@ Popup {
         }
 
         Label {
-            text: calculator.python_version
+            text: configBridge.python_version
             font.pixelSize: 16
             font.bold: true
         }
@@ -103,7 +103,7 @@ Popup {
         }
 
         Label {
-            text: calculator.qt_version
+            text: configBridge.qt_version
             font.pixelSize: 16
             font.bold: true
         }
@@ -114,7 +114,7 @@ Popup {
         }
 
         Label {
-            text: calculator.processor
+            text: configBridge.processor
             font.pixelSize: 16
             font.bold: true
         }

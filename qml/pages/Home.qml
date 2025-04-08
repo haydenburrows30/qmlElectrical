@@ -14,8 +14,12 @@ Page {
     id: home
 
     property ConfigBridge calculator: ConfigBridge {}
-
-    About {id: about}
+    
+    // Pass the calculator instance to the About popup
+    About {
+        id: about
+        configBridge: home.calculator
+    }
 
     ColumnLayout {
         id: menuText

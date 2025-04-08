@@ -60,44 +60,60 @@ class AppConfig:
             "app_name": "Electrical",
             "org_name": "QtProject",
             "icon_path": "icons/gallery/24x24/Wave_dark.ico",
-            "version": "1.0.1"
+            "version": "1.1.0"
         }
 
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        try:
+            # Use with statement for proper connection handling
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                cursor = conn.cursor()
 
-        # Insert defaults if not exist
-        for key, value in defaults.items():
-            cursor.execute("""
-                INSERT OR IGNORE INTO config (key, value) 
-                VALUES (?, ?)
-            """, (key, json.dumps(value)))
-            
-            # Load value from database
-            cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
-            result = cursor.fetchone()
-            if result:
-                setattr(self, key, json.loads(result[0]))
-
-        conn.commit()
-        conn.close()
+                # Insert defaults if not exist
+                for key, value in defaults.items():
+                    cursor.execute("""
+                        INSERT OR IGNORE INTO config (key, value) 
+                        VALUES (?, ?)
+                    """, (key, json.dumps(value)))
+                    
+                    # Load value from database
+                    cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
+                    result = cursor.fetchone()
+                    if result:
+                        setattr(self, key, json.loads(result[0]))
+                        logger.debug(f"Loaded setting {key}: {json.loads(result[0])}")
+                
+                # Force update version in the same connection
+                cursor.execute("""
+                    UPDATE config SET value = ? WHERE key = ?
+                """, (json.dumps(defaults["version"]), "version"))
+                conn.commit()
+                
+                # Set local attribute
+                setattr(self, "version", defaults["version"])
+                logger.info(f"Application version set to: {self.version}")
+                
+        except sqlite3.Error as e:
+            logger.error(f"Database error in _load_defaults: {e}")
 
     def save_setting(self, key: str, value: Any) -> bool:
         """Save a setting to the database."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
+            # Use with statement for proper connection handling
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    INSERT OR REPLACE INTO config (key, value) 
+                    VALUES (?, ?)
+                """, (key, json.dumps(value)))
+                
+                conn.commit()
             
-            cursor.execute("""
-                INSERT OR REPLACE INTO config (key, value) 
-                VALUES (?, ?)
-            """, (key, json.dumps(value)))
-            
-            conn.commit()
-            conn.close()
-            
+            # Set local attribute after database save
             setattr(self, key, value)
+            logger.debug(f"Successfully saved setting {key}: {value}")
             return True
+            
         except Exception as e:
             logger.error(f"Error saving setting {key}: {e}")
             return False
@@ -105,13 +121,12 @@ class AppConfig:
     def get_setting(self, key: str, default: Any = None) -> Any:
         """Get a setting from the database."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
-            result = cursor.fetchone()
-            
-            conn.close()
+            # Use with statement for proper connection handling
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
+                result = cursor.fetchone()
             
             if result:
                 return json.loads(result[0])
