@@ -14,30 +14,7 @@ Page {
     id: home
 
     property ConfigBridge calculator: ConfigBridge {}
-
-    // Focus handling for key events
-    focus: true
-    activeFocusOnTab: true
     
-    // IMPORTANT: Add this BackButtonHandler to all your subpages to enable back navigation
-    BackButtonHandler {
-        id: backHandler
-        anchors.fill: parent
-        
-        // You can customize the back action if needed
-        onBackRequested: function() {
-            console.log("Custom back action on home page")
-            // On home page, we might want to show an exit dialog instead of navigating back
-            if (window.calculatorLoader && window.calculatorLoader.depth > 1) {
-                window.calculatorLoader.pop()
-                return true
-            }
-            return false
-        }
-    }
-    
-    // Remove previous back button handling code since we're now using the BackButtonHandler
-
     // Pass the calculator instance to the About popup
     About {
         id: about
