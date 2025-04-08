@@ -110,6 +110,10 @@ Item {
                             valueFromText: function(text) {
                                 return Math.round(parseFloat(text) * 10);
                             }
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                             
                             onValueModified: if (calculatorReady) calculator.setTransformerImpedance(realValue)
                         }
@@ -120,7 +124,7 @@ Item {
                             from: 30
                             to: 150
                             value: calculator ? calculator.transformerXRRatio * 10 : 80
-                            stepSize: 5
+                            stepSize: 1
                             editable: true
                             Layout.fillWidth: true
                             property real realValue: value / 10.0
@@ -134,6 +138,10 @@ Item {
                             }
                             
                             onValueModified: if (calculatorReady) calculator.setTransformerXRRatio(realValue)
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                         }
                     }
                 }
@@ -167,6 +175,10 @@ Item {
                             }
                             
                             onValueModified: if (calculatorReady) calculator.setLineLength(realValue)
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                         }
                         
                         Label { text: "Line Resistance (Ohm/km):" }
@@ -189,6 +201,10 @@ Item {
                             }
                             
                             onValueModified: if (calculatorReady) calculator.setLineR(realValue)
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                         }
                         
                         Label { text: "Line Reactance (Ohm/km):" }
@@ -211,6 +227,10 @@ Item {
                             }
                             
                             onValueModified: if (calculatorReady) calculator.setLineX(realValue)
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                         }
                     }
                 }
@@ -247,6 +267,10 @@ Item {
                                 if (calculatorReady) calculator.setLoadMVA(realValue)
                                 calculator.refreshCalculations()
                             }
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                         }
                         
                         Label { text: "Power Factor:" }
@@ -269,6 +293,10 @@ Item {
                             }
                             
                             onValueModified: if (calculatorReady) calculator.setLoadPowerFactor(realValue)
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /[0-9]*\.?[0-9]*/
+                            }
                         }
                     }
                 }
