@@ -50,7 +50,9 @@ ApplicationWindow {
         { name: qsTr("Open Delta"), source: "components/calculators/DeltaCalculator.qml" },
         { name: qsTr("RGF"), source: "components/calculators/RefRgfCalculator.qml" },
         { name: qsTr("Fault Current"), source: "components/calculators/FaultCurrentCalculator.qml" },
-        { name: qsTr("Transformer & Line"), source: "components/calculators/TransformerLineCalculator.qml" }
+        { name: qsTr("Transformer & Line"), source: "components/calculators/TransformerLineCalculator.qml" },
+        { name: qsTr("Solkor Rf"), source: "components/calculators/FaultTable.qml" },
+
     ]
 
     property var cable: [
