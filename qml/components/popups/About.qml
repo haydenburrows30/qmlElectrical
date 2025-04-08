@@ -67,7 +67,7 @@ Popup {
         }
 
         Label {
-            text: calculator.system
+            text: calculator.platform
             font.pixelSize: 16
             font.bold: true
         }
@@ -104,6 +104,17 @@ Popup {
 
         Label {
             text: calculator.qt_version
+            font.pixelSize: 16
+            font.bold: true
+        }
+
+        Label {
+            text: "Processor:"
+            font.pixelSize: 16
+        }
+
+        Label {
+            text: calculator.processor
             font.pixelSize: 16
             font.bold: true
         }

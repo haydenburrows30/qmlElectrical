@@ -2,6 +2,7 @@ from PySide6.QtCore import QObject, Property
 from utils.config import AppConfig  # Using relative import since both are in the models package
 import platform
 import PySide6.QtCore
+import os
 
 class ConfigBridge(QObject):
     """Bridge to expose AppConfig properties to QML."""
@@ -11,9 +12,13 @@ class ConfigBridge(QObject):
         self._app_name = self._config.get_setting("app_name", "Default App Name")
         self._version = self._config.get_setting("version", "1.0.0")
         self._style = self._config.get_setting("style", "Test")
+
         self._system = platform.system()
         self._system_version = platform.version()
+        self._platform = platform.platform()
         self._python_version = platform.python_version()
+        self._processor = platform.processor()
+        
         self._qt_version = PySide6.QtCore.__version__
 
     @Property(str, constant=True)
@@ -43,3 +48,11 @@ class ConfigBridge(QObject):
     @Property(str, constant=True)
     def qt_version(self):
         return self._qt_version
+    
+    @Property(str, constant=True)
+    def platform(self):
+        return self._platform
+    
+    @Property(str, constant=True)
+    def processor(self):
+        return self._processor
