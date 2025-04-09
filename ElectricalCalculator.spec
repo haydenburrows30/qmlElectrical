@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['C:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\main.py'],
+    ['Z:\\home\\hayden\\Documents\\qmltest\\main.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('C:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\qml', 'qml'), ('C:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\resources', 'resources'), ('C:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\data', 'data'), ('C:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\icons', 'icons')],
+    datas=[('Z:\\home\\hayden\\Documents\\qmltest\\qml', 'qml'), ('Z:\\home\\hayden\\Documents\\qmltest\\resources', 'resources'), ('Z:\\home\\hayden\\Documents\\qmltest\\data', 'data'), ('Z:\\home\\hayden\\Documents\\qmltest\\icons', 'icons')],
     hiddenimports=['PySide6.QtQml', 'PySide6.QtQuick', 'PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets', 'PySide6.QtCharts'],
     hookspath=[],
     hooksconfig={},
@@ -25,7 +25,7 @@ exe = EXE(
     name='ElectricalCalculator',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=True,
+    strip=False,
     upx=True,
     upx_exclude=['vcruntime140.dll', 'python3*.dll', 'Qt*.dll'],
     runtime_tmpdir=None,

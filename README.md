@@ -93,11 +93,11 @@ sudo apt install wine64
 
 2. Run cross-platform build script:
 ```bash
-python build_scripts/cross_build.py
+python scripts/cross_build.py
 ```
 
 The script will automatically:
-- Download Python 3.8.10 for Windows
+- Download Python 3.12.10 for Windows
 - Set up Wine environment
 - Install Python in Wine
 - Install dependencies in Wine Python
@@ -105,7 +105,7 @@ The script will automatically:
 
 ```bash
 pip install -r build_requirements.txt
-python build_scripts/windows_build.py
+python scripts/windows_build.py
 ```
 
 ## Development
@@ -113,12 +113,12 @@ python build_scripts/windows_build.py
 ### Project Structure
 ```
 electrical-calculator/
-├── components/     # Reusable QML components
-├── pages/         # Main application pages
+├── qml/components/    # Reusable QML components
+├── qml/pages/         # Main application pages
 ├── data/          # Data files and resources
 ├── icons/         # Application icons
 ├── docs/          # Documentation
-└── build_scripts/ # Build automation scripts
+└── scripts/       # Build automation scripts
 ```
 
 ## License

@@ -5,6 +5,8 @@ import zipfile
 from pathlib import Path
 import PyInstaller.__main__
 from generate_icon import create_icon
+import time
+import errno
 
 def download_upx():
     """Download and extract UPX if not already present"""
@@ -49,6 +51,42 @@ def download_upx():
         print(f"Failed to download UPX: {e}")
         return None
 
+def safe_rmtree(path, max_retries=5, retry_delay=1):
+    """Safely remove a directory tree with retries for Windows permission issues."""
+    path = Path(path)
+    if not path.exists():
+        return
+    
+    for attempt in range(max_retries):
+        try:
+            if path.is_dir():
+                # Try using rmtree with ignore_errors first
+                shutil.rmtree(path, ignore_errors=True)
+                # Check if directory was actually removed
+                if not path.exists():
+                    return
+                
+                # If directory still exists, try removing files one by one
+                for item in path.glob('**/*'):
+                    try:
+                        if item.is_file():
+                            item.unlink(missing_ok=True)
+                        elif item.is_dir() and not any(item.iterdir()):
+                            item.rmdir()
+                    except Exception:
+                        pass
+                
+                # Final attempt to remove the directory
+                shutil.rmtree(path, ignore_errors=True)
+                return
+            else:
+                return
+        except Exception as e:
+            print(f"Error deleting {path}: {e}. Retrying in {retry_delay} seconds...")
+            time.sleep(retry_delay)
+    
+    print(f"Warning: Could not fully remove {path}. Continuing anyway...")
+
 def build_windows():
     """Build Windows executable using PyInstaller"""
     ROOT_DIR = Path(__file__).parent.parent
@@ -74,10 +112,18 @@ def build_windows():
     data_dir = str(ROOT_DIR / "data")
     icons_dir = str(ICONS_DIR)
     
-    # Clean previous builds
-    for dir in [DIST_DIR, BUILD_DIR]:
-        if dir.exists():
-            shutil.rmtree(dir)
+    # Clean previous builds with safe removal
+    print("Cleaning previous builds...")
+    for dir_path in [DIST_DIR, BUILD_DIR]:
+        print(f"Removing {dir_path}...")
+        safe_rmtree(dir_path)
+    
+    # If build directory still exists, create a uniquely named directory
+    if BUILD_DIR.exists():
+        print("Warning: Could not fully remove old build directory.")
+        timestamp = int(time.time())
+        BUILD_DIR = ROOT_DIR / f"build_{timestamp}"
+        print(f"Using alternative build directory: {BUILD_DIR}")
     
     # Base PyInstaller arguments
     pyinstaller_args = [
@@ -97,7 +143,7 @@ def build_windows():
         '--hidden-import=PySide6.QtCharts',
         '--paths=.',
         '--clean',
-        '--strip',
+        f'--workpath={BUILD_DIR}',
         '--onefile'
     ]
     
@@ -113,7 +159,13 @@ def build_windows():
         print("UPX not available, building without compression")
     
     # Run PyInstaller
-    PyInstaller.__main__.run(pyinstaller_args)
+    print("Running PyInstaller...")
+    try:
+        PyInstaller.__main__.run(pyinstaller_args)
+        print("PyInstaller completed successfully!")
+    except Exception as e:
+        print(f"PyInstaller encountered an error: {e}")
+        # Try to continue if possible
 
 if __name__ == '__main__':
     build_windows()

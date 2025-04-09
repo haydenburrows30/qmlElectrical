@@ -15,8 +15,8 @@ def download_file(url: str, filename: str) -> bool:
 
 def download_python():
     """Download Python Windows installer."""
-    url = "https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe"  # Changed to .exe from archive
-    exe_file = "python-3.8.10.exe"
+    url = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe"  # Updated to Python 3.12.10
+    exe_file = "python-3.12.10-amd64.exe"
     
     if not os.path.exists(exe_file):
         print(f"Downloading {url}...")
@@ -40,16 +40,16 @@ def setup_wine():
         return False
     
     # Setup Python in Wine
-    WINE_PYTHON = "~/wine/drive_c/python38/python.exe"
+    WINE_PYTHON = "~/wine/drive_c/python312/python.exe"
     if not os.path.exists(os.path.expanduser(WINE_PYTHON)):
         print("Setting up Python in Wine environment...")
         # Install Python
         subprocess.run([
             'wine',
-            'python-3.8.10.exe',
+            'python-3.12.10-amd64.exe',
             '/quiet', 
             'InstallAllUsers=1',
-            'TargetDir=C:\\python38',
+            'TargetDir=C:\\python312',
             'Include_test=0',
             'PrependPath=1'
         ], check=True)
@@ -58,7 +58,7 @@ def setup_wine():
         # Upgrade pip first
         subprocess.run([
             'wine',
-            'c:\\python38\\python.exe',
+            'c:\\python312\\python.exe',
             '-m',
             'pip',
             'install',
@@ -76,7 +76,7 @@ def setup_wine():
         for package in base_packages:
             subprocess.run([
                 'wine',
-                'c:\\python38\\python.exe',
+                'c:\\python312\\python.exe',
                 '-m',
                 'pip',
                 'install',
@@ -84,31 +84,33 @@ def setup_wine():
                 package
             ], check=True)
         
-        # Download and install PySide6 wheel
-        pyside_wheel = "PySide6-6.4.0-cp38-abi3-win_amd64.whl"
-        pyside_url = f"https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.4.0-cp38/{pyside_wheel}"
-        
-        if download_file(pyside_url, pyside_wheel):
+        # Install PySide6 - Python 3.12 should have better support for newer PySide6 versions
+        print("Installing PySide6...")
+        try:
             subprocess.run([
                 'wine',
-                'c:\\python38\\python.exe',
+                'c:\\python312\\python.exe',
                 '-m',
                 'pip',
                 'install',
-                pyside_wheel
-            ], check=True)
+                'PySide6'
+            ], check=True, timeout=300)
+            print("Successfully installed PySide6")
+        except Exception as e:
+            print(f"Error installing PySide6: {e}")
+            print("WARNING: Could not install PySide6. The build may fail.")
         
         # Install remaining packages
         packages = [
-            'pyinstaller==5.7.0',
-            'pillow==9.3.0'
+            'pyinstaller>=6.0.0',  # Updated PyInstaller for better Python 3.12 support
+            'pillow>=10.0.0'       # Updated Pillow for compatibility
         ]
         
         for package in packages:
             print(f"Installing {package}...")
             result = subprocess.run([
                 'wine',
-                'c:\\python38\\python.exe',
+                'c:\\python312\\python.exe',
                 '-m',
                 'pip',
                 'install',
@@ -124,11 +126,18 @@ def build_windows():
         return
     
     print("Building Windows executable...")
+    # Set environment variables to help with cross-platform build issues
+    env = os.environ.copy()
+    env['PYTHONNOUSERSITE'] = '1'  # Prevent loading user site packages
+    env['PYINSTALLER_CONFIG_DIR'] = os.path.expanduser('~/.wine/drive_c/users/Public/pyinstaller')
+    # Prevent PyInstaller from trying to strip binaries
+    env['PYINSTALLER_NO_STRIP'] = '1'
+    
     subprocess.run([
         'wine', 
-        'c:\\python38\\python.exe', 
-        'build_scripts/windows_build.py'
-    ])
+        'c:\\python312\\python.exe',  # Updated Python path 
+        'scripts/windows_build.py'
+    ], env=env)
 
 if __name__ == '__main__':
     build_windows()
