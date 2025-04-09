@@ -18,10 +18,6 @@ class PlatformHelper(QObject):
         self._is_mac = self._platform == 'darwin'
         self._win_version = platform.version() if self._is_windows else ""
         
-        # Print platform info for debugging
-        # print(f"Platform: {platform.system()} {platform.version()}")
-        # print(f"Python: {platform.python_version()}")
-        
         # Windows-specific GL debug info
         if self._is_windows:
             try:
