@@ -8,7 +8,6 @@ import math
 import csv
 import os
 from datetime import datetime
-import json
 import time
 
 # Import the profiling decorator

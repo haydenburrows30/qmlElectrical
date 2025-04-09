@@ -1,23 +1,16 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Slot, Signal, Property
 import os
-
-# Remove QPrinter imports and add ReportLab imports
-try:
-    from reportlab.lib import colors
-    from reportlab.lib.pagesizes import A4, landscape
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-    from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.lib.units import mm, cm
-    from reportlab.platypus import Spacer
-except ImportError:
-    print("ReportLab is not installed. Please install it using: pip install reportlab")
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import Spacer
 
 class SolkorRfCalculator(QAbstractTableModel):
-    # Add signals for site information changes
+
     siteInfoChanged = Signal()
-    # Add a signal to notify when PDF is saved
     pdfSaved = Signal(bool, str)
-    # Add signal for comparison results change
     comparisonResultsChanged = Signal()
 
     # Add custom roles
@@ -26,7 +19,6 @@ class SolkorRfCalculator(QAbstractTableModel):
 
     def __init__(self):
         super().__init__()
-        # Update the headers to add Test 2 columns
         self.headers = [
             "Test 1 Inj Current", 
             "Test 1 Relay 1 (mA DC)", 
@@ -37,36 +29,29 @@ class SolkorRfCalculator(QAbstractTableModel):
             "Fault Settings  (A)"
         ]
         self.row_headers = ["R-E", "Y-E", "B-E", "R-Y", "Y-B", "B-R"]
-        
-        # Initialize with empty data - now with 7 columns
+
         self.data_matrix = [[0.0] * 7 for _ in range(6)]
-        
-        # Set fixed values for the "Fault Settings" column (now column index 6)
+
         fault_settings = [0.22, 0.275, 0.370, 1.10, 1.10, 0.55]
         for i in range(6):
             self.data_matrix[i][6] = fault_settings[i]
-        
-        # Add properties for site information
+
         self._site_name_relay1 = ""
         self._site_name_relay2 = ""
         self._serial_number_relay1 = ""
         self._serial_number_relay2 = ""
-        self._loop_resistance = ""  # Add loop resistance property
-        self._l1_l2_e = ""  # Add L1-L2+E property
-        self._l2_l1_e = ""  # Add L2-L1+E property
-        
-        # Add comparison results storage
+        self._loop_resistance = ""
+        self._l1_l2_e = ""
+        self._l2_l1_e = ""
+
         self._test1_comparison = ["N/A"] * 6
         self._test2_comparison = ["N/A"] * 6
-        # Add mA DC comparison storage
         self._test1_relay1_ma_comparison = ["N/A"] * 6
         self._test1_relay2_ma_comparison = ["N/A"] * 6
         self._test2_relay1_ma_comparison = ["N/A"] * 6
         self._test2_relay2_ma_comparison = ["N/A"] * 6
-        # Reference value for mA DC comparisons
         self._ma_reference_value = 11.0
 
-    # Site information property getters and setters
     def get_site_name_relay1(self):
         return self._site_name_relay1
         
@@ -134,7 +119,6 @@ class SolkorRfCalculator(QAbstractTableModel):
     
     def get_standard_padding_resistance(self):
         try:
-            # Standard values
             standard_values = [500, 260, 130, 65, 35]
             
             # Calculate actual padding resistance
@@ -188,7 +172,7 @@ class SolkorRfCalculator(QAbstractTableModel):
                 
                 return f"{' + '.join(result_parts)} = {best_sum}"
             else:
-                return str(padding_res)  # Fallback to exact value
+                return str(padding_res)
                 
         except (ValueError, ZeroDivisionError):
             return "Error"
@@ -323,13 +307,11 @@ class SolkorRfCalculator(QAbstractTableModel):
                         self._test2_relay2_ma_comparison[row] = f"{percent2_2:.1f}% (OK)"
                     else:
                         self._test2_relay2_ma_comparison[row] = f"{percent2_2:.1f}% (OUT)"
-            
-            # Notify QML about the change
+
             self.comparisonResultsChanged.emit()
         except Exception as e:
             print(f"Error updating mA comparisons: {e}")
             
-    # Update setData to also update mA comparisons when relevant columns change
     def setData(self, index, value, role=Qt.EditRole):
         if not index.isValid():
             return False
@@ -355,8 +337,7 @@ class SolkorRfCalculator(QAbstractTableModel):
             except ValueError:
                 return False
         return False
-        
-    # Define properties for QML binding for mA comparisons
+
     test1_relay1_ma_comparison = Property("QVariantList", get_test1_relay1_ma_comparison, notify=comparisonResultsChanged)
     test1_relay2_ma_comparison = Property("QVariantList", get_test1_relay2_ma_comparison, notify=comparisonResultsChanged)
     test2_relay1_ma_comparison = Property("QVariantList", get_test2_relay1_ma_comparison, notify=comparisonResultsChanged)
@@ -377,9 +358,8 @@ class SolkorRfCalculator(QAbstractTableModel):
         elif role == Qt.TextAlignmentRole:
             return Qt.AlignCenter
         elif role == self.CellTypeRole:
-            # Return "text" for the Fault Settings column (now column 6), "number" for others
             return "text" if index.column() == 6 else "number"
-        elif role == Qt.UserRole:  # For row headers
+        elif role == Qt.UserRole:
             return self.row_headers[index.row()]
 
         return None
@@ -409,47 +389,38 @@ class SolkorRfCalculator(QAbstractTableModel):
     def exportToPdf(self, filePath):
         """Export the table data to a PDF file using ReportLab."""
         try:
-            # Debug print statements
             print(f"Raw filePath received: '{filePath}'")
             
-            # Fix common URL-related issues
             if filePath.startswith("file:///"):
-                # Handle Windows paths correctly by removing file:/// but not adding an extra slash
-                if ':' in filePath[8:]:  # Windows path with drive letter
-                    filePath = filePath[8:]  # Just remove the "file:///"
+                if ':' in filePath[8:]:
+                    filePath = filePath[8:]
                 else:
-                    filePath = filePath[7:]  # Remove "file://"
+                    filePath = filePath[7:]
                 print(f"Removed file prefix: '{filePath}'")
-            
-            # Ensure we have a valid path
+
             if not filePath:
                 raise ValueError("Empty file path provided")
-            
-            # Make sure the path is absolute
+
             if not os.path.isabs(filePath):
                 filePath = os.path.abspath(filePath)
                 print(f"Converted to absolute path: '{filePath}'")
-            
-            # Fix Windows paths that might have a leading slash before drive letter
+
             if filePath.startswith('/') and ':' in filePath[1:3]:
-                filePath = filePath[1:]  # Remove the leading slash
+                filePath = filePath[1:]
                 print(f"Removed leading slash from Windows path: '{filePath}'")
-                
-            # Make sure the directory exists
+
             directory = os.path.dirname(filePath)
             print(f"Directory path: '{directory}'")
             if not os.path.exists(directory):
                 print(f"Directory doesn't exist, creating: '{directory}'")
                 os.makedirs(directory)
-                
-            # Add .pdf extension if not present
+
             if not filePath.lower().endswith('.pdf'):
                 filePath += '.pdf'
                 print(f"Added .pdf extension: '{filePath}'")
                 
             print(f"Final path for PDF: '{filePath}'")
-            
-            # Create a test file to check write permissions
+
             try:
                 with open(filePath + ".test", 'w') as f:
                     f.write("Test")
@@ -458,41 +429,28 @@ class SolkorRfCalculator(QAbstractTableModel):
             except Exception as e:
                 print(f"Write test failed: {e}")
                 raise ValueError(f"Cannot write to the specified location: {e}")
-            
-            # Make sure ReportLab is imported
-            from reportlab.lib import colors
-            from reportlab.lib.pagesizes import A4, landscape
-            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-            from reportlab.lib.styles import getSampleStyleSheet
-            from reportlab.lib.units import mm, cm
-            from reportlab.platypus import Spacer
-            
-            # Create the PDF document with compact margins
+
             print(f"Creating PDF document at: {filePath}")
             doc = SimpleDocTemplate(filePath, pagesize=landscape(A4), 
                                    rightMargin=12*mm, leftMargin=12*mm,
                                    topMargin=12*mm, bottomMargin=12*mm)
             
-            # Container for the elements to be added to the document
             elements = []
             
-            # Add title with compact size
             styles = getSampleStyleSheet()
             title_style = styles['Title']
-            title_style.alignment = 1  # Center alignment
-            title_style.fontSize = 16  # Smaller title size
+            title_style.alignment = 1
+            title_style.fontSize = 16
             title = Paragraph("SOLKOR Rf with N", title_style)
             elements.append(title)
-            elements.append(Spacer(1, 8))  # Reduced spacing after title
-            
-            # Add site information with compact layout
+            elements.append(Spacer(1, 8))
+
             site_info = []
             if self._site_name_relay1 or self._site_name_relay2 or self._serial_number_relay1 or self._serial_number_relay2 or self._loop_resistance or self._l1_l2_e or self._l2_l1_e:
-                # Calculate padding resistance for PDF
+
                 padding_res = self.get_padding_resistance()
                 std_padding_res = self.get_standard_padding_resistance()
                 
-                # Create a table for site information with compact layout
                 site_info_data = [
                     ["Site Name Relay 1:", self._site_name_relay1, "Site Name Relay 2:", self._site_name_relay2],
                     ["Serial Number Relay 1:", self._serial_number_relay1, "Serial Number Relay 2:", self._serial_number_relay2],
@@ -500,90 +458,77 @@ class SolkorRfCalculator(QAbstractTableModel):
                     ["L1-L2+E:", self._l1_l2_e, "L2-L1+E:", self._l2_l1_e],
                     ["Std Padding Resistance:", std_padding_res, "", ""]
                 ]
-                
-                # Use wider column widths for the site information table
+
                 col_widths = [150, 180, 150, 180]
                 site_info = Table(site_info_data, colWidths=col_widths)
                 site_info.setStyle(TableStyle([
                     ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
                     ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 9),  # Smaller font
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
                     ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
                     ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  # Reduced padding
-                    ('TOPPADDING', (0, 0), (-1, -1), 6),     # Reduced padding
-                    ('LEFTPADDING', (0, 0), (-1, -1), 5),    # Reduced padding
-                    ('RIGHTPADDING', (0, 0), (-1, -1), 5),   # Reduced padding
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                    ('TOPPADDING', (0, 0), (-1, -1), 6),
+                    ('LEFTPADDING', (0, 0), (-1, -1), 5),
+                    ('RIGHTPADDING', (0, 0), (-1, -1), 5),
                     ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
                     ('BACKGROUND', (0, 0), (-1, -1), colors.white),
                 ]))
                 
                 elements.append(site_info)
-                elements.append(Spacer(1, 10))  # Reduced spacing
-            
-            # Prepare data for the main table with compact proportions
+                elements.append(Spacer(1, 10))
+
             data = []
             
-            # Create header styles for text wrapping with smaller sizing
             header_style = styles['Normal']
-            header_style.alignment = 1  # Center alignment
+            header_style.alignment = 1
             header_style.fontName = 'Helvetica-Bold'
-            header_style.fontSize = 9  # Reduced font size
-            
-            # Create wrapped header paragraphs
+            header_style.fontSize = 9
+
             header_paragraphs = []
             for header in self.headers:
                 header_paragraphs.append(Paragraph(header, header_style))
-            
-            # Add header row with "Fault Type" as the first cell
+
             header_row = [Paragraph('Fault Type', header_style)] + header_paragraphs
             data.append(header_row)
-            
-            # Add data rows with row headers
+
             for row_idx, row_header in enumerate(self.row_headers):
                 row_data = [row_header]
                 for col_idx in range(len(self.headers)):
                     row_data.append(str(self.data_matrix[row_idx][col_idx]))
                 data.append(row_data)
-            
-            # Set compact column widths
+
             first_col_width = 65
             data_col_width = 90
             col_widths = [first_col_width] + [data_col_width] * len(self.headers)
             
-            # Create the table with smaller proportions
             table = Table(data, colWidths=col_widths, rowHeights=[45] + [30] * len(self.row_headers))
-            
-            # Add style to the table with reduced spacing
+
             style = TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Header row
                 ('BACKGROUND', (0, 1), (0, -1), colors.lightgrey),  # Row headers column
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),  # Make row headers bold
-                ('FONTSIZE', (0, 0), (-1, 0), 9),  # Reduced font size
-                ('FONTSIZE', (0, 1), (-1, -1), 9),  # Reduced font size
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 5),  # Reduced padding
-                ('TOPPADDING', (0, 0), (-1, -1), 5),     # Reduced padding
-                ('LEFTPADDING', (0, 0), (-1, -1), 4),    # Reduced padding
-                ('RIGHTPADDING', (0, 0), (-1, -1), 4),   # Reduced padding
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Thinner grid lines
+                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+                ('TOPPADDING', (0, 0), (-1, -1), 5),
+                ('LEFTPADDING', (0, 0), (-1, -1), 4),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                # Make fault settings column (last column) slightly grayed - like in QML
                 ('BACKGROUND', (-1, 1), (-1, -1), colors.whitesmoke),
             ])
-            
-            # Define colors that match the QML table
-            out_of_spec_color = colors.HexColor('#ffe0e0')  # Light red
-            ok_color = colors.HexColor('#e0ffe0')           # Light green
+
+            out_of_spec_color = colors.HexColor('#ffe0e0')
+            ok_color = colors.HexColor('#e0ffe0')
             
             # Add cell background colors based on value checks
-            for row_idx in range(6):  # 6 rows of data
-                # Process each column in the data matrix
-                for col_idx in range(7):  # 7 columns of data
-                    # Skip the last column (fault settings)
+            for row_idx in range(6):
+                for col_idx in range(7):
                     if col_idx == 6:
                         continue
                     
@@ -596,8 +541,7 @@ class SolkorRfCalculator(QAbstractTableModel):
                     # Skip empty cells
                     if cell_value == 0:
                         continue
-                    
-                    # Calculate table column index (add 1 because we added Fault Type column at beginning)
+
                     table_col_idx = col_idx + 1
                     is_out_of_spec = False
                     is_ok = False
@@ -611,15 +555,14 @@ class SolkorRfCalculator(QAbstractTableModel):
                     
                     # For injection current columns (0, 3) - Check against fault setting
                     elif col_idx in [0, 3]:
-                        fault_setting = float(self.data_matrix[row_idx][6])  # Column 6 has fault settings
+                        fault_setting = float(self.data_matrix[row_idx][6])
                         if fault_setting > 0:
                             percentage = (cell_value / fault_setting) * 100
                             if percentage < 90 or percentage > 110:
                                 is_out_of_spec = True
                             else:
                                 is_ok = True
-                    
-                    # Apply the appropriate color to the cell
+
                     if is_out_of_spec:
                         style.add('BACKGROUND', (table_col_idx, row_idx + 1), (table_col_idx, row_idx + 1), out_of_spec_color)
                     elif is_ok:
@@ -627,10 +570,8 @@ class SolkorRfCalculator(QAbstractTableModel):
             
             table.setStyle(style)
             
-            # Add the table to the elements
             elements.append(table)
-            
-            # Build the PDF
+
             doc.build(elements)
             
             print(f"PDF successfully saved to: '{filePath}'")

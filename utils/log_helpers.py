@@ -1,8 +1,6 @@
 import os
-import sys
 import threading
-from datetime import datetime
-from PySide6.QtCore import QObject, Signal, Slot, QUrl, QFile, QIODevice, QTextStream
+from PySide6.QtCore import QObject, Signal, Slot, QUrl
 
 class LogFileHelper(QObject):
     """Helper class for file operations on logs."""
