@@ -13,12 +13,10 @@ from .logger import setup_logger
 # Base paths
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = ROOT_DIR / 'data'
-RESULTS_DIR = ROOT_DIR / 'results'
 LOGS_DIR = ROOT_DIR / 'logs'
 
 # Ensure directories exist
 DATA_DIR.mkdir(exist_ok=True)
-RESULTS_DIR.mkdir(exist_ok=True)
 LOGS_DIR.mkdir(exist_ok=True)
 
 # Add logger instance

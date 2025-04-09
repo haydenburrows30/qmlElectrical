@@ -3,6 +3,7 @@ import json
 import pandas as pd
 from PySide6.QtCore import QObject, Signal, QUrl, QThread
 from PySide6.QtWidgets import QFileDialog
+from pathlib import Path
 
 class FileUtils(QObject):
     """Utility class for file operations."""
@@ -17,15 +18,16 @@ class FileUtils(QObject):
         if parent and QThread.currentThread() != parent.thread():
             print("Warning: FileUtils created in a thread different from its parent")
         
-        self._results_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'results'))
-        os.makedirs(self._results_dir, exist_ok=True)
+        # No longer creating a results directory automatically
+        # Instead we'll use system directories as needed
         
         # Create in-memory storage for calculation history
         self._calculation_history = []
         
     def get_results_dir(self):
-        """Get the results directory path."""
-        return self._results_dir
+        """Get a default directory for saving files."""
+        # Return the user's documents directory instead of a hardcoded results dir
+        return str(Path.home() / "Documents")
         
     def normalize_filepath(self, filepath):
         """Normalize filepath from different input types."""
@@ -41,9 +43,9 @@ class FileUtils(QObject):
         if QThread.currentThread() != QThread.currentThread():
             print("Warning: Attempting to show file dialog from a non-main thread")
             # We should ideally use a signal to request the dialog from the main thread
-            # For now, we'll return a default path
+            # For now, we'll return a default path in the user's home directory
             if default_dir is None:
-                default_dir = self._results_dir
+                default_dir = str(Path.home())
             if default_name is None:
                 timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
                 default_name = f"voltage_drop_{timestamp}"
@@ -58,7 +60,8 @@ class FileUtils(QObject):
             return os.path.join(default_dir, default_name)
         
         if default_dir is None:
-            default_dir = self._results_dir
+            # Use user's documents directory instead of results dir
+            default_dir = str(Path.home() / "Documents")
             
         if default_name is None:
             timestamp = pd.Timestamp.now().strftime('%Y-%m-%d-%H-%M-%S')
