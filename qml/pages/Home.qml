@@ -21,6 +21,10 @@ Page {
         configBridge: home.calculator
     }
 
+    WhatsNew {
+        id: whatsNewPopup
+    }
+
     ColumnLayout {
         id: menuText
         anchors.centerIn: parent
@@ -291,6 +295,7 @@ Page {
             }
         }
     }
+
     // Buttons bottom right
     RowLayout {
         anchors {
@@ -300,6 +305,25 @@ Page {
         }
 
         height: 70
+
+        // What's New button
+        Button {
+            id: whatsNewButton
+            contentItem: Label {
+                text: "What's New"
+                font.pixelSize: 14
+            }
+            
+            background: Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.width: 1
+                border.color: whatsNewButton.hovered ? "blue" : "transparent"
+                radius: 5
+            }
+            
+            onClicked: whatsNewPopup.open()
+        }
 
         // About button
         Button {
