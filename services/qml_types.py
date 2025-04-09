@@ -33,7 +33,7 @@ from models.series_helper import SeriesHelper
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import RLCChart
 from utils.AboutProgram import ConfigBridge
-from models.fault_current_model import FaultCurrentModel
+from models.solkor_rf_calculator import SolkorRfCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -76,5 +76,5 @@ def register_qml_types(engine, current_dir):
         (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
         (RLCChart, "RLC", 1, 0, "RLCChart"),
         (ConfigBridge, "ConfigBridge", 1, 0, "ConfigBridge"),
-        (FaultCurrentModel, "FaultCurrentModel", 1, 0, "FaultCurrentModel"),
+        (SolkorRfCalculator, "SolkorRfCalculator", 1, 0, "SolkorRfCalculator"),
     ]

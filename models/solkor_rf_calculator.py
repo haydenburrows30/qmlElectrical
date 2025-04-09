@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Slot, Signal, Property
 import os
-import reportlab
+
 # Remove QPrinter imports and add ReportLab imports
 try:
     from reportlab.lib import colors
@@ -12,9 +12,7 @@ try:
 except ImportError:
     print("ReportLab is not installed. Please install it using: pip install reportlab")
 
-from itertools import combinations_with_replacement
-
-class FaultCurrentModel(QAbstractTableModel):
+class SolkorRfCalculator(QAbstractTableModel):
     # Add signals for site information changes
     siteInfoChanged = Signal()
     # Add a signal to notify when PDF is saved
@@ -54,6 +52,8 @@ class FaultCurrentModel(QAbstractTableModel):
         self._serial_number_relay1 = ""
         self._serial_number_relay2 = ""
         self._loop_resistance = ""  # Add loop resistance property
+        self._l1_l2_e = ""  # Add L1-L2+E property
+        self._l2_l1_e = ""  # Add L2-L1+E property
         
         # Add comparison results storage
         self._test1_comparison = ["N/A"] * 6
@@ -105,6 +105,22 @@ class FaultCurrentModel(QAbstractTableModel):
     def set_loop_resistance(self, value):
         if self._loop_resistance != value:
             self._loop_resistance = value
+            self.siteInfoChanged.emit()
+    
+    def get_l1_l2_e(self):
+        return self._l1_l2_e
+        
+    def set_l1_l2_e(self, value):
+        if self._l1_l2_e != value:
+            self._l1_l2_e = value
+            self.siteInfoChanged.emit()
+    
+    def get_l2_l1_e(self):
+        return self._l2_l1_e
+        
+    def set_l2_l1_e(self, value):
+        if self._l2_l1_e != value:
+            self._l2_l1_e = value
             self.siteInfoChanged.emit()
     
     def get_padding_resistance(self):
@@ -183,6 +199,8 @@ class FaultCurrentModel(QAbstractTableModel):
     serial_number_relay1 = Property(str, get_serial_number_relay1, set_serial_number_relay1, notify=siteInfoChanged)
     serial_number_relay2 = Property(str, get_serial_number_relay2, set_serial_number_relay2, notify=siteInfoChanged)
     loop_resistance = Property(str, get_loop_resistance, set_loop_resistance, notify=siteInfoChanged)
+    l1_l2_e = Property(str, get_l1_l2_e, set_l1_l2_e, notify=siteInfoChanged)
+    l2_l1_e = Property(str, get_l2_l1_e, set_l2_l1_e, notify=siteInfoChanged)
     padding_resistance = Property(str, get_padding_resistance, notify=siteInfoChanged)
     standard_padding_resistance = Property(str, get_standard_padding_resistance, notify=siteInfoChanged)
 
@@ -469,7 +487,7 @@ class FaultCurrentModel(QAbstractTableModel):
             
             # Add site information with compact layout
             site_info = []
-            if self._site_name_relay1 or self._site_name_relay2 or self._serial_number_relay1 or self._serial_number_relay2 or self._loop_resistance:
+            if self._site_name_relay1 or self._site_name_relay2 or self._serial_number_relay1 or self._serial_number_relay2 or self._loop_resistance or self._l1_l2_e or self._l2_l1_e:
                 # Calculate padding resistance for PDF
                 padding_res = self.get_padding_resistance()
                 std_padding_res = self.get_standard_padding_resistance()
@@ -479,6 +497,7 @@ class FaultCurrentModel(QAbstractTableModel):
                     ["Site Name Relay 1:", self._site_name_relay1, "Site Name Relay 2:", self._site_name_relay2],
                     ["Serial Number Relay 1:", self._serial_number_relay1, "Serial Number Relay 2:", self._serial_number_relay2],
                     ["Loop Resistance:", self._loop_resistance, "Padding Resistance:", padding_res],
+                    ["L1-L2+E:", self._l1_l2_e, "L2-L1+E:", self._l2_l1_e],
                     ["Std Padding Resistance:", std_padding_res, "", ""]
                 ]
                 
@@ -555,6 +574,57 @@ class FaultCurrentModel(QAbstractTableModel):
                 # Make fault settings column (last column) slightly grayed - like in QML
                 ('BACKGROUND', (-1, 1), (-1, -1), colors.whitesmoke),
             ])
+            
+            # Define colors that match the QML table
+            out_of_spec_color = colors.HexColor('#ffe0e0')  # Light red
+            ok_color = colors.HexColor('#e0ffe0')           # Light green
+            
+            # Add cell background colors based on value checks
+            for row_idx in range(6):  # 6 rows of data
+                # Process each column in the data matrix
+                for col_idx in range(7):  # 7 columns of data
+                    # Skip the last column (fault settings)
+                    if col_idx == 6:
+                        continue
+                    
+                    cell_value = 0
+                    try:
+                        cell_value = float(self.data_matrix[row_idx][col_idx])
+                    except (ValueError, TypeError):
+                        continue
+                    
+                    # Skip empty cells
+                    if cell_value == 0:
+                        continue
+                    
+                    # Calculate table column index (add 1 because we added Fault Type column at beginning)
+                    table_col_idx = col_idx + 1
+                    is_out_of_spec = False
+                    is_ok = False
+                    
+                    # For mA DC columns (1, 2, 4, 5) - Check against 11 mA reference
+                    if col_idx in [1, 2, 4, 5]:
+                        if abs(cell_value - 11.0) > 0.5:
+                            is_out_of_spec = True
+                        else:
+                            is_ok = True
+                    
+                    # For injection current columns (0, 3) - Check against fault setting
+                    elif col_idx in [0, 3]:
+                        fault_setting = float(self.data_matrix[row_idx][6])  # Column 6 has fault settings
+                        if fault_setting > 0:
+                            percentage = (cell_value / fault_setting) * 100
+                            if percentage < 90 or percentage > 110:
+                                is_out_of_spec = True
+                            else:
+                                is_ok = True
+                    
+                    # Apply the appropriate color to the cell
+                    if is_out_of_spec:
+                        style.add('BACKGROUND', (table_col_idx, row_idx + 1), (table_col_idx, row_idx + 1), out_of_spec_color)
+                    elif is_ok:
+                        style.add('BACKGROUND', (table_col_idx, row_idx + 1), (table_col_idx, row_idx + 1), ok_color)
+            
             table.setStyle(style)
             
             # Add the table to the elements

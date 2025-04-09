@@ -22,8 +22,6 @@ ApplicationWindow {
     Universal.theme: modeToggled ? Universal.Dark : Universal.Light
     Universal.accent: modeToggled ? Universal.Red : Universal.Cyan
     
-    // Make logViewerPopup and logManagerInstance explicit properties
-    // so that other QML components can access them through the window
     property var logViewerPopup: logViewerPopupInstance
     property var logManagerInstance: null
     property bool modeToggled: false
@@ -51,8 +49,7 @@ ApplicationWindow {
         { name: qsTr("RGF"), source: "components/calculators/RefRgfCalculator.qml" },
         { name: qsTr("Fault Current"), source: "components/calculators/FaultCurrentCalculator.qml" },
         { name: qsTr("Transformer & Line"), source: "components/calculators/TransformerLineCalculator.qml" },
-        { name: qsTr("Solkor Rf"), source: "components/calculators/FaultTable.qml" },
-
+        { name: qsTr("Solkor Rf"), source: "components/calculators/SolkorRf.qml" },
     ]
 
     property var cable: [
@@ -93,17 +90,13 @@ ApplicationWindow {
         logManager: logManagerInstance
     }
 
-    // Timer to initialize logManager after it's available from python
     Timer {
         interval: 10
         running: true
         repeat: false
         onTriggered: {
-            // Set the log manager instance if it's available
             if (typeof logManager !== 'undefined') {
                 logManagerInstance = logManager
-                // console.log("Log manager initialized")
-                // Log app startup
                 logManager.log("INFO", "Application started successfully")
             } else {
                 console.error("Log manager not available after timeout")
