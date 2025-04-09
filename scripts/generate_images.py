@@ -21,7 +21,7 @@ def generate_all_images():
     from generate_diagram_images import main as generate_diagrams    # This exists
     
     # Create media directory if it doesn't exist
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     # Generate all formula images
     print("Generating formula images...")

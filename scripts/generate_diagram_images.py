@@ -13,7 +13,7 @@ rcParams['mathtext.fontset'] = 'dejavusans'  # Use DejaVu Sans for math
 def create_transformer_diagram(filename='transformer_diagram.png'):
     """Generate a transformer diagram with primary and secondary windings."""
     # Create directory if needed
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
@@ -63,7 +63,7 @@ def create_transformer_diagram(filename='transformer_diagram.png'):
     
     # Save the figure
     plt.tight_layout()
-    output_path = os.path.join('media', filename)
+    output_path = os.path.join('assets/formulas', filename)
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f"Created transformer diagram: {output_path}")
@@ -71,7 +71,7 @@ def create_transformer_diagram(filename='transformer_diagram.png'):
 def create_voltage_drop_diagram(filename='voltage_drop_diagram.png'):
     """Generate a voltage drop diagram showing a cable with voltage levels."""
     # Create directory if needed
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(6, 3), dpi=100)
@@ -109,7 +109,7 @@ def create_voltage_drop_diagram(filename='voltage_drop_diagram.png'):
     
     # Save the figure
     plt.tight_layout()
-    output_path = os.path.join('media', filename)
+    output_path = os.path.join('assets/formulas', filename)
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f"Created voltage drop diagram: {output_path}")
@@ -117,7 +117,7 @@ def create_voltage_drop_diagram(filename='voltage_drop_diagram.png'):
 def create_power_triangle_diagram(filename='power_triangle_diagram.png'):
     """Generate power triangle diagram showing before and after PF correction."""
     # Create directory if needed
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     # Create figure and axis
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4))
@@ -173,7 +173,7 @@ def create_power_triangle_diagram(filename='power_triangle_diagram.png'):
     
     # Save the figure
     plt.tight_layout()
-    output_path = os.path.join('media', filename)
+    output_path = os.path.join('assets/formulas', filename)
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f"Created power triangle diagram: {output_path}")
@@ -181,7 +181,7 @@ def create_power_triangle_diagram(filename='power_triangle_diagram.png'):
 def create_cable_ampacity_chart(filename='cable_ampacity_chart.png'):
     """Generate chart showing cable ampacity for different sizes."""
     # Create directory if needed
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -211,14 +211,14 @@ def create_cable_ampacity_chart(filename='cable_ampacity_chart.png'):
     
     # Save the figure
     plt.tight_layout()
-    output_path = os.path.join('media', filename)
+    output_path = os.path.join('assets/formulas', filename)
     plt.savefig(output_path, dpi=150)
     plt.close()
     print(f"Created cable ampacity chart: {output_path}")
 
 def create_relay_coordination_diagram(filename='relay_coordination.png'):
     """Generate a relay coordination diagram showing multiple relays in series."""
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     fig, ax = plt.subplots(figsize=(8, 6))
     
@@ -255,13 +255,13 @@ def create_relay_coordination_diagram(filename='relay_coordination.png'):
     ax.set_ylim(0.2, 0.9)
     ax.axis('off')
     
-    plt.savefig(f'media/{filename}', dpi=150, bbox_inches='tight')
+    plt.savefig(f'assets/formulas/{filename}', dpi=150, bbox_inches='tight')
     plt.close()
-    print(f"Created relay coordination diagram: media/{filename}")
+    print(f"Created relay coordination diagram: assets/formulas/{filename}")
 
 def create_discrimination_diagram(filename='discrimination.png'):
     """Generate a discrimination diagram showing time-current curves."""
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     fig, ax = plt.subplots(figsize=(8, 6))
     
@@ -305,7 +305,7 @@ def create_discrimination_diagram(filename='discrimination.png'):
     ax.legend()
     ax.set_title('Relay Discrimination Curves')
     
-    output_path = os.path.join('media', filename)
+    output_path = os.path.join('assets/formulas', filename)
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f"Created discrimination diagram: {output_path}")
