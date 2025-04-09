@@ -6,7 +6,7 @@ import QtQuick.Controls.impl as Impl
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
-import "../../../scripts/MaterialDesignRegular.js" as MD
+import "../../../data/MaterialDesignRegular.js" as MD
 
 Button {
     id: control
