@@ -7,6 +7,8 @@ try:
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
     from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.units import mm, cm
+    from reportlab.platypus import Spacer
 except ImportError:
     print("ReportLab is not installed. Please install it using: pip install reportlab")
 
@@ -17,6 +19,8 @@ class FaultCurrentModel(QAbstractTableModel):
     siteInfoChanged = Signal()
     # Add a signal to notify when PDF is saved
     pdfSaved = Signal(bool, str)
+    # Add signal for comparison results change
+    comparisonResultsChanged = Signal()
 
     # Add custom roles
     CellTypeRole = Qt.UserRole + 1
@@ -26,13 +30,13 @@ class FaultCurrentModel(QAbstractTableModel):
         super().__init__()
         # Update the headers to add Test 2 columns
         self.headers = [
-            "Secondary Current Relay 1", 
-            "Secondary Current Relay 2", 
-            "Relay 1 mA", 
-            "Relay 2 mA",
-            "Relay 1 mA Test 2",  # New column
-            "Relay 2 mA Test 2",  # New column
-            "Fault Settings"
+            "Test 1 Inj Current", 
+            "Test 1 Relay 1 (mA DC)", 
+            "Test 1 Relay 2 (mA DC)",
+            "Test 2 Inj Current", 
+            "Test 2 Relay 1 (mA DC)",
+            "Test 2 Relay 2 (mA DC)",
+            "Fault Settings  (A)"
         ]
         self.row_headers = ["R-E", "Y-E", "B-E", "R-Y", "Y-B", "B-R"]
         
@@ -50,6 +54,17 @@ class FaultCurrentModel(QAbstractTableModel):
         self._serial_number_relay1 = ""
         self._serial_number_relay2 = ""
         self._loop_resistance = ""  # Add loop resistance property
+        
+        # Add comparison results storage
+        self._test1_comparison = ["N/A"] * 6
+        self._test2_comparison = ["N/A"] * 6
+        # Add mA DC comparison storage
+        self._test1_relay1_ma_comparison = ["N/A"] * 6
+        self._test1_relay2_ma_comparison = ["N/A"] * 6
+        self._test2_relay1_ma_comparison = ["N/A"] * 6
+        self._test2_relay2_ma_comparison = ["N/A"] * 6
+        # Reference value for mA DC comparisons
+        self._ma_reference_value = 11.0
 
     # Site information property getters and setters
     def get_site_name_relay1(self):
@@ -171,6 +186,164 @@ class FaultCurrentModel(QAbstractTableModel):
     padding_resistance = Property(str, get_padding_resistance, notify=siteInfoChanged)
     standard_padding_resistance = Property(str, get_standard_padding_resistance, notify=siteInfoChanged)
 
+    # Add comparison results properties
+    def get_test1_comparison(self):
+        return self._test1_comparison
+    
+    def get_test2_comparison(self):
+        return self._test2_comparison
+    
+    @Slot()
+    def updateComparisons(self):
+        """Compare injection currents against fault settings and update results"""
+        try:
+            for row in range(6):
+                # Get test values
+                test1_current = float(self.data_matrix[row][0])
+                test2_current = float(self.data_matrix[row][3])
+                fault_setting = float(self.data_matrix[row][6])
+                
+                # Test 1 comparison
+                if test1_current == 0:
+                    self._test1_comparison[row] = "N/A"
+                else:
+                    ratio1 = test1_current / fault_setting if fault_setting else 0
+                    percent1 = ratio1 * 100
+                    if percent1 < 90:
+                        self._test1_comparison[row] = f"{percent1:.1f}% (LOW)"
+                    elif percent1 > 110:
+                        self._test1_comparison[row] = f"{percent1:.1f}% (HIGH)"
+                    else:
+                        self._test1_comparison[row] = f"{percent1:.1f}% (OK)"
+                
+                # Test 2 comparison
+                if test2_current == 0:
+                    self._test2_comparison[row] = "N/A"
+                else:
+                    ratio2 = test2_current / fault_setting if fault_setting else 0
+                    percent2 = ratio2 * 100
+                    if percent2 < 90:
+                        self._test2_comparison[row] = f"{percent2:.1f}% (LOW)"
+                    elif percent2 > 110:
+                        self._test2_comparison[row] = f"{percent2:.1f}% (HIGH)"
+                    else:
+                        self._test2_comparison[row] = f"{percent2:.1f}% (OK)"
+            
+            # Notify QML about the change
+            self.comparisonResultsChanged.emit()
+        except Exception as e:
+            print(f"Error updating comparisons: {e}")
+    
+    # Define properties for QML binding
+    test1_comparison = Property("QVariantList", get_test1_comparison, notify=comparisonResultsChanged)
+    test2_comparison = Property("QVariantList", get_test2_comparison, notify=comparisonResultsChanged)
+
+    # Add getters for mA DC comparison results
+    def get_test1_relay1_ma_comparison(self):
+        return self._test1_relay1_ma_comparison
+    
+    def get_test1_relay2_ma_comparison(self):
+        return self._test1_relay2_ma_comparison
+    
+    def get_test2_relay1_ma_comparison(self):
+        return self._test2_relay1_ma_comparison
+    
+    def get_test2_relay2_ma_comparison(self):
+        return self._test2_relay2_ma_comparison
+    
+    @Slot()
+    def updateMAComparisons(self):
+        """Compare mA DC values against reference value of 11 mA"""
+        try:
+            for row in range(6):
+                # Get test values for mA DC
+                test1_relay1 = float(self.data_matrix[row][1])
+                test1_relay2 = float(self.data_matrix[row][2])
+                test2_relay1 = float(self.data_matrix[row][4])
+                test2_relay2 = float(self.data_matrix[row][5])
+                
+                # Test 1 Relay 1 comparison
+                if test1_relay1 == 0:
+                    self._test1_relay1_ma_comparison[row] = "N/A"
+                else:
+                    diff1_1 = abs(test1_relay1 - self._ma_reference_value)
+                    percent1_1 = (test1_relay1 / self._ma_reference_value) * 100
+                    if diff1_1 <= 0.5:  # Within ±0.5 mA
+                        self._test1_relay1_ma_comparison[row] = f"{percent1_1:.1f}% (OK)"
+                    else:
+                        self._test1_relay1_ma_comparison[row] = f"{percent1_1:.1f}% (OUT)"
+                
+                # Test 1 Relay 2 comparison
+                if test1_relay2 == 0:
+                    self._test1_relay2_ma_comparison[row] = "N/A"
+                else:
+                    diff1_2 = abs(test1_relay2 - self._ma_reference_value)
+                    percent1_2 = (test1_relay2 / self._ma_reference_value) * 100
+                    if diff1_2 <= 0.5:  # Within ±0.5 mA
+                        self._test1_relay2_ma_comparison[row] = f"{percent1_2:.1f}% (OK)"
+                    else:
+                        self._test1_relay2_ma_comparison[row] = f"{percent1_2:.1f}% (OUT)"
+                
+                # Test 2 Relay 1 comparison
+                if test2_relay1 == 0:
+                    self._test2_relay1_ma_comparison[row] = "N/A"
+                else:
+                    diff2_1 = abs(test2_relay1 - self._ma_reference_value)
+                    percent2_1 = (test2_relay1 / self._ma_reference_value) * 100
+                    if diff2_1 <= 0.5:  # Within ±0.5 mA
+                        self._test2_relay1_ma_comparison[row] = f"{percent2_1:.1f}% (OK)"
+                    else:
+                        self._test2_relay1_ma_comparison[row] = f"{percent2_1:.1f}% (OUT)"
+                
+                # Test 2 Relay 2 comparison
+                if test2_relay2 == 0:
+                    self._test2_relay2_ma_comparison[row] = "N/A"
+                else:
+                    diff2_2 = abs(test2_relay2 - self._ma_reference_value)
+                    percent2_2 = (test2_relay2 / self._ma_reference_value) * 100
+                    if diff2_2 <= 0.5:  # Within ±0.5 mA
+                        self._test2_relay2_ma_comparison[row] = f"{percent2_2:.1f}% (OK)"
+                    else:
+                        self._test2_relay2_ma_comparison[row] = f"{percent2_2:.1f}% (OUT)"
+            
+            # Notify QML about the change
+            self.comparisonResultsChanged.emit()
+        except Exception as e:
+            print(f"Error updating mA comparisons: {e}")
+            
+    # Update setData to also update mA comparisons when relevant columns change
+    def setData(self, index, value, role=Qt.EditRole):
+        if not index.isValid():
+            return False
+
+        if role == Qt.EditRole:
+            try:
+                # Don't allow editing the Fault Settings column (now column index 6)
+                if index.column() == 6:
+                    return False
+                
+                self.data_matrix[index.row()][index.column()] = float(value)
+                self.dataChanged.emit(index, index, [role])
+                
+                # Update comparisons when injection current values change (columns 0 and 3)
+                if index.column() == 0 or index.column() == 3:
+                    self.updateComparisons()
+                
+                # Update mA comparisons when mA values change (columns 1, 2, 4, 5)
+                if index.column() in [1, 2, 4, 5]:
+                    self.updateMAComparisons()
+                
+                return True
+            except ValueError:
+                return False
+        return False
+        
+    # Define properties for QML binding for mA comparisons
+    test1_relay1_ma_comparison = Property("QVariantList", get_test1_relay1_ma_comparison, notify=comparisonResultsChanged)
+    test1_relay2_ma_comparison = Property("QVariantList", get_test1_relay2_ma_comparison, notify=comparisonResultsChanged)
+    test2_relay1_ma_comparison = Property("QVariantList", get_test2_relay1_ma_comparison, notify=comparisonResultsChanged)
+    test2_relay2_ma_comparison = Property("QVariantList", get_test2_relay2_ma_comparison, notify=comparisonResultsChanged)
+
     def rowCount(self, parent=QModelIndex()):
         return len(self.row_headers)
 
@@ -204,23 +377,6 @@ class FaultCurrentModel(QAbstractTableModel):
         # Other columns are editable
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
-    def setData(self, index, value, role=Qt.EditRole):
-        if not index.isValid():
-            return False
-
-        if role == Qt.EditRole:
-            try:
-                # Don't allow editing the Fault Settings column (now column index 6)
-                if index.column() == 6:
-                    return False
-                
-                self.data_matrix[index.row()][index.column()] = float(value)
-                self.dataChanged.emit(index, index, [role])
-                return True
-            except ValueError:
-                return False
-        return False
-
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
@@ -240,8 +396,12 @@ class FaultCurrentModel(QAbstractTableModel):
             
             # Fix common URL-related issues
             if filePath.startswith("file:///"):
-                filePath = filePath[8:]  # Remove file:///
-                print(f"Removed file:/// prefix: '{filePath}'")
+                # Handle Windows paths correctly by removing file:/// but not adding an extra slash
+                if ':' in filePath[8:]:  # Windows path with drive letter
+                    filePath = filePath[8:]  # Just remove the "file:///"
+                else:
+                    filePath = filePath[7:]  # Remove "file://"
+                print(f"Removed file prefix: '{filePath}'")
             
             # Ensure we have a valid path
             if not filePath:
@@ -251,9 +411,15 @@ class FaultCurrentModel(QAbstractTableModel):
             if not os.path.isabs(filePath):
                 filePath = os.path.abspath(filePath)
                 print(f"Converted to absolute path: '{filePath}'")
+            
+            # Fix Windows paths that might have a leading slash before drive letter
+            if filePath.startswith('/') and ':' in filePath[1:3]:
+                filePath = filePath[1:]  # Remove the leading slash
+                print(f"Removed leading slash from Windows path: '{filePath}'")
                 
             # Make sure the directory exists
             directory = os.path.dirname(filePath)
+            print(f"Directory path: '{directory}'")
             if not os.path.exists(directory):
                 print(f"Directory doesn't exist, creating: '{directory}'")
                 os.makedirs(directory)
@@ -280,26 +446,35 @@ class FaultCurrentModel(QAbstractTableModel):
             from reportlab.lib.pagesizes import A4, landscape
             from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
             from reportlab.lib.styles import getSampleStyleSheet
+            from reportlab.lib.units import mm, cm
+            from reportlab.platypus import Spacer
             
-            # Create the PDF document
+            # Create the PDF document with compact margins
             print(f"Creating PDF document at: {filePath}")
-            doc = SimpleDocTemplate(filePath, pagesize=landscape(A4))
+            doc = SimpleDocTemplate(filePath, pagesize=landscape(A4), 
+                                   rightMargin=12*mm, leftMargin=12*mm,
+                                   topMargin=12*mm, bottomMargin=12*mm)
             
             # Container for the elements to be added to the document
             elements = []
             
-            # Add title
+            # Add title with compact size
             styles = getSampleStyleSheet()
-            title = Paragraph("Fault Current Table", styles['Title'])
+            title_style = styles['Title']
+            title_style.alignment = 1  # Center alignment
+            title_style.fontSize = 16  # Smaller title size
+            title = Paragraph("SOLKOR Rf with N", title_style)
             elements.append(title)
+            elements.append(Spacer(1, 8))  # Reduced spacing after title
             
-            # Add site information
+            # Add site information with compact layout
             site_info = []
             if self._site_name_relay1 or self._site_name_relay2 or self._serial_number_relay1 or self._serial_number_relay2 or self._loop_resistance:
                 # Calculate padding resistance for PDF
                 padding_res = self.get_padding_resistance()
                 std_padding_res = self.get_standard_padding_resistance()
                 
+                # Create a table for site information with compact layout
                 site_info_data = [
                     ["Site Name Relay 1:", self._site_name_relay1, "Site Name Relay 2:", self._site_name_relay2],
                     ["Serial Number Relay 1:", self._serial_number_relay1, "Serial Number Relay 2:", self._serial_number_relay2],
@@ -307,23 +482,43 @@ class FaultCurrentModel(QAbstractTableModel):
                     ["Std Padding Resistance:", std_padding_res, "", ""]
                 ]
                 
-                site_info = Table(site_info_data, colWidths=[120, 150, 120, 150])
+                # Use wider column widths for the site information table
+                col_widths = [150, 180, 150, 180]
+                site_info = Table(site_info_data, colWidths=col_widths)
                 site_info.setStyle(TableStyle([
                     ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
                     ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),  # Smaller font
                     ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
                     ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  # Reduced padding
+                    ('TOPPADDING', (0, 0), (-1, -1), 6),     # Reduced padding
+                    ('LEFTPADDING', (0, 0), (-1, -1), 5),    # Reduced padding
+                    ('RIGHTPADDING', (0, 0), (-1, -1), 5),   # Reduced padding
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+                    ('BACKGROUND', (0, 0), (-1, -1), colors.white),
                 ]))
                 
                 elements.append(site_info)
-                elements.append(Paragraph("<br/>", styles["Normal"]))  # Add some spacing
+                elements.append(Spacer(1, 10))  # Reduced spacing
             
-            # Prepare data for the table
+            # Prepare data for the main table with compact proportions
             data = []
             
+            # Create header styles for text wrapping with smaller sizing
+            header_style = styles['Normal']
+            header_style.alignment = 1  # Center alignment
+            header_style.fontName = 'Helvetica-Bold'
+            header_style.fontSize = 9  # Reduced font size
+            
+            # Create wrapped header paragraphs
+            header_paragraphs = []
+            for header in self.headers:
+                header_paragraphs.append(Paragraph(header, header_style))
+            
             # Add header row with "Fault Type" as the first cell
-            header_row = ['Fault Type'] + self.headers
+            header_row = [Paragraph('Fault Type', header_style)] + header_paragraphs
             data.append(header_row)
             
             # Add data rows with row headers
@@ -333,20 +528,32 @@ class FaultCurrentModel(QAbstractTableModel):
                     row_data.append(str(self.data_matrix[row_idx][col_idx]))
                 data.append(row_data)
             
-            # Create the table
-            table = Table(data)
+            # Set compact column widths
+            first_col_width = 65
+            data_col_width = 90
+            col_widths = [first_col_width] + [data_col_width] * len(self.headers)
             
-            # Add style to the table
+            # Create the table with smaller proportions
+            table = Table(data, colWidths=col_widths, rowHeights=[45] + [30] * len(self.row_headers))
+            
+            # Add style to the table with reduced spacing
             style = TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Header row
                 ('BACKGROUND', (0, 1), (0, -1), colors.lightgrey),  # Row headers column
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),  # Make row headers bold
+                ('FONTSIZE', (0, 0), (-1, 0), 9),  # Reduced font size
+                ('FONTSIZE', (0, 1), (-1, -1), 9),  # Reduced font size
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 5),  # Reduced padding
+                ('TOPPADDING', (0, 0), (-1, -1), 5),     # Reduced padding
+                ('LEFTPADDING', (0, 0), (-1, -1), 4),    # Reduced padding
+                ('RIGHTPADDING', (0, 0), (-1, -1), 4),   # Reduced padding
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Thinner grid lines
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                # Make fault settings column (last column) slightly grayed - like in QML
+                ('BACKGROUND', (-1, 1), (-1, -1), colors.whitesmoke),
             ])
             table.setStyle(style)
             
