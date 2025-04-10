@@ -29,8 +29,8 @@ Button {
             id: backgroundID
             anchors.fill: parent
             gradient: control.gradient
-        visible: !control.flat || control.down || control.checked || control.highlighted
-        color: control.down ? control.Universal.baseMediumLowColor :
+            visible: !control.flat || control.down || control.checked || control.highlighted
+            color: control.down ? control.Universal.baseMediumLowColor :
             control.enabled && (control.highlighted || control.checked) ? control.Universal.accent :
                                                                             back
 

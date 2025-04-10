@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Universal
+import QtQuick.Effects
 
 Button {
     id: control
@@ -16,6 +17,7 @@ Button {
                                                                              control.Universal.baseLowColor
 
         Rectangle {
+            id: buttonBackground
             width: parent.width
             height: parent.height
             color: "transparent"
@@ -25,5 +27,16 @@ Button {
 
             radius: 3
         }
+
+        // MultiEffect {
+        //     source: buttonBackground
+        //     anchors.fill: buttonBackground
+        //     autoPaddingEnabled: true
+        //     shadowBlur: 1.0
+        //     shadowEnabled: true
+        //     shadowVerticalOffset: 3
+        //     shadowHorizontalOffset: 1
+        //     opacity: control.pressed ? 0.75 : 1.0
+        // }
     }
 }

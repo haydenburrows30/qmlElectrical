@@ -20,7 +20,7 @@ ApplicationWindow {
     visible: true
 
     Universal.theme: modeToggled ? Universal.Dark : Universal.Light
-    Universal.accent: modeToggled ? Universal.Red : Universal.Cyan
+    Universal.accent: Universal.Cyan
     
     property var logViewerPopup: logViewerPopupInstance
     property var logManagerInstance: null
