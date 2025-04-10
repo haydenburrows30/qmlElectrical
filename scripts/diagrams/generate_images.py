@@ -17,11 +17,11 @@ def check_and_install_dependencies():
 def generate_all_images():
     """Generate all formula and diagram images for the application."""
     # Import after ensuring dependencies are installed
-    from scripts.generate_formula_images import main as generate_formulas    # This file doesn't exist
-    from scripts.generate_diagram_images import main as generate_diagrams    # This exists
+    from generate_formula_images import main as generate_formulas    # This file doesn't exist
+    from generate_diagram_images import main as generate_diagrams    # This exists
     
     # Create media directory if it doesn't exist
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets/formulas', exist_ok=True)
     
     # Generate all formula images
     print("Generating formula images...")

@@ -8,7 +8,7 @@ import "../components"
 import "../components/buttons/"
 import "../components/playground/"
 import "../components/style"
-import "../../scripts/MaterialDesignRegular.js" as MD
+import "../../data/MaterialDesignRegular.js" as MD
 
 Page {
 

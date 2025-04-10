@@ -201,6 +201,6 @@
     <file>data/qtquickcontrols2.conf</file>
     
     <!-- JavaScript -->
-    <file>scripts/MaterialDesignRegular.js</file>
+    <file>data/MaterialDesignRegular.js</file>
 </qresource>
 </RCC>

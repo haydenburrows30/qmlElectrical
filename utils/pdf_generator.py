@@ -2,7 +2,6 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.lineplots import LinePlot
 import os

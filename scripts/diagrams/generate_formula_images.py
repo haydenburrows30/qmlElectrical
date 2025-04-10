@@ -30,7 +30,7 @@ def create_formula_image(filename, formula, width=6, height=1.5, dpi=200, bg_col
         extra_padding: Extra padding around the formula (in inches)
     """
     # Create the media directory if it doesn't exist
-    os.makedirs('media', exist_ok=True)
+    os.makedirs('assets', exist_ok=True)
     
     # Setup figure with transparent background
     fig = plt.figure(figsize=(width, height), dpi=dpi)
@@ -54,7 +54,7 @@ def create_formula_image(filename, formula, width=6, height=1.5, dpi=200, bg_col
     plt.tight_layout(pad=extra_padding)
     
     # Save the figure with transparent background
-    output_path = os.path.join('media', filename)
+    output_path = os.path.join('assets/formulas', filename)
     plt.savefig(output_path, 
                 format='png', 
                 bbox_inches='tight',

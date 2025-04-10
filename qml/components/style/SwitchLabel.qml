@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
-import "../../../scripts/MaterialDesignRegular.js" as MD
+import "../../../data/MaterialDesignRegular.js" as MD
 
 ShadowRectangle {
     id: control

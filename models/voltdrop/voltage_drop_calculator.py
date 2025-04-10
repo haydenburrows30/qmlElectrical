@@ -438,7 +438,7 @@ class VoltageDropCalculator(QObject):
         """Save chart as image with optional scale factor."""
         # Pass this request directly to the QML view via signal
         if not filepath:
-            results_dir = self._file_utils.get_results_dir()
+            # Get save filepath directly without using default results_dir
             filepath = self._file_utils.get_save_filepath("png", "voltage_drop_chart")
         
         if filepath:

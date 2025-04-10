@@ -218,7 +218,7 @@ Item {
                             TextFieldBlue {
                                 text: calculator.padding_resistance
                                 Layout.fillWidth: true
-                                color: calculator.padding_resistance === "Error" ? "red" : "black"
+                                color: calculator.padding_resistance === "Error" ? "red" : Universal.foreground
                             }
 
                             Label {

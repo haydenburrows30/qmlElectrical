@@ -13,12 +13,10 @@ from .logger import setup_logger
 # Base paths
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = ROOT_DIR / 'data'
-RESULTS_DIR = ROOT_DIR / 'results'
 LOGS_DIR = ROOT_DIR / 'logs'
 
 # Ensure directories exist
 DATA_DIR.mkdir(exist_ok=True)
-RESULTS_DIR.mkdir(exist_ok=True)
 LOGS_DIR.mkdir(exist_ok=True)
 
 # Add logger instance
@@ -137,19 +135,31 @@ class AppConfig:
             return default
 
 def print_config_info() -> None:
-    """Display current config file location and contents."""
-    config_file = ROOT_DIR / 'config.json'
-    print(f"\nConfig file location: {config_file}")
+    """Display current config settings from database."""
+    logger.info("=== Configuration Information ===")
     
-    if config_file.exists():
-        try:
-            with open(config_file, 'r') as f:
-                print("\nCurrent config contents:")
-                print(json.dumps(json.load(f), indent=2))
-        except Exception as e:
-            print(f"\nError reading config: {e}")
-    else:
-        print("\nConfig file does not exist yet. It will be created with defaults when needed.")
+    try:
+        # Use with statement for proper connection handling
+        with sqlite3.connect(app_config.db_path, timeout=20) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT key, value FROM config")
+            settings = cursor.fetchall()
+        
+        if settings:
+            logger.info(f"Database location: {app_config.db_path}")
+            logger.info("Current configuration:")
+            for key, value in settings:
+                logger.info(f"  {key}: {value}")
+        else:
+            logger.info("No configuration settings found in database.")
+    except Exception as e:
+        logger.error(f"Error reading configuration: {e}")
+
+# Function to expose config info to other modules
+def log_config_info():
+    """Log the current configuration settings."""
+    print_config_info()
+    return True
 
 async def initialize_config() -> AppConfig:
     """Initialize configuration asynchronously."""

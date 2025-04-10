@@ -6,7 +6,6 @@ from pathlib import Path
 import PyInstaller.__main__
 from generate_icon import create_icon
 import time
-import errno
 
 def download_upx():
     """Download and extract UPX if not already present"""
@@ -98,7 +97,7 @@ def build_windows():
     upx_dir = download_upx()
     
     # Create required directories
-    os.makedirs(ROOT_DIR / "resources" / "icons", exist_ok=True)
+    os.makedirs(ROOT_DIR / "icons", exist_ok=True)
     os.makedirs(ROOT_DIR / "qml", exist_ok=True)
     os.makedirs(ROOT_DIR / "data", exist_ok=True)
     
@@ -107,7 +106,6 @@ def build_windows():
     
     # Get relative paths from build script location
     main_script = str(ROOT_DIR / "main.py")
-    resources_dir = str(ROOT_DIR / "resources")
     qml_dir = str(ROOT_DIR / "qml")
     data_dir = str(ROOT_DIR / "data")
     icons_dir = str(ICONS_DIR)
@@ -132,7 +130,6 @@ def build_windows():
         '--windowed',
         f'--icon={icon_path}',
         f'--add-data={qml_dir};qml',
-        f'--add-data={resources_dir};resources',
         f'--add-data={data_dir};data',
         f'--add-data={icons_dir};icons',
         '--hidden-import=PySide6.QtQml',
