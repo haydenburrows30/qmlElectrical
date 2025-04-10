@@ -2,58 +2,49 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-GridLayout {
-    id: resultsDisplay
-    columns: 2
+import "../style"
+import HarmonicAnalysis 1.0
 
-    property var calculator
+GridLayout {
+    id: root
+    columns: 2
+    rowSpacing: 10
+    columnSpacing: 20
     
-    Label { 
-        text: "Results:" 
-        Layout.columnSpan: 2 
-        font.bold: true 
-        font.pixelSize: 16
-    }
+    property HarmonicAnalysisCalculator calculator
+
+    // Add default safe values for when calculator is not available or initialized
+    readonly property real safeThd: calculator && calculator.hasOwnProperty("thd") && calculator.thd !== undefined ? calculator.thd : 0.0
+    readonly property real safeCf: calculator && calculator.hasOwnProperty("crestFactor") && calculator.crestFactor !== undefined ? calculator.crestFactor : 1.414
+    readonly property real safeFf: calculator && calculator.hasOwnProperty("formFactor") && calculator.formFactor !== undefined ? calculator.formFactor : 1.11
 
     Label { 
         text: "THD:" 
-        Layout.preferredWidth: 120 
-        ToolTip.text: "Total Harmonic Distortion - measures the amount of harmonic content"
-        ToolTip.visible: thdMouseArea.containsMouse
-        ToolTip.delay: 500
-        
-        MouseArea {
-            id: thdMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-        }
+        font.bold: true
     }
     Label { 
-        text: calculator ? calculator.thd.toFixed(2) + "%" : "0.00%" 
+        // Use the safe property instead of directly accessing calculator.thd
+        text: safeThd.toFixed(2) + "%"
+        Layout.fillWidth: true
     }
-
+    
     Label { 
         text: "Crest Factor:" 
-        Layout.preferredWidth: 120 
-        ToolTip.text: "Ratio of peak to RMS value - indicates waveform distortion"
-        ToolTip.visible: crestMouseArea.containsMouse
-        ToolTip.delay: 500
-        
-        MouseArea {
-            id: crestMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-        }
+        font.bold: true
     }
     Label { 
-        text: calculator ? calculator.crestFactor.toFixed(2) : "1.00" 
+        // Use the safe property instead of directly accessing calculator.crestFactor
+        text: safeCf.toFixed(2)
+        Layout.fillWidth: true
     }
     
     Label { 
         text: "Form Factor:" 
-        Layout.preferredWidth: 120 
+        font.bold: true
     }
     Label { 
-        text: calculator && calculator.formFactor ? calculator.formFactor.toFixed(2) : "1.11" 
+        // Use the safe property instead of directly accessing calculator.formFactor
+        text: safeFf.toFixed(2)
+        Layout.fillWidth: true
     }
 }

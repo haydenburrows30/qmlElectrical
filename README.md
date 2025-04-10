@@ -121,3 +121,9 @@ electrical-calculator/
 
 ## License
 This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+## To Do
+
+- Change Qt.GraphicalEffects for HButton.qml to QtQuick.Effects
+- Check all styling is the same across calculators
+- 

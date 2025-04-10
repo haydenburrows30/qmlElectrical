@@ -27,6 +27,7 @@ from services.worker_pool import WorkerPool
 from utils.config import app_config
 from utils.qml_debug import register_debug_helper
 from utils.logger import QLogManager
+from utils.system_resources import SystemResources
 
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 
@@ -163,6 +164,12 @@ class Application:
         # Create and expose log manager to QML
         self.log_manager = QLogManager()
         self.qml_engine.engine.rootContext().setContextProperty("logManager", self.log_manager)
+
+    def _initialize_engine(self):
+        """Initialize the QML engine."""
+        # Add system resources monitor to root context
+        self.system_resources = SystemResources()
+        self.qml_engine.engine.rootContext().setContextProperty("systemInfo", self.system_resources)
 
     def setup(self):
         """Configure application components and initialize subsystems."""

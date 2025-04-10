@@ -2,114 +2,125 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import "../buttons"
-
-Item {
-    id: calculationMonitor
+Rectangle {
+    id: root
     
+    // Properties
     property var calculator
-    property bool profilingEnabled: false
-
-    BusyIndicator {
-        id: calculationBusyIndicator
-        anchors {
-            right: parent.right
-            top: parent.top
-            margins: 10
+    property int updateIntervalMs: 100
+    property bool showDetails: true
+    
+    // Visual properties
+    color: "transparent"
+    border.color: "#cccccc"
+    border.width: 0
+    
+    // Default size
+    width: parent ? parent.width : 300
+    height: showDetails ? 80 : 40
+    
+    // Progress update timer
+    Timer {
+        id: updateTimer
+        interval: root.updateIntervalMs
+        running: visible && calculator && calculator.calculationInProgress // Use property accessor
+        repeat: true
+        onTriggered: {
+            progressBar.value = calculator.calculationProgress // Use property accessor
+            updateStatusText()
         }
-        width: 32
-        height: 32
-        visible: calculator ? calculator.calculationInProgress : false
-        running: visible
     }
-
-    Rectangle {
-        anchors {
-            right: parent.right
-            top: calculationBusyIndicator.bottom
-            margins: 5
+    
+    // Update the status text based on calculator state
+    function updateStatusText() {
+        if (!calculator) {
+            statusText.text = "No calculator"
+            return
         }
-        width: 100
-        height: 25
-        color: "lightgrey"
-        opacity: 0.7
-        radius: 5
-        visible: calculator ? calculator.calculationInProgress : false
         
-        Label {
-            anchors.centerIn: parent
-            text: calculator ? (calculator.calculationProgress * 100).toFixed(0) + "%" : "0%"
-            font.bold: true
+        if (calculator.calculationInProgress) { // Use property accessor
+            statusText.text = "Calculating... " + Math.round(calculator.calculationProgress * 100) + "%" // Use property accessor
+            statusText.color = "#106010"
+        } else {
+            statusText.text = "Calculation Complete"
+            statusText.color = "#101060"
         }
     }
-
-    StyledButton {
-        anchors {
-            right: parent.right
-            top: parent.top
-            margins: 50
-        }
-        text: "Cancel"
-        visible: calculator ? calculator.calculationInProgress : false
-        onClicked: {
-            if (calculator) {
-                calculator.cancelCalculation();
+    
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 5
+        spacing: 5
+        
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            
+            Label {
+                id: statusText
+                text: "Ready"
+                font.pixelSize: 12
+                Layout.fillWidth: true
             }
-        }
-    }
-
-    Label {
-        font.italic: true
-        font.pixelSize: 10;
-        color: "gray"
-        
-        anchors {
-            left: parent.left
-            bottom: parent.bottom
-            margins: 45
-        }
-        text: {
-            if (calculator && calculator.calculationInProgress) {
-                try {
-                    var status = calculator.getThreadPoolStatus();
-                    if (status && status.active_threads !== undefined) {
-                        return "Threads: " + status.active_threads + "/" + status.max_threads;
-                    }
-                } catch (e) {
-                    console.error("Error getting thread status:", e);
+            
+            Button {
+                text: "Cancel"
+                visible: calculator && calculator.calculationInProgress // Use property accessor
+                implicitWidth: 70
+                implicitHeight: 24
+                font.pixelSize: 10
+                padding: 2
+                
+                onClicked: {
+                    if (calculator) calculator.cancelCalculation()
                 }
-                return "Threads: Active";
-            return "";
             }
-            visible: calculator ? calculator.calculationInProgress : false
+            
+            Label {
+                text: calculator && calculator.profilingEnabled ? "Profiling" : "" // Use property accessor
+                color: "#805020"
+                font.pixelSize: 9
+                font.italic: true
+                visible: calculator && calculator.profilingEnabled // Use property accessor
+            }
+        }
+        
+        ProgressBar {
+            id: progressBar
+            Layout.fillWidth: true
+            from: 0.0
+            to: 1.0
+            value: calculator ? calculator.calculationProgress : 0 // Use property accessor
+            visible: calculator && calculator.calculationInProgress // Use property accessor
+        }
+        
+        Item {
+            id: detailsItem
+            visible: showDetails
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            
+            // Additional details could be added here
+            // For example, performance metrics
         }
     }
-
-    TextArea {
-        id: statusLog
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-        height: 60
-        readOnly: true
-        font.pixelSize: 10
-        visible: profilingEnabled && calculator ? calculator.profilingEnabled : false
-        z: 10
+    
+    // Initial status update
+    Component.onCompleted: {
+        updateStatusText()
     }
-
+    
+    // Update status when calculation state changes
     Connections {
         target: calculator
-        function onCalculationsComplete() {
-            statusLog.append("✓ Calculations complete");
-        }
+        
         function onCalculationStatusChanged() {
-            if (calculator.calculationInProgress) {
-                statusLog.append("⏳ Calculation started");
-            } else {
-                statusLog.append("⏹ Calculation finished");
-            }
+            updateStatusText()
+        }
+        
+        function onCalculationProgressChanged(progress) {
+            progressBar.value = progress
+            updateStatusText()
         }
     }
 }

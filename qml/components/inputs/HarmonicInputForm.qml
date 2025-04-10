@@ -4,12 +4,19 @@ import QtQuick.Layouts
 
 import "../style"
 import "../buttons"
+import HarmonicAnalysis 1.0
 
 ColumnLayout {
     id: harmonicInputForm
     
-    property var calculator
+    property HarmonicAnalysisCalculator calculator
     signal resetTriggered
+
+    function safeSetHarmonic(order, magnitude, angle) {
+        if (calculator) {
+            calculator.setHarmonic(order, magnitude, angle);
+        }
+    }
 
     RowLayout {
         
@@ -57,7 +64,7 @@ ColumnLayout {
                     repeat: false
                     onTriggered: {
                         if (magnitudeField.text) {
-                            calculator.setHarmonic(
+                            safeSetHarmonic(
                                 modelData, 
                                 parseFloat(magnitudeField.text), 
                                 phaseField.text ? parseFloat(phaseField.text) : 0
@@ -103,7 +110,7 @@ ColumnLayout {
                     repeat: false
                     onTriggered: {
                         if (phaseField.text) {
-                            calculator.setHarmonic(
+                            safeSetHarmonic(
                                 modelData, 
                                 magnitudeField.text ? parseFloat(magnitudeField.text) : 0,
                                 parseFloat(phaseField.text)

@@ -10,18 +10,31 @@ ChartView {
     legend.alignment: Qt.AlignBottom
     theme: Universal.theme
     
+    // Added properties for performance tuning
     property bool useOpenGL: Qt.platform.os !== "windows"
     property bool animationsEnabled: false
     property bool showFundamental: false
     property var calculator
     property var seriesHelper
     property var onUpdateCompleted: null
+    property bool throttleUpdates: true
+    property int updateThrottleMs: 50  // Don't update more often than this
+    property var lastUpdateTime: Date.now()
 
     // Function to update the waveform visualization
     function updateWaveform() {
         // Skip updates if not visible for better performance
         if (!visible) {
             return;
+        }
+        
+        // Throttle updates for better performance
+        if (throttleUpdates) {
+            var currentTime = Date.now();
+            if (currentTime - lastUpdateTime < updateThrottleMs) {
+                return;
+            }
+            lastUpdateTime = currentTime;
         }
         
         // Explicitly check if QML is running on Windows
