@@ -54,7 +54,7 @@ Item {
     }
 
     function showMotorInfo() {
-        showMessage("Motor Type Info", calculator.motorDescription)
+        showMessage("Motor Type Info", (calculator.motorDescription))
     }
 
     PopUpText {

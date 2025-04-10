@@ -114,7 +114,7 @@ class MotorCalculator(QObject):
             "Induction Motor": {
                 "efficiency_range": (0.75, 0.95),
                 "power_factor_range": (0.7, 0.9),
-                "description": "Standard AC motor, widely used in industrial applications"
+                "description": "The most common type of AC motor. Simple, rugged design with a squirrel-cage rotor. "
             },
             "Synchronous Motor": {
                 "efficiency_range": (0.85, 0.97),
@@ -310,7 +310,6 @@ class MotorCalculator(QObject):
     @Property(str)
     def motorDescription(self):
         return self._motor_characteristics.get(self._motor_type, {}).get("description", "")
-
     # QML slots
     @Slot(float)
     def setMotorPower(self, power):
