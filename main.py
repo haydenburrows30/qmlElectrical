@@ -206,6 +206,8 @@ def setup_windows_specifics():
     """Configure Windows-specific settings"""
     import sys
     if sys.platform == "win32":
+        # Import Qt first to avoid the UnboundLocalError
+        from PySide6.QtCore import Qt
         # Use software OpenGL on Windows by default (can be overridden with command-line args)
         from PySide6.QtQuick import QSGRendererInterface
         from PySide6.QtGui import QGuiApplication
@@ -223,7 +225,6 @@ def setup_windows_specifics():
         os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
         
         # Set the software backend for compatibility
-        from PySide6.QtCore import Qt
         QGuiApplication.setAttribute(Qt.AA_UseSoftwareOpenGL)
 
 def main():
