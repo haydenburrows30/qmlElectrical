@@ -95,7 +95,7 @@ Item {
                         Label { text: "Transformer Impedance (%):" }
                         SpinBoxRound {
                             id: transformerImpedanceSpinBox
-                            from: 30
+                            from: 1
                             to: 100
                             value: calculator ? calculator.transformerImpedance * 10 : 60
                             stepSize: 1
@@ -159,7 +159,7 @@ Item {
                         SpinBoxRound {
                             id: lineLengthSpinBox
                             from: 1
-                            to: 50
+                            to: 500
                             value: calculator ? calculator.lineLength * 10 : 50
                             stepSize: 5
                             editable: true
@@ -185,7 +185,7 @@ Item {
                         SpinBoxRound {
                             id: lineRSpinBox
                             from: 1
-                            to: 100
+                            to: 1000
                             value: calculator ? calculator.lineR * 100 : 25
                             stepSize: 1
                             editable: true
@@ -211,7 +211,7 @@ Item {
                         SpinBoxRound {
                             id: lineXSpinBox
                             from: 1
-                            to: 100
+                            to: 1000
                             value: calculator ? calculator.lineX * 100 : 20
                             stepSize: 1
                             editable: true
@@ -249,18 +249,18 @@ Item {
                             id: loadMVASpinBox
                             from: 1
                             to: 100
-                            value: calculator ? calculator.loadMVA * 10 : 8
+                            value: calculator ? calculator.loadMVA * 100 : 80
                             stepSize: 1
                             editable: true
                             Layout.minimumWidth: 150
-                            property real realValue: value / 10.0
+                            property real realValue: value / 100.0
                             
                             textFromValue: function(value) {
-                                return (value / 10.0).toFixed(1);
+                                return (value / 100.0).toFixed(2);
                             }
                             
                             valueFromText: function(text) {
-                                return Math.round(parseFloat(text) * 10);
+                                return Math.round(parseFloat(text) * 100);
                             }
                             
                             onValueModified: {

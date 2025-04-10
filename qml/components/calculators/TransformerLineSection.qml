@@ -166,7 +166,7 @@ Item {
                             SpinBoxRound {
                                 id: lineLengthSpinBox
                                 from: 1
-                                to: 50
+                                to: 1000
                                 value: calculatorReady ? calculator.lineLength * 10 : 50
                                 stepSize: 5
                                 editable: true

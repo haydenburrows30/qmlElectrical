@@ -34,6 +34,7 @@ from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import RLCChart
 from utils.AboutProgram import ConfigBridge
 from models.solkor_rf_calculator import SolkorRfCalculator
+from models.vr32_cl7_calculator import VR32CL7Calculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -77,4 +78,5 @@ def register_qml_types(engine, current_dir):
         (RLCChart, "RLC", 1, 0, "RLCChart"),
         (ConfigBridge, "ConfigBridge", 1, 0, "ConfigBridge"),
         (SolkorRfCalculator, "SolkorRfCalculator", 1, 0, "SolkorRfCalculator"),
+        (VR32CL7Calculator, "VR32CL7Calculator", 1, 0, "VR32CL7Calculator")
     ]

@@ -109,6 +109,13 @@ def main():
         
         # CT/VT formulas
         "ct_vt_formula.png": r"V_{k} = 2 \times I_s \times \sqrt{VA_{burden}} \quad ALF = \frac{I_f}{I_{pn}}",
+        
+        # VR32 CL-7 Calculator Formulas
+        "vr32cl7_resistance.png": r"R_{total} = R_{per\_km} \times (L_{cable} + L_{load})",
+        "vr32cl7_reactance.png": r"X_{total} = X_{per\_km} \times (L_{cable} + L_{load})",
+        "vr32cl7_impedance.png": r"Z = \sqrt{R_{total}^2 + X_{total}^2}",
+        "vr32cl7_impedance_angle.png": r"\phi = \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right)",
+        "vr32cl7_overall.png": r"Z = \sqrt{(R_{per\_km} \times L)^2 + (X_{per\_km} \times L)^2} \angle \tan^{-1}\left(\frac{X_{per\_km}}{R_{per\_km}}\right)",
     }
     
     # Generate each formula

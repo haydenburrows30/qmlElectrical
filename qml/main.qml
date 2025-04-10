@@ -50,6 +50,7 @@ ApplicationWindow {
         { name: qsTr("Fault Current"), source: "components/calculators/FaultCurrentCalculator.qml" },
         { name: qsTr("Transformer + Line"), source: "components/calculators/TransformerLineCalculator.qml" },
         { name: qsTr("Solkor Rf"), source: "components/calculators/SolkorRf.qml" },
+        { name: qsTr("VR Calculations"), source: "components/calculators/VR32CL7Calculator.qml" }
     ]
 
     property var cable: [

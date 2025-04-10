@@ -84,7 +84,15 @@ def main():
         
         # Other Conversions
         "reactance_freq": r"X_{60} = X_{50} \cdot \frac{60}{50}",
-        "three_phase_power": r"P_{phase} = \frac{P_{total}}{3}"
+        "three_phase_power": r"P_{phase} = \frac{P_{total}}{3}",
+        
+        # VR32 CL-7 Calculator Formulas
+        "vr32cl7_total_length": r"L_{total} = L_{cable} + L_{load}",
+        "vr32cl7_resistance": r"R_{total} = R_{per\_km} \times L_{total}",
+        "vr32cl7_reactance": r"X_{total} = X_{per\_km} \times L_{total}",
+        "vr32cl7_impedance": r"Z = \sqrt{R_{total}^2 + X_{total}^2}",
+        "vr32cl7_impedance_angle": r"\phi = \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right) \times \frac{180}{\pi}",
+        "vr32cl7_overall": r"Z \angle \phi = \sqrt{R_{total}^2 + X_{total}^2} \angle \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right)",
     }
     
     for name, formula in formulas.items():
