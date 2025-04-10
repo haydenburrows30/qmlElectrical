@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
-import PerformanceMonitor 1.0  // Updated to include version
+import PerformanceMonitor 1.0
 
 Item {
     id: root
@@ -10,7 +10,6 @@ Item {
     width: parent ? parent.width : 400
     height: parent ? parent.height : 300
     
-    // Access to our performance monitor
     property var perfMonitor: null
     
     // Auto-update timer

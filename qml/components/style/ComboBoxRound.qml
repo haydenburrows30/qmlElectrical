@@ -10,7 +10,7 @@ ComboBox {
 
         radius: 3
 
-        border.width: control.flat ? 0 : 2 // ComboBoxBorderThemeThickness
+        border.width: control.flat ? 0 : 2
         border.color: !control.enabled ? control.Universal.baseLowColor :
                        control.editable && control.activeFocus ? control.Universal.accent :
                        control.down ? control.Universal.baseMediumLowColor :

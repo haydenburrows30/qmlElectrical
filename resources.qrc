@@ -11,11 +11,8 @@
     <file>qml/components/LogViewer.qml</file>
 
     <!-- Buttons -->
-    <file>qml/components/buttons/MessageButton.qml</file>
     <file>qml/components/buttons/HButton.qml</file>
     <file>qml/components/buttons/DarkLightButton.qml</file>
-    <file>qml/components/buttons/InlineMessage.qml</file>
-    <file>qml/components/buttons/MessageItem.qml</file>
     <file>qml/components/buttons/StyledButton.qml</file>
 
     <!-- Calculators -->
@@ -131,26 +128,11 @@
     <file>qml/components/popups/TransmissionPopUp.qml</file>
     <file>qml/components/popups/WindPopup.qml</file>
     <file>qml/components/popups/LogViewerPopup.qml</file>
-  
-    <!-- Playground -->
-    <file>qml/components/playground/TryoutStyle.qml</file>
-    <file>qml/components/playground/ScientificCalculator.qml</file>
-    <file>qml/components/playground/EnhancedCalculatorExample.qml</file>
-    <file>qml/components/playground/CalculatorPad.qml</file>
 
     <!-- Style -->
-    <file>qml/components/style/ButtonCard.qml</file>
     <file>qml/components/style/ComboBoxRound.qml</file>
-    <file>qml/components/style/DevicesTile.qml</file>
-    <file>qml/components/style/IconLabel.qml</file>
-    <file>qml/components/style/ImageButton.qml</file>
-    <file>qml/components/style/OutlinedLabel.qml</file>
-    <file>qml/components/style/PrefsSwitch.qml</file>
-    <file>qml/components/style/PrefsTabButton.qml</file>
-    <file>qml/components/style/ShadowRectangle.qml</file>
     <file>qml/components/style/SpinBoxRound.qml</file>
     <file>qml/components/style/Style.qml</file>
-    <file>qml/components/style/SwitchLabel.qml</file>
     <file>qml/components/style/TextFieldBlue.qml</file>
     <file>qml/components/style/TextFieldRound.qml</file>
     
