@@ -58,7 +58,7 @@ class AppConfig:
             "app_name": "Electrical",
             "org_name": "QtProject",
             "icon_path": "icons/gallery/24x24/Wave_dark.ico",
-            "version": "1.1.1"
+            "version": "1.1.2"
         }
 
         try:

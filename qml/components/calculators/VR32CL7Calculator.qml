@@ -244,6 +244,7 @@ Item {
                     GridLayout {
                         columns: 2
                         Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignTop
                         
                         // Labels and Values
                         Label { 

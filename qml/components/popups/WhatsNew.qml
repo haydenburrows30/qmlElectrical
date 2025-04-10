@@ -103,6 +103,21 @@ Popup {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
                 }
+
+                Label {
+                    text: "1.1.2"
+                    font.pixelSize: 18
+                    font.bold: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            
+                Label {
+                    text: "Added VR R+X Calculator, WaveCard blur"
+                    font.pixelSize: 14
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignLeft
+                }
             }
         }
         
