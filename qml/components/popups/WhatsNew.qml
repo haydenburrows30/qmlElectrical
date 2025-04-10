@@ -12,13 +12,6 @@ Popup {
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    
-    background: Rectangle {
-        color: palette.window
-        border.color: palette.mid
-        border.width: 1
-        radius: 10
-    }
 
     ColumnLayout {
         anchors.fill: parent

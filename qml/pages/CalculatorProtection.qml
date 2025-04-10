@@ -24,7 +24,8 @@ Page {
         { name: qsTr("RGF"), source: "../components/calculators/RefRgfCalculator.qml", icon: "calculate" },
         { name: qsTr("Fault Current"), source: "../components/calculators/FaultCurrentCalculator.qml", icon: "electric_bolt" },
         { name: qsTr("Transformer & Line"), source: "../components/calculators/TransformerLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("SOLKOR Rf"), source: "../components/calculators/SolkorRf.qml", icon: "cell_tower" }
+        { name: qsTr("SOLKOR Rf"), source: "../components/calculators/SolkorRf.qml", icon: "cell_tower" },
+        { name: qsTr("VR Calculations"), source: "../components/calculators/VR32CL7Calculator.qml", icon: "cell_tower" }
     ]
 
     ColumnLayout {
