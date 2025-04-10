@@ -201,7 +201,35 @@ def setup_container() -> Container:
     
     return container
 
+# Add Windows-specific code
+def setup_windows_specifics():
+    """Configure Windows-specific settings"""
+    import sys
+    if sys.platform == "win32":
+        # Use software OpenGL on Windows by default (can be overridden with command-line args)
+        from PySide6.QtQuick import QSGRendererInterface
+        from PySide6.QtGui import QGuiApplication
+        
+        # Set default render loop (better performance on Windows)
+        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(
+            Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+        )
+        
+        # Allow environment variables to override these settings
+        if not os.environ.get("QT_OPENGL"):
+            os.environ["QT_OPENGL"] = "software"
+        
+        # Disable file system watcher to avoid potential performance issues
+        os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
+        
+        # Set the software backend for compatibility
+        from PySide6.QtCore import Qt
+        QGuiApplication.setAttribute(Qt.AA_UseSoftwareOpenGL)
+
 def main():
+    # Setup Windows-specific configuration
+    setup_windows_specifics()
+    
     container = setup_container()
     app = Application(container)
     app.run()
