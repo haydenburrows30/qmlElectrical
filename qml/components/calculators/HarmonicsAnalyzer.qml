@@ -185,7 +185,11 @@ Item {
                     id: calculationMonitor
                     anchors.fill: parent
                     calculator: harmonicsCard.calculator
-                    profilingEnabled: true
+                    Component.onCompleted: {
+                        if (calculator) {
+                            calculator.enableProfiling(false);
+                        }
+                    }
                 }
             }
 

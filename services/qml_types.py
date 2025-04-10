@@ -1,5 +1,5 @@
 from PySide6.QtCore import QUrl
-from PySide6.QtQml import qmlRegisterSingletonType
+from PySide6.QtQml import qmlRegisterSingletonType, qmlRegisterType
 
 import os
 
@@ -35,6 +35,8 @@ from models.rlc import RLCChart
 from utils.AboutProgram import ConfigBridge
 from models.solkor_rf_calculator import SolkorRfCalculator
 from models.vr32_cl7_calculator import VR32CL7Calculator
+from utils.system_resources import SystemResources
+from utils.perf_monitor import PerformanceMonitor
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -42,6 +44,18 @@ def register_qml_types(engine, current_dir):
     style_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "components","style", "Style.qml"))
     engine.addImportPath(os.path.join(current_dir, "qml"))
     qmlRegisterSingletonType(style_url, "Style", 1, 0, "Style")
+
+    # Register SystemResources
+    try:
+        qmlRegisterType(SystemResources, "App.Utils", 1, 0, "SystemResources")
+    except Exception as e:
+        print(f"Error registering SystemResources: {e}")
+
+    # Register PerformanceMonitor
+    try:
+        qmlRegisterType(PerformanceMonitor, "PerformanceMonitor", 1, 0, "PerformanceMonitor")
+    except Exception as e:
+        print(f"Error registering PerformanceMonitor: {e}")
 
     return [
         (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
