@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Property
-from utils.config import AppConfig  # Using relative import since both are in the models package
+from utils.config import AppConfig
 import platform
 import PySide6.QtCore
 

@@ -1,6 +1,5 @@
-from PySide6.QtCore import QObject, Signal, Property, Slot
+from PySide6.QtCore import QObject, Slot
 import numpy as np
-import math
 
 class TimeCurveCalculator(QObject):
     """Calculator for time-current curves and coordination"""

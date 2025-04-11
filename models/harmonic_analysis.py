@@ -1,6 +1,6 @@
 from PySide6.QtCore import (
-    QObject, Property, Signal, Slot, QPointF, QTimer, QThreadPool, 
-    QRunnable, QThread, QMetaObject, Qt, Q_ARG
+    QObject, Property, Signal, Slot, QPointF, QTimer,
+    QThread, QMetaObject, Qt, Q_ARG
 )
 from PySide6.QtWidgets import QApplication
 import numpy as np

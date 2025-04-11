@@ -2,11 +2,9 @@
 import time
 import hashlib
 import threading
-import weakref
 import json
-import logging
 from datetime import datetime
-from typing import Dict, Any, Optional, Tuple, List
+from typing import Dict, Any, Optional
 
 class CalculationCache:
     """Thread-safe LRU cache for calculation results."""

@@ -1,9 +1,8 @@
 """System resource monitoring and management utilities."""
 import platform
 import psutil
-import threading
 import time
-from typing import Dict, Any
+from typing import Any
 from PySide6.QtCore import QObject, Signal, Slot, Property, QTimer
 
 class SystemResources(QObject):

@@ -1,8 +1,6 @@
 """Worker pool manager for background processing tasks."""
 import threading
-import queue
-import time
-from typing import Callable, Dict, Any, List, Optional
+from typing import Dict, Any
 import psutil
 from PySide6.QtCore import QThreadPool, QRunnable
 

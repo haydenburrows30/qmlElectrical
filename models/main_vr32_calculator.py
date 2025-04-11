@@ -3,7 +3,7 @@
 
 import os
 import sys
-from PySide6.QtCore import QObject, QUrl
+from PySide6.QtCore import QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 

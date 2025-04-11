@@ -2,7 +2,6 @@
 from PySide6.QtCore import QObject, Signal, Slot, Property
 # Remove QVariant import as it's not available directly in PySide6.QtCore
 import os
-import time
 from datetime import datetime
 
 from .calculation_cache import CalculationCache

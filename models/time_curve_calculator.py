@@ -1,5 +1,4 @@
 from PySide6.QtCore import QObject
-import math
 
 class TimeCurveCalculator(QObject):
     def __init__(self, parent=None):
