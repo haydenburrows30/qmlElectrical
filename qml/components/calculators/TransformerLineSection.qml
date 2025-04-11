@@ -8,6 +8,7 @@ import "../"
 import "../buttons"
 import "../popups"
 import "../style"
+import "."  // Import current directory for ExpertProtectionPopup
 
 Item {
     id: transformerLineSection
@@ -17,6 +18,10 @@ Item {
     property bool calculatorReady
     property real totalGeneratedPower
     property var safeValueFunction
+
+    property var relayCtRatioText: ({ text: "300/5" })
+    property var relayTimeDialText: ({ text: "0.30" })
+    property var relayCurveTypeText: ({ text: "Very Inverse" })
 
     signal calculate()
 
@@ -55,9 +60,34 @@ Item {
         return value;
     }
 
+    // Add function to component level
+    function getCurveInfoText(curveType) {
+        switch(curveType) {
+            case "Standard Inverse":
+                return "IEC Standard Inverse: t = TDS * 0.14 / ((I/Is)^0.02 - 1)\nGood for general distribution networks."
+            case "Very Inverse":
+                return "IEC Very Inverse: t = TDS * 13.5 / ((I/Is) - 1)\nGood for feeder protection and transformer protection."
+            case "Extremely Inverse":
+                return "IEC Extremely Inverse: t = TDS * 80 / ((I/Is)^2 - 1)\nGood for transformer and motor protection."
+            case "Long-Time Inverse":
+                return "Long-Time Inverse: t = TDS * 120 / ((I/Is) - 1)\nGood for high inrush applications."
+            case "Definite Time":
+                return "Definite Time: t = TDS regardless of current magnitude\nGood for backup protection schemes."
+            default:
+                return "No information available for this curve type."
+        }
+    }
+
     onTotalGeneratedPowerChanged: {
         if (calculatorReady) {
-            calculator.setLoadMVA(totalGeneratedPower / 1000000)
+            // Update display only
+            loadMVAField.text = (totalGeneratedPower / 1000000).toFixed(3);
+            
+            // Update the display MVA value in the calculator for voltage calculations only
+            calculator.setDisplayLoadMVA(totalGeneratedPower / 1000000);
+            
+            // Use our special method for voltage calculations only
+            calculator.updateLoadForVoltageOnly(totalGeneratedPower / 1000000);
         }
     }
 
@@ -511,34 +541,145 @@ Item {
                         id: transformerProtectionCard
                         title: "Transformer Protection Settings"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 280
+                        Layout.preferredHeight: 350
 
                         GridLayout {
                             anchors.fill: parent
                             columns: 2
 
                             Label { text: "Relay Pickup Current (A):" }
-                            TextFieldBlue {
-                                id: relayPickupCurrentText
-                                text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
+                            RowLayout {
+                                Layout.fillWidth: true
+                                TextFieldBlue {
+                                    id: relayPickupCurrentText
+                                    text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
+                                    Layout.fillWidth: true
+                                }
+                                StyledButton {
+                                    text: "Set"
+                                    implicitWidth: 40
+                                    onClicked: pickupDialog.open()
+                                }
                             }
 
                             Label { text: "CT Ratio:" }
-                            TextFieldBlue {
-                                id: relayCtRatioText
-                                text: calculatorReady ? calculator.relayCtRatio : "300/1"
+                            ComboBox {
+                                id: ctRatioCombo
+                                Layout.fillWidth: true
+                                model: ["50/1", "100/1", "150/1", "200/1", "300/1", "400/1", "500/1", "600/1", "800/1", "1000/1"]
+                                currentIndex: 4 // Default to 300/1
+                                onActivated: {
+                                    if (calculatorReady) {
+                                        // This would need a method to update the CT ratio in the calculator
+                                        // For now just update the display
+                                        relayCtRatioText.text = currentText
+                                    }
+                                }
                             }
-
+                            
                             Label { text: "Relay Curve Type:" }
-                            TextFieldBlue {
-                                id: relayCurveTypeText
-                                text: calculatorReady ? calculator.relayCurveType : "Very Inverse"
+                            ComboBox {
+                                id: curveTypeCombo
+                                Layout.fillWidth: true
+                                model: ["Standard Inverse", "Very Inverse", "Extremely Inverse", "Long-Time Inverse", "Definite Time"]
+                                currentIndex: 1 // Default to Very Inverse
+                                onActivated: {
+                                    if (calculatorReady) {
+                                        // This would need a method to update the curve type in the calculator
+                                        // For now just update the display
+                                        relayCurveTypeText.text = currentText
+                                    }
+                                }
+                                
+                                // Custom popup that shows curve characteristics
+                                Popup {
+                                    id: curveInfoPopup
+                                    width: 300
+                                    height: 200
+                                    x: parent.width
+                                    y: 0
+                                    
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        
+                                        Label {
+                                            id: curveInfoTitle
+                                            text: "Curve Characteristics"
+                                            font.bold: true
+                                        }
+                                        
+                                        Label {
+                                            id: curveInfoText
+                                            text: getCurveInfoText(curveTypeCombo.currentText)
+                                            wrapMode: Text.Wrap
+                                            Layout.fillWidth: true
+                                        }
+                                        
+                                        Button {
+                                            text: "Close"
+                                            Layout.alignment: Qt.AlignRight
+                                            onClicked: curveInfoPopup.close()
+                                        }
+                                    }
+                                }
+                                
+                                // Show curve info when right-clicked
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.RightButton
+                                    onClicked: {
+                                        if (mouse.button === Qt.RightButton) {
+                                            curveInfoPopup.open()
+                                        }
+                                    }
+                                }
                             }
 
                             Label { text: "Time Dial Setting:" }
-                            TextFieldBlue {
-                                id: relayTimeDialText
-                                text: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0).toFixed(2) : "0.30"
+                            SpinBoxRound {
+                                id: timeDialSpinBox
+                                from: 1
+                                to: 10
+                                value: calculatorReady ? safeValueFunction(calculator.relayTimeDial, 0.3) * 10 : 3
+                                stepSize: 1
+                                editable: true
+                                Layout.fillWidth: true
+                                property real realValue: value / 10.0
+
+                                textFromValue: function(value) {
+                                    return (value / 10.0).toFixed(1);
+                                }
+
+                                valueFromText: function(text) {
+                                    return Math.round(parseFloat(text) * 10);
+                                }
+                                
+                                onValueModified: {
+                                    if (calculatorReady) {
+                                        // This would need a method to update the time dial in calculator
+                                        relayTimeDialText.text = realValue.toFixed(2)
+                                    }
+                                }
+                            }
+                            
+                            Label { text: "Instantaneous Pickup:" }
+                            SpinBoxRound {
+                                id: instantaneousPickupSpinBox
+                                from: 2
+                                to: 15
+                                value: 8 
+                                stepSize: 1
+                                editable: true
+                                Layout.fillWidth: true
+                                property real multiplier: value
+                                
+                                textFromValue: function(value) {
+                                    return value.toString() + "× FLC";
+                                }
+                                
+                                valueFromText: function(text) {
+                                    return parseInt(text);
+                                }
                             }
 
                             StyledButton {
@@ -560,19 +701,103 @@ Item {
                         }
                     }
 
-                    // Enhanced ExpertProtectionPopup with proper value passing
-                    ExpertProtectionPopup {
-                        id: expertProtectionPopup
-                        calculator: transformerLineSection.calculator
-                        safeValueFunction: function(value, defaultVal) {
-                            // Enhanced safe value function that handles null, undefined, NaN
-                            if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
-                                return defaultVal;
-                            }
-                            return value;
-                        }
+                    Dialog {
+                        id: pickupDialog
+                        title: "Set Relay Pickup Current"
+                        width: 400
+                        height: 300
+                        modal: true
                         x: Math.round((parent.width - width) / 2)
                         y: Math.round((parent.height - height) / 2)
+                        
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: 10
+                            
+                            Label {
+                                text: "Full Load Current (FLC):"
+                                font.bold: true
+                            }
+                            
+                            TextFieldBlue {
+                                id: flcText
+                                text: calculatorReady ? 
+                                    ((calculator.transformerRating * 1000) / (Math.sqrt(3) * 11000)).toFixed(2) + " A" : 
+                                    "15.75 A"
+                                readOnly: true
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label {
+                                text: "Select pickup value as percentage of FLC:"
+                                font.bold: true
+                            }
+                            
+                            Slider {
+                                id: pickupSlider
+                                from: 100
+                                to: 150
+                                value: 125
+                                stepSize: 5
+                                snapMode: Slider.SnapAlways
+                                Layout.fillWidth: true
+                                
+                                ToolTip {
+                                    parent: pickupSlider.handle
+                                    visible: pickupSlider.pressed
+                                    text: pickupSlider.value + "%"
+                                }
+                            }
+                            
+                            TextFieldBlue {
+                                text: pickupSlider.value.toFixed(0) + "% of FLC = " + 
+                                    (calculatorReady ? 
+                                    ((pickupSlider.value / 100) * (calculator.transformerRating * 1000) / (Math.sqrt(3) * 11000)).toFixed(2) : 
+                                    "19.69") + " A"
+                                readOnly: true
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label {
+                                text: "Protection guidelines:"
+                                font.bold: true
+                            }
+                            
+                            TextArea {
+                                text: "• Pickup should be above maximum load current\n" +
+                                      "• Typically set to 125% of FLC for transformers\n" +
+                                      "• Must be below minimum fault current\n" +
+                                      "• Consider cold load pickup conditions"
+                                readOnly: true
+                                Layout.fillWidth: true
+                                wrapMode: Text.Wrap
+                                background: Rectangle { color: "#f0f0f0"; border.color: "#c0c0c0" }
+                            }
+                            
+                            RowLayout {
+                                Layout.alignment: Qt.AlignRight
+                                Layout.fillWidth: true
+                                
+                                Button {
+                                    text: "Cancel"
+                                    onClicked: pickupDialog.close()
+                                }
+                                
+                                Button {
+                                    text: "Apply"
+                                    onClicked: {
+                                        if (calculatorReady) {
+                                            // This would need a method to update the pickup current in calculator
+                                            // For now just update the display
+                                            let flc = (calculator.transformerRating * 1000) / (Math.sqrt(3) * 11000);
+                                            let newPickup = (pickupSlider.value / 100) * flc;
+                                            relayPickupCurrentText.text = newPickup.toFixed(2);
+                                        }
+                                        pickupDialog.close();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -711,5 +936,31 @@ Item {
                 transformerLineSection.updateDisplayValues()
             }
         }
+    }
+
+    // Add connections for transformer rating changes to update FLC calculations
+    Connections {
+        target: transformerRatingSpinBox
+        function onValueModified() {
+            if (calculatorReady) {
+                // Update FLC calculations in the pickup dialog
+                let flc = (transformerRatingSpinBox.value * 1000) / (Math.sqrt(3) * 11000);
+                flcText.text = flc.toFixed(2) + " A";
+                
+                // Update the pickup current display as well
+                let newPickup = (pickupSlider.value / 100) * flc;
+                relayPickupCurrentText.text = newPickup.toFixed(2);
+                
+                // Force recalculation
+                calculator.refreshCalculations();
+            }
+        }
+    }
+
+    // Add the ExpertProtectionPopup at the bottom of the component
+    ExpertProtectionPopup {
+        id: expertProtectionPopup
+        calculator: transformerLineSection.calculator
+        safeValueFunction: transformerLineSection.safeValueFunction
     }
 }

@@ -21,6 +21,7 @@ Page {
         { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml", icon: "public" },
         { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml", icon: "battery_charging_full" },
         { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml", icon: "change_history" },
+        { name: qsTr("Overcurrent Protection"), source: "../components/calculators/OvercurrentProtectionCalculator.qml", icon: "electrical_services" },
         { name: qsTr("RGF"), source: "../components/calculators/RefRgfCalculator.qml", icon: "calculate" },
         { name: qsTr("Fault Current"), source: "../components/calculators/FaultCurrentCalculator.qml", icon: "electric_bolt" },
         { name: qsTr("Transformer & Line"), source: "../components/calculators/TransformerLineCalculator.qml", icon: "cell_tower" },

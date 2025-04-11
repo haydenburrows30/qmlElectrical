@@ -2,310 +2,230 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import "../"
-import "../buttons"
 import "../style"
 
-ColumnLayout {
-    Layout.fillWidth: true
-    Layout.fillHeight: true
-    Layout.margins: 50
+Item {
+    id: root
     
-    GridLayout {
-        columns: 2
-        Layout.fillWidth: true
-
-        // Phase Overcurrent Section
-        Label { 
-            text: "Phase Overcurrent (ANSI 51P)"
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 10
+        
+        Label {
+            text: "ABB REF615 Relay Configuration"
             font.bold: true
-            font.pixelSize: 14
-            Layout.columnSpan: 2
-            Layout.topMargin: 5
+            font.pixelSize: 16
+            Layout.bottomMargin: 10
         }
         
-        Label { 
-            text: "Operating Mode:"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "3-phase, IEC Very Inverse (VI)"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Startup Value:"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: (safeValueFunction(transformerCalculator.relayPickupCurrent, 0) * 1.1).toFixed(1) + " A"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Time Multiplier:"
-            leftPadding: 10
-        }
-        
-        Label { 
-            text: "0.4 (coordinate with downstream)"
-            font.bold: true
-        }
-
-        // Earth Fault Section
-        Rectangle {
+        TabBar {
+            id: tabBar
             Layout.fillWidth: true
-            Layout.columnSpan: 2
-            Layout.topMargin: 10
-            Layout.bottomMargin: 5
-            height: 1
-            color: window.modeToggled ? "#404040" : "#e0e0e0"
-        }
-        
-        Label { 
-            text: "Earth Fault (ANSI 51N)" 
-            font.bold: true
-            font.pixelSize: 14
-            Layout.columnSpan: 2
-        }
-        
-        Label { 
-            text: "Operating Mode:"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "IEC Extremely Inverse (EI)"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Startup Value:"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: (safeValueFunction(transformerCalculator.relayPickupCurrent, 0) * 0.2).toFixed(1) + " A (20% of rated)"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Time Multiplier:"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "0.5"
-            font.bold: true
-        }
-
-        // Instantaneous Overcurrent
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.columnSpan: 2
-            Layout.topMargin: 10
-            Layout.bottomMargin: 5
-            height: 1
-            color: window.modeToggled ? "#404040" : "#e0e0e0"
-        }
-        
-        Label { 
-            text: "Instantaneous Overcurrent (ANSI 50P)" 
-            font.bold: true
-            font.pixelSize: 14
-            Layout.columnSpan: 2
-        }
-        
-        Label { 
-            text: "Startup Value:"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: (safeValueFunction(transformerCalculator.faultCurrentHV, 0) * 0.8).toFixed(1) + " A (80% of fault current)"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Operating Delay:"
-            leftPadding: 10
-        }
-        Label { 
-            text: "100 ms"
-            font.bold: true
-        }
-        
-        // Directional Overcurrent
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.columnSpan: 2
-            Layout.topMargin: 10
-            Layout.bottomMargin: 5
-            height: 1
-            color: window.modeToggled ? "#404040" : "#e0e0e0"
-        }
-        
-        Label { 
-            text: "Directional Overcurrent (ANSI 67)" 
-            font.bold: true
-            font.pixelSize: 14
-            Layout.columnSpan: 2
-        }
-        
-        Label { 
-            text: "Direction Mode:"
-            leftPadding: 10
-        }
-        Label { 
-            text: "Forward (from wind turbine to grid)"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Characteristic Angle:"
-            leftPadding: 10
-        }
-        Label { 
-            text: "60°"
-            font.bold: true
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.columnSpan: 2
-            Layout.topMargin: 10
-            Layout.bottomMargin: 5
-            height: 1
-            color: window.modeToggled ? "#404040" : "#e0e0e0"
-        }
-        
-        Label { 
-            text: "Additional Functions:" 
-            font.bold: true
-            font.pixelSize: 14
-            Layout.columnSpan: 2
-        }
-        
-        Label { 
-            text: "Auto-Reclosing (ANSI 79):"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "Enabled with 1 fast + 1 delayed cycle"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Undervoltage (ANSI 27):"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "0.8 × Un, delay 3.0s"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Overvoltage (ANSI 59):"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "1.1 × Un, delay 2.0s"
-            font.bold: true
-        }
-        
-        Label { 
-            text: "Breaker Failure (ANSI 50BF):"
-            leftPadding: 10
-        }
-
-        Label { 
-            text: "Enabled, operate time 150ms"
-            font.bold: true
-        }
-
-        // Ring Main Unit Configuration
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.columnSpan: 2
-            Layout.topMargin: 15
-            Layout.bottomMargin: 5
-            height: 1
-            color: window.modeToggled ? "#404040" : "#e0e0e0"
-        }
-
-        Label {
-            text: "ABB Ring Main Unit Configuration"
-            font.pixelSize: 14
-            Layout.columnSpan: 2
-            font.bold: true
-        }
-        
-        Label {
-            text: "Equipment:"
-            leftPadding: 10
-        }
-
-        Label {
-            text: "SafeRing/SafePlus with vacuum circuit breaker module (V)"
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-            font.bold: true
-        }
-
-        Label {
-            text: "CT Ratio: "
-            leftPadding: 10
-        }
-
-        Label {
-            text: (transformerReady ? transformerCalculator.relayCtRatio : "300/1")
-            wrapMode: Text.WordWrap
-            font.bold: true
-        }
-
-        Label {
-            text: "VT Ratio: "
-            leftPadding: 10
-        }
-
-        Label {
-            text: "11000/110V"
-            wrapMode: Text.WordWrap
-            font.bold: true
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.columnSpan: 2
-            Layout.topMargin: 5
-            Layout.bottomMargin: 5
-            height: 1
-            color: window.modeToggled ? "#404040" : "#e0e0e0"
-        }
-
-        Label {
-            text: "Installation Requirements:"
-            font.bold: true
-            Layout.columnSpan: 2
             
+            TabButton {
+                text: "Protection Settings"
+            }
+            TabButton {
+                text: "I/O Configuration"
+            }
+            TabButton {
+                text: "Communication"
+            }
         }
         
-        Column {
-            Layout.columnSpan: 2
+        StackLayout {
+            currentIndex: tabBar.currentIndex
             Layout.fillWidth: true
-            Layout.leftMargin: 10
-
-            Label {
-                text: "• Ensure SF6 gas pressure monitoring is connected to alarm<br>" +
-                "• Configure local/remote control mode selection<br>" +
-                "• Connect motor operators for remote circuit breaker control"
-                wrapMode: Text.WordWrap
-                width: parent.width
+            Layout.fillHeight: true
+            
+            // Tab 1: Protection Settings
+            Item {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    anchors.fill: parent
+                    columns: 4
+                    rowSpacing: 10
+                    columnSpacing: 10
+                    
+                    // Headers
+                    Label { 
+                        text: "Function" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Label { 
+                        text: "Stage" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Label { 
+                        text: "Setting" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Label { 
+                        text: "Time" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    
+                    // Phase Overcurrent
+                    Label { text: "Non-directional OC (PHLPTOC)" }
+                    Label { text: "Low" }
+                    Label { text: "1.25 × In" }
+                    Label { text: "0.3s - VI curve" }
+                    
+                    Label { text: "Non-directional OC (PHHPTOC)" }
+                    Label { text: "High" }
+                    Label { text: "8.0 × In" }
+                    Label { text: "0.05s" }
+                    
+                    // Earth Fault
+                    Label { text: "Earth Fault (EFLPTOC)" }
+                    Label { text: "Low" }
+                    Label { text: "0.2 × In" }
+                    Label { text: "0.5s" }
+                    
+                    Label { text: "Earth Fault (EFHPTOC)" }
+                    Label { text: "High" }
+                    Label { text: "0.8 × In" }
+                    Label { text: "0.1s" }
+                    
+                    // Auto-reclose
+                    Label { text: "Auto-Reclosing (DARREC)" }
+                    Label { text: "-" }
+                    Label { text: "1 shot" }
+                    Label { text: "5s dead time" }
+                    
+                    // Circuit Breaker Failure
+                    Label { text: "CB Failure (CCBRBRF)" }
+                    Label { text: "-" }
+                    Label { text: "0.2 × In" }
+                    Label { text: "0.15s" }
+                }
+            }
+            
+            // Tab 2: I/O Configuration
+            Item {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    anchors.fill: parent
+                    columns: 3
+                    rowSpacing: 10
+                    columnSpacing: 10
+                    
+                    // Headers
+                    Label { 
+                        text: "I/O Point" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Label { 
+                        text: "Signal" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Label { 
+                        text: "Notes" 
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    
+                    // Digital Inputs
+                    Label { text: "X110-DI1" }
+                    Label { text: "CB Status (52a)" }
+                    Label { text: "Normally open contact" }
+                    
+                    Label { text: "X110-DI2" }
+                    Label { text: "CB Status (52b)" }
+                    Label { text: "Normally closed contact" }
+                    
+                    Label { text: "X110-DI3" }
+                    Label { text: "Manual Close" }
+                    Label { text: "From local panel" }
+                    
+                    Label { text: "X110-DI4" }
+                    Label { text: "External Trip" }
+                    Label { text: "From transformer relay" }
+                    
+                    // Digital Outputs
+                    Label { text: "X100-PO1" }
+                    Label { text: "CB Trip" }
+                    Label { text: "Trip coil 1" }
+                    
+                    Label { text: "X100-PO2" }
+                    Label { text: "CB Close" }
+                    Label { text: "Close coil" }
+                    
+                    Label { text: "X100-SO1" }
+                    Label { text: "Alarm" }
+                    Label { text: "General alarm" }
+                    
+                    Label { text: "X100-SO2" }
+                    Label { text: "Trip Lockout" }
+                    Label { text: "After final trip" }
+                }
+            }
+            
+            // Tab 3: Communication
+            Item {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                
+                GridLayout {
+                    anchors.fill: parent
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 10
+                    
+                    Label { text: "Communication Protocol:" }
+                    Label { text: "IEC 61850" }
+                    
+                    Label { text: "IP Address:" }
+                    Label { text: "192.168.1.10" }
+                    
+                    Label { text: "Subnet Mask:" }
+                    Label { text: "255.255.255.0" }
+                    
+                    Label { text: "Gateway:" }
+                    Label { text: "192.168.1.1" }
+                    
+                    Label { text: "GOOSE Configuration:" }
+                    Label { text: "Enabled for interlocking" }
+                    
+                    Label { text: "MMS Services:" }
+                    Label { text: "Enabled" }
+                    
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        height: 1
+                        color: "#c0c0c0"
+                        Layout.margins: 10
+                    }
+                    
+                    Label { 
+                        text: "GOOSE Message Configuration:" 
+                        font.bold: true
+                        Layout.columnSpan: 2
+                    }
+                    
+                    Label { text: "Publisher GOOSE 1:" }
+                    Label { text: "CB status" }
+                    
+                    Label { text: "Publisher GOOSE 2:" }
+                    Label { text: "Protection trip" }
+                    
+                    Label { text: "Subscriber GOOSE 1:" }
+                    Label { text: "From transformer relay" }
+                    
+                    Label { text: "Subscriber GOOSE 2:" }
+                    Label { text: "From voltage regulator" }
+                }
             }
         }
     }

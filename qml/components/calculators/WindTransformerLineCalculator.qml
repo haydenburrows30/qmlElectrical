@@ -44,10 +44,16 @@ Item {
     // Function to update combined system parameters
     function updateCombinedSystem() {
         if (windTurbineReady && transformerReady) {
-            // Update transformer load based on wind turbine output
-            // Wind turbine output in kW, transformer needs MVA
+            // Get wind turbine output in MVA
             var turbinePower = windTurbineCalculator.actualPower / 1000;
-            transformerCalculator.setLoadMVA(turbinePower);
+            
+            // Update display load MVA for UI purposes
+            transformerCalculator.setDisplayLoadMVA(turbinePower);
+            
+            // Use our special method for updating voltage calculations only without affecting protection settings
+            transformerCalculator.updateLoadForVoltageOnly(turbinePower);
+            
+            // Do NOT call setLoadMVA which would affect protection settings
         }
     }
                 

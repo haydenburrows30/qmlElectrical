@@ -2,63 +2,130 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import "../"
-import "../buttons"
+import "../style"
 
-GridLayout {
-    Layout.fillWidth: true
-    Layout.fillHeight: true
-    columns: 2
-    Layout.margins: 50
-    columnSpacing: 15
-    rowSpacing: 8
-
-    Label {
-        text: "Transformer Protection:" 
-        Layout.columnSpan: 2
-        font.bold: true 
-        Layout.topMargin: 5
-    }
-    Label {
-        text: "Differential Protection (ANSI 87T)"
-    }
-    Label {
-        text: ">5 MVA" 
-        font.bold: true
-    }
-    Label {
-        text: "Overcurrent (ANSI 50/51)"
-    }
-    Label {
-        text: safeValueFunction(transformerCalculator.relayPickupCurrent, 0).toFixed(0) + "A"
-        font.bold: true
-    }
-    Label {
-        text: "Restricted Earth Fault (ANSI 64)"
-    }
-    Label {
-        text: "Y-connected winding"
-        font.bold: true
-    }
-    Label {
-        text: "Buchholz Relay"
-    }
-    Label {
-        text: "For oil-filled transformers"
-        font.bold: true
-    }
-    Label {
-        text: "Pressure Relief Device"
-    }
-    Label {
-        text: "Opens at excessive pressure"
-        font.bold: true
-    }
-    Label {
-        text: "Winding Temperature"
-    }
-    Label {
-        text: "Alarm at 100°C, Trip at 120°C"
-        font.bold: true
+Item {
+    id: root
+    
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 10
+        
+        Label {
+            text: "Transformer Protection Requirements"
+            font.bold: true
+            font.pixelSize: 16
+            Layout.bottomMargin: 10
+        }
+        
+        GridLayout {
+            columns: 4
+            Layout.fillWidth: true
+            
+            // Headers
+            Label { 
+                text: "Protection Function" 
+                font.bold: true
+                Layout.fillWidth: true
+            }
+            Label { 
+                text: "Setting" 
+                font.bold: true
+                Layout.fillWidth: true
+            }
+            Label { 
+                text: "Time Delay" 
+                font.bold: true
+                Layout.fillWidth: true
+            }
+            Label { 
+                text: "Notes" 
+                font.bold: true
+                Layout.fillWidth: true
+            }
+            
+            // Overcurrent
+            Label { text: "51 - Overcurrent" }
+            Label { text: "125% FLC" }
+            Label { text: "Very Inverse" }
+            Label { text: "TDS = 0.3" }
+            
+            // Instantaneous OC
+            Label { text: "50 - Instantaneous OC" }
+            Label { text: "8× FLC" }
+            Label { text: "0.05s" }
+            Label { text: "For transformer faults" }
+            
+            // Earth Fault
+            Label { text: "51G - Restricted Earth Fault" }
+            Label { text: "20% FLC" }
+            Label { text: "0.1s" }
+            Label { text: "High impedance REF" }
+            
+            // Thermal Overload
+            Label { text: "49 - Thermal Overload" }
+            Label { text: "105% FLC" }
+            Label { text: "Inverse time" }
+            Label { text: "With cooling status" }
+            
+            // Differential
+            Label { text: "87T - Differential" }
+            Label { text: "20% pickup, 30% slope" }
+            Label { text: "Instantaneous" }
+            Label { text: "For internal faults" }
+        }
+        
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#c0c0c0"
+            Layout.margins: 10
+        }
+        
+        Label {
+            text: "CT Requirements"
+            font.bold: true
+            font.pixelSize: 14
+            Layout.topMargin: 10
+        }
+        
+        GridLayout {
+            columns: 2
+            Layout.fillWidth: true
+            
+            Label { text: "HV CT Ratio:" }
+            Label { text: "300/1A" }
+            
+            Label { text: "LV CT Ratio:" }
+            Label { text: "2000/1A" }
+            
+            Label { text: "Protection Class:" }
+            Label { text: "5P20" }
+            
+            Label { text: "REF CT:" }
+            Label { text: "100/1A, Class PX" }
+            
+            Label { text: "Burden:" }
+            Label { text: "15VA" }
+        }
+        
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#c0c0c0"
+            Layout.margins: 10
+        }
+        
+        Label {
+            text: "Recommended Relay: ABB RET615"
+            font.bold: true
+            Layout.topMargin: 10
+        }
+        
+        Label {
+            text: "ABB RET615 transformer protection relay provides differential protection along with backup overcurrent and earth fault protection for power transformers, unit transformers, and generator-transformer blocks."
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+        }
     }
 }

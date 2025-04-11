@@ -60,7 +60,7 @@ Item {
                         id: regConfigLayout
                         anchors.fill: parent
                         anchors.margins: 10
-=
+
                         Label {
                             text: "<b>Controller Configuration:</b>"
                             font.pixelSize: 13

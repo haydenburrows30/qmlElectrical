@@ -32,7 +32,8 @@ class TransformerLineCalculator(QObject):
         self._line_c = 0.3  # μF/km
         
         # Load parameters
-        self._load_mva = 0.8  # MVA
+        self._load_mva = 0.8  # MVA - This is for protection settings
+        self._display_load_mva = 0.8  # MVA - This is for display purposes only
         self._load_pf = 0.85  # Power factor
         
         # Voltage regulator parameters
@@ -124,12 +125,31 @@ class TransformerLineCalculator(QObject):
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
         try:
-                
             logger = logging.getLogger("qmltest")
-            print("Calculating system parameters...")
-            
-            # Log the start of calculations
             logger.info("\n=== Starting Transformer-Line Calculations ===")
+            
+            # IMPORTANT: Protection settings must be based on transformer rating, not load
+            # Calculate transformer full load current (FLC)
+            transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            
+            # Set relay pickup current at 125% of transformer FLC - independent of actual load
+            self._relay_pickup_current = 1.25 * transformer_flc
+            
+            # CT ratio selection (select next standard ratio above pickup current)
+            standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000]
+            ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
+            self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
+            
+            # Calculate time dial setting - using Very Inverse curve (IEC 60255)
+            self._relay_time_dial = 0.3
+            self._relay_curve_type = "Very Inverse (IEC)"
+            
+            logger.info(f"Transformer rating: {self._transformer_rating:.2f} kVA")
+            logger.info(f"Transformer full load current: {transformer_flc:.2f} A")
+            logger.info(f"Relay pickup current: {self._relay_pickup_current:.2f} A")
+            logger.info(f"CT ratio selected: {self._relay_ct_ratio}")
+            
+            # Now proceed with the rest of the calculations using actual load values
             logger.info(f"Load MVA: {self._load_mva:.4f} MVA")
             logger.info(f"Load power factor: {self._load_pf:.2f}")
             
@@ -262,7 +282,6 @@ class TransformerLineCalculator(QObject):
                 self._regulator_tap_position = round(voltage_difference_percent / step_size)
                 
                 # Calculate regulated voltage - for single-phase regulators in delta configuration
-                # Each regulator handles line-to-line voltage
                 regulation_percent = self._regulator_tap_position * step_size
                 self._regulated_voltage = voltage_with_drop * (1 + regulation_percent / 100.0)
                 
@@ -276,10 +295,11 @@ class TransformerLineCalculator(QObject):
                 self._regulator_three_phase_capacity = 0
             
             # Calculate relay settings
-            # Full load current on HV side
+            # Ensure we use transformer rating for proper full load current calculation
+            # This is independent of actual load connected to the transformer
             transformer_full_load_current = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
             
-            # Set pickup current at 125% of full load current
+            # Set pickup current at 125% of full load current - based on transformer rating, not actual load
             self._relay_pickup_current = 1.25 * transformer_full_load_current
             
             # CT ratio selection (select next standard ratio above pickup current)
@@ -306,14 +326,14 @@ class TransformerLineCalculator(QObject):
             
             # Transformer zero sequence impedance (typically 0.85 * Z1)
             z0_transformer_pu = 0.85 * (self._transformer_impedance / 100.0)
-            z0_transformer = z0_transformer_pu * base_z_hv
+            z0_transformer = complex(z0_transformer_pu * base_z_hv, 0)  # Convert to complex
 
             # Line zero sequence impedance (typically 3 * Z1)
             z0_line = complex(3 * self._line_r * self._line_length,
                             3 * self._line_x * self._line_length)
             
             # Neutral grounding impedance referred to HV side
-            z_ng_referred = self._neutral_grounding_resistance * (self._transformer_hv_voltage / self._transformer_lv_voltage)**2
+            z_ng_referred = complex(self._neutral_grounding_resistance * (self._transformer_hv_voltage / self._transformer_lv_voltage)**2, 0)
             
             # Total zero sequence impedance
             z0_total = z0_transformer + z0_line + z_ng_referred
@@ -331,6 +351,8 @@ class TransformerLineCalculator(QObject):
             logger.info(f"Z0 transformer: {z0_transformer:.2f} ohm")
             logger.info(f"Z0 line: {z0_line:.2f} ohm")
             logger.info(f"Zn referred: {z_ng_referred:.2f} ohm")
+            logger.info(f"Total Z0: {z0_total:.2f} ohm")
+            logger.info(f"Total impedance for SLG fault: {(z1 + z2 + z0_total):.2f} ohm")
             logger.info(f"Ground fault current: {self._ground_fault_current:.2f} A")
             
             logger.info("\nProtection Settings:")
@@ -358,7 +380,28 @@ class TransformerLineCalculator(QObject):
             print(f"Error in calculations: {str(e)}")
             logger.error(f"Error in transformer-line calculations: {e}")
             logger.exception(e)
+    
+    def _recalculate_load_values(self):
+        """Update load-dependent values when transformer or load parameters change"""
+        try:
+            # Calculate full load current at HV side
+            self._full_load_current = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
             
+            # Update relay pickup current based on full load current (typically 125%)
+            self._relay_pickup_current = self._full_load_current * 1.25
+            
+            # Update CT ratio selection based on pickup current
+            standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000]
+            ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
+            self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
+            
+            logger = logging.getLogger("qmltest")
+            logger.info(f"Recalculated load values: FLC={self._full_load_current:.2f}A, Pickup={self._relay_pickup_current:.2f}A")
+            
+        except Exception as e:
+            print(f"Error in recalculate_load_values: {str(e)}")
+            logging.getLogger("qmltest").error(f"Error in recalculate_load_values: {str(e)}")
+    
     @Property(float, notify=transformerChanged)
     def transformerRating(self):
         return self._transformer_rating
@@ -368,6 +411,8 @@ class TransformerLineCalculator(QObject):
         if self._transformer_rating != value and value > 0:
             self._transformer_rating = value
             self.transformerChanged.emit()
+            # Recalculate load-dependent values when transformer rating changes
+            self._recalculate_load_values()
             self._calculate()
     
     @Property(float, notify=transformerChanged)
@@ -433,6 +478,17 @@ class TransformerLineCalculator(QObject):
     def loadMVA(self, value):
         if self._load_mva != value and value >= 0:
             self._load_mva = value
+            self.loadChanged.emit()
+            self._calculate()
+    
+    @Property(float, notify=loadChanged)
+    def displayLoadMVA(self):
+        return self._display_load_mva
+    
+    @displayLoadMVA.setter
+    def displayLoadMVA(self, value):
+        if self._display_load_mva != value and value >= 0:
+            self._display_load_mva = value
             self.loadChanged.emit()
             self._calculate()
     
@@ -652,7 +708,12 @@ class TransformerLineCalculator(QObject):
     # QML slots for setters
     @Slot(float)
     def setTransformerRating(self, value):
-        self.transformerRating = value
+        if self._transformer_rating != value and value > 0:
+            self._transformer_rating = value
+            self.transformerChanged.emit()
+            # Recalculate load-dependent values when transformer rating changes
+            self._recalculate_load_values()
+            self._calculate()
         
     @Slot(float)
     def setTransformerImpedance(self, value):
@@ -676,9 +737,19 @@ class TransformerLineCalculator(QObject):
         
     @Slot(float)
     def setLoadMVA(self, value):
+        logger = logging.getLogger("qmltest")
+        logger.info(f"setLoadMVA called with value: {value} from caller: {__import__('traceback').format_stack()[-2]}")
         self._load_mva = value
         self.loadChanged.emit()
+        # Don't immediately calculate to avoid repeated calculations
         # self._calculate()
+        
+    @Slot(float)
+    def setDisplayLoadMVA(self, value):
+        if self._display_load_mva != value and value >= 0:
+            self._display_load_mva = value
+            self.loadChanged.emit()
+            self._calculate()
         
     @Slot(float)
     def setLoadPowerFactor(self, value):
@@ -828,3 +899,90 @@ class TransformerLineCalculator(QObject):
             print(f"Error exporting protection report: {e}")
             print(f"Attempted filename: {filename}")
             print(f"Data received: {data}")
+
+    @Slot(float)
+    def updateLoadForVoltageOnly(self, value):
+        """
+        Update load MVA only for voltage drop and regulator calculations without recalculating protection settings.
+        This prevents wind turbine output from affecting protection settings which should be based on transformer rating.
+        """
+        logger = logging.getLogger("qmltest")
+        logger.info(f"updateLoadForVoltageOnly called with value: {value}")
+        
+        if value > 0:
+            self._load_for_voltage_calc = value
+            
+            # Only update voltage drop and regulator calculations
+            try:
+                # Calculate voltage drop using complex arithmetic for more accurate results
+                load_current = max((value * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage), 0.1)
+                load_angle = math.acos(self._load_pf)
+                load_current_complex = load_current * complex(math.cos(load_angle), -math.sin(load_angle))
+                
+                # Calculate voltage drop
+                source_voltage = self._transformer_hv_voltage / math.sqrt(3)  # Phase voltage
+                source_voltage_complex = complex(source_voltage, 0)
+                total_impedance = complex(self._transformer_r, self._transformer_x) + self._line_total_z
+                voltage_drop_complex = load_current_complex * total_impedance
+                receiving_end_voltage = source_voltage_complex - voltage_drop_complex
+                
+                # Calculate percentage drop using the actual voltage difference
+                voltage_drop_percent = (abs(source_voltage_complex) - abs(receiving_end_voltage)) / abs(source_voltage_complex) * 100.0
+                
+                # For very small loads, calculate a scaled voltage drop based on impedance
+                if value < 0.01:  # For very small loads
+                    # Calculate an approximation based on rated impedance and scaled by actual load
+                    rated_current = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+                    rated_drop = (abs(total_impedance) * rated_current) / source_voltage * 100.0
+                    # Scale by the actual load as a fraction of rated load
+                    scaled_drop = rated_drop * (value * 1000 / self._transformer_rating)
+                    # Use the scaled drop for very small loads
+                    self._voltage_drop = max(scaled_drop, 0.01)
+                else:
+                    # Regular calculation for normal loads
+                    self._voltage_drop = max(voltage_drop_percent, 0.01)  # At least 0.01%
+                
+                # Calculate unregulated voltage (scaled to line-to-line)
+                self._unregulated_voltage = (abs(receiving_end_voltage) * math.sqrt(3)) / 1000.0  # Line-to-line kV
+                
+                # Update regulator values if enabled
+                if self._voltage_regulator_enabled:
+                    # Use unregulated voltage as input to regulator
+                    voltage_with_drop = self._unregulated_voltage
+                    # Calculate required tap position to achieve target voltage
+                    target_voltage = self._voltage_regulator_target
+                    voltage_difference_percent = ((target_voltage - voltage_with_drop) / (self._transformer_hv_voltage / 1000)) * 100.0
+                    
+                    # Limit to regulator range
+                    voltage_difference_percent = max(min(voltage_difference_percent, self._voltage_regulator_range), 
+                                                  -self._voltage_regulator_range)
+                    
+                    # Step resolution for a 32-step regulator with ±10% range
+                    step_size = self._voltage_regulator_range / (self._voltage_regulator_steps / 2)  # Size of each tap step
+                    
+                    # Calculate tap position (positive for boost, negative for buck)
+                    self._regulator_tap_position = round(voltage_difference_percent / step_size)
+                    
+                    # Calculate regulated voltage - for single-phase regulators in delta configuration
+                    regulation_percent = self._regulator_tap_position * step_size
+                    self._regulated_voltage = voltage_with_drop * (1 + regulation_percent / 100.0)
+                else:
+                    # No regulation
+                    self._regulated_voltage = (self._transformer_hv_voltage / 1000) * (1 - self._voltage_drop / 100.0)
+                    self._regulator_tap_position = 0
+                
+                # Notice we DO NOT recalculate protection settings here
+                # This preserves the transformer-rated protection values
+                
+                # Emit signal since values have changed
+                self.calculationCompleted.emit()
+                self.calculationsComplete.emit()  # Backwards compatibility
+                
+            except Exception as e:
+                logger.error(f"Error in updateLoadForVoltageOnly: {e}")
+                logger.exception(e)
+        else:
+            logger.warning(f"Invalid load value for voltage calculation: {value}")
+            
+        # Don't store as the official load MVA property to avoid affecting protection settings
+        # DO NOT SET self._load_mva = value
