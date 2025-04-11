@@ -34,7 +34,7 @@
     <file>qml/components/calculators/MotorStartingCalculator.qml</file>
     <file>qml/components/calculators/OhmsLawCalculator.qml</file>
 
-    <file>qml/components/calculators/ProtectionRelayCalculator.qml</file>
+    <file>qml/components/calculators/OvercurrentProtectionCalculator.qml</file>
     <file>qml/components/calculators/PowerCurrentCalculator.qml</file>
     <file>qml/components/calculators/ProtectionRequirementsSection.qml</file>
 

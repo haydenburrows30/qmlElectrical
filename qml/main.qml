@@ -46,6 +46,7 @@ ApplicationWindow {
         { name: qsTr("Earthing Calculator"), source: "components/calculators/EarthingCalculator.qml" },
         { name: qsTr("Battery Calculator"), source: "components/calculators/BatteryCalculator.qml" },
         { name: qsTr("Open Delta"), source: "components/calculators/DeltaCalculator.qml" },
+        { name: qsTr("Overcurrent Protection"), source: "components/calculators/OvercurrentProtectionCalculator.qml" },
         { name: qsTr("RGF"), source: "components/calculators/RefRgfCalculator.qml" },
         { name: qsTr("Fault Current"), source: "components/calculators/FaultCurrentCalculator.qml" },
         { name: qsTr("Transformer + Line"), source: "components/calculators/TransformerLineCalculator.qml" },
