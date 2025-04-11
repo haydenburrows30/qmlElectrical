@@ -308,92 +308,225 @@ Item {
         // Formulas section
         WaveCard {
             Layout.fillWidth: true
-            Layout.minimumHeight: 260
+            Layout.minimumHeight: 300
             title: "Formulas"
                 
             GridLayout {
                 width: parent.width
                 columns: 4
-                uniformCellWidths: true
+                // uniformCellWidths: true
                 
-                    // Formula for total length
-                    Label {
-                        text: "Total Length:"
-                        font.bold: true
-                        
-                    }
-                    Image {
-                        source: "../../../assets/formulas/vr32cl7_total_length.png"
-                        fillMode: Image.PreserveAspectFit
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 50
-                    }
-                
-                    // Formula for resistance
+                // Formula for total length
+                Label {
+                    text: "Total Length:"
+                    font.bold: true
                     
-                    Label {
-                        text: "Total Resistance:"
-                        font.bold: true
-                        
-                    }
+                }
+
+                Rectangle {
+                    id: lengthImageContainer
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
+
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_resistance.png"
+                        id: lengthImage
+                        source: "../../../assets/formulas/vr32cl7_total_length.svg"
                         fillMode: Image.PreserveAspectFit
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 50
+                        anchors.fill: parent
+                        
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    lengthImageContainer.scale = 1.5
+                                    lengthImageContainer.z = 2
+
+                                }
+                                else{
+                                    lengthImageContainer.scale = 1.0
+                                    lengthImageContainer.z = 1
+                                }
+                            }
+                        }
                     }
+                }
+            
+                // Formula for resistance
+                Label {
+                    text: "Total Resistance:"
+                    font.bold: true
+                }
+
+                Rectangle {
+                    id: resistanceImageContainer
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
                 
-                    // Formula for reactance
-                    Label {
-                        text: "Total Reactance:"
-                        font.bold: true
-                        
-                    }
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_reactance.png"
+                        source: "../../../assets/formulas/vr32cl7_resistance.svg"
                         fillMode: Image.PreserveAspectFit
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 50
+                        anchors.fill: parent
+
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    resistanceImageContainer.scale = 1.5
+                                    resistanceImageContainer.z = 2
+
+                                }
+                                else{
+                                    resistanceImageContainer.scale = 1.0
+                                    resistanceImageContainer.z = 1
+                                }
+                            }
+
+                        }
                     }
-                
-                    // Formula for impedance
-                    Label {
-                        text: "Impedance Magnitude:"
-                        font.bold: true
-                        
-                    }
+                }
+            
+                // Formula for reactance
+                Label {
+                    text: "Total Reactance:"
+                    font.bold: true
+                    
+                }
+
+                Rectangle {
+                    id: reactanceImage
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
+
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_impedance.png"
+                        source: "../../../assets/formulas/vr32cl7_reactance.svg"
                         fillMode: Image.PreserveAspectFit
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 50
+                        anchors.fill: parent
+
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    reactanceImage.scale = 1.5
+                                    reactanceImage.z = 2
+
+                                }
+                                else{
+                                    reactanceImage.scale = 1.0
+                                    reactanceImage.z = 1
+                                }
+                            }
+                        }
                     }
-                
-                    // Formula for impedance angle
-                    Label {
-                        text: "Impedance Angle:"
-                        font.bold: true
-                        
-                    }
+                }
+
+                // Formula for impedance
+                Label {
+                    text: "Impedance Magnitude:"
+                    font.bold: true
+                    
+                }
+
+                Rectangle {
+                    id: impedanceImage
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
+
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_impedance_angle.png"
+                        source: "../../../assets/formulas/vr32cl7_impedance.svg"
                         fillMode: Image.PreserveAspectFit
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 50
+                        anchors.fill: parent
+
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    impedanceImage.scale = 1.5
+                                    impedanceImage.z = 2
+
+                                }
+                                else{
+                                    impedanceImage.scale = 1.0
+                                    impedanceImage.z = 1
+                                }
+                            }
+
+                        }
                     }
-                
-                    // Overall impedance formula
-                    Label {
-                        text: "Complete Impedance:"
-                        font.bold: true
-                        
-                    }
+                }
+            
+                // Formula for impedance angle
+                Label {
+                    text: "Impedance Angle:"
+                    font.bold: true
+                    
+                }
+
+                Rectangle {
+                    id: angleImage
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
+
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_overall.png"
+                        source: "../../../assets/formulas/vr32cl7_impedance_angle.svg"
                         fillMode: Image.PreserveAspectFit
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 50
+                        anchors.fill: parent
+                        
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    angleImage.scale = 1.5
+                                    angleImage.z = 2
+
+                                }
+                                else{
+                                    angleImage.scale = 1.0
+                                    angleImage.z = 1
+                                }
+                            }
+                        }
                     }
+                }
+            
+                // Overall impedance formula
+                Label {
+                    text: "Complete Impedance:"
+                    font.bold: true
+                    
+                }
+
+                Rectangle {
+                    id: overallImage
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
+                    
+                    Image {
+                        source: "../../../assets/formulas/vr32cl7_overall.svg"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.fill: parent
+                        
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    overallImage.scale = 2
+                                    overallImage.z = 2
+
+                                }
+                                else{
+                                    overallImage.scale = 1.0
+                                    overallImage.z = 1
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -419,14 +552,14 @@ Item {
                     displayPath = folderUrl.replace(/^file:\/\/\//, "")
                     if (displayPath.match(/^[A-Za-z]:/)) {
                         // Windows path
-                        displayPath = displayPath + "\\vr32_cl7_plot.png"
+                        displayPath = displayPath + "\\vr32_cl7_plot.svg"
                     } else {
                         // Linux/Unix path
-                        displayPath = "/" + displayPath + "/vr32_cl7_plot.png"
+                        displayPath = "/" + displayPath + "/vr32_cl7_plot.svg"
                     }
                 } else {
                     // Fallback
-                    displayPath = folderUrl + "/vr32_cl7_plot.png"
+                    displayPath = folderUrl + "/vr32_cl7_plot.svg"
                 }
                 
                 plotSavedDialog.text = "The VR32 CL-7 plot has been generated and saved to:\n" + displayPath

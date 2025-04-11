@@ -46,7 +46,6 @@ Item {
             rightMargin : 5
             topMargin : 5
 
-        
             ColumnLayout {
                 id: mainLayout
                 width: mainRowLayout.width
@@ -241,12 +240,13 @@ Item {
                     // Right Column - Results
                     ColumnLayout {
                         Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignTop
                         
                         // Cable & Fault Results
                         WaveCard {
                             title: "Cable & Fault Analysis"
                             Layout.minimumWidth: 400
-                            Layout.minimumHeight: 270
+                            Layout.minimumHeight: 230
                             
                             GridLayout {
                                 columns: 2
@@ -302,7 +302,7 @@ Item {
                         WaveCard {
                             title: "Phase Overcurrent Protection"
                             Layout.minimumWidth: 400
-                            Layout.minimumHeight: 410
+                            Layout.minimumHeight: 250
                             
                             GridLayout {
                                 columns: 2
@@ -356,243 +356,90 @@ Item {
                                 Label { 
                                     text: calculator.curveType51
                                 }
-                                
-                                // Manual adjustments
-                                Label {
-                                    text: "Manual Adjustments"
-                                    font.bold: true
-                                    Layout.columnSpan: 2
-                                    Layout.topMargin: 10
-                                }
-                                
-                                Label { text: "50 Pickup:" }
-                                SpinBoxRound {
-                                    id: spinPickup50Manual  // Changed ID to avoid duplicate
-                                    from: 50
-                                    to: 2000
-                                    stepSize: 10
-                                    value: calculator.iPickup50
-                                    onValueChanged: calculator.setIPickup50(value)
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "50 Time Delay (s):" }
-                                SpinBoxRound {
-                                    id: spinTimeDelay50
-                                    from: 0
-                                    to: 1
-                                    stepSize: 1/100
-                                    Component.onCompleted: value = calculator.timeDelay50
-                                    onValueChanged: calculator.setTimeDelay50(value)
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "51 Pickup:" }
-                                SpinBoxRound {
-                                    id: spinPickup51
-                                    from: 20  // Static minimum value
-                                    to: 500   // Static maximum value
-                                    stepSize: 5
-                                    Component.onCompleted: value = calculator.iPickup51
-                                    onValueChanged: calculator.setIPickup51(value)
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "51 Time Dial:" }
-                                SpinBoxRound {
-                                    id: spinTimeDial51
-                                    from: 5/100
-                                    to: 1
-                                    stepSize: 5/100
-                                    Component.onCompleted: value = calculator.timeDial51
-                                    onValueChanged: calculator.setTimeDial51(value)
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "51 Curve:" }
-                                ComboBoxRound {
-                                    model: [
-                                        "IEC Standard Inverse", 
-                                        "IEC Very Inverse", 
-                                        "IEC Extremely Inverse",
-                                        "IEC Long Time Inverse"
-                                    ]
-                                    currentIndex: model.indexOf(calculator.curveType51)
-                                    onCurrentTextChanged: calculator.setCurveType51(currentText)
-                                    Layout.fillWidth: true
-                                }
                             }
                         }
-                    }
 
-                    // Earth Fault Protection
-                    WaveCard {
-                        title: "Earth Fault Protection"
-                        Layout.minimumWidth: 400
-                        Layout.minimumHeight: 600
-                        Layout.alignment: Qt.AlignTop
-                        
-                        GridLayout {
-                            columns: 2
-                            anchors.fill: parent
+                        // Earth Fault Protection
+                        WaveCard {
+                            title: "Earth Fault Protection"
+                            Layout.minimumWidth: 400
+                            Layout.minimumHeight: 300
+                            Layout.alignment: Qt.AlignTop
                             
-                            // 50N - Instantaneous EF
-                            Label { 
-                                text: "50N Pickup:" 
-                                font.bold: true
-                                Layout.minimumWidth: 100
-                            }
-                            Label {  // Changed from SpinBoxRound to Label
-                                id: earth50nPickupLabel  // Changed ID
-                                text: calculator.usePercentage ? 
-                                    calculator.convertToPercentage(calculator.iPickup50N).toFixed(1) + " %" : 
-                                    calculator.iPickup50N.toFixed(1) + " A"
-                                Layout.minimumWidth: 200
-                            }
-                            
-                            Label { 
-                                text: "50N Time Delay:" 
-                                font.bold: true
-                            }
-                            Label { 
-                                text: calculator.timeDelay50N.toFixed(2) + " s" 
-                            }
-                            
-                            // 51N - Time EF
-                            Label { 
-                                text: "51N Pickup:" 
-                                font.bold: true
-                            }
-                            Label { 
-                                id: earth51nPickupLabel
-                                text: calculator.usePercentage ? 
-                                    calculator.convertToPercentage(calculator.iPickup51N).toFixed(1) + " %" : 
-                                    calculator.iPickup51N.toFixed(1) + " A"
-                            }
-                            
-                            Label { 
-                                text: "51N Time Dial:" 
-                                font.bold: true
-                            }
-                            Label { 
-                                text: calculator.timeDial51N.toFixed(2) 
-                            }
-                            
-                            Label { 
-                                text: "51N Curve Type:" 
-                                font.bold: true
-                            }
-                            Label { 
-                                text: calculator.curveType51N
-                            }
-                            
-                            // 50Q - Negative Sequence
-                            Label { 
-                                text: "50Q Pickup:" 
-                                font.bold: true
-                            }
-                            Label {
-                                id: spinPickup50Q  // Changed from SpinBoxRound to Label to eliminate binding loop
-                                text: calculator.usePercentage ? 
-                                      calculator.convertToPercentage(calculator.iPickup50Q).toFixed(1) + " %" : 
-                                      calculator.iPickup50Q.toFixed(1) + " A"
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { 
-                                text: "50Q Time Delay:" 
-                                font.bold: true
-                            }
-                            Label { 
-                                text: calculator.timeDelay50Q.toFixed(2) + " s" 
-                            }
-                            
-                            // Manual adjustments
-                            Label {
-                                text: "Manual Adjustments"
-                                font.bold: true
-                                Layout.columnSpan: 2
-                                Layout.topMargin: 10
-                            }
-                            
-                            Label { text: "50N Pickup:" }
-                            SpinBoxRound {
-                                id: spinPickup50NManual2  // Changed ID to avoid duplicate
-                                from: 10
-                                to: 500 // Fixed value instead of binding
-                                stepSize: 5
-                                // Use Component.onCompleted instead of direct binding
-                                Component.onCompleted: value = calculator.iPickup50N
-                                onValueChanged: calculator.setIPickup50N(value)
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { text: "50N Time Delay (s):" }
-                            SpinBoxRound {
-                                id: spinTimeDelay50N
-                                from: 5/100
-                                to: 1
-                                stepSize: 1/100
-                                Component.onCompleted: value = calculator.timeDelay50N
-                                onValueChanged: calculator.setTimeDelay50N(value)
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { text: "51N Pickup:" }
-                            SpinBoxRound {
-                                id: spinPickup51N
-                                from: 5
-                                to: 100
-                                stepSize: 1
-                                Component.onCompleted: value = calculator.iPickup51N
-                                onValueChanged: calculator.setIPickup51N(value)
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { text: "51N Time Dial:" }
-                            SpinBoxRound {
-                                id: spinTimeDial51N
-                                from: 5/100
-                                to: 1
-                                stepSize: 5/100
-                                Component.onCompleted: value = calculator.timeDial51N
-                                onValueChanged: calculator.setTimeDial51N(value)
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { text: "51N Curve:" }
-                            ComboBoxRound {
-                                model: [
-                                    "IEC Standard Inverse", 
-                                    "IEC Very Inverse", 
-                                    "IEC Extremely Inverse",
-                                    "IEC Long Time Inverse"
-                                ]
-                                currentIndex: model.indexOf(calculator.curveType51N)
-                                onCurrentTextChanged: calculator.setCurveType51N(currentText)
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { text: "50Q Pickup:" }
-                            SpinBoxRound {
-                                id: spinPickup50QManual  // Changed ID to avoid duplicate with display label
-                                from: 10
-                                to: 500  
-                                stepSize: 5
-                                Component.onCompleted: value = calculator.iPickup50Q
-                                onValueChanged: calculator.setIPickup50Q(value)
-                                Layout.fillWidth: true
-                            }
-                            
-                            Label { text: "50Q Time Delay (s):" }
-                            SpinBoxRound {
-                                id: spinTimeDelay50Q
-                                from: 5/100
-                                to: 1
-                                stepSize: 1/100
-                                Component.onCompleted: value = calculator.timeDelay50Q
-                                onValueChanged: calculator.setTimeDelay50Q(value)
-                                Layout.fillWidth: true
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+                                
+                                // 50N - Instantaneous EF
+                                Label { 
+                                    text: "50N Pickup:" 
+                                    font.bold: true
+                                    Layout.minimumWidth: 100
+                                }
+                                Label {  // Changed from SpinBoxRound to Label
+                                    id: earth50nPickupLabel
+                                    text: calculator.usePercentage ? 
+                                        calculator.convertToPercentage(calculator.iPickup50N).toFixed(1) + " %" : 
+                                        calculator.iPickup50N.toFixed(1) + " A"
+                                    Layout.minimumWidth: 200
+                                }
+                                
+                                Label { 
+                                    text: "50N Time Delay:" 
+                                    font.bold: true
+                                }
+                                Label { 
+                                    text: calculator.timeDelay50N.toFixed(2) + " s" 
+                                }
+                                
+                                // 51N - Time EF
+                                Label { 
+                                    text: "51N Pickup:" 
+                                    font.bold: true
+                                }
+                                Label { 
+                                    id: earth51nPickupLabel
+                                    text: calculator.usePercentage ? 
+                                        calculator.convertToPercentage(calculator.iPickup51N).toFixed(1) + " %" : 
+                                        calculator.iPickup51N.toFixed(1) + " A"
+                                }
+                                
+                                Label { 
+                                    text: "51N Time Dial:" 
+                                    font.bold: true
+                                }
+                                Label { 
+                                    text: calculator.timeDial51N.toFixed(2) 
+                                }
+                                
+                                Label { 
+                                    text: "51N Curve Type:" 
+                                    font.bold: true
+                                }
+                                Label { 
+                                    text: calculator.curveType51N
+                                }
+                                
+                                // 50Q - Negative Sequence
+                                Label { 
+                                    text: "50Q Pickup:" 
+                                    font.bold: true
+                                }
+                                Label {
+                                    id: spinPickup50Q
+                                    text: calculator.usePercentage ? 
+                                        calculator.convertToPercentage(calculator.iPickup50Q).toFixed(1) + " %" : 
+                                        calculator.iPickup50Q.toFixed(1) + " A"
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Label { 
+                                    text: "50Q Time Delay:" 
+                                    font.bold: true
+                                }
+                                Label { 
+                                    text: calculator.timeDelay50Q.toFixed(2) + " s" 
+                                }
                             }
                         }
                     }

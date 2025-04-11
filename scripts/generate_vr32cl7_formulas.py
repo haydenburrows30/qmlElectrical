@@ -12,15 +12,15 @@ def setup_matplotlib():
     })
 
 def save_formula(formula, filename, directory):
-    """Save formula as PNG image using matplotlib's math renderer."""
-    plt.figure(figsize=(8, 1.5))
-    plt.text(0.5, 0.5, f"${formula}$", 
-             fontsize=16, ha='center', va='center')
+    """Save formula as SVG image using matplotlib's math renderer."""
+    plt.figure(figsize=(2, 0.2), frameon="false") # width, height in inches
+    plt.text(1, 1, f"${formula}$", 
+             fontsize=32, ha='center', va='center')
     plt.axis('off')
+    plt.tight_layout(pad=0.0)
     plt.savefig(os.path.join(directory, filename), 
-                bbox_inches='tight', dpi=150, transparent=True)
+                bbox_inches='tight', dpi=300, transparent=True, pad_inches=0)
     plt.close()
-    print(f"Created: {os.path.join(directory, filename)}")
 
 def main():
     setup_matplotlib()
@@ -31,12 +31,12 @@ def main():
     
     # VR32 CL-7 Calculator formulas
     vr32cl7_formulas = {
-        "vr32cl7_total_length.png": r"L_{total} = L_{cable} + L_{load}",
-        "vr32cl7_resistance.png": r"R_{total} = R_{per\_km} \times L_{total}",
-        "vr32cl7_reactance.png": r"X_{total} = X_{per\_km} \times L_{total}",
-        "vr32cl7_impedance.png": r"Z = \sqrt{R_{total}^2 + X_{total}^2}",
-        "vr32cl7_impedance_angle.png": r"\phi = \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right) \times \frac{180}{\pi}",
-        "vr32cl7_overall.png": r"Z \angle \phi = \sqrt{R_{total}^2 + X_{total}^2} \angle \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right)",
+        "vr32cl7_total_length.svg": r"L_{total} = L_{cable} + L_{load}",
+        "vr32cl7_resistance.svg": r"R_{total} = R_{per\_km} \times L_{total}",
+        "vr32cl7_reactance.svg": r"X_{total} = X_{per\_km} \times L_{total}",
+        "vr32cl7_impedance.svg": r"Z = \sqrt{R_{total}^2 + X_{total}^2}",
+        "vr32cl7_impedance_angle.svg": r"\phi = \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right) \times \frac{180}{\pi}",
+        "vr32cl7_overall.svg": r"Z \angle \phi = \sqrt{R_{total}^2 + X_{total}^2} \angle \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right)",
     }
     
     # Generate each formula

@@ -77,6 +77,7 @@ Item {
                 id: mainLayout
                 anchors.centerIn: parent
                 width: 880
+                spacing: 10
 
                 RowLayout {
                     Layout.minimumHeight: 40
@@ -91,10 +92,12 @@ Item {
 
                 // site information section
                 RowLayout {
+                    spacing: 10
+
                     WaveCard {
                         id: siteInfoCard
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 300
+                        Layout.preferredHeight: 280
                         Layout.alignment: Qt.AlignHCenter
 
                         title: "Site Information"
@@ -187,8 +190,8 @@ Item {
                     WaveCard {
                         id: resistanceCard
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 220
-                        Layout.alignment: Qt.AlignHCenter
+                        Layout.preferredHeight: 280
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
 
                         title: "Resistance"
 
@@ -260,7 +263,7 @@ Item {
                 // Tableview
                 WaveCard {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 400
+                    Layout.preferredHeight: 320
                     Layout.alignment: Qt.AlignHCenter
                     titleVisible: false
 
