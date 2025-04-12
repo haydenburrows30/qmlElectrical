@@ -72,6 +72,7 @@ class TransformerLineCalculator(QObject):
         self._voltage_drop = 0.0  # %
         self._fault_current_lv = 0.0  # kA
         self._fault_current_hv = 0.0  # kA
+        self._fault_current_slg = 0.0  # kA
         self._relay_pickup_current = 0.0  # A
         self._relay_time_dial = 0.0
         self._relay_curve_type = "Very Inverse"
@@ -82,6 +83,14 @@ class TransformerLineCalculator(QObject):
         self._unregulated_voltage = 0.0  # kV
         self._recommended_hv_cable = ""
         self._recommended_lv_cable = ""
+        
+        # IEC/IEEE standard time-overcurrent curves
+        self._iec_curves = {
+            "Standard Inverse": {"a": 0.14, "b": 0.02},
+            "Very Inverse": {"a": 13.5, "b": 1.0},
+            "Extremely Inverse": {"a": 80.0, "b": 2.0},
+            "Long-Time Inverse": {"a": 120.0, "b": 1.0}
+        }
         
         # Perform initial calculations
         self._calculate()
@@ -122,259 +131,204 @@ class TransformerLineCalculator(QObject):
         else:
             self._recommended_lv_cable = "150 mm² or larger"
 
+    def _calculate_trip_time(self, current_multiple):
+        """Calculate relay trip time based on curve type"""
+        try:
+            if current_multiple <= 1.0:
+                return float('inf')  # Won't trip below pickup
+                
+            curve = self._iec_curves.get(self._relay_curve_type)
+            if not curve:
+                return 0.0
+                
+            # IEC standard formula
+            trip_time = (curve["a"] * self._relay_time_dial) / (current_multiple**curve["b"] - 1)
+            return max(trip_time, 0.025)  # Minimum 25ms operating time
+            
+        except Exception as e:
+            logger = logging.getLogger("qmltest")
+            logger.error(f"Error calculating trip time: {e}")
+            return 0.0
+
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
         try:
             logger = logging.getLogger("qmltest")
             logger.info("\n=== Starting Transformer-Line Calculations ===")
             
-            # IMPORTANT: Protection settings must be based on transformer rating, not load
-            # Calculate transformer full load current (FLC)
-            transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            # 1. Calculate base values
+            base_mva = self._transformer_rating / 1000  # Convert kVA to MVA
+            base_v_hv = self._transformer_hv_voltage / 1000  # Convert V to kV
+            base_z_hv = (self._transformer_hv_voltage**2) / (self._transformer_rating * 1000)  # Ohms
             
-            # Set relay pickup current at 125% of transformer FLC - independent of actual load
-            self._relay_pickup_current = 1.25 * transformer_flc
-            
-            # CT ratio selection (select next standard ratio above pickup current)
-            standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000]
-            ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
-            self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
-            
-            # Calculate time dial setting - using Very Inverse curve (IEC 60255)
-            self._relay_time_dial = 0.3
-            self._relay_curve_type = "Very Inverse (IEC)"
-            
-            logger.info(f"Transformer rating: {self._transformer_rating:.2f} kVA")
-            logger.info(f"Transformer full load current: {transformer_flc:.2f} A")
-            logger.info(f"Relay pickup current: {self._relay_pickup_current:.2f} A")
-            logger.info(f"CT ratio selected: {self._relay_ct_ratio}")
-            
-            # Now proceed with the rest of the calculations using actual load values
-            logger.info(f"Load MVA: {self._load_mva:.4f} MVA")
-            logger.info(f"Load power factor: {self._load_pf:.2f}")
-            
-            # Calculate transformer impedance
-            transformer_z_pu = self._transformer_impedance / 100.0
-            transformer_z_base = (self._transformer_hv_voltage**2) / (self._transformer_rating * 1000)
-            self._transformer_z = transformer_z_pu * transformer_z_base
-            
-            # Remove print statements and keep only logging
-            logger.info("\nTransformer Impedance Calculations:")
-            logger.info(f"• Z base: {transformer_z_base:.2f} ohm")
-            logger.info(f"• Z (pu): {transformer_z_pu:.3f}")
-            logger.info(f"• Total Z: {self._transformer_z:.2f} ohm")
-            
-            # R and X components
-            angle = math.atan(self._transformer_x_r_ratio)
-            self._transformer_r = self._transformer_z * math.cos(angle)
-            self._transformer_x = self._transformer_z * math.sin(angle)
-            logger.info(f"• R: {self._transformer_r:.2f} ohm")
-            logger.info(f"• X: {self._transformer_x:.2f} ohm")
-            
-            # Line calculations
-            self._line_total_z = complex(self._line_r * self._line_length, 
-                                       self._line_x * self._line_length)
-            logger.info("\nLine Parameters:")
-            logger.info(f"• Total Z: {abs(self._line_total_z):.2f} at {math.degrees(cmath.phase(self._line_total_z)):.1f} degrees ohm")
-            
-            # Voltage drop calculations - improve for very low loads
-            # Make sure we have a minimum load to avoid division by zero and ensure realistic results
-            load_current = max((self._load_mva * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage), 0.1)
-            load_angle = math.acos(self._load_pf)
-            load_current_complex = load_current * complex(math.cos(load_angle), -math.sin(load_angle))
-            
-            logger.info("\nLoad Current:")
-            logger.info(f"• Magnitude: {load_current:.2f} A")
-            logger.info(f"• Angle: {math.degrees(load_angle):.1f}°")
-            logger.info(f"• Complex: {load_current_complex:.2f} A")
-            
-            # 1. Calculate transformer impedance in Ohms (referred to HV side)
-            transformer_z_pu = self._transformer_impedance / 100.0
-            transformer_z_base = (self._transformer_hv_voltage**2) / (self._transformer_rating * 1000)
-            self._transformer_z = transformer_z_pu * transformer_z_base
+            # 2. Calculate transformer impedance
+            z_pu = self._transformer_impedance / 100.0  # Convert % to per unit
+            self._transformer_z = z_pu * base_z_hv
             
             # Calculate R and X components using X/R ratio
             angle = math.atan(self._transformer_x_r_ratio)
             self._transformer_r = self._transformer_z * math.cos(angle)
             self._transformer_x = self._transformer_z * math.sin(angle)
             
-            # 2. Calculate line impedance
+            logger.info("\nTransformer Impedance:")
+            logger.info(f"Base Z: {base_z_hv:.2f} Ω")
+            logger.info(f"Z (pu): {z_pu:.3f}")
+            logger.info(f"Total Z: {self._transformer_z:.2f} Ω")
+            logger.info(f"R: {self._transformer_r:.2f} Ω")
+            logger.info(f"X: {self._transformer_x:.2f} Ω")
+            
+            # Calculate line impedance
             self._line_total_z = complex(self._line_r * self._line_length, 
-                                       self._line_x * self._line_length)
+                                         self._line_x * self._line_length)
             
-            # 3. Calculate charging current
-            line_charging_current = 2 * math.pi * 50 * self._line_c * 1e-6 * self._transformer_hv_voltage * self._line_length
+            logger.info("\nLine Parameters:")
+            logger.info(f"R per km: {self._line_r:.3f} Ω")
+            logger.info(f"X per km: {self._line_x:.3f} Ω")
+            logger.info(f"Length: {self._line_length:.2f} km")
+            logger.info(f"Total Z: {abs(self._line_total_z):.2f}∠{math.degrees(cmath.phase(self._line_total_z)):.1f}° Ω")
             
-            # 4. Calculate voltage drop (before regulation)
-            # Ensure a minimum load current for calculation stability
-            load_current = max((self._load_mva * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage), 0.1)
+            # Fault current calculations using sequence components
+            # Calculate transformer impedance
+            z1_transformer = complex(self._transformer_r, self._transformer_x)  # Positive sequence
+            z2_transformer = z1_transformer  # Negative sequence equals positive
+            z0_transformer = 0.85 * z1_transformer  # Zero sequence typically 0.85 * Z1
+            
+            # Calculate line impedance sequences
+            z1_line = self._line_total_z  # Positive sequence
+            z2_line = z1_line  # Negative sequence equals positive
+            z0_line = 3.0 * z1_line  # Zero sequence typically 3 * Z1
+            
+            # Total sequence impedances
+            z1_total = z1_transformer + z1_line
+            z2_total = z2_transformer + z2_line
+            z0_total = z0_transformer + z0_line
+            
+            # Three-phase fault current (uses only positive sequence)
+            self._fault_current_hv = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z1_total))) / 1000  # kA
+            
+            # Single-line-to-ground fault current (uses all sequences)
+            z_total_slg = z1_total + z2_total + z0_total
+            self._fault_current_slg = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z_total_slg))) / 1000  # kA
+            
+            # Ground fault current calculation
+            z_ng = complex(self._neutral_grounding_resistance, 0)  # NGR referred to HV
+            z_total_ground = z0_total + 3 * z_ng
+            self._ground_fault_current = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z_total_ground)))  # A
+            
+            # Calculate LV fault current using transformer impedance referred to LV side
+            z_base_lv = (self._transformer_lv_voltage**2) / (self._transformer_rating * 1000)
+            z_t_lv = z_pu * z_base_lv
+            self._fault_current_lv = (self._transformer_lv_voltage / (math.sqrt(3) * abs(z_t_lv))) / 1000  # Convert to kA
+            
+            logger.info(f"\nLV Fault Current Calculation:")
+            logger.info(f"Base Z (LV): {z_base_lv:.4f} Ω")
+            logger.info(f"Transformer Z (LV): {z_t_lv:.4f} Ω")
+            logger.info(f"LV Fault Current: {self._fault_current_lv:.2f} kA")
+            
+            logger.info("\nFault Current Calculations:")
+            logger.info(f"Three-phase fault: {self._fault_current_hv:.2f} kA")
+            logger.info(f"SLG fault: {self._fault_current_slg:.2f} kA")
+            logger.info(f"Ground fault: {self._ground_fault_current:.2f} A")
+            
+            # Calculate voltage drop and regulator settings
+            # Get load current with power factor
+            load_current = (self._load_mva * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage)
             load_angle = math.acos(self._load_pf)
             load_current_complex = load_current * complex(math.cos(load_angle), -math.sin(load_angle))
             
-            # Calculate voltage drop using complex arithmetic for more accurate results
-            source_voltage = self._transformer_hv_voltage / math.sqrt(3)  # Phase voltage
-            source_voltage_complex = complex(source_voltage, 0)
+            # Calculate sending end voltage (phase)
+            sending_voltage = self._transformer_hv_voltage / math.sqrt(3)
+            sending_voltage_complex = complex(sending_voltage, 0)
+            
+            # Calculate total system impedance
             total_impedance = complex(self._transformer_r, self._transformer_x) + self._line_total_z
+            
+            # Calculate voltage drop using complex arithmetic
             voltage_drop_complex = load_current_complex * total_impedance
-            receiving_end_voltage = source_voltage_complex - voltage_drop_complex
+            receiving_voltage_complex = sending_voltage_complex - voltage_drop_complex
             
-            # Improved voltage drop calculation that properly accounts for phase angles
-            # Calculate percentage drop using the actual voltage difference
-            voltage_drop_percent = (abs(source_voltage_complex) - abs(receiving_end_voltage)) / abs(source_voltage_complex) * 100.0
+            # Calculate voltage drop percentage
+            self._voltage_drop = (abs(sending_voltage_complex) - abs(receiving_voltage_complex)) / abs(sending_voltage_complex) * 100.0
+            self._unregulated_voltage = (abs(receiving_voltage_complex) * math.sqrt(3)) / 1000.0  # Convert to kV L-L
             
-            # For very small loads, calculate a scaled voltage drop based on impedance
-            # This provides more realistic results for nominal system conditions
-            if self._load_mva < 0.01:  # For very small loads
-                # Calculate an approximation based on rated impedance and scaled by actual load
-                rated_current = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
-                rated_drop = (abs(total_impedance) * rated_current) / source_voltage * 100.0
-                # Scale by the actual load as a fraction of rated load
-                scaled_drop = rated_drop * (self._load_mva * 1000 / self._transformer_rating)
-                # Use the scaled drop for very small loads
-                self._voltage_drop = max(scaled_drop, 0.01)
-            else:
-                # Regular calculation for normal loads
-                self._voltage_drop = max(voltage_drop_percent, 0.01)  # At least 0.01%
+            logger.info("\nVoltage Drop Calculation:")
+            logger.info(f"Load Current: {load_current:.2f}∠{math.degrees(-load_angle):.1f}° A")
+            logger.info(f"Total Impedance: {abs(total_impedance):.2f}∠{math.degrees(cmath.phase(total_impedance)):.1f}° Ω")
+            logger.info(f"Voltage Drop: {self._voltage_drop:.2f}%")
+            logger.info(f"Unregulated Voltage: {self._unregulated_voltage:.2f} kV")
             
-            # Calculate unregulated voltage (scaled to line-to-line)
-            self._unregulated_voltage = (abs(receiving_end_voltage) * math.sqrt(3)) / 1000.0  # Line-to-line kV
-            
-            logger.info(f"Source voltage: {source_voltage:.2f} V")
-            logger.info(f"Voltage drop complex: {voltage_drop_complex}")
-            logger.info(f"Receiving end voltage: {receiving_end_voltage}")
-            logger.info(f"Natural voltage drop: {self._voltage_drop:.2f}%")
-            logger.info(f"Unregulated voltage: {self._unregulated_voltage:.2f} kV")
-            
-            # Calculate fault currents - before the regulator calculations
-            # LV fault current - using actual transformer impedance
-            lv_base_current = self._transformer_rating * 1000 / (math.sqrt(3) * self._transformer_lv_voltage)
-            z_base_lv = self._transformer_lv_voltage * self._transformer_lv_voltage / (self._transformer_rating * 1000)
-            z_t_pu = self._transformer_impedance / 100.0
-            
-            # Convert transformer impedance to LV side
-            z_t_lv = z_t_pu * z_base_lv
-            self._fault_current_lv = (self._transformer_lv_voltage / math.sqrt(3)) / abs(z_t_lv) / 1000  # kA
-            
-            # HV fault current - using total system impedance
-            total_fault_z = complex(self._transformer_r, self._transformer_x) + self._line_total_z
-            self._fault_current_hv = (self._transformer_hv_voltage / math.sqrt(3)) / abs(total_fault_z) / 1000  # kA
-            
-            logger.info(f"Fault current LV: {self._fault_current_lv:.2f} kA")
-            logger.info(f"Fault current HV: {self._fault_current_hv:.2f} kA")
-            
-            # Rest of voltage regulator calculations...
+            # Calculate regulator tap position and regulated voltage
             if self._voltage_regulator_enabled:
-                # Use unregulated voltage as input to regulator
-                voltage_with_drop = self._unregulated_voltage
-                # Calculate required tap position to achieve target voltage
                 target_voltage = self._voltage_regulator_target
-                voltage_difference_percent = ((target_voltage - voltage_with_drop) / (self._transformer_hv_voltage / 1000)) * 100.0
+                step_size = self._voltage_regulator_range / (self._voltage_regulator_steps / 2)
+                voltage_difference = target_voltage - self._unregulated_voltage
+                
+                # Calculate required boost/buck percentage
+                required_percent = (voltage_difference / self._unregulated_voltage) * 100.0
                 
                 # Limit to regulator range
-                voltage_difference_percent = max(min(voltage_difference_percent, self._voltage_regulator_range), 
-                                              -self._voltage_regulator_range)
+                limited_percent = max(min(required_percent, self._voltage_regulator_range), 
+                                   -self._voltage_regulator_range)
                 
-                # Step resolution for a 32-step regulator with ±10% range
-                step_size = self._voltage_regulator_range / (self._voltage_regulator_steps / 2)  # Size of each tap step
+                # Calculate tap position
+                self._regulator_tap_position = round(limited_percent / step_size)
+                actual_percent = self._regulator_tap_position * step_size
                 
-                # Calculate tap position (positive for boost, negative for buck)
-                max_tap = self._voltage_regulator_steps // 2
-                self._regulator_tap_position = round(voltage_difference_percent / step_size)
+                # Calculate final regulated voltage
+                self._regulated_voltage = self._unregulated_voltage * (1 + actual_percent / 100.0)
                 
-                # Calculate regulated voltage - for single-phase regulators in delta configuration
-                regulation_percent = self._regulator_tap_position * step_size
-                self._regulated_voltage = voltage_with_drop * (1 + regulation_percent / 100.0)
-                
-                # For delta configuration, calculate the effective three-phase power capacity
-                # In delta, each regulator handles line-to-line voltage and phase-to-phase current
-                self._regulator_three_phase_capacity = self._voltage_regulator_capacity * 3  # Total capacity
+                logger.info("\nVoltage Regulator:")
+                logger.info(f"Target Voltage: {target_voltage:.2f} kV")
+                logger.info(f"Required Boost: {required_percent:.2f}%")
+                logger.info(f"Actual Boost: {actual_percent:.2f}%")
+                logger.info(f"Tap Position: {self._regulator_tap_position}")
+                logger.info(f"Regulated Voltage: {self._regulated_voltage:.2f} kV")
             else:
-                # No regulation
-                self._regulated_voltage = (self._transformer_hv_voltage / 1000) * (1 - self._voltage_drop / 100.0)
+                self._regulated_voltage = self._unregulated_voltage
                 self._regulator_tap_position = 0
-                self._regulator_three_phase_capacity = 0
             
-            # Calculate relay settings
-            # Ensure we use transformer rating for proper full load current calculation
-            # This is independent of actual load connected to the transformer
-            transformer_full_load_current = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            # 2. Calculate protection settings
+            transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            self._relay_pickup_current = transformer_flc * 1.25  # 125% of FLC
+            self._relay_time_dial = 0.3  # Default time dial setting
             
-            # Set pickup current at 125% of full load current - based on transformer rating, not actual load
-            self._relay_pickup_current = 1.25 * transformer_full_load_current
+            # Calculate example trip times
+            trip_times = {
+                "2× pickup": self._calculate_trip_time(2.0),
+                "5× pickup": self._calculate_trip_time(5.0),
+                "10× pickup": self._calculate_trip_time(10.0)
+            }
             
-            # CT ratio selection (select next standard ratio above pickup current)
-            standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000]
-            ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
-            self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
+            logger.info("\nRelay Trip Times:")
+            for condition, time in trip_times.items():
+                logger.info(f"{condition}: {time:.3f}s")
             
-            # Calculate time dial setting
-            # Using Very Inverse curve (IEC 60255)
-            # TDS typically 0.1 to 1.0, using 0.3 as default
-            self._relay_time_dial = 0.3
-            self._relay_curve_type = "Very Inverse (IEC)"
+            # CT ratio selection
+            standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200]
+            ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 1200)
+            self._relay_ct_ratio = f"{ct_primary}/1"
             
-            logger.info(f"Transformer full load current: {transformer_full_load_current:.2f} A")
-            logger.info(f"Relay pickup current: {self._relay_pickup_current:.2f} A")
-            logger.info(f"CT ratio selected: {self._relay_ct_ratio}")
+            logger.info(f"\nProtection Settings:")
+            logger.info(f"Transformer FLC: {transformer_flc:.2f} A")
+            logger.info(f"Relay Pickup: {self._relay_pickup_current:.2f} A")
+            logger.info(f"Selected CT Ratio: {self._relay_ct_ratio}")
             
-            # Calculate cable sizes
+            # Calculate voltage regulator values
+            if self._voltage_regulator_enabled:
+                # For delta configuration, calculate the effective three-phase power capacity
+                self._regulator_three_phase_capacity = self._voltage_regulator_capacity * 3.0
+                logger.info(f"\nVoltage Regulator:")
+                logger.info(f"Single Phase Capacity: {self._voltage_regulator_capacity:.1f} kVA")
+                logger.info(f"Three Phase Capacity: {self._regulator_three_phase_capacity:.1f} kVA")
+            else:
+                self._regulator_three_phase_capacity = 0.0
+            
+            # 4. Calculate cable sizes based on actual currents
             self._calculate_cable_sizes()
             
-            # Calculate ground fault current using full zero-sequence network
-            # Convert all impedances to HV side and per unit
-            base_z_hv = (self._transformer_hv_voltage**2) / (self._transformer_rating * 1000)
-            
-            # Transformer zero sequence impedance (typically 0.85 * Z1)
-            z0_transformer_pu = 0.85 * (self._transformer_impedance / 100.0)
-            z0_transformer = complex(z0_transformer_pu * base_z_hv, 0)  # Convert to complex
-
-            # Line zero sequence impedance (typically 3 * Z1)
-            z0_line = complex(3 * self._line_r * self._line_length,
-                            3 * self._line_x * self._line_length)
-            
-            # Neutral grounding impedance referred to HV side
-            z_ng_referred = complex(self._neutral_grounding_resistance * (self._transformer_hv_voltage / self._transformer_lv_voltage)**2, 0)
-            
-            # Total zero sequence impedance
-            z0_total = z0_transformer + z0_line + z_ng_referred
-            
-            # Single line to ground fault current (Vln / (Z1 + Z2 + Z0))
-            z1 = total_impedance  # Already calculated positive sequence
-            z2 = z1  # Negative sequence equals positive for passive network
-            
-            vln = self._transformer_hv_voltage / math.sqrt(3)
-            
-            # Calculate ground fault current with minimum value to prevent zero
-            self._ground_fault_current = max(vln / abs(z1 + z2 + z0_total), 10.0)  # Minimum 10A
-            
-            logger.info("\nGround fault calculation:")
-            logger.info(f"Z0 transformer: {z0_transformer:.2f} ohm")
-            logger.info(f"Z0 line: {z0_line:.2f} ohm")
-            logger.info(f"Zn referred: {z_ng_referred:.2f} ohm")
-            logger.info(f"Total Z0: {z0_total:.2f} ohm")
-            logger.info(f"Total impedance for SLG fault: {(z1 + z2 + z0_total):.2f} ohm")
-            logger.info(f"Ground fault current: {self._ground_fault_current:.2f} A")
-            
-            logger.info("\nProtection Settings:")
-            logger.info(f"• Relay Pickup Current: {self._relay_pickup_current:.2f} A")
-            logger.info(f"• CT Ratio: {self._relay_ct_ratio}")
-            logger.info(f"• Time Dial: {self._relay_time_dial:.2f}")
-            logger.info(f"• Curve Type: {self._relay_curve_type}")
-            
-            # Voltage regulator
-            if self._voltage_regulator_enabled:
-                logger.info("\nVoltage Regulator:")
-                logger.info(f"• Unregulated Voltage: {self._unregulated_voltage:.2f} kV")
-                logger.info(f"• Target Voltage: {self._voltage_regulator_target:.2f} kV")
-                logger.info(f"• Tap Position: {self._regulator_tap_position}")
-                logger.info(f"• Regulated Voltage: {self._regulated_voltage:.2f} kV")
-            
-            print("Calculations complete.")
-            logger.info("\n=== Calculations Complete ===\n")
-            
-            # Emit completion signal - emit both signals for compatibility
+            # Ensure signal emission after all calculations
             self.calculationCompleted.emit()
-            self.calculationsComplete.emit()  # Backwards compatibility
+            self.calculationsComplete.emit()
             
         except Exception as e:
             print(f"Error in calculations: {str(e)}")
@@ -648,6 +602,10 @@ class TransformerLineCalculator(QObject):
         return self._fault_current_hv
     
     @Property(float, notify=calculationCompleted)
+    def faultCurrentSLG(self):
+        return self._fault_current_slg
+    
+    @Property(float, notify=calculationCompleted)
     def relayPickupCurrent(self):
         """Relay pickup current in primary amps"""
         return self._relay_pickup_current
@@ -843,6 +801,7 @@ class TransformerLineCalculator(QObject):
                 # Fault analysis
                 "fault_current_lv": self._fault_current_lv,
                 "fault_current_hv": self._fault_current_hv,
+                "fault_current_slg": self._fault_current_slg,
                 "ground_fault_current": self._ground_fault_current,
                 
                 # Protection settings
@@ -873,26 +832,13 @@ class TransformerLineCalculator(QObject):
             if not clean_path.lower().endswith('.pdf'):
                 clean_path += '.pdf'
 
-            # Convert QJSValue to Python dict
+            # Convert QJSValue to Python dict and use directly
             js_data = data.toVariant()
-
-            # Extract and validate the data
-            export_data = {
-                "wind_power": float(js_data["wind_power"]),
-                "generator_current": float(js_data["generator_current"]),
-                "generator_capacity": float(js_data["generator_capacity"]),
-                "transformer_rating": float(js_data["transformer_rating"]),
-                "relay_settings": {
-                    "pickup_current": float(self._relay_pickup_current),
-                    "ct_ratio": self._relay_ct_ratio,
-                    "curve_type": self._relay_curve_type
-                },
-                "voltage_protection": js_data["voltage_protection"],
-                "frequency_protection": js_data["frequency_protection"],
-            }
+            print("Received JS data:", js_data)
             
+            # No data transformation - pass directly to PDF generator
             generator = PDFGenerator()
-            generator.generate_protection_report(export_data, clean_path)
+            generator.generate_protection_report(js_data, clean_path)
             print(f"Protection report exported to: {clean_path}")
             
         except Exception as e:

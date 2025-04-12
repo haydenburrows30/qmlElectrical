@@ -8,7 +8,7 @@ import "../"
 import "../buttons"
 import "../popups"
 import "../style"
-import "."  // Import current directory for ExpertProtectionPopup
+import "."
 
 Item {
     id: transformerLineSection
