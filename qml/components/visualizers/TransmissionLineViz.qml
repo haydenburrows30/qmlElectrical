@@ -13,6 +13,9 @@ Item {
     property real attenuationConstant: 0
     property real phaseConstant: 0
     
+    // Reference to calculator object
+    property var calculator  // Make sure this property is set from parent
+    
     // Theme properties
     property bool darkMode: Universal.theme === Universal.Dark
     property color textColor: Universal.foreground
@@ -25,11 +28,43 @@ Item {
     onAttenuationConstantChanged: canvas.requestPaint()
     onPhaseConstantChanged: canvas.requestPaint()
 
+    // Add calculator change handler
+    onCalculatorChanged: {
+        console.log("Calculator reference changed")
+        canvas.requestPaint()
+    }
+
+    // Debug rectangle to show component boundaries
+    Rectangle {
+        anchors.fill: parent
+        border.width: 1
+        border.color: "red"
+        color: "transparent"
+        visible: false // Set to true for debugging
+    }
+
     Canvas {
         id: canvas
         anchors.fill: parent
         
+        // Make sure we repaint when the component size changes
+        onWidthChanged: requestPaint()
+        onHeightChanged: requestPaint()
+        
+        Component.onCompleted: {
+            console.log("Canvas created with size:", width, "x", height)
+            requestPaint()
+        }
+        
         onPaint: {
+            console.log("Canvas painting at size:", width, "x", height)
+            
+            // Don't try to paint if we have no size
+            if (width <= 0 || height <= 0) {
+                console.log("Canvas has no size, skipping paint")
+                return
+            }
+            
             var ctx = getContext("2d");
             ctx.reset();
             
@@ -49,63 +84,80 @@ Item {
             drawWavePropagation(ctx, width * 0.1, height * 0.5, width * 0.8, height * 0.2, 
                               voltageColor, currentColor);
             
-            // Change how we call drawPhasorDiagram
+            // Fix phasor diagram drawing
             var phasorSize = Math.min(width * 0.2, height * 0.2);
             drawPhasorDiagram(ctx, width * 0.7, height * 0.8, phasorSize, voltageColor, currentColor);
         }
         
         function drawTransmissionLine(ctx, x, y, width, height, color) {
-            // Draw conductor lines
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
-            
-            // Top conductor
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x + width, y);
-            ctx.stroke();
-            
-            // Bottom conductor
-            ctx.beginPath();
-            ctx.moveTo(x, y + height);
-            ctx.lineTo(x + width, y + height);
-            ctx.stroke();
-            
-            // Draw distributed parameters
-            var segments = 8;
-            var segmentWidth = width / segments;
-            
-            for (var i = 0; i < segments; i++) {
-                var xPos = x + i * segmentWidth;
+            try {
+                // Draw conductor lines
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
                 
-                // Draw inductors (series elements)
-                drawInductor(ctx, xPos, y, segmentWidth * 0.8, height * 0.2);
+                // Top conductor
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + width, y);
+                ctx.stroke();
                 
-                // Draw capacitors (shunt elements)
-                drawCapacitor(ctx, xPos + segmentWidth/2, y + height * 0.4, height * 0.2);
+                // Bottom conductor
+                ctx.beginPath();
+                ctx.moveTo(x, y + height);
+                ctx.lineTo(x + width, y + height);
+                ctx.stroke();
+                
+                // Draw distributed parameters
+                var segments = 8;
+                var segmentWidth = width / segments;
+                
+                for (var i = 0; i < segments; i++) {
+                    var xPos = x + i * segmentWidth;
+                    
+                    // Draw inductors (series elements)
+                    drawInductor(ctx, xPos, y, segmentWidth * 0.8, height * 0.2);
+                    
+                    // Draw capacitors (shunt elements)
+                    drawCapacitor(ctx, xPos + segmentWidth/2, y + height * 0.4, height * 0.2);
+                }
+                
+                // Safe access to calculator properties
+                var zMagnitude = 0;
+                var zAngle = 0;
+                var subConductors = 1;
+                var sil = 0;
+                
+                if (calculator) {
+                    zMagnitude = calculator.zMagnitude || 0;
+                    zAngle = calculator.zAngle || 0;
+                    subConductors = calculator.subConductors || 1;
+                    sil = calculator.surgeImpedanceLoading || 0;
+                }
+                
+                // Draw bundle configuration
+                if (subConductors > 1) {
+                    drawBundleConductors(ctx, x, y, width, height, color);
+                }
+                
+                // Add SIL indicator
+                var silRatio = sil / 2000; // Normalize to typical values
+                drawSILIndicator(ctx, x + width + 20, y, height, silRatio);
+                
+                // Add labels
+                ctx.fillStyle = textColor.toString();
+                ctx.font = "12px sans-serif";
+                ctx.textAlign = "center";
+                
+                // Length label
+                ctx.fillText(length.toFixed(0) + " km", x + width/2, y - 20);
+                
+                // Impedance label
+                ctx.fillText("Z₀ = " + zMagnitude.toFixed(1) + "∠" + 
+                            zAngle.toFixed(1) + "°", 
+                            x + width/2, y + height + 30);
+            } catch (e) {
+                console.error("Error in drawTransmissionLine:", e);
             }
-            
-            // Draw bundle configuration
-            if (calculator.subConductors > 1) {
-                drawBundleConductors(ctx, x, y, width, height, color);
-            }
-            
-            // Add SIL indicator
-            var silRatio = calculator.surgeImpedanceLoading / 2000; // Normalize to typical values
-            drawSILIndicator(ctx, x + width + 20, y, height, silRatio);
-            
-            // Add labels
-            ctx.fillStyle = textColor.toString();
-            ctx.font = "12px sans-serif";
-            ctx.textAlign = "center";
-            
-            // Length label
-            ctx.fillText(length.toFixed(0) + " km", x + width/2, y - 20);
-            
-            // Impedance label
-            ctx.fillText("Z₀ = " + calculator.zMagnitude.toFixed(1) + "∠" + 
-                        calculator.zAngle.toFixed(1) + "°", 
-                        x + width/2, y + height + 30);
         }
         
         function drawInductor(ctx, x, y, width, height) {
@@ -172,19 +224,8 @@ Item {
         }
         
         function drawPhasorDiagram(ctx, centerX, centerY, size, vColor, iColor) {
-            // Calculate a safe radius that is always valid
-            var radius = Math.max(10, Math.min(size, Math.min(canvas.width, canvas.height) * 0.15));
-            
-            // Draw circle
-            ctx.strokeStyle = textColor.toString();
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.stroke();
-            
-            // Rest of phasor diagram drawing using centerX, centerY and radius
-            // Ensure radius is valid and reasonable size
-            var phasorRadius = Math.min(radius || 50, Math.min(canvas.width, canvas.height) * 0.15);
+            // Calculate a safe radius value
+            var phasorRadius = Math.max(10, Math.min(size/2, Math.min(canvas.width, canvas.height) * 0.15));
             
             // Draw circle
             ctx.strokeStyle = textColor.toString();
@@ -201,39 +242,56 @@ Item {
             ctx.lineTo(centerX, centerY + phasorRadius);
             ctx.stroke();
             
-            // Calculate angles using calculator's magnitude and angle properties
-            var vAngle = calculator.zAngle * Math.PI / 180;  // Convert degrees to radians
-            var vMag = Math.min(calculator.zMagnitude / 100, 1.0);  // Normalize magnitude
-            
-            // Draw voltage phasor
-            ctx.strokeStyle = vColor;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX + phasorRadius * vMag * Math.cos(vAngle), 
-                      centerY - phasorRadius * vMag * Math.sin(vAngle));
-            ctx.stroke();
-            
-            // Draw current phasor (phase shifted)
-            var iAngle = vAngle - Math.PI/2;  // 90° lag for inductive load
-            ctx.strokeStyle = iColor;
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX + phasorRadius * Math.cos(iAngle), 
-                      centerY - phasorRadius * Math.sin(iAngle));
-            ctx.stroke();
-            
-            // Add labels
-            ctx.fillStyle = textColor.toString();
-            ctx.font = "12px sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText("Phasor Diagram", centerX, centerY + phasorRadius + 20);
-            
-            // Add magnitude and angle labels
-            ctx.fillText("|Z₀| = " + calculator.zMagnitude.toFixed(1) + " Ω", 
-                        centerX, centerY + phasorRadius + 40);
-            ctx.fillText("∠Z₀ = " + calculator.zAngle.toFixed(1) + "°", 
-                        centerX, centerY + phasorRadius + 60);
+            try {
+                // Safely access calculator properties
+                var zAngle = 0;
+                var zMagnitude = 0;
+                
+                if (typeof calculator !== 'undefined' && calculator !== null) {
+                    zAngle = calculator.zAngle || 0;
+                    zMagnitude = calculator.zMagnitude || 0;
+                }
+                
+                // Calculate angles
+                var vAngle = zAngle * Math.PI / 180;  // Convert degrees to radians
+                var vMag = Math.min(zMagnitude / 100, 1.0);  // Normalize magnitude
+                
+                // Draw voltage phasor
+                ctx.strokeStyle = vColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + phasorRadius * vMag * Math.cos(vAngle), 
+                          centerY - phasorRadius * vMag * Math.sin(vAngle));
+                ctx.stroke();
+                
+                // Draw current phasor (phase shifted)
+                var iAngle = vAngle - Math.PI/2;  // 90° lag for inductive load
+                ctx.strokeStyle = iColor;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + phasorRadius * Math.cos(iAngle), 
+                          centerY - phasorRadius * Math.sin(iAngle));
+                ctx.stroke();
+                
+                // Add labels
+                ctx.fillStyle = textColor.toString();
+                ctx.font = "12px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Phasor Diagram", centerX, centerY + phasorRadius + 20);
+                
+                // Add magnitude and angle labels
+                ctx.fillText("|Z₀| = " + zMagnitude.toFixed(1) + " Ω", 
+                            centerX, centerY + phasorRadius + 40);
+                ctx.fillText("∠Z₀ = " + zAngle.toFixed(1) + "°", 
+                            centerX, centerY + phasorRadius + 60);
+            } catch (e) {
+                console.error("Error in phasor diagram: ", e);
+                // Draw fallback content if there's an error
+                ctx.fillStyle = textColor.toString();
+                ctx.textAlign = "center";
+                ctx.fillText("Phasor diagram unavailable", centerX, centerY);
+            }
         }
         
         function drawBundleConductors(ctx, x, y, width, height, color) {

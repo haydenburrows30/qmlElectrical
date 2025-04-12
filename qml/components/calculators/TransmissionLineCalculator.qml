@@ -51,6 +51,47 @@ Item {
         popupText: "A = Open circuit voltage ratio\nB = Transfer impedance\n" +
                                       "C = Transfer admittance\nD = Short circuit current ratio"
     }
+    
+    // Add info popup for conductance impact with improved visibility
+    PopUpText {
+        id: conductanceInfoPopup
+        parentCard: parametersCard
+        visible: false  // Start hidden
+        popupText: "Higher conductance decreases the characteristic impedance magnitude and " +
+                   "affects its phase angle. This represents leakage current through insulation.\n\n" +
+                   "Formula: Z₀ = √(Z/Y) where Y = G + jωC\n" +
+                   "• Higher G (conductance) increases losses\n" +
+                   "• Higher G decreases surge impedance loading\n" +
+                   "• Typical transmission lines have very low conductance\n\n" +
+                   "Typical values:\n" +
+                   "• 0.00001 S/km (dry weather, good insulation)\n" +
+                   "• 0.001 S/km (wet weather, light pollution)\n" +
+                   "• 0.01 S/km (heavy pollution, salt spray areas)"
+        
+        function show() {
+            visible = true;
+        }
+    }
+
+    // Add info popup for parameter explanations
+    PopUpText {
+        id: resultsInfoPopup
+        parentCard: parametersCard
+        visible: false  // Start hidden
+        popupText: "Transmission Line Parameters Explained:\n\n" +
+                   "• Characteristic Impedance (Z₀): Depends on R, L, G, C per unit length, but NOT on line length\n" +
+                   "• ABCD Parameters: DO depend on line length, frequency, and other parameters\n" +
+                   "• Surge Impedance Loading (SIL): The power delivered when terminated with Z₀\n\n" +
+                   "Changing line length affects:\n" +
+                   "• ABCD parameters\n" +
+                   "• Total line impedance\n" +
+                   "• Receiving end voltage and current\n\n" +
+                   "But does NOT affect characteristic impedance Z₀."
+        
+        function show() {
+            visible = true;
+        }
+    }
 
     ScrollView {
         id: scrollView
@@ -71,6 +112,7 @@ Item {
 
                 ColumnLayout {
                     Layout.maximumWidth: 370
+                    Layout.preferredWidth: 370
 
                     // Basic Line Parameters
                     WaveCard {
@@ -127,13 +169,52 @@ Item {
                                     Layout.fillWidth: true
                                 }
 
-                                Label { text: "Conductance (S/km):" }
+                                // Conductance label with info button
+                                RowLayout {
+                                    Layout.minimumWidth: 200
+                                    
+                                    Label { 
+                                        text: "Conductance (S/km):"
+                                        Layout.fillWidth: true
+                                    }
+                                    
+                                    Rectangle {
+                                        width: 16
+                                        height: 16
+                                        radius: width/2
+                                        color: Universal.accent
+                                        
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "i"
+                                            color: "white"
+                                            font.bold: true
+                                            font.pixelSize: 12
+                                        }
+                                        
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: conductanceInfoPopup.show()
+                                            
+                                            ToolTip {
+                                                visible: parent.containsMouse
+                                                text: "Click for info about conductance"
+                                            }
+                                        }
+                                    }
+                                }
+                                
                                 TextFieldRound {
                                     id: conductanceInput
-                                    text: "0"
+                                    text: "0.00001"  // Typical value for dry conditions
                                     validator: DoubleValidator { bottom: 0 }
                                     onTextChanged: if(text && acceptableInput) calculator.setConductance(parseFloat(text))
                                     Layout.fillWidth: true
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Typical values: 0.00001-0.0001 S/km (dry conditions), 0.001-0.01 S/km (wet conditions)"
                                 }
 
                                 Label { text: "Frequency (Hz):" }
@@ -224,6 +305,43 @@ Item {
                         title: "Results"
                         Layout.fillWidth: true
                         Layout.minimumHeight: 220
+                        showSettings: true
+                        
+                        // Add info button to results card
+                        RowLayout {
+                            id: resultInfoButton
+                            x: parent.width - width - 10
+                            y: 5
+                            width: 30
+                            height: 20
+                            
+                            Rectangle {
+                                width: 20
+                                height: 20
+                                radius: width/2
+                                color: Universal.accent
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "?"
+                                    color: "white"
+                                    font.bold: true
+                                    font.pixelSize: 12
+                                }
+                                
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: resultsInfoPopup.show()
+                                    
+                                    ToolTip {
+                                        visible: parent.containsMouse
+                                        text: "Click for explanation of parameter relationships"
+                                    }
+                                }
+                            }
+                        }
 
                         GridLayout {
                             columns: 2
@@ -235,21 +353,60 @@ Item {
                             }
 
                             TextFieldBlue { 
+                                id: impedanceField
                                 text: calculator.zMagnitude.toFixed(2) + " Ω ∠" + 
                                     calculator.zAngle.toFixed(1) + "°"
                                 Layout.minimumWidth: 120
                                 Layout.alignment: Qt.AlignRight
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        impedanceField.text = calculator.zMagnitude.toFixed(2) + " Ω ∠" + 
+                                                           calculator.zAngle.toFixed(1) + "°"
+                                    }
+                                }
+                                ToolTip.visible: hovered
+                                ToolTip.text: "Characteristic impedance is independent of line length. It only depends on the line's per-unit-length parameters."
+                                hoverEnabled: true
                             }
 
                             Label { text: "Attenuation Constant:" }
-                            TextFieldBlue { text: calculator.attenuationConstant.toFixed(6) + " Np/km"}
+                            TextFieldBlue { 
+                                id: attenuationField
+                                text: calculator.attenuationConstant.toFixed(6) + " Np/km"
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        attenuationField.text = calculator.attenuationConstant.toFixed(6) + " Np/km"
+                                    }
+                                }
+                            }
 
                             Label { text: "Phase Constant:" }
-                            TextFieldBlue { text: calculator.phaseConstant.toFixed(4) + " rad/km"}
+                            TextFieldBlue { 
+                                id: phaseField
+                                text: calculator.phaseConstant.toFixed(4) + " rad/km"
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        phaseField.text = calculator.phaseConstant.toFixed(4) + " rad/km"
+                                    }
+                                }
+                            }
                             
                             Label { text: "Surge Impedance Loading:" }
                             TextFieldBlue { 
+                                id: silField
                                 text: calculator.surgeImpedanceLoading.toFixed(1) + " MW"
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        silField.text = calculator.surgeImpedanceLoading.toFixed(1) + " MW"
+                                    }
+                                    function onSilCalculated() {
+                                        silField.text = calculator.surgeImpedanceLoading.toFixed(1) + " MW"
+                                    }
+                                }
                             }
                         }
                     }
@@ -260,59 +417,109 @@ Item {
                         title: "ABCD Parameters"
                         Layout.fillWidth: true
                         Layout.minimumHeight: 230
-
                         showSettings: true
                     
                         GridLayout {
                             columns: 2
 
                             Label { 
-                                text: "A Parameter:" ; 
+                                text: "A Parameter:"
                                 Layout.minimumWidth: 180
                             }
-
                             TextFieldBlue { 
+                                id: aParameterField
                                 text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°"
                                 Layout.minimumWidth: 150
                                 Layout.alignment: Qt.AlignRight
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        aParameterField.text = calculator.aMagnitude.toFixed(3) + " ∠" + 
+                                                              calculator.aAngle.toFixed(1) + "°"
+                                    }
+                                }
                             }
-                            
+
                             Label { text: "B Parameter:" }
                             TextFieldBlue { 
+                                id: bParameterField
                                 text: calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°"
                                 Layout.alignment: Qt.AlignRight
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        bParameterField.text = calculator.bMagnitude.toFixed(3) + " ∠" + 
+                                                              calculator.bAngle.toFixed(1) + "°"
+                                    }
+                                }
                             }
-                            
+
                             Label { text: "C Parameter:" }
                             TextFieldBlue { 
+                                id: cParameterField
                                 text: calculator.cMagnitude.toFixed(6) + " ∠" + calculator.cAngle.toFixed(1) + "°"
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        cParameterField.text = calculator.cMagnitude.toFixed(6) + " ∠" + 
+                                                              calculator.cAngle.toFixed(1) + "°"
+                                    }
+                                }
                             }
-                            
+
                             Label { text: "D Parameter:" }
                             TextFieldBlue { 
+                                id: dParameterField
                                 text: calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°"
+                                Connections {
+                                    target: calculator
+                                    function onResultsCalculated() {
+                                        dParameterField.text = calculator.dMagnitude.toFixed(3) + " ∠" + 
+                                                              calculator.dAngle.toFixed(1) + "°"
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
-                // Right side - Visualization
-                WaveCard {
-                    Layout.fillHeight: true
+                
+                // Right side - Visualization - Fix layout issues
+                ColumnLayout {
                     Layout.fillWidth: true
-                    title: "Line Parameters Visualization"
+                    Layout.fillHeight: true
+                    
+                    WaveCard {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        title: "Line Parameters Visualization"
+                        
+                        // This ensures a minimum size for the visualization to render properly
+                        Layout.minimumWidth: 300
+                        Layout.minimumHeight: 400
 
-                    TransmissionLineViz {
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        
-                        length: parseFloat(lengthInput.text || "100")
-                        characteristicImpedance: calculator.characteristicImpedance
-                        attenuationConstant: calculator.attenuationConstant
-                        phaseConstant: calculator.phaseConstant
-                        
-                        darkMode: Universal.theme === Universal.Dark
-                        textColor: transmissionCard.textColor
+                        TransmissionLineViz {
+                            anchors.fill: parent
+                            anchors.margins: 5
+                            
+                            // Pass all required properties correctly
+                            length: parseFloat(lengthInput.text || "100")
+                            characteristicImpedance: calculator.characteristicImpedance
+                            attenuationConstant: calculator.attenuationConstant
+                            phaseConstant: calculator.phaseConstant
+                            
+                            // Make sure calculator is passed to the visualization
+                            calculator: transmissionCard.calculator
+                            
+                            darkMode: Universal.theme === Universal.Dark
+                            textColor: transmissionCard.textColor
+                            
+                            // Add debug output
+                            Component.onCompleted: {
+                                console.log("TransmissionLineViz initialized")
+                                console.log("Size:", width, "x", height)
+                                console.log("Calculator reference:", calculator ? "valid" : "null")
+                            }
+                        }
                     }
                 }
             }
