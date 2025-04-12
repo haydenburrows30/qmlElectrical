@@ -3,15 +3,17 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 
-import "../"
-import "../visualizers"
-import "../inputs"
-import "../displays"
-import "../monitors"
-import "../popups/"
-import "../style"
-import "../charts"
-import "../buttons"
+import "../../"
+import "../../components"
+import "../../components/buttons"
+import "../../components/popups"
+import "../../components/style"
+import "../../components/visualizers"
+import "../../components/exports"
+import "../../components/charts"
+import "../../components/displays"
+import "../../components/menus"
+import "../../components/monitors"
 
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0
@@ -73,7 +75,7 @@ Item {
 
                 ColumnLayout {
 
-                    HarmonicInputForm {
+                    HarmonicInputMenu {
                         id: harmonicForm
                         calculator: harmonicsCard.calculator
                         Layout.fillWidth: true
