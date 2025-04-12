@@ -5,12 +5,13 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
+import "calculators"
 import "components"
-import "components/calculators"
-import "components/buttons"
+import "pages"
 import "components/style"
 import "components/popups"
-import "pages"
+import "components/buttons"
+
 
 ApplicationWindow {
     id: window
@@ -31,54 +32,50 @@ ApplicationWindow {
         ]
 
     property var basic: [
-        { name: qsTr("Impedance Calculator"), source: "components/calculators/ImpedanceCalculator.qml" },
-        { name: qsTr("kVA / kw / A"), source: "components/calculators/PowerCurrentCalculator.qml" },
-        { name: qsTr("Unit Converter"), source: "components/calculators/UnitConverter.qml" },
-        { name: qsTr("Power Factor Correction"), source: "components/calculators/PowerFactorCorrection.qml" },
-        { name: qsTr("Ohm's Law"), source: "components/calculators/OhmsLawCalculator.qml" },
-        { name: qsTr("Voltage Divider"), source: "components/calculators/VoltageDividerCalculator.qml" }
+        { name: qsTr("Impedance Calculator"), source: "calculators/basic/ImpedanceCalculator.qml" },
+        { name: qsTr("kVA / kw / A"), source: "calculators/basic/PowerCurrentCalculator.qml" },
+        { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml" },
+        { name: qsTr("Power Factor Correction"), source: "calculators/basic/PowerFactorCorrection.qml" },
+        { name: qsTr("Ohm's Law"), source: "calculators/basic/OhmsLawCalculator.qml" },
+        { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml" }
     ]
 
     property var protection: [
-        { name: qsTr("Discrimination Analysis"), source: "components/calculators/DiscriminationAnalyzer.qml" },
-        { name: qsTr("Protection Relay"), source: "components/calculators/ProtectionRelayCalculator.qml" },
-        { name: qsTr("Instrument Transformer"), source: "components/calculators/InstrumentTransformerCalculator.qml" },
-        { name: qsTr("Earthing Calculator"), source: "components/calculators/EarthingCalculator.qml" },
-        { name: qsTr("Battery Calculator"), source: "components/calculators/BatteryCalculator.qml" },
-        { name: qsTr("Open Delta"), source: "components/calculators/DeltaCalculator.qml" },
-        { name: qsTr("Overcurrent Protection"), source: "components/calculators/OvercurrentProtectionCalculator.qml" },
-        { name: qsTr("RGF"), source: "components/calculators/RefRgfCalculator.qml" },
-        { name: qsTr("Fault Current"), source: "components/calculators/FaultCurrentCalculator.qml" },
-        { name: qsTr("Transformer + Line"), source: "components/calculators/TransformerLineCalculator.qml" },
-        { name: qsTr("Solkor Rf"), source: "components/calculators/SolkorRf.qml" },
-        { name: qsTr("VR Calculations"), source: "components/calculators/VR32CL7Calculator.qml" }
+        { name: qsTr("Discrimination Analysis"), source: "calculators/protection/DiscriminationAnalyzer.qml" },
+        { name: qsTr("Protection Relay"), source: "calculators/protection/ProtectionRelayCalculator.qml" },
+        { name: qsTr("Instrument Transformer"), source: "calculators/protection/InstrumentTransformerCalculator.qml" },
+        { name: qsTr("Earthing Calculator"), source: "calculators/protection/EarthingCalculator.qml" },
+        { name: qsTr("Battery Calculator"), source: "calculators/protection/BatteryCalculator.qml" },
+        { name: qsTr("Open Delta"), source: "calculators/protection/DeltaCalculator.qml" },
+        { name: qsTr("Overcurrent Protection"), source: "calculators/protection/OvercurrentProtectionCalculator.qml" },
+        { name: qsTr("RGF"), source: "calculators/protection/RefRgfCalculator.qml" },
+        { name: qsTr("Fault Current"), source: "calculators/protection/FaultCurrentCalculator.qml" },
+        { name: qsTr("Transformer + Line"), source: "calculators/protection/TransformerLineCalculator.qml" },
+        { name: qsTr("Solkor Rf"), source: "calculators/protection/SolkorRf.qml" },
+        { name: qsTr("VR Calculations"), source: "calculators/protection/VR32CL7Calculator.qml" }
     ]
 
     property var cable: [
-        { name: qsTr("Cable Ampacity"), source: "components/calculators/CableAmpacityCalculator.qml" },
-        { name: qsTr("Charging Current"), source: "components/calculators/ChargingCurrentCalculator.qml" },
-        { name: qsTr("Voltage Drop"), source: "components/calculators/VoltageDropCalculator.qml" },
-        { name: qsTr("Transmission Line"), source: "components/calculators/TransmissionLineCalculator.qml" },
-        { name: qsTr("Switchboard"), source: "components/calculators/SwitchboardPanel.qml" },
-        { name: qsTr("Voltage Drop Orion"), source: "components/calculators/VoltageDrop.qml" }
+        { name: qsTr("Cable Ampacity"), source: "calculators/cable/CableAmpacityCalculator.qml" },
+        { name: qsTr("Charging Current"), source: "calculators/cable/ChargingCurrentCalculator.qml" },
+        { name: qsTr("Voltage Drop"), source: "calculators/cable/VoltageDropCalculator.qml" },
+        { name: qsTr("Transmission Line"), source: "calculators/cable/TransmissionLineCalculator.qml" },
+        { name: qsTr("Switchboard"), source: "calculators/cable/SwitchboardPanel.qml" },
+        { name: qsTr("Voltage Drop Orion"), source: "calculators/cable/VoltageDrop.qml" }
     ]
     
     property var theory: [
-        { name: qsTr("Transformer Calculator"), source: "components/calculators/TransformerCalculator.qml" },
-        { name: qsTr("Harmonics Analysis"), source: "components/calculators/HarmonicsAnalyzer.qml" },
-        { name: qsTr("Machine Calculator"), source: "components/calculators/ElectricMachineCalculator.qml" },
-        { name: qsTr("Motor Starting"), source: "components/calculators/MotorStartingCalculator.qml" },
-        { name: qsTr("RLC"), source: "components/calculators/RLC.qml" },
-        { name: qsTr("Three Phase Waveforms"), source: "components/calculators/ThreePhase.qml" },
-        { name: qsTr("Real Time Chart"), source: "components/calculators/RealTime.qml" }
+        { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml" },
+        { name: qsTr("Harmonics Analysis"), source: "calculators/theory/HarmonicsAnalyzer.qml" },
+        { name: qsTr("Machine Calculator"), source: "calculators/theory/ElectricMachineCalculator.qml" },
+        { name: qsTr("Motor Starting"), source: "calculators/theory/MotorStartingCalculator.qml" },
+        { name: qsTr("RLC"), source: "calculators/theory/RLC.qml" },
+        { name: qsTr("Three Phase Waveforms"), source: "calculators/theory/ThreePhase.qml" },
+        { name: qsTr("Real Time Chart"), source: "calculators/theory/RealTime.qml" }
     ]
     
     property var renewables: [
-        { name: qsTr("Wind & Grid Connection"), source: "components/calculators/WindTransformerLineCalculator.qml" }
-    ]
-
-    property var info: [
-        { name: qsTr("Info"), source: "components/popups/About.qml" }
+        { name: qsTr("Wind & Grid Connection"), source: "calculators/grid_wind/WindTransformerLineCalculator.qml" }
     ]
 
     ResultsManager {id: resultsManager}

@@ -16,12 +16,12 @@ Page {
     }
 
     property var cable: [
-        { name: qsTr("Cable Ampacity"), source: "../components/calculators/CableAmpacityCalculator.qml", icon: "electrical_services" },
-        { name: qsTr("Charging Current"), source: "../components/calculators/ChargingCurrentCalculator.qml", icon: "battery_saver" },
-        { name: qsTr("Voltage Drop"), source: "../components/calculators/VoltageDropCalculator.qml", icon: "bolt" },
-        { name: qsTr("Transmission Line"), source: "../components/calculators/TransmissionLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("Switchboard"), source: "../components/calculators/SwitchboardPanel.qml", icon: "power" },
-        { name: qsTr("Voltage Drop Orion"), source: "../components/calculators/VoltageDrop.qml", icon: "bolt" }
+        { name: qsTr("Cable Ampacity"), source: "../calculators/cable/CableAmpacityCalculator.qml", icon: "electrical_services" },
+        { name: qsTr("Charging Current"), source: "../calculators/cable/ChargingCurrentCalculator.qml", icon: "battery_saver" },
+        { name: qsTr("Voltage Drop"), source: "../calculators/cable/VoltageDropCalculator.qml", icon: "bolt" },
+        { name: qsTr("Transmission Line"), source: "../calculators/cable/TransmissionLineCalculator.qml", icon: "cell_tower" },
+        { name: qsTr("Switchboard"), source: "../calculators/cable/SwitchboardPanel.qml", icon: "power" },
+        { name: qsTr("Voltage Drop Orion"), source: "../calculators/cable/VoltageDrop.qml", icon: "bolt" }
     ]
 
     ColumnLayout {

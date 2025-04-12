@@ -4,6 +4,8 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 
+import "../"
+import "."
 import "../components"
 import "../components/buttons/"
 import "../components/popups"
@@ -113,7 +115,7 @@ Page {
                 Behavior on scale { NumberAnimation { duration: 100 } }
 
                 Item {
-                    anchors.fill: parent                
+                    anchors.fill: parent
                     Text {
                         text: "Protection"
                         font.bold: true

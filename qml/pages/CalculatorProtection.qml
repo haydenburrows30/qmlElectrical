@@ -15,18 +15,18 @@ Page {
     }
 
     property var protection: [
-        { name: qsTr("Discrimination Analysis"), source: "../components/calculators/DiscriminationAnalyzer.qml", icon: "show_chart"},
-        { name: qsTr("Protection Relay"), source: "../components/calculators/ProtectionRelayCalculator.qml", icon: "computer" },
-        { name: qsTr("Instrument Transformer"), source: "../components/calculators/InstrumentTransformerCalculator.qml", icon: "transform" },
-        { name: qsTr("Earthing Calculator"), source: "../components/calculators/EarthingCalculator.qml", icon: "public" },
-        { name: qsTr("Battery Calculator"), source: "../components/calculators/BatteryCalculator.qml", icon: "battery_charging_full" },
-        { name: qsTr("Open Delta"), source: "../components/calculators/DeltaCalculator.qml", icon: "change_history" },
-        { name: qsTr("Overcurrent Protection"), source: "../components/calculators/OvercurrentProtectionCalculator.qml", icon: "electrical_services" },
-        { name: qsTr("RGF"), source: "../components/calculators/RefRgfCalculator.qml", icon: "calculate" },
-        { name: qsTr("Fault Current"), source: "../components/calculators/FaultCurrentCalculator.qml", icon: "electric_bolt" },
-        { name: qsTr("Transformer & Line"), source: "../components/calculators/TransformerLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("SOLKOR Rf"), source: "../components/calculators/SolkorRf.qml", icon: "cell_tower" },
-        { name: qsTr("VR Calculations"), source: "../components/calculators/VR32CL7Calculator.qml", icon: "cell_tower" }
+        { name: qsTr("Discrimination Analysis"), source: "../calculators/protection/DiscriminationAnalyzer.qml", icon: "show_chart"},
+        { name: qsTr("Protection Relay"), source: "../calculators/protection/ProtectionRelayCalculator.qml", icon: "computer" },
+        { name: qsTr("Instrument Transformer"), source: "../calculators/protection/InstrumentTransformerCalculator.qml", icon: "transform" },
+        { name: qsTr("Earthing Calculator"), source: "../calculators/protection/EarthingCalculator.qml", icon: "public" },
+        { name: qsTr("Battery Calculator"), source: "../calculators/protection/BatteryCalculator.qml", icon: "battery_charging_full" },
+        { name: qsTr("Open Delta"), source: "../calculators/protection/DeltaCalculator.qml", icon: "change_history" },
+        { name: qsTr("Overcurrent Protection"), source: "../calculators/protection/OvercurrentProtectionCalculator.qml", icon: "electrical_services" },
+        { name: qsTr("RGF"), source: "../calculators/protection/RefRgfCalculator.qml", icon: "calculate" },
+        { name: qsTr("Fault Current"), source: "../calculators/protection/FaultCurrentCalculator.qml", icon: "electric_bolt" },
+        { name: qsTr("Transformer & Line"), source: "../calculators/protection/TransformerLineCalculator.qml", icon: "cell_tower" },
+        { name: qsTr("SOLKOR Rf"), source: "../calculators/protection/SolkorRf.qml", icon: "cell_tower" },
+        { name: qsTr("VR Calculations"), source: "../calculators/protection/VR32CL7Calculator.qml", icon: "cell_tower" }
     ]
 
     ColumnLayout {
