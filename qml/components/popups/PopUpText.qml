@@ -32,10 +32,10 @@ Popup {
             anchors.fill: parent
     }
 
-    contentItem: Label {
-                    anchors.fill: parent
-                    padding: 10
-                    wrapMode: Text.WordWrap
-                    text: popupText
-                    }
+    // contentItem: Label {
+    //                 anchors.fill: parent
+    //                 padding: 10
+    //                 wrapMode: Text.WordWrap
+    //                 text: popupText
+    //                 }
 }

@@ -19,8 +19,8 @@ class OvercurrentProtectionCalculator(QObject):
     ctRatioChanged = Signal()
     usePercentageChanged = Signal()
     earthSystemChanged = Signal()
-    cableRChanged = Signal()
-    cableXChanged = Signal()
+    cableRChanged = Signal()  # Add this signal
+    cableXChanged = Signal()  # Add this signal
     calculationsComplete = Signal()
     transformerImpedanceChanged = Signal()
     transformerXRRatioChanged = Signal()
@@ -668,3 +668,35 @@ class OvercurrentProtectionCalculator(QObject):
             self._cable_installation = value
             self.cableInstallationChanged.emit()
             self._calculate()
+
+    # Add these new property definitions after your other properties
+    @Property(float, notify=cableRChanged)
+    def cableR(self):
+        """Get cable R value with safe default"""
+        return self._custom_cable_r
+
+    @cableR.setter
+    def cableR(self, value):
+        """Set cable R value with validation"""
+        if value != self._custom_cable_r and value >= 0:
+            self._custom_cable_r = value
+            self.cableRChanged.emit()
+            self._calculate()
+
+    @Property(float, notify=cableXChanged)
+    def cableX(self):
+        """Get cable X value with safe default"""
+        return self._custom_cable_x
+
+    @cableX.setter
+    def cableX(self, value):
+        """Set cable X value with validation"""
+        if value != self._custom_cable_x and value >= 0:
+            self._custom_cable_x = value
+            self.cableXChanged.emit()
+            self._calculate()
+
+    @Property(float, notify=calculationsComplete)
+    def cableImpedance(self):
+        """Get cable impedance value"""
+        return self._cable_impedance
