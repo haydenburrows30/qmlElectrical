@@ -160,7 +160,7 @@ Item {
                     WaveCard {
                         title: "Transformer Protection (11kV)"
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 360
+                        Layout.minimumHeight: 800  // Increased height for new fields
                         
                         GridLayout {
                             anchors.fill: parent
@@ -238,6 +238,197 @@ Item {
                                     (safeValueFunction(calculateTransformerFullLoadCurrent(), 15.75) * 8).toFixed(2) + " A (8× FLC)" : 
                                     "126.00 A (8× FLC)" 
                                 Layout.fillWidth: true
+                            }
+                            
+                            // Add differential protection section
+                            Rectangle {
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 2
+                                color: "#e0e0e0"
+                            }
+                            
+                            Label { 
+                                text: "Differential Protection:"
+                                font.bold: true
+                                Layout.columnSpan: 2
+                            }
+                            
+                            Label { text: "HV CT Ratio:" }
+                            TextFieldBlue { 
+                                text: transformerReady && transformerCalculator.differentialSettings ? 
+                                    transformerCalculator.differentialSettings.hv_ct_ratio : "300/1"
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label { text: "LV CT Ratio:" }
+                            TextFieldBlue { 
+                                text: transformerReady && transformerCalculator.differentialSettings ? 
+                                    transformerCalculator.differentialSettings.lv_ct_ratio : "1000/1"
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label { text: "Diff. Pickup Current:" }
+                            TextFieldBlue { 
+                                text: transformerReady && transformerCalculator.differentialSettings ? 
+                                    transformerCalculator.differentialSettings.pickup_current.toFixed(2) + " A" : "0.00 A"
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label { text: "Slope 1/Slope 2:" }
+                            TextFieldBlue { 
+                                text: transformerReady && transformerCalculator.differentialSettings ? 
+                                    (transformerCalculator.differentialSettings.slope1 * 100).toFixed(0) + "% / " +
+                                    (transformerCalculator.differentialSettings.slope2 * 100).toFixed(0) + "%" : 
+                                    "25% / 50%"
+                                Layout.fillWidth: true
+                            }
+                            
+                            // Add harmonics section
+                            Rectangle {
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 2
+                                color: "#e0e0e0"
+                            }
+                            
+                            Label { 
+                                text: "Harmonic Limits:"
+                                font.bold: true
+                                Layout.columnSpan: 2
+                            }
+                            
+                            Label { text: "2nd/3rd Harmonic:" }
+                            TextFieldBlue { 
+                                text: "2% / 5% of fundamental"
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label { text: "5th/7th Harmonic:" }
+                            TextFieldBlue { 
+                                text: "6% / 5% of fundamental"
+                                Layout.fillWidth: true
+                            }
+                            
+                            Label { text: "THD Limit:" }
+                            TextFieldBlue { 
+                                text: "8% maximum"
+                                Layout.fillWidth: true
+                            }
+                        }
+                    }
+                    
+                    // Time-Overcurrent Curve Card
+                    WaveCard {
+                        title: "Time-Overcurrent Curve"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 400
+                        
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: 10
+                            
+                            // Curve type info
+                            GridLayout {
+                                columns: 4
+                                Layout.fillWidth: true
+                                
+                                Label { text: "Curve Type:" }
+                                ComboBox {
+                                    id: curveTypeCombo
+                                    model: ["Standard Inverse", "Very Inverse", "Extremely Inverse", "Long-Time Inverse"]
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: curveCanvas.requestPaint()
+                                }
+                                
+                                Label { text: "Time Dial:" }
+                                SpinBox {
+                                    id: timeDialSpin
+                                    from: 10
+                                    to: 100
+                                    value: 30
+                                    stepSize: 5
+                                    editable: true
+                                    onValueChanged: curveCanvas.requestPaint()
+                                }
+                            }
+                            
+                            // Curve canvas
+                            Canvas {
+                                id: curveCanvas
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                
+                                property var curveParams: {
+                                    "Standard Inverse": {a: 0.14, b: 0.02},
+                                    "Very Inverse": {a: 13.5, b: 1.0},
+                                    "Extremely Inverse": {a: 80.0, b: 2.0},
+                                    "Long-Time Inverse": {a: 120.0, b: 1.0}
+                                }
+                                
+                                onPaint: {
+                                    var ctx = getContext("2d")
+                                    var w = width
+                                    var h = height
+                                    
+                                    ctx.clearRect(0, 0, w, h)
+                                    
+                                    // Draw grid
+                                    ctx.strokeStyle = "#e0e0e0"
+                                    ctx.beginPath()
+                                    for(var i = 0; i < w; i += w/10) {
+                                        ctx.moveTo(i, 0)
+                                        ctx.lineTo(i, h)
+                                    }
+                                    for(var j = 0; j < h; j += h/10) {
+                                        ctx.moveTo(0, j)
+                                        ctx.lineTo(w, j)
+                                    }
+                                    ctx.stroke()
+                                    
+                                    // Draw curve
+                                    ctx.strokeStyle = "#2196F3"
+                                    ctx.lineWidth = 2
+                                    ctx.beginPath()
+                                    
+                                    var params = curveParams[curveTypeCombo.currentText]
+                                    var timeDial = timeDialSpin.value / 100
+                                    
+                                    for(var x = 1; x < 20; x += 0.1) {
+                                        var t = (params.a * timeDial) / (Math.pow(x, params.b) - 1)
+                                        t = Math.max(t, 0.025)  // Minimum 25ms
+                                        
+                                        // Scale for display
+                                        var px = Math.log(x) * w/3 + w/4
+                                        var py = h - (Math.log(t) * h/3 + h/4)
+                                        
+                                        if(x === 1) ctx.moveTo(px, py)
+                                        else ctx.lineTo(px, py)
+                                    }
+                                    ctx.stroke()
+                                    
+                                    // Draw axes labels
+                                    ctx.fillStyle = "#000000"
+                                    ctx.font = "12px Arial"
+                                    ctx.fillText("Current Multiple (×pickup)", w/2, h-5)
+                                    ctx.save()
+                                    ctx.translate(10, h/2)
+                                    ctx.rotate(-Math.PI/2)
+                                    ctx.fillText("Time (seconds)", 0, 0)
+                                    ctx.restore()
+                                }
+                            }
+                            
+                            // Trip times table
+                            GridLayout {
+                                columns: 4
+                                Layout.fillWidth: true
+                                
+                                Label { text: "Trip Times:" ; font.bold: true; Layout.columnSpan: 4 }
+                                Label { text: "2× pickup:" }
+                                Label { text: transformerCalculator ? transformerCalculator.calculateTripTime(2.0).toFixed(2) + "s" : "0.00s" }
+                                Label { text: "5× pickup:" }
+                                Label { text: transformerCalculator ? transformerCalculator.calculateTripTime(5.0).toFixed(2) + "s" : "0.00s" }
                             }
                         }
                     }

@@ -64,6 +64,17 @@ class TransformerLineCalculator(QObject):
             "time_delay": 2.0      # seconds
         }
         
+        # Harmonic analysis parameters
+        self._harmonic_limits = {
+            2: 2.0,   # 2nd harmonic: 2%
+            3: 5.0,   # 3rd harmonic: 5%
+            5: 6.0,   # 5th harmonic: 6%
+            7: 5.0,   # 7th harmonic: 5%
+            11: 3.5,  # 11th harmonic: 3.5%
+            13: 3.0   # 13th harmonic: 3%
+        }
+        self._thd_limit = 8.0  # Total Harmonic Distortion limit
+        
         # Calculated values
         self._transformer_z = 0.0  # Ohm
         self._transformer_r = 0.0  # Ohm
@@ -83,6 +94,7 @@ class TransformerLineCalculator(QObject):
         self._unregulated_voltage = 0.0  # kV
         self._recommended_hv_cable = ""
         self._recommended_lv_cable = ""
+        self._differential_settings = {}
         
         # IEC/IEEE standard time-overcurrent curves
         self._iec_curves = {
@@ -149,6 +161,52 @@ class TransformerLineCalculator(QObject):
             logger = logging.getLogger("qmltest")
             logger.error(f"Error calculating trip time: {e}")
             return 0.0
+
+    @Slot(float, result=float)
+    def calculateTripTime(self, current_multiple):
+        """Public method to calculate relay trip time"""
+        return self._calculate_trip_time(current_multiple)
+
+    def _calculate_differential_protection(self):
+        """Calculate differential protection settings"""
+        try:
+            # Calculate currents on both sides
+            i_hv = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            i_lv = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_lv_voltage)
+            
+            # Calculate CT ratios for both sides
+            ct_primary_hv = next((x for x in [50, 75, 100, 150, 200, 300, 400, 500] if x > i_hv), 500)
+            ct_primary_lv = next((x for x in [100, 200, 300, 400, 600, 800, 1000] if x > i_lv), 1000)
+            
+            # Calculate differential settings
+            pickup = 0.2 * i_hv  # 20% of HV full load current
+            slope1 = 0.25  # 25% slope for first region
+            slope2 = 0.50  # 50% slope for second region
+            
+            return {
+                "hv_ct_ratio": f"{ct_primary_hv}/1",
+                "lv_ct_ratio": f"{ct_primary_lv}/1",
+                "pickup_current": pickup,
+                "slope1": slope1,
+                "slope2": slope2,
+                "breakpoint": 2.0  # Current where slope changes
+            }
+        except Exception as e:
+            logger = logging.getLogger("qmltest")
+            logger.error(f"Error calculating differential protection: {e}")
+            return None
+
+    def _calculate_harmonic_limits(self, current):
+        """Calculate harmonic current limits"""
+        try:
+            limits = {}
+            for harmonic, percent in self._harmonic_limits.items():
+                limits[harmonic] = (percent / 100.0) * current
+            return limits
+        except Exception as e:
+            logger = logging.getLogger("qmltest")
+            logger.error(f"Error calculating harmonic limits: {e}")
+            return {}
 
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
@@ -322,6 +380,23 @@ class TransformerLineCalculator(QObject):
                 logger.info(f"Three Phase Capacity: {self._regulator_three_phase_capacity:.1f} kVA")
             else:
                 self._regulator_three_phase_capacity = 0.0
+            
+            # Calculate differential protection settings
+            diff_settings = self._calculate_differential_protection()
+            if diff_settings:
+                self._differential_settings = diff_settings
+                logger.info("\nDifferential Protection Settings:")
+                logger.info(f"HV CT Ratio: {diff_settings['hv_ct_ratio']}")
+                logger.info(f"LV CT Ratio: {diff_settings['lv_ct_ratio']}")
+                logger.info(f"Pickup Current: {diff_settings['pickup_current']:.2f} A")
+                logger.info(f"Slope 1: {diff_settings['slope1']*100:.0f}%")
+                logger.info(f"Slope 2: {diff_settings['slope2']*100:.0f}%")
+            
+            # Calculate harmonic limits
+            harmonic_limits = self._calculate_harmonic_limits(transformer_flc)
+            logger.info("\nHarmonic Current Limits:")
+            for harmonic, limit in harmonic_limits.items():
+                logger.info(f"{harmonic}th harmonic: {limit:.2f} A")
             
             # 4. Calculate cable sizes based on actual currents
             self._calculate_cable_sizes()
@@ -663,6 +738,11 @@ class TransformerLineCalculator(QObject):
         """Reverse power protection threshold"""
         return self._reverse_power_threshold
 
+    @Property(dict, notify=calculationCompleted)
+    def differentialSettings(self):
+        """Differential protection settings"""
+        return self._differential_settings
+
     # QML slots for setters
     @Slot(float)
     def setTransformerRating(self, value):
@@ -813,6 +893,11 @@ class TransformerLineCalculator(QObject):
                 "reverse_power": self._reverse_power_threshold,
                 "frequency_settings": self._frequency_relay_settings,
                 "voltage_settings": self._voltage_relay_settings,
+                
+                # Harmonic analysis
+                "harmonic_limits": self._harmonic_limits,
+                "thd_limit": self._thd_limit,
+                "differential_settings": self._differential_settings
             }
             
             generator = PDFGenerator()
