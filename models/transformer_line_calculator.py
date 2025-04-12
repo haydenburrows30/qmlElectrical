@@ -152,9 +152,13 @@ class TransformerLineCalculator(QObject):
             curve = self._iec_curves.get(self._relay_curve_type)
             if not curve:
                 return 0.0
-                
-            # IEC standard formula
-            trip_time = (curve["a"] * self._relay_time_dial) / (current_multiple**curve["b"] - 1)
+            
+            # Improved IEC standard formula implementation
+            numerator = curve["a"] * self._relay_time_dial
+            denominator = (current_multiple**curve["b"]) - 1
+            
+            # Add minimum operating time check
+            trip_time = numerator / denominator if denominator > 0 else float('inf')
             return max(trip_time, 0.025)  # Minimum 25ms operating time
             
         except Exception as e:
@@ -166,6 +170,25 @@ class TransformerLineCalculator(QObject):
     def calculateTripTime(self, current_multiple):
         """Public method to calculate relay trip time"""
         return self._calculate_trip_time(current_multiple)
+
+    @Slot(str, result=dict)
+    def getCurveParams(self, curve_type):
+        """Get IEC curve parameters for given curve type"""
+        return self._iec_curves.get(curve_type, {"a": 0.14, "b": 0.02})
+
+    @Slot(str, float)
+    def setRelayCurveType(self, curve_type):
+        """Update relay curve type"""
+        if curve_type in self._iec_curves:
+            self._relay_curve_type = curve_type
+            self.calculationCompleted.emit()
+
+    @Slot(float)
+    def setRelayTimeDial(self, value):
+        """Update relay time dial setting"""
+        if 0.1 <= value <= 1.0:
+            self._relay_time_dial = value
+            self.calculationCompleted.emit()
 
     def _calculate_differential_protection(self):
         """Calculate differential protection settings"""
