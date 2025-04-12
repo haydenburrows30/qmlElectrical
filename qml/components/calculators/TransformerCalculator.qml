@@ -2,11 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+import QtQuick.Pdf
 
 import "../"
 import "../visualizers/"
 import "../style"
 import "../popups"
+import "../buttons"
 
 import Transformer 1.0
 
@@ -16,6 +18,44 @@ Item {
     property TransformerCalculator calculator: TransformerCalculator {}
 
     TransformerPopUp {id: tipsPopup}
+
+    Popup {
+        id: pdfPopup
+        width: transformerCard.width - 50
+        height: transformerCard.height - 50
+        anchors.centerIn: Overlay.overlay
+        modal: true
+
+        ColumnLayout {
+            anchors.fill: parent
+            Button {
+                action: Action {
+                    onTriggered: view.renderScale *= 1.2
+                }
+                Layout.maximumHeight: 40
+                Layout.fillWidth: true
+                text: "Zoom In"
+            }
+            Button {
+                action: Action {
+                    onTriggered: view.renderScale *= 0.8
+                }
+                Layout.maximumHeight: 40
+                Layout.fillWidth: true
+                text: "Zoom Out"
+            }
+
+            PdfMultiPageView {
+                id: view
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                document: PdfDocument {          
+                    source: "../../../assets/vector_groups.pdf"
+                }
+            }
+        }
+    }
 
     ScrollView {
         id: scrollView
@@ -33,10 +73,15 @@ Item {
 
             RowLayout {
                 id: mainLayout
-                width: flickableContainer.width -20
+                width: flickableContainer.width - 20
 
                 ColumnLayout {
                     Layout.maximumWidth: 400
+
+                    StyledButton {
+                        text: "IEC 60076 Vector Group"
+                        onClicked: pdfPopup.open()
+                    }
 
                     // Inputs
                     WaveCard {
