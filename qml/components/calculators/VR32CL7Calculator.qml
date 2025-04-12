@@ -352,10 +352,44 @@ Item {
                     }
                 }
             
-                // Formula for resistance
+                // Formula for power factor
                 Label {
-                    text: "Total Resistance:"
+                    text: "Power Factor:"
                     font.bold: true
+                }
+
+                Rectangle {
+                    id: powerFactorImageContainer
+                    color: "white"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 60
+                    radius: 10
+                
+                    Image {
+                        source: "../../../assets/formulas/vr32cl7_power_factor.svg"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.fill: parent
+
+                        HoverHandler{
+                            onHoveredChanged: {
+                                if(hovered){
+                                    powerFactorImageContainer.scale = 1.5
+                                    powerFactorImageContainer.z = 2
+                                }
+                                else{
+                                    powerFactorImageContainer.scale = 1.0
+                                    powerFactorImageContainer.z = 1
+                                }
+                            }
+                        }
+                    }
+                }
+            
+                // Formula for adjusted resistance
+                Label {
+                    text: "Adjusted Resistance:"
+                    font.bold: true
+                    
                 }
 
                 Rectangle {
@@ -366,7 +400,7 @@ Item {
                     radius: 10
                 
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_resistance.svg"
+                        source: "../../../assets/formulas/vr32cl7_adjusted_resistance.svg"
                         fillMode: Image.PreserveAspectFit
                         anchors.fill: parent
 
@@ -387,9 +421,9 @@ Item {
                     }
                 }
             
-                // Formula for reactance
+                // Formula for adjusted reactance
                 Label {
-                    text: "Total Reactance:"
+                    text: "Adjusted Reactance:"
                     font.bold: true
                     
                 }
@@ -402,7 +436,7 @@ Item {
                     radius: 10
 
                     Image {
-                        source: "../../../assets/formulas/vr32cl7_reactance.svg"
+                        source: "../../../assets/formulas/vr32cl7_adjusted_reactance.svg"
                         fillMode: Image.PreserveAspectFit
                         anchors.fill: parent
 

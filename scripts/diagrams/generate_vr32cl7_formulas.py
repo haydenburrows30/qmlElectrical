@@ -37,12 +37,18 @@ def main():
         "vr32cl7_impedance.svg": r"Z = \sqrt{R_{total}^2 + X_{total}^2}",
         "vr32cl7_impedance_angle.svg": r"\phi = \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right) \times \frac{180}{\pi}",
         "vr32cl7_overall.svg": r"Z \angle \phi = \sqrt{R_{total}^2 + X_{total}^2} \angle \tan^{-1}\left(\frac{X_{total}}{R_{total}}\right)",
+        
+        # New formulas for generation capacity adjustments
+        "vr32cl7_power_factor.svg": r"P_{factor} = \frac{Generation\ Capacity\ (kW)}{1000}",
+        "vr32cl7_adjusted_resistance.svg": r"R_{adjusted} = R_{total} \times (1 + 0.05 \times P_{factor})",
+        "vr32cl7_adjusted_reactance.svg": r"X_{adjusted} = X_{total} \times (1 + 0.08 \times P_{factor})",
     }
     
     # Generate each formula
     for filename, formula in vr32cl7_formulas.items():
         try:
             save_formula(formula, filename, formula_dir)
+            print(f"Generated {filename}")
         except Exception as e:
             print(f"Error generating {filename}: {e}")
             # Try fallback with simplified formula

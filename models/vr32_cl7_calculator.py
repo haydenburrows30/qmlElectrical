@@ -138,14 +138,22 @@ class VR32CL7Calculator(QObject):
         total_resistance = self._cable_r_per_km * total_length_km
         total_reactance = self._cable_x_per_km * total_length_km
         
+        # Factor in generation capacity (MW) - adjust reactance and resistance based on power
+        # Using a simplified model where impedance is adjusted by the ratio of nominal power
+        power_factor = self._generation_capacity_kw / 1000  # convert kW to MW
+        
+        # Apply power factor to adjust impedance values
+        adjusted_resistance = total_resistance * (1 + 0.05 * power_factor)  # Example adjustment
+        adjusted_reactance = total_reactance * (1 + 0.08 * power_factor)    # Example adjustment
+        
         # Calculate impedance and angle
-        total_impedance = np.sqrt(total_resistance**2 + total_reactance**2)
-        impedance_angle = np.arctan(total_reactance / total_resistance) * (180 / np.pi)
+        total_impedance = np.sqrt(adjusted_resistance**2 + adjusted_reactance**2)
+        impedance_angle = np.arctan2(adjusted_reactance, adjusted_resistance) * (180 / np.pi)
         
         # Update results
         self._results = {
-            'resistance': total_resistance,
-            'reactance': total_reactance,
+            'resistance': adjusted_resistance,
+            'reactance': adjusted_reactance,
             'impedance': total_impedance,
             'impedance_angle': impedance_angle
         }
