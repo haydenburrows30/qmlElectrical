@@ -27,6 +27,7 @@ class TransformerCalculator(QObject):
     ironLossesChanged = Signal()
     temperatureRiseChanged = Signal()
     warningsChanged = Signal()
+    vectorGroupApplicationsChanged = Signal()  # Add new signal
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -41,15 +42,89 @@ class TransformerCalculator(QObject):
         self._vector_group_description = "Delta primary, wye secondary with 30° phase shift"
         self._corrected_ratio = 0.0
         
-        # Define vector group information
+        # Define vector group information with detailed descriptions and applications
         self._vector_group_descriptions = {
-            "Dyn11": "Delta primary, wye secondary with 30° phase shift",
-            "Yyn0": "Wye primary, wye secondary with 0° phase shift",
-            "Dyn1": "Delta primary, wye secondary with -30° phase shift",
-            "Yzn1": "Wye primary, zigzag secondary with -30° phase shift",
-            "Yd1": "Wye primary, delta secondary with -30° phase shift",
-            "Dd0": "Delta primary, delta secondary with 0° phase shift",
-            "Yy0": "Wye primary, wye secondary with 0° phase shift"
+            "Dyn11": "Delta primary, wye secondary with 30° phase shift.",
+            "Yyn0": "Wye primary, wye secondary with 0° phase shift.",
+            "Dyn1": "Delta primary, wye secondary with -30° phase shift.",
+            "Yzn1": "Wye primary with zigzag secondary, -30° phase shift.",
+            "Yd1": "Wye primary, delta secondary with -30° phase shift.",
+            "Dd0": "Delta primary and secondary with 0° phase shift.",
+            "Yy0": "Wye primary and secondary with 0° phase shift.",
+            "Zyn11": "Zigzag primary, wye secondary with 30° phase shift.",
+            "Dzn0": "Delta primary, zigzag secondary with 0° phase shift.",
+            "Zzn0": "Zigzag primary and secondary with 0° phase shift.",
+            "Ynzn11": "Wye primary with neutral, zigzag secondary with 30° phase shift."
+        }
+        
+        # Add application notes for each vector group
+        self._vector_group_applications = {
+            "Dyn11": [
+                "Common in distribution transformers where secondary neutral is needed. Provides good isolation and harmonic suppression.",
+                "Distribution transformers in residential areas",
+                "Industrial power distribution",
+                "Renewable energy grid connections"
+            ],
+            "Yyn0": [
+                "Used in transmission and where neutral points are needed on both sides. Cost-effective but sensitive to unbalanced loads.",
+                "High voltage transmission systems",
+                "Generator step-up applications",
+                "Balanced three-phase loads"
+            ],
+            "Dyn1": [
+                "Similar applications to Dyn11, common in European networks. Delta primary helps block harmonic currents.",
+                "European distribution networks",
+                "Industrial power systems",
+                "Areas with significant harmonic concerns"
+            ],
+            "Yzn1": [
+                "Used in grounding transformers and special applications requiring neutral current control. Zigzag helps balance unbalanced loads.",
+                "Grounding transformer applications",
+                "Systems requiring neutral current control",
+                "Networks with unbalanced loads"
+            ],
+            "Yd1": [
+                "Common in step-up applications like generators. Delta secondary eliminates triple-n harmonics.",
+                "Generator step-up transformers",
+                "Industrial drives and rectifier loads",
+                "Applications requiring harmonic mitigation"
+            ],
+            "Dd0": [
+                "Excellent for industrial loads, no neutral point available. Very stable for unbalanced loads.",
+                "Heavy industrial loads",
+                "Arc furnace supply",
+                "Unbalanced three-phase loads"
+            ],
+            "Yy0": [
+                "Simple and economical. Used in balanced systems where neutral points are required on both sides.",
+                "Light industrial applications",
+                "Balanced distribution systems",
+                "Cost-sensitive applications"
+            ],
+            "Zyn11": [
+                "Advanced harmonic suppression and special grounding applications.",
+                "Grounding transformers in high voltage systems",
+                "Industrial applications with severe unbalanced loads",
+                "Networks requiring zero-sequence impedance control"
+            ],
+            "Dzn0": [
+                "Excellent for unbalanced loads and harmonic mitigation.",
+                "Distribution systems with high harmonic content",
+                "Industrial drives with unbalanced loading",
+                "Special phase-shifting applications"
+            ],
+            "Zzn0": [
+                "Specialized grounding and phase shifting applications.",
+                "Critical grounding transformer applications",
+                "Systems requiring dual zigzag windings",
+                "Special harmonic filtering requirements"
+            ],
+            "Ynzn11": [
+                "Used in critical grounding applications.",
+                "High voltage system neutral grounding",
+                "Critical power quality applications",
+                "Networks requiring defined zero-sequence path"
+            ]
         }
         
         # Voltage correction factors for different vector groups
@@ -62,7 +137,11 @@ class TransformerCalculator(QObject):
             "Yzn1":  {"voltage": 1, "current": 1},
             "Yd1":   {"voltage": 1/math.sqrt(3), "current": math.sqrt(3)},
             "Dd0":   {"voltage": 1, "current": 1},
-            "Yy0":   {"voltage": 1, "current": 1}
+            "Yy0":   {"voltage": 1, "current": 1},
+            "Zyn11": {"voltage": 1, "current": 1},
+            "Dzn0":  {"voltage": math.sqrt(3), "current": 1},
+            "Zzn0":  {"voltage": 1, "current": 1},
+            "Ynzn11": {"voltage": 1, "current": 1}
         }
         
         # Add impedance properties
@@ -156,6 +235,7 @@ class TransformerCalculator(QObject):
                 self._vector_group_description = self._vector_group_descriptions.get(value, "")
                 self.vectorGroupChanged.emit()
                 self.vectorGroupDescriptionChanged.emit()
+                self.vectorGroupApplicationsChanged.emit()  # Emit when vector group changes
                 
                 # Recalculate the corrected ratio AND secondary current when vector group changes
                 self._calculate_corrected_ratio()
@@ -166,6 +246,11 @@ class TransformerCalculator(QObject):
     @Property(str, notify=vectorGroupDescriptionChanged)
     def vectorGroupDescription(self):
         return self._vector_group_description
+
+    @Property('QVariantList', notify=vectorGroupApplicationsChanged)  # Add notify signal
+    def vectorGroupApplications(self):
+        """Return applications for current vector group"""
+        return self._vector_group_applications.get(self._vector_group, [])
 
     @Property(float, notify=impedancePercentChanged)
     def impedancePercent(self):

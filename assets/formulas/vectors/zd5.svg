@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Clock face reference -->
+    <circle cx="0" cy="0" r="90" fill="none" stroke="#ccc" stroke-width="1"/>
+    <circle cx="0" cy="0" r="85" fill="none" stroke="#ccc" stroke-width="1"/>
+    
+    <!-- Clock numbers -->
+    <text x="0" y="-75" text-anchor="middle" font-size="12" fill="#999">12</text>
+    <text x="75" y="0" text-anchor="middle" font-size="12" fill="#999">3</text>
+    <text x="0" y="75" text-anchor="middle" font-size="12" fill="#999">6</text>
+    <text x="-75" y="0" text-anchor="middle" font-size="12" fill="#999">9</text>
+
+    <!-- Primary (Zigzag) vectors -->
+    <g stroke-width="2" stroke-linecap="round">
+        <path d="M 0,0 L 45,-78 L 70,-40" stroke="#4285f4" fill="none"/>
+        <path d="M 0,0 L 78,45 L 40,70" stroke="#4285f4" fill="none" transform="rotate(120)"/>
+        <path d="M 0,0 L -45,78 L -70,40" stroke="#4285f4" fill="none" transform="rotate(240)"/>
+    </g>
+
+    <!-- Secondary (Delta) vectors -->
+    <g stroke-width="2" stroke-linecap="round" transform="rotate(150) scale(0.8)">
+        <line x1="40.62" y1="-70.36" x2="-40.62" y2="-70.36" stroke="#db4437"/>
+        <line x1="-40.62" y1="-70.36" x2="0" y2="80.72" stroke="#db4437"/>
+        <line x1="0" y1="80.72" x2="40.62" y2="-70.36" stroke="#db4437"/>
+    </g>
+
+    <!-- Label -->
+    <text x="0" y="95" text-anchor="middle" font-size="14" fill="#666">Zd5</text>
+</svg>

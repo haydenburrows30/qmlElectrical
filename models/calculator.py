@@ -217,25 +217,25 @@ class ConversionCalculator(BaseCalculator):
         - Hz to RPM: $N = f \\cdot 60$
 
         Three-Phase Relationships:
-        - Line-Phase Voltage: $V_{ph} = V_L/\sqrt{3}$
-        - Phase-Line Voltage: $V_L = V_{ph} \cdot \sqrt{3}$
-        - Line-Phase Current: $I_{ph} = I_L/\sqrt{3}$
-        - Phase-Line Current: $I_L = I_{ph} \cdot \sqrt{3}$
+        - Line-Phase Voltage: $V_{ph} = V_L/\\sqrt{3}$
+        - Phase-Line Voltage: $V_L = V_{ph} \\cdot \\sqrt{3}$
+        - Line-Phase Current: $I_{ph} = I_L/\\sqrt{3}$
+        - Phase-Line Current: $I_L = I_{ph} \\cdot \\sqrt{3}$
 
         Per Unit System:
         - Base Impedance: $Z_{base} = \\frac{kV_{base}^2}{MVA_{base}}$
         - Per Unit Value: $Z_{pu} = Z_{actual}/Z_{base}$
-        - Impedance Base Change: $Z_{new} = Z_{old} \cdot \\frac{MVA_{old}}{MVA_{new}}$
+        - Impedance Base Change: $Z_{new} = Z_{old} \\cdot \\frac{MVA_{old}}{MVA_{new}}$
 
         Sequence Components:
         - Positive Sequence: $\\vec{V_a} = V_1 \\angle 0°$
         - Negative Sequence: $\\vec{V_a} = V_2 \\angle 0°$
 
         Fault Calculations:
-        - Symmetrical to Phase: $I_{ph} = I_{sym} \cdot \sqrt{3}$
+        - Symmetrical to Phase: $I_{ph} = I_{sym} \\cdot \\sqrt{3}$
 
         Reactance Frequency:
-        - 50Hz to 60Hz: $X_{60} = X_{50} \cdot \\frac{60}{50}$
+        - 50Hz to 60Hz: $X_{60} = X_{50} \\cdot \\frac{60}{50}$
         """
 
         if self._input_value != 0:
@@ -290,13 +290,16 @@ class KwFromCurrentCalculator(BaseCalculator):
     
     Features:
     - Single and three-phase power calculations
-    - Fixed voltage values (230V single phase, 415V three phase)
+    - Custom voltage values
     - Power factor support
+    - kVA calculation
     
     Signals:
         kwCalculated: Emitted when kW calculation completes
+        kvaCalculated: Emitted when kVA calculation completes
     """
     kwCalculated = Signal(float)
+    kvaCalculated = Signal(float)
 
     def __init__(self):
         super().__init__()
@@ -304,10 +307,8 @@ class KwFromCurrentCalculator(BaseCalculator):
         self._phase = "Three Phase"
         self._power_factor = 0.8  # Default power factor
         self._kw = 0.0
-        
-        # Fixed voltages
-        self._single_phase_voltage = 230.0
-        self._three_phase_voltage = 415.0
+        self._voltage = 415.0  # Default voltage
+        self._kva = 0.0
 
     @Slot(float)
     def setCurrent(self, current):
@@ -326,27 +327,54 @@ class KwFromCurrentCalculator(BaseCalculator):
 
     @Slot(float)
     def setPowerFactor(self, pf):
+        """Set power factor.
+        
+        Args:
+            pf: Power factor value between 0 and 1
+        """
         self._power_factor = pf
+        self.calculateKw()  # Always recalculate to ensure values update
+
+    @Slot(float)
+    def setVoltage(self, voltage):
+        """Set voltage in volts.
+        
+        Args:
+            voltage: Voltage value in volts
+        """
+        self._voltage = voltage
         self.calculateKw()
 
     def calculateKw(self):
         if self._current > 0:
             if self._phase == "Single Phase":
-                # P = V × I × PF / 1000 (for kW)
-                self._kw = self._single_phase_voltage * self._current * self._power_factor / 1000
+                # Calculate kVA first
+                self._kva = self._voltage * self._current / 1000
             elif self._phase == "Three Phase":
-                # P = √3 × V × I × PF / 1000 (for kW)
-                self._kw = math.sqrt(3) * self._three_phase_voltage * self._current * self._power_factor / 1000
+                # Calculate kVA first
+                self._kva = math.sqrt(3) * self._voltage * self._current / 1000
+                
+            # Calculate kW after kVA
+            self._kw = self._kva * self._power_factor
+            
+            # Always emit both signals
+            self.kvaCalculated.emit(self._kva)
             self.kwCalculated.emit(self._kw)
 
     @Property(float, notify=kwCalculated)
     def kw(self):
         return self._kw
 
+    @Property(float, notify=kvaCalculated)
+    def kva(self):
+        return self._kva
+
     def reset(self):
         self._current = 0.0
         self._power_factor = 0.8
+        self._voltage = 415.0
         self._kw = 0.0
+        self._kva = 0.0
         self.dataChanged.emit()
         
     def calculate(self):

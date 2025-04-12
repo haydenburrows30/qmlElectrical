@@ -48,7 +48,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
             Layout.minimumWidth: 400
-            title: "Transformer Calculator"
+            title: "Transformer kVA -> Current"
 
             showSettings: true
          
@@ -86,9 +86,10 @@ Item {
                     Layout.preferredWidth: 120
                     onCurrentTextChanged: {
                         if (currentText !== "Custom") {
-                            let kva = parseInt(currentText)
-                            kvaInput.text = kva.toString()
+                            let kva = parseInt(currentText.replace("V", ""))
+                            calculator.setKva(kva)
                             kvaInput.enabled = false
+                            kvaInput.text = kva.toString()
                         } else {
                             kvaInput.enabled = true
                         }
@@ -106,7 +107,7 @@ Item {
                         bottom: 0
                         decimals: 2
                     }
-                    color: acceptableInput ? "black" : "red"
+
                     onTextChanged: {
                         if (acceptableInput && calculator) {
                             calculator.setKva(parseFloat(text))
@@ -128,6 +129,7 @@ Item {
                             let voltage = parseInt(currentText.replace("V", ""))
                             calculator.setVoltage(voltage)
                             voltageInput.enabled = false
+                            voltageInput.text = voltage.toString()
                         } else {
                             voltageInput.enabled = true
                         }
@@ -144,9 +146,9 @@ Item {
                         bottom: 0
                         decimals: 1
                     }
-                    color: acceptableInput ? "black" : "red"
+
                     onTextChanged: {
-                        if (acceptableInput && calculator && enabled) {
+                        if (acceptableInput && calculator) {
                             calculator.setVoltage(parseFloat(text))
                         }
                     }
@@ -211,7 +213,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.minimumHeight: 300
             Layout.minimumWidth: 400
-            title: "Current-> Power Calculator"
+            title: "Current -> Power"
 
             showSettings: true
          
@@ -222,8 +224,9 @@ Item {
 
                 Label {
                     text: "Phase Type:"
-                    Layout.preferredWidth: 80
+                    Layout.preferredWidth: 120
                 }
+
                 ComboBoxRound {
                     id: phaseSelector1
                     model: ["Single Phase", "Three Phase"]
@@ -241,7 +244,7 @@ Item {
 
                 Label {
                     text: "Current (A):"
-                    Layout.preferredWidth: 100
+                    Layout.fillWidth: true
                 }
 
                 TextFieldRound {
@@ -253,7 +256,6 @@ Item {
                         bottom: 0
                         decimals: 2
                     }
-                    color: acceptableInput ? "black" : "red"
                     onTextChanged: {
                         if (acceptableInput && calculator1) {
                             calculator1.setCurrent(parseFloat(text))
@@ -262,14 +264,54 @@ Item {
                 }
 
                 Label {
+                    text: "Voltage:"
+                    Layout.fillWidth: true
+                }
+
+                ComboBoxRound {
+                    id: voltagePresets1
+                    model: ["Custom", "230V", "400V", "415V", "11000V"]
+                    Layout.fillWidth: true
+                    onCurrentTextChanged: {
+                        if (currentText !== "Custom") {
+                            let voltage = parseInt(currentText.replace("V", ""))
+                            calculator1.setVoltage(voltage)
+                            voltageInput1.enabled = false
+                            voltageInput1.text = voltage.toString()
+                        } else {
+                            voltageInput1.enabled = true
+                        }
+                    }
+                    currentIndex: 2  // Default to 415V
+                }
+
+                TextFieldRound {
+                    id: voltageInput1
+                    Layout.fillWidth: true
+                    enabled: voltagePresets1.currentText === "Custom"
+                    opacity: enabled ? 1.0 : 0.5
+                    placeholderText: "Voltage"
+                    validator: DoubleValidator {
+                        bottom: 0
+                        decimals: 1
+                    }
+
+                    onTextChanged: {
+                        if (acceptableInput && calculator1 && enabled) {
+                            calculator1.setVoltage(parseFloat(text))
+                        }
+                    }
+                }
+
+                Label {
                     text: "Power Factor:"
-                    Layout.preferredWidth: 100
+                    Layout.fillWidth: true
                 }
                 
                 ComboBoxRound {
                     id: pfPresets
                     model: ["Custom", "0.8", "0.85", "0.9", "0.95", "1.0"]
-                    Layout.preferredWidth: 120
+                   Layout.fillWidth: true
                     onCurrentTextChanged: {
                         if (currentText !== "Custom") {
                             pfInput.text = currentText
@@ -283,17 +325,16 @@ Item {
                 
                 TextFieldRound {
                     id: pfInput
-                    Layout.preferredWidth: 80
+                    Layout.fillWidth: true
                     enabled: pfPresets.currentText === "Custom"
                     opacity: enabled ? 1.0 : 0.5
-                    placeholderText: "0.8-1.0"
+                    placeholderText: "PF"
                     validator: DoubleValidator {
-                        bottom: 0
-                        top: 1
+                        bottom: 0.0  // Changed from 1 to 0.0
+                        top: 1.0     // Added top limit
                         decimals: 2
                     }
-                    text: "0.8"  
-                    color: acceptableInput ? "black" : "red"
+                    // color: acceptableInput ? "black" : "red"
                     onTextChanged: {
                         if (acceptableInput && calculator1) {
                             calculator1.setPowerFactor(parseFloat(text))
@@ -301,37 +342,64 @@ Item {
                     }
                 }
 
-                RowLayout {
-                    Layout.columnSpan: 3
-                    
-                    Label {
-                        text: "Power (kW):"
-                        Layout.preferredWidth: 100
-                    }
+                Label {
+                    text: "Power (kW):"
+                    Layout.fillWidth: true
+                }
 
-                    TextFieldBlue {
-                        id: kwOutput
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignLeft
-                        font.bold: true
-                        text: {
-                            if (!calculator1 || isNaN(calculator1.kw)) return "0.00 kW"
-                            return calculator1.kw.toFixed(2) + " kW"
+                TextFieldBlue {
+                    id: kwOutput
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignLeft
+                    font.bold: true
+                    text: {
+                        if (!calculator1 || isNaN(calculator1.kw)) return "0.00 kW"
+                        return calculator1.kw.toFixed(2) + " kW"
+                    }
+                }
+
+                StyledButton {
+                    Layout.preferredWidth: 80
+                    text: "Copy"
+                    ToolTip.text: "Copy to clipboard"
+                    ToolTip.visible: hovered
+                    icon.source: "../../../icons/rounded/copy_all.svg"
+                    onClicked: {
+                        if (calculator1 && !isNaN(calculator1.kw)) {
+                            clipboardHelper.text = kwOutput.text
+                            clipboardHelper.selectAll()
+                            clipboardHelper.copy()
                         }
                     }
+                }
 
-                    StyledButton {
-                        Layout.preferredWidth: 80
-                        text: "Copy"
-                        ToolTip.text: "Copy to clipboard"
-                        ToolTip.visible: hovered
-                        icon.source: "../../../icons/rounded/copy_all.svg"
-                        onClicked: {
-                            if (calculator1 && !isNaN(calculator1.kw)) {
-                                clipboardHelper.text = kwOutput.text
-                                clipboardHelper.selectAll()
-                                clipboardHelper.copy()
-                            }
+                Label {
+                    text: "Apparent Power:"
+                    Layout.preferredWidth: 100
+                }
+
+                TextFieldBlue {
+                    id: kvaOutput
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignLeft
+                    font.bold: true
+                    text: {
+                        if (!calculator1 || isNaN(calculator1.kva)) return "0.00 kVA"
+                        return calculator1.kva.toFixed(2) + " kVA"
+                    }
+                }
+
+                StyledButton {
+                    Layout.preferredWidth: 80
+                    text: "Copy"
+                    ToolTip.text: "Copy to clipboard"
+                    ToolTip.visible: hovered
+                    icon.source: "../../../icons/rounded/copy_all.svg"
+                    onClicked: {
+                        if (calculator1 && !isNaN(calculator1.kva)) {
+                            clipboardHelper.text = kvaOutput.text
+                            clipboardHelper.selectAll()
+                            clipboardHelper.copy()
                         }
                     }
                 }
@@ -350,7 +418,8 @@ Item {
                     id: errorMessage1
                     color: "red"
                     visible: (!currentInput.acceptableInput && currentInput.text !== "") ||
-                             (!pfInput.acceptableInput && pfInput.text !== "")
+                             (!pfInput.acceptableInput && pfInput.text !== "") ||
+                             (!voltageInput1.acceptableInput && voltageInput1.text !== "")
                     text: "Please enter valid numbers"
                     Layout.columnSpan: 3
                 }

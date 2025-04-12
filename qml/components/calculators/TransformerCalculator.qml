@@ -23,8 +23,9 @@ Item {
         clip: true
         
         Flickable {
+            id: flickableContainer
             contentWidth: parent.width
-            contentHeight: mainLayout.height
+            contentHeight: mainLayout.height + 20
             bottomMargin : 5
             leftMargin : 5
             rightMargin : 5
@@ -32,28 +33,30 @@ Item {
 
             RowLayout {
                 id: mainLayout
-                width: scrollView.width
+                width: flickableContainer.width -20
 
                 ColumnLayout {
-                    Layout.maximumWidth: 330
+                    Layout.maximumWidth: 400
 
                     // Inputs
                     WaveCard {
                         title: "Transformer Rating"
-                        Layout.minimumHeight: 140
+                        Layout.minimumHeight: 180
                         Layout.fillWidth: true
 
                         GridLayout {
                             columns: 2
+                            anchors.fill: parent
+                            uniformCellWidths: true
 
                             Label {
-                                text: "KVA:" 
-                                Layout.minimumWidth: 120
+                                text: "KVA:"
+                                Layout.fillWidth: true
                             }
                             TextFieldRound {
                                 id: kvaInput
                                 placeholderText: "Enter KVA"
-                                Layout.minimumWidth: 150
+                                Layout.fillWidth: true
                                 onTextChanged: {
                                     if (text) {
                                         calculator.setApparentPower(parseFloat(text));
@@ -63,17 +66,25 @@ Item {
                                 }
                             }
                             
-                            Label { text: "Vector Group:" }
+                            Label { text: "Vector Group:" ; Layout.fillWidth: true }
                             ComboBoxRound {
                                 id: vectorGroupCombo
-                                Layout.minimumWidth: 150
-                                model: ["Dyn11", "Yyn0", "Dyn1", "Yzn1", "Yd1", "Dd0", "Yy0"]
+                                Layout.fillWidth: true
+                                model: ["Dyn11", "Yyn0", "Dyn1", "Yzn1", "Yd1", "Dd0", "Yy0", 
+                                       "Zyn11", "Dzn0", "Zzn0", "Ynzn11"]
                                 onCurrentTextChanged: {
                                     calculator.setVectorGroup(currentText)
                                 }
                                 Component.onCompleted: {
                                     currentIndex = 0 // Default to Dyn11
                                 }
+                            }
+
+                            Label {
+                                text: calculator.vectorGroupDescription
+                                wrapMode: Text.WordWrap
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
                             }
                         }
                     }
@@ -86,14 +97,16 @@ Item {
 
                         GridLayout {
                             columns: 2
+                            anchors.fill: parent
+                            uniformCellWidths: true
 
                             Label { 
                                 text: "Line Voltage (V):"
-                                Layout.minimumWidth: 120
+                                Layout.fillWidth: true
                             }
                             TextFieldRound {
                                 id: primaryVoltage
-                                Layout.minimumWidth: 150
+                                Layout.fillWidth: true
                                 placeholderText: "Enter line voltage"
                                 onTextChanged: {
                                     calculator.primaryVoltage = parseFloat(text || "0")
@@ -103,27 +116,24 @@ Item {
                                 }
                             }
 
-                            Label { text: "Current (A):" }
-                            RowLayout {
-                                Layout.minimumWidth: 150
+                            Label { text: "Current (A):" ; Layout.fillWidth: true}
                                 
-                                TextFieldRound {
-                                    id: primaryCurrentInput
-                                    placeholderText: "Enter current"
-                                    Layout.fillWidth: true
-                                    visible: parseFloat(kvaInput.text || "0") <= 0
-                                    onTextChanged: {
-                                        if (text) {
-                                            calculator.primaryCurrent = parseFloat(text || "0")
-                                        }
+                            TextFieldRound {
+                                id: primaryCurrentInput
+                                placeholderText: "Enter current"
+                                Layout.fillWidth: true
+                                visible: parseFloat(kvaInput.text || "0") <= 0
+                                onTextChanged: {
+                                    if (text) {
+                                        calculator.primaryCurrent = parseFloat(text || "0")
                                     }
                                 }
-                                
-                                Label {
-                                    text: calculator.primaryCurrent.toFixed(2)
-                                    visible: parseFloat(kvaInput.text || "0") > 0
-                                    Layout.fillWidth: true
-                                }
+                            }
+                            
+                            Label {
+                                text: calculator.primaryCurrent.toFixed(2)
+                                visible: parseFloat(kvaInput.text || "0") > 0
+                                Layout.fillWidth: true
                             }
                         }
                     }
@@ -136,10 +146,12 @@ Item {
 
                         GridLayout {
                             columns: 2
+                            uniformCellWidths: true
+                            anchors.fill: parent
 
                             Label { 
                                 text: "Line Voltage (V):"
-                                Layout.minimumWidth: 120
+                                Layout.fillWidth: true
                             }
                             TextFieldRound {
                                 id: secondaryVoltage
@@ -153,13 +165,14 @@ Item {
                                         calculator.setApparentPower(parseFloat(kvaInput.text));
                                     }
                                 }
-                                Layout.minimumWidth: 150
+                                Layout.fillWidth: true
                             }
 
-                            Label { text: "Current (A):" }
+                            Label { text: "Current (A):" ; Layout.fillWidth: true }
                             TextFieldBlue {
                                 id: secondaryCurrent
                                 text: calculator.secondaryCurrent.toFixed(2)
+                                Layout.fillWidth: true
                             }
                         }
                     }
@@ -172,16 +185,18 @@ Item {
 
                         GridLayout {
                             columns: 2
+                            anchors.fill: parent
+                            uniformCellWidths: true
 
                             Label { 
                                 text: "Impedance (%):" 
-                                Layout.minimumWidth: 120
+                                Layout.fillWidth: true
                             }
                             TextFieldRound {
                                 id: impedanceInput
                                 placeholderText: "Enter impedance %"
                                 text: calculator.impedancePercent.toFixed(2)
-                                Layout.minimumWidth: 150
+                                Layout.fillWidth: true
                                 onTextChanged: {
                                     if (text) {
                                         calculator.setImpedancePercent(parseFloat(text))
@@ -199,11 +214,10 @@ Item {
                                 }
                             }
 
-                            Label { text: "Cu Losses (W):" }
+                            Label { text: "Cu Losses (W):" ; Layout.fillWidth: true}
                             TextFieldRound {
                                 id: copperLossesInput
                                 placeholderText: "Enter Cu losses"
-                                Layout.minimumWidth: 150
                                 Layout.fillWidth: true
                                 onTextChanged: {
                                     if (text) {
@@ -217,11 +231,11 @@ Item {
                                 }
                             }
 
-                            Label { text: "Resistance (%):" }
+                            Label { text: "Resistance (%):" ; Layout.fillWidth: true}
                             TextFieldRound {
                                 id: resistanceInput
+                                Layout.fillWidth: true
                                 placeholderText: "Enter resistance %"
-                                Layout.minimumWidth: 150
                                 onTextChanged: {
                                     if (text) {
                                         calculator.setResistancePercent(parseFloat(text))
@@ -237,11 +251,10 @@ Item {
                                 }
                             }
 
-                            Label { text: "Iron Losses (W):" }
+                            Label { text: "Iron Losses (W):" ; Layout.fillWidth: true}
                             TextFieldRound {
                                 id: ironLossesInput
                                 placeholderText: "Enter Fe losses"
-                                Layout.minimumWidth: 150
                                 Layout.fillWidth: true
                                 onTextChanged: {
                                     if (text) {
@@ -253,30 +266,34 @@ Item {
                                 ToolTip.delay: 500
                             }
 
-                            Label { text: "Reactance (%):" }
+                            Label { text: "Reactance (%):" ; Layout.fillWidth: true}
                             TextFieldBlue {
                                 text: calculator.reactancePercent.toFixed(2)
+                                Layout.fillWidth: true
                             }
 
-                            Label { text: "Short-circuit MVA:" }
+                            Label { text: "Short-circuit MVA:" ; Layout.fillWidth: true}
                             TextFieldBlue {
                                 text: calculator.shortCircuitPower.toFixed(2)
+                                Layout.fillWidth: true
                             }
 
-                            Label { text: "Voltage Drop (%):" }
+                            Label { text: "Voltage Drop (%):" ;Layout.fillWidth: true}
                                 
                             TextFieldBlue {
                                 id: voltageDrop
                                 text: calculator.voltageDrop.toFixed(2)
+                                Layout.fillWidth: true
                             }
 
-                            Label { text: "Temperature Rise:" }
+                            Label { text: "Temperature Rise:" ; Layout.fillWidth: true}
                             TextFieldBlue {
                                 text: calculator.temperatureRise.toFixed(1) + "°C"
                                 color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
                                 ToolTip.text: "Estimated temperature rise above ambient"
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
+                                Layout.fillWidth: true
                             }
 
                             Rectangle {
@@ -311,59 +328,68 @@ Item {
                     WaveCard {
                         id: results
                         title: "Results"
-                        Layout.minimumHeight: 260
+                        Layout.minimumHeight: 380
                         Layout.fillWidth: true
                         showSettings: true
 
                         GridLayout {
                             columns: 2
+                            anchors.fill: parent
+                            uniformCellWidths: true
 
                             Label { 
                                 text: "Turns Ratio:"
-                                Layout.minimumWidth: 120
+                                Layout.fillWidth: true
                             }
                             TextFieldBlue {
-                                Layout.minimumWidth: 120
+                                Layout.fillWidth: true
                                 text: calculator.turnsRatio.toFixed(1)
                                 ToolTip.text: "Turns ratio"
                             }
                             Label { 
                                 text: "Vector-corrected Ratio:"
+                                Layout.fillWidth: true
                             }
                             TextFieldBlue { 
                                 text: calculator.correctedRatio.toFixed(1)
                                 ToolTip.text: "Vector-corrected turns ratio"
+                                Layout.fillWidth: true
                             }
                             Label { 
                                 text: "Efficiency:"
+                                Layout.fillWidth: true
                             }
                             TextFieldBlue { 
                                 text: calculator.efficiency.toFixed(0) + "%"
                                 ToolTip.text: "Efficiency"
+                                Layout.fillWidth: true
                             }
                             Label {
                                 text: "Vector Group:"
+                                Layout.fillWidth: true
                             }
                             TextFieldBlue {
                                 text: calculator.vectorGroup
                                 ToolTip.text: "Vector Group"
-                            }
-                            Label {
-                                text: calculator.vectorGroupDescription
-                                font.pixelSize: 12
-                                wrapMode: Text.WordWrap
-                                Layout.columnSpan: 2
-                            }
-                            Label {
-                                visible: calculator.vectorGroup.indexOf("D") === 0 || calculator.vectorGroup.indexOf("Y") === 0
-                                text: calculator.vectorGroup.indexOf("D") === 0 ? 
-                                    "Delta primary: Line voltage = Phase voltage × √3" : 
-                                    "Wye primary: Line voltage = Phase voltage"
-                                color: Universal.accent
-                                font.pixelSize: 11
-                                wrapMode: Text.Wrap
                                 Layout.fillWidth: true
-                                Layout.columnSpan: 2
+                            }
+                                
+                            Label {
+                                text: "Common Applications:"
+                                font.bold: true
+                                color: Universal.accent
+                                Layout.fillWidth: true
+                            }
+                            
+                            Repeater {
+                                model: calculator.vectorGroupApplications
+                                delegate: Label {
+                                    text: "• " + modelData
+                                    opacity: 0.9
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.WordWrap
+                                    Layout.columnSpan: 2
+                                }
                             }
                         }
                     }
