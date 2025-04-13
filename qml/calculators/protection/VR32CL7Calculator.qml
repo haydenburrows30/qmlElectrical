@@ -23,6 +23,28 @@ Item {
         id: mainLayout
         anchors.centerIn: parent
 
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Voltage Regulator Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
+
+            // StyledButton {
+            //     id: helpButton
+            //     icon.source: "../../../icons/rounded/info.svg"
+            //     ToolTip.text: "Help"
+            //     onClicked: popUpText.open()
+            // }
+        }
+
         RowLayout {
             
             // Input parameters section
@@ -310,7 +332,7 @@ Item {
         // Formulas section
         WaveCard {
             Layout.fillWidth: true
-            Layout.minimumHeight: 300
+            Layout.minimumHeight: 330
             title: "Formulas"
                 
             GridLayout {

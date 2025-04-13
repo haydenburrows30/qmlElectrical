@@ -81,15 +81,32 @@ Item {
                 width: 880
                 spacing: 10
 
+                // Header with title and help button
                 RowLayout {
-                    Layout.minimumHeight: 40
+                    id: topHeader
                     Layout.fillWidth: true
-                    
+                    Layout.bottomMargin: 5
+                    Layout.leftMargin: 5
+
+                    Label {
+                        text: "Solkor RF Calculator"
+                        font.pixelSize: 20
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+
                     Button {
                         text: "Save to PDF"
                         onClicked: saveToPdf()
                         Layout.preferredHeight: 30
                     }
+
+                    // StyledButton {
+                    //     id: helpButton
+                    //     icon.source: "../../../icons/rounded/info.svg"
+                    //     ToolTip.text: "Help"
+                    //     onClicked: popUpText.open()
+                    // }
                 }
 
                 // site information section
