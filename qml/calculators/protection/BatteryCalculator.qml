@@ -18,7 +18,8 @@ Item {
     property BatteryCalculator calculator: BatteryCalculator {}
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<h3>Battery Calculator</h3><br>" +
                 "This calculator estimates the battery capacity required for a given load and backup time.<br><br>" +
                 "<b>Load:</b> The power consumption in watts.<br>" +
@@ -29,128 +30,153 @@ Item {
                 "The calculator estimates the current draw, required capacity, recommended capacity, and energy storage.<br>" +
                 "The battery visualization shows the depth of discharge and recommended capacity."
     }
-        
-    RowLayout {
+    
+    ColumnLayout {
+        id: mainLayout
         anchors.centerIn: parent
 
-        ColumnLayout {
-            id: inputLayout
-            Layout.preferredWidth: 410
-            Layout.alignment: Qt.AlignTop
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
 
-            //Inputs
-            WaveCard {
-                id: results
-                title: "System Parameters"
+            Label {
+                text: "Battery Calculator"
+                font.pixelSize: 20
+                font.bold: true
                 Layout.fillWidth: true
-                Layout.minimumHeight: 260
+            }
 
-                showSettings: true
-                    
-                GridLayout {
-                    columns: 2
-                    
-                    Label { text: "Load (watts):" }
-                    TextFieldRound {
-                        id: loadInput
-                        placeholderText: "Enter load"
-                        validator: DoubleValidator { bottom: 0 }
-                        onTextChanged: if(text) calculator.load = parseFloat(text)
-                        Layout.fillWidth: true
-                        Layout.minimumWidth: 180
-                    }
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
 
-                    Label { text: "System Voltage (V):" }
-                    ComboBoxRound {
-                        id: systemVoltageCombo
-                        model: [12, 24, 48]
-                        onCurrentTextChanged: calculator.systemVoltage = parseInt(currentText)
-                        Layout.fillWidth: true
-                    }
-                    
-                    Label { text: "Backup Time (hours):" }
-                    TextFieldRound {
-                        id: backupTimeInput
-                        placeholderText: "Enter hours"
-                        text: "4"
-                        validator: DoubleValidator { bottom: 0 }
-                        onTextChanged: if(text) calculator.backupTime = parseFloat(text)
-                        Layout.fillWidth: true
-                    }
-                    
-                    Label { text: "Depth of Discharge (%):" }
+        RowLayout {
 
-                    RowLayout {
-                        Layout.fillWidth: true
+            ColumnLayout {
+                id: inputLayout
+                Layout.preferredWidth: 410
+                Layout.alignment: Qt.AlignTop
+
+                //Inputs
+                WaveCard {
+                    id: results
+                    title: "System Parameters"
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 260
+
+                    GridLayout {
+                        columns: 2
                         
-                        Slider {
-                            id: dodSlider
-                            from: 30
-                            to: 80
-                            value: 50
-                            stepSize: 5
-                            onValueChanged: calculator.depthOfDischarge = value
-                            Layout.maximumWidth: 150
+                        Label { text: "Load (watts):" }
+                        TextFieldRound {
+                            id: loadInput
+                            placeholderText: "Enter load"
+                            validator: DoubleValidator { bottom: 0 }
+                            onTextChanged: if(text) calculator.load = parseFloat(text)
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 180
                         }
 
-                        Label { 
-                            text: dodSlider.value + "%" 
-                            Layout.alignment: Qt.AlignRight
-                            Layout.minimumWidth: 50
+                        Label { text: "System Voltage (V):" }
+                        ComboBoxRound {
+                            id: systemVoltageCombo
+                            model: [12, 24, 48]
+                            onCurrentTextChanged: calculator.systemVoltage = parseInt(currentText)
+                            Layout.fillWidth: true
+                        }
+                        
+                        Label { text: "Backup Time (hours):" }
+                        TextFieldRound {
+                            id: backupTimeInput
+                            placeholderText: "Enter hours"
+                            text: "4"
+                            validator: DoubleValidator { bottom: 0 }
+                            onTextChanged: if(text) calculator.backupTime = parseFloat(text)
+                            Layout.fillWidth: true
+                        }
+                        
+                        Label { text: "Depth of Discharge (%):" }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            
+                            Slider {
+                                id: dodSlider
+                                from: 30
+                                to: 80
+                                value: 50
+                                stepSize: 5
+                                onValueChanged: calculator.depthOfDischarge = value
+                                Layout.maximumWidth: 150
+                            }
+
+                            Label { 
+                                text: dodSlider.value + "%" 
+                                Layout.alignment: Qt.AlignRight
+                                Layout.minimumWidth: 50
+                                Layout.fillWidth: true
+                            }
+                        }
+                        
+                        Label { text: "Battery Type:" }
+                        ComboBoxRound {
+                            id: batteryType
+                            model: ["Lead Acid", "Lithium Ion", "AGM"]
+                            onCurrentTextChanged: calculator.batteryType = currentText
                             Layout.fillWidth: true
                         }
                     }
-                    
-                    Label { text: "Battery Type:" }
-                    ComboBoxRound {
-                        id: batteryType
-                        model: ["Lead Acid", "Lithium Ion", "AGM"]
-                        onCurrentTextChanged: calculator.batteryType = currentText
-                        Layout.fillWidth: true
-                    }
                 }
-            }
-            // Results
-            WaveCard {
-                Layout.minimumHeight: 210
-                title: "Results"
-                Layout.fillWidth: true
-
-                GridLayout {
-                    columns: 2
+                // Results
+                WaveCard {
+                    Layout.minimumHeight: 210
+                    title: "Results"
                     Layout.fillWidth: true
 
-                    Label { text: "Current Draw:" }
-                    TextFieldBlue { 
-                        text: calculator.currentDraw.toFixed(2) + " A"
-                        Layout.minimumWidth: 180
-                    }
+                    GridLayout {
+                        columns: 2
+                        Layout.fillWidth: true
 
-                    Label { text: "Required Capacity:" }
-                    TextFieldBlue { 
-                        text: calculator.requiredCapacity.toFixed(1) + " Ah"
-                    }
-                    
-                    Label { text: "Recommended Capacity:" }
-                    TextFieldBlue { 
-                        text: calculator.recommendedCapacity.toFixed(1) + " Ah"
-                        color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
-                    }
-                    
-                    Label { text: "Energy Storage:" }
-                    TextFieldBlue { 
-                        text: calculator.energyStorage.toFixed(2) + " kWh"
+                        Label { text: "Current Draw:" }
+                        TextFieldBlue { 
+                            text: calculator.currentDraw.toFixed(2) + " A"
+                            Layout.minimumWidth: 180
+                        }
+
+                        Label { text: "Required Capacity:" }
+                        TextFieldBlue { 
+                            text: calculator.requiredCapacity.toFixed(1) + " Ah"
+                        }
+                        
+                        Label { text: "Recommended Capacity:" }
+                        TextFieldBlue { 
+                            text: calculator.recommendedCapacity.toFixed(1) + " Ah"
+                            color: Universal.theme === Universal.Dark ? "#90EE90" : "green"
+                        }
+                        
+                        Label { text: "Energy Storage:" }
+                        TextFieldBlue { 
+                            text: calculator.energyStorage.toFixed(2) + " kWh"
+                        }
                     }
                 }
             }
-        }
-        WaveCard {
-            Layout.minimumHeight: inputLayout.height
-            Layout.minimumWidth: 400
 
-            Canvas { 
-                anchors.fill: parent
-                BatteryViz {id: batteryVizCanvas} 
+            WaveCard {
+                Layout.minimumHeight: inputLayout.height
+                Layout.minimumWidth: 400
+
+                Canvas { 
+                    anchors.fill: parent
+                    BatteryViz {id: batteryVizCanvas} 
+                }
             }
         }
     }

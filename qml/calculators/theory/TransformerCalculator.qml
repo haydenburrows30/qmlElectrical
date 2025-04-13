@@ -95,7 +95,6 @@ Item {
                         onClicked: pdfPopup.open()
                     }
                 }
-                
 
                 RowLayout {
 

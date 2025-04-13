@@ -110,8 +110,6 @@ class DeltaTransformerCalculator(QObject):
         """Get the currently calculated wattage rating"""
         return self._required_wattage
     
-    # Add new properties
-    
     @Property(float, notify=wattageCalculated)
     def wattage(self):
         """Get the currently calculated wattage rating"""

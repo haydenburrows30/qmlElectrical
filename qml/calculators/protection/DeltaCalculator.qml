@@ -16,7 +16,8 @@ Item {
     property DeltaTransformerCalculator calculator: DeltaTransformerCalculator {}
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<h3>Open Delta Transformer Calculator</h3><br>" +
                 "This calculator estimates the resistor required for an open delta transformer.<br><br>" +
                 "<b>Primary Voltage:</b> The primary side line-to-line voltage.<br>" +
@@ -31,186 +32,189 @@ Item {
                 "The validation indicator will change color based on the input validity.<br>"
     }
 
-    RowLayout {
+    ColumnLayout {
+        id: mainLayout
         anchors.centerIn: parent
-        
 
-        ColumnLayout {
-            id: inputLayout
-            Layout.minimumWidth: 400
-            
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
 
-            WaveCard {
-                id: results
+            Label {
+                text: "Open Delta Calculator"
+                font.pixelSize: 20
+                font.bold: true
                 Layout.fillWidth: true
-                Layout.minimumHeight: 600
-                showSettings: true
+            }
 
-                ColumnLayout {
-                    
-                    anchors.fill: parent
-                    
 
-                    Label {
-                        text: "Open Delta Transformer Calculator"
-                        font.bold: true
-                        font.pixelSize: 18
-                    }
+            StyledButton {
+                text: "Reference Guide"
+                icon.source: "../../../icons/rounded/folder.svg"
+                onClicked: {
+                    Qt.openUrlExternally("file://" + calculator.getPdfPath())
+                }
+            }
+
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
+
+        RowLayout {
+
+            ColumnLayout {
+                id: inputLayout
+                Layout.minimumWidth: 400
+
+                WaveCard {
+                    id: results
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 450
+                    titleVisible: false
 
                     GridLayout {
+                        anchors.fill: parent
                         columns: 2
-                        
-                        
+                        uniformCellWidths: true
 
-                        Label { text: "Primary Voltage (V):" }
+                        Label { text: "Primary Voltage (V):" ; Layout.alignment: Qt.AlignRight }
+
                         TextFieldRound {
                             id: primaryVoltage
                             validator: DoubleValidator { bottom: 0 }
                             Layout.fillWidth: true
+                            placeholderText: "11000"
+
+                            ToolTip.text: "Enter primary side line-to-line voltage"
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
                         }
 
-                        ToolTip {
-                            parent: primaryVoltage
-                            visible: primaryVoltage.hovered 
-                            text: "Enter primary side line-to-line voltage"
-                            delay: 1000
-                        }
+                        Label { text: "Secondary Voltage (V):" ; Layout.alignment: Qt.AlignRight }
 
-                        Label { text: "Secondary Voltage (V):" }
                         TextFieldRound {
                             id: secondaryVoltage
                             validator: DoubleValidator { bottom: 0 }
                             Layout.fillWidth: true
-                            placeholderText: "Usually 110V phase-to-phase"
+                            placeholderText: "110"
+
+                            ToolTip.text: "Phase voltage will be V/3 = 36.67V for 110V input"
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
                         }
 
-                        Label {
-                            text: "(Phase voltage will be V/3 = 36.67V for 110V input)"
-                            font.italic: true
-                            font.pixelSize: 12
-                            color: "#666666"
-                            Layout.columnSpan: 2
-                        }
+                        Label { text: "Power Rating (VA):" ; Layout.alignment: Qt.AlignRight }
 
-                        Label { text: "Power Rating (VA):" }
                         TextFieldRound {
                             id: powerRating
                             validator: DoubleValidator { bottom: 0 }
                             Layout.fillWidth: true
+                            placeholderText: "150"
+
+                            ToolTip.text: "Enter voltage transformer secondary nameplate VA rating. Power will be derated to 86.6% for open delta."
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
                         }
 
-                        ToolTip {
-                            parent: powerRating
-                            visible: powerRating.hovered
-                            text: "Enter voltage transformer secondary nameplate VA rating"
-                            delay: 1000
+                        StyledButton {
+                            text: "Calculate"
+                            Layout.columnSpan: 2
+                            Layout.alignment: Qt.AlignRight
+
+                            icon.source: "../../../icons/rounded/calculate.svg"
+
+                            onClicked: {
+                                if (primaryVoltage.text && secondaryVoltage.text && powerRating.text) {
+                                    calculator.calculateResistor(
+                                        parseFloat(primaryVoltage.text),
+                                        parseFloat(secondaryVoltage.text),
+                                        parseFloat(powerRating.text)
+                                    )
+                                }
+                            }
                         }
 
-                        Label { 
-                            text: "(Note: Power will be derated to 86.6% for open delta)" 
-                            font.italic: true
-                            font.pixelSize: 12
+                        Label {
+                            id: phaseVoltageText
+                            text: "Phase Voltage:"
+                            Layout.alignment: Qt.AlignRight
+                        }
+
+                        TextFieldBlue {
+                            text: secondaryVoltage.text ? 
+                                `${(parseFloat(secondaryVoltage.text)/3).toFixed(2)}V` : ""
+                        }
+
+                        Label {
+                            id: resultText
+                            text: "Resistor:"
+                            Layout.alignment: Qt.AlignRight
+                        }
+
+                        TextFieldBlue {
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            text: calculator.resistor.toFixed(2) + " ohm"
+                        }
+
+                        Label {
+                            id: wattageText
+                            Layout.alignment: Qt.AlignRight
+                            text: "Resistor power rating:"
+                        }
+
+                        TextFieldBlue {
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            text: calculator.wattage.toFixed(2) + " W"
+                        }
+
+                        Label {
+                            text: "Note: Calculations based on phase voltage (V/3)\n" +
+                                "• Open delta connection factor applied\n" +
+                                "• Fault conditions (1.5x)\n" +
+                                "• Continuous operation (2.0x)"
                             color: "#666666"
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            Layout.topMargin: 10
                             Layout.columnSpan: 2
                         }
-                    }
 
-                    StyledButton {
-                        text: "Open Reference Guide"
-                        icon.source: "../../../icons/rounded/folder.svg"
-                        Layout.fillWidth: true
-                        onClicked: {
-                            Qt.openUrlExternally("file://" + calculator.getPdfPath())
-                        }
-                    }
-
-                    StyledButton {
-                        text: "Calculate"
-                        Layout.fillWidth: true
-                        icon.source: "../../../icons/rounded/calculate.svg"
-                        onClicked: {
-                            if (primaryVoltage.text && secondaryVoltage.text && powerRating.text) {
-                                calculator.calculateResistor(
-                                    parseFloat(primaryVoltage.text),
-                                    parseFloat(secondaryVoltage.text),
-                                    parseFloat(powerRating.text)
-                                )
+                        Rectangle {
+                            id: validationIndicator
+                            Layout.minimumHeight: 10
+                            Layout.fillWidth: true
+                            Layout.topMargin: 10
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.columnSpan: 2
+                            radius: 5
+                            color: {
+                                if (!primaryVoltage.text || !secondaryVoltage.text || !powerRating.text)
+                                    return "#666666"
+                                if (primaryVoltage.acceptableInput && secondaryVoltage.acceptableInput && 
+                                    powerRating.acceptableInput)
+                                    return "#00ff00"
+                                return "#ff0000"
                             }
-                        }
-                    }
-
-                    GroupBox {
-                        title: "Results"
-                        Layout.fillWidth: true
-                        Layout.topMargin: 10
-
-                        ColumnLayout {
-                            width: parent.width
-                            
-
-                            Label {
-                                id: phaseVoltageText
-                                text: secondaryVoltage.text ? 
-                                    `Phase Voltage: ${(parseFloat(secondaryVoltage.text)/3).toFixed(2)}V` : ""
-                                font.pixelSize: 14
-                                visible: secondaryVoltage.text !== ""
-                            }
-
-                            Label {
-                                id: resultText
-                                font.pixelSize: 14
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                                text: "Resistor: " + calculator.resistor.toFixed(2) + " ohm"
-                            }
-
-                            Label {
-                                id: wattageText
-                                font.pixelSize: 14
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                                text: "Resistor power rating: " + calculator.wattage.toFixed(2) + " W"
-                            }
-
-                            Label {
-                                text: "Note: Calculations based on phase voltage (V/3)\n" +
-                                    "• Open delta connection factor applied\n" +
-                                    "• Fault conditions (1.5x)\n" +
-                                    "• Continuous operation (2.0x)"
-                                font.pixelSize: 12
-                                color: "#666666"
-                                wrapMode: Text.WordWrap
-                                Layout.fillWidth: true
-                                Layout.topMargin: 10
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        id: validationIndicator
-                        Layout.minimumHeight: 10
-                        Layout.fillWidth: true
-                        Layout.topMargin: 10
-                        Layout.alignment: Qt.AlignHCenter
-                        radius: 5
-                        color: {
-                            if (!primaryVoltage.text || !secondaryVoltage.text || !powerRating.text)
-                                return "#666666"
-                            if (primaryVoltage.acceptableInput && secondaryVoltage.acceptableInput && 
-                                powerRating.acceptableInput)
-                                return "#00ff00"
-                            return "#ff0000"
                         }
                     }
                 }
             }
-        }
 
-        Image {
-            source: "../../../assets/open_delta.png"
-            Layout.preferredWidth: 400
-            Layout.maximumHeight: inputLayout.height
-            fillMode: Image.PreserveAspectFit
+            Image {
+                source: "../../../assets/open_delta.png"
+                Layout.preferredWidth: 400
+                Layout.maximumHeight: inputLayout.height
+                fillMode: Image.PreserveAspectFit
+            }
         }
     }
 }
