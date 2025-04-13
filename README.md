@@ -116,12 +116,13 @@ python scripts/windows_build.py
 ### Project Structure
 ```
 electrical-calculator/
-├── qml/components/    # Reusable QML components
-├── qml/pages/         # Main application pages
-├── data/          # Data files and resources
-├── icons/         # Application icons
-├── docs/          # Documentation
-└── scripts/       # Build automation scripts
+├── qml/components/     # Reusable QML components
+├── qml/pages/          # Main application pages
+├── qml/calculators/    # Calculators
+├── data/               # Data files and resources
+├── icons/              # Application icons
+├── docs/               # Documentation
+└── scripts/            # Build automation scripts
 ```
 
 ## License
