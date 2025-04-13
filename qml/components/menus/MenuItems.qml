@@ -45,6 +45,7 @@ QtObject {
         { name: qsTr("Machine Calculator"), source: "calculators/theory/ElectricMachineCalculator.qml", icon: "forward_circle" },
         { name: qsTr("Motor Starting"), source: "calculators/theory/MotorStartingCalculator.qml", icon: "show_chart" },
         { name: qsTr("RLC"), source: "calculators/theory/RLC.qml", icon: "general_device" },
+        { name: qsTr("Real Time"), source: "calculators/theory/RealTime.qml", icon: "general_device" },
         { name: qsTr("Three Phase Waveforms"), source: "calculators/theory/ThreePhase.qml", icon: "density_medium" },
         { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml", icon: "calculate" },
     ]

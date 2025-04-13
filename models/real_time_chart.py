@@ -111,7 +111,8 @@ class RealTimeChart(QObject):
         elif wave_type == WaveType.SQUARE:
             return offset + amp * np.sign(np.sin(t * freq))
         elif wave_type == WaveType.SAWTOOTH:
-            return offset + amp * (2 * (t * freq - np.floor(0.5 + t * freq)))
+            # Corrected sawtooth formula
+            return offset + amp * (2 * (t * freq - np.floor(t * freq)) - 1)
         else:  # TRIANGLE
             return offset + 2 * amp * abs((t * freq % 2) - 1) - amp
 

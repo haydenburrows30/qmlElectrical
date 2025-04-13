@@ -7,6 +7,7 @@ import "../../components"
 import "../../components/visualizers/"
 import "../../components/style"
 import "../../components/popups"
+import "../../components/buttons"
 
 import Impedance 1.0
 
@@ -17,7 +18,8 @@ Item {
     property color textColor: Universal.foreground
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<h3> Impedance Calculator </h3><br>" +
                 "Impedance is the total opposition to the flow of alternating current in a circuit. <br>" + 
                 "It is the vector sum of resistance and reactance. The impedance is calculated using the formula Z = √(R² + X²) where R is the resistance and X is the reactance. <br>" + 
@@ -26,81 +28,102 @@ Item {
         heightFactor: 0.4
     }
 
-    RowLayout {
+    ColumnLayout {
         anchors.centerIn: parent
-        anchors.margins: 10
 
-        WaveCard {
-            title: "Impedance Calculator"
-            Layout.minimumHeight: 300
-            Layout.minimumWidth: 300
-            Layout.alignment: Qt.AlignTop
-        
-            GridLayout {
-                anchors.centerIn: parent
-                columns: 2
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
 
-                Label {
-                    text: "Resistance(R):"
-                    Layout.preferredWidth: 100
-                }
-                TextFieldRound {
-                    id: rInput
-                    placeholderText: "Enter Resistance"
-                    onTextChanged: {
-                        if (text && calculator) {
-                            calculator.setResistance(parseFloat(text))
-                        }
-                    }
-                    Layout.preferredWidth: 140
-                    Layout.alignment: Qt.AlignRight
-                }
+            Label {
+                text: "Impedance Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
 
-                Label {
-                    text: "Reactance (X):"
-                    Layout.preferredWidth: 100
-                }
-                TextFieldRound {
-                    id: reactanceInput
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignRight
-                    placeholderText: "Enter Reactance"
-                    onTextChanged: {
-                        if (text && calculator) {
-                            calculator.setReactance(parseFloat(text))
-                        }
-                    }
-                }
-
-                Label {
-                    text: "Impedance (Z):"
-                    Layout.preferredWidth: 110
-                }
-                TextFieldBlue {
-                    text: calculator && !isNaN(calculator.impedance) ? calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
-                }
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
             }
         }
 
-        WaveCard {
-            id: results
-            Layout.minimumHeight: 300
-            Layout.minimumWidth: 300
+        RowLayout {
 
-            showSettings: true
+            WaveCard {
+                title: "Impedance Calculator"
+                Layout.minimumHeight: 300
+                Layout.minimumWidth: 300
+                Layout.alignment: Qt.AlignTop
             
-            ImpedanceVectorViz {
-                id: impedanceViz
-                anchors.fill: parent
-                anchors.margins: 2
-                resistance: parseFloat(rInput.text || "3")
-                reactance: parseFloat(reactanceInput.text || "4")
-                impedance: calculator && !isNaN(calculator.impedance) ? 
-                           parseFloat(calculator.impedance.toFixed(2)) : 5.0
-                phaseAngle: calculator && !isNaN(calculator.phaseAngle) ?
-                            parseFloat(calculator.phaseAngle.toFixed(2)) : 53.13
-                darkMode: Universal.theme === Universal.Dark
-                textColor: fault_current.textColor
+                GridLayout {
+                    anchors.centerIn: parent
+                    columns: 2
+
+                    Label {
+                        text: "Resistance(R):"
+                        Layout.preferredWidth: 100
+                    }
+                    TextFieldRound {
+                        id: rInput
+                        placeholderText: "Enter Resistance"
+                        onTextChanged: {
+                            if (text && calculator) {
+                                calculator.setResistance(parseFloat(text))
+                            }
+                        }
+                        Layout.preferredWidth: 140
+                        Layout.alignment: Qt.AlignRight
+                    }
+
+                    Label {
+                        text: "Reactance (X):"
+                        Layout.preferredWidth: 100
+                    }
+                    TextFieldRound {
+                        id: reactanceInput
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignRight
+                        placeholderText: "Enter Reactance"
+                        onTextChanged: {
+                            if (text && calculator) {
+                                calculator.setReactance(parseFloat(text))
+                            }
+                        }
+                    }
+
+                    Label {
+                        text: "Impedance (Z):"
+                        Layout.preferredWidth: 110
+                    }
+                    TextFieldBlue {
+                        text: calculator && !isNaN(calculator.impedance) ? calculator.impedance.toFixed(2) + "Ω" : "0.00Ω"
+                    }
+                }
+            }
+
+            WaveCard {
+                Layout.minimumHeight: 300
+                Layout.minimumWidth: 300
+
+                ImpedanceVectorViz {
+                    id: impedanceViz
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    resistance: parseFloat(rInput.text || "3")
+                    reactance: parseFloat(reactanceInput.text || "4")
+                    impedance: calculator && !isNaN(calculator.impedance) ? 
+                            parseFloat(calculator.impedance.toFixed(2)) : 5.0
+                    phaseAngle: calculator && !isNaN(calculator.phaseAngle) ?
+                                parseFloat(calculator.phaseAngle.toFixed(2)) : 53.13
+                    darkMode: Universal.theme === Universal.Dark
+                    textColor: fault_current.textColor
+                }
             }
         }
     }
