@@ -12,7 +12,7 @@ import "components/style"
 import "components/popups"
 import "components/buttons"
 import "components/displays"
-
+import "components/menus"
 
 ApplicationWindow {
     id: window
@@ -27,58 +27,6 @@ ApplicationWindow {
     property var logViewerPopup: logViewerPopupInstance
     property var logManagerInstance: null
     property bool modeToggled: false
-
-    property var home: [
-            {name: qsTr("Home"), source: "pages/Home.qml"}
-        ]
-
-    property var basic: [
-        { name: qsTr("Impedance Calculator"), source: "calculators/basic/ImpedanceCalculator.qml" },
-        { name: qsTr("kVA / kw / A"), source: "calculators/basic/PowerCurrentCalculator.qml" },
-        { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml" },
-        { name: qsTr("Power Factor Correction"), source: "calculators/basic/PowerFactorCorrection.qml" },
-        { name: qsTr("Ohm's Law"), source: "calculators/basic/OhmsLawCalculator.qml" },
-        { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml" }
-    ]
-
-    property var protection: [
-        { name: qsTr("Discrimination Analysis"), source: "calculators/protection/DiscriminationAnalyzer.qml" },
-        { name: qsTr("Protection Relay"), source: "calculators/protection/ProtectionRelayCalculator.qml" },
-        { name: qsTr("Instrument Transformer"), source: "calculators/protection/InstrumentTransformerCalculator.qml" },
-        { name: qsTr("Earthing Calculator"), source: "calculators/protection/EarthingCalculator.qml" },
-        { name: qsTr("Battery Calculator"), source: "calculators/protection/BatteryCalculator.qml" },
-        { name: qsTr("Open Delta"), source: "calculators/protection/DeltaCalculator.qml" },
-        { name: qsTr("Overcurrent Protection"), source: "calculators/protection/OvercurrentProtectionCalculator.qml" },
-        { name: qsTr("RGF"), source: "calculators/protection/RefRgfCalculator.qml" },
-        { name: qsTr("Fault Current"), source: "calculators/protection/FaultCurrentCalculator.qml" },
-        { name: qsTr("Transformer + Line"), source: "calculators/protection/TransformerLineCalculator.qml" },
-        { name: qsTr("Solkor Rf"), source: "calculators/protection/SolkorRf.qml" },
-        { name: qsTr("VR Calculations"), source: "calculators/protection/VR32CL7Calculator.qml" }
-    ]
-
-    property var cable: [
-        { name: qsTr("Cable Ampacity"), source: "calculators/cable/CableAmpacityCalculator.qml" },
-        { name: qsTr("Charging Current"), source: "calculators/cable/ChargingCurrentCalculator.qml" },
-        { name: qsTr("Voltage Drop"), source: "calculators/cable/VoltageDropCalculator.qml" },
-        { name: qsTr("Transmission Line"), source: "calculators/cable/TransmissionLineCalculator.qml" },
-        { name: qsTr("Switchboard"), source: "calculators/cable/SwitchboardPanel.qml" },
-        { name: qsTr("Voltage Drop Orion"), source: "calculators/cable/VoltageDrop.qml" }
-    ]
-    
-    property var theory: [
-        { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml" },
-        { name: qsTr("Harmonics Analysis"), source: "calculators/theory/HarmonicsAnalyzer.qml" },
-        { name: qsTr("Machine Calculator"), source: "calculators/theory/ElectricMachineCalculator.qml" },
-        { name: qsTr("Motor Starting"), source: "calculators/theory/MotorStartingCalculator.qml" },
-        { name: qsTr("RLC"), source: "calculators/theory/RLC.qml" },
-        { name: qsTr("Three Phase Waveforms"), source: "calculators/theory/ThreePhase.qml" },
-        { name: qsTr("Real Time Chart"), source: "calculators/theory/RealTime.qml" },
-        { name: qsTr("Instrument Tx Naming"), source: "calculators/theory/TransformerNamingGuide.qml" }
-    ]
-    
-    property var renewables: [
-        { name: qsTr("Wind & Grid Connection"), source: "calculators/grid_wind/WindTransformerLineCalculator.qml" }
-    ]
 
     ResultsManager {id: resultsManager}
 
@@ -166,7 +114,7 @@ ApplicationWindow {
                 Menu {
                     title: "Basic Calculators"
                     Repeater {
-                        model: basic
+                        model: MenuItems.basic
 
                         MenuItem {
                             text: modelData.name
@@ -177,11 +125,10 @@ ApplicationWindow {
                         }
                     }
                 }
-
                 Menu {
                     title: "Protection"
                     Repeater {
-                        model: protection
+                        model: MenuItems.protection
 
                         MenuItem {
                             text: modelData.name
@@ -195,7 +142,7 @@ ApplicationWindow {
                 Menu {
                     title: "Cable"
                     Repeater {
-                        model: cable
+                        model: MenuItems.cable
 
                         MenuItem {
                             text: modelData.name
@@ -209,7 +156,7 @@ ApplicationWindow {
                 Menu {
                     title: "Theory"
                     Repeater {
-                        model: theory
+                        model: MenuItems.theory
 
                         MenuItem {
                             text: modelData.name
@@ -223,7 +170,7 @@ ApplicationWindow {
                 Menu {
                     title: "Renewables"
                     Repeater {
-                        model: renewables
+                        model: MenuItems.renewables
 
                         MenuItem {
                             text: modelData.name

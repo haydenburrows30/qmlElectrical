@@ -44,8 +44,10 @@ def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
     # Register Style singleton
     style_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "components","style", "Style.qml"))
+    menu_items_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "components","menus", "MenuItems.qml"))
     engine.addImportPath(os.path.join(current_dir, "qml"))
     qmlRegisterSingletonType(style_url, "Style", 1, 0, "Style")
+    qmlRegisterSingletonType(menu_items_url, "MenuItems", 1, 0, "MenuItems")
 
     # Register SystemResources
     try:

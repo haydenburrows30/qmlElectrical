@@ -57,4 +57,13 @@ QtObject {
         actualColor.a = alpha
         return actualColor
     }
+
+    property var basic: [
+        { name: qsTr("Impedance Calculator"), source: "calculators/basic/ImpedanceCalculator.qml" },
+        { name: qsTr("kVA / kw / A"), source: "calculators/basic/PowerCurrentCalculator.qml" },
+        { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml" },
+        { name: qsTr("Power Factor Correction"), source: "calculators/basic/PowerFactorCorrection.qml" },
+        { name: qsTr("Ohm's Law"), source: "calculators/basic/OhmsLawCalculator.qml" },
+        { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml" }
+    ]
 }

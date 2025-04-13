@@ -146,8 +146,8 @@ class TransmissionLineCalculator(QObject):
                 self._sil = (self._nominal_voltage**2) / abs(self._Z)
                 
                 # Debug to check calculations
-                print(f"Characteristic impedance: {abs(self._Z):.2f} Ω ∠{math.degrees(cmath.phase(self._Z)):.1f}°")
-                print(f"SIL calculation: ({self._nominal_voltage}^2) / {abs(self._Z)} = {self._sil} MW")
+                # print(f"Characteristic impedance: {abs(self._Z):.2f} Ω ∠{math.degrees(cmath.phase(self._Z)):.1f}°")
+                # print(f"SIL calculation: ({self._nominal_voltage}^2) / {abs(self._Z)} = {self._sil} MW")
             else:
                 self._sil = 0
             
@@ -159,7 +159,7 @@ class TransmissionLineCalculator(QObject):
             # Calculate ABCD parameters - these DO depend on line length
             gamma_l = self._gamma * self._length  # This is where length affects the calculations
             
-            print(f"Line length: {self._length} km, gamma: {self._gamma}, gamma*length: {gamma_l}")
+            # print(f"Line length: {self._length} km, gamma: {self._gamma}, gamma*length: {gamma_l}")
             
             # Use hyperbolic functions with numerical stability checks
             if abs(gamma_l) < 100:  # Prevent overflow
@@ -167,7 +167,7 @@ class TransmissionLineCalculator(QObject):
                 self._B = self._Z * cmath.sinh(gamma_l)  # B parameter depends on line length
                 self._C = cmath.sinh(gamma_l) / self._Z  # C parameter depends on line length
                 self._D = self._A  # D = A for symmetrical lines
-                print(f"ABCD parameters calculated using hyperbolic functions")
+                # print(f"ABCD parameters calculated using hyperbolic functions")
             else:
                 # Use exponential form for numerical stability with very long lines
                 half_exp_pos = cmath.exp(gamma_l/2)

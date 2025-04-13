@@ -7,27 +7,13 @@ import QtQuick.Layouts
 import "../components"
 import "../components/buttons"
 import "../components/style"
+import "../components/menus"
 
 Page {
     id: protectionCalc
     background: Rectangle {
         color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
-
-    property var protection: [
-        { name: qsTr("Discrimination Analysis"), source: "../calculators/protection/DiscriminationAnalyzer.qml", icon: "show_chart"},
-        { name: qsTr("Protection Relay"), source: "../calculators/protection/ProtectionRelayCalculator.qml", icon: "computer" },
-        { name: qsTr("Instrument Transformer"), source: "../calculators/protection/InstrumentTransformerCalculator.qml", icon: "transform" },
-        { name: qsTr("Earthing Calculator"), source: "../calculators/protection/EarthingCalculator.qml", icon: "public" },
-        { name: qsTr("Battery Calculator"), source: "../calculators/protection/BatteryCalculator.qml", icon: "battery_charging_full" },
-        { name: qsTr("Open Delta"), source: "../calculators/protection/DeltaCalculator.qml", icon: "change_history" },
-        { name: qsTr("Overcurrent Protection"), source: "../calculators/protection/OvercurrentProtectionCalculator.qml", icon: "electrical_services" },
-        { name: qsTr("RGF"), source: "../calculators/protection/RefRgfCalculator.qml", icon: "calculate" },
-        { name: qsTr("Fault Current"), source: "../calculators/protection/FaultCurrentCalculator.qml", icon: "electric_bolt" },
-        { name: qsTr("Transformer & Line"), source: "../calculators/protection/TransformerLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("SOLKOR Rf"), source: "../calculators/protection/SolkorRf.qml", icon: "cell_tower" },
-        { name: qsTr("VR Calculations"), source: "../calculators/protection/VR32CL7Calculator.qml", icon: "cell_tower" }
-    ]
 
     ColumnLayout {
         id: menuText
@@ -49,7 +35,7 @@ Page {
             columnSpacing: 20
 
             Repeater {
-                model: protection
+                model: MenuItems.protection
 
                 HButton {
                     id: hbuttonParent
@@ -81,7 +67,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.push(modelData.source)
+                        calculatorLoader.push("../" + modelData.source)
                     }
 
                     HoverHandler {

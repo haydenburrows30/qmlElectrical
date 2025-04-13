@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import "../components"
 import "../components/buttons"
 import "../components/style"
+import "../components/menus"
 
 Page {
     id: cableCalc
@@ -14,15 +15,6 @@ Page {
     background: Rectangle {
         color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
-
-    property var cable: [
-        { name: qsTr("Cable Ampacity"), source: "../calculators/cable/CableAmpacityCalculator.qml", icon: "electrical_services" },
-        { name: qsTr("Charging Current"), source: "../calculators/cable/ChargingCurrentCalculator.qml", icon: "battery_saver" },
-        { name: qsTr("Voltage Drop"), source: "../calculators/cable/VoltageDropCalculator.qml", icon: "bolt" },
-        { name: qsTr("Transmission Line"), source: "../calculators/cable/TransmissionLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("Switchboard"), source: "../calculators/cable/SwitchboardPanel.qml", icon: "power" },
-        { name: qsTr("Voltage Drop Orion"), source: "../calculators/cable/VoltageDrop.qml", icon: "bolt" }
-    ]
 
     ColumnLayout {
         id: menuText
@@ -44,7 +36,7 @@ Page {
             columnSpacing: 20
 
             Repeater {
-                model: cable
+                model: MenuItems.cable
 
                 HButton {
                     id: hbuttonParent
@@ -76,7 +68,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.push(modelData.source)
+                        calculatorLoader.push("../" + modelData.source)
                     }
 
                     HoverHandler {

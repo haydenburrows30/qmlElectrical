@@ -186,7 +186,7 @@ Page {
 
     ChartPopup {
         id: chartPopup
-        
+
         onSaveRequested: function(scale) {
             exportFileDialog.setup("Save Chart", "PNG files (*.png)", "png", 
                                   "voltage_drop_chart", exportFileDialog.chartExport)

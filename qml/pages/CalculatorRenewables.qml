@@ -7,16 +7,13 @@ import QtQuick.Layouts
 import "../components"
 import "../components/buttons"
 import "../components/style"
+import "../components/menus"
 
 Page {
 
     background: Rectangle {
         color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
-
-    property var renewables: [
-        { name: qsTr("Wind & Grid Connection"), source: "../calculators/grid_wind/WindTransformerLineCalculator.qml", icon: "air"}
-    ]
 
     ColumnLayout {
         id: menuText
@@ -38,7 +35,7 @@ Page {
             columnSpacing: 20
 
             Repeater {
-                model: renewables
+                model: MenuItems.renewables
 
                 HButton {
                     id: hbuttonParent
@@ -70,7 +67,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.push(modelData.source)
+                        calculatorLoader.push("../" + modelData.source)
                     }
 
                     HoverHandler {

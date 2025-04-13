@@ -15,7 +15,7 @@ import Charging 1.0
 Item {
     id: charging_current
     property ChargingCalculator calculator: ChargingCalculator {}
-    
+
     property color textColor: Universal.foreground
 
     TextEdit {
@@ -24,7 +24,8 @@ Item {
     }
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<h3>Charging Current Calculator</h3><br>" +
                     "This calculator estimates the charging current for a cable based on various parameters.<br><br>" +
                     "<b>Voltage:</b> The voltage level of the cable in kV.<br>" +
@@ -37,21 +38,43 @@ Item {
                     "Developed by <b>Wave</b>."
     }
 
-    RowLayout {
-        anchors.fill: parent
+    ColumnLayout {
+        id: mainLayout
+        anchors.centerIn: parent
+        anchors.margins: 10
 
-        WaveCard {
-            title: "System Parameters"
-            Layout.minimumWidth: 350
-            Layout.alignment: Qt.AlignHCenter
-            Layout.minimumHeight: 300
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
 
-            id: results
-            showSettings: true
+            Label {
+                text: "Charging Current Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
 
-            ColumnLayout {
-            
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
+
+        RowLayout {
+
+            WaveCard {
+                title: "System Parameters"
+                Layout.minimumWidth: 350
+                Layout.alignment: Qt.AlignHCenter
+                Layout.minimumHeight: 300
+
                 GridLayout {
+                    anchors.fill: parent
                     columns: 2
 
                     RowLayout {
@@ -186,23 +209,23 @@ Item {
                     }
                 }
             }
-        }
 
-        WaveCard {
-            title: "Visualization"
-            Layout.fillWidth: true
-            Layout.minimumHeight: 300
-            Layout.minimumWidth: 300
-            
-            ChargingCurrentViz {
-                id: chargingCurrentViz
-                anchors.fill: parent
-                anchors.margins: 2
-                voltage: calculator.voltage
-                capacitance: calculator.capacitance
-                frequency: calculator.frequency
-                length: calculator.length
-                current: calculator ? calculator.chargingCurrent : 0.0
+            WaveCard {
+                title: "Visualization"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 300
+                Layout.minimumWidth: 500
+                
+                ChargingCurrentViz {
+                    id: chargingCurrentViz
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    voltage: calculator.voltage
+                    capacitance: calculator.capacitance
+                    frequency: calculator.frequency
+                    length: calculator.length
+                    current: calculator ? calculator.chargingCurrent : 0.0
+                }
             }
         }
     }

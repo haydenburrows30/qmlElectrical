@@ -30,7 +30,6 @@ Item {
 
     // Add calculator change handler
     onCalculatorChanged: {
-        console.log("Calculator reference changed")
         canvas.requestPaint()
     }
 
@@ -46,31 +45,28 @@ Item {
     Canvas {
         id: canvas
         anchors.fill: parent
-        
+
         // Make sure we repaint when the component size changes
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
-        
+
         Component.onCompleted: {
-            console.log("Canvas created with size:", width, "x", height)
             requestPaint()
         }
-        
+
         onPaint: {
-            console.log("Canvas painting at size:", width, "x", height)
-            
+            var width = canvas.width;
+            var height = canvas.height;
+
             // Don't try to paint if we have no size
             if (width <= 0 || height <= 0) {
                 console.log("Canvas has no size, skipping paint")
                 return
             }
-            
+
             var ctx = getContext("2d");
             ctx.reset();
-            
-            var width = canvas.width;
-            var height = canvas.height;
-            
+
             // Define colors based on theme
             var lineColor = darkMode ? "#6CB4EE" : "#2196F3";
             var waveColor = darkMode ? "#FFA07A" : "#FF6347";
@@ -87,6 +83,8 @@ Item {
             // Fix phasor diagram drawing
             var phasorSize = Math.min(width * 0.2, height * 0.2);
             drawPhasorDiagram(ctx, width * 0.7, height * 0.8, phasorSize, voltageColor, currentColor);
+
+            // console.log("Canvas painting at size:", width, "x", height)
         }
         
         function drawTransmissionLine(ctx, x, y, width, height, color) {

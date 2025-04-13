@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import "../components"
 import "../components/buttons"
 import "../components/style"
+import "../components/menus"
 
 Page {
     id: theoryCalc
@@ -14,17 +15,6 @@ Page {
     background: Rectangle {
         color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
-
-    property var theory: [
-        { name: qsTr("Transformer Calculator"), source: "../calculators/theory/TransformerCalculator.qml", icon: "calculate" },
-        { name: qsTr("Harmonics Analysis"), source: "../calculators/theory/HarmonicsAnalyzer.qml", icon: "troubleshoot" },
-        { name: qsTr("Machine Calculator"), source: "../calculators/theory/ElectricMachineCalculator.qml", icon: "forward_circle" },
-        { name: qsTr("Motor Starting"), source: "../calculators/theory/MotorStartingCalculator.qml", icon: "show_chart" },
-        { name: qsTr("RLC"), source: "../calculators/theory/RLC.qml", icon: "general_device" },
-        { name: qsTr("Realtime"), source: "../calculators/theory/RealTime.qml", icon: "timeline" },
-        { name: qsTr("Three Phase"), source: "../calculators/theory/ThreePhase.qml", icon: "density_medium" },
-        { name: qsTr("Instrument Tx Naming"), source: "../calculators/theory/TransformerNamingGuide.qml", icon: "density_medium" }
-    ]
 
     ColumnLayout {
         id: menuText
@@ -46,7 +36,7 @@ Page {
             columnSpacing: 20
 
             Repeater {
-                model: theory
+                model: MenuItems.theory
 
                 HButton {
                     id: hbuttonParent
@@ -78,7 +68,7 @@ Page {
                     }
                     
                     onClicked: {
-                        calculatorLoader.push(modelData.source)
+                        calculatorLoader.push("../" + modelData.source)
                     }
 
                     HoverHandler {

@@ -13,7 +13,7 @@ Popup {
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    visible: parentCard.open | parentCard.onButtonClicked
+    visible: parentCard.open | parentCard.onButtonClicked | tipsPopup.open()
 
     property string popupText: ""
     property double widthFactor: 0.5
