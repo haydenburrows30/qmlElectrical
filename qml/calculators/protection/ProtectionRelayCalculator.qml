@@ -335,14 +335,13 @@ Item {
                                 Layout.columnSpan: 2
                                 Layout.fillWidth: true
                                 onClicked: {
-                                    // Calculate fault current based on circuit parameters
+                                    // Use the improved calculation method from the backend
                                     let voltage = parseFloat(supplyVoltage.text);
                                     let length = parseFloat(cableLength.text);
                                     let size = parseFloat(cableSize.currentText);
                                     
-                                    // Simple calculation (more sophisticated one would be in Python)
-                                    let impedance = 0.018 * length / size; // Simplified impedance calculation
-                                    let calculatedFaultCurrent = voltage / impedance;
+                                    // Call the improved Python implementation instead of the simplified formula
+                                    let calculatedFaultCurrent = relay.calculateFaultCurrent(voltage, length, size);
                                     
                                     // Update fault current field
                                     faultCurrent.text = calculatedFaultCurrent.toFixed(1);
@@ -420,6 +419,9 @@ Item {
                             width: 2
                             style: Qt.DashLine
                         }
+                        
+                        // Add this property to control logarithmic point display
+                        property bool useLogarithmicPoints: true
                     }
                     
                     // Add legend toggle
@@ -624,7 +626,7 @@ Item {
                     )
                 }
             } else {
-                // Otherwise fall back to the general curve points
+                // Use the improved logarithmically distributed curve points
                 let generalPoints = relay.curvePoints
                 for (let i = 0; i < generalPoints.length; i++) {
                     tripCurve.append(generalPoints[i].current, generalPoints[i].time)
@@ -638,6 +640,9 @@ Item {
                     relay.operatingTime
                 )
             }
+            
+            // Ensure axis ranges adapt to the curve points
+            adjustAxisRanges()
         }
         
         function onSavedCurveReady(points) {
@@ -653,5 +658,54 @@ Item {
                 savedCurve.visible = false;
             }
         }
+    }
+    
+    // Add this function to ensure chart axis ranges adapt to the data
+    function adjustAxisRanges() {
+        if (tripCurve.count === 0) return
+        
+        let minCurrent = Number.MAX_VALUE
+        let maxCurrent = 0
+        let minTime = Number.MAX_VALUE
+        let maxTime = 0
+        
+        // Find the min/max values in the current curve
+        for (let i = 0; i < tripCurve.count; i++) {
+            let point = tripCurve.at(i)
+            minCurrent = Math.min(minCurrent, point.x)
+            maxCurrent = Math.max(maxCurrent, point.x)
+            minTime = Math.min(minTime, point.y)
+            maxTime = Math.max(maxTime, point.y)
+        }
+        
+        // Include fault point in range calculation if visible
+        if (faultPoint.count > 0) {
+            let point = faultPoint.at(0)
+            minCurrent = Math.min(minCurrent, point.x)
+            maxCurrent = Math.max(maxCurrent, point.x)
+            minTime = Math.min(minTime, point.y)
+            maxTime = Math.max(maxTime, point.y)
+        }
+        
+        // Include saved curve in range calculation if visible
+        if (savedCurve.visible && savedCurve.count > 0) {
+            for (let i = 0; i < savedCurve.count; i++) {
+                let point = savedCurve.at(i)
+                minCurrent = Math.min(minCurrent, point.x)
+                maxCurrent = Math.max(maxCurrent, point.x)
+                minTime = Math.min(minTime, point.y)
+                maxTime = Math.max(maxTime, point.y)
+            }
+        }
+        
+        // Add margins to the ranges (10% on each side)
+        const currentMargin = (maxCurrent - minCurrent) * 0.1
+        const timeMargin = (maxTime - minTime) * 0.1
+        
+        // Set the new axis ranges with some limits to avoid extreme values
+        currentAxis.min = Math.max(minCurrent * 0.9, 10)
+        currentAxis.max = Math.min(maxCurrent * 1.1, 10000)
+        timeAxis.min = Math.max(minTime * 0.9, 0.01)
+        timeAxis.max = Math.min(maxTime * 1.1, 100)
     }
 }

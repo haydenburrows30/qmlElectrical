@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -16,14 +15,13 @@ Item {
     id: root
 
     property var calculator
-
     property bool calculatorReady: calculator !== null
-    
+
     Component.onCompleted: {
         // Create the calculator instance when component is loaded
         calculator = Qt.createQmlObject('import QtQuick; import TransformerLine 1.0; TransformerLineCalculator {}', root, "dynamicCalculator");
     }
-    
+
     function safeValue(value, defaultVal) {
         if (value === undefined || value === null) {
             return defaultVal;
@@ -37,13 +35,23 @@ Item {
     }
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        widthFactor: 0.5
+        heightFactor: 0.8
+        parentCard: topHeader
         popupText: "<b>Protection Settings Notes:</b><br>" +
                             "• Relay pickup is set at 120% of transformer rated current<br>" +
                             "• CT ratio is selected based on the pickup current<br>" +
                             "• Very Inverse curve is recommended for transformer protection<br>" +
                             "• Time dial setting depends on coordination with upstream and downstream devices<br>" +
                             "• Actual settings should be confirmed with a coordination study<br><br>" +
+                            "<b>Transformer X/R Ratio Notes:</b><br>" +
+                            "• X/R ratio is the ratio of transformer reactance to resistance<br>" +
+                            "• Typical values range from 3-15 depending on transformer size<br>" +
+                            "• Higher X/R ratios are common in larger transformers<br>" +
+                            "• Affects fault current asymmetry and DC offset<br>" +
+                            "• Higher X/R ratio means slower DC offset decay<br>" +
+                            "• Important for circuit breaker interruption capacity<br><br>" +
                             "<b>Recommended Additional Protection:</b><br>" +
                             "• Differential protection for transformer > 5 MVA<br>" +
                             "• Earth fault protection (typically 10-20% of CT primary rating)<br>" +
@@ -62,6 +70,27 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.centerIn: parent
+
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Transformer Line Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
+
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
        
         TransformerLineViz {}
 
@@ -77,8 +106,6 @@ Item {
                     Layout.fillWidth: true
                     Layout.minimumHeight: 180
 
-                    showSettings: true
-                    
                     GridLayout {
                         columns: 2
                         
@@ -372,6 +399,7 @@ Item {
                         
                         Label { text: "Relay Pickup Current (A):" ; Layout.minimumWidth: 200}
                         TextFieldBlue {
+                            id: relayPickupCurrentText
                             Layout.minimumWidth: 150
                             text: calculatorReady ? safeValue(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
                         }
@@ -401,6 +429,8 @@ Item {
 
     Connections {
         target: calculator
+        // Changed from 'function onCalculationCompleted()' to 'function calculationCompleted()'
+        // to properly connect to the signal named 'calculationCompleted'
         function calculationCompleted() {
             if (calculatorReady) {
                 transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)

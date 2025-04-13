@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls.Universal
 
+import "../style"
+
 Item {
     id: root
     

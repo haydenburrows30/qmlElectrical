@@ -2,6 +2,7 @@ from PySide6.QtCore import QObject, Property, Signal, Slot
 import os
 import sqlite3
 import json
+import math
 
 class ProtectionRelayCalculator(QObject):
     """Protection relay calculator and database interface."""
@@ -11,8 +12,8 @@ class ProtectionRelayCalculator(QObject):
     curveTypeChanged = Signal()
     faultCurrentChanged = Signal()
     calculationsComplete = Signal()
-    curveTypesChanged = Signal()  # Add new signal
-    deviceTypesChanged = Signal()  # Add new signal
+    curveTypesChanged = Signal()
+    deviceTypesChanged = Signal()
     savedSettingsChanged = Signal()
     savedCurveReady = Signal(list)
 
@@ -203,6 +204,7 @@ class ProtectionRelayCalculator(QObject):
                 conn.close()
 
     def _calculate(self):
+        """Calculate operating time for relay with improved logarithmic curve generation."""
         if self._pickup_current <= 0:
             return
             
@@ -212,21 +214,30 @@ class ProtectionRelayCalculator(QObject):
         
         # Calculate operating time for fault current
         M = self._fault_current / self._pickup_current
-        if M > 1:
-            self._operating_time = (constants["a"] * self._time_dial) / ((M ** constants["b"]) - 1)
-        else:
-            self._operating_time = float('inf')
-            
-        # Generate curve points with more resolution
-        self._curve_points = []
-        current = self._pickup_current * 1.1  # Start just above pickup
         
-        while current <= 10000:
+        # Improved handling of edge cases
+        if M <= 1:
+            self._operating_time = float('inf')  # No trip for M <= 1
+        else:
+            self._operating_time = (constants["a"] * self._time_dial) / ((M ** constants["b"]) - 1)
+            
+        # Generate curve points with improved logarithmic resolution
+        self._curve_points = []
+        
+        # Use logarithmic scale for better curve representation
+        start = math.log10(1.1)  # Start at 1.1x pickup
+        end = math.log10(50)     # End at 50x pickup
+        
+        # Generate 20 points distributed logarithmically
+        for i in range(20):
+            log_current = start + (end - start) * i / 19
+            current = 10 ** log_current * self._pickup_current
+            
             m = current / self._pickup_current
             if m > 1:
                 t = (constants["a"] * self._time_dial) / ((m ** constants["b"]) - 1)
-                self._curve_points.append({"current": current, "time": t})
-            current *= 1.1  # Logarithmic steps
+                if t < 100:  # Limit to reasonable time values
+                    self._curve_points.append({"current": current, "time": t})
         
         self.calculationsComplete.emit()
 
@@ -351,34 +362,46 @@ class ProtectionRelayCalculator(QObject):
 
     @Slot(int)
     def loadSavedCurve(self, index):
-        """Load saved curve for comparison."""
+        """Load saved curve for comparison with improved error handling and curve generation."""
         if 0 <= index < len(self._saved_settings):
             settings = self._saved_settings[index]
             
             try:
-                # Try to parse values with proper error handling
-                pickup = float(settings.get('rating', 0)) or 1.0  # Default to 1.0 if missing or invalid
+                # Parse values with proper error handling
+                pickup = float(settings.get('rating', '1.0')) if settings.get('rating') else 1.0
                 
                 # Handle empty or invalid timeDial
                 td_value = settings.get('timeDial', '')
-                td = float(td_value) if td_value and td_value.strip() else 0.5  # Default to 0.5
+                td = 0.5  # Default
+                try:
+                    if td_value and str(td_value).strip():
+                        td = float(td_value)
+                except ValueError:
+                    pass  # Use default
                 
                 curve_type = settings.get('curveType', "IEC Standard Inverse")
                 
-                # Get curve constants for the specified type
+                # Get curve constants
                 constants = self._curve_constants.get(curve_type, 
                                               self._curve_constants["IEC Standard Inverse"])
                 
-                # Generate curve points
+                # Generate curve points with improved resolution
                 curve_points = []
-                current = pickup * 1.1  # Start just above pickup
                 
-                while current <= 10000:
+                # Use logarithmic scale for better curve representation
+                start = math.log10(1.1)  # Start at 1.1x pickup
+                end = math.log10(50)    # End at 50x pickup
+                
+                # Generate 20 points distributed logarithmically
+                for i in range(20):
+                    log_current = start + (end - start) * i / 19
+                    current = 10 ** log_current * pickup
+                    
                     m = current / pickup
                     if m > 1:
                         t = (constants["a"] * td) / ((m ** constants["b"]) - 1)
-                        curve_points.append({"current": current, "time": t})
-                    current *= 1.1  # Logarithmic steps
+                        if t < 100:  # Limit to reasonable time values
+                            curve_points.append({"current": current, "time": t})
                 
                 # Emit signal with the curve points
                 self.savedCurveReady.emit(curve_points)
@@ -534,7 +557,7 @@ class ProtectionRelayCalculator(QObject):
     # Add capability to calculate fault current based on circuit parameters
     @Slot(float, float, float, result=float)
     def calculateFaultCurrent(self, voltage, length, cable_size):
-        """Calculate fault current based on circuit parameters.
+        """Calculate fault current based on circuit parameters with improved accuracy.
         
         Args:
             voltage: Supply voltage in volts
@@ -544,7 +567,7 @@ class ProtectionRelayCalculator(QObject):
         Returns:
             Estimated fault current in amps
         """
-        # Approximate resistance per meter (ohm/m) based on cable size
+        # Resistance per meter (ohm/m) based on cable size
         resistivity = {
             1.5: 0.0183,
             2.5: 0.0109,
@@ -560,13 +583,44 @@ class ProtectionRelayCalculator(QObject):
             120: 0.000229
         }
         
-        # Calculate circuit resistance (simple model)
-        r_cable = resistivity.get(cable_size, 0.01) * length * 2  # Go and return path
-        r_source = 0.05  # Approximate source impedance in ohms
+        # Reactance per meter (approximate values for copper cables)
+        reactance = {
+            1.5: 0.000115,
+            2.5: 0.000109,
+            4: 0.000107,
+            6: 0.000102,
+            10: 0.000098,
+            16: 0.000094,
+            25: 0.000092,
+            35: 0.000089,
+            50: 0.000088,
+            70: 0.000086,
+            95: 0.000085,
+            120: 0.000084
+        }
         
-        # Calculate fault current using Ohm's law (V=IR)
-        total_r = r_cable + r_source
-        fault_current = voltage / total_r if total_r > 0 else float('inf')
+        # Get values with fallback defaults
+        r_per_m = resistivity.get(cable_size, 0.01)
+        x_per_m = reactance.get(cable_size, 0.0001)
+        
+        # Calculate cable impedance (go and return path)
+        r_cable = r_per_m * length * 2
+        x_cable = x_per_m * length * 2
+        
+        # Source impedance (typical LV transformer and network)
+        r_source = 0.03
+        x_source = 0.04
+        
+        # Total circuit impedance (using complex impedance)
+        r_total = r_cable + r_source
+        x_total = x_cable + x_source
+        z_total = (r_total**2 + x_total**2)**0.5
+        
+        # Calculate fault current using Ohm's law
+        if z_total > 0:
+            fault_current = voltage / z_total
+        else:
+            fault_current = float('inf')
         
         return fault_current
 

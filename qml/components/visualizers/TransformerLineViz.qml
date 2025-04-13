@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
 import "../"
+import "../style"
 
 WaveCard {
     title: "Single-Line Diagram"
