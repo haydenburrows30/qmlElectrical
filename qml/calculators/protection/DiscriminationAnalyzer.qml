@@ -55,7 +55,7 @@ Item {
                     Layout.leftMargin: 5
 
                     Label {
-                        text: "Impedance Calculator"
+                        text: "Discrimination Analysis"
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true

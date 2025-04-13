@@ -123,7 +123,7 @@ Item {
                     Layout.leftMargin: 5
 
                     Label {
-                        text: "Battery Calculator"
+                        text: "Instrument Transformer Calculator"
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
