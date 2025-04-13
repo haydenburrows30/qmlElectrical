@@ -258,8 +258,8 @@ class ThreePhaseSineWaveModel(QObject):
         va = self._rms_a * np.exp(1j * np.radians(self._phase_angle_a))
         vb = self._rms_b * np.exp(1j * np.radians(self._phase_angle_b))
         vc = self._rms_c * np.exp(1j * np.radians(self._phase_angle_c))
-        # Calculate positive sequence: (Va + aVb + a²Vc)/3
-        return abs((va + a * vb + (a * a) * vc) / 3)
+        # Calculate positive sequence: (Va + a*Vb + a²*Vc)/3
+        return abs((va + a * vb + (a**2) * vc) / 3)
 
     @Property(float, notify=dataChanged)
     def negativeSeq(self):
@@ -270,7 +270,7 @@ class ThreePhaseSineWaveModel(QObject):
         vb = self._rms_b * np.exp(1j * np.radians(self._phase_angle_b))
         vc = self._rms_c * np.exp(1j * np.radians(self._phase_angle_c))
         # Calculate negative sequence: (Va + a²Vb + aVc)/3
-        return abs((va + (a * a) * vb + a * vc) / 3)
+        return abs((va + (a**2) * vb + a * vc) / 3)
 
     @Property(float, notify=dataChanged)
     def zeroSeq(self):
@@ -290,19 +290,33 @@ class ThreePhaseSineWaveModel(QObject):
     def activePower(self):
         """Calculate total active power (P = VI cos(φ)) in kW
         φ is the angle between voltage and current"""
+        # For three-phase, P = √3 * VL * IL * cos(φ) for balanced systems
+        # For unbalanced, sum individual phase powers
         power_a = self._rms_a * self._currentA * np.cos(np.radians(self._current_angle_a - self._phase_angle_a))
         power_b = self._rms_b * self._currentB * np.cos(np.radians(self._current_angle_b - self._phase_angle_b))
         power_c = self._rms_c * self._currentC * np.cos(np.radians(self._current_angle_c - self._phase_angle_c))
-        return (power_a + power_b + power_c) / 1000.0
+        return (power_a + power_b + power_c) / 1000.0  # Convert to kW
 
     @Property(float, notify=dataChanged)
     def reactivePower(self):
         """Calculate total reactive power (Q = VI sin(φ)) in kVAR
         φ is the angle between voltage and current"""
+        # For three-phase, Q = √3 * VL * IL * sin(φ) for balanced systems
+        # For unbalanced, sum individual phase reactive powers
         power_a = self._rms_a * self._currentA * np.sin(np.radians(self._current_angle_a - self._phase_angle_a))
         power_b = self._rms_b * self._currentB * np.sin(np.radians(self._current_angle_b - self._phase_angle_b))
         power_c = self._rms_c * self._currentC * np.sin(np.radians(self._current_angle_c - self._phase_angle_c))
-        return (power_a + power_b + power_c) / 1000.0
+        return (power_a + power_b + power_c) / 1000.0  # Convert to kVAR
+
+    @Property(float, notify=dataChanged)
+    def apparentPower(self):
+        """Calculate total apparent power (S = VI) in kVA"""
+        # For three-phase, S = √3 * VL * IL for balanced systems
+        # For unbalanced, S = √(P² + Q²)
+        power_a = self._rms_a * self._currentA
+        power_b = self._rms_b * self._currentB
+        power_c = self._rms_c * self._currentC
+        return (power_a + power_b + power_c) / 1000.0  # Convert to kVA
 
     @Property(float, notify=dataChanged)
     def thd(self):
@@ -402,35 +416,6 @@ class ThreePhaseSineWaveModel(QObject):
             self.update_wave()
 
     @Property(float, notify=dataChanged)
-    def apparentPower(self):
-        """Calculate total apparent power (S = VI) in kVA"""
-        power_a = self._rms_a * self._currentA
-        power_b = self._rms_b * self._currentB
-        power_c = self._rms_c * self._currentC
-        return (power_a + power_b + power_c) / 1000.0
-
-    @Slot(float)
-    def setCurrentA(self, current):
-        if self._currentA != current:
-            self._currentA = current
-            self._cache_key = None
-            self.update_wave()
-
-    @Slot(float)
-    def setCurrentB(self, current):
-        if self._currentB != current:
-            self._currentB = current
-            self._cache_key = None
-            self.update_wave()
-
-    @Slot(float)
-    def setCurrentC(self, current):
-        if self._currentC != current:
-            self._currentC = current
-            self._cache_key = None
-            self.update_wave()
-
-    @Property(float, notify=dataChanged)
     def currentA(self):
         return self._currentA
 
@@ -461,7 +446,8 @@ class ThreePhaseSineWaveModel(QObject):
         ia = self._currentA * np.exp(1j * np.radians(self._current_angle_a))
         ib = self._currentB * np.exp(1j * np.radians(self._current_angle_b))
         ic = self._currentC * np.exp(1j * np.radians(self._current_angle_c))
-        return abs((ia + ib * a + ic * (a * a)) / 3)
+        # Positive sequence: (Ia + a*Ib + a²*Ic)/3
+        return abs((ia + a * ib + (a**2) * ic) / 3)
 
     @Property(float, notify=dataChanged)
     def negativeSeqCurrent(self):
@@ -470,7 +456,8 @@ class ThreePhaseSineWaveModel(QObject):
         ia = self._currentA * np.exp(1j * np.radians(self._current_angle_a))
         ib = self._currentB * np.exp(1j * np.radians(self._current_angle_b))
         ic = self._currentC * np.exp(1j * np.radians(self._current_angle_c))
-        return abs((ia + ib * (a * a) + ic * a) / 3)
+        # Negative sequence: (Ia + a²*Ib + a*Ic)/3
+        return abs((ia + (a**2) * ib + a * ic) / 3)
 
     @Property(float, notify=dataChanged)
     def zeroSeqCurrent(self):

@@ -218,14 +218,28 @@ Page {
                                         id: frequencySlider
                                         from: 1
                                         to: 100
-                                        value: 50
+                                        value: calculator.resonantFreq > 0 ? calculator.resonantFreq : 50
                                         stepSize: 1
                                         Layout.fillWidth: true
+                                        
+                                        // Add highlight for resonant frequency
+                                        Rectangle {
+                                            width: 4
+                                            height: parent.height
+                                            color: "orange"
+                                            opacity: 0.8
+                                            x: ((calculator.resonantFreq - frequencySlider.from) / 
+                                               (frequencySlider.to - frequencySlider.from)) * parent.width
+                                            visible: calculator.resonantFreq >= frequencySlider.from && 
+                                                     calculator.resonantFreq <= frequencySlider.to
+                                        }
                                     }
 
                                     Label {
                                         text: frequencySlider.value.toFixed(1) + " Hz"
                                         Layout.preferredWidth: 80
+                                        color: Math.abs(frequencySlider.value - calculator.resonantFreq) < 2 ? 
+                                               "orange" : (window.modeToggled ? "#ffffff" : "#000000")
                                     }
                                 }
 
@@ -610,5 +624,8 @@ Page {
             + "The resonant frequency and quality factor (Q) are also calculated based on the circuit parameters. "
             + "The circuit response is displayed in a chart showing the gain or impedance vs. frequency. "
             + "The phase vector diagram shows the phase angle of the impedance and the current in the circuit. "
+            + "<br><br><b>Enhanced with complex number calculations:</b> This simulation uses complex "
+            + "mathematics to accurately model the phase relationships between voltage and current "
+            + "components in the circuit."
     }
 }

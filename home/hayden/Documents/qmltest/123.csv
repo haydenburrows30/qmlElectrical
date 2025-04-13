@@ -1,0 +1,12 @@
+Motor Starting Calculator Results
+Motor Type,Induction Motor
+Motor Power (kW),2.2
+Voltage (V),400.0
+Efficiency,0.9
+Power Factor,0.85
+Starting Method,DOL
+Full Load Current (A),4.15
+Starting Current (A),24.91
+Starting Current Multiplier,6.00
+Nominal Torque (Nm),14.01
+Starting Torque (% FLT),100.0

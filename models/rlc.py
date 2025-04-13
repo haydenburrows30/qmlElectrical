@@ -128,24 +128,37 @@ class RLCChart(QObject):
                 frequencies = np.concatenate([f1, f2, f3])
                 omega = 2 * np.pi * frequencies
                 
-                # Calculate impedance components and gain based on circuit mode
+                # Calculate impedance components and gain based on circuit mode using complex numbers
                 if self._circuit_mode == self.SERIES_MODE:
-                    # Series RLC
-                    z_r = np.full_like(omega, self._resistance)
-                    z_l = omega * self._inductance
-                    z_c = 1 / (omega * self._capacitance)
-                    z_total = np.sqrt(z_r**2 + (z_l - z_c)**2)
-                    gain = 1 / z_total
-                    # Calculate series Q factor at resonance
+                    # Series RLC - using complex impedances
+                    z_r = self._resistance  # Resistor impedance is real
+                    z_l = 1j * omega * self._inductance  # Inductor impedance is imaginary
+                    z_c = 1.0 / (1j * omega * self._capacitance)  # Capacitor impedance is imaginary
+                    
+                    # Total impedance for series is sum of impedances
+                    z_total = z_r + z_l + z_c
+                    
+                    # Gain is 1/|Z| - magnitude of complex number
+                    gain = 1.0 / np.abs(z_total)
+                    
+                    # Calculate series Q factor at resonance - formula is correct
                     self._quality_factor = (1.0 / self._resistance) * np.sqrt(self._inductance / self._capacitance)
                 else:
-                    # Parallel RLC
-                    y_r = 1.0 / np.full_like(omega, self._resistance)
-                    y_l = 1.0 / (omega * self._inductance)
-                    y_c = omega * self._capacitance
-                    y_total = np.sqrt(y_r**2 + (y_l - y_c)**2)
-                    gain = 1 / y_total
-                    # Calculate parallel Q factor at resonance
+                    # Parallel RLC - using complex admittances
+                    y_r = 1.0 / self._resistance  # Resistor admittance is real
+                    y_l = 1.0 / (1j * omega * self._inductance)  # Inductor admittance
+                    y_c = 1j * omega * self._capacitance  # Capacitor admittance
+                    
+                    # Total admittance for parallel is sum of admittances
+                    y_total = y_r + y_l + y_c
+                    
+                    # Total impedance is 1/Y
+                    z_total = 1.0 / y_total
+                    
+                    # Gain for parallel circuit (still 1/|Z|)
+                    gain = 1.0 / np.abs(z_total)
+                    
+                    # Calculate parallel Q factor at resonance - formula is correct
                     self._quality_factor = self._resistance * np.sqrt(self._capacitance / self._inductance)
                 
                 # Create data points

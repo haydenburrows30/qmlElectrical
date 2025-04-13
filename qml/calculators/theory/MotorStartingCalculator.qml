@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+import QtQuick.Dialogs
+import Qt.labs.platform as Platform  // Add this for StandardPaths
 
 import "../../components"
 import "../../components/buttons"
@@ -20,7 +22,8 @@ Item {
                                  parseFloat(motorPower.text) > 0 &&
                                  parseFloat(motorVoltage.text) > 0 &&
                                  parseFloat(motorEfficiency.text) > 0 &&
-                                 parseFloat(motorPowerFactor.text) > 0
+                                 parseFloat(motorPowerFactor.text) > 0 &&
+                                 calculator.isMethodApplicable(startingMethod.currentText)
     
     function getStartingMultiplier() {
         return calculator ? calculator.startingMultiplier : 7.0
@@ -35,7 +38,6 @@ Item {
         function onMotorTypeChanged() {
             motorEfficiency.text = (calculator.efficiency * 100).toFixed(0)
             motorPowerFactor.text = calculator.powerFactor.toFixed(2)
-
             updateMethodAvailability()
         }
     }
@@ -105,6 +107,40 @@ Item {
         }
     }
 
+
+    // Add file dialog for exporting results
+    FileDialog {
+        id: fileDialog
+        title: "Export Results"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV files (*.csv)"]
+        defaultSuffix: "csv"
+        currentFolder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
+        
+        onAccepted: {
+            // Convert the URL to a local file path and ensure it has the .csv extension
+            let filePath = fileDialog.selectedFile.toString()
+            
+            // Remove the "file://" prefix if present
+            if (filePath.startsWith("file://")) {
+                filePath = filePath.substring(7)
+            }
+            
+            // Add .csv extension if not present
+            if (!filePath.toLowerCase().endsWith(".csv")) {
+                filePath += ".csv"
+            }
+            
+            console.log("Attempting to save to:", filePath)
+            
+            if (calculator.exportResults(filePath)) {
+                showMessage("Export Successful", "Results have been exported to: " + filePath)
+            } else {
+                showMessage("Export Failed", "An error occurred while exporting results to: " + filePath)
+            }
+        }
+    }
+
     // Main layout
     ColumnLayout {
         anchors.fill: parent
@@ -129,15 +165,23 @@ Item {
                 ToolTip.text: "Help"
                 onClicked: popUpText.open()
             }
+            
+            // Add export button next to help button
+            StyledButton {
+                id: exportButton
+                icon.source: "../../../icons/rounded/download.svg"
+                ToolTip.text: "Export Results"
+                enabled: hasValidInputs && calculator.startingCurrent > 0
+                onClicked: fileDialog.open()
+            }
         }
 
         RowLayout {
-
             // Inputs
             WaveCard {
                 id: results
                 title: "Motor Parameters"
-                Layout.minimumHeight: 330
+                Layout.minimumHeight: 360
                 Layout.minimumWidth: 410
             
                 GridLayout {
@@ -231,6 +275,33 @@ Item {
                         Layout.preferredWidth: 200
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0 ; top: 1.0 }
+                    }
+
+                    // Add motor speed selection
+                    Label {
+                        text: "Motor Speed:"
+                        Layout.preferredWidth: 150
+                    }
+
+                    RowLayout {
+                        Layout.preferredWidth: 200
+                        
+                        ComboBoxRound {
+                            id: motorSpeed
+                            model: ["1500 RPM (4 Pole 50Hz)", "3000 RPM (2 Pole 50Hz)", 
+                                    "1000 RPM (6 Pole 50Hz)", "750 RPM (8 Pole 50Hz)"]
+                            Layout.fillWidth: true
+                            
+                            Component.onCompleted: currentIndex = 0
+                            
+                            onCurrentTextChanged: {
+                                if (currentText) {
+                                    // Extract RPM value from the text
+                                    let rpm = parseInt(currentText.match(/\d+/)[0])
+                                    calculator.setMotorSpeed(rpm)
+                                }
+                            }
+                        }
                     }
                     
                     Label {
@@ -361,9 +432,18 @@ Item {
                     }
                     
                     TextFieldBlue {
-                        text: !isNaN(calculator.startingTorque) ? 
-                                (calculator.startingTorque / (calculator.startingTorque * 100 / 100)).toFixed(1) + " Nm" : "0.0 Nm"
+                        text: !isNaN(calculator.nominalTorque) ? 
+                                calculator.nominalTorque.toFixed(1) + " Nm" : "0.0 Nm"
                         Layout.fillWidth: true
+                    }
+                    
+                    Label {
+                        visible: !calculator.isMethodApplicable(startingMethod.currentText)
+                        text: "⚠️ Selected starting method is not recommended for this motor type"
+                        color: "orange"
+                        Layout.columnSpan: 2
+                        Layout.fillWidth: true
+                        wrapMode: Text.Wrap
                     }
                 }
             }

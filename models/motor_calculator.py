@@ -16,6 +16,7 @@ class MotorCalculator(QObject):
     startingMultiplierChanged = Signal()
     nominalTorqueChanged = Signal()
     motorTypeChanged = Signal()
+    motorSpeedChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -30,6 +31,7 @@ class MotorCalculator(QObject):
         self._nominal_torque = 0.0
         self._full_load_current = 0.0
         self._starting_methods = ["DOL", "Star-Delta", "Soft Starter", "VFD"]
+        self._debug = False
         
         # Motor types
         self._motor_type = "Induction Motor"
@@ -164,6 +166,11 @@ class MotorCalculator(QObject):
     def _calculate(self):
         """Calculate starting current and torque based on inputs"""
         try:
+            # Input validation
+            if self._motor_power <= 0 or self._voltage <= 0 or self._efficiency <= 0 or self._power_factor <= 0:
+                print("Invalid input parameters detected")
+                return
+                
             # Convert motor power to VA
             motor_va = self._motor_power * 1000 / (self._efficiency * self._power_factor)
             
@@ -179,15 +186,28 @@ class MotorCalculator(QObject):
             
             # Get torque multiplier for the current motor type and starting method
             torque_multiplier = self._torque_multipliers.get(self._motor_type, {}).get(self._starting_method, 1.0)
-            self._starting_torque = self._nominal_torque * torque_multiplier / self._nominal_torque if self._nominal_torque > 0 else 0
+            # Store the torque multiplier directly (since QML displays it as percentage)
+            self._starting_torque = torque_multiplier
             
             # Emit signals for UI update
             self.startingCurrentChanged.emit()
             self.startingTorqueChanged.emit()
             self.nominalTorqueChanged.emit()
             self.resultsCalculated.emit()
+        except ZeroDivisionError as e:
+            print(f"Division by zero error: {e}")
+            # Clear results to avoid displaying incorrect values
+            self._full_load_current = 0.0
+            self._starting_current = 0.0
+            self._nominal_torque = 0.0
+            self._starting_torque = 0.0
         except Exception as e:
             print(f"Error in calculation: {e}")
+            # Initialize values to avoid undefined states
+            self._full_load_current = 0.0
+            self._starting_current = 0.0
+            self._nominal_torque = 0.0
+            self._starting_torque = 0.0
 
     # Property getters and setters
     @Property(float, notify=motorPowerChanged)
@@ -303,6 +323,17 @@ class MotorCalculator(QObject):
             self.startingMultiplierChanged.emit()
             self._calculate()
     
+    @Property(int, notify=motorSpeedChanged)
+    def motorSpeed(self):
+        return self._motor_speed
+    
+    @motorSpeed.setter
+    def motorSpeed(self, value):
+        if self._motor_speed != value and value > 0:
+            self._motor_speed = value
+            self.motorSpeedChanged.emit()
+            self._calculate()
+            
     @Property(list)
     def motorTypes(self):
         return self._motor_types
@@ -310,6 +341,7 @@ class MotorCalculator(QObject):
     @Property(str)
     def motorDescription(self):
         return self._motor_characteristics.get(self._motor_type, {}).get("description", "")
+        
     # QML slots
     @Slot(float)
     def setMotorPower(self, power):
@@ -346,3 +378,58 @@ class MotorCalculator(QObject):
         """Check if a starting method is applicable to the current motor type"""
         applicable = self._applicable_methods.get(self._motor_type, ["DOL"])
         return method in applicable
+    
+    @Slot(bool)
+    def setDebug(self, enable):
+        self._debug = enable
+        
+    @Slot(result=dict)
+    def getMotorSpeedOptions(self):
+        """Return the available motor speed options"""
+        return self._motor_speeds
+        
+    @Slot(str, result=bool)
+    def exportResults(self, filePath):
+        """Export the calculation results to a CSV file"""
+        try:
+            # Always print the file path for debugging
+            print(f"Attempting to export to: '{filePath}'")
+            
+            # Handle Qt URL format if it wasn't handled on the QML side
+            if filePath.startswith("file://"):
+                filePath = filePath.replace("file://", "")
+            
+            # Ensure the directory exists
+            import os
+            directory = os.path.dirname(filePath)
+            if directory and not os.path.exists(directory):
+                try:
+                    os.makedirs(directory)
+                    print(f"Created directory: {directory}")
+                except Exception as e:
+                    print(f"Error creating directory: {e}")
+            
+            # Print the absolute path for easier debugging
+            abs_path = os.path.abspath(filePath)
+            print(f"Absolute path: {abs_path}")
+            
+            with open(filePath, 'w') as f:
+                f.write("Motor Starting Calculator Results\n")
+                f.write(f"Motor Type,{self._motor_type}\n")
+                f.write(f"Motor Power (kW),{self._motor_power}\n")
+                f.write(f"Voltage (V),{self._voltage}\n")
+                f.write(f"Efficiency,{self._efficiency}\n")
+                f.write(f"Power Factor,{self._power_factor}\n")
+                f.write(f"Starting Method,{self._starting_method}\n")
+                f.write(f"Full Load Current (A),{self._full_load_current:.2f}\n")
+                f.write(f"Starting Current (A),{self._starting_current:.2f}\n")
+                f.write(f"Starting Current Multiplier,{self.startingMultiplier:.2f}\n")
+                f.write(f"Nominal Torque (Nm),{self._nominal_torque:.2f}\n")
+                f.write(f"Starting Torque (% FLT),{self._starting_torque*100:.1f}\n")
+            
+            # Print success message with the absolute path
+            print(f"Successfully exported to: '{abs_path}'")
+            return True
+        except Exception as e:
+            print(f"Error exporting results: {e}")
+            return False
