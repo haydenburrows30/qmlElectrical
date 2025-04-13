@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -35,7 +34,7 @@ Item {
                 id: results
                 title: "Voltage Drop Calculator"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 250
+                Layout.minimumHeight: 290
 
                 showSettings: true
 
@@ -74,6 +73,14 @@ Item {
                         id: conductorMaterial
                         model: ["Copper", "Aluminum"]
                         onCurrentTextChanged: calculator.conductorMaterial = currentText
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label { text: "System Type:" }
+                    ComboBoxRound {
+                        id: systemTypeCombo
+                        model: ["Single-phase", "Three-phase"]
+                        onCurrentTextChanged: calculator.setSystemType(currentText)
                         Layout.fillWidth: true
                     }
 

@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtQuick.Pdf
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -72,394 +71,414 @@ Item {
             rightMargin : 5
             topMargin : 5
 
-            RowLayout {
+            ColumnLayout {
                 id: mainLayout
                 width: flickableContainer.width - 20
 
-                ColumnLayout {
-                    Layout.maximumWidth: 400
+                // Header with title and help button
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 5
+                    Layout.leftMargin: 5
+
+                    Label {
+                        text: "Transformer Calculator"
+                        font.pixelSize: 20
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
 
                     StyledButton {
-                        text: "IEC 60076 Vector Group"
+                        id: helpButton
+                        icon.source: "../../../icons/rounded/info.svg"
+                        ToolTip.text: "Help"
                         onClicked: pdfPopup.open()
                     }
+                }
+                
 
-                    // Inputs
-                    WaveCard {
-                        title: "Transformer Rating"
-                        Layout.minimumHeight: 180
-                        Layout.fillWidth: true
+                RowLayout {
 
-                        GridLayout {
-                            columns: 2
-                            anchors.fill: parent
-                            uniformCellWidths: true
+                    ColumnLayout {
+                        Layout.maximumWidth: 400
 
-                            Label {
-                                text: "KVA:"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldRound {
-                                id: kvaInput
-                                placeholderText: "Enter KVA"
-                                Layout.fillWidth: true
-                                onTextChanged: {
-                                    if (text) {
-                                        calculator.setApparentPower(parseFloat(text));
-                                    } else {
-                                        calculator.setApparentPower(0);
+                        // Inputs
+                        WaveCard {
+                            title: "Transformer Rating"
+                            Layout.minimumHeight: 180
+                            Layout.fillWidth: true
+
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+                                uniformCellWidths: true
+
+                                Label {
+                                    text: "KVA:"
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldRound {
+                                    id: kvaInput
+                                    placeholderText: "Enter KVA"
+                                    Layout.fillWidth: true
+                                    onTextChanged: {
+                                        if (text) {
+                                            calculator.setApparentPower(parseFloat(text));
+                                        } else {
+                                            calculator.setApparentPower(0);
+                                        }
                                     }
                                 }
-                            }
-                            
-                            Label { text: "Vector Group:" ; Layout.fillWidth: true }
-                            ComboBoxRound {
-                                id: vectorGroupCombo
-                                Layout.fillWidth: true
-                                model: ["Dyn11", "Yyn0", "Dyn1", "Yzn1", "Yd1", "Dd0", "Yy0", 
-                                       "Zyn11", "Dzn0", "Zzn0", "Ynzn11"]
-                                onCurrentTextChanged: {
-                                    calculator.setVectorGroup(currentText)
-                                }
-                                Component.onCompleted: {
-                                    currentIndex = 0 // Default to Dyn11
-                                }
-                            }
-
-                            Label {
-                                text: calculator.vectorGroupDescription
-                                wrapMode: Text.WordWrap
-                                Layout.columnSpan: 2
-                                Layout.fillWidth: true
-                            }
-                        }
-                    }
-                    
-                    // Primary Side
-                    WaveCard {
-                        title: "Primary Side"
-                        Layout.minimumHeight: 140
-                        Layout.fillWidth: true
-
-                        GridLayout {
-                            columns: 2
-                            anchors.fill: parent
-                            uniformCellWidths: true
-
-                            Label { 
-                                text: "Line Voltage (V):"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldRound {
-                                id: primaryVoltage
-                                Layout.fillWidth: true
-                                placeholderText: "Enter line voltage"
-                                onTextChanged: {
-                                    calculator.primaryVoltage = parseFloat(text || "0")
-                                    if (kvaInput.text && text) {
-                                        calculator.setApparentPower(parseFloat(kvaInput.text))
-                                    }
-                                }
-                            }
-
-                            Label { text: "Current (A):" ; Layout.fillWidth: true}
                                 
-                            TextFieldRound {
-                                id: primaryCurrentInput
-                                placeholderText: "Enter current"
-                                Layout.fillWidth: true
-                                visible: parseFloat(kvaInput.text || "0") <= 0
-                                onTextChanged: {
-                                    if (text) {
-                                        calculator.primaryCurrent = parseFloat(text || "0")
+                                Label { text: "Vector Group:" ; Layout.fillWidth: true }
+                                ComboBoxRound {
+                                    id: vectorGroupCombo
+                                    Layout.fillWidth: true
+                                    model: ["Dyn11", "Yyn0", "Dyn1", "Yzn1", "Yd1", "Dd0", "Yy0", 
+                                        "Zyn11", "Dzn0", "Zzn0", "Ynzn11"]
+                                    onCurrentTextChanged: {
+                                        calculator.setVectorGroup(currentText)
+                                    }
+                                    Component.onCompleted: {
+                                        currentIndex = 0 // Default to Dyn11
                                     }
                                 }
-                            }
-                            
-                            Label {
-                                text: calculator.primaryCurrent.toFixed(2)
-                                visible: parseFloat(kvaInput.text || "0") > 0
-                                Layout.fillWidth: true
+
+                                Label {
+                                    text: calculator.vectorGroupDescription
+                                    wrapMode: Text.WordWrap
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                }
                             }
                         }
-                    }
+                        
+                        // Primary Side
+                        WaveCard {
+                            title: "Primary Side"
+                            Layout.minimumHeight: 140
+                            Layout.fillWidth: true
 
-                    // Secondary Side
-                    WaveCard {
-                        title: "Secondary Side"
-                        Layout.minimumHeight: 150
-                        Layout.fillWidth: true
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+                                uniformCellWidths: true
 
-                        GridLayout {
-                            columns: 2
-                            uniformCellWidths: true
-                            anchors.fill: parent
+                                Label { 
+                                    text: "Line Voltage (V):"
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldRound {
+                                    id: primaryVoltage
+                                    Layout.fillWidth: true
+                                    placeholderText: "Enter line voltage"
+                                    onTextChanged: {
+                                        calculator.primaryVoltage = parseFloat(text || "0")
+                                        if (kvaInput.text && text) {
+                                            calculator.setApparentPower(parseFloat(kvaInput.text))
+                                        }
+                                    }
+                                }
 
-                            Label { 
-                                text: "Line Voltage (V):"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldRound {
-                                id: secondaryVoltage
-                                placeholderText: "Enter line voltage"
-                                onTextChanged: {
-                                    var value = text ? parseFloat(text) : 0;
-                                    calculator.secondaryVoltage = value;
-                                    console.log("Setting secondary voltage to: " + value);
+                                Label { text: "Current (A):" ; Layout.fillWidth: true}
                                     
-                                    if (kvaInput.text && text) {
-                                        calculator.setApparentPower(parseFloat(kvaInput.text));
+                                TextFieldRound {
+                                    id: primaryCurrentInput
+                                    placeholderText: "Enter current"
+                                    Layout.fillWidth: true
+                                    visible: parseFloat(kvaInput.text || "0") <= 0
+                                    onTextChanged: {
+                                        if (text) {
+                                            calculator.primaryCurrent = parseFloat(text || "0")
+                                        }
                                     }
                                 }
-                                Layout.fillWidth: true
-                            }
-
-                            Label { text: "Current (A):" ; Layout.fillWidth: true }
-                            TextFieldBlue {
-                                id: secondaryCurrent
-                                text: calculator.secondaryCurrent.toFixed(2)
-                                Layout.fillWidth: true
+                                
+                                Label {
+                                    text: calculator.primaryCurrent.toFixed(2)
+                                    visible: parseFloat(kvaInput.text || "0") > 0
+                                    Layout.fillWidth: true
+                                }
                             }
                         }
-                    }
 
-                    //Impedance
-                    WaveCard {
-                        title: "Impedance & Construction"
-                        Layout.minimumHeight: 350
-                        Layout.fillWidth: true
+                        // Secondary Side
+                        WaveCard {
+                            title: "Secondary Side"
+                            Layout.minimumHeight: 150
+                            Layout.fillWidth: true
 
-                        GridLayout {
-                            columns: 2
-                            anchors.fill: parent
-                            uniformCellWidths: true
+                            GridLayout {
+                                columns: 2
+                                uniformCellWidths: true
+                                anchors.fill: parent
 
-                            Label { 
-                                text: "Impedance (%):" 
-                                Layout.fillWidth: true
+                                Label { 
+                                    text: "Line Voltage (V):"
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldRound {
+                                    id: secondaryVoltage
+                                    placeholderText: "Enter line voltage"
+                                    onTextChanged: {
+                                        var value = text ? parseFloat(text) : 0;
+                                        calculator.secondaryVoltage = value;
+                                        console.log("Setting secondary voltage to: " + value);
+                                        
+                                        if (kvaInput.text && text) {
+                                            calculator.setApparentPower(parseFloat(kvaInput.text));
+                                        }
+                                    }
+                                    Layout.fillWidth: true
+                                }
+
+                                Label { text: "Current (A):" ; Layout.fillWidth: true }
+                                TextFieldBlue {
+                                    id: secondaryCurrent
+                                    text: calculator.secondaryCurrent.toFixed(2)
+                                    Layout.fillWidth: true
+                                }
                             }
-                            TextFieldRound {
-                                id: impedanceInput
-                                placeholderText: "Enter impedance %"
-                                text: calculator.impedancePercent.toFixed(2)
-                                Layout.fillWidth: true
-                                onTextChanged: {
-                                    if (text) {
-                                        calculator.setImpedancePercent(parseFloat(text))
+                        }
+
+                        //Impedance
+                        WaveCard {
+                            title: "Impedance & Construction"
+                            Layout.minimumHeight: 350
+                            Layout.fillWidth: true
+
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+                                uniformCellWidths: true
+
+                                Label { 
+                                    text: "Impedance (%):" 
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldRound {
+                                    id: impedanceInput
+                                    placeholderText: "Enter impedance %"
+                                    text: calculator.impedancePercent.toFixed(2)
+                                    Layout.fillWidth: true
+                                    onTextChanged: {
+                                        if (text) {
+                                            calculator.setImpedancePercent(parseFloat(text))
+                                        }
+                                    }
+
+                                    validator: DoubleValidator {
+                                        bottom: 0.0
+                                        decimals: 2
+                                        notation: DoubleValidator.StandardNotation
+                                    }
+
+                                    Component.onCompleted: {
+                                        text = calculator.impedancePercent.toFixed(2)
                                     }
                                 }
 
-                                validator: DoubleValidator {
-                                    bottom: 0.0
-                                    decimals: 2
-                                    notation: DoubleValidator.StandardNotation
-                                }
-
-                                Component.onCompleted: {
-                                    text = calculator.impedancePercent.toFixed(2)
-                                }
-                            }
-
-                            Label { text: "Cu Losses (W):" ; Layout.fillWidth: true}
-                            TextFieldRound {
-                                id: copperLossesInput
-                                placeholderText: "Enter Cu losses"
-                                Layout.fillWidth: true
-                                onTextChanged: {
-                                    if (text) {
-                                        calculator.setCopperLosses(parseFloat(text))
+                                Label { text: "Cu Losses (W):" ; Layout.fillWidth: true}
+                                TextFieldRound {
+                                    id: copperLossesInput
+                                    placeholderText: "Enter Cu losses"
+                                    Layout.fillWidth: true
+                                    onTextChanged: {
+                                        if (text) {
+                                            calculator.setCopperLosses(parseFloat(text))
+                                        }
+                                    }
+                                    validator: DoubleValidator {
+                                        bottom: 0.0
+                                        decimals: 1
+                                        notation: DoubleValidator.StandardNotation
                                     }
                                 }
-                                validator: DoubleValidator {
-                                    bottom: 0.0
-                                    decimals: 1
-                                    notation: DoubleValidator.StandardNotation
-                                }
-                            }
 
-                            Label { text: "Resistance (%):" ; Layout.fillWidth: true}
-                            TextFieldRound {
-                                id: resistanceInput
-                                Layout.fillWidth: true
-                                placeholderText: "Enter resistance %"
-                                onTextChanged: {
-                                    if (text) {
-                                        calculator.setResistancePercent(parseFloat(text))
+                                Label { text: "Resistance (%):" ; Layout.fillWidth: true}
+                                TextFieldRound {
+                                    id: resistanceInput
+                                    Layout.fillWidth: true
+                                    placeholderText: "Enter resistance %"
+                                    onTextChanged: {
+                                        if (text) {
+                                            calculator.setResistancePercent(parseFloat(text))
+                                        }
+                                    }
+                                    validator: DoubleValidator {
+                                        bottom: 0.0
+                                        decimals: 2
+                                        notation: DoubleValidator.StandardNotation
+                                    }
+                                    Component.onCompleted: {
+                                        text = calculator.resistancePercent.toFixed(2)
                                     }
                                 }
-                                validator: DoubleValidator {
-                                    bottom: 0.0
-                                    decimals: 2
-                                    notation: DoubleValidator.StandardNotation
-                                }
-                                Component.onCompleted: {
-                                    text = calculator.resistancePercent.toFixed(2)
-                                }
-                            }
 
-                            Label { text: "Iron Losses (W):" ; Layout.fillWidth: true}
-                            TextFieldRound {
-                                id: ironLossesInput
-                                placeholderText: "Enter Fe losses"
-                                Layout.fillWidth: true
-                                onTextChanged: {
-                                    if (text) {
-                                        calculator.setIronLosses(parseFloat(text))
+                                Label { text: "Iron Losses (W):" ; Layout.fillWidth: true}
+                                TextFieldRound {
+                                    id: ironLossesInput
+                                    placeholderText: "Enter Fe losses"
+                                    Layout.fillWidth: true
+                                    onTextChanged: {
+                                        if (text) {
+                                            calculator.setIronLosses(parseFloat(text))
+                                        }
                                     }
+                                    ToolTip.text: "Core losses due to hysteresis and eddy currents"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
                                 }
-                                ToolTip.text: "Core losses due to hysteresis and eddy currents"
-                                ToolTip.visible: hovered
-                                ToolTip.delay: 500
-                            }
 
-                            Label { text: "Reactance (%):" ; Layout.fillWidth: true}
-                            TextFieldBlue {
-                                text: calculator.reactancePercent.toFixed(2)
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Reactance (%):" ; Layout.fillWidth: true}
+                                TextFieldBlue {
+                                    text: calculator.reactancePercent.toFixed(2)
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Short-circuit MVA:" ; Layout.fillWidth: true}
-                            TextFieldBlue {
-                                text: calculator.shortCircuitPower.toFixed(2)
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Short-circuit MVA:" ; Layout.fillWidth: true}
+                                TextFieldBlue {
+                                    text: calculator.shortCircuitPower.toFixed(2)
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Voltage Drop (%):" ;Layout.fillWidth: true}
-                                
-                            TextFieldBlue {
-                                id: voltageDrop
-                                text: calculator.voltageDrop.toFixed(2)
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Voltage Drop (%):" ;Layout.fillWidth: true}
+                                    
+                                TextFieldBlue {
+                                    id: voltageDrop
+                                    text: calculator.voltageDrop.toFixed(2)
+                                    Layout.fillWidth: true
+                                }
 
-                            Label { text: "Temperature Rise:" ; Layout.fillWidth: true}
-                            TextFieldBlue {
-                                text: calculator.temperatureRise.toFixed(1) + "°C"
-                                color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
-                                ToolTip.text: "Estimated temperature rise above ambient"
-                                ToolTip.visible: hovered
-                                ToolTip.delay: 500
-                                Layout.fillWidth: true
-                            }
+                                Label { text: "Temperature Rise:" ; Layout.fillWidth: true}
+                                TextFieldBlue {
+                                    text: calculator.temperatureRise.toFixed(1) + "°C"
+                                    color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
+                                    ToolTip.text: "Estimated temperature rise above ambient"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    Layout.fillWidth: true
+                                }
 
-                            Rectangle {
-                                visible: calculator.warnings.length > 0
-                                color: Universal.accent
-                                opacity: 0.1
-                                Layout.columnSpan: 2
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: warningColumn.height + 20
+                                Rectangle {
+                                    visible: calculator.warnings.length > 0
+                                    color: Universal.accent
+                                    opacity: 0.1
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: warningColumn.height + 20
 
-                                ColumnLayout {
-                                    id: warningColumn
-                                    width: parent.width
-                                    anchors.centerIn: parent
+                                    ColumnLayout {
+                                        id: warningColumn
+                                        width: parent.width
+                                        anchors.centerIn: parent
 
-                                    Repeater {
-                                        model: calculator.warnings
-                                        Label {
-                                            text: "⚠️ " + modelData
-                                            color: Universal.accent
-                                            font.pixelSize: 12
-                                            Layout.fillWidth: true
-                                            horizontalAlignment: Text.AlignHCenter
+                                        Repeater {
+                                            model: calculator.warnings
+                                            Label {
+                                                text: "⚠️ " + modelData
+                                                color: Universal.accent
+                                                font.pixelSize: 12
+                                                Layout.fillWidth: true
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Results
-                    WaveCard {
-                        id: results
-                        title: "Results"
-                        Layout.minimumHeight: 380
-                        Layout.fillWidth: true
-                        showSettings: true
+                        // Results
+                        WaveCard {
+                            id: results
+                            title: "Results"
+                            Layout.minimumHeight: 380
+                            Layout.fillWidth: true
+                            showSettings: true
 
-                        GridLayout {
-                            columns: 2
-                            anchors.fill: parent
-                            uniformCellWidths: true
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+                                uniformCellWidths: true
 
-                            Label { 
-                                text: "Turns Ratio:"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldBlue {
-                                Layout.fillWidth: true
-                                text: calculator.turnsRatio.toFixed(1)
-                                ToolTip.text: "Turns ratio"
-                            }
-                            Label { 
-                                text: "Vector-corrected Ratio:"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldBlue { 
-                                text: calculator.correctedRatio.toFixed(1)
-                                ToolTip.text: "Vector-corrected turns ratio"
-                                Layout.fillWidth: true
-                            }
-                            Label { 
-                                text: "Efficiency:"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldBlue { 
-                                text: calculator.efficiency.toFixed(0) + "%"
-                                ToolTip.text: "Efficiency"
-                                Layout.fillWidth: true
-                            }
-                            Label {
-                                text: "Vector Group:"
-                                Layout.fillWidth: true
-                            }
-                            TextFieldBlue {
-                                text: calculator.vectorGroup
-                                ToolTip.text: "Vector Group"
-                                Layout.fillWidth: true
-                            }
-                                
-                            Label {
-                                text: "Common Applications:"
-                                font.bold: true
-                                color: Universal.accent
-                                Layout.fillWidth: true
-                            }
-                            
-                            Repeater {
-                                model: calculator.vectorGroupApplications
-                                delegate: Label {
-                                    text: "• " + modelData
-                                    opacity: 0.9
+                                Label { 
+                                    text: "Turns Ratio:"
                                     Layout.fillWidth: true
-                                    wrapMode: Text.WordWrap
-                                    Layout.columnSpan: 2
+                                }
+                                TextFieldBlue {
+                                    Layout.fillWidth: true
+                                    text: calculator.turnsRatio.toFixed(1)
+                                    ToolTip.text: "Turns ratio"
+                                }
+                                Label { 
+                                    text: "Vector-corrected Ratio:"
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldBlue { 
+                                    text: calculator.correctedRatio.toFixed(1)
+                                    ToolTip.text: "Vector-corrected turns ratio"
+                                    Layout.fillWidth: true
+                                }
+                                Label { 
+                                    text: "Efficiency:"
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldBlue { 
+                                    text: calculator.efficiency.toFixed(0) + "%"
+                                    ToolTip.text: "Efficiency"
+                                    Layout.fillWidth: true
+                                }
+                                Label {
+                                    text: "Vector Group:"
+                                    Layout.fillWidth: true
+                                }
+                                TextFieldBlue {
+                                    text: calculator.vectorGroup
+                                    ToolTip.text: "Vector Group"
+                                    Layout.fillWidth: true
+                                }
+                                    
+                                Label {
+                                    text: "Common Applications:"
+                                    font.bold: true
+                                    color: Universal.accent
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Repeater {
+                                    model: calculator.vectorGroupApplications
+                                    delegate: Label {
+                                        text: "• " + modelData
+                                        opacity: 0.9
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                        Layout.columnSpan: 2
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                WaveCard {
-                    title: "Transformer Visualization"
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
+                    WaveCard {
+                        title: "Transformer Visualization"
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
 
-                    PowerTransformerVisualization {
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        
-                        primaryVoltage: parseFloat(primaryVoltage.text || "0")
-                        primaryCurrent: calculator.primaryCurrent || parseFloat(primaryCurrentInput.text || "0")
-                        secondaryVoltage: parseFloat(secondaryVoltage.text || "0")
-                        secondaryCurrent: calculator.secondaryCurrent
-                        turnsRatio: calculator ? calculator.turnsRatio : 1
-                        correctedRatio: calculator ? calculator.correctedRatio : 1
-                        efficiency: calculator ? calculator.efficiency : 0
-                        vectorGroup: calculator ? calculator.vectorGroup : "Dyn11"
-                        
-                        darkMode: Universal.theme === Universal.Dark
+                        PowerTransformerVisualization {
+                            anchors.fill: parent
+                            anchors.margins: 5
+                            
+                            primaryVoltage: parseFloat(primaryVoltage.text || "0")
+                            primaryCurrent: calculator.primaryCurrent || parseFloat(primaryCurrentInput.text || "0")
+                            secondaryVoltage: parseFloat(secondaryVoltage.text || "0")
+                            secondaryCurrent: calculator.secondaryCurrent
+                            turnsRatio: calculator ? calculator.turnsRatio : 1
+                            correctedRatio: calculator ? calculator.correctedRatio : 1
+                            efficiency: calculator ? calculator.efficiency : 0
+                            vectorGroup: calculator ? calculator.vectorGroup : "Dyn11"
+                            
+                            darkMode: Universal.theme === Universal.Dark
+                        }
                     }
                 }
             }

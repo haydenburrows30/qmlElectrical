@@ -116,7 +116,9 @@ Item {
                         enabled: cablePresets.currentText === "Custom"
                         opacity: enabled ? 1.0 : 0.5
                         placeholderText: "Enter Capacitance"
-                        onTextChanged: calculator.capacitance = parseFloat(text)
+                        validator: DoubleValidator { bottom: 0; decimals: 6 }
+                        color: acceptableInput ? Universal.foreground : "red"
+                        onTextChanged: if (acceptableInput && text) calculator.capacitance = parseFloat(text)
                     }
 
                     Label {
@@ -141,7 +143,9 @@ Item {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         placeholderText: "Enter Length"
-                        onTextChanged: calculator.length = parseFloat(text)
+                        validator: DoubleValidator { bottom: 0; decimals: 3 }
+                        color: acceptableInput ? Universal.foreground : "red"
+                        onTextChanged: if (acceptableInput && text) calculator.length = parseFloat(text)
                     }
 
                     RowLayout {

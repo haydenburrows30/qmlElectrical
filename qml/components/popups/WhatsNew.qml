@@ -7,7 +7,7 @@ Popup {
     anchors.centerIn: Overlay.overlay
 
     width: 600
-    height: 300
+    height: 600
 
     modal: true
     focus: true
@@ -122,6 +122,22 @@ Popup {
             
                 Label {
                     text: "Added Transformer OC calculator with cable 50, 51 50Q calculations"
+                    font.pixelSize: 14
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignLeft
+                }
+
+                Label {
+                    text: "1.1.4"
+                    font.pixelSize: 18
+                    font.bold: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            
+                Label {
+                    text: "Updates for many calculators fixing bugs and improving accurary of" +
+                    " calculations. Added new calculator for CT & VT explaining naming convention"
                     font.pixelSize: 14
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft

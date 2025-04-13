@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -59,6 +58,7 @@ Item {
     }
 
     PopUpText {
+        id: popUpText
         parentCard: results
         popupText: "<h3>Motor Starting Calculator </h3><br>" +
                 "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. <br>" +
@@ -105,10 +105,31 @@ Item {
         }
     }
 
+    // Main layout
     ColumnLayout {
         anchors.fill: parent
-        
         anchors.margins: 10
+
+        // Header with title and help button
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Motor Starting Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
+
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
 
         RowLayout {
 
@@ -118,8 +139,6 @@ Item {
                 title: "Motor Parameters"
                 Layout.minimumHeight: 330
                 Layout.minimumWidth: 410
-
-                showSettings: true
             
                 GridLayout {
                     columns: 2
@@ -351,6 +370,5 @@ Item {
         }
 
         MotorStartingViz {}
-
     }
 }

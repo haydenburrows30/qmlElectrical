@@ -38,6 +38,7 @@ from models.solkor_rf_calculator import SolkorRfCalculator
 from models.vr32_cl7_calculator import VR32CL7Calculator
 from utils.system_resources import SystemResources
 from utils.perf_monitor import PerformanceMonitor
+from models.transformer_naming import TransformerNamingGuide
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -94,5 +95,6 @@ def register_qml_types(engine, current_dir):
         (ConfigBridge, "ConfigBridge", 1, 0, "ConfigBridge"),
         (SolkorRfCalculator, "SolkorRfCalculator", 1, 0, "SolkorRfCalculator"),
         (VR32CL7Calculator, "VR32CL7Calculator", 1, 0, "VR32CL7Calculator"),
-        (OvercurrentProtectionCalculator, "OvercurrentProtectionCalculator", 1, 0, "OvercurrentProtectionCalculator")
+        (OvercurrentProtectionCalculator, "OvercurrentProtectionCalculator", 1, 0, "OvercurrentProtectionCalculator"),
+        (TransformerNamingGuide, "TransformerNamingGuide", 1, 0, "TransformerNamingGuide")
     ]

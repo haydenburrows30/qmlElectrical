@@ -127,22 +127,65 @@ class CableAmpacityCalculator(QObject):
         if self._insulation_type == "PVC":
             self._base_ampacity = self._base_ampacity_pvc_conduit.get(closest_size, [0, 0])[material_index]
             
-            # Get ambient temperature correction factor
-            temps = list(self._ambient_temp_factors_pvc.keys())
-            closest_temp = min(temps, key=lambda x: abs(x - self._ambient_temp))
-            temp_factor = self._ambient_temp_factors_pvc.get(closest_temp, 1.0)
+            # Get ambient temperature correction factor - use exact match or interpolate
+            if self._ambient_temp in self._ambient_temp_factors_pvc:
+                temp_factor = self._ambient_temp_factors_pvc[self._ambient_temp]
+            else:
+                # Find closest temperatures for interpolation
+                temps = sorted(list(self._ambient_temp_factors_pvc.keys()))
+                if self._ambient_temp < temps[0]:
+                    temp_factor = self._ambient_temp_factors_pvc[temps[0]]
+                elif self._ambient_temp > temps[-1]:
+                    temp_factor = self._ambient_temp_factors_pvc[temps[-1]]
+                else:
+                    # Linear interpolation
+                    for i in range(len(temps) - 1):
+                        if temps[i] <= self._ambient_temp <= temps[i + 1]:
+                            t1, t2 = temps[i], temps[i + 1]
+                            f1 = self._ambient_temp_factors_pvc[t1]
+                            f2 = self._ambient_temp_factors_pvc[t2]
+                            temp_factor = f1 + (f2 - f1) * (self._ambient_temp - t1) / (t2 - t1)
+                            break
         else:  # XLPE
             self._base_ampacity = self._base_ampacity_xlpe_conduit.get(closest_size, [0, 0])[material_index]
             
-            # Get ambient temperature correction factor
-            temps = list(self._ambient_temp_factors_xlpe.keys())
-            closest_temp = min(temps, key=lambda x: abs(x - self._ambient_temp))
-            temp_factor = self._ambient_temp_factors_xlpe.get(closest_temp, 1.0)
+            # Get ambient temperature correction factor - use exact match or interpolate
+            if self._ambient_temp in self._ambient_temp_factors_xlpe:
+                temp_factor = self._ambient_temp_factors_xlpe[self._ambient_temp]
+            else:
+                # Find closest temperatures for interpolation
+                temps = sorted(list(self._ambient_temp_factors_xlpe.keys()))
+                if self._ambient_temp < temps[0]:
+                    temp_factor = self._ambient_temp_factors_xlpe[temps[0]]
+                elif self._ambient_temp > temps[-1]:
+                    temp_factor = self._ambient_temp_factors_xlpe[temps[-1]]
+                else:
+                    # Linear interpolation
+                    for i in range(len(temps) - 1):
+                        if temps[i] <= self._ambient_temp <= temps[i + 1]:
+                            t1, t2 = temps[i], temps[i + 1]
+                            f1 = self._ambient_temp_factors_xlpe[t1]
+                            f2 = self._ambient_temp_factors_xlpe[t2]
+                            temp_factor = f1 + (f2 - f1) * (self._ambient_temp - t1) / (t2 - t1)
+                            break
         
-        # Get grouping factor
-        groups = list(self._grouping_factors.keys())
-        closest_group = min(groups, key=lambda x: abs(x - self._grouping_number))
-        grouping_factor = self._grouping_factors.get(closest_group, 0.38)  # Default to worst case
+        # Get grouping factor - use exact match or interpolate between closest values
+        if self._grouping_number in self._grouping_factors:
+            grouping_factor = self._grouping_factors[self._grouping_number]
+        else:
+            groups = sorted(list(self._grouping_factors.keys()))
+            if self._grouping_number > groups[-1]:
+                # Use the factor for the highest number of groups available
+                grouping_factor = self._grouping_factors[groups[-1]]
+            else:
+                # Find the closest values and interpolate
+                for i in range(len(groups) - 1):
+                    if groups[i] < self._grouping_number < groups[i + 1]:
+                        g1, g2 = groups[i], groups[i + 1]
+                        f1 = self._grouping_factors[g1]
+                        f2 = self._grouping_factors[g2]
+                        grouping_factor = f1 + (f2 - f1) * (self._grouping_number - g1) / (g2 - g1)
+                        break
         
         # Get installation method factor
         install_factor = self._install_method_factors.get(self._install_method, 1.0)
@@ -151,16 +194,34 @@ class CableAmpacityCalculator(QObject):
         self._derated_ampacity = self._base_ampacity * temp_factor * grouping_factor * install_factor
         
         # Calculate voltage drop (estimated per 100m at full load)
-        # This is a simplification - in reality depends on power factor, etc.
-        r_per_km = 18.0 / self._cable_size if self._conductor_material == "Copper" else 30.0 / self._cable_size
-        self._voltage_drop_per_100m = self._derated_ampacity * r_per_km * 0.1  # V per 100m
+        # Improved model with resistive and reactive components
+        if self._conductor_material == "Copper":
+            r_per_km = 18.0 / self._cable_size  # ohms/km (approximate)
+            x_per_km = 0.08  # ohms/km (typical reactance for LV cables)
+        else:  # Aluminum
+            r_per_km = 30.0 / self._cable_size  # ohms/km (approximate)
+            x_per_km = 0.08  # ohms/km (typical reactance for LV cables)
         
-        # Calculate economic sizing recommendation
-        econ_current = self._cable_size * self._economic_density.get(self._conductor_material, 4.0)
-        self._economic_recommendation = econ_current
+        # Assume power factor of 0.85 for typical loads
+        pf = 0.85
+        sin_phi = (1 - pf**2) ** 0.5
+        
+        # Voltage drop with both resistance and reactance components
+        # ΔV = I × (R×cosφ + X×sinφ)
+        self._voltage_drop_per_100m = self._derated_ampacity * (r_per_km * pf + x_per_km * sin_phi) * 0.1  # V per 100m (0.1 km)
+        
+        # Calculate economic sizing recommendation based on economic current density
+        self._economic_recommendation = self._cable_size
+        econ_current_density = self._economic_density.get(self._conductor_material, 4.0)
+        
+        # Find the optimal size based on current and economic density
+        for size in sorted(sizes):
+            if size >= (self._derated_ampacity / econ_current_density):
+                self._economic_recommendation = size
+                break
         
         # Calculate recommended size for given current
-        min_size = 1.5
+        self._recommended_size = None
         for size in sorted(sizes):
             if self._insulation_type == "PVC":
                 amp_capacity = self._base_ampacity_pvc_conduit.get(size, [0, 0])[material_index]
@@ -170,10 +231,12 @@ class CableAmpacityCalculator(QObject):
             amp_capacity *= temp_factor * grouping_factor * install_factor
             
             if amp_capacity >= self._derated_ampacity:
-                min_size = size
+                self._recommended_size = size
                 break
-                
-        self._recommended_size = min_size
+        
+        # If no size is adequate, recommend the largest available
+        if self._recommended_size is None:
+            self._recommended_size = sizes[-1]
         
         # Notify QML of changes
         self.calculationsComplete.emit()

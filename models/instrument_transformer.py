@@ -225,11 +225,17 @@ class InstrumentTransformerCalculator(QObject):
                     voltage_factor = 1.0
                 
                 # Adjusted knee point calculation including voltage level effects
-                self._knee_point_voltage = (knee_multiplier * 
-                    self._secondary_current * 
-                    math.sqrt(self._burden_va) * 
-                    base_factor * 
-                    voltage_factor)
+                if self._burden_va > 0:  # Add check to prevent math domain error
+                    self._knee_point_voltage = (knee_multiplier * 
+                        self._secondary_current * 
+                        math.sqrt(self._burden_va) * 
+                        base_factor * 
+                        voltage_factor)
+                else:
+                    self._knee_point_voltage = 0.0
+                
+                # Calculate minimum accuracy burden
+                self._min_accuracy_burden = (self._knee_point_voltage / (20 * self._secondary_current))
                 
                 # Adjust ALF for protection class
                 if self._current_ct_type == "protection":
@@ -238,7 +244,7 @@ class InstrumentTransformerCalculator(QObject):
                         # Fix: Extract the number after P properly
                         try:
                             self._alf = float(self._accuracy_class.split("P")[1])
-                        except ValueError:
+                        except (ValueError, IndexError):
                             # Default ALF if conversion fails
                             self._alf = 20.0
                     else:
@@ -259,31 +265,31 @@ class InstrumentTransformerCalculator(QObject):
             # Calculate error margin considering power factor
             if self._current_ct_type == "protection":
                 # For protection class, extract number after P (e.g., 5P20 -> 5)
-                # Fix: Add proper error handling for extracting protection class value
                 try:
                     if "P" in self._accuracy_class:
                         base_error = float(self._accuracy_class.split('P')[0])
                     else:
                         base_error = 5.0  # Default for protection class
-                except ValueError:
+                except (ValueError, IndexError):
                     base_error = 5.0  # Default if conversion fails
             elif self._current_ct_type == "combined":
                 # For combined class, use measurement part (e.g., 0.5/5P10 -> 0.5)
-                # Fix: Add proper error handling for combined class
                 try:
                     if "/" in self._accuracy_class:
                         base_error = float(self._accuracy_class.split('/')[0])
                     else:
                         base_error = 0.5  # Default for combined class
-                except ValueError:
+                except (ValueError, IndexError):
                     base_error = 0.5  # Default if conversion fails
             else:
-                # Fix: Add proper error handling for measurement class
                 try:
                     base_error = float(self._accuracy_class)
-                except ValueError:
+                except (ValueError, IndexError):
                     base_error = 0.5  # Default for measurement class
                 
+            # Ensure base_error is not zero to prevent calculation issues
+            base_error = max(0.1, base_error)
+            
             pf_compensation = (1 - self._power_factor) * base_error * 0.5
             temp_compensation = self._temperature_effect * 0.5
             self._error_margin = base_error + pf_compensation + temp_compensation
@@ -296,12 +302,20 @@ class InstrumentTransformerCalculator(QObject):
             if self._primary_voltage > 0 and self._secondary_voltage > 0:
                 vt_ratio = self._primary_voltage / self._secondary_voltage
                 
+                # Initialize variables to prevent reference errors
+                self._vt_burden_status = ""
+                self._vt_burden_within_range = False
+                self._vt_burden_utilization = 0.0
+                
                 # Calculate VT rated voltage
                 rated_factor = self._rated_voltage_factors.get(self._rated_voltage_factor, 1.2)
                 self._rated_secondary_voltage = self._secondary_voltage * rated_factor
                 
-                # Calculate VT burden impedance
-                self._vt_impedance = (self._vt_burden / (self._secondary_voltage ** 2)) * 1000  # in ohms
+                # Calculate VT burden impedance (prevent division by zero)
+                if self._secondary_voltage > 0:
+                    self._vt_impedance = (self._vt_burden / (self._secondary_voltage ** 2)) * 1000  # in ohms
+                else:
+                    self._vt_impedance = 0.0
                 
                 # Find recommended burden range and detailed status
                 closest_voltage = min(self._vt_burden_ranges.keys(), 
@@ -318,8 +332,11 @@ class InstrumentTransformerCalculator(QObject):
                     self._vt_burden_status = f"Within range ({burden_range['min']}-{burden_range['max']} VA)"
                     self._vt_burden_within_range = True
                 
-                # Calculate burden utilization percentage
-                self._vt_burden_utilization = (self._vt_burden / burden_range["max"]) * 100
+                # Calculate burden utilization percentage (prevent division by zero)
+                if burden_range["max"] > 0:
+                    self._vt_burden_utilization = (self._vt_burden / burden_range["max"]) * 100
+                else:
+                    self._vt_burden_utilization = 0.0
                 
                 # Adjust existing calculations with VT effects
                 if self._current_ct_type == "protection":
@@ -355,16 +372,16 @@ class InstrumentTransformerCalculator(QObject):
                 
                 # Linear region (below knee point)
                 if v_norm <= self._knee_point_voltage:
-                    i_norm = v_norm / (0.1 * self._secondary_current)
+                    i_norm = v_norm / (0.1 * self._secondary_current) if self._secondary_current > 0 else 0
                 else:
                     # Saturation region (above knee point)
                     # I = k * (V - Vknee)^0.3 + Iknee
                     excess = v_norm - self._knee_point_voltage
-                    i_norm = self._secondary_current + 2 * math.pow(excess / self._knee_point_voltage, 0.3) * self._secondary_current
+                    i_norm = self._secondary_current + 2 * math.pow(excess / max(0.001, self._knee_point_voltage), 0.3) * self._secondary_current
                     
                 curve_points.append({"voltage": v_norm, "current": i_norm})
         return curve_points
-    
+
     def _calculate_harmonics(self):
         """Calculate harmonic content based on CT saturation"""
         # Start with clean signal

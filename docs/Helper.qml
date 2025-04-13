@@ -48,6 +48,7 @@ PopUpText {
         widthFactor: 0.5
         heightFactor: 0.5
     }
+
 // Fonts
 
 icon.source: "../../../icons/rounded/download.svg"
@@ -70,7 +71,7 @@ icon.source: "../../../icons/rounded/play_arrow.svg"
 icon.source: "../../../icons/rounded/show_chart.svg"
 icon.source: "../../../icons/rounded/lightbulb.svg"
 icon.source: "../../../icons/rounded/home_app_logo.svg"
-analytics
+
 FontLoader {
     id: iconFont
     source: "../../../icons/MaterialIcons-Regular.ttf"
@@ -89,42 +90,7 @@ TextFieldBlue {
     ToolTip.delay: 500
 }
 
-// buttons
-
-MessageButton {
-    id: saveButton
-    
-    ToolTip.text: "Add Relay"
-    buttonIcon: '\ue145'
-    buttonColor: Style.blueGreen
-
-    defaultMessage: ""
-    successMessage: "Adding relay:" + relayName.text
-    errorMessage: "Please fill in all relay fields"
-
-    onButtonClicked: {
-
-        startOperation()
-
-        if (!relayName.text || !pickupCurrent.text || !tds.text) {
-            console.log("Please fill all relay fields")
-            operationFailed(2000)
-        } else {
-            console.log("Adding relay:", relayName.text)
-
-            calculator.addRelay({
-                "name": relayName.text,
-                "pickup": parseFloat(pickupCurrent.text),
-                "tds": parseFloat(tds.text),
-                "curve_constants": calculator.getCurveConstants(curveType.currentText)
-                })
-            operationSucceeded(2000)
-        }
-    }
-}
-
-
-
+// imports
 
 import "../../components"
 import "../../components/buttons"
@@ -133,8 +99,10 @@ import "../../components/style"
 import "../../components/visualizers"
 import "../../components/exports"
 import "../../components/charts"
-
 import "../../components/displays"
 
 
+// copilot checks
 
+Are you able to check the calculations in this file please?
+Are there any changes needed to the qml file?

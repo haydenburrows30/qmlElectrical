@@ -36,7 +36,8 @@ Item {
     }
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<h3>Voltage Divider Equation:</h3><br>" +
                     "<b>Vout</b> = Vin × (R2 / (R1 + R2))<br><br>" +
                     "<b>Applications:</b><br>" +
@@ -51,6 +52,28 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
+
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Voltage Divider Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
+
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
         
         RowLayout {
             id: header
@@ -61,8 +84,6 @@ Item {
                 Layout.preferredWidth: 300
                 Layout.minimumHeight: 230
 
-                showSettings: true
-                
                 GridLayout {
                     anchors.fill: parent
                     columns: 2

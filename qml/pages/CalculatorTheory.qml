@@ -22,7 +22,8 @@ Page {
         { name: qsTr("Motor Starting"), source: "../calculators/theory/MotorStartingCalculator.qml", icon: "show_chart" },
         { name: qsTr("RLC"), source: "../calculators/theory/RLC.qml", icon: "general_device" },
         { name: qsTr("Realtime"), source: "../calculators/theory/RealTime.qml", icon: "timeline" },
-        { name: qsTr("Three Phase"), source: "../calculators/theory/ThreePhase.qml", icon: "density_medium" }
+        { name: qsTr("Three Phase"), source: "../calculators/theory/ThreePhase.qml", icon: "density_medium" },
+        { name: qsTr("Instrument Tx Naming"), source: "../calculators/theory/TransformerNamingGuide.qml", icon: "density_medium" }
     ]
 
     ColumnLayout {

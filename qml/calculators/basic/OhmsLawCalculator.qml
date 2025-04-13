@@ -201,9 +201,10 @@ Item {
     }
 
     PopUpText {
+        id: popUpText
         widthFactor: 0.3
         heightFactor: 0.4
-        parentCard: results
+        parentCard: topHeader
         
         popupText: "<h3>Basic Ohm's Law Equations:</h3><br>" +
                 "<h4> Voltage (V): </h4> V = I × R<br>" +
@@ -256,13 +257,35 @@ Item {
     ColumnLayout {
         anchors.centerIn: parent
 
-        StyledButton {
-            text: "View History"
-            icon.source: "../../../icons/rounded/history.svg"
-            onClicked: historyDialog.open()
-            Layout.columnSpan: 2
-            Layout.minimumWidth: 100
-            Layout.alignment: Qt.AlignLeft
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Ohm's Law Calculator"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
+
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+
+            StyledButton {
+                text: "View History"
+                icon.source: "../../../icons/rounded/history.svg"
+                onClicked: historyDialog.open()
+                Layout.columnSpan: 2
+                Layout.minimumWidth: 100
+                Layout.alignment: Qt.AlignLeft
+            }
         }
 
         WaveCard {
@@ -273,8 +296,6 @@ Item {
             Layout.minimumWidth: 450
             Layout.maximumWidth: 450
 
-            showSettings: true
-            
             GridLayout {
                 anchors.fill: parent
                 columns: 4

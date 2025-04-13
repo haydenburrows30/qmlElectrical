@@ -61,6 +61,12 @@ class ChargingCalculator(QObject):
     @Property(float, notify=chargingCurrentChanged)
     def chargingCurrent(self):
         try:
-            return 2 * 3.14159 * self._frequency * self._capacitance * self._voltage * self._length * 0.001
+            # Ic = 2πfCVL where:
+            # f is frequency in Hz
+            # C is capacitance in μF/km
+            # V is voltage in kV
+            # L is length in km
+            # Result is in Amperes
+            return 2 * 3.14159 * self._frequency * self._capacitance * self._voltage * self._length
         except:
             return 0.0

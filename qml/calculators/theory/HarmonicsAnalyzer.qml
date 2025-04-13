@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -49,6 +48,7 @@ Item {
     }
 
     PopUpText {
+        id: popUpText
         parentCard: results
         widthFactor: 0.3
         heightFactor: 0.3
@@ -58,175 +58,197 @@ Item {
                 "You can also export the harmonic data to a CSV file for further analysis."
     }
 
-    RowLayout {
+    ColumnLayout {
+        id: mainLayout
         anchors.fill: parent
 
-        ColumnLayout {
-            Layout.maximumWidth: 400
-            Layout.alignment: Qt.AlignTop
-            
-            WaveCard {
-                id: results
-                title: "Harmonic Components"
-                Layout.fillWidth: true
-                Layout.minimumHeight: 480
-
-                showSettings: true
-
-                ColumnLayout {
-
-                    HarmonicInputMenu {
-                        id: harmonicForm
-                        calculator: harmonicsCard.calculator
-                        Layout.fillWidth: true
-                    }
-
-                    ResultsDisplay {
-                        id: resultsDisplay
-                        calculator: harmonicsCard.calculator
-                        Layout.fillWidth: true
-                        Layout.topMargin: 10
-                    }
-                }
-            }
-            
-            // Export buttons
-            StyledButton {
-                text: "Export Data"
-                icon.source: "../../../icons/rounded/download.svg"
-                Layout.fillWidth: true
-                onClicked: {
-                    calculator.exportData()
-                }
-                ToolTip.text: "Export harmonic data to CSV"
-                ToolTip.visible: exportMouseArea.containsMouse
-                ToolTip.delay: 500
-                
-                MouseArea {
-                    id: exportMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    propagateComposedEvents: true
-                    onPressed: function(mouse) { mouse.accepted = false }
-                }
-            }
-            
-        }
-
-        // Right Panel - Visualizations
-        ColumnLayout {
+        // Header with title and help button
+        RowLayout {
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            
-            // Waveform Chart
-            WaveCard {
-                id: waveformCard
-                title: "Waveform"
-                Layout.fillHeight: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Harmonics Analyzer"
+                font.pixelSize: 20
+                font.bold: true
                 Layout.fillWidth: true
-
-                WaveformVisualizerChart {
-                    id: waveformVisualizer
-                    anchors.fill: parent
-                    calculator: harmonicsCard.calculator
-                    seriesHelper: harmonicsCard.seriesHelper
-                }
-                
-                CheckBox {
-                    id: showLabels
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-                    anchors.margins: 5
-                    text: "Show degree labels"
-                    checked: true
-                    z: 10
-
-                    onCheckedChanged: {
-                        if (waveformVisualizer) {
-                            waveformVisualizer.setLabelsVisible(checked);
-                        }
-                    }
-                }
-                
-                StyledButton {
-                    id: performanceButton
-                    anchors {
-                        right: parent.right
-                        top: parent.top
-                        margins: 0
-                    }
-                    text: "Performance Settings"
-                    onClicked: performancePopup.open()
-                    icon.source: "../../../icons/rounded/speed.svg"
-                }
-
-                CheckBox {
-                    id: fundamentalCheckbox
-                    text: "Show Fundamental"
-                    checked: false
-                    anchors {
-                        right: performanceButton.left
-                        top: parent.top
-                        margins: 0
-                    }
-                    
-                    onCheckedChanged: {
-                        if (waveformVisualizer) {
-                            waveformVisualizer.showFundamental = checked;
-                        }
-                    }
-                }
-
-                PerformancePopup {
-                    id: performancePopup
-                    x: Math.round((parent.width - width) / 2)
-                    y: Math.round((parent.height - height) / 2)
-                }
-
-                CalculationMonitor {
-                    id: calculationMonitor
-                    anchors.fill: parent
-                    calculator: harmonicsCard.calculator
-                    Component.onCompleted: {
-                        if (calculator) {
-                            calculator.enableProfiling(false);
-                        }
-                    }
-                }
             }
 
-            WaveCard {
-                id: harmonicSpectrumCard
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                title: "Harmonic Spectrum"
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
 
-                HarmonicSpectrumChart {
-                    id: harmonicSpectrum
-                    anchors.fill: parent
-                    calculator: harmonicsCard.calculator
-                    showPhaseAngles: showPhaseCheckbox.checked
+        RowLayout {
+
+            ColumnLayout {
+                Layout.maximumWidth: 400
+                Layout.alignment: Qt.AlignTop
+                
+                WaveCard {
+                    id: results
+                    title: "Harmonic Components"
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 480
+
+                    ColumnLayout {
+
+                        HarmonicInputMenu {
+                            id: harmonicForm
+                            calculator: harmonicsCard.calculator
+                            Layout.fillWidth: true
+                        }
+
+                        ResultsDisplay {
+                            id: resultsDisplay
+                            calculator: harmonicsCard.calculator
+                            Layout.fillWidth: true
+                            Layout.topMargin: 10
+                        }
+                    }
                 }
+                
+                // Export buttons
+                StyledButton {
+                    text: "Export Data"
+                    icon.source: "../../../icons/rounded/download.svg"
+                    Layout.fillWidth: true
+                    onClicked: {
+                        calculator.exportData()
+                    }
+                    ToolTip.text: "Export harmonic data to CSV"
+                    ToolTip.visible: exportMouseArea.containsMouse
+                    ToolTip.delay: 500
+                    
+                    MouseArea {
+                        id: exportMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        propagateComposedEvents: true
+                        onPressed: function(mouse) { mouse.accepted = false }
+                    }
+                }
+                
+            }
 
-                CheckBox {
-                    id: showPhaseCheckbox
-                    text: "Show Phase Angles"
-                    checked: false
-                    anchors {
-                        top: parent.top
-                        right: parent.right
-                        margins: 10
+            // Right Panel - Visualizations
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                
+                // Waveform Chart
+                WaveCard {
+                    id: waveformCard
+                    title: "Waveform"
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    WaveformVisualizerChart {
+                        id: waveformVisualizer
+                        anchors.fill: parent
+                        calculator: harmonicsCard.calculator
+                        seriesHelper: harmonicsCard.seriesHelper
                     }
                     
-                    onCheckedChanged: {
-                        if (harmonicSpectrum) {
-                            harmonicSpectrum.showPhaseAngles = checked;
+                    CheckBox {
+                        id: showLabels
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 5
+                        text: "Show degree labels"
+                        checked: true
+                        z: 10
+
+                        onCheckedChanged: {
+                            if (waveformVisualizer) {
+                                waveformVisualizer.setLabelsVisible(checked);
+                            }
+                        }
+                    }
+                    
+                    StyledButton {
+                        id: performanceButton
+                        anchors {
+                            right: parent.right
+                            top: parent.top
+                            margins: 0
+                        }
+                        text: "Performance Settings"
+                        onClicked: performancePopup.open()
+                        icon.source: "../../../icons/rounded/speed.svg"
+                    }
+
+                    CheckBox {
+                        id: fundamentalCheckbox
+                        text: "Show Fundamental"
+                        checked: false
+                        anchors {
+                            right: performanceButton.left
+                            top: parent.top
+                            margins: 0
+                        }
+                        
+                        onCheckedChanged: {
+                            if (waveformVisualizer) {
+                                waveformVisualizer.showFundamental = checked;
+                            }
+                        }
+                    }
+
+                    PerformancePopup {
+                        id: performancePopup
+                        x: Math.round((parent.width - width) / 2)
+                        y: Math.round((parent.height - height) / 2)
+                    }
+
+                    CalculationMonitor {
+                        id: calculationMonitor
+                        anchors.fill: parent
+                        calculator: harmonicsCard.calculator
+                        Component.onCompleted: {
+                            if (calculator) {
+                                calculator.enableProfiling(false);
+                            }
+                        }
+                    }
+                }
+
+                WaveCard {
+                    id: harmonicSpectrumCard
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    title: "Harmonic Spectrum"
+
+                    HarmonicSpectrumChart {
+                        id: harmonicSpectrum
+                        anchors.fill: parent
+                        calculator: harmonicsCard.calculator
+                        showPhaseAngles: showPhaseCheckbox.checked
+                    }
+
+                    CheckBox {
+                        id: showPhaseCheckbox
+                        text: "Show Phase Angles"
+                        checked: false
+                        anchors {
+                            top: parent.top
+                            right: parent.right
+                            margins: 10
+                        }
+                        
+                        onCheckedChanged: {
+                            if (harmonicSpectrum) {
+                                harmonicSpectrum.showPhaseAngles = checked;
+                            }
                         }
                     }
                 }
             }
         }
-
     }
 
     Connections {

@@ -28,6 +28,8 @@ Item {
                     "The calculator provides the knee point voltage, maximum fault current, minimum CT burden, error margin, temperature effect, VT rated voltage, VT impedance, and burden utilization.<br><br>" +
                     "The visualization shows the transformer connections and the current and voltage waveforms.<br><br>" +
                     "Developed by <b>Wave</b>."
+        widthFactor: 0.5
+        heightFactor: 0.5
     }
 
     Popup {
@@ -63,6 +65,35 @@ Item {
                 Layout.alignment: Qt.AlignRight
                 onClicked: errorPopup.close()
             }
+        }
+    }
+
+    Connections {
+        target: calculator
+        
+        function onValidationError(message) {
+            errorPopup.errorMessage = message
+            errorPopup.open()
+        }
+        
+        function onResetCompleted() {
+            // Update UI elements after reset
+            ctBurden.text = calculator.burden.toFixed(1)
+            temperature.text = calculator.temperature.toFixed(1)
+            vtBurden.text = calculator.vtBurden.toFixed(1)
+            
+            // Update comboboxes - find the correct indices
+            let ctTypeIndex = ctType.find(calculator.currentCtType.charAt(0).toUpperCase() + calculator.currentCtType.slice(1))
+            if (ctTypeIndex !== -1) ctType.currentIndex = ctTypeIndex
+            
+            let accClassIndex = accuracyClass.find(calculator.accuracyClass)
+            if (accClassIndex !== -1) accuracyClass.currentIndex = accClassIndex
+            
+            let vtRatioIndex = vtRatio.find(calculator.primaryVoltage + "/" + calculator.secondaryVoltage)
+            if (vtRatioIndex !== -1) vtRatio.currentIndex = vtRatioIndex
+            
+            let ratedVoltageFactorIndex = ratedVoltageFactor.find(calculator.ratedVoltageFactor)
+            if (ratedVoltageFactorIndex !== -1) ratedVoltageFactor.currentIndex = ratedVoltageFactorIndex
         }
     }
 
@@ -164,6 +195,9 @@ Item {
                                 }
                                 Layout.fillWidth: true
                                 inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                ToolTip.text: "Enter burden between 3.0 and 100.0 VA"
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
                             }
 
                             Label { text: "Power Factor:" }
@@ -235,15 +269,17 @@ Item {
                                     validator: RegularExpressionValidator {
                                         regularExpression: /^\d+\/\d+$/
                                     }
+                                    ToolTip.text: "Enter in format: primary/secondary"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
                                 }
 
                                 StyledButton {
                                     Layout.alignment: Qt.AlignRight
-                                    ToolTip.text: "Add Relay"
+                                    ToolTip.text: "Add Custom Ratio"
                                     icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
-
                                         if (customRatio.acceptableInput) {
                                             calculator.setCtRatio(customRatio.text)
                                             let found = false
@@ -251,17 +287,16 @@ Item {
                                                 if (ctRatio.model[i] === customRatio.text) {
                                                     ctRatio.currentIndex = i
                                                     found = true
-                                                    console.log("Custom ratio already exists in the model.")
                                                     break
                                                 }
                                             }
                                             if (!found) {
                                                 ctRatio.model.push(customRatio.text)
                                                 ctRatio.currentIndex = ctRatio.model.length - 1
-                                                console.log("Custom ratio added to the model.")
                                             }
                                         } else {
-                                            console.log("Invalid custom ratio format.")
+                                            errorPopup.errorMessage = "Invalid ratio format. Use format: primary/secondary (e.g., 150/5)"
+                                            errorPopup.open()
                                         }
                                     }
                                 }
@@ -303,6 +338,9 @@ Item {
                                     }
                                 }
                                 Layout.fillWidth: true
+                                ToolTip.text: "Enter burden between 25.0 and 2000.0 VA"
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
                             }
 
                             Label { text: "Rated Voltage Factor:" }
@@ -318,7 +356,7 @@ Item {
                     // Results Section
                     WaveCard {
                         Layout.fillWidth: true
-                        Layout.minimumHeight: 430
+                        Layout.minimumHeight: 550
                         title: "Results"
 
                         GridLayout {
@@ -328,6 +366,9 @@ Item {
                             TextFieldBlue { 
                                 text: isFinite(calculator.kneePointVoltage) ? calculator.kneePointVoltage.toFixed(1) + " V" : "0.0 V"
                                 Layout.minimumWidth: 150
+                                ToolTip.text: "Voltage at which the CT begins to saturate"
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
                             }
 
                             Label { text: "Maximum Fault Current:" }
@@ -379,6 +420,30 @@ Item {
                                     if (calculator.vtBurdenUtilization < 80) return "orange"
                                     return "red"
                                 }
+                            }
+
+                            Label { text: "CT Saturation Status:" }
+                            TextFieldBlue {
+                                text: calculator.saturationStatus
+                                color: {
+                                    if (calculator.saturationStatus.includes("Linear")) return "green"
+                                    if (calculator.saturationStatus.includes("Slightly")) return "lightgreen"
+                                    if (calculator.saturationStatus.includes("Moderately")) return "orange"
+                                    return "red"
+                                }
+                            }
+                            
+                            // Additional section for recommendations (if they exist)
+                            Label { 
+                                text: "Recommendations:" 
+                                visible: calculator.accuracyRecommendation !== "No issues detected. Operation within specifications."
+                            }
+                            TextFieldBlue { 
+                                text: calculator.accuracyRecommendation
+                                visible: calculator.accuracyRecommendation !== "No issues detected. Operation within specifications."
+                                wrapMode: Text.WordWrap
+                                Layout.minimumHeight: 80
+                                Layout.fillWidth: true
                             }
                         }
                     }

@@ -72,7 +72,8 @@ ApplicationWindow {
         { name: qsTr("Motor Starting"), source: "calculators/theory/MotorStartingCalculator.qml" },
         { name: qsTr("RLC"), source: "calculators/theory/RLC.qml" },
         { name: qsTr("Three Phase Waveforms"), source: "calculators/theory/ThreePhase.qml" },
-        { name: qsTr("Real Time Chart"), source: "calculators/theory/RealTime.qml" }
+        { name: qsTr("Real Time Chart"), source: "calculators/theory/RealTime.qml" },
+        { name: qsTr("Instrument Tx Naming"), source: "calculators/theory/TransformerNamingGuide.qml" }
     ]
     
     property var renewables: [

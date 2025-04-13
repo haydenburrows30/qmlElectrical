@@ -44,7 +44,8 @@ class BatteryCalculator(QObject):
             
             # Calculate required capacity considering depth of discharge
             if self._depth_of_discharge > 0:
-                self._required_capacity = (self._current_draw * self._backup_time) / (self._depth_of_discharge / 100)
+                # Correct formula: multiply by (100/DoD) since we can only use DoD% of the battery
+                self._required_capacity = (self._current_draw * self._backup_time) * (100 / self._depth_of_discharge)
             else:
                 self._required_capacity = 0
                 

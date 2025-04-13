@@ -81,9 +81,11 @@ Item {
                   "• Initial symmetrical fault current<br>" + 
                   "• Peak fault current<br>" +
                   "• Breaking current<br>" +
-                  "• Thermal equivalent current"
+                  "• Thermal equivalent current<br><br>" +
+                  "<b>Standards:</b> Calculations are based on IEC 60909 methods for fault current calculations in three-phase AC systems. " +
+                  "The implementation follows standard industry practices for X/R ratio considerations, DC component decay, and thermal equivalence."
         widthFactor: 0.4
-        heightFactor: 0.4
+        heightFactor: 0.5
     }
 
     // Left side inputs and results

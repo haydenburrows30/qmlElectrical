@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtCharts
 import QtQuick.Controls.Universal
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -24,7 +23,7 @@ Item {
         parentCard: results
         popupText: "<h3>Discrimination Analyzer</h3><br>" +
                     "This tool analyzes the discrimination between relays in a protection system.<br><br>" +
-                    "The user can add multiple relays with their pickup current and time dial setting (TDS).<br>" +
+                    "The user can add multiple relays with their pickup current and time dial setting (TDS).<br><br>" +
                     "The tool calculates the minimum margin between the primary and backup relays for different fault levels.<br><br>" +
                     "The visualization shows the margin analysis chart with the relay curves and margin points.<br><br>" +
                     "Developed by <b>Wave</b>."
@@ -135,9 +134,16 @@ Item {
                                 icon.source: "../../../icons/rounded/add.svg"
 
                                 onClicked: {
-
-                                    if (!relayName.text || !pickupCurrent.text || !tds.text) {
-                                        console.log("Please fill all relay fields")
+                                    // Add input validation with user feedback
+                                    if (!relayName.text) {
+                                        relayName.focus = true
+                                        console.log("Please enter a relay name")
+                                    } else if (!pickupCurrent.text || parseFloat(pickupCurrent.text) <= 0) {
+                                        pickupCurrent.focus = true
+                                        console.log("Please enter a valid pickup current")
+                                    } else if (!tds.text || parseFloat(tds.text) <= 0) {
+                                        tds.focus = true
+                                        console.log("Please enter a valid time dial setting")
                                     } else {
                                         console.log("Adding relay:", relayName.text)
 
@@ -146,7 +152,13 @@ Item {
                                             "pickup": parseFloat(pickupCurrent.text),
                                             "tds": parseFloat(tds.text),
                                             "curve_constants": calculator.getCurveConstants(curveType.currentText)
-                                            })
+                                        })
+                                        
+                                        // Clear fields after adding relay for better UX
+                                        relayName.text = ""
+                                        pickupCurrent.text = ""
+                                        tds.text = ""
+                                        relayName.focus = true
                                     }
                                 }
                             }
@@ -252,14 +264,17 @@ Item {
                                 icon.source: "../../../icons/rounded/add.svg"
 
                                 onClicked: {
-
                                     if (calculator.relayCount < 2) {
-                                        console.log ("Please add at least 2 relays")
-                                    } else if (calculator.relayCount >= 2 && !faultCurrent.text) {
-                                        console.log("Please enter a number")
+                                        console.log("Please add at least 2 relays")
+                                    } else if (!faultCurrent.text || parseFloat(faultCurrent.text) <= 0) {
+                                        faultCurrent.focus = true
+                                        console.log("Please enter a valid fault current")
                                     } else {
-                                        console.log("Adding fault level:", parseFloat(faultCurrent.text))
-                                        calculator.addFaultLevel(parseFloat(faultCurrent.text))
+                                        let current = parseFloat(faultCurrent.text)
+                                        console.log("Adding fault level:", current)
+                                        calculator.addFaultLevel(current)
+                                        faultCurrent.text = ""  // Clear after adding
+                                        faultCurrent.focus = true
                                     }
                                 }
                             }
@@ -355,19 +370,24 @@ Item {
             marginChart.scatterSeries.clear()
             let model = calculator.results
             console.log("Model rowCount:", model.rowCount())
-            for(let i = 0; i < model.rowCount(); i++) {
-                let modelIndex = model.index(i, 0)
-                let result = model.data(modelIndex, calculator.results.DataRole)
-                console.log("Chart data for index", i, ":", JSON.stringify(result))
-                if (result && result.margins) {
-                    result.margins.forEach(function(margin) {
-                        if (margin.fault_current && margin.margin != null && 
-                            isFinite(margin.fault_current) && isFinite(margin.margin) &&
-                            margin.margin > 0 && margin.margin < 10) {
-                            marginChart.scatterSeries.append(margin.fault_current, margin.margin)
-                        }
-                    })
+            
+            try {
+                for(let i = 0; i < model.rowCount(); i++) {
+                    let modelIndex = model.index(i, 0)
+                    let result = model.data(modelIndex, calculator.results.DataRole)
+                    console.log("Chart data for index", i, ":", JSON.stringify(result))
+                    if (result && result.margins) {
+                        result.margins.forEach(function(margin) {
+                            if (margin.fault_current && margin.margin != null && 
+                                isFinite(margin.fault_current) && isFinite(margin.margin) &&
+                                margin.margin > 0 && margin.margin < 10) {
+                                marginChart.scatterSeries.append(margin.fault_current, margin.margin)
+                            }
+                        })
+                    }
                 }
+            } catch (e) {
+                console.error("Error updating chart:", e)
             }
         }
 

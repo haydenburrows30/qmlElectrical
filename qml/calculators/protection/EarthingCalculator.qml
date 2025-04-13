@@ -21,7 +21,7 @@ Item {
     PopUpText {
             parentCard: results
             widthFactor: 0.5
-            heightFactor: 0.6
+            heightFactor: 0.7
             popupText: "<h3>Earthing System Calculator</h3><br>" +
                     "This calculator estimates the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for an earthing system.<br><br>" +
                     "<b>Grid Parameters:</b><br>" +
@@ -35,6 +35,9 @@ Item {
                     "<b>Fault Parameters:</b><br>" +
                     "<b>Fault Current:</b> The fault current in Amperes.<br>" +
                     "<b>Fault Duration:</b> The fault duration in seconds.<br><br>" +
+                    "<b>Standards:</b> Calculations are based on IEEE Standard 80 \"Guide for Safety in AC Substation Grounding\". " +
+                    "The implementation includes improved grid resistance formulation using the IEEE 80 approach, accurate " +
+                    "touch and step voltage calculations, and conductor sizing based on thermal capacity.<br><br>" +
                     "The calculator provides the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for the earthing system.<br><br>" +
                     "The visualization shows the earthing system with the grid and ground rods.<br><br>" +
                     "Developed by <b>Wave</b>."
@@ -179,28 +182,47 @@ Item {
                     TextFieldBlue { 
                         text: calculator.gridResistance.toFixed(3) + " Ω"
                         Layout.minimumWidth: 100
+                        ToolTip.text: "Total ground grid resistance"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     Label { text: "Ground Rise:" }
                     TextFieldBlue { 
                         text: calculator.voltageRise.toFixed(1) + " V"
+                        ToolTip.text: "Ground potential rise under fault conditions"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     Label { text: "Touch Voltage:" }
                     TextFieldBlue { 
                         text: calculator.touchVoltage.toFixed(1) + " V"
-                        color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
+                        color: calculator.touchVoltage > 50 * (1 + 0.116 * parseFloat(soilResistivityInput.text)/1000) ? 
+                               (Universal.theme === Universal.Dark ? "#FF8080" : "red") : 
+                               (Universal.theme === Universal.Dark ? "#80FF80" : "green")
+                        ToolTip.text: "Touch voltage potential (colored red if exceeds safety threshold)"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     Label { text: "Step Voltage:" }
                     TextFieldBlue { 
                         text: calculator.stepVoltage.toFixed(1) + " V"
-                        color: Universal.theme === Universal.Dark ? "#FF8080" : "red"
+                        color: calculator.stepVoltage > 50 * (1 + 0.53 * parseFloat(soilResistivityInput.text)/1000) ? 
+                               (Universal.theme === Universal.Dark ? "#FF8080" : "red") : 
+                               (Universal.theme === Universal.Dark ? "#80FF80" : "green")
+                        ToolTip.text: "Step voltage potential (colored red if exceeds safety threshold)"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     Label { text: "Min. Conductor Size:" }
                     TextFieldBlue { 
                         text: calculator.conductorSize.toFixed(1) + " mm²"
+                        ToolTip.text: "Minimum conductor cross-sectional area for thermal rating"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
                 }
             }

@@ -150,12 +150,31 @@ class DiscriminationAnalyzer(QObject):
 
     def _calculate_operating_time(self, relay, fault_current):
         """Calculate relay operating time for given fault current"""
-        multiple = fault_current / relay["pickup"]
-        if multiple <= 1:
-            return float('inf')
+        try:
+            pickup = float(relay["pickup"])
+            if pickup <= 0:
+                print(f"Invalid pickup current: {pickup}")
+                return None
+                
+            multiple = fault_current / pickup
+            if multiple <= 1.0:
+                return float('inf')  # Current is below pickup threshold
+                
+            constants = relay["curve_constants"]
+            tds = float(relay["tds"])
             
-        constants = relay["curve_constants"]
-        return (constants["a"] * relay["tds"]) / ((multiple ** constants["b"]) - 1)
+            # Calculation using the standard formula
+            denominator = (multiple ** constants["b"]) - 1
+            if denominator <= 0:
+                print(f"Invalid calculation: multiple={multiple}, b={constants['b']}, denominator={denominator}")
+                return None
+                
+            time = (constants["a"] * tds) / denominator
+            return time if time >= 0 else None
+            
+        except Exception as e:
+            print(f"Error in relay time calculation: {e}")
+            return None
 
     @Property(QObject, notify=analysisComplete)
     def results(self):
