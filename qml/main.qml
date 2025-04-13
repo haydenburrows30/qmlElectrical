@@ -11,6 +11,7 @@ import "pages"
 import "components/style"
 import "components/popups"
 import "components/buttons"
+import "components/displays"
 
 
 ApplicationWindow {

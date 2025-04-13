@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-import "../../"
+
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"

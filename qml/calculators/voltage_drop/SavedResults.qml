@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import "../../"
+
 import "../../components"
 import "../../components/buttons"
 import "../../components/style"

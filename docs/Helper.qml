@@ -125,7 +125,7 @@ MessageButton {
 
 
 
-import "../../"
+
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"

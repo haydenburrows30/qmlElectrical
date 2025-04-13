@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtQuick.Effects
 
-import "style"
+import "."
 
 Rectangle {
     id: controlRect

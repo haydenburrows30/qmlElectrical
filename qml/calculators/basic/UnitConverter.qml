@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-import "../../"
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"

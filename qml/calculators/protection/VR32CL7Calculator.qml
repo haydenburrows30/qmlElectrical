@@ -5,7 +5,7 @@ import QtQuick.Dialogs
 import QtCharts
 import Qt.labs.platform
 
-import "../../"
+
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
