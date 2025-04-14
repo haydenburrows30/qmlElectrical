@@ -572,59 +572,6 @@ Popup {
                         text: calculator ? calculator.relayCurveType : "Very Inverse"
                     }
                     
-                    Label { text: "Coordination Notes:" }
-                    TextArea {
-                        text: "• Time margin between protection devices: 0.3-0.4s\n" +
-                              "• Overcurrent pickup margin: 20-30%\n" +
-                              "• Curve selection optimized for transformer protection\n" +
-                              "• Refer to grid code requirements for exact settings"
-                        readOnly: true
-                        Layout.fillWidth: true
-                        
-                        Layout.preferredHeight: 200
-                        wrapMode: Text.Wrap
-                        background: Rectangle { color: "#f0f0f0"; border.color: "#c0c0c0" }
-                    }
-                    
-                    Label { text: "Curve Calculation Formulas:" }
-                    Layout.columnSpan: 2
-                    TextArea {
-                        id: curveFormulas
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 400
-                        readOnly: true
-                        text: "Standard Inverse (IEC): t = TDS * 0.14 / ((I/Is)^0.02 - 1)\n" +
-                              "Very Inverse (IEC): t = TDS * 13.5 / ((I/Is) - 1)\n" +
-                              "Extremely Inverse (IEC): t = TDS * 80 / ((I/Is)^2 - 1)\n" +
-                              "Long-Time Inverse: t = TDS * 120 / ((I/Is) - 1)\n" +
-                              "Definite Time: t = TDS\n\n" +
-                              "Where: I = fault current, Is = pickup current, TDS = time dial setting"
-                        wrapMode: Text.Wrap
-                        font.family: "Courier"
-                        background: Rectangle { color: "#f0f0f0"; border.color: "#c0c0c0" }
-                    }
-                    
-                    Label { text: "Recommended CT Ratio:" }
-                    TextFieldBlue {
-                        text: {
-                            if (!calculator) return "300/5";
-                            
-                            let flc = safeValueFunction(calculator.transformerRating, 300) * 1000 / 
-                                     (Math.sqrt(3) * safeValueFunction(calculator.hvVoltage, 11000));
-                            
-                            let required = flc * 1.5;
-                            
-                            let standardRatios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200];
-                            
-                            for (let i = 0; i < standardRatios.length; i++) {
-                                if (standardRatios[i] >= required) {
-                                    return standardRatios[i] + "/5";
-                                }
-                            }
-                            return "1200/5";
-                        }
-                    }
-                    
                     Label { text: "Minimum Fault Current:" }
                     TextFieldBlue {
                         text: calculator ? safeValueFunction(calculator.minimumFaultCurrent, 0).toFixed(1) + " A" : "0.0 A"
@@ -633,6 +580,34 @@ Popup {
                     Label { text: "Remote Backup Trip Time:" }
                     TextFieldBlue {
                         text: calculator ? safeValueFunction(calculator.remoteBackupTripTime, 0.7).toFixed(1) + "s" : "0.7s"
+                    }
+
+                    Label { text: "Coordination Notes:" }
+                    TextArea {
+                        text: "• Time margin between protection devices: 0.3-0.4s\n" +
+                              "• Overcurrent pickup margin: 20-30%\n" +
+                              "• Curve selection optimized for transformer protection\n" +
+                              "• Refer to grid code requirements for exact settings"
+                        readOnly: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 100
+                        wrapMode: Text.Wrap
+                    }
+
+                    Label { text: "Curve Calculation Formulas:" }
+                    Layout.columnSpan: 2
+                    TextArea {
+                        id: curveFormulas
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 200
+                        readOnly: true
+                        text: "Standard Inverse (IEC): t = TDS * 0.14 / ((I/Is)^0.02 - 1)\n" +
+                              "Very Inverse (IEC): t = TDS * 13.5 / ((I/Is) - 1)\n" +
+                              "Extremely Inverse (IEC): t = TDS * 80 / ((I/Is)^2 - 1)\n" +
+                              "Long-Time Inverse: t = TDS * 120 / ((I/Is) - 1)\n" +
+                              "Definite Time: t = TDS\n\n" +
+                              "Where: I = fault current, Is = pickup current, TDS = time dial setting"
+                        wrapMode: Text.Wrap
                     }
                 }
             }

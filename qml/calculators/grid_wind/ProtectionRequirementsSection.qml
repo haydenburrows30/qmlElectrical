@@ -38,10 +38,10 @@ Item {
         
         for (let i = 0; i < standardRatios.length; i++) {
             if (standardRatios[i] >= multipliedCurrent) {
-                return standardRatios[i] + "/5";
+                return standardRatios[i] + "/1";
             }
         }
-        return "1000/5";
+        return "1000/1";
     }
                 
     ScrollView {
@@ -132,20 +132,8 @@ Item {
                                 TextFieldBlue { 
                                     text: windTurbineReady ? 
                                         determineCtRatio((windTurbineCalculator.actualPower * 1000) / (Math.sqrt(3) * 400)) : 
-                                        "100/5" 
+                                        "100/1" 
                                     Layout.fillWidth: true
-                                    
-                                    function determineCtRatio(current) {
-                                        let standardRatios = [50, 75, 100, 150, 200, 300, 400, 600, 800, 1000, 1200];
-                                        let multipliedCurrent = current * 1.5; // 150% margin
-                                        
-                                        for (let i = 0; i < standardRatios.length; i++) {
-                                            if (standardRatios[i] >= multipliedCurrent) {
-                                                return standardRatios[i] + "/5";
-                                            }
-                                        }
-                                        return "1000/5";
-                                    }
                                 }
                                 
                                 Label { text: "Under/Over Voltage:" }

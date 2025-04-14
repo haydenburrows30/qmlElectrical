@@ -501,48 +501,36 @@ Item {
                             columns: 2
 
                             Label { text: "Relay Pickup Current (A):" }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                TextFieldBlue {
+                            TextFieldBlue {
                                     id: relayPickupCurrentText
                                     text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
                                     Layout.fillWidth: true
                                 }
-                                StyledButton {
-                                    text: "Set"
-                                    implicitWidth: 40
-                                    onClicked: pickupDialog.open()
-                                }
-                            }
+                            // RowLayout {
+                            //     Layout.fillWidth: true
+                            //     TextFieldBlue {
+                            //         id: relayPickupCurrentText
+                            //         text: calculatorReady ? safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2) : "0.00"
+                            //         Layout.fillWidth: true
+                            //     }
+                            //     StyledButton {
+                            //         text: "Set"
+                            //         implicitWidth: 40
+                            //         onClicked: pickupDialog.open()
+                            //     }
+                            // }
 
                             Label { text: "CT Ratio:" }
-                            ComboBox {
-                                id: ctRatioCombo
-                                Layout.fillWidth: true
-                                model: ["50/1", "100/1", "150/1", "200/1", "300/1", "400/1", "500/1", "600/1", "800/1", "1000/1"]
-                                currentIndex: 4 // Default to 300/1
-                                onActivated: {
-                                    if (calculatorReady) {
-                                        // This would need a method to update the CT ratio in the calculator
-                                        // For now just update the display
-                                        relayCtRatioText.text = currentText
-                                    }
-                                }
+                            TextFieldBlue {
+                                id: relayCtRatioText
+                                text: calculator ? calculator.relayCtRatio : "300/5"
                             }
                             
                             Label { text: "Relay Curve Type:" }
-                            ComboBox {
+                            TextFieldBlue {
                                 id: curveTypeCombo
                                 Layout.fillWidth: true
-                                model: ["Standard Inverse", "Very Inverse", "Extremely Inverse", "Long-Time Inverse", "Definite Time"]
-                                currentIndex: 1 // Default to Very Inverse
-                                onActivated: {
-                                    if (calculatorReady) {
-                                        // This would need a method to update the curve type in the calculator
-                                        // For now just update the display
-                                        relayCurveTypeText.text = currentText
-                                    }
-                                }
+                                text: calculator ? calculator.relayCurveType : "Very Inverse"
                                 
                                 // Custom popup that shows curve characteristics
                                 Popup {
