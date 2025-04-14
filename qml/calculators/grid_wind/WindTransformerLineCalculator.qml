@@ -13,13 +13,10 @@ Item {
 
     property var transformerCalculator
     property var windTurbineCalculator
-
     property bool transformerReady: transformerCalculator !== null
     property bool windTurbineReady: windTurbineCalculator !== null
-
     property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.actualPower : 0
-    // property real windGeneratorCapacity: windTurbineReady ? windTurbineCalculator.actualPower * 1.2 : 0 // 20% margin
-    
+
     Component.onCompleted: {
         transformerCalculator = Qt.createQmlObject('import QtQuick; import TransformerLine 1.0; TransformerLineCalculator {}', 
                                                  root, "dynamicTransformerCalculator");
@@ -52,13 +49,13 @@ Item {
                 text: "Wind Turbine"
             }
             TabButton {
-                text: "Transformer & Line"
+                text: "Transformer and Line"
             }
             TabButton {
                 text: "Protection Requirements"
             }
         }
-        
+
         StackLayout {
             Layout.fillWidth: true
             currentIndex: tabBar.currentIndex
@@ -67,8 +64,7 @@ Item {
             WindTurbineSection {
                 id: windTurbineSection
                 Layout.fillWidth: true
-                Layout.preferredHeight: 750
-                
+
                 // Pass only necessary properties and functions
                 calculator: windTurbineCalculator
                 calculatorReady: windTurbineReady
@@ -80,13 +76,12 @@ Item {
                 }
                 safeValueFunction: safeValue
             }
-            
+
             // Tab 2: Transformer & Line Parameters - operates independently
             TransformerLineSection {
                 id: transformerLineSection
                 Layout.fillWidth: true
-                Layout.minimumHeight: 800
-                
+
                 // Pass only necessary properties and functions
                 calculator: transformerCalculator
                 calculatorReady: transformerReady
@@ -98,19 +93,18 @@ Item {
                 }
                 safeValueFunction: safeValue
             }
-            
+
             // Tab 3: Protection Requirements - still needs access to both
             ProtectionRequirementsSection {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 2000
-                
+
                 // Pass the required properties
                 transformerCalculator: root.transformerCalculator
                 windTurbineCalculator: root.windTurbineCalculator
                 transformerReady: root.transformerReady
                 windTurbineReady: root.windTurbineReady
                 totalGeneratedPower: root.totalGeneratedPower
-                
+
                 onCalculate: {
                     // For the protection tab, we need data from both systems
                     if (transformerReady && windTurbineReady) {

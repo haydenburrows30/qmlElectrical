@@ -365,7 +365,7 @@ Item {
                         }
                     }
                 }
-                
+
                 ColumnLayout {
                     Layout.minimumWidth: 400
                     Layout.maximumWidth: 400
@@ -430,28 +430,31 @@ Item {
                                     "0.00"
                             }
 
-                            StyledButton {
-                                id: calculateButton
-                                text: "Recalculate"
-                                icon.source: "../../../icons/rounded/calculate.svg"
+                            RowLayout {
+                                Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
-                                
-                                onClicked: {
-                                    if (calculatorReady) {
-                                        calculate() // Emit the calculate signal
-                                        calculator.refreshCalculations()
+                                Layout.fillWidth: true
+
+                                StyledButton {
+                                    id: calculateButton
+                                    text: "Recalculate"
+                                    icon.source: "../../../icons/rounded/calculate.svg"
+
+                                    onClicked: {
+                                        if (calculatorReady) {
+                                            calculate() // Emit the calculate signal
+                                            calculator.refreshCalculations()
+                                        }
                                     }
                                 }
-                            }
 
-                            StyledButton {
-                                id: exportButton
-                                Layout.alignment: Qt.AlignRight
-                                text: "Export"
-                                icon.source: "../../../icons/rounded/download.svg"
+                                StyledButton {
+                                    text: "Export"
+                                    icon.source: "../../../icons/rounded/download.svg"
 
-                                onClicked: {
-                                    saveDialog.open()
+                                    onClicked: {
+                                        saveDialog.open()
+                                    }
                                 }
                             }
                         }

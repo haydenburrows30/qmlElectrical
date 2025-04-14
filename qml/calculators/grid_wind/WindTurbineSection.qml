@@ -5,7 +5,6 @@ import QtCharts
 import QtQuick.Controls.Universal
 import QtQuick.Dialogs
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -179,11 +178,12 @@ Item {
                     WaveCard {
                         id: windTurbineCard
                         title: "Wind Turbine Parameters"
-                        Layout.minimumHeight: 440
+                        Layout.minimumHeight: windTurbineOutputCard.height
                         Layout.minimumWidth: 350
 
                         GridLayout {
                             columns: 2
+                            anchors.fill: parent
                             
                             Label { text: "Blade Radius (m):" }
                             SpinBoxRound {
@@ -353,13 +353,15 @@ Item {
                     }
                     
                     WaveCard {
+                        id: windTurbineOutputCard
                         title: "Wind Turbine Output"
-                        Layout.minimumHeight: windTurbineCard.height
+                        Layout.minimumHeight: 530
                         Layout.minimumWidth: 430
                         Layout.alignment: Qt.AlignTop
                         
                         GridLayout {
                             columns: 2
+                            anchors.fill: parent
 
                             Label { text: "Swept Area (m²):" }
                             TextFieldBlue {
@@ -440,8 +442,6 @@ Item {
                                 stepSize: 1
                                 editable: true
                                 Layout.fillWidth: true
-                                // REMOVE: onValueModified binding that causes stack overflow
-                                // Instead, we'll use the button to trigger updates
                             }
                             
                             Label { text: "Weibull Shape Parameter:" }
@@ -452,6 +452,7 @@ Item {
                                 value: 20
                                 stepSize: 1
                                 editable: true
+                                Layout.fillWidth: true
                                 
                                 property real realValue: value / 10
                                 
@@ -462,9 +463,6 @@ Item {
                                 valueFromText: function(text) {
                                     return Math.round(parseFloat(text) * 10);
                                 }
-                                
-                                // REMOVE: onValueModified binding that causes stack overflow
-                                // Instead, we'll use the button to trigger updates
                             }
                             
                             Label { text: "Estimated AEP (MWh/year):" }
@@ -480,7 +478,6 @@ Item {
                                 Layout.alignment: Qt.AlignRight
                                 
                                 onClicked: {
-                                    // Single explicit call to calculate AEP
                                     calculateAdvancedAEP()
                                 }
                             }

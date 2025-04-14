@@ -20,7 +20,7 @@ Item {
     property var safeValueFunction
 
     signal calculate()
-    
+
     // Add helper function for transformer ratings
     function calculateTransformerFullLoadCurrent() {
         if (!transformerReady) return 0.0;
@@ -50,16 +50,17 @@ Item {
         clip: true
 
         Flickable {
-            contentWidth: mainLayout.width + 20
-            contentHeight: mainLayout.height + 20
+            contentWidth: parent.width
+            contentHeight: mainLayout.height + 50
             bottomMargin : 5
             leftMargin : 5
             rightMargin : 5
             topMargin : 5
-        
+            clip: true
+
             ColumnLayout {
                 id: mainLayout
-                width: scrollView.width - 20
+                anchors.centerIn: parent
 
                 // Title and calculate button
                 Item {
@@ -90,14 +91,16 @@ Item {
                 }
 
                 RowLayout {
-                    Layout.fillWidth: true
-                    ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
 
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignTop
                         // Generator Protection Card
                         WaveCard {
                             title: "Generator Protection (400V)"
-                            Layout.fillWidth: true
+                            Layout.minimumWidth: 400
                             Layout.preferredHeight: 360
+
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -158,11 +161,11 @@ Item {
                                 TextFieldBlue { text: "Required" }
                             }
                         }
-                        
+
                         // Transformer Protection Card - Important to be based on transformer rating
                         WaveCard {
                             title: "Transformer Protection (11kV)"
-                            Layout.fillWidth: true
+                            Layout.minimumWidth: 400
                             Layout.minimumHeight: 800  // Increased height for new fields
                             
                             GridLayout {
@@ -320,11 +323,64 @@ Item {
                                 }
                             }
                         }
-                        
+
+                        // Line Protection Card
+                        WaveCard {
+                            title: "Line Protection Requirements"
+                            Layout.minimumWidth: 400
+                            Layout.preferredHeight: 300
+                            
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: 2
+                                
+                                Label { text: "Fault Current at 11kV:" }
+                                TextFieldBlue { 
+                                    text: transformerReady ? 
+                                        (safeValueFunction(transformerCalculator.faultCurrentHV, 0.5) * 1000).toFixed(2) + " A" : 
+                                        "500.00 A" 
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Label { text: "Minimum Cable Size:" }
+                                TextFieldBlue { 
+                                    text: transformerReady ? 
+                                        transformerCalculator.recommendedHVCable : "25mm²" 
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Label { text: "Line Length:" }
+                                TextFieldBlue { 
+                                    text: transformerReady ? 
+                                        safeValueFunction(transformerCalculator.lineLength, 5).toFixed(1) + " km" : 
+                                        "5.0 km" 
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Label { text: "Voltage Regulation:" }
+                                TextFieldBlue { 
+                                    text: transformerReady ? 
+                                        safeValueFunction(transformerCalculator.voltageDrop, 0.5).toFixed(2) + "%" : 
+                                        "0.50%" 
+                                    Layout.fillWidth: true
+                                }
+                                
+                                Label { text: "Distance Protection:" }
+                                TextFieldBlue { text: "Required for lines > 10km" }
+                                
+                                Label { text: "Auto-Reclosure:" }
+                                TextFieldBlue { text: "Single-shot" }
+                            }
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignTop
+
                         // Time-Overcurrent Curve Card
                         WaveCard {
                             title: "Time-Overcurrent Curve"
-                            Layout.fillWidth: true
+                            Layout.minimumWidth: 500
                             Layout.preferredHeight: 400
                             
                             ColumnLayout {
@@ -435,64 +491,13 @@ Item {
                                 }
                             }
                         }
-                                        
-                        // Line Protection Card
-                        WaveCard {
-                            title: "Line Protection Requirements"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 300
-                            
-                            GridLayout {
-                                anchors.fill: parent
-                                columns: 2
-                                
-                                Label { text: "Fault Current at 11kV:" }
-                                TextFieldBlue { 
-                                    text: transformerReady ? 
-                                        (safeValueFunction(transformerCalculator.faultCurrentHV, 0.5) * 1000).toFixed(2) + " A" : 
-                                        "500.00 A" 
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "Minimum Cable Size:" }
-                                TextFieldBlue { 
-                                    text: transformerReady ? 
-                                        transformerCalculator.recommendedHVCable : "25mm²" 
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "Line Length:" }
-                                TextFieldBlue { 
-                                    text: transformerReady ? 
-                                        safeValueFunction(transformerCalculator.lineLength, 5).toFixed(1) + " km" : 
-                                        "5.0 km" 
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "Voltage Regulation:" }
-                                TextFieldBlue { 
-                                    text: transformerReady ? 
-                                        safeValueFunction(transformerCalculator.voltageDrop, 0.5).toFixed(2) + "%" : 
-                                        "0.50%" 
-                                    Layout.fillWidth: true
-                                }
-                                
-                                Label { text: "Distance Protection:" }
-                                TextFieldBlue { text: "Required for lines > 10km" }
-                                
-                                Label { text: "Auto-Reclosure:" }
-                                TextFieldBlue { text: "Single-shot" }
-                            }
-                        }
-                    }
 
-                    ColumnLayout {
-                        Layout.alignment: Qt.AlignTop
+                        // VR-32 Voltage Regulator Card
                         WaveCard {
                             title: "Eaton VR-32 Voltage Regulator Protection Specifications"
-                            Layout.fillWidth: true
+                            Layout.minimumWidth: 500
                             Layout.preferredHeight: 600
-                            
+
                             ColumnLayout {
                                 anchors.fill: parent
 
@@ -524,7 +529,7 @@ Item {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: regConfigLayout.implicitHeight + 20
-                                    color: "#f7f0ff"
+                                    color: window.modeToggled ? "black" : "#f7f0ff"
                                     border.color: "#8a4eef"
                                     radius: 5
                                     
@@ -587,12 +592,12 @@ Item {
                                 }
                             }
                         }
-                        
+
                         // Grid Connection Requirements Card
                         WaveCard {
                             title: "Grid Connection Requirements"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 500
+                            Layout.minimumWidth: 500
+                            Layout.preferredHeight: 470
                             
                             ColumnLayout {
                                 anchors.fill: parent
