@@ -165,31 +165,12 @@ Popup {
                     
                     Label { text: "X/R Ratio at Fault Point:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "0.00";
-                            let r = safeValueFunction(calculator.transformerROhms, 0.1) + 
-                                   (safeValueFunction(calculator.lineR, 0.25) * 
-                                    safeValueFunction(calculator.lineLength, 5));
-                            let x = safeValueFunction(calculator.transformerXOhms, 0.8) + 
-                                   (safeValueFunction(calculator.lineX, 0.2) * 
-                                    safeValueFunction(calculator.lineLength, 5));
-                            return (x/r).toFixed(2);
-                        }
+                        text: calculator ? safeValueFunction(calculator.xrRatioAtFault, 0).toFixed(2) : "0.00"
                     }
                     
                     Label { text: "Asymmetry Factor:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "1.00";
-                            let r = safeValueFunction(calculator.transformerROhms, 0.1) + 
-                                   (safeValueFunction(calculator.lineR, 0.25) * 
-                                    safeValueFunction(calculator.lineLength, 5));
-                            let x = safeValueFunction(calculator.transformerXOhms, 0.8) + 
-                                   (safeValueFunction(calculator.lineX, 0.2) * 
-                                    safeValueFunction(calculator.lineLength, 5));
-                            let xr = x/r;
-                            return (Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI * r / x))).toFixed(2);
-                        }
+                        text: calculator ? safeValueFunction(calculator.asymmetryFactor, 1).toFixed(2) : "1.00"
                     }
                     
                     Label { text: "Transformer MVA Base:" }
@@ -204,12 +185,7 @@ Popup {
                     
                     Label { text: "Short Circuit MVA:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "0.00";
-                            let vkv = safeValueFunction(calculator.hvVoltage, 11000) / 1000;
-                            let fault_ka = safeValueFunction(calculator.faultCurrentHV, 0);
-                            return (Math.sqrt(3) * vkv * fault_ka).toFixed(2);
-                        }
+                        text: calculator ? safeValueFunction(calculator.shortCircuitMVA, 0).toFixed(2) : "0.00"
                     }
                     
                     Label { 
@@ -237,48 +213,12 @@ Popup {
                     
                     Label { text: "Instantaneous Pickup (A):" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "0.00";
-                            let flc = safeValueFunction(calculator.transformerRating, 300) * 1000 / 
-                                     (Math.sqrt(3) * safeValueFunction(calculator.hvVoltage, 11000));
-                            return (flc * 8).toFixed(2);
-                        }
+                        text: calculator ? safeValueFunction(calculator.instantaneousPickup, 0).toFixed(2) : "0.00"
                     }
                     
                     Label { text: "Trip Time at Max Fault:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "0.00";
-                            
-                            let pickup = safeValueFunction(calculator.relayPickupCurrent, 1);
-                            let fault = safeValueFunction(calculator.faultCurrentHV, 1) * 1000;
-                            let multiple = fault / pickup;
-                            let tds = safeValueFunction(calculator.relayTimeDial, 0.3);
-                            
-                            let time = 0;
-                            let curveType = calculator ? calculator.relayCurveType : "Very Inverse";
-                            
-                            switch(curveType) {
-                                case "Standard Inverse":
-                                    time = tds * 0.14 / (Math.pow(multiple, 0.02) - 1);
-                                    break;
-                                case "Very Inverse":
-                                    time = tds * 13.5 / (multiple - 1);
-                                    break;
-                                case "Extremely Inverse":
-                                    time = tds * 80 / (Math.pow(multiple, 2) - 1);
-                                    break;
-                                case "Long-Time Inverse":
-                                    time = tds * 120 / (multiple - 1);
-                                    break;
-                                default:
-                                    time = tds;
-                                    break;
-                            }
-                            
-                            time = Math.max(time, 0.025);
-                            return time.toFixed(3) + "s";
-                        }
+                        text: calculator ? safeValueFunction(calculator.tripTimeMaxFault, 0).toFixed(3) + "s" : "0.000s"
                     }
                     
                     Label { text: "Breaker Duty Factor:" }
@@ -307,32 +247,12 @@ Popup {
                     
                     Label { text: "A Constant:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "13.5";
-                            let curveType = calculator.relayCurveType || "Very Inverse";
-                            switch (curveType) {
-                                case "Standard Inverse": return "0.14";
-                                case "Very Inverse": return "13.5";
-                                case "Extremely Inverse": return "80.0";
-                                case "Long-Time Inverse": return "120.0";
-                                default: return "13.5";
-                            }
-                        }
+                        text: calculator ? safeValueFunction(calculator.curveAConstant, 13.5).toString() : "13.5"
                     }
                     
                     Label { text: "B Exponent:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "1.0";
-                            let curveType = calculator.relayCurveType || "Very Inverse";
-                            switch (curveType) {
-                                case "Standard Inverse": return "0.02";
-                                case "Very Inverse": return "1.0";
-                                case "Extremely Inverse": return "2.0";
-                                case "Long-Time Inverse": return "1.0";
-                                default: return "1.0";
-                            }
-                        }
+                        text: calculator ? safeValueFunction(calculator.curveBExponent, 1.0).toString() : "1.0"
                     }
                 }
             }
@@ -569,28 +489,8 @@ Popup {
                             let fault = safeValueFunction(calculator.faultCurrentHV, 0) * 1000;
                             let multiple = fault / pickup;
                             let tds = timeDialSlider.value;
-                            let time = 0;
                             
-                            switch(curveTypeCombo.currentText) {
-                                case "Standard Inverse":
-                                    time = tds * 0.14 / (Math.pow(multiple, 0.02) - 1);
-                                    break;
-                                case "Very Inverse":
-                                    time = tds * 13.5 / (multiple - 1);
-                                    break;
-                                case "Extremely Inverse":
-                                    time = tds * 80 / (Math.pow(multiple, 2) - 1);
-                                    break;
-                                case "Long-Time Inverse":
-                                    time = tds * 120 / (multiple - 1);
-                                    break;
-                                case "Definite Time":
-                                    time = tds;
-                                    break;
-                            }
-                            
-                            time = Math.max(time, 0.025);
-                            
+                            let time = calculator.calculateTripTimeWithParams(multiple, tds, curveTypeCombo.currentText);
                             return time.toFixed(2) + " s";
                         }
                     }
@@ -727,22 +627,12 @@ Popup {
                     
                     Label { text: "Minimum Fault Current:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "0.0 A";
-                            
-                            let minFault = safeValueFunction(calculator.faultCurrentHV, 0) * 1000 * 0.87;
-                            return minFault.toFixed(1) + " A";
-                        }
+                        text: calculator ? safeValueFunction(calculator.minimumFaultCurrent, 0).toFixed(1) + " A" : "0.0 A"
                     }
                     
                     Label { text: "Remote Backup Trip Time:" }
                     TextFieldBlue {
-                        text: {
-                            if (!calculator) return "0.7s";
-                            
-                            let mainTripTime = 0.3;
-                            return (mainTripTime + 0.4).toFixed(1) + "s";
-                        }
+                        text: calculator ? safeValueFunction(calculator.remoteBackupTripTime, 0.7).toFixed(1) + "s" : "0.7s"
                     }
                 }
             }

@@ -103,6 +103,21 @@ class TransformerLineCalculator(QObject):
             "Extremely Inverse": {"a": 80.0, "b": 2.0},
             "Long-Time Inverse": {"a": 120.0, "b": 1.0}
         }
+
+        # Additional calculated values for expert popup
+        self._z0_transformer = 0.0  # Ohm
+        self._z0_line = 0.0  # Ohm
+        self._z_ng_referred = 0.0  # Ohm
+        self._x_r_ratio_at_fault = 0.0
+        self._asymmetry_factor = 1.0
+        self._short_circuit_mva = 0.0  # MVA
+        self._instantaneous_pickup = 0.0  # A
+        self._trip_time_max_fault = 0.0  # s
+        self._breaker_duty_factor = 1.0
+        self._curve_a_constant = 13.5
+        self._curve_b_exponent = 1.0
+        self._minimum_fault_current = 0.0  # A
+        self._remote_backup_trip_time = 0.7  # s
         
         # Perform initial calculations
         self._calculate()
@@ -433,6 +448,9 @@ class TransformerLineCalculator(QObject):
             
             # 4. Calculate cable sizes based on actual currents
             self._calculate_cable_sizes()
+
+            # Add additional calculations that were previously in QML
+            self._calculate_additional_parameters()
             
             # Ensure signal emission after all calculations
             self.calculationCompleted.emit()
@@ -464,6 +482,64 @@ class TransformerLineCalculator(QObject):
             print(f"Error in recalculate_load_values: {str(e)}")
             logging.getLogger("qmltest").error(f"Error in recalculate_load_values: {str(e)}")
     
+    def _calculate_additional_parameters(self):
+        """Calculate additional parameters for expert protection popup"""
+        try:
+            # Zero sequence impedances
+            self._z0_transformer = 0.85 * self._transformer_z
+            self._z0_line = 3.0 * abs(self._line_total_z)
+            
+            # Calculate neutral impedance referred to HV
+            self._z_ng_referred = self._neutral_grounding_resistance * (self._transformer_hv_voltage / self._transformer_lv_voltage) ** 2
+            
+            # Calculate X/R ratio at fault point
+            r_total = self._transformer_r + (self._line_r * self._line_length)
+            x_total = self._transformer_x + (self._line_x * self._line_length)
+            self._x_r_ratio_at_fault = x_total / max(r_total, 0.001)  # Prevent division by zero
+            
+            # Calculate asymmetry factor for fault current
+            self._asymmetry_factor = math.sqrt(1 + 2 * math.exp(-2 * math.pi * r_total / max(x_total, 0.001)))
+            
+            # Calculate short circuit MVA at fault point
+            v_kv = self._transformer_hv_voltage / 1000
+            self._short_circuit_mva = math.sqrt(3) * v_kv * self._fault_current_hv
+            
+            # Calculate instantaneous pickup current (typically 8x FLC)
+            self._instantaneous_pickup = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage) * 8
+            
+            # Calculate trip time at maximum fault current
+            pickup = self._relay_pickup_current
+            fault = self._fault_current_hv * 1000
+            multiple = fault / max(pickup, 0.1)  # Prevent division by zero
+            
+            # Get curve parameters
+            curve_params = self._iec_curves.get(self._relay_curve_type, {"a": 13.5, "b": 1.0})
+            
+            # Calculate trip time based on curve formula
+            if multiple > 1.0:
+                numerator = curve_params["a"] * self._relay_time_dial
+                denominator = (multiple ** curve_params["b"]) - 1
+                self._trip_time_max_fault = max(numerator / max(denominator, 0.0001), 0.025)
+            else:
+                self._trip_time_max_fault = float('inf')  # No trip below pickup
+            
+            # Calculate breaker duty factor (1.0 for 50Hz systems)
+            self._breaker_duty_factor = 1.0
+            
+            # Calculate curve parameters
+            self._curve_a_constant = curve_params["a"]
+            self._curve_b_exponent = curve_params["b"]
+            
+            # Calculate minimum fault current (87% of 3-phase fault current is common approximation)
+            self._minimum_fault_current = self._fault_current_hv * 1000 * 0.87
+            
+            # Calculate remote backup trip time
+            self._remote_backup_trip_time = 0.3 + 0.4  # Main trip + coordination margin
+            
+        except Exception as e:
+            logger = logging.getLogger("qmltest")
+            logger.error(f"Error in calculating additional parameters: {e}")
+
     @Property(float, notify=transformerChanged)
     def transformerRating(self):
         return self._transformer_rating
@@ -796,7 +872,71 @@ class TransformerLineCalculator(QObject):
     def reversePowerThreshold(self):
         """Reverse power protection threshold"""
         return self._reverse_power_threshold
+    
+    @Property(float, notify=calculationCompleted)
+    def z0Transformer(self):
+        """Zero sequence impedance of transformer in ohms"""
+        return self._z0_transformer
 
+    @Property(float, notify=calculationCompleted)
+    def z0Line(self):
+        """Zero sequence impedance of line in ohms"""
+        return self._z0_line
+
+    @Property(float, notify=calculationCompleted)
+    def zNeutralReferred(self):
+        """Neutral grounding impedance referred to HV side in ohms"""
+        return self._z_ng_referred
+
+    @Property(float, notify=calculationCompleted)
+    def xrRatioAtFault(self):
+        """X/R ratio at fault point"""
+        return self._x_r_ratio_at_fault
+
+    @Property(float, notify=calculationCompleted)
+    def asymmetryFactor(self):
+        """Asymmetry factor for fault current"""
+        return self._asymmetry_factor
+
+    @Property(float, notify=calculationCompleted)
+    def shortCircuitMVA(self):
+        """Short circuit MVA at fault point"""
+        return self._short_circuit_mva
+
+    @Property(float, notify=calculationCompleted)
+    def instantaneousPickup(self):
+        """Instantaneous pickup current (A)"""
+        return self._instantaneous_pickup
+
+    @Property(float, notify=calculationCompleted)
+    def tripTimeMaxFault(self):
+        """Trip time at maximum fault current (s)"""
+        return self._trip_time_max_fault
+
+    @Property(float, notify=calculationCompleted)
+    def breakerDutyFactor(self):
+        """Breaker duty factor"""
+        return self._breaker_duty_factor
+
+    @Property(float, notify=calculationCompleted)
+    def curveAConstant(self):
+        """A constant for current curve formula"""
+        return self._curve_a_constant
+
+    @Property(float, notify=calculationCompleted)
+    def curveBExponent(self):
+        """B exponent for current curve formula"""
+        return self._curve_b_exponent
+
+    @Property(float, notify=calculationCompleted)
+    def minimumFaultCurrent(self):
+        """Minimum fault current (A)"""
+        return self._minimum_fault_current
+
+    @Property(float, notify=calculationCompleted)
+    def remoteBackupTripTime(self):
+        """Remote backup trip time (s)"""
+        return self._remote_backup_trip_time
     @Property(dict, notify=calculationCompleted)
     def differentialSettings(self):
         """Differential protection settings"""
@@ -1091,6 +1231,52 @@ class TransformerLineCalculator(QObject):
                 logger.exception(e)
         else:
             logger.warning(f"Invalid load value for voltage calculation: {value}")
+
+    @Slot(float, float, str, result=float)
+    def calculateTripTimeWithParams(self, current_multiple, time_dial, curve_type):
+        """Calculate trip time based on provided parameters"""
+        try:
+            if current_multiple <= 1.0:
+                return float('inf')  # Won't trip below pickup
+                
+            curve_params = self._iec_curves.get(curve_type, {"a": 13.5, "b": 1.0})
             
-        # Don't store as the official load MVA property to avoid affecting protection settings
-        # DO NOT SET self._load_mva = value
+            # Formula: t = TD * A / ((I/Ip)^B - 1)
+            numerator = curve_params["a"] * time_dial
+            denominator = (current_multiple**curve_params["b"]) - 1
+            
+            trip_time = numerator / denominator if denominator > 0 else float('inf')
+            return max(trip_time, 0.025)  # Minimum 25ms operating time
+            
+        except Exception as e:
+            logger = logging.getLogger("qmltest")
+            logger.error(f"Error calculating trip time with params: {e}")
+            return 0.0
+
+    @Slot(str, result=dict)
+    def getCurveDescription(self, curve_type):
+        """Get description and formula for relay curve type"""
+        descriptions = {
+            "Standard Inverse": {
+                "description": "Good for general distribution networks.",
+                "formula": "t = TDS * 0.14 / ((I/Is)^0.02 - 1)"
+            },
+            "Very Inverse": {
+                "description": "Good for feeder protection and transformer protection.",
+                "formula": "t = TDS * 13.5 / ((I/Is) - 1)"
+            },
+            "Extremely Inverse": {
+                "description": "Good for transformer and motor protection.",
+                "formula": "t = TDS * 80 / ((I/Is)^2 - 1)"
+            },
+            "Long-Time Inverse": {
+                "description": "Good for high inrush applications.",
+                "formula": "t = TDS * 120 / ((I/Is) - 1)"
+            },
+            "Definite Time": {
+                "description": "Good for backup protection schemes.",
+                "formula": "t = TDS (regardless of current magnitude)"
+            }
+        }
+        
+        return descriptions.get(curve_type, {"description": "Unknown curve type", "formula": ""})
