@@ -71,6 +71,7 @@ Item {
         id: mainLayout
         anchors.centerIn: parent
 
+        // Header
         RowLayout {
             id: topHeader
             Layout.fillWidth: true
@@ -91,25 +92,26 @@ Item {
                 onClicked: popUpText.open()
             }
         }
-       
-        TransformerLineViz {}
 
         RowLayout {
+            // Inputs
             ColumnLayout {
-                Layout.minimumWidth: 300
+                Layout.minimumWidth: 400
                 Layout.alignment: Qt.AlignTop
     
                 // Transformer parameters section
                 WaveCard {
                     id: results
-                    title: "Transformer Parameters (400V to 11kV)"
+                    title: "Transformer Parameters"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 180
+                    Layout.minimumHeight: 260
 
                     GridLayout {
                         columns: 2
+                        anchors.fill: parent
+                        uniformCellWidths: true
                         
-                        Label { text: "Transformer Rating (kVA):" ; Layout.minimumWidth: 200}
+                        Label { text: "Transformer Rating (kVA):" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: transformerRatingSpinBox
                             from: 100
@@ -117,11 +119,35 @@ Item {
                             value: calculator ? calculator.transformerRating : 300
                             stepSize: 50
                             editable: true
-                            Layout.minimumWidth: 150
+                            Layout.fillWidth: true
                             onValueModified: if (calculatorReady) calculator.setTransformerRating(value)
                         }
+
+                        Label { text: "Transformer LV (V):" }
+                        SpinBoxRound {
+                            id: lvVoltageSpinBox
+                            from: 100
+                            to: 5000
+                            value: calculatorReady ? calculator.lvVoltage : 1000
+                            stepSize: 10
+                            editable: true
+                            Layout.fillWidth: true
+                            onValueModified: if (calculatorReady) calculator.setLVTXRating(value)
+                        }
+
+                        Label { text: "Transformer HV (V):" }
+                        SpinBoxRound {
+                            id: hvVoltageSpinBox
+                            from: 100
+                            to: 33000
+                            value: calculatorReady ? calculator.hvVoltage : 11000
+                            stepSize: 100
+                            editable: true
+                            Layout.fillWidth: true
+                            onValueModified: if (calculatorReady) calculator.setHVTXRating(value)
+                        }
                         
-                        Label { text: "Transformer Impedance (%):" }
+                        Label { text: "Transformer Impedance (%):" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: transformerImpedanceSpinBox
                             from: 1
@@ -147,7 +173,7 @@ Item {
                             onValueModified: if (calculatorReady) calculator.setTransformerImpedance(realValue)
                         }
                         
-                        Label { text: "Transformer X/R Ratio:" }
+                        Label { text: "Transformer X/R Ratio:" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: transformerXRRatioSpinBox
                             from: 30
@@ -177,14 +203,16 @@ Item {
                 
                 // Line parameters section
                 WaveCard {
-                    title: "Line Parameters (5km Cable)"
+                    title: "Line Parameters"
                     Layout.fillWidth: true
                     Layout.minimumHeight: 180
                     
                     GridLayout {
                         columns: 2
+                        anchors.fill: parent
+                        uniformCellWidths: true
                         
-                        Label { text: "Line Length (km):" ; Layout.minimumWidth: 200}
+                        Label { text: "Line Length (km):" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: lineLengthSpinBox
                             from: 1
@@ -192,8 +220,8 @@ Item {
                             value: calculator ? calculator.lineLength * 10 : 50
                             stepSize: 5
                             editable: true
-                            Layout.minimumWidth: 150
                             property real realValue: value / 10.0
+                            Layout.fillWidth: true
                             
                             textFromValue: function(value) {
                                 return (value / 10.0).toFixed(1);
@@ -210,7 +238,7 @@ Item {
                             }
                         }
                         
-                        Label { text: "Line Resistance (Ohm/km):" }
+                        Label { text: "Line Resistance (Ohm/km):" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: lineRSpinBox
                             from: 1
@@ -236,7 +264,7 @@ Item {
                             }
                         }
                         
-                        Label { text: "Line Reactance (Ohm/km):" }
+                        Label { text: "Line Reactance (Ohm/km):" ; Layout.fillWidth: true }
                         SpinBoxRound {
                             id: lineXSpinBox
                             from: 1
@@ -272,16 +300,18 @@ Item {
                     
                     GridLayout {
                         columns: 2
+                        anchors.fill: parent
+                        uniformCellWidths: true
                         
-                        Label { text: "Load (MVA):" ; Layout.minimumWidth: 200}
+                        Label { text: "Load (MVA):" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: loadMVASpinBox
                             from: 1
                             to: 100
-                            value: calculator ? calculator.loadMVA * 100 : 80
+                            value: calculator ? calculator.loadMVA * 100 : 50
                             stepSize: 1
                             editable: true
-                            Layout.minimumWidth: 150
+                            Layout.fillWidth: true
                             property real realValue: value / 100.0
                             
                             textFromValue: function(value) {
@@ -302,7 +332,7 @@ Item {
                             }
                         }
                         
-                        Label { text: "Power Factor:" }
+                        Label { text: "Power Factor:" ; Layout.fillWidth: true}
                         SpinBoxRound {
                             id: loadPowerFactorSpinBox
                             from: 70
@@ -330,9 +360,10 @@ Item {
                     }
                 }
             }
-
+            // Results
             ColumnLayout {
-                Layout.minimumWidth: 300
+                Layout.minimumWidth: 400
+                Layout.alignment: Qt.AlignTop
 
                 // System results section
                 WaveCard {
@@ -342,6 +373,7 @@ Item {
                     
                     GridLayout {
                         columns: 2
+                        anchors.fill: parent
                         
                         Label { text: "Transformer Z (Ohms):" ; Layout.minimumWidth: 200}
                         TextFieldBlue {
@@ -396,6 +428,7 @@ Item {
                     
                     GridLayout {
                         columns: 2
+                        anchors.fill: parent
                         
                         Label { text: "Relay Pickup Current (A):" ; Layout.minimumWidth: 200}
                         TextFieldBlue {
@@ -440,6 +473,7 @@ Item {
                 voltageDropText.text = safeValue(calculator.voltageDrop, 0).toFixed(2)
                 faultCurrentLVText.text = safeValue(calculator.faultCurrentLV, 0).toFixed(2)
                 faultCurrentHVText.text = safeValue(calculator.faultCurrentHV, 0).toFixed(2)
+
                 relayPickupCurrentText.text = safeValue(calculator.relayPickupCurrent, 0).toFixed(2)
                 relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
                 relayCtRatioText.text = calculator.relayCtRatio

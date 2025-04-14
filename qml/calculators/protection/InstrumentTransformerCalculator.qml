@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -130,6 +129,17 @@ Item {
                     }
 
                     StyledButton {
+                        ToolTip.text: "Reset to default values"
+                        Layout.alignment: Qt.AlignRight
+                        Layout.columnSpan: 2
+                        icon.source: "../../../icons/rounded/restart_alt.svg"
+
+                        onClicked: {
+                            calculator.resetToDefaults()
+                        }
+                    }
+
+                    StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Help"
@@ -138,41 +148,12 @@ Item {
                 }
 
                 RowLayout {
-
                     // Left side inputs and results
                     ColumnLayout {
                         id: leftColumn
                         Layout.minimumWidth: 380
                         Layout.maximumWidth: 380
                         Layout.alignment: Qt.AlignTop
-
-                        // Controls
-                        RowLayout {
-                            Layout.minimumWidth: 50
-                            Layout.alignment: Qt.AlignHCenter
-
-                            StyledButton {
-                                ToolTip.text: "Reset to default values"
-                                Layout.alignment: Qt.AlignRight
-                                Layout.columnSpan: 2
-                                icon.source: "../../../icons/rounded/restart_alt.svg"
-
-                                onClicked: {
-                                    calculator.resetToDefaults()
-                                }
-                            }
-
-                            StyledButton {
-                                id: info
-
-                                ToolTip.visible: false
-                                icon.source: "../../../icons/rounded/info.svg"
-
-                                onClicked: {
-                                    tipsPopup.open()
-                                }
-                            }
-                        }
 
                         // CT Section
                         WaveCard {

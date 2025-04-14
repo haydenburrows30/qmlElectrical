@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -11,9 +10,11 @@ import "../../components/style"
 Popup {
     id: expertPopup
     modal: true
-    padding: 25
-    width: 700  // Increased width
-    height: 700  // Increased height
+    padding: 10
+    width: 800
+    height: 800
+
+    anchors.centerIn: Overlay.overlay
     
     property var calculator
     property var safeValueFunction
@@ -31,12 +32,12 @@ Popup {
     
     ColumnLayout {
         anchors.fill: parent
-        spacing: 20
+        spacing: 10
         
         Label {
             text: "Expert Protection Settings"
             font.bold: true
-            font.pixelSize: 20
+            font.pixelSize: 16
         }
         Rectangle { height: 1; Layout.fillWidth: true; color: "gray"}
         
@@ -44,17 +45,9 @@ Popup {
             id: tabBar
             Layout.fillWidth: true
             
-            TabButton {
-                text: "System Parameters"
-            }
-            
-            TabButton {
-                text: "Time-Current Curves"
-            }
-            
-            TabButton {
-                text: "Protection Settings"
-            }
+            TabButton {text: "System Parameters"}
+            TabButton {text: "Time-Current Curves"}
+            TabButton {text: "Protection Settings"}
         }
         
         StackLayout {
@@ -447,7 +440,7 @@ Popup {
                 Layout.fillHeight: true
                 
                 GridLayout {
-                    width: parent.width
+                    width: 700
                     columns: 2
                     
                     Label { 
@@ -524,7 +517,8 @@ Popup {
                               "• Refer to grid code requirements for exact settings"
                         readOnly: true
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 100
+                        
+                        Layout.preferredHeight: 200
                         wrapMode: Text.Wrap
                         background: Rectangle { color: "#f0f0f0"; border.color: "#c0c0c0" }
                     }
@@ -534,7 +528,7 @@ Popup {
                     TextArea {
                         id: curveFormulas
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 130
+                        Layout.preferredHeight: 400
                         readOnly: true
                         text: "Standard Inverse (IEC): t = TDS * 0.14 / ((I/Is)^0.02 - 1)\n" +
                               "Very Inverse (IEC): t = TDS * 13.5 / ((I/Is) - 1)\n" +

@@ -62,6 +62,19 @@ Item {
                     }
 
                     StyledButton {
+                        icon.source: "../../../icons/rounded/restart_alt.svg"
+
+                        onClicked: {
+                            calculator.reset()
+                            relayName.text = ""
+                            pickupCurrent.text = ""
+                            tds.text = ""
+                            faultCurrent.text = ""
+                            marginChart.scatterSeries.clear()
+                        }
+                    }
+
+                    StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Help"
@@ -76,30 +89,6 @@ Item {
                         id: leftColumn
                         Layout.maximumWidth: 400
                         Layout.minimumWidth: 400
-
-                        RowLayout {
-
-                            StyledButton {
-                                icon.source: "../../../icons/rounded/restart_alt.svg"
-
-                                onClicked: {
-                                    calculator.reset()
-                                    relayName.text = ""
-                                    pickupCurrent.text = ""
-                                    tds.text = ""
-                                    faultCurrent.text = ""
-                                    marginChart.scatterSeries.clear()
-                                }
-                            }
-
-                            StyledButton {
-                                id: results
-                                icon.source: "../../../icons/rounded/info.svg"
-                                onClicked: {
-                                    tipsPopup.open()
-                                }
-                            }
-                        }
 
                         // Relay Input Section
                         WaveCard {

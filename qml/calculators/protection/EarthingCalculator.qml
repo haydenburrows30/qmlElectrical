@@ -22,7 +22,7 @@ Item {
         id: popUpText
         parentCard: topHeader
         widthFactor: 0.5
-        heightFactor: 0.7
+        heightFactor: 0.8
         popupText: "<h3>Earthing System Calculator</h3><br>" +
                 "This calculator estimates the grid resistance, ground rise, touch voltage, step voltage, and minimum conductor size for an earthing system.<br><br>" +
                 "<b>Grid Parameters:</b><br>" +
@@ -47,6 +47,7 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
+        anchors.margins: 5
 
         // Header with title and help button
         RowLayout {

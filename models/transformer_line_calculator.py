@@ -22,18 +22,18 @@ class TransformerLineCalculator(QObject):
         self._transformer_lv_voltage = 400.0  # V
         self._transformer_hv_voltage = 11000.0  # V
         self._transformer_rating = 300.0  # kVA
-        self._transformer_impedance = 6.0  # %
+        self._transformer_impedance = 4.5  # %
         self._transformer_x_r_ratio = 8.0  # X/R ratio
         
         # Line parameters (5km cable)
         self._line_length = 5.0  # km
-        self._line_r = 0.25  # Ohm/km
-        self._line_x = 0.20  # Ohm/km
+        self._line_r = 1.42  # Ohm/km
+        self._line_x = 0.13  # Ohm/km
         self._line_c = 0.3  # μF/km
         
         # Load parameters
-        self._load_mva = 0.8  # MVA - This is for protection settings
-        self._display_load_mva = 0.8  # MVA - This is for display purposes only
+        self._load_mva = 0.5  # MVA - This is for protection settings
+        self._display_load_mva = 0.5  # MVA - This is for display purposes only
         self._load_pf = 0.85  # Power factor
         
         # Voltage regulator parameters
@@ -252,21 +252,21 @@ class TransformerLineCalculator(QObject):
             self._transformer_x = self._transformer_z * math.sin(angle)
             
             logger.info("\nTransformer Impedance:")
-            logger.info(f"Base Z: {base_z_hv:.2f} Ω")
+            logger.info(f"Base Z: {base_z_hv:.2f} ohm")
             logger.info(f"Z (pu): {z_pu:.3f}")
-            logger.info(f"Total Z: {self._transformer_z:.2f} Ω")
-            logger.info(f"R: {self._transformer_r:.2f} Ω")
-            logger.info(f"X: {self._transformer_x:.2f} Ω")
+            logger.info(f"Total Z: {self._transformer_z:.2f} ohm")
+            logger.info(f"R: {self._transformer_r:.2f} ohm")
+            logger.info(f"X: {self._transformer_x:.2f} ohm")
             
             # Calculate line impedance
             self._line_total_z = complex(self._line_r * self._line_length, 
                                          self._line_x * self._line_length)
             
             logger.info("\nLine Parameters:")
-            logger.info(f"R per km: {self._line_r:.3f} Ω")
-            logger.info(f"X per km: {self._line_x:.3f} Ω")
+            logger.info(f"R per km: {self._line_r:.3f} ohm")
+            logger.info(f"X per km: {self._line_x:.3f} ohm")
             logger.info(f"Length: {self._line_length:.2f} km")
-            logger.info(f"Total Z: {abs(self._line_total_z):.2f}∠{math.degrees(cmath.phase(self._line_total_z)):.1f}° Ω")
+            logger.info(f"Total Z: {abs(self._line_total_z):.2f} ohm at angle {math.degrees(cmath.phase(self._line_total_z)):.1f} deg")
             
             # Fault current calculations using sequence components
             # Calculate transformer impedance
@@ -302,8 +302,8 @@ class TransformerLineCalculator(QObject):
             self._fault_current_lv = (self._transformer_lv_voltage / (math.sqrt(3) * abs(z_t_lv))) / 1000  # Convert to kA
             
             logger.info(f"\nLV Fault Current Calculation:")
-            logger.info(f"Base Z (LV): {z_base_lv:.4f} Ω")
-            logger.info(f"Transformer Z (LV): {z_t_lv:.4f} Ω")
+            logger.info(f"Base Z (LV): {z_base_lv:.4f} ohm")
+            logger.info(f"Transformer Z (LV): {z_t_lv:.4f} ohm")
             logger.info(f"LV Fault Current: {self._fault_current_lv:.2f} kA")
             
             logger.info("\nFault Current Calculations:")
@@ -333,8 +333,8 @@ class TransformerLineCalculator(QObject):
             self._unregulated_voltage = (abs(receiving_voltage_complex) * math.sqrt(3)) / 1000.0  # Convert to kV L-L
             
             logger.info("\nVoltage Drop Calculation:")
-            logger.info(f"Load Current: {load_current:.2f}∠{math.degrees(-load_angle):.1f}° A")
-            logger.info(f"Total Impedance: {abs(total_impedance):.2f}∠{math.degrees(cmath.phase(total_impedance)):.1f}° Ω")
+            logger.info(f"Load Current: {load_current:.2f} A at angle {math.degrees(-load_angle):.1f} deg")
+            logger.info(f"Total Impedance: {abs(total_impedance):.2f} ohm at angle {math.degrees(cmath.phase(total_impedance)):.1f} deg")
             logger.info(f"Voltage Drop: {self._voltage_drop:.2f}%")
             logger.info(f"Unregulated Voltage: {self._unregulated_voltage:.2f} kV")
             
@@ -466,7 +466,33 @@ class TransformerLineCalculator(QObject):
             # Recalculate load-dependent values when transformer rating changes
             self._recalculate_load_values()
             self._calculate()
+
+    @Property(float, notify=transformerChanged)
+    def lvVoltage(self):
+        return self._transformer_lv_voltage
     
+    @lvVoltage.setter
+    def lvVoltage(self, value):
+        if self._transformer_lv_voltage != value and value > 0:
+            self._transformer_lv_voltage = value
+            self.transformerChanged.emit()
+            # Recalculate load-dependent values when transformer rating changes
+            self._recalculate_load_values()
+            self._calculate()
+    
+    @Property(float, notify=transformerChanged)
+    def hvVoltage(self):
+        return self._transformer_hv_voltage
+    
+    @hvVoltage.setter
+    def hvVoltage(self, value):
+        if self._transformer_hv_voltage != value and value > 0:
+            self._transformer_hv_voltage = value
+            self.transformerChanged.emit()
+            # Recalculate load-dependent values when transformer rating changes
+            self._recalculate_load_values()
+            self._calculate()
+            
     @Property(float, notify=transformerChanged)
     def transformerImpedance(self):
         return self._transformer_impedance
@@ -771,6 +797,24 @@ class TransformerLineCalculator(QObject):
     def setTransformerRating(self, value):
         if self._transformer_rating != value and value > 0:
             self._transformer_rating = value
+            self.transformerChanged.emit()
+            # Recalculate load-dependent values when transformer rating changes
+            self._recalculate_load_values()
+            self._calculate()
+
+    @Slot(float)
+    def setLVTXRating(self, value):
+        if self._transformer_lv_voltage != value and value > 0:
+            self._transformer_lv_voltage = value
+            self.transformerChanged.emit()
+            # Recalculate load-dependent values when transformer rating changes
+            self._recalculate_load_values()
+            self._calculate()
+
+    @Slot(float)
+    def setHVTXRating(self, value):
+        if self._transformer_hv_voltage != value and value > 0:
+            self._transformer_hv_voltage = value
             self.transformerChanged.emit()
             # Recalculate load-dependent values when transformer rating changes
             self._recalculate_load_values()

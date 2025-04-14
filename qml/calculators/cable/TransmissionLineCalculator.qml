@@ -89,7 +89,7 @@ Item {
         Flickable {
             id: flickableMain
             contentWidth: parent.width
-            contentHeight: mainLayout.height
+            contentHeight: mainLayout.height + 20
             bottomMargin: 5
             leftMargin: 5
             rightMargin: 5
@@ -97,7 +97,7 @@ Item {
 
             ColumnLayout {
                 id: mainLayout
-                width: flickableMain.width
+                width: flickableMain.width - 20
 
                 // Header with title and help button
                 RowLayout {

@@ -16,11 +16,14 @@ Item {
 
     property var calculator
     property bool calculatorReady
-    property real totalGeneratedPower
     property var safeValueFunction
     property string applicationDirPath: Qt.application.directoryPath || "."
 
     property bool saveSuccess: false
+    
+    // Fix for the maximum call stack error - guard against recursive calls
+    property bool isUpdatingValues: false
+    property bool isUpdatingAEP: false
 
     signal calculate()
 
@@ -146,7 +149,6 @@ Item {
                         icon.source: "../../../icons/rounded/restart_alt.svg"
 
                         onClicked: {
-
                             if (calculatorReady) {
                                 calculator.resetToGenericTurbine()
                                 bladeRadiusSpinBox.value = calculator.bladeRadius
@@ -362,40 +364,37 @@ Item {
                             Label { text: "Swept Area (m²):" }
                             TextFieldBlue {
                                 id: sweptAreaText
-                                text: safeValue(calculator.sweptArea, 0).toFixed(2)
+                                text: "0.00" // Set default value, will be updated by timer
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
-
                                 ToolTip.text: "self._swept_area = math.pi * self._blade_radius * self._blade_radius"
                             }
 
                             Label { text: "Theoretical Power (kW):" }
                             TextFieldBlue {
                                 id: theoreticalPowerText
-                                text: safeValue(calculator.theoreticalPower, 0).toFixed(2)
+                                text: "0.00" // Set default value, will be updated by timer
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
-
                                 ToolTip.text: "self._theoretical_power = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)"
                             }
 
                             Label { text: "Actual Power Output (kW):" }
                             TextFieldBlue {
                                 id: actualPowerText
-                                text: calculatorReady ? safeValueFunction(calculator.actualPower, 0).toFixed(2) : "0.00"
+                                text: "0.00" // Set default value, will be updated by timer
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
-
                                 ToolTip.text: "self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency"
                             }
                             
                             Label { text: "Generator Rated Capacity (kVA):" }
                             TextFieldBlue {
                                 id: genCapacityText
-                                text: calculatorReady ? safeValueFunction(calculator.ratedCapacity, 0).toFixed(2) : "0.00"
+                                text: "0.00" // Set default value, will be updated by timer
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
@@ -405,7 +404,7 @@ Item {
                             Label { text: "Generator Output Current (A):" }
                             TextFieldBlue {
                                 id: genCurrentText
-                                text: calculatorReady ? safeValueFunction(calculator.outputCurrent, 0).toFixed(2) : "0.00"
+                                text: "0.00" // Set default value, will be updated by timer
                                 hoverEnabled: true
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
@@ -415,7 +414,7 @@ Item {
                             Label { text: "Annual Energy Production (MWh/year):" }
                             TextFieldBlue {
                                 id: annualEnergyText
-                                text: calculatorReady ? safeValueFunction(calculator.annualEnergy, 0).toFixed(2) : "0.00"
+                                text: "0.00" // Set default value, will be updated by timer
                             }
 
                             Rectangle {
@@ -441,7 +440,8 @@ Item {
                                 stepSize: 1
                                 editable: true
                                 Layout.fillWidth: true
-                                onValueModified: updateAdvancedAEP()
+                                // REMOVE: onValueModified binding that causes stack overflow
+                                // Instead, we'll use the button to trigger updates
                             }
                             
                             Label { text: "Weibull Shape Parameter:" }
@@ -463,13 +463,26 @@ Item {
                                     return Math.round(parseFloat(text) * 10);
                                 }
                                 
-                                onValueModified: updateAdvancedAEP()
+                                // REMOVE: onValueModified binding that causes stack overflow
+                                // Instead, we'll use the button to trigger updates
                             }
                             
                             Label { text: "Estimated AEP (MWh/year):" }
                             TextFieldBlue {
                                 id: advancedAepText
                                 text: "0.00"
+                            }
+                            
+                            StyledButton {
+                                text: "Calculate AEP"
+                                icon.source: "../../../icons/rounded/calculate.svg"
+                                Layout.columnSpan: 2
+                                Layout.alignment: Qt.AlignRight
+                                
+                                onClicked: {
+                                    // Single explicit call to calculate AEP
+                                    calculateAdvancedAEP()
+                                }
                             }
                         }
                     }
@@ -509,13 +522,20 @@ Item {
                             onClicked: {
                                 calculate()
                                 updatePowerCurve()
+                                
+                                // Signal that calculation has been completed
+                                if (calculatorReady) {
+                                    // We do NOT directly synchronize with transformer here
+                                    // This makes the component fully independent
+                                }
                             }
                         }
                         
                         ValueAxis {
                             id: axisX
                             min: 0
-                            max: safeValue(calculator.cutOutSpeed, 25) + 5
+                            // Remove binding that may cause recursion
+                            max: 30 // Default value
                             titleText: "Wind Speed (m/s)"
                         }
                         
@@ -538,28 +558,26 @@ Item {
         }
     }
 
+    // Function to update the power curve display
     function updatePowerCurve() {
-
-        powerSeries.clear()
-
         if (!calculatorReady) {
             console.error("Calculator instance not ready")
             return
         }
         
         try {
+            // Clear existing points
+            powerSeries.clear()
+            
+            // Get data from calculator
             var powerCurveData = calculator.powerCurve || []
-
-            if (powerCurveData.length > 0) {
-            }
-
+            
             var maxPower = 0.1
-            var totalPower = 0
-            var nonZeroPoints = 0
-
+            
+            // Process points
             for (var i = 0; i < powerCurveData.length; i++) {
                 var point = powerCurveData[i]
-
+                
                 var x, y;
                 if (typeof point === 'object') {
                     if ('x' in point && 'y' in point) {
@@ -574,24 +592,17 @@ Item {
                 } else {
                     continue
                 }
-
-                if (i % 10 === 0 || y > maxPower) {
-                }
-
+                
+                // Add point to series
                 powerSeries.append(x, y)
                 
-                if (y > 0) {
-                    nonZeroPoints++
-                    totalPower += y
-                }
-                
+                // Track maximum power for Y-axis scaling
                 if (y > maxPower) {
                     maxPower = y
                 }
             }
-
-            var avgPower = nonZeroPoints > 0 ? totalPower / nonZeroPoints : 0
-
+            
+            // Calculate appropriate Y axis maximum
             var yAxisMax;
             if (maxPower < 1) {
                 yAxisMax = 1;
@@ -600,15 +611,19 @@ Item {
             } else {
                 yAxisMax = Math.ceil(maxPower * 1.2);
             }
-
+            
             if (maxPower > 50) {
                 yAxisMax = Math.max(yAxisMax, 100);
             }
-
+            
+            // Set axis ranges
             axisY.max = yAxisMax;
-
-            axisX.max = Math.max(calculator.cutOutSpeed + 5, 30);
-
+            
+            // Safely get cut-out speed
+            var cutOut = calculatorReady ? calculator.cutOutSpeed : 25;
+            axisX.max = Math.max(cutOut + 5, 30);
+            
+            // Force chart update
             powerCurveChart.update()
         } catch (e) {
             console.error("Error updating power curve:", e)
@@ -616,13 +631,69 @@ Item {
         }
     }
 
+    // Helper function for path formatting
     function platformPath(path) {
         return Qt.platform.os === "windows" ? path.replace(/\//g, "\\") : path;
     }
 
+    // Safe value handling without recursion risk
+    function safeValue(value, defaultVal) {
+        if (typeof value === 'undefined' || value === null || isNaN(value) || !isFinite(value)) {
+            return defaultVal;
+        }
+        return value;
+    }
+
+    // Fixed implementation of advanced AEP calculation
+    function calculateAdvancedAEP() {
+        if (!calculatorReady || isUpdatingAEP) return;
+        
+        try {
+            isUpdatingAEP = true;
+            
+            // Get values directly from spinboxes
+            var windSpeed = avgWindSpeedSpinBox.value;
+            var weibullK = weibullKSpinBox.value / 10;
+            
+            // Call Python function directly
+            var aep = calculator.estimateAEP(windSpeed, weibullK);
+            
+            // Update text field with result
+            advancedAepText.text = safeValue(aep, 0).toFixed(2);
+        } catch (e) {
+            console.error("Error calculating AEP:", e);
+            advancedAepText.text = "Error";
+        } finally {
+            isUpdatingAEP = false;
+        }
+    }
+    
+    // Update display values from calculator
+    function updateDisplayValues() {
+        if (!calculatorReady || isUpdatingValues) return;
+        
+        try {
+            isUpdatingValues = true;
+            
+            // Update text fields with values from calculator
+            sweptAreaText.text = safeValue(calculator.sweptArea, 0).toFixed(2);
+            theoreticalPowerText.text = safeValue(calculator.theoreticalPower, 0).toFixed(2);
+            actualPowerText.text = safeValue(calculator.actualPower, 0).toFixed(2);
+            genCapacityText.text = safeValue(calculator.ratedCapacity, 0).toFixed(2);
+            genCurrentText.text = safeValue(calculator.outputCurrent, 0).toFixed(2);
+            annualEnergyText.text = safeValue(calculator.annualEnergy, 0).toFixed(2);
+            
+        } catch (e) {
+            console.error("Error updating display values:", e);
+        } finally {
+            isUpdatingValues = false;
+        }
+    }
+
+    // Regular update timer - reduced frequency
     Timer {
         id: updateTimer
-        interval: 250
+        interval: 500
         repeat: true
         running: calculatorReady
         onTriggered: {
@@ -630,44 +701,18 @@ Item {
                 updateDisplayValues()
             }
         }
-        
-        function updateDisplayValues() {
-            actualPowerText.text = safeValueFunction(calculator.actualPower, 0).toFixed(2)
-            genCapacityText.text = (calculator.actualPower * 1.2).toFixed(2)
-
-            var genCurrent = (calculator.actualPower * 1000) / (Math.sqrt(3) * 400)
-            genCurrentText.text = safeValueFunction(genCurrent, 0).toFixed(2)
-            
-            annualEnergyText.text = safeValueFunction(calculator.annualEnergy, 0).toFixed(2)
-        }
-
-        property Timer updateDisplayValuesTimer: Timer {
-            interval: 500
-            repeat: false
-            onTriggered: {
-                if (calculatorReady) {
-                    updateAdvancedAEP();
-                }
-            }
-        }
     }
-
-    function updateAdvancedAEP() {
-        if (!calculatorReady) return;
-        
-        try {
-            var windSpeed = safeValue(avgWindSpeedSpinBox.value, 7);
-            var weibullK = safeValue(weibullKSpinBox.value / 10, 2.0);
-            
-            var aep = calculator.estimateAEP(windSpeed, weibullK);
-            advancedAepText.text = safeValue(aep, 0).toFixed(2);
-        } catch (e) {
-            console.error("Error calculating AEP:", e);
-            advancedAepText.text = "Error";
-        }
-    }
-
+    
+    // Initial setup
     Component.onCompleted: {
-        updateTimer.updateDisplayValuesTimer.start();
+        // Initial one-time calculations
+        if (calculatorReady) {
+            // Do initial display update
+            Qt.callLater(function() {
+                updateDisplayValues();
+                calculateAdvancedAEP();
+                updatePowerCurve();
+            });
+        }
     }
 }

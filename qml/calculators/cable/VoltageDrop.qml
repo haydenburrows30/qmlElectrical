@@ -28,7 +28,8 @@ Page {
     property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<b>Overview</b><br> This tool is used to calculate the voltage drop in a cable system. The tool calculates the voltage drop based on the cable size, length, current, and other factors. The tool also provides a comparison of different cable sizes and their voltage drop values. <br> " +
             "<br> <b>Results</b><br> The tool displays the voltage drop, current, and other results of the calculation. You can save the results and view the details of the calculation."
         widthFactor: 0.3
@@ -45,139 +46,162 @@ Page {
         clip: true
         
         Flickable {
+            id: flickableMain
             contentWidth: parent.width
-            contentHeight: mainLayout.height
-            bottomMargin : 5
-            leftMargin : 5
-            rightMargin : 5
-            topMargin : 5
+            contentHeight: mainLayout.height + 20
+            bottomMargin: 5
+            leftMargin: 5
+            rightMargin: 5
+            topMargin: 5
 
-            RowLayout {
+            ColumnLayout {
                 id: mainLayout
-                width: scrollView.width
+                width: flickableMain.width - 20
 
-                ColumnLayout {
-                    WaveCard {
-                        id: results
-                        showSettings: true
-                        title: "Cable Selection"
-                        Layout.minimumHeight: 540
-                        Layout.minimumWidth: 420
+                // Header with title and help button
+                RowLayout {
+                    id: topHeader
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 5
+                    Layout.leftMargin: 5
 
-                        CableSelectionSettings {
-                            id: cableSettings
-                            anchors.fill: parent
-
-                            onResetCompleted: {
-                                root.currentVoltageDropValue = voltageDrop.voltageDrop || 0
-                                resultsPanel.combinedRatingInfo = voltageDrop.combinedRatingInfo || "N/A"
-                                resultsPanel.totalLoad = voltageDrop.totalKva || 0.0
-                                resultsPanel.current = voltageDrop.current || 0.0
-                            }
-                        }
+                    Label {
+                        text: "Voltage Drop Orion"
+                        font.pixelSize: 20
+                        font.bold: true
+                        Layout.fillWidth: true
                     }
-                    
-                    WaveCard {
-                        title: "Results"
-                        Layout.minimumHeight: 370
-                        Layout.minimumWidth: 420
 
-                        ResultsPanel {
-                            id: resultsPanel
-                            anchors.fill: parent
-                            darkMode: window.modeToggled
-                            voltageDropValue: root.currentVoltageDropValue
-                            selectedVoltage: voltageDrop.selectedVoltage
-                            diversityFactor: voltageDrop.diversityFactor
-                            combinedRatingInfo: voltageDrop.combinedRatingInfo || "N/A"
-                            totalLoad: voltageDrop.totalKva || 0.0
-                            current: voltageDrop.current || 0.0
-                            
-                            onSaveResultsClicked: {
-                                // Add validation function to handle NaN values
-                                function safeValue(value, defaultValue = 0) {
-                                    return (value === undefined || value === null || isNaN(value)) ? 
-                                           defaultValue : value;
-                                }
-                                
-                                resultsManager.save_calculation({
-                                    "voltage_system": cableSettings.voltageSelect.currentText,
-                                    "kva_per_house": safeValue(parseFloat(cableSettings.kvaPerHouseInput.text)),
-                                    "num_houses": safeValue(parseInt(cableSettings.numberOfHousesInput.text), 1),
-                                    "diversity_factor": safeValue(voltageDrop.diversityFactor, 1),
-                                    "total_kva": safeValue(voltageDrop.totalKva),
-                                    "current": safeValue(voltageDrop.current),
-                                    "cable_size": cableSettings.cableSelect.currentText || "Unknown",
-                                    "conductor": cableSettings.conductorSelect.currentText || "Unknown",
-                                    "core_type": cableSettings.coreTypeSelect.currentText || "Unknown",
-                                    "length": safeValue(parseFloat(cableSettings.lengthInput.text)),
-                                    "voltage_drop": safeValue(root.currentVoltageDropValue),
-                                    "drop_percent": safeValue(resultsPanel.dropPercentage),
-                                    "admd_enabled": !!cableSettings.admdCheckBox.checked
-                                });
-                            }
-                            
-                            onViewDetailsClicked: {
-                                detailsPopup.voltageSystem = voltageDrop.selectedVoltage
-                                detailsPopup.admdEnabled = voltageDrop.admdEnabled
-                                detailsPopup.kvaPerHouse = voltageDrop.totalKva / voltageDrop.numberOfHouses
-                                detailsPopup.numHouses = voltageDrop.numberOfHouses
-                                detailsPopup.diversityFactor = voltageDrop.diversityFactor
-                                detailsPopup.totalKva = voltageDrop.totalKva
-                                detailsPopup.current = voltageDrop.current
-                                detailsPopup.cableSize = cableSettings.cableSelect.currentText
-                                detailsPopup.conductorMaterial = voltageDrop.conductorMaterial
-                                detailsPopup.coreType = voltageDrop.coreType
-                                detailsPopup.length = cableSettings.lengthInput.text
-                                detailsPopup.installationMethod = cableSettings.installationMethodCombo.currentText
-                                detailsPopup.temperature = cableSettings.temperatureInput.text
-                                detailsPopup.groupingFactor = cableSettings.groupingFactorInput.text
-                                detailsPopup.combinedRatingInfo = voltageDrop.combinedRatingInfo
-                                detailsPopup.voltageDropValue = root.currentVoltageDropValue
-                                detailsPopup.dropPercentage = resultsPanel.dropPercentage
-                                detailsPopup.open()
-                            }
-                            
-                            onViewChartClicked: {
-                                chartPopup.percentage = resultsPanel.dropPercentage
-                                chartPopup.cableSize = cableSettings.cableSelect.currentText
-                                chartPopup.currentValue = voltageDrop.current
-                                chartPopup.prepareChart()
-                                chartPopup.open()
-                            }
-                        }
+                    StyledButton {
+                        id: helpButton
+                        icon.source: "../../../icons/rounded/info.svg"
+                        ToolTip.text: "Help"
+                        onClicked: popUpText.open()
                     }
                 }
 
-                ColumnLayout {
-                    WaveCard {
-                        title: "Cable Size Comparison"
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                RowLayout {
+                    ColumnLayout {
+                        WaveCard {
+                            title: "Cable Selection"
+                            Layout.minimumHeight: 540
+                            Layout.minimumWidth: 420
 
-                        ComparisonTable {
-                            id: comparisonTable
-                            anchors.fill: parent
-                            darkMode: window.modeToggled
-                            tableModel: voltageDrop.tableModel
-                            
-                            onExportRequest: function(format) {
-                                if (format === "csv") {
-                                    loadingIndicator.show()
-                                    voltageDrop.exportTableData(null)
-                                } else if (format === "pdf") {
-                                    loadingIndicator.show()
-                                    voltageDrop.exportTableToPDF(null)
-                                } else if (format === "menu") {
-                                    exportFormatMenu.popup()
+                            CableSelectionSettings {
+                                id: cableSettings
+                                anchors.fill: parent
+
+                                onResetCompleted: {
+                                    root.currentVoltageDropValue = voltageDrop.voltageDrop || 0
+                                    resultsPanel.combinedRatingInfo = voltageDrop.combinedRatingInfo || "N/A"
+                                    resultsPanel.totalLoad = voltageDrop.totalKva || 0.0
+                                    resultsPanel.current = voltageDrop.current || 0.0
+                                }
+                            }
+                        }
+                        
+                        WaveCard {
+                            title: "Results"
+                            Layout.minimumHeight: 370
+                            Layout.minimumWidth: 420
+
+                            ResultsPanel {
+                                id: resultsPanel
+                                anchors.fill: parent
+                                darkMode: window.modeToggled
+                                voltageDropValue: root.currentVoltageDropValue
+                                selectedVoltage: voltageDrop.selectedVoltage
+                                diversityFactor: voltageDrop.diversityFactor
+                                combinedRatingInfo: voltageDrop.combinedRatingInfo || "N/A"
+                                totalLoad: voltageDrop.totalKva || 0.0
+                                current: voltageDrop.current || 0.0
+                                
+                                onSaveResultsClicked: {
+                                    // Add validation function to handle NaN values
+                                    function safeValue(value, defaultValue = 0) {
+                                        return (value === undefined || value === null || isNaN(value)) ? 
+                                            defaultValue : value;
+                                    }
+                                    
+                                    resultsManager.save_calculation({
+                                        "voltage_system": cableSettings.voltageSelect.currentText,
+                                        "kva_per_house": safeValue(parseFloat(cableSettings.kvaPerHouseInput.text)),
+                                        "num_houses": safeValue(parseInt(cableSettings.numberOfHousesInput.text), 1),
+                                        "diversity_factor": safeValue(voltageDrop.diversityFactor, 1),
+                                        "total_kva": safeValue(voltageDrop.totalKva),
+                                        "current": safeValue(voltageDrop.current),
+                                        "cable_size": cableSettings.cableSelect.currentText || "Unknown",
+                                        "conductor": cableSettings.conductorSelect.currentText || "Unknown",
+                                        "core_type": cableSettings.coreTypeSelect.currentText || "Unknown",
+                                        "length": safeValue(parseFloat(cableSettings.lengthInput.text)),
+                                        "voltage_drop": safeValue(root.currentVoltageDropValue),
+                                        "drop_percent": safeValue(resultsPanel.dropPercentage),
+                                        "admd_enabled": !!cableSettings.admdCheckBox.checked
+                                    });
+                                }
+                                
+                                onViewDetailsClicked: {
+                                    detailsPopup.voltageSystem = voltageDrop.selectedVoltage
+                                    detailsPopup.admdEnabled = voltageDrop.admdEnabled
+                                    detailsPopup.kvaPerHouse = voltageDrop.totalKva / voltageDrop.numberOfHouses
+                                    detailsPopup.numHouses = voltageDrop.numberOfHouses
+                                    detailsPopup.diversityFactor = voltageDrop.diversityFactor
+                                    detailsPopup.totalKva = voltageDrop.totalKva
+                                    detailsPopup.current = voltageDrop.current
+                                    detailsPopup.cableSize = cableSettings.cableSelect.currentText
+                                    detailsPopup.conductorMaterial = voltageDrop.conductorMaterial
+                                    detailsPopup.coreType = voltageDrop.coreType
+                                    detailsPopup.length = cableSettings.lengthInput.text
+                                    detailsPopup.installationMethod = cableSettings.installationMethodCombo.currentText
+                                    detailsPopup.temperature = cableSettings.temperatureInput.text
+                                    detailsPopup.groupingFactor = cableSettings.groupingFactorInput.text
+                                    detailsPopup.combinedRatingInfo = voltageDrop.combinedRatingInfo
+                                    detailsPopup.voltageDropValue = root.currentVoltageDropValue
+                                    detailsPopup.dropPercentage = resultsPanel.dropPercentage
+                                    detailsPopup.open()
+                                }
+                                
+                                onViewChartClicked: {
+                                    chartPopup.percentage = resultsPanel.dropPercentage
+                                    chartPopup.cableSize = cableSettings.cableSelect.currentText
+                                    chartPopup.currentValue = voltageDrop.current
+                                    chartPopup.prepareChart()
+                                    chartPopup.open()
                                 }
                             }
                         }
                     }
-                    
-                    SavedResults {
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 300
+
+                    ColumnLayout {
+                        WaveCard {
+                            title: "Cable Size Comparison"
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            ComparisonTable {
+                                id: comparisonTable
+                                anchors.fill: parent
+                                darkMode: window.modeToggled
+                                tableModel: voltageDrop.tableModel
+                                
+                                onExportRequest: function(format) {
+                                    if (format === "csv") {
+                                        loadingIndicator.show()
+                                        voltageDrop.exportTableData(null)
+                                    } else if (format === "pdf") {
+                                        loadingIndicator.show()
+                                        voltageDrop.exportTableToPDF(null)
+                                    } else if (format === "menu") {
+                                        exportFormatMenu.popup()
+                                    }
+                                }
+                            }
+                        }
+                        
+                        SavedResults {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 300
+                        }
                     }
                 }
             }

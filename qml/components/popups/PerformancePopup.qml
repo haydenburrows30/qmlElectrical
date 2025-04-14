@@ -11,8 +11,8 @@ Popup {
     id: performancePopup
     modal: true
     focus: true
-    width: 500  // Make wider to fit all controls
-    height: 600  // Make taller to fit all controls
+    width: 500
+    height: 600
     
     // Create performance monitor instance directly in QML
     property var systemInfo: PerformanceMonitor {

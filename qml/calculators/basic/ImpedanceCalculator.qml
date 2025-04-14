@@ -54,9 +54,7 @@ Item {
         }
 
         RowLayout {
-
             WaveCard {
-                title: "Impedance Calculator"
                 Layout.minimumHeight: 300
                 Layout.minimumWidth: 300
                 Layout.alignment: Qt.AlignTop
