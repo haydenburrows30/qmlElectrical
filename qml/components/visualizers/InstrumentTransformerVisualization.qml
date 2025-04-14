@@ -445,11 +445,11 @@ Item {
                     Grid {
                         anchors.centerIn: parent
                         columns: 3
-                        
+                        columnSpacing: 10
                         
                         // CT Status
                         Rectangle {
-                            width: 100
+                            width: 150
                             height: 50
                             color: saturationColor(circuitView.satLevel)
                             radius: 5
@@ -465,7 +465,7 @@ Item {
                         
                         // Error Margin
                         Rectangle {
-                            width: 100
+                            width: 150
                             height: 50
                             color: ctErrorMargin > parseFloat(ctAccuracyClass) ? "#F44336" : "#4CAF50"
                             radius: 5
@@ -481,7 +481,7 @@ Item {
                         
                         // VT Status
                         Rectangle {
-                            width: 100
+                            width: 150
                             height: 50
                             color: vtUtilization < 50 ? "#4CAF50" : (vtUtilization < 80 ? "#FF9800" : "#F44336")
                             radius: 5

@@ -68,21 +68,23 @@ Item {
         }
 
         RowLayout {
+            id: inputLayout
+            Layout.minimumWidth: 800
 
-            ColumnLayout {
-                id: inputLayout
-                Layout.minimumWidth: 400
+            WaveCard {
+                id: results
+                Layout.fillWidth: true
+                Layout.minimumHeight: 450
+                titleVisible: false
 
-                WaveCard {
-                    id: results
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 450
-                    titleVisible: false
+                RowLayout {
+                    anchors.fill: parent
 
                     GridLayout {
-                        anchors.fill: parent
                         columns: 2
                         uniformCellWidths: true
+                        Layout.minimumWidth: 350
+                        Layout.leftMargin: 10
 
                         Label { text: "Primary Voltage (V):" ; Layout.alignment: Qt.AlignRight }
 
@@ -185,6 +187,7 @@ Item {
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
                             Layout.topMargin: 10
+                            Layout.leftMargin: 10
                             Layout.columnSpan: 2
                         }
 
@@ -206,14 +209,13 @@ Item {
                             }
                         }
                     }
-                }
-            }
 
-            Image {
-                source: "../../../assets/open_delta.png"
-                Layout.preferredWidth: 400
-                Layout.maximumHeight: inputLayout.height
-                fillMode: Image.PreserveAspectFit
+                    Image {
+                        Layout.maximumHeight: 400
+                        source: "../../../assets/open_delta.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                }
             }
         }
     }

@@ -363,11 +363,9 @@ Page {
                 }
             
             onClicked: {
-                console.log("Log button clicked")
                 // access the logViewerPopup from the application window
                 var appWindow = window || applicationWindow
                 if (appWindow && appWindow.logViewerPopup) {
-                    console.log("Opening log viewer popup")
                     appWindow.logViewerPopup.open()
                 } else {
                     console.error("Could not find log viewer popup")
