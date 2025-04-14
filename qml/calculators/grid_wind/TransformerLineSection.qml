@@ -834,17 +834,17 @@ Item {
         }
     }
 
-    Timer {
-        id: updateTimer
-        interval: 500
-        repeat: true
-        running: calculatorReady
-        onTriggered: {
-            if (calculatorReady) {
-                transformerLineSection.updateDisplayValues()
-            }
-        }
-    }
+    // Timer {
+    //     id: updateTimer
+    //     interval: 500
+    //     repeat: true
+    //     running: calculatorReady
+    //     onTriggered: {
+    //         if (calculatorReady) {
+    //             transformerLineSection.updateDisplayValues()
+    //         }
+    //     }
+    // }
 
     // pdf export
     FileDialog {
@@ -886,6 +886,36 @@ Item {
             }
 
             calculator.exportTransformerReport(data, filePath)
+        }
+    }
+
+    Connections {
+        target: calculator
+        enabled: calculatorReady
+        
+        // Signal handlers based on exact signal names from Python
+        function onTransformerChanged() {
+            transformerLineSection.updateDisplayValues()
+        }
+        
+        function onLineChanged() {
+            transformerLineSection.updateDisplayValues()
+        }
+        
+        function onLoadChanged() {
+            transformerLineSection.updateDisplayValues()
+        }
+        
+        function onVoltageRegulatorChanged() {
+            transformerLineSection.updateDisplayValues()
+        }
+        
+        function onCalculationCompleted() {
+            transformerLineSection.updateDisplayValues()
+        }
+        
+        function onCalculationsComplete() {
+            transformerLineSection.updateDisplayValues()
         }
     }
 

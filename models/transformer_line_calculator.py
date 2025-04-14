@@ -4,6 +4,9 @@ import cmath
 import logging
 from utils.pdf_generator import PDFGenerator
 
+# Setup logging
+logger = logging.getLogger("qmltest")
+
 class TransformerLineCalculator(QObject):
     """Calculator for transformer-line system analysis including protection parameters"""
 
@@ -177,7 +180,7 @@ class TransformerLineCalculator(QObject):
             return max(trip_time, 0.025)  # Minimum 25ms operating time
             
         except Exception as e:
-            logger = logging.getLogger("qmltest")
+            
             logger.error(f"Error calculating trip time: {e}")
             return 0.0
 
@@ -230,7 +233,7 @@ class TransformerLineCalculator(QObject):
                 "breakpoint": 2.0  # Current where slope changes
             }
         except Exception as e:
-            logger = logging.getLogger("qmltest")
+            
             logger.error(f"Error calculating differential protection: {e}")
             return None
 
@@ -242,14 +245,14 @@ class TransformerLineCalculator(QObject):
                 limits[harmonic] = (percent / 100.0) * current
             return limits
         except Exception as e:
-            logger = logging.getLogger("qmltest")
+            
             logger.error(f"Error calculating harmonic limits: {e}")
             return {}
 
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
         try:
-            logger = logging.getLogger("qmltest")
+            
             logger.info("\n=== Starting Transformer-Line Calculations ===")
             
             # 1. Calculate base values
@@ -475,7 +478,7 @@ class TransformerLineCalculator(QObject):
             ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
             self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
             
-            logger = logging.getLogger("qmltest")
+            
             logger.info(f"Recalculated load values: FLC={self._full_load_current:.2f}A, Pickup={self._relay_pickup_current:.2f}A")
             
         except Exception as e:
@@ -537,7 +540,7 @@ class TransformerLineCalculator(QObject):
             self._remote_backup_trip_time = 0.3 + 0.4  # Main trip + coordination margin
             
         except Exception as e:
-            logger = logging.getLogger("qmltest")
+            
             logger.error(f"Error in calculating additional parameters: {e}")
 
     @Property(float, notify=transformerChanged)
@@ -682,7 +685,7 @@ class TransformerLineCalculator(QObject):
             new_mva = current_real_power / new_pf
             
             # Log the change
-            logger = logging.getLogger("qmltest")
+            
             logger.info(f"Updating power factor from {self._load_pf:.2f} to {new_pf:.2f}")
             logger.info(f"Maintaining real power at {current_real_power:.4f} MW")
             logger.info(f"New apparent power: {new_mva:.4f} MVA")
@@ -992,7 +995,7 @@ class TransformerLineCalculator(QObject):
         
     @Slot(float)
     def setLoadMVA(self, value):
-        logger = logging.getLogger("qmltest")
+        
         logger.info(f"setLoadMVA called with value: {value} from caller: {__import__('traceback').format_stack()[-2]}")
         self._load_mva = value
         self.loadChanged.emit()
@@ -1148,90 +1151,6 @@ class TransformerLineCalculator(QObject):
             print(f"Attempted filename: {filename}")
             print(f"Data received: {data}")
 
-    @Slot(float)
-    def updateLoadForVoltageOnly(self, value):
-        """
-        Update load MVA only for voltage drop and regulator calculations without recalculating protection settings.
-        This prevents wind turbine output from affecting protection settings which should be based on transformer rating.
-        """
-        logger = logging.getLogger("qmltest")
-        logger.info(f"updateLoadForVoltageOnly called with value: {value}")
-        
-        if value > 0:
-            self._load_for_voltage_calc = value
-            
-            # Only update voltage drop and regulator calculations
-            try:
-                # Calculate voltage drop using complex arithmetic for more accurate results
-                load_current = max((value * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage), 0.1)
-                load_angle = math.acos(self._load_pf)
-                load_current_complex = load_current * complex(math.cos(load_angle), -math.sin(load_angle))
-                
-                # Calculate voltage drop
-                source_voltage = self._transformer_hv_voltage / math.sqrt(3)  # Phase voltage
-                source_voltage_complex = complex(source_voltage, 0)
-                total_impedance = complex(self._transformer_r, self._transformer_x) + self._line_total_z
-                voltage_drop_complex = load_current_complex * total_impedance
-                receiving_end_voltage = source_voltage_complex - voltage_drop_complex
-                
-                # Calculate percentage drop using the actual voltage difference
-                voltage_drop_percent = (abs(source_voltage_complex) - abs(receiving_end_voltage)) / abs(source_voltage_complex) * 100.0
-                
-                # For very small loads, calculate a scaled voltage drop based on impedance
-                if value < 0.01:  # For very small loads
-                    # Calculate an approximation based on rated impedance and scaled by actual load
-                    rated_current = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
-                    rated_drop = (abs(total_impedance) * rated_current) / source_voltage * 100.0
-                    # Scale by the actual load as a fraction of rated load
-                    scaled_drop = rated_drop * (value * 1000 / self._transformer_rating)
-                    # Use the scaled drop for very small loads
-                    self._voltage_drop = max(scaled_drop, 0.01)
-                else:
-                    # Regular calculation for normal loads
-                    self._voltage_drop = max(voltage_drop_percent, 0.01)  # At least 0.01%
-                
-                # Calculate unregulated voltage (scaled to line-to-line)
-                self._unregulated_voltage = (abs(receiving_end_voltage) * math.sqrt(3)) / 1000.0  # Line-to-line kV
-                
-                # Update regulator values if enabled
-                if self._voltage_regulator_enabled:
-                    # Use unregulated voltage as input to regulator
-                    voltage_with_drop = self._unregulated_voltage
-                    # Calculate required tap position to achieve target voltage
-                    target_voltage = self._voltage_regulator_target
-                    voltage_difference_percent = ((target_voltage - voltage_with_drop) / (self._transformer_hv_voltage / 1000)) * 100.0
-                    
-                    # Limit to regulator range
-                    voltage_difference_percent = max(min(voltage_difference_percent, self._voltage_regulator_range), 
-                                                  -self._voltage_regulator_range)
-                    
-                    # Step resolution for a 32-step regulator with ±10% range
-                    step_size = self._voltage_regulator_range / (self._voltage_regulator_steps / 2)  # Size of each tap step
-                    
-                    # Calculate tap position (positive for boost, negative for buck)
-                    self._regulator_tap_position = round(voltage_difference_percent / step_size)
-                    
-                    # Calculate regulated voltage - for single-phase regulators in delta configuration
-                    regulation_percent = self._regulator_tap_position * step_size
-                    self._regulated_voltage = voltage_with_drop * (1 + regulation_percent / 100.0)
-                else:
-                    # No regulation
-                    self._regulated_voltage = (self._transformer_hv_voltage / 1000) * (1 - self._voltage_drop / 100.0)
-                    self._regulator_tap_position = 0
-                
-                # Notice we DO NOT recalculate protection settings here
-                # This preserves the transformer-rated protection values
-                
-                # Emit signal since values have changed
-                self.calculationCompleted.emit()
-                self.calculationsComplete.emit()  # Backwards compatibility
-                
-            except Exception as e:
-                logger.error(f"Error in updateLoadForVoltageOnly: {e}")
-                logger.exception(e)
-        else:
-            logger.warning(f"Invalid load value for voltage calculation: {value}")
-
     @Slot(float, float, str, result=float)
     def calculateTripTimeWithParams(self, current_multiple, time_dial, curve_type):
         """Calculate trip time based on provided parameters"""
@@ -1249,7 +1168,7 @@ class TransformerLineCalculator(QObject):
             return max(trip_time, 0.025)  # Minimum 25ms operating time
             
         except Exception as e:
-            logger = logging.getLogger("qmltest")
+            
             logger.error(f"Error calculating trip time with params: {e}")
             return 0.0
 

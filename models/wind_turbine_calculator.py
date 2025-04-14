@@ -4,6 +4,9 @@ import numpy as np
 from utils.pdf_generator import PDFGenerator
 import logging
 
+# Setup logging
+logger = logging.getLogger("qmltest")
+
 class WindTurbineCalculator(QObject):
     """Calculator for wind turbine power output and performance analysis"""
 
@@ -149,11 +152,11 @@ class WindTurbineCalculator(QObject):
             
             # Print debug info about rated specs
             if has_rated_specs:
-                print(f"Using rated specs: Power = {self._rated_power/1000} kW at {self._rated_wind_speed} m/s")
+                logger.info(f"Using rated specs: Power = {self._rated_power/1000} kW at {self._rated_wind_speed} m/s")
                 rated_power = self._rated_power
                 rated_wind_speed = self._rated_wind_speed
             else:
-                print("No rated specs defined, using standard calculation")
+                logger.info("No rated specs defined, using standard calculation")
                 rated_power = None
                 # Without rated specs, we'll use a calculated wind speed that gives max power
                 rated_wind_speed = self._wind_speed if self._wind_speed > 0 else 12.0
@@ -425,7 +428,7 @@ class WindTurbineCalculator(QObject):
                 1/3
             )
             
-            print(f"V27 Parameters loaded - Rated power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s")
+            logger.info(f"V27 Parameters loaded - Rated power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s")
             
             # Important: Set wind speed to at least the rated wind speed to show full power capability
             # This ensures the UI shows the rated power immediately
@@ -473,34 +476,34 @@ class WindTurbineCalculator(QObject):
         has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
         rated_info = f"Rated Power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s" if has_rated_specs else "No rated specs"
         
-        print("\n===== TURBINE DEBUG INFO =====")
-        print(f"Blade radius: {self._blade_radius} m")
-        print(f"Wind speed: {self._wind_speed} m/s")
-        print(f"Power coefficient: {self._power_coefficient}")
-        print(f"Efficiency: {self._efficiency}")
-        print(f"Cut-in speed: {self._cut_in_speed} m/s")
-        print(f"Cut-out speed: {self._cut_out_speed} m/s")
-        print(f"{rated_info}")
-        print(f"Swept area: {self._swept_area:.2f} m²")
-        print(f"Theoretical power: {self._theoretical_power/1000:.2f} kW")
-        print(f"Actual power: {self._actual_power/1000:.2f} kW")
+        logger.info("\n===== TURBINE DEBUG INFO =====")
+        logger.info(f"Blade radius: {self._blade_radius} m")
+        logger.info(f"Wind speed: {self._wind_speed} m/s")
+        logger.info(f"Power coefficient: {self._power_coefficient}")
+        logger.info(f"Efficiency: {self._efficiency}")
+        logger.info(f"Cut-in speed: {self._cut_in_speed} m/s")
+        logger.info(f"Cut-out speed: {self._cut_out_speed} m/s")
+        logger.info(f"{rated_info}")
+        logger.info(f"Swept area: {self._swept_area:.2f} m²")
+        logger.info(f"Theoretical power: {self._theoretical_power/1000:.2f} kW")
+        logger.info(f"Actual power: {self._actual_power/1000:.2f} kW")
         
         # Test calculation at current wind speed
         theoretical = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)
         calculated_power = theoretical * self._power_coefficient * self._efficiency
         
-        print(f"Direct calculation:")
-        print(f"- Theoretical at {self._wind_speed} m/s: {theoretical/1000:.2f} kW")
-        print(f"- With coefficients: {calculated_power/1000:.2f} kW")
+        logger.info(f"Direct calculation:")
+        logger.info(f"- Theoretical at {self._wind_speed} m/s: {theoretical/1000:.2f} kW")
+        logger.info(f"- With coefficients: {calculated_power/1000:.2f} kW")
         
         if has_rated_specs:
             if self._wind_speed >= self._rated_wind_speed:
-                print(f"- Should be using rated power: {self._rated_power/1000:.2f} kW")
+                logger.info(f"- Should be using rated power: {self._rated_power/1000:.2f} kW")
             else:
                 limited = min(calculated_power, self._rated_power)
-                print(f"- Should be limited to: {limited/1000:.2f} kW")
+                logger.info(f"- Should be limited to: {limited/1000:.2f} kW")
         
-        print("==============================\n")
+        logger.info("==============================\n")
         
         return True
     

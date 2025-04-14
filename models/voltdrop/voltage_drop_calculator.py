@@ -8,6 +8,9 @@ from .file_utils import FileUtils
 from .pdf_generator import PDFGenerator
 from .data_manager import DataManager
 
+# Setup logging
+logger = logging.getLogger("qmltest")
+
 class VoltageDropCalculator(QObject):
     """
     Voltage drop calculator using mV/A/m method according to AS/NZS 3008.
@@ -648,8 +651,6 @@ class VoltageDropCalculator(QObject):
     def _calculate_voltage_drop(self):
         """Calculate voltage drop using mV/A/m method."""
         try:
-            logger = logging.getLogger("qmltest")
-            # print("Calculating voltage drop...")
             
             logger.info("\n=== Starting Voltage Drop Calculations ===")
             logger.info(f"Input Parameters:")
