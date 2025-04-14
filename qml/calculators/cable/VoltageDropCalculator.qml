@@ -53,19 +53,21 @@ Item {
         RowLayout {
             ColumnLayout {
                 id: inputLayout
-                Layout.preferredWidth: 300
+                Layout.preferredWidth: 350
 
                 WaveCard {
                     id: results
-                    title: "Voltage Drop Calculator"
+                    title: "Inputs"
                     Layout.fillWidth: true
                     Layout.minimumHeight: 290
 
                     GridLayout {
                         id: cableParamsLayout
                         columns: 2
+                        anchors.fill: parent
+                        uniformCellWidths: true
 
-                        Label { text: "Cable Size (mm²):" }
+                        Label { text: "Cable Size (mm²):" ; Layout.fillWidth: true}
                         ComboBoxRound {
                             id: cableSizeCombo
                             model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
@@ -73,7 +75,7 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        Label { text: "Length (m):" }
+                        Label { text: "Length (m):" ; Layout.fillWidth: true}
                         TextFieldRound {
                             id: lengthInput
                             placeholderText: "Enter length"
@@ -82,7 +84,7 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        Label { text: "Current (A):" }
+                        Label { text: "Current (A):" ; Layout.fillWidth: true}
                         TextFieldRound {
                             id: currentInput
                             placeholderText: "Enter current"
@@ -91,7 +93,7 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        Label { text: "Conductor Material:" }
+                        Label { text: "Conductor Material:" ; Layout.fillWidth: true}
                         ComboBoxRound {
                             id: conductorMaterial
                             model: ["Copper", "Aluminum"]
@@ -99,7 +101,7 @@ Item {
                             Layout.fillWidth: true
                         }
                         
-                        Label { text: "System Type:" }
+                        Label { text: "System Type:" ; Layout.fillWidth: true}
                         ComboBoxRound {
                             id: systemTypeCombo
                             model: ["Single-phase", "Three-phase"]
@@ -107,7 +109,7 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        Label { text: "System Voltage (V):" }
+                        Label { text: "System Voltage (V):" ; Layout.fillWidth: true}
                         TextFieldRound {
                             id: systemVoltage
                             text: "230"
@@ -123,20 +125,23 @@ Item {
                     Layout.minimumHeight: 140
                     
                     GridLayout {
+                        anchors.fill: parent
+                        uniformCellWidths: true
                         id: resultsLayout
                         columns: 2
 
-                        Label { text: "Voltage Drop:" ; Layout.minimumWidth: 135}
+                        Label { text: "Voltage Drop:" ; Layout.fillWidth: true}
                         TextFieldBlue { 
                             text: calculator.voltageDrop.toFixed(2) + " V"
                             Layout.minimumWidth: 120
                             Layout.fillWidth: true
                         }
 
-                        Label { text: "Drop Percentage:" }
+                        Label { text: "Drop Percentage:" ; Layout.fillWidth: true}
                         TextFieldBlue { 
                             text: calculator.dropPercentage.toFixed(2) + "%"
                             color: calculator.dropPercentage > 3 ? "red" : "green"
+                            Layout.fillWidth: true
                         }
                     }
                 }

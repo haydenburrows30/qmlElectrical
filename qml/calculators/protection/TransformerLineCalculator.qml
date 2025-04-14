@@ -96,7 +96,7 @@ Item {
         RowLayout {
             // Inputs
             ColumnLayout {
-                Layout.minimumWidth: 400
+                Layout.minimumWidth: 420
                 Layout.alignment: Qt.AlignTop
     
                 // Transformer parameters section

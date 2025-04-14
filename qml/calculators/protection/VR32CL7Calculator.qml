@@ -5,7 +5,6 @@ import QtQuick.Dialogs
 import QtCharts
 import Qt.labs.platform
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -17,7 +16,6 @@ Item {
     id: root
 
     property VR32CL7Calculator calculator: VR32CL7Calculator {}
-
 
     ColumnLayout {
         id: mainLayout
@@ -45,9 +43,9 @@ Item {
             // }
         }
 
+        // Input parameters section
         RowLayout {
-            
-            // Input parameters section
+
             WaveCard {
                 Layout.minimumWidth: 400
                 Layout.minimumHeight: 300
@@ -60,9 +58,9 @@ Item {
                     // Generation capacity
                     Label { 
                         text: "Wind Generation:" 
-                        
                         Layout.fillWidth: true
                     }
+
                     SpinBoxRound {
                         id: generationInput
                         from: 1
@@ -84,15 +82,15 @@ Item {
                     }
                     Label { 
                         text: "kW" 
-                        
                         Layout.fillWidth: true
                     }
+
                     // Cable length
                     Label { 
                         text: "Cable Length:" 
-                        
                         Layout.fillWidth: true
                     }
+
                     SpinBoxRound {
                         id: cableLengthInput
                         from: 1  // Changed from 0.1 to 1 as SpinBox expects integers
@@ -120,15 +118,15 @@ Item {
                     }
                     Label { 
                         text: "km" 
-                        
                         Layout.fillWidth: true
                     }
+
                     // Cable R value
                     Label { 
                         text: "Cable R:" 
-                        
                         Layout.fillWidth: true
                     }
+
                     SpinBoxRound {
                         id: cableRInput
                         from: 1  // Changed from 0.01
@@ -156,15 +154,15 @@ Item {
                     }
                     Label { 
                         text: "Ω/km" 
-                        
                         Layout.fillWidth: true
                     }
+
                     // Cable X value
                     Label { 
                         text: "Cable X:" 
-                        
                         Layout.fillWidth: true
                     }
+
                     SpinBoxRound {
                         id: cableXInput
                         from: 1  // Changed from 0.01
@@ -192,15 +190,15 @@ Item {
                     }
                     Label { 
                         text: "Ω/km" 
-                        
                         Layout.fillWidth: true
                     }
+
                     // Load distance
                     Label { 
                         text: "Load Distance:" 
-                        
                         Layout.fillWidth: true
                     }
+
                     SpinBoxRound {
                         id: loadDistanceInput
                         from: 1  // Changed from 0.1
@@ -228,9 +226,9 @@ Item {
                     }
                     Label { 
                         text: "km" 
-                        
                         Layout.fillWidth: true
                     }
+
                     StyledButton {
                         Layout.alignment: Qt.AlignHCenter
                         text: "Calculate"
@@ -242,6 +240,7 @@ Item {
                             }
                         }
                     }
+
                     StyledButton {
                         Layout.alignment: Qt.AlignHCenter
                         text: "Generate Plot"
@@ -255,7 +254,7 @@ Item {
                     }
                 }
             }
-            
+
             // Results section
             WaveCard {
                 Layout.minimumWidth: 400
@@ -269,82 +268,79 @@ Item {
                         columns: 2
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignTop
+                        uniformCellWidths: true
                         
                         // Labels and Values
                         Label { 
                             text: "Resistance (R):" 
-                            font.bold: true
+                            Layout.fillWidth: true
                         }
-                        Label { 
+
+                        TextFieldBlue { 
                             text: calculator ? calculator.resistance.toFixed(2) + " Ω" : "0.0000 Ω"
+                            Layout.fillWidth: true
                         }
                         
                         Label { 
                             text: "Reactance (X):" 
-                            font.bold: true
                         }
-                        Label { 
+
+                        TextFieldBlue { 
                             text: calculator ? calculator.reactance.toFixed(2) + " Ω" : "0.0000 Ω"
                         }
                         
                         Label { 
                             text: "Impedance (Z):" 
-                            font.bold: true
                         }
-                        Label { 
+
+                        TextFieldBlue { 
                             text: calculator ? calculator.impedance.toFixed(2) + " Ω" : "0.0000 Ω"
                         }
                         
                         Label { 
                             text: "Impedance Angle:" 
-                            font.bold: true
                         }
-                        Label { 
+
+                        TextFieldBlue { 
                             text: calculator ? calculator.impedance_angle.toFixed(2) + "°" : "0.00°"
                         }
 
                         Label {
                             text: "Total Resistance (R)"
-                            font.bold: true
                             horizontalAlignment: Text.AlignHCenter
                         }
-                        
-                        Label {
+
+                        TextFieldBlue {
                             text: calculator ? calculator.resistance.toFixed(2) + " Ω" : "0.0000 Ω"
-                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         Label {
                             text: "Total Reactance (X)"
-                            font.bold: true
                             horizontalAlignment: Text.AlignHCenter
                         }
                         
-                        Label {
+                        TextFieldBlue {
                             text: calculator ? calculator.reactance.toFixed(2) + " Ω" : "0.0000 Ω"
-                            horizontalAlignment: Text.AlignHCenter
                         }
                     }
                 }
             }
         }
-                        
+
         // Formulas section
         WaveCard {
             Layout.fillWidth: true
             Layout.minimumHeight: 330
             title: "Formulas"
-                
+
             GridLayout {
                 width: parent.width
                 columns: 4
-                // uniformCellWidths: true
-                
+
                 // Formula for total length
                 Label {
                     text: "Total Length:"
                     font.bold: true
-                    
                 }
 
                 Rectangle {
@@ -375,7 +371,7 @@ Item {
                         }
                     }
                 }
-            
+
                 // Formula for power factor
                 Label {
                     text: "Power Factor:"
@@ -388,7 +384,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 60
                     radius: 10
-                
+
                     Image {
                         source: "../../../assets/formulas/vr32cl7_power_factor.svg"
                         fillMode: Image.PreserveAspectFit
@@ -408,12 +404,11 @@ Item {
                         }
                     }
                 }
-            
+
                 // Formula for adjusted resistance
                 Label {
                     text: "Adjusted Resistance:"
                     font.bold: true
-                    
                 }
 
                 Rectangle {
@@ -422,7 +417,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 60
                     radius: 10
-                
+
                     Image {
                         source: "../../../assets/formulas/vr32cl7_adjusted_resistance.svg"
                         fillMode: Image.PreserveAspectFit
@@ -444,12 +439,11 @@ Item {
                         }
                     }
                 }
-            
+
                 // Formula for adjusted reactance
                 Label {
                     text: "Adjusted Reactance:"
                     font.bold: true
-                    
                 }
 
                 Rectangle {
@@ -484,7 +478,6 @@ Item {
                 Label {
                     text: "Impedance Magnitude:"
                     font.bold: true
-                    
                 }
 
                 Rectangle {
@@ -515,12 +508,11 @@ Item {
                         }
                     }
                 }
-            
+
                 // Formula for impedance angle
                 Label {
                     text: "Impedance Angle:"
                     font.bold: true
-                    
                 }
 
                 Rectangle {
@@ -534,7 +526,7 @@ Item {
                         source: "../../../assets/formulas/vr32cl7_impedance_angle.svg"
                         fillMode: Image.PreserveAspectFit
                         anchors.fill: parent
-                        
+
                         HoverHandler{
                             onHoveredChanged: {
                                 if(hovered){
@@ -550,12 +542,11 @@ Item {
                         }
                     }
                 }
-            
+
                 // Overall impedance formula
                 Label {
                     text: "Complete Impedance:"
                     font.bold: true
-                    
                 }
 
                 Rectangle {
@@ -564,12 +555,12 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 60
                     radius: 10
-                    
+
                     Image {
                         source: "../../../assets/formulas/vr32cl7_overall.svg"
                         fillMode: Image.PreserveAspectFit
                         anchors.fill: parent
-                        
+
                         HoverHandler{
                             onHoveredChanged: {
                                 if(hovered){

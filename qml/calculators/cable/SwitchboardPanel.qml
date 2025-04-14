@@ -5,7 +5,6 @@ import QtQuick.Controls.Universal
 import QtQuick.Dialogs
 import QtCharts
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
@@ -38,6 +37,9 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
+        anchors.leftMargin: 5
+        anchors.rightMargin: 5
+        anchors.bottomMargin: 5
 
         // Header with title and help button
         RowLayout {
@@ -241,10 +243,6 @@ Item {
                                     text: "Circuit count: " + manager.circuitCount
                                     visible: manager.circuitCount === 0
                                     color: "gray"
-                                }
-                                
-                                Component.onCompleted: {
-                                    console.log("ListView created with circuit count:", model)
                                 }
 
                                 // This connection must remain with the ListView as it updates its model property
@@ -501,7 +499,6 @@ Item {
         property string circuitNumber: ""
 
         function handleAccepted() {
-            console.log("Saving circuit...");
 
             let circuitData = {
                 destination: destinationField.text,
@@ -514,8 +511,6 @@ Item {
                 length: parseFloat(lengthField.text || "0"),
                 notes: notesField.text
             };
-            
-            console.log("Circuit data:", JSON.stringify(circuitData));
 
             if (editMode) {
                 let success = manager.updateCircuit(circuitIndex, circuitData);
