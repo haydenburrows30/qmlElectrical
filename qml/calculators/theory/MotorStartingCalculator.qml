@@ -107,7 +107,6 @@ Item {
         }
     }
 
-
     // Add file dialog for exporting results
     FileDialog {
         id: fileDialog
@@ -143,7 +142,7 @@ Item {
 
     // Main layout
     ColumnLayout {
-        anchors.fill: parent
+        anchors.centerIn: parent
         anchors.margins: 10
 
         // Header with title and help button
@@ -177,23 +176,25 @@ Item {
         }
 
         RowLayout {
+            id: mainLayout
+            Layout.minimumWidth: 800
+
             // Inputs
             WaveCard {
                 id: results
                 title: "Motor Parameters"
                 Layout.minimumHeight: 360
-                Layout.minimumWidth: 410
+                Layout.fillWidth: true
             
                 GridLayout {
                     columns: 2
+                    anchors.fill: parent
+                    uniformCellWidths: true
 
-                    Label {
-                        text: "Motor Type:"
-                        Layout.preferredWidth: 150
-                    }
-                    
+                    Label {text: "Motor Type:" ; Layout.fillWidth: true}
+
                     RowLayout {
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         
                         ComboBoxRound {
                             id: motorType
@@ -216,14 +217,14 @@ Item {
 
                     Label {
                         text: "Motor Power (kW):"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
 
                     TextFieldRound {
                         id: motorPower
                         placeholderText: "Enter Power"
                         onTextChanged: if(text.length > 0) calculator.setMotorPower(parseFloat(text))
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0 ; top: 999 }
                         maximumLength: 4
@@ -231,7 +232,7 @@ Item {
                     
                     Label {
                         text: "Voltage (V):"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
 
                     TextFieldRound {
@@ -239,14 +240,14 @@ Item {
                         placeholderText: "Enter Voltage"
                         text: "400"
                         onTextChanged: if(text.length > 0) calculator.setVoltage(parseFloat(text))
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0; top: 15000 }
                     }
                     
                     Label {
                         text: "Efficiency (%):"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
 
                     TextFieldRound {
@@ -254,7 +255,7 @@ Item {
                         placeholderText: "Enter Efficiency"
                         text: "90"
                         onTextChanged: if(text.length > 0) calculator.setEfficiency(parseFloat(text) / 100)
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0 ; top: 99 }
                         maximumLength: 2
@@ -262,7 +263,7 @@ Item {
 
                     Label {
                         text: "Power Factor:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
 
                     TextFieldRound {
@@ -272,7 +273,7 @@ Item {
                         onTextChanged: {
                             if(text.length > 0) calculator.setPowerFactor(parseFloat(text))
                         }
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignRight
                         validator: DoubleValidator { bottom: 0 ; top: 1.0 }
                     }
@@ -280,11 +281,11 @@ Item {
                     // Add motor speed selection
                     Label {
                         text: "Motor Speed:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
 
                     RowLayout {
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         
                         ComboBoxRound {
                             id: motorSpeed
@@ -306,11 +307,11 @@ Item {
                     
                     Label {
                         text: "Starting Method:"
-                        Layout.preferredWidth: 150
+                        Layout.fillWidth: true
                     }
 
                     RowLayout {
-                        Layout.preferredWidth: 200
+                        Layout.fillWidth: true
                         
                         ComboBoxRound {
                             id: startingMethod
@@ -365,11 +366,12 @@ Item {
             // Results
             WaveCard {
                 title: "Results"
-                Layout.minimumWidth: 350
+                Layout.fillWidth: true
                 Layout.minimumHeight: results.height
 
                 GridLayout {
                     columns: 2
+                    anchors.fill: parent
 
                     Label {
                         text: "Motor Type:"
@@ -449,6 +451,9 @@ Item {
             }
         }
 
-        MotorStartingViz {}
+        MotorStartingViz {
+            Layout.minimumWidth: mainLayout.width
+            Layout.minimumHeight: 400
+        }
     }
 }
