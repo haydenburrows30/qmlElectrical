@@ -268,16 +268,18 @@ class TransformerLineCalculator(QObject):
             logger.info(f"Length: {self._line_length:.2f} km")
             logger.info(f"Total Z: {abs(self._line_total_z):.2f} ohm at angle {math.degrees(cmath.phase(self._line_total_z)):.1f} deg")
             
-            # Fault current calculations using sequence components
+            # Improved fault current calculations using sequence components
             # Calculate transformer impedance
             z1_transformer = complex(self._transformer_r, self._transformer_x)  # Positive sequence
             z2_transformer = z1_transformer  # Negative sequence equals positive
-            z0_transformer = 0.85 * z1_transformer  # Zero sequence typically 0.85 * Z1
+            # Zero sequence typically 0.85-1.0 times Z1 for transformers
+            z0_transformer = 0.85 * z1_transformer  
             
             # Calculate line impedance sequences
             z1_line = self._line_total_z  # Positive sequence
             z2_line = z1_line  # Negative sequence equals positive
-            z0_line = 3.0 * z1_line  # Zero sequence typically 3 * Z1
+            # Zero sequence typically 2.0-3.5 times Z1 for overhead lines
+            z0_line = 3.0 * z1_line
             
             # Total sequence impedances
             z1_total = z1_transformer + z1_line
@@ -285,21 +287,28 @@ class TransformerLineCalculator(QObject):
             z0_total = z0_transformer + z0_line
             
             # Three-phase fault current (uses only positive sequence)
-            self._fault_current_hv = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z1_total))) / 1000  # kA
+            # Corrected calculation with proper voltage reference
+            v_ln = self._transformer_hv_voltage / math.sqrt(3)  # Line-to-neutral voltage
+            self._fault_current_hv = (v_ln / abs(z1_total)) * math.sqrt(3) / 1000  # kA
             
             # Single-line-to-ground fault current (uses all sequences)
             z_total_slg = z1_total + z2_total + z0_total
-            self._fault_current_slg = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z_total_slg))) / 1000  # kA
+            self._fault_current_slg = (3 * v_ln / abs(z_total_slg)) / 1000  # kA
             
-            # Ground fault current calculation
-            z_ng = complex(self._neutral_grounding_resistance, 0)  # NGR referred to HV
+            # Ground fault current calculation with neutral grounding resistance
+            z_ng = complex(self._neutral_grounding_resistance, 0)  # NGR impedance
             z_total_ground = z0_total + 3 * z_ng
-            self._ground_fault_current = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z_total_ground)))  # A
+            self._ground_fault_current = (3 * v_ln / abs(z_total_ground))  # A
             
             # Calculate LV fault current using transformer impedance referred to LV side
             z_base_lv = (self._transformer_lv_voltage**2) / (self._transformer_rating * 1000)
             z_t_lv = z_pu * z_base_lv
-            self._fault_current_lv = (self._transformer_lv_voltage / (math.sqrt(3) * abs(z_t_lv))) / 1000  # Convert to kA
+            
+            # Corrected LV fault current calculation
+            # We need to use line-to-neutral voltage at LV side for the calculation
+            # and then multiply by sqrt(3) to get the three-phase fault current
+            v_ln_lv = self._transformer_lv_voltage / math.sqrt(3)
+            self._fault_current_lv = (v_ln_lv / abs(z_t_lv)) * math.sqrt(3) / 1000  # Convert to kA
             
             logger.info(f"\nLV Fault Current Calculation:")
             logger.info(f"Base Z (LV): {z_base_lv:.4f} ohm")
@@ -311,7 +320,7 @@ class TransformerLineCalculator(QObject):
             logger.info(f"SLG fault: {self._fault_current_slg:.2f} kA")
             logger.info(f"Ground fault: {self._ground_fault_current:.2f} A")
             
-            # Calculate voltage drop and regulator settings
+            # Calculate voltage drop with improved accuracy using complex power factor
             # Get load current with power factor
             load_current = (self._load_mva * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage)
             load_angle = math.acos(self._load_pf)
@@ -328,8 +337,8 @@ class TransformerLineCalculator(QObject):
             voltage_drop_complex = load_current_complex * total_impedance
             receiving_voltage_complex = sending_voltage_complex - voltage_drop_complex
             
-            # Calculate voltage drop percentage
-            self._voltage_drop = (abs(sending_voltage_complex) - abs(receiving_voltage_complex)) / abs(sending_voltage_complex) * 100.0
+            # Calculate voltage drop percentage more accurately
+            self._voltage_drop = (1 - abs(receiving_voltage_complex) / abs(sending_voltage_complex)) * 100.0
             self._unregulated_voltage = (abs(receiving_voltage_complex) * math.sqrt(3)) / 1000.0  # Convert to kV L-L
             
             logger.info("\nVoltage Drop Calculation:")
@@ -341,7 +350,8 @@ class TransformerLineCalculator(QObject):
             # Calculate regulator tap position and regulated voltage
             if self._voltage_regulator_enabled:
                 target_voltage = self._voltage_regulator_target
-                step_size = self._voltage_regulator_range / (self._voltage_regulator_steps / 2)
+                # Corrected calculation with proper number of steps
+                step_size = (2 * self._voltage_regulator_range) / self._voltage_regulator_steps
                 voltage_difference = target_voltage - self._unregulated_voltage
                 
                 # Calculate required boost/buck percentage
@@ -368,7 +378,7 @@ class TransformerLineCalculator(QObject):
                 self._regulated_voltage = self._unregulated_voltage
                 self._regulator_tap_position = 0
             
-            # 2. Calculate protection settings
+            # Calculate protection settings
             transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
             self._relay_pickup_current = transformer_flc * 1.25  # 125% of FLC
             self._relay_time_dial = 0.3  # Default time dial setting
@@ -386,7 +396,7 @@ class TransformerLineCalculator(QObject):
             
             # CT ratio selection
             standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200]
-            ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 1200)
+            ct_primary = next((x for x in standard_ct_ratios if x > transformer_flc * 1.25), 1200)
             self._relay_ct_ratio = f"{ct_primary}/1"
             
             logger.info(f"\nProtection Settings:")

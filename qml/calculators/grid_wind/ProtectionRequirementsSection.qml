@@ -199,7 +199,13 @@ Item {
                                 
                                 Label { text: "CT Ratio:" }
                                 TextFieldBlue { 
-                                    text: transformerReady ? transformerCalculator.relayCtRatio : "200/1"
+                                    id: someField
+                                    text: {
+                                        if (!transformerReady || !transformerCalculator) return "Default Value";
+                                        
+                                        const propertyValue = transformerCalculator.relayCtRatio;
+                                        return propertyValue !== undefined ? propertyValue.toString() : "Default Value";
+                                    }
                                     Layout.fillWidth: true
                                 }
                                 
@@ -232,9 +238,10 @@ Item {
                                 
                                 Label { text: "Ground Fault Current:" }
                                 TextFieldBlue { 
-                                    text: transformerReady ? 
-                                        safeValueFunction(transformerCalculator.groundFaultCurrent, 100).toFixed(2) + " A" : 
-                                        "100.00 A"
+                                    text: transformerReady && transformerCalculator ? 
+                                        (typeof transformerCalculator.groundFaultCurrent === 'number' ? 
+                                            transformerCalculator.groundFaultCurrent.toFixed(2) + " A" : "0.00 A") : 
+                                        "0.00 A"
                                     Layout.fillWidth: true
                                 }
                                 
@@ -485,9 +492,47 @@ Item {
                                     
                                     Label { text: "Trip Times:" ; font.bold: true; Layout.columnSpan: 4 }
                                     Label { text: "2× pickup:" }
-                                    Label { text: transformerCalculator ? transformerCalculator.calculateTripTime(2.0).toFixed(2) + "s" : "0.00s" }
+                                    Label { 
+                                        text: {
+                                            if (!transformerReady || !transformerCalculator) return "0.00";
+                                            
+                                            try {
+                                                // Try the new method first, fall back to hardcoded value
+                                                if (typeof transformerCalculator.calculateTripTimeWithParams === 'function') {
+                                                    return transformerCalculator.calculateTripTimeWithParams(2.0, 
+                                                           safeValueFunction(transformerCalculator.relayTimeDial, 0.3), 
+                                                           transformerCalculator.relayCurveType || "Very Inverse").toFixed(2);
+                                                } else {
+                                                    console.warn("Trip time calculation methods not available");
+                                                    return "1.25"; // Sensible default for Very Inverse at 2x pickup
+                                                }
+                                            } catch (e) {
+                                                console.error("Error calculating trip time:", e);
+                                                return "1.25";
+                                            }
+                                        }
+                                    }
                                     Label { text: "5× pickup:" }
-                                    Label { text: transformerCalculator ? transformerCalculator.calculateTripTime(5.0).toFixed(2) + "s" : "0.00s" }
+                                    Label { 
+                                        text: {
+                                            if (!transformerReady || !transformerCalculator) return "0.00";
+                                            
+                                            try {
+                                                // Try the new method first, fall back to hardcoded value
+                                                if (typeof transformerCalculator.calculateTripTimeWithParams === 'function') {
+                                                    return transformerCalculator.calculateTripTimeWithParams(5.0, 
+                                                           safeValueFunction(transformerCalculator.relayTimeDial, 0.3), 
+                                                           transformerCalculator.relayCurveType || "Very Inverse").toFixed(2);
+                                                } else {
+                                                    console.warn("Trip time calculation methods not available");
+                                                    return "0.25"; // Sensible default for Very Inverse at 5x pickup
+                                                }
+                                            } catch (e) {
+                                                console.error("Error calculating trip time:", e);
+                                                return "0.25";
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

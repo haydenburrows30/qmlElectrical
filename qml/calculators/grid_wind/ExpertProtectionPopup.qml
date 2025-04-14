@@ -81,8 +81,8 @@ Popup {
                     TextFieldBlue {
                         text: {
                             if (!calculator) return "0.000";
-                            let z_base = safeValueFunction((calculator.transformerHvVoltage**2) / (calculator.transformerRating * 1000), 1);
-                            let z0 = 0.85 * (calculator.transformerImpedance / 100.0) * z_base;
+                            let z1 = safeValueFunction(calculator.transformerZOhms, 0);
+                            let z0 = 0.85 * z1;
                             return safeValueFunction(z0, 0).toFixed(3);
                         }
                     }
@@ -91,11 +91,9 @@ Popup {
                     TextFieldBlue {
                         text: {
                             if (!calculator) return "0.000";
-                            let z = Math.sqrt(Math.pow(3 * safeValueFunction(calculator.lineR, 0.25) * 
-                                             safeValueFunction(calculator.lineLength, 5), 2) + 
-                                            Math.pow(3 * safeValueFunction(calculator.lineX, 0.2) * 
-                                             safeValueFunction(calculator.lineLength, 5), 2));
-                            return safeValueFunction(z, 0).toFixed(3);
+                            let z1 = safeValueFunction(calculator.lineTotalZ, 0);
+                            let z0 = 3.0 * z1;
+                            return safeValueFunction(z0, 0).toFixed(3);
                         }
                     }
                     
@@ -103,8 +101,7 @@ Popup {
                     TextFieldBlue {
                         text: {
                             if (!calculator) return "0.000";
-                            // Calculate neutral grounding impedance referred to HV side
-                            let z_ng = 5.0; // Default neutral grounding resistance
+                            let z_ng = 5.0;
                             let z_ng_referred = z_ng * Math.pow(11000 / 400, 2);
                             return safeValueFunction(z_ng_referred, 0).toFixed(1);
                         }
@@ -126,17 +123,11 @@ Popup {
                         text: {
                             if (!calculator) return "0.0∠0° A";
                             
-                            // Get MVA from calculator, ensuring we have a minimum value
                             let loadMVA = Math.max(0.001, safeValueFunction(calculator.loadMVA, 0.001));
-                            
-                            // Calculate load current in amps at 11kV (line-to-line voltage)
                             let currentMagnitude = (loadMVA * 1000000) / (Math.sqrt(3) * 11000);
-                            
-                            // Calculate angle using power factor
                             let powerFactor = safeValueFunction(calculator.loadPowerFactor, 0.85);
                             let angle = Math.acos(powerFactor);
                             
-                            // Format with angle notation
                             return `${currentMagnitude.toFixed(1)}∠${(-angle * 180 / Math.PI).toFixed(1)}° A`;
                         }
                     }
@@ -158,6 +149,190 @@ Popup {
                         text: calculator ? 
                             `${safeValueFunction(calculator.unregulatedVoltage, 11).toFixed(2)} kV` : 
                             "11.00 kV"
+                    }
+                    
+                    // Additional calculated values
+                    
+                    Label { text: "Symmetrical 3Φ Fault (kA):" }
+                    TextFieldBlue {
+                        text: calculator ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
+                    }
+                    
+                    Label { text: "SLG Fault Current (kA):" }
+                    TextFieldBlue {
+                        text: calculator ? safeValueFunction(calculator.faultCurrentSLG, 0).toFixed(2) : "0.00"
+                    }
+                    
+                    Label { text: "X/R Ratio at Fault Point:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "0.00";
+                            let r = safeValueFunction(calculator.transformerROhms, 0.1) + 
+                                   (safeValueFunction(calculator.lineR, 0.25) * 
+                                    safeValueFunction(calculator.lineLength, 5));
+                            let x = safeValueFunction(calculator.transformerXOhms, 0.8) + 
+                                   (safeValueFunction(calculator.lineX, 0.2) * 
+                                    safeValueFunction(calculator.lineLength, 5));
+                            return (x/r).toFixed(2);
+                        }
+                    }
+                    
+                    Label { text: "Asymmetry Factor:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "1.00";
+                            let r = safeValueFunction(calculator.transformerROhms, 0.1) + 
+                                   (safeValueFunction(calculator.lineR, 0.25) * 
+                                    safeValueFunction(calculator.lineLength, 5));
+                            let x = safeValueFunction(calculator.transformerXOhms, 0.8) + 
+                                   (safeValueFunction(calculator.lineX, 0.2) * 
+                                    safeValueFunction(calculator.lineLength, 5));
+                            let xr = x/r;
+                            return (Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI * r / x))).toFixed(2);
+                        }
+                    }
+                    
+                    Label { text: "Transformer MVA Base:" }
+                    TextFieldBlue {
+                        text: calculator ? (safeValueFunction(calculator.transformerRating, 0) / 1000).toFixed(3) : "0.000"
+                    }
+                    
+                    Label { text: "Per Unit Impedance:" }
+                    TextFieldBlue {
+                        text: calculator ? (safeValueFunction(calculator.transformerImpedance, 0) / 100).toFixed(3) : "0.000"
+                    }
+                    
+                    Label { text: "Short Circuit MVA:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "0.00";
+                            let vkv = safeValueFunction(calculator.hvVoltage, 11000) / 1000;
+                            let fault_ka = safeValueFunction(calculator.faultCurrentHV, 0);
+                            return (Math.sqrt(3) * vkv * fault_ka).toFixed(2);
+                        }
+                    }
+                    
+                    Label { 
+                        text: "Protection Coordination" 
+                        font.bold: true
+                        Layout.topMargin: 10
+                        Layout.bottomMargin: 5
+                        Layout.columnSpan: 2
+                    }
+                    
+                    Rectangle {
+                        height: 1
+                        Layout.fillWidth: true
+                        Layout.bottomMargin: 10
+                        Layout.columnSpan: 2
+                        color: "gray"
+                    }
+                    
+                    Label { text: "Time-Overcurrent Margin:" }
+                    TextFieldBlue {
+                        text: {
+                            return "0.3s (min required)";
+                        }
+                    }
+                    
+                    Label { text: "Instantaneous Pickup (A):" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "0.00";
+                            let flc = safeValueFunction(calculator.transformerRating, 300) * 1000 / 
+                                     (Math.sqrt(3) * safeValueFunction(calculator.hvVoltage, 11000));
+                            return (flc * 8).toFixed(2);
+                        }
+                    }
+                    
+                    Label { text: "Trip Time at Max Fault:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "0.00";
+                            
+                            let pickup = safeValueFunction(calculator.relayPickupCurrent, 1);
+                            let fault = safeValueFunction(calculator.faultCurrentHV, 1) * 1000;
+                            let multiple = fault / pickup;
+                            let tds = safeValueFunction(calculator.relayTimeDial, 0.3);
+                            
+                            let time = 0;
+                            let curveType = calculator ? calculator.relayCurveType : "Very Inverse";
+                            
+                            switch(curveType) {
+                                case "Standard Inverse":
+                                    time = tds * 0.14 / (Math.pow(multiple, 0.02) - 1);
+                                    break;
+                                case "Very Inverse":
+                                    time = tds * 13.5 / (multiple - 1);
+                                    break;
+                                case "Extremely Inverse":
+                                    time = tds * 80 / (Math.pow(multiple, 2) - 1);
+                                    break;
+                                case "Long-Time Inverse":
+                                    time = tds * 120 / (multiple - 1);
+                                    break;
+                                default:
+                                    time = tds;
+                                    break;
+                            }
+                            
+                            time = Math.max(time, 0.025);
+                            return time.toFixed(3) + "s";
+                        }
+                    }
+                    
+                    Label { text: "Breaker Duty Factor:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "1.0";
+                            return "1.0";
+                        }
+                    }
+                    
+                    Label { 
+                        text: "TCC Curve Parameters" 
+                        font.bold: true
+                        Layout.topMargin: 10
+                        Layout.bottomMargin: 5
+                        Layout.columnSpan: 2
+                    }
+                    
+                    Rectangle {
+                        height: 1
+                        Layout.fillWidth: true
+                        Layout.bottomMargin: 10
+                        Layout.columnSpan: 2
+                        color: "gray"
+                    }
+                    
+                    Label { text: "A Constant:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "13.5";
+                            let curveType = calculator.relayCurveType || "Very Inverse";
+                            switch (curveType) {
+                                case "Standard Inverse": return "0.14";
+                                case "Very Inverse": return "13.5";
+                                case "Extremely Inverse": return "80.0";
+                                case "Long-Time Inverse": return "120.0";
+                                default: return "13.5";
+                            }
+                        }
+                    }
+                    
+                    Label { text: "B Exponent:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "1.0";
+                            let curveType = calculator.relayCurveType || "Very Inverse";
+                            switch (curveType) {
+                                case "Standard Inverse": return "0.02";
+                                case "Very Inverse": return "1.0";
+                                case "Extremely Inverse": return "2.0";
+                                case "Long-Time Inverse": return "1.0";
+                                default: return "1.0";
+                            }
+                        }
                     }
                 }
             }
@@ -191,30 +366,24 @@ Popup {
                             var ctx = getContext("2d");
                             ctx.reset();
                             
-                            // Draw grid
                             ctx.strokeStyle = "#c0c0c0";
                             ctx.lineWidth = 1;
                             
-                            // Draw x and y axes
                             ctx.beginPath();
                             for(var i = 0; i <= 10; i++) {
-                                // Horizontal lines
                                 ctx.moveTo(0, i * yScale);
                                 ctx.lineTo(width, i * yScale);
                                 
-                                // Vertical lines
                                 ctx.moveTo(i * xScale, 0);
                                 ctx.lineTo(i * xScale, height);
                             }
                             ctx.stroke();
                             
-                            // Draw curve labels
                             ctx.fillStyle = "#000000";
                             ctx.font = "12px sans-serif";
                             ctx.textAlign = "center";
                             ctx.fillText("Current (× Pickup)", width / 2, height - 5);
                             
-                            // Y axis label
                             ctx.save();
                             ctx.translate(10, height / 2);
                             ctx.rotate(-Math.PI / 2);
@@ -222,7 +391,6 @@ Popup {
                             ctx.fillText("Time (seconds)", 0, 0);
                             ctx.restore();
                             
-                            // Draw curve based on selected type
                             drawCurve(ctx);
                         }
                         
@@ -231,10 +399,9 @@ Popup {
                             ctx.strokeStyle = "#0066cc";
                             ctx.lineWidth = 2;
                             
-                            let pickup = 1; // Multiple of pickup current
+                            let pickup = 1;
                             let points = [];
                             
-                            // Generate points for the selected curve type
                             for(let x = 1; x < 10; x += 0.1) {
                                 let t = 0;
                                 
@@ -256,17 +423,14 @@ Popup {
                                         break;
                                 }
                                 
-                                // Normalize t to canvas scale (clamp to 0-10 range)
-                                t = Math.min(t, 10);
+                                t = Math.max(Math.min(t, 10), 0.025);
                                 
-                                // Map the point to canvas coordinates with logarithmic scaling
-                                let canvasX = Math.log10(x) * width / Math.log10(10);
+                                let canvasX = (Math.log10(x) / Math.log10(10)) * width;
                                 let canvasY = height - (t * height / 10);
                                 
                                 points.push({x: canvasX, y: canvasY});
                             }
                             
-                            // Draw the curve
                             if(points.length > 0) {
                                 ctx.moveTo(points[0].x, points[0].y);
                                 for(let i = 1; i < points.length; i++) {
@@ -275,7 +439,6 @@ Popup {
                                 ctx.stroke();
                             }
                             
-                            // Draw pickup line
                             ctx.beginPath();
                             ctx.strokeStyle = "#cc0000";
                             ctx.lineWidth = 1;
@@ -286,7 +449,6 @@ Popup {
                             ctx.setLineDash([]);
                         }
                         
-                        // Trigger redraw when parameters change
                         Connections {
                             target: curveTypeCombo
                             function onCurrentTextChanged() { curveCanvas.requestPaint(); }
@@ -357,7 +519,7 @@ Popup {
                         id: curveTypeCombo
                         Layout.fillWidth: true
                         model: ["Standard Inverse", "Very Inverse", "Extremely Inverse", "Long-Time Inverse", "Definite Time"]
-                        currentIndex: 1 // Default to Very Inverse
+                        currentIndex: 1
                     }
                     
                     Label { text: "Time Dial Setting (TDS):" }
@@ -403,7 +565,6 @@ Popup {
                         text: {
                             if (!calculator) return "0.00 s";
                             
-                            // Calculate trip time based on selected curve
                             let pickup = safeValueFunction(calculator.relayPickupCurrent, 1);
                             let fault = safeValueFunction(calculator.faultCurrentHV, 0) * 1000;
                             let multiple = fault / pickup;
@@ -427,6 +588,8 @@ Popup {
                                     time = tds;
                                     break;
                             }
+                            
+                            time = Math.max(time, 0.025);
                             
                             return time.toFixed(2) + " s";
                         }
@@ -464,7 +627,7 @@ Popup {
 
                     Label { text: "Under/Over Frequency (Hz):" }
                     TextFieldBlue {
-                        text: calculator ? 
+                        text: calculator && calculator.frequencyRelaySettings ? 
                             calculator.frequencyRelaySettings.under_freq.toFixed(1) + " / " + 
                             calculator.frequencyRelaySettings.over_freq.toFixed(1) : "47.5 / 51.5"
                     }
@@ -476,7 +639,7 @@ Popup {
 
                     Label { text: "Under/Over Voltage (pu):" }
                     TextFieldBlue {
-                        text: calculator ? 
+                        text: calculator && calculator.voltageRelaySettings ? 
                             calculator.voltageRelaySettings.under_voltage.toFixed(2) + " / " +
                             calculator.voltageRelaySettings.over_voltage.toFixed(2) : "0.80 / 1.20"
                     }
@@ -539,6 +702,47 @@ Popup {
                         wrapMode: Text.Wrap
                         font.family: "Courier"
                         background: Rectangle { color: "#f0f0f0"; border.color: "#c0c0c0" }
+                    }
+                    
+                    Label { text: "Recommended CT Ratio:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "300/5";
+                            
+                            let flc = safeValueFunction(calculator.transformerRating, 300) * 1000 / 
+                                     (Math.sqrt(3) * safeValueFunction(calculator.hvVoltage, 11000));
+                            
+                            let required = flc * 1.5;
+                            
+                            let standardRatios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200];
+                            
+                            for (let i = 0; i < standardRatios.length; i++) {
+                                if (standardRatios[i] >= required) {
+                                    return standardRatios[i] + "/5";
+                                }
+                            }
+                            return "1200/5";
+                        }
+                    }
+                    
+                    Label { text: "Minimum Fault Current:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "0.0 A";
+                            
+                            let minFault = safeValueFunction(calculator.faultCurrentHV, 0) * 1000 * 0.87;
+                            return minFault.toFixed(1) + " A";
+                        }
+                    }
+                    
+                    Label { text: "Remote Backup Trip Time:" }
+                    TextFieldBlue {
+                        text: {
+                            if (!calculator) return "0.7s";
+                            
+                            let mainTripTime = 0.3;
+                            return (mainTripTime + 0.4).toFixed(1) + "s";
+                        }
                     }
                 }
             }

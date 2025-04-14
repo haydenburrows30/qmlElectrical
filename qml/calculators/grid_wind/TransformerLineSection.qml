@@ -111,7 +111,7 @@ Item {
                                 id: transformerRatingSpinBox
                                 from: 100
                                 to: 5000
-                                value: calculatorReady ? calculator.transformerRating : 1000
+                                value: calculatorReady && calculator ? safeValueFunction(calculator.transformerRating, 1000) : 1000
                                 stepSize: 50
                                 editable: true
                                 Layout.fillWidth: true
@@ -123,7 +123,7 @@ Item {
                                 id: lvVoltageSpinBox
                                 from: 100
                                 to: 5000
-                                value: calculatorReady ? calculator.lvVoltage : 1000
+                                value: calculatorReady && calculator ? safeValueFunction(calculator.lvVoltage, 400) : 400
                                 stepSize: 10
                                 editable: true
                                 Layout.fillWidth: true
@@ -135,7 +135,7 @@ Item {
                                 id: hvVoltageSpinBox
                                 from: 100
                                 to: 33000
-                                value: calculatorReady ? calculator.hvVoltage : 11000
+                                value: calculatorReady && calculator ? safeValueFunction(calculator.hvVoltage, 11000) : 11000
                                 stepSize: 100
                                 editable: true
                                 Layout.fillWidth: true
@@ -643,10 +643,26 @@ Item {
                                 onClicked: {
                                     // Force calculator to use current MVA and power factor
                                     if (calculatorReady) {
-                                        // Update values just to be sure
-                                        calculator.setLoadMVA(parseFloat(loadMVASpinBox.realValue));
-                                        calculator.setLoadPowerFactor(loadPowerFactorSpinBox.realValue);
-                                        calculator.refreshCalculations();
+                                        try {
+                                            // Update power factor first
+                                            if (typeof calculator.setLoadPowerFactor === 'function') {
+                                                calculator.setLoadPowerFactor(loadPowerFactorSpinBox.realValue);
+                                            }
+                                            
+                                            // Use direct property assignment for loadMVA - more reliable
+                                            calculator.loadMVA = parseFloat(loadMVASpinBox.realValue);
+                                            
+                                            // Try refreshing calculations - handle gracefully if not available
+                                            if (typeof calculator.refreshCalculations === 'function') {
+                                                calculator.refreshCalculations();
+                                            } else {
+                                                console.warn("refreshCalculations method not available");
+                                                // Fall back to calculate signal
+                                                calculate();
+                                            }
+                                        } catch (e) {
+                                            console.error("Error updating values:", e);
+                                        }
                                     }
                                     expertProtectionPopup.open();
                                 }
@@ -669,7 +685,7 @@ Item {
                             Label { text: "Enable Voltage Regulator:" }
                             Switch {
                                 id: regulatorEnabledSwitch
-                                checked: calculatorReady ? calculator.voltageRegulatorEnabled : true
+                                checked: calculatorReady && calculator ? safeValueFunction(calculator.voltageRegulatorEnabled, true) : true
                                 onToggled: if (calculatorReady) calculator.setVoltageRegulatorEnabled(checked)
                             }
 
@@ -700,7 +716,7 @@ Item {
                             Label { text: "Connection Type:" }
                             TextFieldBlue {
                                 id: regulatorConnectionText
-                                text: "Delta"
+                                text: "Delta"  // Using a fixed string prevents the undefined error
                                 enabled: regulatorEnabledSwitch.checked
                             }
 
@@ -708,7 +724,7 @@ Item {
                             Label { text: "Capacity per Phase (kVA):" }
                             TextFieldBlue {
                                 id: regulatorCapacityText
-                                text: "185"
+                                text: "185"  // Using a fixed string prevents the undefined error
                                 enabled: regulatorEnabledSwitch.checked
                             }
 
@@ -809,7 +825,7 @@ Item {
                             Label { text: "Unregulated Voltage (kV):" }
                             TextFieldBlue {
                                 text: calculatorReady ? 
-                                    ((11 * (1 - safeValueFunction(calculator.voltageDrop, 0) / 100))).toFixed(2) : 
+                                    safeValueFunction(calculator.unregulatedVoltage, 0).toFixed(2) : 
                                     "0.00"
                             }
 
@@ -827,7 +843,9 @@ Item {
 
                             Label { text: "Step Size (%):" }
                             TextFieldBlue {
-                                text: (calculator.voltageRegulatorRange / 16).toFixed(3)
+                                text: calculatorReady ? 
+                                    ((2 * calculator.voltageRegulatorRange) / calculator.voltageRegulatorSteps).toFixed(3) :
+                                    "0.625"
                             }
 
                             Label { text: "Total 3-Phase Capacity (kVA):" }
