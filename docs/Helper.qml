@@ -106,3 +106,29 @@ import "../../components/displays"
 
 Are you able to check the calculations in this file please?
 Are there any changes needed to the qml file?
+
+
+// section header
+
+// Header with title and help button
+RowLayout {
+    id: topHeader
+    Layout.fillWidth: true
+    Layout.bottomMargin: 5
+    Layout.leftMargin: 5
+
+    Label {
+        text: "Transmission Line Calculator"
+        font.pixelSize: 20
+        font.bold: true
+        Layout.fillWidth: true
+    }
+
+    StyledButton {
+        id: helpButton
+        visible: false
+        icon.source: "../../../icons/rounded/info.svg"
+        ToolTip.text: "Help"
+        onClicked: popUpText.open()
+    }
+}

@@ -22,7 +22,8 @@ Item {
     property color textColor: Universal.foreground
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: topHeader
         popupText: "<h3>Switchboard Designer</h3><br>" +
                    "This tool helps you design electrical switchboards by entering circuit data such as:<br><br>" +
                    "• Breaker details (size, poles, type)<br>" +
@@ -38,13 +39,34 @@ Item {
     ColumnLayout {
         anchors.fill: parent
 
+        // Header with title and help button
+        RowLayout {
+            id: topHeader
+            Layout.fillWidth: true
+            Layout.bottomMargin: 5
+            Layout.leftMargin: 5
+
+            Label {
+                text: "Switchboard"
+                font.pixelSize: 20
+                font.bold: true
+                Layout.fillWidth: true
+            }
+
+            StyledButton {
+                id: helpButton
+                icon.source: "../../../icons/rounded/info.svg"
+                ToolTip.text: "Help"
+                onClicked: popUpText.open()
+            }
+        }
+
         // Header section with general switchboard info
         WaveCard {
             id: results
             title: "Switchboard Information"
             Layout.fillWidth: true
             Layout.preferredHeight: 180
-            showSettings: true
 
             GridLayout {
                 anchors.fill: parent

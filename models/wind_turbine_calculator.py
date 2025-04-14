@@ -38,8 +38,8 @@ class WindTurbineCalculator(QObject):
         self._theoretical_power = 0.0  # W
         self._actual_power = 0.0       # W
         self._annual_energy = 0.0      # MWh/year
-        self._rated_capacity = 0.0         # kVA
-        self._output_current = 0.0         # A
+        self._rated_capacity = 0.0     # kVA
+        self._output_current = 0.0     # A
         self._power_curve = []         # List of (wind_speed, power) tuples
 
         self._pdf = "Success"
@@ -67,7 +67,7 @@ class WindTurbineCalculator(QObject):
             self._theoretical_power = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)
             logger.info(f"Theoretical Power: {self._theoretical_power/1000:.2f} kW")
             
-            # Calculate actual power
+            # Calculate actual power with proper handling of rated power
             if self._wind_speed < self._cut_in_speed:
                 logger.info(f"Wind speed below cut-in speed ({self._cut_in_speed} m/s)")
                 self._actual_power = 0.0
@@ -78,28 +78,48 @@ class WindTurbineCalculator(QObject):
                 # Check if we have rated power and are above rated wind speed
                 has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
                 
-                if has_rated_specs and self._wind_speed >= self._rated_wind_speed:
-                    # For speeds above rated wind speed, use the rated power
-                    self._actual_power = self._rated_power
-                    logger.info(f"Wind speed above rated speed, using rated power of {self._rated_power/1000:.2f} kW")
+                if has_rated_specs:
+                    # Log rated power information
+                    logger.info(f"Turbine has specified rated power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s")
+                    
+                    # For V27 and similar commercial turbines with a fixed rated power
+                    if self._wind_speed >= self._rated_wind_speed:
+                        # When above rated wind speed, use the rated power (constant power region)
+                        self._actual_power = self._rated_power
+                        logger.info(f"Wind speed ({self._wind_speed} m/s) >= rated speed, using rated power of {self._rated_power/1000:.2f} kW")
+                    else:
+                        # Below rated wind speed, calculate power normally
+                        calculated_power = self._theoretical_power * self._power_coefficient * self._efficiency
+                        # Make sure we don't exceed rated power
+                        self._actual_power = min(calculated_power, self._rated_power)
+                        logger.info(f"Wind speed below rated speed, calculated power: {calculated_power/1000:.2f} kW, limited to: {self._actual_power/1000:.2f} kW")
                 else:
-                    # Normal power calculation based on wind speed cubed
+                    # Normal power calculation based on wind speed cubed (for generic turbines)
                     self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency
+                    logger.info(f"Generic turbine calculation: {self._actual_power/1000:.2f} kW")
                 
-                logger.info(f"Actual Power Output: {self._actual_power/1000:.2f} kW")
+                logger.info(f"Final power output: {self._actual_power/1000:.2f} kW")
             
             # Calculate annual energy
-            average_wind_speed_hours = 0.35 * 365 * 24
-            self._annual_energy = (self._actual_power / 1000) * average_wind_speed_hours / 1000
+            # Fix: Use a more accurate capacity factor approach for annual energy
+            hours_in_year = 8760
+            capacity_factor = 0.35  # A typical capacity factor for wind turbines
+            self._annual_energy = (self._actual_power / 1000) * capacity_factor * hours_in_year / 1000
             logger.info(f"\nAnnual Energy Production: {self._annual_energy:.2f} MWh")
 
-            # Calculate kVAs
-            self._rated_capacity =  self._actual_power * 1.2 / 1000  # kVA
-            logger.info(f"\nRated Capcacity: {self._rated_capacity:.2f} MVA")
+            # Calculate generator capacity (kVA)
+            # Fix: Power factor of ~0.85 is typical for wind turbines
+            power_factor = 0.85
+            self._rated_capacity = (self._actual_power / 1000) / power_factor
+            logger.info(f"\nRated Capacity: {self._rated_capacity:.2f} kVA")
 
-            # Calculate output current
-            self._output_current =  (self._actual_power / 1000) / (math.sqrt(3) * 0.4)  # A at 400V
-            logger.info(f"\nOuput Current: {self._output_current:.2f} MVA")
+            # Calculate output current at 400V (3-phase)
+            if self._actual_power > 0:
+                self._output_current = (self._actual_power) / (math.sqrt(3) * 400 * power_factor)
+                logger.info(f"\nOutput Current: {self._output_current:.2f} A")
+            else:
+                self._output_current = 0.0
+                logger.info("\nOutput Current: 0.00 A (no power generation)")
             
             # Generate power curve
             logger.info("\nGenerating Power Curve...")
@@ -126,26 +146,42 @@ class WindTurbineCalculator(QObject):
             
             # Use rated wind speed and power if they are set (for commercial turbines)
             has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
-            rated_power = self._rated_power if has_rated_specs else None
-            rated_wind_speed = self._rated_wind_speed if has_rated_specs else self._wind_speed
+            
+            # Print debug info about rated specs
+            if has_rated_specs:
+                print(f"Using rated specs: Power = {self._rated_power/1000} kW at {self._rated_wind_speed} m/s")
+                rated_power = self._rated_power
+                rated_wind_speed = self._rated_wind_speed
+            else:
+                print("No rated specs defined, using standard calculation")
+                rated_power = None
+                # Without rated specs, we'll use a calculated wind speed that gives max power
+                rated_wind_speed = self._wind_speed if self._wind_speed > 0 else 12.0
             
             for speed in np.arange(0, self._cut_out_speed + 5.0, 0.5):
                 # Calculate power at this wind speed
                 if speed < self._cut_in_speed or speed > self._cut_out_speed:
                     power = 0.0
                 else:
-                    # Power increases as cube of wind speed up to rated speed
-                    if speed <= rated_wind_speed:
-                        power = 0.5 * self._air_density * self._swept_area * math.pow(speed, 3) * self._power_coefficient * self._efficiency
-                    else:
-                        # After rated speed, power is constant at rated power until cut-out
-                        if has_rated_specs:
+                    # Calculate the theoretical power at this wind speed
+                    theoretical = 0.5 * self._air_density * self._swept_area * math.pow(speed, 3)
+                    
+                    # Apply efficiency and power coefficient
+                    calculated_power = theoretical * self._power_coefficient * self._efficiency
+                    
+                    # Apply rated power limit if specified
+                    if has_rated_specs:
+                        if speed >= rated_wind_speed:
+                            # At or above rated wind speed, use the exact rated power
                             power = rated_power
                         else:
-                            # If no rated power is set, use the power at rated wind speed
-                            power = 0.5 * self._air_density * self._swept_area * math.pow(rated_wind_speed, 3) * self._power_coefficient * self._efficiency
+                            # Below rated wind speed, calculate normally but don't exceed rated power
+                            power = min(calculated_power, rated_power)
+                    else:
+                        # No rated power specified, use calculated power
+                        power = calculated_power
                 
-                # Keep track of maximum power
+                # Keep track of maximum power for display purposes
                 power_kw = power / 1000.0
                 if power_kw > max_power:
                     max_power = power_kw
@@ -158,14 +194,29 @@ class WindTurbineCalculator(QObject):
         except Exception as e:
             print(f"Error generating power curve: {e}")
             self._power_curve = []
-    
+            
     def _calculate_power_at_speed(self, speed):
         """Calculate power output at a specific wind speed"""
         if speed < self._cut_in_speed or speed > self._cut_out_speed:
             return 0.0
         
-        return 0.5 * self._air_density * self._swept_area * math.pow(speed, 3) * self._power_coefficient * self._efficiency
-    
+        # Calculate theoretical power
+        theoretical = 0.5 * self._air_density * self._swept_area * math.pow(speed, 3)
+        calculated_power = theoretical * self._power_coefficient * self._efficiency
+        
+        # Apply rated power limit if specified
+        has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
+        if has_rated_specs and speed >= self._rated_wind_speed:
+            # Print debug information
+            print(f"Using rated power: {self._rated_power/1000:.2f} kW (speed: {speed} >= rated: {self._rated_wind_speed})")
+            return self._rated_power
+        elif has_rated_specs:
+            limited_power = min(calculated_power, self._rated_power)
+            print(f"Limited power: {limited_power/1000:.2f} kW (speed: {speed}, rated: {self._rated_wind_speed})")
+            return limited_power
+        else:
+            return calculated_power
+            
     def _reset_rated_power_settings(self):
         """Reset any fixed rated power settings to allow dynamic calculation"""
         if hasattr(self, '_rated_power'):
@@ -374,6 +425,14 @@ class WindTurbineCalculator(QObject):
                 1/3
             )
             
+            print(f"V27 Parameters loaded - Rated power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s")
+            
+            # Important: Set wind speed to at least the rated wind speed to show full power capability
+            # This ensures the UI shows the rated power immediately
+            if self._wind_speed < self._rated_wind_speed:
+                self._wind_speed = self._rated_wind_speed
+                self.windSpeedChanged.emit()
+            
             # Emit signals for all changed properties
             self.bladeRadiusChanged.emit()
             self.powerCoefficientChanged.emit()
@@ -383,6 +442,10 @@ class WindTurbineCalculator(QObject):
             
             # Recalculate all values
             self._calculate()
+            
+            # Force another signal emission to ensure UI updates
+            self.calculationsComplete.emit()
+            self.calculationCompleted.emit()
             
             print(f"Loaded Vestas V27 parameters (rated power: 225kW at {self._rated_wind_speed:.1f} m/s)")
             return True
@@ -402,6 +465,43 @@ class WindTurbineCalculator(QObject):
         self._calculate()
         # Ensure the power curve is regenerated
         self._generate_power_curve()
+        return True
+        
+    @Slot()
+    def debugTurbineState(self):
+        """Print debug information about the turbine state"""
+        has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
+        rated_info = f"Rated Power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s" if has_rated_specs else "No rated specs"
+        
+        print("\n===== TURBINE DEBUG INFO =====")
+        print(f"Blade radius: {self._blade_radius} m")
+        print(f"Wind speed: {self._wind_speed} m/s")
+        print(f"Power coefficient: {self._power_coefficient}")
+        print(f"Efficiency: {self._efficiency}")
+        print(f"Cut-in speed: {self._cut_in_speed} m/s")
+        print(f"Cut-out speed: {self._cut_out_speed} m/s")
+        print(f"{rated_info}")
+        print(f"Swept area: {self._swept_area:.2f} m²")
+        print(f"Theoretical power: {self._theoretical_power/1000:.2f} kW")
+        print(f"Actual power: {self._actual_power/1000:.2f} kW")
+        
+        # Test calculation at current wind speed
+        theoretical = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)
+        calculated_power = theoretical * self._power_coefficient * self._efficiency
+        
+        print(f"Direct calculation:")
+        print(f"- Theoretical at {self._wind_speed} m/s: {theoretical/1000:.2f} kW")
+        print(f"- With coefficients: {calculated_power/1000:.2f} kW")
+        
+        if has_rated_specs:
+            if self._wind_speed >= self._rated_wind_speed:
+                print(f"- Should be using rated power: {self._rated_power/1000:.2f} kW")
+            else:
+                limited = min(calculated_power, self._rated_power)
+                print(f"- Should be limited to: {limited/1000:.2f} kW")
+        
+        print("==============================\n")
+        
         return True
     
     @Slot(str, str)
@@ -445,6 +545,14 @@ class WindTurbineCalculator(QObject):
             # Make sure the power curve is up-to-date
             self._generate_power_curve()
             
+            # Updated: Make sure we're using the most current calculations for the report
+            self._calculate()
+            
+            # Fix: Use the corrected calculations for rated capacity and output current
+            power_factor = 0.85
+            rated_capacity = self._actual_power / (1000 * power_factor)  # Convert W to kVA
+            output_current = self._actual_power / (math.sqrt(3) * 400 * power_factor)
+            
             # Prepare power curve data (to be used if chart image isn't available)
             power_curve_data = {
                 'wind_speeds': [point[0] for point in self._power_curve],
@@ -463,8 +571,8 @@ class WindTurbineCalculator(QObject):
                 "theoretical_power": self._theoretical_power,
                 "actual_power": self._actual_power,
                 "annual_energy": self._annual_energy,
-                "rated_capacity": self._actual_power * 1.2 / 1000,  # kVA
-                "output_current": (self._actual_power / 1000) / (math.sqrt(3) * 0.4),  # A at 400V
+                "rated_capacity": rated_capacity,
+                "output_current": output_current,
                 "capacity_factor": self.calculateCapacityFactor(self._wind_speed),
                 "power_curve": power_curve_data,
                 "chart_image_path": chart_image_path if chart_image_path else ""
@@ -504,7 +612,12 @@ class WindTurbineCalculator(QObject):
             wind_speeds = np.arange(0, 31, 1)
             
             # Calculate Weibull scale parameter
-            weibull_a = avg_wind_speed / (math.gamma(1 + 1/weibull_k))
+            # Fix: Added safety check for division by zero and negative values
+            if weibull_k <= 0:
+                weibull_k = 2.0  # Default to standard value if invalid
+            
+            # The correct formula for the Weibull scale parameter
+            weibull_a = avg_wind_speed / math.gamma(1 + 1/weibull_k)
             
             # Calculate Weibull probability for each wind speed
             weibull_probs = []
@@ -513,7 +626,10 @@ class WindTurbineCalculator(QObject):
                     prob = 0
                 else:
                     # Weibull probability density function
-                    prob = (weibull_k / weibull_a) * (speed / weibull_a)**(weibull_k-1) * math.exp(-(speed/weibull_a)**weibull_k)
+                    try:
+                        prob = (weibull_k / weibull_a) * (speed / weibull_a)**(weibull_k-1) * math.exp(-(speed/weibull_a)**weibull_k)
+                    except (ValueError, ZeroDivisionError, OverflowError):
+                        prob = 0  # Handle math errors gracefully
                 weibull_probs.append(prob)
             
             # Normalize probabilities to ensure they sum to 1
@@ -525,8 +641,9 @@ class WindTurbineCalculator(QObject):
             energy = 0
             hours_per_year = 8760
             for speed, prob in zip(wind_speeds, weibull_probs):
-                power = self._calculate_power_at_speed(speed) / 1000  # kW
-                energy += power * prob * hours_per_year  # kWh
+                # Get power at this speed using existing method
+                power_at_speed = self._calculate_power_at_speed(speed) / 1000  # kW
+                energy += power_at_speed * prob * hours_per_year  # kWh
             
             # Convert kWh to MWh
             energy_mwh = energy / 1000

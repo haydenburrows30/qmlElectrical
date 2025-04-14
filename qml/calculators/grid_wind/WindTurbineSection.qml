@@ -84,16 +84,21 @@ Item {
                 // Process the file URL to ensure it's properly formatted for the Python backend
                 let filePath = exportFileDialog.selectedFile.toString();
                 
-                // Remove the "file://" prefix properly based on platform
-                if (filePath.startsWith("file:///") && Qt.platform.os === "windows") {
-                    // On Windows, file:///C:/path becomes C:/path
-                    filePath = filePath.substring(8);
-                } else if (filePath.startsWith("file:///")) {
-                    // On Unix-like systems, file:///path becomes /path
-                    filePath = filePath.substring(7); 
-                } else if (filePath.startsWith("file://")) {
-                    // Alternative format
-                    filePath = filePath.substring(5);
+                // More robust path handling for different platforms
+                if (Qt.platform.os === "windows") {
+                    // On Windows, remove file:/// prefix and handle drive letters
+                    if (filePath.startsWith("file:///")) {
+                        filePath = filePath.substring(8); // Remove file:///
+                    } else if (filePath.startsWith("file://")) {
+                        filePath = filePath.substring(5); // Remove file://
+                    }
+                } else {
+                    // On Unix-like systems
+                    if (filePath.startsWith("file:///")) {
+                        filePath = filePath.substring(7); // Remove file:///
+                    } else if (filePath.startsWith("file://")) {
+                        filePath = filePath.substring(5); // Remove file://
+                    }
                 }
                 
                 console.log("Exporting to file path: " + filePath);
@@ -321,6 +326,7 @@ Item {
                             }
 
                             RowLayout {
+                                Layout.columnSpan: 2
 
                                 StyledButton {
                                     text: "Vestas V27"
@@ -330,11 +336,15 @@ Item {
                                         if (calculatorReady) {
                                             calculator.loadVestasV27Parameters()
                                             bladeRadiusSpinBox.value = calculator.bladeRadius
+                                            windSpeedSpinBox.value = calculator.windSpeed  // Will be set to rated wind speed
                                             cutInSpinBox.value = calculator.cutInSpeed
                                             cutOutSpinBox.value = calculator.cutOutSpeed
                                             powerCoefficientSpinBox.value = calculator.powerCoefficient * 100
                                             efficiencySpinBox.value = calculator.efficiency * 100
+                                            
+                                            // Force immediate recalculation and update
                                             updatePowerCurve()
+                                            calculator.debugTurbineState()
                                         }
                                     }
                                 }
@@ -347,6 +357,18 @@ Item {
                                     ToolTip.text: "View Vestas V27 statistics"
                                     ToolTip.delay: 500
                                     ToolTip.visible: hovered
+                                }
+                                
+                                StyledButton {
+                                    text: "Debug"
+                                    visible: true // Set to true to show debug button
+                                    Layout.alignment: Qt.AlignRight
+                                    
+                                    onClicked: {
+                                        if (calculatorReady) {
+                                            calculator.debugTurbineState()
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -635,7 +657,10 @@ Item {
 
     // Safe value handling without recursion risk
     function safeValue(value, defaultVal) {
-        if (typeof value === 'undefined' || value === null || isNaN(value) || !isFinite(value)) {
+        // Improved safeValue function to handle more edge cases
+        if (value === undefined || value === null || 
+            typeof value !== 'number' || 
+            isNaN(value) || !isFinite(value)) {
             return defaultVal;
         }
         return value;
