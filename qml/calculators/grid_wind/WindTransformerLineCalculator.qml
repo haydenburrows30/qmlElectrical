@@ -10,19 +10,12 @@ import WindTurbine 1.0
 
 Item {
     id: root
-
-    property var transformerCalculator
-    property var windTurbineCalculator
+    property TransformerLineCalculator transformerCalculator : TransformerLineCalculator {}
+    property WindTurbineCalculator windTurbineCalculator : WindTurbineCalculator {}
+    
     property bool transformerReady: transformerCalculator !== null
     property bool windTurbineReady: windTurbineCalculator !== null
     property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.actualPower : 0
-
-    Component.onCompleted: {
-        transformerCalculator = Qt.createQmlObject('import QtQuick; import TransformerLine 1.0; TransformerLineCalculator {}', 
-                                                 root, "dynamicTransformerCalculator");
-        windTurbineCalculator = Qt.createQmlObject('import QtQuick; import WindTurbine 1.0; WindTurbineCalculator {}', 
-                                                 root, "dynamicWindCalculator");
-    }
     
     function safeValue(value, defaultVal) {
         if (value === undefined || value === null) {

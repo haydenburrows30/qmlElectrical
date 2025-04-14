@@ -834,14 +834,13 @@ Item {
         }
     }
 
-    // update display timer
     Timer {
         id: updateTimer
         interval: 500
         repeat: true
         running: calculatorReady
         onTriggered: {
-            if(calculatorReady) {
+            if (calculatorReady) {
                 transformerLineSection.updateDisplayValues()
             }
         }
@@ -887,34 +886,6 @@ Item {
             }
 
             calculator.exportTransformerReport(data, filePath)
-        }
-    }
-
-    Connections {
-        target: calculator
-        function loadChanged() {
-            if (calculatorReady) {
-                transformerLineSection.updateDisplayValues()
-            }
-        }
-    }
-
-    // Update FLC calculations
-    Connections {
-        target: transformerRatingSpinBox
-        function onValueModified() {
-            if (calculatorReady) {
-                // Update FLC calculations in the pickup dialog
-                let flc = (transformerRatingSpinBox.value * 1000) / (Math.sqrt(3) * 11000);
-                flcText.text = flc.toFixed(2) + " A";
-                
-                // Update the pickup current display as well
-                let newPickup = (pickupSlider.value / 100) * flc;
-                relayPickupCurrentText.text = newPickup.toFixed(2);
-                
-                // Force recalculation
-                calculator.refreshCalculations();
-            }
         }
     }
 
