@@ -1,12 +1,10 @@
 """Configuration settings for the application."""
 
 import os
-import sys
-import logging
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict
 import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor

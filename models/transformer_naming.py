@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Property, Signal, Slot, QStringListModel
+from PySide6.QtCore import QObject, Property, Signal, Slot
 
 class TransformerNamingGuide(QObject):
     """Model for transformer naming conventions"""

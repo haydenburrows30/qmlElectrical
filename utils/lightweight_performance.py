@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 from PySide6.QtCore import QObject, Signal, Slot, Property, QTimer, QElapsedTimer
 

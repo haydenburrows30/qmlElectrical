@@ -1,6 +1,5 @@
 """Performance monitoring interface for the application."""
 from PySide6.QtCore import QObject, Signal, Slot, Property
-# Remove QVariant import as it's not available directly in PySide6.QtCore
 import os
 from datetime import datetime
 
