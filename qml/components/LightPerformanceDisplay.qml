@@ -8,7 +8,7 @@ Rectangle {
     // Position in the bottom-right corner by default
     width: expanded ? 180 : 30
     height: expanded ? 120 : 30
-    anchors.right: parent.right
+    anchors.left: parent.left
     anchors.bottom: parent.bottom
     anchors.margins: 10
     

@@ -314,6 +314,7 @@ Page {
             contentItem: Label {
                 text: "What's New"
                 font.pixelSize: 14
+                color: window.modeToggled ? "white" : "black"
             }
             
             background: Rectangle {
@@ -330,7 +331,10 @@ Page {
         // About button
         Button {
             id: aboutProgram
-            contentItem: Label {text: calculator.version}
+            contentItem: Label {
+                text: calculator.version
+                color: window.modeToggled ? "white" : "black"
+            }
             font.pixelSize: 14
 
             background: 
@@ -351,6 +355,7 @@ Page {
             contentItem: Label {
                 text: "View Logs"
                 font.pixelSize: 14
+                color: window.modeToggled ? "white" : "black"
             }
             
             background: 
