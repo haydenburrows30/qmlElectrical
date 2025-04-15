@@ -81,9 +81,7 @@ Popup {
                     TextFieldBlue {
                         text: {
                             if (!calculator) return "0.000";
-                            let z1 = safeValueFunction(calculator.transformerZOhms, 0);
-                            let z0 = 0.85 * z1;
-                            return safeValueFunction(z0, 0).toFixed(3);
+                            return safeValueFunction(calculator.z0Transformer, 0).toFixed(3);
                         }
                     }
                     
@@ -91,9 +89,7 @@ Popup {
                     TextFieldBlue {
                         text: {
                             if (!calculator) return "0.000";
-                            let z1 = safeValueFunction(calculator.lineTotalZ, 0);
-                            let z0 = 3.0 * z1;
-                            return safeValueFunction(z0, 0).toFixed(3);
+                            return safeValueFunction(calculator.z0Line, 0).toFixed(3);
                         }
                     }
                     
@@ -101,9 +97,7 @@ Popup {
                     TextFieldBlue {
                         text: {
                             if (!calculator) return "0.000";
-                            let z_ng = 5.0;
-                            let z_ng_referred = z_ng * Math.pow(11000 / 400, 2);
-                            return safeValueFunction(z_ng_referred, 0).toFixed(1);
+                            return safeValueFunction(calculator.zNeutralReferred, 0).toFixed(1);
                         }
                     }
                     
@@ -134,7 +128,7 @@ Popup {
                     
                     Label { text: "Ground Fault Current (A):" }
                     TextFieldBlue {
-                        text: calculator ? safeValueFunction(calculator.groundFaultCurrent, 10).toFixed(2) : "0.00"
+                        text: calculator ? safeValueFunction(calculator.groundFaultCurrent, 10).toFixed(4) : "0.000"
                     }
                     
                     Label { text: "Voltage Drop:" }

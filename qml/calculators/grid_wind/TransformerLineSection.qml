@@ -35,6 +35,7 @@ Item {
         voltageDropText.text = safeValueFunction(calculator.voltageDrop, 0.01).toFixed(2)
         faultCurrentLVText.text = safeValueFunction(calculator.faultCurrentLV, 0).toFixed(2)
         faultCurrentHVText.text = safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2)
+        groundFaultCurrentText.text = safeValueFunction(calculator.groundFaultCurrent, 0).toFixed(4)
 
         // Update protection settings
         relayPickupCurrentText.text = safeValueFunction(calculator.relayPickupCurrent, 0).toFixed(2)
@@ -421,6 +422,12 @@ Item {
                             TextFieldBlue {
                                 id: faultCurrentHVText
                                 text: calculatorReady ? safeValueFunction(calculator.faultCurrentHV, 0).toFixed(2) : "0.00"
+                            }
+
+                            Label { text: "Ground Fault Current (kA):" }
+                            TextFieldBlue {
+                                id: groundFaultCurrentText
+                                text: calculatorReady ? safeValueFunction(calculator.groundFaultCurrent, 0).toFixed(4) : "0.0000"
                             }
 
                             Label { text: "Unregulated Voltage (kV):" }

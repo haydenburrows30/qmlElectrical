@@ -86,7 +86,7 @@ class TransformerLineCalculator(QObject):
         self._voltage_drop = 0.0  # %
         self._fault_current_lv = 0.0  # kA
         self._fault_current_hv = 0.0  # kA
-        self._fault_current_slg = 0.0  # kA
+        self._fault_current_slg = 0.000  # kA
         self._relay_pickup_current = 0.0  # A
         self._relay_time_dial = 0.0
         self._relay_curve_type = "Very Inverse"
@@ -290,7 +290,7 @@ class TransformerLineCalculator(QObject):
             # Calculate transformer impedance
             z1_transformer = complex(self._transformer_r, self._transformer_x)  # Positive sequence
             z2_transformer = z1_transformer  # Negative sequence equals positive
-            # Zero sequence typically 0.85-1.0 times Z1 for transformers
+            # Zero sequence typically 0.85-1.0 times Z1 for transformers - depends on winding type
             z0_transformer = 0.85 * z1_transformer  
             
             # Calculate line impedance sequences
@@ -305,28 +305,69 @@ class TransformerLineCalculator(QObject):
             z0_total = z0_transformer + z0_line
             
             # Three-phase fault current (uses only positive sequence)
-            # Corrected calculation with proper voltage reference
-            v_ln = self._transformer_hv_voltage / math.sqrt(3)  # Line-to-neutral voltage
-            self._fault_current_hv = (v_ln / abs(z1_total)) * math.sqrt(3) / 1000  # kA
+            # Fixed calculation using line-to-line voltage
+            self._fault_current_hv = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z1_total))) / 1000  # kA
             
             # Single-line-to-ground fault current (uses all sequences)
-            z_total_slg = z1_total + z2_total + z0_total
-            self._fault_current_slg = (3 * v_ln / abs(z_total_slg)) / 1000  # kA
+            # For SLG fault, we need line-to-neutral voltage
+            v_ln = self._transformer_hv_voltage / math.sqrt(3)  # Line-to-neutral voltage
+            self._fault_current_slg = (3 * v_ln / abs(z1_total + z2_total + z0_total)) / 1000  # kA
             
-            # Ground fault current calculation with neutral grounding resistance
-            z_ng = complex(self._neutral_grounding_resistance, 0)  # NGR impedance
-            z_total_ground = z0_total + 3 * z_ng
-            self._ground_fault_current = (3 * v_ln / abs(z_total_ground))  # A
+            # Improved ground fault current calculation
+            # First check transformer configuration (assume delta-wye with grounded neutral)
+            is_delta_primary = True  # HV side is typically delta in distribution transformers
+            
+            if is_delta_primary:
+                # For delta primary winding, ground fault on delta side is limited by:
+                # 1. Zero sequence impedance path through the transformer (winding to winding)
+                # 2. System grounding on the wye side reflected to delta side
+                
+                # Calculate zero sequence impedance
+                z0_transformer = 1.0 * z1_transformer  # For delta primary, Z0 typically equals Z1
+                
+                # For a delta primary, the zero sequence current path is through the delta,
+                # so ground fault current on delta side will be very small or zero
+                # This is because there's no direct ground path on the delta side
+                if self._neutral_grounding_resistance > 0:
+                    # Convert NGR on LV side to HV equivalent
+                    z_ng = complex(self._neutral_grounding_resistance, 0) * (self._transformer_hv_voltage / self._transformer_lv_voltage) ** 2
+                    
+                    # Calculate ground fault current through transformer (from LV to HV)
+                    # This is typically very small due to delta configuration blocking zero sequence
+                    v_ln = self._transformer_hv_voltage / math.sqrt(3)
+                    total_z0_path = z0_transformer + 3 * z_ng + z0_line
+                    self._ground_fault_current = (v_ln / abs(total_z0_path)) / 1000  # kA
+                else:
+                    # With no NGR, ground fault on delta side has no return path
+                    self._ground_fault_current = 0.001  # Negligible current (1A)
+            else:
+                # For wye-connected HV side with neutral grounding
+                # Calculate ground fault current using standard method
+                v_ln = self._transformer_hv_voltage / math.sqrt(3)
+                z_ng = complex(self._neutral_grounding_resistance, 0)
+                total_z0_path = z0_total + 3 * z_ng
+                self._ground_fault_current = (3 * v_ln / abs(total_z0_path)) / 1000  # kA
+            
+            # Store sequence impedances for reference
+            self._z0_transformer = abs(z0_transformer)
+            self._z0_line = abs(z0_line)
+            self._z_ng_referred = abs(z_ng) if 'z_ng' in locals() else 0.0
+            
+            logger.info("\nGround Fault Calculation:")
+            logger.info(f"Transformer Configuration: {'Delta-Wye' if is_delta_primary else 'Wye-Delta/Wye'}")
+            logger.info(f"Z0 Transformer: {abs(z0_transformer):.2f} ohms")
+            logger.info(f"Z0 Line: {abs(z0_line):.2f} ohms")
+            if 'z_ng' in locals():
+                logger.info(f"NGR (referred to HV): {abs(z_ng):.2f} ohms")
+            logger.info(f"Ground Fault Current: {self._ground_fault_current:.3f} kA")
             
             # Calculate LV fault current using transformer impedance referred to LV side
             z_base_lv = (self._transformer_lv_voltage**2) / (self._transformer_rating * 1000)
             z_t_lv = z_pu * z_base_lv
             
-            # Corrected LV fault current calculation
-            # We need to use line-to-neutral voltage at LV side for the calculation
-            # and then multiply by sqrt(3) to get the three-phase fault current
-            v_ln_lv = self._transformer_lv_voltage / math.sqrt(3)
-            self._fault_current_lv = (v_ln_lv / abs(z_t_lv)) * math.sqrt(3) / 1000  # Convert to kA
+            # Fixed LV fault current calculation using proper three-phase formula
+            # For three-phase fault current, we use line-to-line voltage
+            self._fault_current_lv = (self._transformer_lv_voltage / (math.sqrt(3) * abs(z_t_lv))) / 1000  # Convert to kA
             
             logger.info(f"\nLV Fault Current Calculation:")
             logger.info(f"Base Z (LV): {z_base_lv:.4f} ohm")
@@ -336,7 +377,7 @@ class TransformerLineCalculator(QObject):
             logger.info("\nFault Current Calculations:")
             logger.info(f"Three-phase fault: {self._fault_current_hv:.2f} kA")
             logger.info(f"SLG fault: {self._fault_current_slg:.2f} kA")
-            logger.info(f"Ground fault: {self._ground_fault_current:.2f} A")
+            logger.info(f"Ground fault: {self._ground_fault_current:.2f} kA")
             
             # Calculate voltage drop with improved accuracy using complex power factor
             # Get load current with power factor
