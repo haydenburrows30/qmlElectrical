@@ -236,7 +236,7 @@ Page {
                 text: "Close"
                 Layout.alignment: Qt.AlignHCenter
                 onClicked: messagePopup.close()
-                icon.source "../../icons/rounded/close.svg"
+                icon.source: "../../icons/rounded/close.svg"
             }
         }
     }

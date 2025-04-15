@@ -1,4 +1,10 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Controls.Universal // Add missing import for Slider and CheckBox
+
 import "../buttons"
+import "../style"
 
 ColumnLayout {
     anchors.fill: parent

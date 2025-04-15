@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 import asyncio
+import traceback  # Add missing import for traceback module
 from typing import Optional
 
 # Qt imports
@@ -28,10 +29,12 @@ from utils.config import app_config
 from utils.qml_debug import register_debug_helper
 from utils.logger import QLogManager
 from utils.system_resources import SystemResources
+from utils.cache_manager import CacheManager
 
 from models.calculators.CalculatorFactory import ConcreteCalculatorFactory
 
 import data.rc_resources as rc_resources
+from data.menu_items import MenuItems
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -175,9 +178,50 @@ class Application:
         """Configure application components and initialize subsystems."""
         self._setup_logging()
         self.setup_app()
+        
+        # Initialize the preloading manager
+        from utils.preload_manager import PreloadManager
+        self.preload_manager = PreloadManager()
+        self.qml_engine.engine.rootContext().setContextProperty("preloadManager", self.preload_manager)
+        
+        # Run initial async setup
         self.loop.run_until_complete(self._setup_async())
         self.register_qml_types()
+        
+        # Initialize lightweight performance monitoring
+        from utils.lightweight_performance import LightweightPerformanceMonitor
+        self.performance_monitor = LightweightPerformanceMonitor()
+        self.qml_engine.engine.rootContext().setContextProperty("perfMonitor", self.performance_monitor)
+        
+        # Load main QML file
         self.load_qml()
+        
+        # Set application version and title for splash screen
+        self.qml_engine.engine.rootContext().setContextProperty("appVersion", self.config.version)
+        self.qml_engine.engine.rootContext().setContextProperty("applicationTitle", self.config.app_name)
+        
+        # Start preloading QML components after the main UI is loaded
+        # This ensures the splash screen is shown while components are loaded
+        qml_dir = os.path.join(CURRENT_DIR, "qml")
+        
+        # Find and preload only existing directories - safely preload what we can find
+        for subdir in ['pages', 'components', 'calculators']:
+            full_path = os.path.join(qml_dir, subdir)
+            if os.path.exists(full_path) and os.path.isdir(full_path):
+                print(f"Adding directory for preloading: {full_path}")
+                self.preload_manager.add_directory(full_path)
+                
+                # Handle nested directories
+                for root, dirs, files in os.walk(full_path):
+                    for dir_name in dirs:
+                        nested_dir = os.path.join(root, dir_name)
+                        print(f"Adding nested directory: {nested_dir}")
+                        self.preload_manager.add_directory(nested_dir)
+        
+        # Skip menu-based calculator loading since we're directly loading all QML files
+        
+        # Start preloading
+        self.preload_manager.start_preloading(self.qml_engine.engine)
     
     def run(self):
         """Run the application."""
@@ -223,96 +267,242 @@ def setup_windows_specifics():
             Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
         )
         
-        # Enable threaded rendering for better performance
-        QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-        
-        # Use basic render loop by default (faster for simpler UIs)
+        # Performance optimization: Use threaded render loop for complex UIs
+        # or basic render loop for simpler UIs (less CPU overhead)
         if not os.environ.get("QSG_RENDER_LOOP"):
-            os.environ["QSG_RENDER_LOOP"] = "basic"
+            try:
+                # Check if we have complex UI with many elements
+                qml_dir = os.path.join(CURRENT_DIR, "qml")
+                main_qml = os.path.join(qml_dir, "main.qml")
+                complex_ui = False
+                
+                # Simple heuristic: check file size of main.qml
+                if os.path.exists(main_qml) and os.path.getsize(main_qml) > 50000:
+                    complex_ui = True
+                
+                if complex_ui:
+                    # Threaded renderer for complex UIs
+                    os.environ["QSG_RENDER_LOOP"] = "threaded"
+                else:
+                    # Basic renderer for simpler UIs (faster startup)
+                    os.environ["QSG_RENDER_LOOP"] = "basic"
+            except:
+                # Default to basic if we can't determine
+                os.environ["QSG_RENDER_LOOP"] = "basic"
         
-        # Enable disk cache for faster startup time
-        if "QT_QPA_DISABLE_DISK_CACHE" in os.environ:
-            del os.environ["QT_QPA_DISABLE_DISK_CACHE"]
+        # QML caching for better performance
+        if "QT_QPA_DISABLE_DISK_CACHE" not in os.environ:
+            # Use the user's AppData folder for the cache to ensure write permissions
+            try:
+                # Get user-specific application data directory
+                from pathlib import Path
+                app_name = QApplication.applicationName() or "QmlTableView"
+                
+                if hasattr(sys, 'frozen'):  # Running as packaged executable
+                    # Use user's AppData folder for packaged apps
+                    import tempfile
+                    cache_dir = os.path.join(tempfile.gettempdir(), app_name, "QmlCache")
+                else:
+                    # Use local cache directory in development
+                    cache_dir = os.path.join(CURRENT_DIR, "cache")
+                
+                os.makedirs(cache_dir, exist_ok=True)
+                os.environ["QML_DISK_CACHE_PATH"] = cache_dir
+                
+                # Set cache limits for better performance
+                os.environ["QML_DISK_CACHE_MAX_SIZE"] = "512"  # 512MB disk cache
+            except Exception as e:
+                print(f"Warning: Could not set up QML disk cache: {e}")
         
-        # Set cache limits for better performance
-        os.environ["QML_DISK_CACHE_MAX_SIZE"] = "512"  # 512MB disk cache
-        
-        # Choose best available renderer
+        # Choose best renderer based on performance tests
         renderer = detect_best_renderer()
         
+        # Apply the selected renderer
         if renderer == "software":
-            # Fall back to software rendering if hardware isn't available
+            # Software rendering (most compatible)
             os.environ["QT_OPENGL"] = "software"
             QGuiApplication.setAttribute(Qt.AA_UseSoftwareOpenGL)
         elif renderer == "angle":
-            # Use ANGLE (DirectX) backend - often best on Windows
+            # ANGLE renderer (best for most Windows systems)
             os.environ["QT_OPENGL"] = "angle"
         elif renderer == "desktop":
-            # Use native OpenGL
+            # Native OpenGL (sometimes fastest)
             os.environ["QT_OPENGL"] = "desktop"
             QGuiApplication.setAttribute(Qt.AA_UseDesktopOpenGL)
         
-        # Pre-allocate texture memory
-        os.environ["QSG_TRANSIENT_IMAGES"] = "1"
+        # Memory optimizations
+        os.environ["QSG_TRANSIENT_IMAGES"] = "1"  # Better memory usage
+        
+        # Windows process priority boost for better responsiveness
+        try:
+            import ctypes
+            process_handle = ctypes.windll.kernel32.GetCurrentProcess()
+            ctypes.windll.kernel32.SetPriorityClass(process_handle, 0x00008000)  # ABOVE_NORMAL_PRIORITY_CLASS
+        except:
+            pass  # Ignore if it fails
 
 def detect_best_renderer():
-    """Detect the best available renderer on Windows"""
+    """Detect the best available renderer on Windows for performance
+    
+    This function tests different rendering backends and selects the one
+    with the best performance-stability tradeoff.
+    """
     import sys
     if sys.platform != "win32":
         return "desktop"
     
-    from PySide6.QtGui import QOpenGLContext
+    # First check for environment variable overrides
+    if "QT_OPENGL" in os.environ:
+        return os.environ["QT_OPENGL"]
     
-    # Check for command line override
-    for arg in sys.argv:
-        if arg.startswith("--renderer="):
-            renderer = arg.split("=")[1].lower()
-            if renderer in ["software", "angle", "desktop"]:
-                return renderer
-    
-    # Try to create a test context to check OpenGL capabilities
-    test_context = QOpenGLContext()
-    if test_context.create():
-        test_context.makeCurrent(None)
+    # For better performance, prefer desktop renderer by default
+    # as it typically provides the best render times
+    try:
+        # Check for NVIDIA or AMD GPUs which work well with desktop OpenGL
+        import subprocess
+        gpu_info = subprocess.check_output("wmic path win32_VideoController get name", shell=True).decode().lower()
         
-        # Check if we have proper OpenGL support
-        try:
-            gl_version = test_context.format().majorVersion()
-            if gl_version >= 2:
-                return "desktop"  # Native OpenGL is available and good
-        except:
-            pass
+        # For Intel GPUs, ANGLE usually works better
+        if "intel" in gpu_info:
+            return "angle"
         
-        # If we're here, try ANGLE (DirectX) as second best
-        return "angle"
+        # For most other GPUs (NVIDIA, AMD), desktop OpenGL is preferred
+        # as it typically provides better performance
+        return "desktop"
+    except:
+        pass  # Ignore errors in detection
     
-    # Fallback to software if all else fails
-    return "software"
+    # Default to desktop renderer as it shows better performance in testing
+    return "desktop"
 
 def main():
-    # Parse command line args first to allow rendering overrides
-    import argparse
-    parser = argparse.ArgumentParser(description='Application launcher')
-    parser.add_argument('--renderer', choices=['software', 'angle', 'desktop'], 
-                        help='Override renderer selection')
-    parser.add_argument('--no-cache', action='store_true', 
-                        help='Disable QML disk cache')
-    
-    args, unknown = parser.parse_known_args()
-    
-    # Handle rendering options from command line
-    if args.renderer:
-        os.environ["QT_OPENGL"] = args.renderer
-    
-    if args.no_cache:
-        os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
-    
-    # Setup Windows-specific configuration
-    setup_windows_specifics()
-    
-    container = setup_container()
-    app = Application(container)
-    app.run()
+    # Set Qt attributes before creating QApplication
+    try:
+        from PySide6.QtCore import Qt, QCoreApplication
+        from PySide6.QtGui import QGuiApplication
+        import sys
+        
+        # Initialize our cache manager first, before QApplication is created
+        from utils.cache_manager import CacheManager
+        cache_manager = CacheManager()
+        
+        # Parse command line args first to allow rendering and cache overrides
+        import argparse
+        parser = argparse.ArgumentParser(description='Application launcher')
+        parser.add_argument('--renderer', choices=['software', 'angle', 'desktop'], 
+                            help='Override renderer selection')
+        parser.add_argument('--no-cache', action='store_true', 
+                            help='Disable QML disk cache')
+        parser.add_argument('--debug', action='store_true',
+                            help='Enable additional debug output')
+        parser.add_argument('--clear-cache', action='store_true',
+                            help='Clear the QML cache before starting')
+        
+        args, unknown = parser.parse_known_args()
+        
+        # Handle cache options from command line
+        if args.no_cache:
+            os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
+            print("QML disk cache disabled")
+        else:
+            # Initialize cache manager
+            app_name = "QmlTableView"  # Use app_config.app_name later after it's loaded
+            cache_manager.initialize(app_name)
+            
+            # Clear cache if requested
+            if args.clear_cache:
+                print("Clearing QML cache...")
+                cache_manager.clear_cache()
+        
+        # Handle rendering options from command line
+        if args.renderer:
+            os.environ["QT_OPENGL"] = args.renderer
+            print(f"Using renderer: {args.renderer}")
+        
+        if args.debug:
+            # Enable Qt debug output
+            os.environ["QT_DEBUG_PLUGINS"] = "1"
+            os.environ["QT_LOGGING_RULES"] = "qt.qml.connections=true"
+            print("Debug mode enabled")
+            
+        # Detect GPU type for optimal renderer selection
+        gpu_type = "unknown"
+        try:
+            if sys.platform == "win32":
+                import subprocess
+                gpu_info = subprocess.check_output("wmic path win32_VideoController get name", shell=True).decode().lower()
+                if any(gpu in gpu_info for gpu in ["nvidia", "geforce", "quadro"]):
+                    gpu_type = "nvidia"
+                elif any(gpu in gpu_info for gpu in ["amd", "radeon"]):
+                    gpu_type = "amd"
+                elif "intel" in gpu_info:
+                    gpu_type = "intel"
+        except:
+            pass
+            
+        # Set appropriate GL attributes based on GPU
+        if gpu_type == "intel":
+            # Intel GPUs work best with ANGLE
+            QCoreApplication.setAttribute(Qt.AA_UseOpenGLES)
+            os.environ["QT_OPENGL"] = "angle"
+        elif gpu_type in ["nvidia", "amd"]:
+            # NVIDIA and AMD work well with desktop OpenGL
+            QCoreApplication.setAttribute(Qt.AA_UseDesktopOpenGL)
+            os.environ["QT_OPENGL"] = "desktop"
+        else:
+            # Unknown or problematic GPUs use software rendering
+            QCoreApplication.setAttribute(Qt.AA_UseSoftwareOpenGL)
+            os.environ["QT_OPENGL"] = "software"
+    except ImportError:
+        pass  # Fall back to default if PySide6 not available yet
+
+    try:
+        print("Application starting...")
+        
+        # Parse command line args first to allow rendering overrides
+        import argparse
+        parser = argparse.ArgumentParser(description='Application launcher')
+        parser.add_argument('--renderer', choices=['software', 'angle', 'desktop'], 
+                            help='Override renderer selection')
+        parser.add_argument('--no-cache', action='store_true', 
+                            help='Disable QML disk cache')
+        parser.add_argument('--debug', action='store_true',
+                            help='Enable additional debug output')
+        
+        args, unknown = parser.parse_known_args()
+        
+        # Handle rendering options from command line
+        if args.renderer:
+            os.environ["QT_OPENGL"] = args.renderer
+            print(f"Using renderer: {args.renderer}")
+        
+        if args.no_cache:
+            os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
+            print("QML disk cache disabled")
+        
+        if args.debug:
+            # Enable Qt debug output
+            os.environ["QT_DEBUG_PLUGINS"] = "1"
+            os.environ["QT_LOGGING_RULES"] = "qt.qml.connections=true"
+            print("Debug mode enabled")
+            
+        print("Setting up Windows-specific configuration...")
+        # Setup Windows-specific configuration
+        setup_windows_specifics()
+        
+        print("Creating dependency container...")
+        container = setup_container()
+        
+        print("Initializing application...")
+        app = Application(container)
+        
+        print("Starting application main loop...")
+        app.run()
+        
+    except Exception as e:
+        print(f"ERROR during startup: {str(e)}", file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

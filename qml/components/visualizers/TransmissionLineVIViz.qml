@@ -1,9 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Controls.Universal
-
-import "../"
+import "../style" // Update import path to find WaveCard.qml
 
 import Transmission 1.0
 

@@ -10,3 +10,5 @@ logs/
 tools
 tools/
 icons/all_icons.svg
+cache
+cache/*

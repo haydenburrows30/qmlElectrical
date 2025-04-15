@@ -4,7 +4,6 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
-
 import "calculators"
 import "components"
 import "pages"
@@ -61,6 +60,31 @@ ApplicationWindow {
             if (!loadingManager.loading) {
                 splashScreen.close()
             }
+        }
+    }
+
+    // Non-intrusive performance monitor that won't interfere with input
+    LightPerformanceDisplay {
+        id: performanceDisplay
+        // This is positioned in the bottom-right corner by default
+        z: 999 // Keep it above regular content but below popups
+    }
+
+    Component.onCompleted: {
+        calculatorLoader.push("pages/Home.qml")
+        
+        // Start monitoring performance (using updated monitor)
+        if (typeof perfMonitor !== 'undefined') {
+            perfMonitor.beginRenderTiming()
+        }
+    }
+    
+    // Render timing hooks - only run if performance monitor is available
+    onAfterRendering: {
+        if (typeof perfMonitor !== 'undefined') {
+            perfMonitor.endRenderTiming()
+            perfMonitor.beginRenderTiming()
+            perfMonitor.frameRendered()
         }
     }
 
@@ -218,7 +242,6 @@ ApplicationWindow {
                 right: parent.right
             }
             z: 1
-            Component.onCompleted: calculatorLoader.push("pages/Home.qml")
         }
     }
 
