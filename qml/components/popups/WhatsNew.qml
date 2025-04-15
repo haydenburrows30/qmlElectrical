@@ -142,6 +142,21 @@ Popup {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
                 }
+
+                Label {
+                    text: "1.1.5"
+                    font.pixelSize: 18
+                    font.bold: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            
+                Label {
+                    text: "Fix styling.  Improve logging.  Fix Wind & Grid calculations"
+                    font.pixelSize: 14
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignLeft
+                }
             }
         }
         

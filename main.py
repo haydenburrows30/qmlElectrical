@@ -210,31 +210,103 @@ def setup_container() -> Container:
 
 # Add Windows-specific code
 def setup_windows_specifics():
-    """Configure Windows-specific settings"""
+    """Configure Windows-specific settings for optimal performance"""
     import sys
     if sys.platform == "win32":
         # Import Qt first to avoid the UnboundLocalError
-        from PySide6.QtCore import Qt
-        # Use software OpenGL on Windows by default (can be overridden with command-line args)
+        from PySide6.QtCore import Qt, QCoreApplication
         from PySide6.QtQuick import QSGRendererInterface
         from PySide6.QtGui import QGuiApplication
         
-        # Set default render loop (better performance on Windows)
+        # Set high DPI settings
         QGuiApplication.setHighDpiScaleFactorRoundingPolicy(
             Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
         )
         
-        # Allow environment variables to override these settings
-        if not os.environ.get("QT_OPENGL"):
+        # Enable threaded rendering for better performance
+        QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+        
+        # Use basic render loop by default (faster for simpler UIs)
+        if not os.environ.get("QSG_RENDER_LOOP"):
+            os.environ["QSG_RENDER_LOOP"] = "basic"
+        
+        # Enable disk cache for faster startup time
+        if "QT_QPA_DISABLE_DISK_CACHE" in os.environ:
+            del os.environ["QT_QPA_DISABLE_DISK_CACHE"]
+        
+        # Set cache limits for better performance
+        os.environ["QML_DISK_CACHE_MAX_SIZE"] = "512"  # 512MB disk cache
+        
+        # Choose best available renderer
+        renderer = detect_best_renderer()
+        
+        if renderer == "software":
+            # Fall back to software rendering if hardware isn't available
             os.environ["QT_OPENGL"] = "software"
+            QGuiApplication.setAttribute(Qt.AA_UseSoftwareOpenGL)
+        elif renderer == "angle":
+            # Use ANGLE (DirectX) backend - often best on Windows
+            os.environ["QT_OPENGL"] = "angle"
+        elif renderer == "desktop":
+            # Use native OpenGL
+            os.environ["QT_OPENGL"] = "desktop"
+            QGuiApplication.setAttribute(Qt.AA_UseDesktopOpenGL)
         
-        # Disable file system watcher to avoid potential performance issues
-        os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
+        # Pre-allocate texture memory
+        os.environ["QSG_TRANSIENT_IMAGES"] = "1"
+
+def detect_best_renderer():
+    """Detect the best available renderer on Windows"""
+    import sys
+    if sys.platform != "win32":
+        return "desktop"
+    
+    from PySide6.QtGui import QOpenGLContext
+    
+    # Check for command line override
+    for arg in sys.argv:
+        if arg.startswith("--renderer="):
+            renderer = arg.split("=")[1].lower()
+            if renderer in ["software", "angle", "desktop"]:
+                return renderer
+    
+    # Try to create a test context to check OpenGL capabilities
+    test_context = QOpenGLContext()
+    if test_context.create():
+        test_context.makeCurrent(None)
         
-        # Set the software backend for compatibility
-        QGuiApplication.setAttribute(Qt.AA_UseSoftwareOpenGL)
+        # Check if we have proper OpenGL support
+        try:
+            gl_version = test_context.format().majorVersion()
+            if gl_version >= 2:
+                return "desktop"  # Native OpenGL is available and good
+        except:
+            pass
+        
+        # If we're here, try ANGLE (DirectX) as second best
+        return "angle"
+    
+    # Fallback to software if all else fails
+    return "software"
 
 def main():
+    # Parse command line args first to allow rendering overrides
+    import argparse
+    parser = argparse.ArgumentParser(description='Application launcher')
+    parser.add_argument('--renderer', choices=['software', 'angle', 'desktop'], 
+                        help='Override renderer selection')
+    parser.add_argument('--no-cache', action='store_true', 
+                        help='Disable QML disk cache')
+    
+    args, unknown = parser.parse_known_args()
+    
+    # Handle rendering options from command line
+    if args.renderer:
+        os.environ["QT_OPENGL"] = args.renderer
+    
+    if args.no_cache:
+        os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
+    
     # Setup Windows-specific configuration
     setup_windows_specifics()
     
