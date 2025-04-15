@@ -21,6 +21,10 @@ ChartView {
     property int updateThrottleMs: 50  // Don't update more often than this
     property var lastUpdateTime: Date.now()
 
+    // Add these properties to control quality based on interaction
+    property bool isInteracting: false
+    property bool lowQualityMode: false
+
     // Function to update the waveform visualization
     function updateWaveform() {
         // Skip updates if not visible for better performance
@@ -119,6 +123,14 @@ ChartView {
             }
         }
 
+        if (lowQualityMode) {
+            // Use lower resolution data or simpler rendering
+            // ...
+        } else {
+            // Use full quality rendering
+            // ...
+        }
+
         if (onUpdateCompleted) {
             onUpdateCompleted();
         }
@@ -149,6 +161,16 @@ ChartView {
         }
     }
     
+    Timer {
+        id: lowQualityTimer
+        interval: 300
+        onTriggered: {
+            lowQualityMode = false;
+            // Request high quality update
+            updateWaveform();
+        }
+    }
+
     ValueAxis {
         id: axisX
         min: 0
@@ -188,6 +210,28 @@ ChartView {
         visible: waveformChart.showFundamental
         useOpenGL: waveformChart.useOpenGL
         pointsVisible: false
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        
+        onPressed: {
+            isInteracting = true;
+            lowQualityMode = true;
+        }
+        
+        onReleased: {
+            isInteracting = false;
+            lowQualityTimer.restart();
+        }
+        
+        onPositionChanged: {
+            if (pressed) {
+                // If user is dragging, extend low quality mode
+                lowQualityTimer.restart();
+            }
+        }
     }
 
     function setLabelsVisible(visible) {

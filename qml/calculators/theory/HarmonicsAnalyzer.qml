@@ -12,7 +12,6 @@ import "../../components/exports"
 import "../../components/charts"
 import "../../components/displays"
 import "../../components/menus"
-import "../../components/monitors"
 
 import HarmonicAnalysis 1.0
 import SeriesHelper 1.0
@@ -203,17 +202,11 @@ Item {
                         id: performancePopup
                         x: Math.round((parent.width - width) / 2)
                         y: Math.round((parent.height - height) / 2)
-                    }
-
-                    CalculationMonitor {
-                        id: calculationMonitor
-                        anchors.fill: parent
+                        waveformVisualizer: waveformVisualizer
+                        harmonicSpectrum: harmonicSpectrum
+                        updateWaveformTimer: updateWaveformTimer
+                        updateHarmonicsTimer: updateHarmonicsTimer
                         calculator: harmonicsCard.calculator
-                        Component.onCompleted: {
-                            if (calculator) {
-                                calculator.enableProfiling(false);
-                            }
-                        }
                     }
                 }
 

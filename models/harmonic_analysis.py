@@ -10,8 +10,6 @@ import os
 from datetime import datetime
 import time
 
-# Import the profiling decorator
-from utils.profiling import profile, PerformanceProfiler
 from utils.calculation_cache import CalculationCache, generate_cache_key
 from utils.worker_pool import WorkerPoolManager, ManagedWorker
 
@@ -116,7 +114,6 @@ class HarmonicAnalysisCalculator(QObject):
     crestFactorChanged = Signal()
     formFactorChanged = Signal()
     waveformChanged = Signal()
-    profilingChanged = Signal()  # Add new signal for profiling state
     calculationStatusChanged = Signal()
     calculationProgressChanged = Signal(float)
 
@@ -142,8 +139,10 @@ class HarmonicAnalysisCalculator(QObject):
         self._waveform_points = []
         self._waveform = []
         self._fundamental_wave = []  # Store fundamental waveform
+        self._fundamental_points = []  # Initialize fundamental points array
         self._spectrum_points = []
         self._spectrum = []
+        self._resolution = 250  # Default resolution
         
         # Add calculation cache for memoization
         self._calculation_cache = CalculationCache.get_instance()
@@ -166,9 +165,6 @@ class HarmonicAnalysisCalculator(QObject):
         self._calculation_progress = 0.0
         self._cancel_requested = False
         
-        # Initialize profiling support
-        self._profiling_enabled = False
-        
         # Add thread pool for background calculations
         self._thread_pool = WorkerPoolManager.get_instance()
         print(f"Using {self._thread_pool.maxThreadCount()} threads for calculations")
@@ -176,50 +172,16 @@ class HarmonicAnalysisCalculator(QObject):
         # Flag to track if updates are needed
         self._emit_pending = False
         
+        # Add a fast memory cache for very common calculations
+        self._memory_cache = {}  # Simple in-memory cache for ultra-fast lookups
+        self._memory_cache_hits = 0
+        
+        # Add debouncing for rapid user input
+        self._last_calculation_time = 0
+        self._debounce_interval = 100  # ms
+        
         # Now we can safely call methods that depend on these attributes
         self._calculate()
-        
-    @Slot(bool)
-    def enableProfiling(self, enabled):
-        """Enable/disable performance profiling"""
-        self._profiling_enabled = enabled  # Make sure we update the attribute
-        profiler = PerformanceProfiler.get_instance()
-        if enabled:
-            profiler.enable()
-        else:
-            profiler.disable()
-        self.profilingChanged.emit()
-            
-    @Slot()
-    def clearProfilingData(self):
-        """Clear all profiling data"""
-        PerformanceProfiler.get_instance().clear()
-            
-    @Slot()
-    def printProfilingSummary(self):
-        """Print profiling summary to console with error handling"""
-        try:
-            PerformanceProfiler.get_instance().print_summary()
-        except Exception as e:
-            print(f"Error printing profiling summary: {e}")
-            print("Some performance data might not be available.")
-    
-    @Property(bool, notify=profilingChanged)
-    def profilingEnabled(self):
-        """Get profiling enabled state"""
-        return self._profiling_enabled
-
-    @profilingEnabled.setter
-    def profilingEnabled(self, enabled):
-        """Set profiling enabled state"""
-        if self._profiling_enabled != enabled:
-            self._profiling_enabled = enabled
-            profiler = PerformanceProfiler.get_instance()
-            if enabled:
-                profiler.enable()
-            else:
-                profiler.disable()
-            self.profilingChanged.emit()
         
     @Property(bool, notify=calculationStatusChanged)
     def calculationInProgress(self):
@@ -261,7 +223,6 @@ class HarmonicAnalysisCalculator(QObject):
         if status_changed:
             self.calculationStatusChanged.emit()
     
-    @profile
     def _emitSignals(self):
         """Actually emit the signals after the delay"""
         if not self._update_pending:
@@ -292,14 +253,12 @@ class HarmonicAnalysisCalculator(QObject):
                     self.calculationsComplete.emit()
                     self.harmonicsChanged.emit()
             
-            # Throttle update frequency during intensive operations
             try:
                 import psutil
-                if self._profiling_enabled:
-                    cpu_load = psutil.cpu_percent(interval=0.05)
-                    if cpu_load > 80:
-                        # Reduce update frequency during high CPU load
-                        time.sleep(0.05)  # Brief pause to allow UI to remain responsive
+                cpu_load = psutil.cpu_percent(interval=0.05)
+                if cpu_load > 80:
+                    # Reduce update frequency during high CPU load
+                    time.sleep(0.05)  # Brief pause to allow UI to remain responsive
             except (ImportError, Exception):
                 pass
         except Exception as e:
@@ -309,7 +268,6 @@ class HarmonicAnalysisCalculator(QObject):
         self._update_pending = False
         self._pending_signals.clear()
     
-    @profile
     def _calculate(self):
         """Start calculation in a worker thread"""
         # Set calculation status to in-progress
@@ -321,7 +279,6 @@ class HarmonicAnalysisCalculator(QObject):
         self._thread_pool.start(worker)
         return True
     
-    @profile
     def _get_cache_key(self):
         """Generate a unique key for the current harmonics configuration
         
@@ -334,7 +291,6 @@ class HarmonicAnalysisCalculator(QObject):
             'fundamental': float(self._fundamental)
         })
     
-    @profile
     def _calculate_full(self):
         """Perform full harmonic analysis calculation"""
         try:
@@ -346,7 +302,36 @@ class HarmonicAnalysisCalculator(QObject):
                 self._update_calculation_status(False)
                 return
             
-            # Check cache first
+            # Try memory cache first (faster than disk cache)
+            sorted_harmonics = sorted(self._harmonics_dict.items())
+            memory_key = str(sorted_harmonics) + str(self._fundamental)
+            if memory_key in self._memory_cache:
+                self._memory_cache_hits += 1
+                result = self._memory_cache[memory_key]
+                # Use memory cached result
+                self._thd = result['thd']
+                self._cf = result['cf']
+                self._ff = result['ff']
+                self._waveform = result['waveform']
+                self._fundamental_wave = result['fundamental_wave']
+                self._individual_distortion = result['individual_distortion']
+                self._harmonic_phases = result['harmonic_phases']
+                self._waveform_points = result['waveform_points']
+                self._fundamental_points = result['fundamental_points']
+                
+                # Mark which signals need emission
+                self._pending_signals = {"harmonicsChanged", "waveformChanged", 
+                                        "crestFactorChanged", "formFactorChanged",
+                                        "calculationsComplete"}
+                
+                # Emit signals once cached data is loaded
+                self.batchUpdate()
+                
+                # Update status before returning
+                self._update_calculation_status(False)
+                return
+            
+            # Check disk cache
             cache_key = self._get_cache_key()
             self._cache_lookups += 1
             cached_result = self._calculation_cache.get(cache_key)
@@ -425,54 +410,68 @@ class HarmonicAnalysisCalculator(QObject):
                 self._safe_value(phases[order-1], 0.0) 
                 for order in display_orders
             ]
+
+            numpoints = self._resolution  # Use stored resolution
             
-            # Generate waveform with validation
-            # Reduced default resolution for better performance
-            t = np.linspace(0, 2*np.pi, 250)  # Reduced from 500 to 250 points
+            # Cache key for resolution calculations
+            resolution_cache_key = generate_cache_key({"type": "resolution", "points": numpoints})
+            cached_resolution = self._calculation_cache.get(resolution_cache_key)
+            
+            if cached_resolution:
+                # Use cached time values
+                t = np.array(cached_resolution.get('time_values', []))
+            else:
+                # Generate new time values and cache them
+                t = np.linspace(0, 2*np.pi, numpoints)
+                self._calculation_cache.put(resolution_cache_key, {'time_values': t.tolist()})
+            
             wave = np.zeros_like(t)  # Pre-allocate array
             
-            # Calculate waveform with safe handling of potential NaN/Inf
+            # Calculate all harmonics at once for orders where magnitude > 0
             try:
-                # Vectorized calculation of fundamental waveform
+                # First calculate the fundamental
                 phase_rad_fundamental = np.radians(self._safe_value(phases[0], 0.0))
                 fundamental_wave = self._fundamental * np.sin(t + phase_rad_fundamental)
-                
-                # Replace any NaN or Inf values with zeros
                 np.nan_to_num(fundamental_wave, copy=False)
                 self._fundamental_wave = fundamental_wave.tolist()
                 
-                # Calculate harmonics and add to waveform
-                for i, (amplitude, phase_deg) in enumerate(zip(harmonics, phases)):
+                # Add fundamental to wave
+                wave += fundamental_wave
+                
+                # Only process harmonics with amplitude > 0 to save computation
+                for i, (amplitude, phase_deg) in enumerate(zip(harmonics[1:], phases[1:])):  # Skip fundamental
                     if amplitude > 0 and self._is_valid_number(amplitude) and self._is_valid_number(phase_deg):
-                        harmonic_order = i + 1
+                        harmonic_order = i + 2  # +2 because we start from 2nd harmonic (index+2)
                         phase_rad = np.radians(phase_deg)
-                        harmonic_wave = amplitude * np.sin(harmonic_order * t + phase_rad)
-                        np.nan_to_num(harmonic_wave, copy=False)  # Replace NaN/Inf with zeros
-                        np.add(wave, harmonic_wave, out=wave)
+                        # Add directly to wave instead of creating temporary arrays
+                        wave += amplitude * np.sin(harmonic_order * t + phase_rad)
                 
                 # Replace any NaN or Inf values in the final waveform
                 np.nan_to_num(wave, copy=False)
                 self._waveform = wave.tolist()
                 
-                # Calculate crest factor and form factor
                 if wave.size:
+                    wave_sq = np.square(wave)
                     wave_abs = np.abs(wave)
-                    peak = np.max(wave_abs)
-                    rms_squared = np.mean(np.square(wave))
+                    
+                    # Calculate RMS once and reuse
+                    rms_squared = np.mean(wave_sq)
                     
                     if rms_squared > 0 and np.isfinite(rms_squared):
                         rms = np.sqrt(rms_squared)
-                        self._cf = self._safe_value(peak / rms, 1.414)  # Default to sine wave value
-                        
-                        # Calculate form factor
+                        peak = np.max(wave_abs)
                         average_rectified = np.mean(wave_abs)
-                        if average_rectified > 0 and np.isfinite(average_rectified):
-                            self._ff = self._safe_value(rms / average_rectified, 1.11)  # Default to sine wave value
+                        
+                        # Calculate factors
+                        if average_rectified > 0:
+                            self._cf = self._safe_value(peak / rms, 1.414)
+                            self._ff = self._safe_value(rms / average_rectified, 1.11)
                         else:
-                            self._ff = 1.11  # Default sine wave value
+                            self._cf = 1.414
+                            self._ff = 1.11
                     else:
-                        self._cf = 1.414  # Default sine wave value
-                        self._ff = 1.11   # Default sine wave value
+                        self._cf = 1.414
+                        self._ff = 1.11
             except Exception as inner_e:
                 print(f"Error in waveform calculation: {inner_e}")
                 # Reset to safe defaults
@@ -480,13 +479,13 @@ class HarmonicAnalysisCalculator(QObject):
                 self._fundamental_wave = [0.0] * 250
                 self._cf = 1.414
                 self._ff = 1.11
-            
-            # Generate QPointF ready data for more efficient plotting
+
+            # Only generate these arrays when actually needed by the UI
             self._waveform_points = self._generate_points_array(t, wave)
             self._fundamental_points = self._generate_points_array(t, fundamental_wave)
             
-            # Store in cache
-            self._calculation_cache.put(cache_key, {
+            # Store in memory cache
+            result = {
                 'thd': self._thd,
                 'cf': self._cf,
                 'ff': self._ff,
@@ -496,7 +495,22 @@ class HarmonicAnalysisCalculator(QObject):
                 'harmonic_phases': self._harmonic_phases,
                 'waveform_points': self._waveform_points,
                 'fundamental_points': self._fundamental_points
-            })
+            }
+            self._memory_cache[memory_key] = result
+            
+            # Limit memory cache size
+            if len(self._memory_cache) > 20:
+                # Remove oldest entries (first 5)
+                for key in list(self._memory_cache.keys())[:5]:
+                    del self._memory_cache[key]
+            
+            # Also store in disk cache
+            self._calculation_cache.put(cache_key, result)
+            
+            # Limit cache size to prevent memory growth
+            if hasattr(self._calculation_cache, 'trim') and self._cache_lookups > 1000:
+                self._calculation_cache.trim(max_size=50)  # Keep only 50 most recent entries
+                self._cache_lookups = 0
             
             # Mark which signals need emission
             self._pending_signals = {"harmonicsChanged", "waveformChanged", 
@@ -516,6 +530,63 @@ class HarmonicAnalysisCalculator(QObject):
             # Reset calculation status on error
             self._update_calculation_status(False)
     
+    @Slot(int)
+    def updateResolution(self, points):
+        """Update the resolution used for waveform calculations"""
+        if self._is_valid_number(points) and 50 <= points <= 1000:
+            # Store new resolution for future calculations
+            self._resolution = points
+            
+            # Start a calculation with the new resolution
+            worker = CalculationWorker(self, {'resolution': points})
+            self._thread_pool.start(worker)
+            return True
+        return False
+    
+    @Slot(int)
+    def calculateWithResolution(self, points):
+        """Calculate waveform with specified resolution"""
+        if not self._is_valid_number(points) or points < 50:
+            points = 250  # Default to safe value
+            
+        t = np.linspace(0, 2*np.pi, points)
+        result = {}
+        
+        try:
+            # Get data from harmonics_dict
+            harmonics = [0.0] * 15
+            phases = [0.0] * 15
+            
+            for order, (magnitude, phase) in self._harmonics_dict.items():
+                if 1 <= order <= len(harmonics):
+                    harmonics[order-1] = magnitude
+                    phases[order-1] = phase
+            
+            # Calculate fundamental wave
+            phase_rad_fundamental = np.radians(phases[0])
+            fundamental = self._fundamental * np.sin(t + phase_rad_fundamental)
+            
+            # Calculate combined waveform
+            wave = np.copy(fundamental)  # Start with fundamental
+            
+            # Add harmonics
+            for i, (amplitude, phase_deg) in enumerate(zip(harmonics[1:], phases[1:])):
+                if amplitude > 0:
+                    harmonic_order = i + 2  # +2 because we start from 2nd harmonic
+                    phase_rad = np.radians(phase_deg)
+                    wave += amplitude * np.sin(harmonic_order * t + phase_rad)
+            
+            # Generate point arrays for plotting
+            result['waveform'] = wave.tolist()
+            result['fundamental'] = fundamental.tolist()
+            result['waveform_points'] = self._generate_points_array(t, wave)
+            result['fundamental_points'] = self._generate_points_array(t, fundamental)
+            
+            return result
+        except Exception as e:
+            print(f"Error in resolution calculation: {e}")
+            return None
+    
     def _is_valid_number(self, value):
         """Check if a value is a valid finite number."""
         try:
@@ -530,7 +601,6 @@ class HarmonicAnalysisCalculator(QObject):
             return float(value)
         return default
     
-    @profile
     def _generate_points_array(self, x_values, y_values):
         """Convert numpy arrays to a list of QPointF for efficient plotting"""
         # Optimize creation of points by avoiding unnecessary array conversion
@@ -547,7 +617,6 @@ class HarmonicAnalysisCalculator(QObject):
         # Create list of QPointF objects efficiently using list comprehension
         return [QPointF(float(x), float(y)) for x, y in zip(x_degrees, y_values)]
     
-    @profile
     def batchUpdate(self):
         """Emit all signals at once to reduce update frequency with a small delay"""
         # Default to emitting all signals if no specific signals are pending
@@ -652,8 +721,14 @@ class HarmonicAnalysisCalculator(QObject):
             # Update the harmonics dictionary
             self._harmonics_dict[order] = (safe_magnitude, safe_angle)
             
-            # Start calculation
-            self._calculate()
+            # Debounce calculations during rapid changes
+            current_time = time.time() * 1000  # Convert to ms
+            if current_time - self._last_calculation_time > self._debounce_interval:
+                self._last_calculation_time = current_time
+                self._calculate()
+            else:
+                # Delay calculation using timer
+                QTimer.singleShot(self._debounce_interval, self._calculate)
             
             return True
         return False
