@@ -19,7 +19,7 @@ from services.interfaces import (
     IQmlEngine,
     ILogger
 )
-from services.container import Container
+from docs.container import Container
 from services.implementations import DefaultLogger, QmlEngineWrapper, ModelFactory
 from services.qml_types import register_qml_types
 from services.loading_manager import LoadingManager
@@ -214,14 +214,14 @@ class Application:
         for subdir in ['pages', 'components', 'calculators']:
             full_path = os.path.join(qml_dir, subdir)
             if os.path.exists(full_path) and os.path.isdir(full_path):
-                print(f"Adding directory for preloading: {full_path}")
+                # print(f"Adding directory for preloading: {full_path}")
                 self.preload_manager.add_directory(full_path)
                 
                 # Handle nested directories
                 for root, dirs, files in os.walk(full_path):
                     for dir_name in dirs:
                         nested_dir = os.path.join(root, dir_name)
-                        print(f"Adding nested directory: {nested_dir}")
+                        # print(f"Adding nested directory: {nested_dir}")
                         self.preload_manager.add_directory(nested_dir)
         
         # Skip menu-based calculator loading since we're directly loading all QML files
@@ -511,19 +511,10 @@ def main():
         pass  # Fall back to default if PySide6 not available yet
 
     try:
-        print("Application starting...")
-        
-        print("Setting up Windows-specific configuration...")
         # Setup Windows-specific configuration
         setup_windows_specifics()
-        
-        print("Creating dependency container...")
         container = setup_container()
-        
-        print("Initializing application...")
         app = Application(container)
-        
-        print("Starting application main loop...")
         app.run()
         
     except Exception as e:
