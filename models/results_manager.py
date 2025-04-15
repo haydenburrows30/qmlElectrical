@@ -59,12 +59,14 @@ class ResultsTableModel(QAbstractTableModel):
         self.endResetModel()
 
 class ResultsManager(QObject):
-    resultsChanged = Signal()
-    saveError = Signal(str)  # New signal to notify UI of errors
+    """Manages calculation results for the application."""
+    
+    resultsChanged = Signal()  # Signal to notify when results change
+    saveError = Signal(str)  # Signal to notify UI of errors
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._results = []
+        self._results = {}
         self._voltage_drop_threshold = 5.0  # Default 5%
         self._results_df = pd.DataFrame()
         self._table_model = ResultsTableModel(self)
@@ -246,8 +248,35 @@ class ResultsManager(QObject):
             'admd_enabled': bool(data.get('admd_enabled', False))
         }
 
-    # Remove duplicate methods that are confusing - use consistent naming
-    # These methods can be removed as they duplicate functionality
+    @Slot(str, 'QVariant')
+    def setResult(self, key, value):
+        """Set a result value.
+        
+        Args:
+            key: Result identifier
+            value: Result value
+        """
+        self._results[key] = value
+        self.resultsChanged.emit()
+    
+    @Slot(str, result='QVariant')
+    def getResult(self, key):
+        """Get a result value.
+        
+        Args:
+            key: Result identifier
+            
+        Returns:
+            Result value or None if not found
+        """
+        return self._results.get(key)
+    
+    @Slot()
+    def clearResults(self):
+        """Clear all results."""
+        self._results.clear()
+        self.resultsChanged.emit()
+
     @Slot(int)
     def deleteResult(self, index: int):
         """Alias for removeResult"""

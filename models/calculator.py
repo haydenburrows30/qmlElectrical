@@ -1,9 +1,8 @@
-from PySide6.QtCore import Slot, Signal, Property
-from models.calculators.BaseCalculator import BaseCalculator
+from PySide6.QtCore import QObject, Slot, Signal, Property
 
 import math
 
-class PowerCalculator(BaseCalculator):
+class PowerCalculator(QObject):
     """Calculator for power-related calculations.
     
     Features:
@@ -18,9 +17,10 @@ class PowerCalculator(BaseCalculator):
     
     currentCalculated = Signal(float)
     series_appended = Signal()
+    dataChanged = Signal()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._kva = 0.0
         self._voltage = 0.0
         self._current = 0.0
@@ -58,21 +58,24 @@ class PowerCalculator(BaseCalculator):
     def current(self):
         return self._current
 
+    @Slot(str, list)
     def append_series(self, series_name, data_points):
         self.chart_data_qml = data_points
         self.series_name = series_name
         self.series_appended.emit()
 
+    @Slot()
     def reset(self):
         self._voltage = 0.0
         self._current = 0.0
         self._power_factor = 1.0
         self.dataChanged.emit()
-        
+    
+    @Slot()
     def calculate(self):
-        self.calculatePower()
+        self.calculateCurrent()
 
-class ChargingCalculator(BaseCalculator):
+class ChargingCalculator(QObject):
     """Calculator for capacitive charging current.
     
     Features:
@@ -84,9 +87,10 @@ class ChargingCalculator(BaseCalculator):
         chargingCurrentCalculated: Emitted when calculation completes
     """
     chargingCurrentCalculated = Signal(float)
+    dataChanged = Signal()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._voltage = 0.0
         self._capacitance = 0.0
         self._frequency = 50.0  # Default frequency in Hz
@@ -122,16 +126,18 @@ class ChargingCalculator(BaseCalculator):
     def chargingCurrent(self):
         return self._chargingCurrent
 
+    @Slot()
     def reset(self):
         self._voltage = 0.0
         self._capacitance = 0.0
         self._frequency = 50.0
         self.dataChanged.emit()
-        
+    
+    @Slot()
     def calculate(self):
         self.calculateChargingCurrent()
     
-class ImpedanceCalculator(BaseCalculator):
+class ImpedanceCalculator(QObject):
     """Calculator for impedance analysis.
     
     Features:
@@ -143,9 +149,10 @@ class ImpedanceCalculator(BaseCalculator):
         impedanceCalculated: Emitted when impedance calculation completes
     """
     impedanceCalculated = Signal(float, float)
+    dataChanged = Signal()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._resistance = 0.0
         self._reactance = 0.0
         self._impedance = 0.0
@@ -175,7 +182,19 @@ class ImpedanceCalculator(BaseCalculator):
     def phaseAngle(self):
         return self._phase_angle
 
-class ConversionCalculator(BaseCalculator):
+    @Slot()
+    def reset(self):
+        self._resistance = 0.0
+        self._reactance = 0.0
+        self._impedance = 0.0
+        self._phase_angle = 0.0
+        self.dataChanged.emit()
+    
+    @Slot()
+    def calculate(self):
+        self.calculateImpedance()
+
+class ConversionCalculator(QObject):
     """Calculator for various electrical and mechanical unit conversions.
     
     Features:
@@ -186,9 +205,10 @@ class ConversionCalculator(BaseCalculator):
         resultCalculated: Emitted when conversion calculation completes
     """
     resultCalculated = Signal(float)
+    dataChanged = Signal()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._input_value = 0.0
         self._conversion_type = "watts_to_dbmw"
         self._result = 0.0
@@ -277,15 +297,17 @@ class ConversionCalculator(BaseCalculator):
     def result(self):
         return self._result
 
+    @Slot()
     def reset(self):
         self._input_value = 0.0
         self._result = 0.0
         self.dataChanged.emit()
-        
+    
+    @Slot()
     def calculate(self):
         self.calculateResult()
 
-class KwFromCurrentCalculator(BaseCalculator):
+class KwFromCurrentCalculator(QObject):
     """Calculator for determining power (kW) from current input.
     
     Features:
@@ -300,9 +322,10 @@ class KwFromCurrentCalculator(BaseCalculator):
     """
     kwCalculated = Signal(float)
     kvaCalculated = Signal(float)
+    dataChanged = Signal()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self._current = 0.0
         self._phase = "Three Phase"
         self._power_factor = 0.8  # Default power factor
@@ -369,6 +392,7 @@ class KwFromCurrentCalculator(BaseCalculator):
     def kva(self):
         return self._kva
 
+    @Slot()
     def reset(self):
         self._current = 0.0
         self._power_factor = 0.8
@@ -376,6 +400,7 @@ class KwFromCurrentCalculator(BaseCalculator):
         self._kw = 0.0
         self._kva = 0.0
         self.dataChanged.emit()
-        
+    
+    @Slot()
     def calculate(self):
         self.calculateKw()

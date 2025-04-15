@@ -4,7 +4,6 @@ from PySide6.QtQml import qmlRegisterSingletonType, qmlRegisterType
 import os
 
 from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
-from models.results_manager import ResultsManager
 from models.real_time_chart import RealTimeChart
 from models.calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
 from models.transformer_calculator import TransformerCalculator
@@ -36,8 +35,10 @@ from models.overcurrent_calculator import OvercurrentProtectionCalculator
 from utils.AboutProgram import ConfigBridge
 from models.solkor_rf_calculator import SolkorRfCalculator
 from models.vr32_cl7_calculator import VR32CL7Calculator
+from models.results_manager import ResultsManager
 from utils.system_resources import SystemResources
 from utils.perf_monitor import PerformanceMonitor
+from utils.logger import QLogManager
 from models.transformer_naming import TransformerNamingGuide
 
 def register_qml_types(engine, current_dir):
@@ -49,18 +50,13 @@ def register_qml_types(engine, current_dir):
     qmlRegisterSingletonType(style_url, "Style", 1, 0, "Style")
     qmlRegisterSingletonType(menu_items_url, "MenuItems", 1, 0, "MenuItems")
 
-    # Register SystemResources
-    try:
-        qmlRegisterType(SystemResources, "App.Utils", 1, 0, "SystemResources")
-    except Exception as e:
-        print(f"Error registering SystemResources: {e}")
+    # Register common utility types
+    qmlRegisterType(SystemResources, "App.Utils", 1, 0, "SystemResources")
+    qmlRegisterType(PerformanceMonitor, "PerformanceMonitor", 1, 0, "PerformanceMonitor")
+    qmlRegisterType(ResultsManager, "App.Models", 1, 0, "ResultsManager")
+    qmlRegisterType(QLogManager, "Logger", 1, 0, "LogManager")
 
-    # Register PerformanceMonitor
-    try:
-        qmlRegisterType(PerformanceMonitor, "PerformanceMonitor", 1, 0, "PerformanceMonitor")
-    except Exception as e:
-        print(f"Error registering PerformanceMonitor: {e}")
-
+    # All types are now QObject subclasses
     return [
         (ChargingCalculator, "Charging", 1, 0, "ChargingCalculator"),
         (PowerCalculator, "PCalculator", 1, 0, "PowerCalculator"),
@@ -74,7 +70,6 @@ def register_qml_types(engine, current_dir):
         (InstrumentTransformerCalculator, "InstrumentTransformer", 1, 0, "InstrumentTransformerCalculator"),
         (DiscriminationAnalyzer, "DiscriminationAnalyzer", 1, 0, "DiscriminationAnalyzer"),
         (VoltageDropCalculator, "VDrop", 1, 0, "VoltageDropCalculator"),
-        (ResultsManager, "Results", 1, 0, "ResultsManager"),
         (RealTimeChart, "RealTime", 1, 0, "RealTimeChart"),
         (ThreePhaseSineWaveModel, "Sine", 1, 0, "ThreePhaseSineWaveModel"),
         (VoltageDropCalc, "VoltageDrop", 1, 0, "VoltageDropCalc"),

@@ -1,9 +1,12 @@
 """Configuration settings for the application."""
 
 import os
+import sys
+import logging
+import argparse
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict, Optional, Tuple
 import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -14,6 +17,7 @@ from .logger import setup_logger
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_DIR = ROOT_DIR / 'data'
 LOGS_DIR = ROOT_DIR / 'logs'
+QML_DIR = ROOT_DIR / 'qml'
 
 # Ensure directories exist
 DATA_DIR.mkdir(exist_ok=True)
@@ -30,6 +34,9 @@ class AppConfig:
         self.db_path = os.path.join(DATA_DIR, 'application_data.db')
         self._init_db()
         self._load_defaults()
+        
+        # Command line argument parsing
+        self.args = self._parse_command_line_args()
 
     def _init_db(self):
         """Initialize config table in database."""
@@ -93,6 +100,58 @@ class AppConfig:
         except sqlite3.Error as e:
             logger.error(f"Database error in _load_defaults: {e}")
 
+    def _parse_command_line_args(self) -> argparse.Namespace:
+        """Parse command line arguments."""
+        parser = argparse.ArgumentParser(description='Application launcher')
+        parser.add_argument('--renderer', choices=['software', 'angle', 'desktop'], 
+                            help='Override renderer selection')
+        parser.add_argument('--no-cache', action='store_true', 
+                            help='Disable QML disk cache')
+        parser.add_argument('--debug', action='store_true',
+                            help='Enable additional debug output')
+        parser.add_argument('--clear-cache', action='store_true',
+                            help='Clear the QML cache before starting')
+        
+        # Parse known args and ignore unknown ones
+        args, _ = parser.parse_known_args()
+        return args
+        
+    def setup_environment(self) -> None:
+        """Set up environment variables based on configuration."""
+        # Handle cache options
+        if self.args.no_cache:
+            os.environ["QT_QPA_DISABLE_DISK_CACHE"] = "1"
+            logger.info("QML disk cache disabled")
+            
+        # Handle renderer option
+        if self.args.renderer:
+            os.environ["QT_OPENGL"] = self.args.renderer
+            logger.info(f"Using renderer: {self.args.renderer}")
+        
+        # Handle debug option
+        if self.args.debug:
+            # Enable Qt debug output
+            os.environ["QT_DEBUG_PLUGINS"] = "1"
+            os.environ["QT_LOGGING_RULES"] = "qt.qml.connections=true"
+            logger.info("Debug mode enabled")
+            
+    def get_qml_directories(self) -> Dict[str, Path]:
+        """Get the QML directories for preloading."""
+        result = {}
+        
+        # Add standard directories that should exist
+        for subdir in ['pages', 'components', 'calculators']:
+            full_path = QML_DIR / subdir
+            if full_path.exists() and full_path.is_dir():
+                result[subdir] = full_path
+                
+                # Also add subdirectories
+                for item in full_path.iterdir():
+                    if item.is_dir():
+                        result[f"{subdir}/{item.name}"] = item
+                        
+        return result
+        
     def save_setting(self, key: str, value: Any) -> bool:
         """Save a setting to the database."""
         try:
