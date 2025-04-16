@@ -36,8 +36,6 @@ from utils.AboutProgram import ConfigBridge
 from models.solkor_rf_calculator import SolkorRfCalculator
 from models.vr32_cl7_calculator import VR32CL7Calculator
 from models.results_manager import ResultsManager
-from utils.system_resources import SystemResources
-from utils.perf_monitor import PerformanceMonitor
 from utils.logger import QLogManager
 from models.transformer_naming import TransformerNamingGuide
 from models.base_impedance_calculator import BaseImpedanceCalculator
@@ -45,6 +43,7 @@ from models.per_unit_impedance_calculator import PerUnitImpedanceCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
+    
     # Register Style singleton
     style_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "components","style", "Style.qml"))
     menu_items_url = QUrl.fromLocalFile(os.path.join(current_dir, "qml", "components","menus", "MenuItems.qml"))
@@ -53,8 +52,6 @@ def register_qml_types(engine, current_dir):
     qmlRegisterSingletonType(menu_items_url, "MenuItems", 1, 0, "MenuItems")
 
     # Register common utility types
-    qmlRegisterType(SystemResources, "App.Utils", 1, 0, "SystemResources")
-    qmlRegisterType(PerformanceMonitor, "PerformanceMonitor", 1, 0, "PerformanceMonitor")
     qmlRegisterType(ResultsManager, "App.Models", 1, 0, "ResultsManager")
     qmlRegisterType(QLogManager, "Logger", 1, 0, "LogManager")
 

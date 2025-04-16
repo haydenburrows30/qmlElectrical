@@ -3,7 +3,7 @@ from PySide6.QtCore import QObject, Signal, Slot, Property
 import os
 from datetime import datetime
 
-from .calculation_cache import CalculationCache
+from ..utils.calculation_cache import CalculationCache
 
 # QML registration decorator
 from PySide6.QtQml import QmlElement

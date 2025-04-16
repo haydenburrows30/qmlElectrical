@@ -6,7 +6,7 @@ from PySide6.QtCore import QObject, Property, Signal, Slot
 from PySide6.QtQml import QmlElement
 from PySide6.QtCore import QSysInfo, qVersion
 
-from .config import app_config, logger
+from ..utils.config import app_config, logger
 
 QML_IMPORT_NAME = "ConfigBridge"
 QML_IMPORT_MAJOR_VERSION = 1
