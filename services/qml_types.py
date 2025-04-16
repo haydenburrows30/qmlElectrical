@@ -21,7 +21,7 @@ from models.machine_calculator import MachineCalculator
 from models.earthing_calculator import EarthingCalculator
 from models.transmission_calculator import TransmissionLineCalculator
 from models.delta_transformer import DeltaTransformerCalculator
-from models.switchboard.switchboard_manager import SwitchboardManager
+from models.switchboard_manager import SwitchboardManager
 from models.wind_turbine_calculator import WindTurbineCalculator
 from models.transformer_line_calculator import TransformerLineCalculator
 from models.fault_current_calculator import FaultCurrentCalculator
