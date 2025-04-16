@@ -11,16 +11,43 @@ WaveCard {
     title: "Starting Current Profile"
 
     property bool darkMode: false
+    property bool showTorqueCurve: false
+    property string activeTab: "current" // "current" or "torque"
 
     onDarkModeChanged: motorStartCanvas.requestPaint()
+    onShowTorqueCurveChanged: motorStartCanvas.requestPaint()
+    onActiveTabChanged: motorStartCanvas.requestPaint()
+    
+    // Add tab bar at the top for switching between current and torque views
+    TabBar {
+        id: vizTabs
+        width: parent.width
+        TabButton {
+            text: "Current Profile"
+            onClicked: activeTab = "current"
+        }
+        TabButton {
+            text: "Torque Curve"
+            onClicked: activeTab = "torque"
+        }
+        TabButton {
+            text: "Combined View"
+            onClicked: {
+                activeTab = "current"
+                showTorqueCurve = true
+            }
+        }
+    }
     
     Canvas {
         id: motorStartCanvas
         anchors.fill: parent
         anchors.margins: 20
+        anchors.topMargin: vizTabs.height + 10
         
         // Use the cached property directly instead of calling function
         property real startingMultiplier: cachedStartingMultiplier
+        property real startingTorque: cachedStartingTorque || 1.0
         property string motorTypeDisplay: motorType.currentText || "Induction Motor"
         
         onPaint: {
@@ -41,10 +68,16 @@ WaveCard {
             // Draw axes
             drawAxes(ctx, canvasWidth, canvasHeight);
             
-            // Draw starting current profile
-            drawCurrentProfile(ctx, canvasWidth, canvasHeight);
+            // Draw profiles based on active tab
+            if (activeTab === "current" || showTorqueCurve) {
+                drawCurrentProfile(ctx, canvasWidth, canvasHeight);
+            }
             
-            // Annotate the starting multiplier
+            if (activeTab === "torque" || showTorqueCurve) {
+                drawTorqueCurve(ctx, canvasWidth, canvasHeight);
+            }
+            
+            // Draw annotations
             drawAnnotations(ctx, canvasWidth, canvasHeight);
         }
         
@@ -188,22 +221,128 @@ WaveCard {
             ctx.stroke();
         }
         
+        // Add function to draw torque curve
+        function drawTorqueCurve(ctx, width, height) {
+            // Get base position
+            var baseY = height * 0.8;  // 80% from top
+            var startX = width * 0.1;  // 10% from left for margin
+            
+            ctx.beginPath();
+            
+            // Different motor types have different torque characteristics
+            var torqueShape = 1.0;
+            var peakTorque = startingTorque;
+            var peakPosition = 0.7; // Default position of peak torque (as percentage of speed)
+            
+            switch(motorTypeDisplay) {
+                case "Synchronous Motor":
+                    torqueShape = 1.1;
+                    peakTorque = startingTorque * 0.9;
+                    peakPosition = 0.8;
+                    break;
+                case "Wound Rotor Motor":
+                    torqueShape = 0.8;
+                    peakTorque = startingTorque * 1.2;
+                    peakPosition = 0.6;
+                    break;
+                case "Permanent Magnet Motor":
+                    torqueShape = 1.2;
+                    peakTorque = startingTorque * 1.5;
+                    peakPosition = 0.5;
+                    break;
+                case "Single Phase Motor":
+                    torqueShape = 0.9;
+                    peakTorque = startingTorque * 0.8;
+                    peakPosition = 0.75;
+                    break;
+            }
+            
+            // Calculate torque curve points
+            ctx.moveTo(startX, baseY - (baseY * 0.6 * startingTorque));
+            
+            // Draw appropriate torque curve based on starting method and motor type
+            if (startingMethod.currentText === "VFD") {
+                // VFD has more linear torque
+                ctx.lineTo(width * 0.9, baseY - (baseY * 0.6));
+            } else {
+                // Draw torque curve with peak at peakPosition
+                var points = [];
+                var numPoints = 50;
+                
+                for (var i = 0; i < numPoints; i++) {
+                    var x = startX + (width * 0.8) * (i / (numPoints - 1));
+                    var normalizedPos = i / (numPoints - 1);
+                    
+                    var torqueVal;
+                    if (normalizedPos < peakPosition) {
+                        // Rising part of curve
+                        torqueVal = startingTorque + (peakTorque - startingTorque) * 
+                                    Math.pow(normalizedPos / peakPosition, torqueShape);
+                    } else {
+                        // Falling part of curve to nominal torque
+                        torqueVal = peakTorque - (peakTorque - 1.0) * 
+                                    Math.pow((normalizedPos - peakPosition) / (1.0 - peakPosition), 1/torqueShape);
+                    }
+                    
+                    var y = baseY - (baseY * 0.6 * torqueVal);
+                    points.push({x: x, y: y});
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+            }
+            
+            // Set different color for torque curve to distinguish from current
+            ctx.strokeStyle = "#FF6347"; // Tomato red
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Label the curve
+            ctx.font = "bold 12px sans-serif";
+            ctx.fillStyle = "#FF6347";
+            ctx.fillText("Torque", width * 0.15, baseY - (baseY * 0.6 * startingTorque) - 10);
+        }
+        
         function drawAnnotations(ctx, width, height) {
             var baseY = height * 0.8;
             var startX = width * 0.1;
             
-            // Annotate the starting multiplier
+            // Annotate based on active tab
             ctx.font = "bold 14px sans-serif";
-            ctx.fillStyle = Universal.accent;
-            ctx.fillText(startingMultiplier.toFixed(1) + "× FLC", startX + 10, baseY - (baseY * 0.8 * 0.7));
+            
+            if (activeTab === "current" || showTorqueCurve) {
+                ctx.fillStyle = Universal.accent;
+                ctx.fillText(startingMultiplier.toFixed(1) + "× FLC", startX + 10, baseY - (baseY * 0.8 * 0.7));
+            }
+            
+            if (activeTab === "torque" || showTorqueCurve) {
+                ctx.fillStyle = "#FF6347"; // Tomato red
+                ctx.fillText(startingTorque.toFixed(2) + "× FLT", startX + 10, baseY - (baseY * 0.6 * startingTorque) - 25);
+            }
             
             // Annotate method
+            ctx.fillStyle = Universal.accent;
             ctx.fillText(startingMethod.currentText, width * 0.7, height * 0.15);
             
             // Annotate motor type
             ctx.fillStyle = Universal.foreground;
             ctx.font = "italic 12px sans-serif";
             ctx.fillText("Motor Type: " + motorTypeDisplay, width * 0.1, height * 0.95);
+            
+            // Add speed markers on x-axis
+            if (activeTab === "torque" || showTorqueCurve) {
+                ctx.fillStyle = Universal.foreground;
+                ctx.font = "10px sans-serif";
+                
+                // Add speed percentage markers
+                for (var i = 0; i <= 10; i += 2) {
+                    var x = startX + (width * 0.8) * (i / 10);
+                    ctx.fillText(i * 10 + "%", x - 10, baseY + 15);
+                }
+            }
         }
         
         function drawGrid(ctx, width, height) {
@@ -260,6 +399,49 @@ WaveCard {
             // Add markers for Full Load Current
             ctx.font = "10px sans-serif";
             ctx.fillText("FLC", width * 0.05, height * 0.8 + 5);
+        }
+    }
+    
+    // Add legend for combined view
+    Rectangle {
+        visible: showTorqueCurve
+        width: 120
+        height: 60
+        color: Universal.background
+        border.color: Universal.foreground
+        border.width: 1
+        radius: 5
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 30
+        
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 5
+            
+            RowLayout {
+                Rectangle {
+                    width: 15
+                    height: 3
+                    color: Universal.accent
+                }
+                Text {
+                    text: "Current"
+                    color: Universal.foreground
+                }
+            }
+            
+            RowLayout {
+                Rectangle {
+                    width: 15
+                    height: 3
+                    color: "#FF6347"
+                }
+                Text {
+                    text: "Torque"
+                    color: Universal.foreground
+                }
+            }
         }
     }
     
