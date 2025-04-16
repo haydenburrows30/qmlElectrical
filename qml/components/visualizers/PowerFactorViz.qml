@@ -11,6 +11,9 @@ WaveCard {
     property var activePower: "12"
     property var currentPF: "0.8"
 
+    property bool darkMode: window.modeToggled
+
+    onDarkModeChanged: powerTriangleCard.requestPaint()
     onActivePowerChanged: powerTriangleCard.requestPaint()
     onCurrentPFChanged: powerTriangleCard.requestPaint()
 

@@ -9,6 +9,10 @@ WaveCard {
     Layout.fillHeight: true
     Layout.fillWidth: true
     title: "Starting Current Profile"
+
+    property bool darkMode: false
+
+    onDarkModeChanged: motorStartCanvas.requestPaint()
     
     Canvas {
         id: motorStartCanvas

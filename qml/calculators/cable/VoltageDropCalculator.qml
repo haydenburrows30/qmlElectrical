@@ -14,6 +14,9 @@ Item {
     id: voltageDropCard
 
     property VoltageDropCalc calculator: VoltageDropCalc {}
+    property bool darkMode: window.modeToggled
+
+    onDarkModeChanged: dropVizCanvas.requestPaint()
 
     PopUpText {
         id: popUpText
@@ -123,7 +126,7 @@ Item {
                     title: "Results"
                     Layout.fillWidth: true
                     Layout.minimumHeight: 140
-                    
+
                     GridLayout {
                         anchors.fill: parent
                         uniformCellWidths: true

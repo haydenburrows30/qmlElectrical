@@ -13,7 +13,8 @@ Rectangle {
     property real reactivePower: sineModel.reactivePower
     property real apparentPower: sineModel.apparentPower
     property real powerFactor: sineModel.averagePowerFactor
-    
+    property bool darkMode: window.modeToggled
+
     // Scaling properties
     property real triangleScale: 100
     property real minPowerValue: 0.1
@@ -218,4 +219,5 @@ Rectangle {
     onApparentPowerChanged: apparentPowerCanvas.requestPaint()
     onWidthChanged: apparentPowerCanvas.requestPaint()
     onHeightChanged: apparentPowerCanvas.requestPaint()
+    onDarkModeChanged: apparentPowerCanvas.requestPaint()
 }

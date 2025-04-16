@@ -454,6 +454,8 @@ Item {
         MotorStartingViz {
             Layout.minimumWidth: mainLayout.width
             Layout.minimumHeight: 400
+
+            darkMode: window.modeToggled
         }
     }
 }
