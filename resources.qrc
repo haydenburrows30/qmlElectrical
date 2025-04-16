@@ -57,13 +57,8 @@
     <file>qml/components/charts/WaveformVisualizerChart.qml</file>
 
     <!-- Displays -->
-    <file>qml/calculators/grid_wind/Accordian.qml</file>
-    <file>qml/calculators/grid_wind/ABBConfig.qml</file>
-    <file>qml/calculators/grid_wind/WindGenProtectionResults.qml</file>
-    <file>qml/calculators/grid_wind/GridConnectionReq.qml</file>
 
     <file>qml/components/displays/LineProtectionResults.qml</file>
-    <file>qml/components/displays/ProtectionRequirementsResults.qml</file>
     <file>qml/components/displays/ResultsDisplay.qml</file>
     <file>qml/components/displays/VoltageRegResults.qml</file>
     <file>qml/components/displays/LogViewer.qml</file>
@@ -97,7 +92,6 @@
     <file>icons/gallery/index.theme</file>
 
     <!-- Monitors -->
-    <file>qml/components/monitors/CalculationMonitor.qml</file>
     <file>qml/components/monitors/LoadingIndicator.qml</file>
     <file>qml/components/menus/LogsMenu.qml</file>
 
