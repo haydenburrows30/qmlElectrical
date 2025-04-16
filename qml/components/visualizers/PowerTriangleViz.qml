@@ -13,7 +13,6 @@ Rectangle {
     property real reactivePower: sineModel.reactivePower
     property real apparentPower: sineModel.apparentPower
     property real powerFactor: sineModel.averagePowerFactor
-    property color textColor: Universal.foreground
     
     // Scaling properties
     property real triangleScale: 100
@@ -21,7 +20,7 @@ Rectangle {
     property real maxPowerValue: 2000
     property real minScale: 400
     property real padding: 10
-    property real labelPadding: 40
+    property real labelPadding: 10
 
     // Container for triangle and labels
     Item {
@@ -47,11 +46,12 @@ Rectangle {
         Shape {
             id: triangle
             anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
 
             ShapePath {
                 strokeWidth: 2
-                strokeColor: "black"
+                strokeColor: window.modeToggled ? "white" : "black"
                 fillColor: "transparent"
                 
                 // Start at origin point
@@ -78,23 +78,23 @@ Rectangle {
             }
         }
 
-        // Labels with dynamic positioning
-        Text {
+        // Power label
+        Label {
             id: activePowerLabel
             anchors.top: triangle.bottom
             anchors.horizontalCenter: triangle.horizontalCenter
             anchors.topMargin: 10
             text: "P = " + activePower.toFixed(1) + " kW"
-            color: root.textColor
         }
-        
-        Text {
+
+        // kvar label
+        Label {
             id: reactivePowerLabel
             anchors.right: triangle.left
             anchors.verticalCenter: triangle.verticalCenter
             anchors.rightMargin: 10
+            anchors.bottomMargin: 10
             text: "Q = " + reactivePower.toFixed(1) + " kVAR"
-            color: root.textColor
         }
 
         // Direct Text element approach for apparent power label
@@ -115,23 +115,7 @@ Rectangle {
             property real midY: (startY + endY) / 2
             property real angleRadians: Math.atan2(startY - endY, endX - startX)
             property real angleDegrees: angleRadians * 180 / Math.PI
-            
-            Text {
-                id: apparentPowerText
-                text: "S = " + apparentPower.toFixed(1) + " kVA"
-                anchors.centerIn: parent
-                
-                // Position at midpoint of hypotenuse
-                x: parent.midX - width/2 - parent.centerX
-                y: parent.midY - height/2 - parent.centerY - 15 // Offset above line
-                
-                // Apply rotation to align with hypotenuse
-                transformOrigin: Item.Center
-                rotation: parent.angleDegrees
-                visible: false // Hide this, used as reference
-                color: root.textColor
-            }
-            
+
             // Draw using Canvas for perfect alignment
             Canvas {
                 id: apparentPowerCanvas
@@ -145,8 +129,8 @@ Rectangle {
                     // Get coordinates
                     var centerX = width / 2;
                     var centerY = height / 2;
-                    var scaledBase = triangleContainer.baseLength * triangleContainer.scaleFactor;
-                    var scaledHeight = triangleContainer.triangleHeight * triangleContainer.scaleFactor;
+                    var scaledBase = triangleContainer.baseLength * triangleContainer.scaleFactor / 10;
+                    var scaledHeight = triangleContainer.triangleHeight * triangleContainer.scaleFactor / 10;
                     
                     // Start is the top vertex of the triangle
                     var startX = centerX;
@@ -164,7 +148,7 @@ Rectangle {
                     var angle = Math.atan2(endY - startY, endX - startX);
                     
                     // Calculate perpendicular offset for text placement
-                    var offsetDistance = 5; // Reduced from 10 to 5 for closer positioning to the hypotenuse
+                    var offsetDistance = 1; // Reduced from 10 to 1 for closer positioning to the hypotenuse
                     var offsetX = -Math.sin(angle) * offsetDistance;
                     var offsetY = Math.cos(angle) * offsetDistance;
                     
@@ -188,14 +172,14 @@ Rectangle {
             }
         }
 
-        Text {
+        // PF label
+        Label {
             id: powerFactorLabel
             anchors.right: triangle.right
             anchors.bottom: triangle.bottom
             anchors.margins: 10
             text: "PF = " + powerFactor.toFixed(3)
             font.bold: true
-            color: root.textColor
         }
 
         // Angle arc
@@ -219,13 +203,12 @@ Rectangle {
         }
 
         // Angle label
-        Text {
+        Label {
             anchors.left: triangle.left
             anchors.bottom: triangle.bottom
             anchors.margins: 25
             text: "φ = " + (Math.acos(powerFactor) * 180 / Math.PI).toFixed(1) + "°"
             font.italic: true
-            color: root.textColor
         }
     }
 

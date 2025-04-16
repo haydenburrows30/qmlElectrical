@@ -18,9 +18,6 @@ Page {
 
     property color textColorPhase: window.modeToggled ? "#ffffff" : "#000000"
     property ThreePhaseSineWaveModel calculator: ThreePhaseSineWaveModel{}
-    background: Rectangle {
-        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
-    }
 
     PopUpText {
         id: popUpText
@@ -177,7 +174,7 @@ Page {
                             ColumnLayout {
                                 anchors.fill: parent
 
-                                PowerTriangle {
+                                PowerTriangleViz {
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 250
                                     Layout.minimumWidth: 250
@@ -187,9 +184,6 @@ Page {
                                     powerFactor: calculator.averagePowerFactor
                                     triangleScale: 100
                                     color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
-                                    textColor: textColorPhase
-
-                                    
                                 }
 
                                 GridLayout {

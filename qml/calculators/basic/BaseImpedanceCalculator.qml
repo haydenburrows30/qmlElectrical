@@ -21,8 +21,10 @@ Item {
         id: popUpText
         parentCard: topHeader
         popupText: "<h3>Base Impedance Calculator</h3><br>" +
-                "The base impedance (Zb) is a reference value used in per-unit system calculations for power systems. <br>" + 
-                "It is calculated using the formula: Zb = (kV)²/MVA where kV is the base voltage in kilovolts and MVA is the base power in megavolt-amperes. <br>" + 
+                "The base impedance (Zb) is a reference value used in per-unit system calculations for power systems. <br><br>" + 
+                "It is calculated using the formula: Zb = (kV)²/MVA <br><br>" +
+                "kV is the base voltage. <br>" +
+                "MVA is the base power <br><br>" + 
                 "Base impedance is useful for normalizing system values and simplifying power system calculations."
         widthFactor: 0.4
         heightFactor: 0.4
@@ -54,11 +56,11 @@ Item {
         }
 
         WaveCard {
-            Layout.preferredHeight: 250
+            Layout.preferredHeight: 280
             Layout.preferredWidth: 400
             Layout.alignment: Qt.AlignCenter
             titleVisible: false
-        
+
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 15
@@ -130,14 +132,15 @@ Item {
                         Layout.alignment: Qt.AlignLeft
                         Layout.fillWidth: true
                     }
-                }
 
-                Label {
-                    text: "Base impedance is used as a reference value in per-unit system calculations"
-                    font.pixelSize: 12
-                    Layout.alignment: Qt.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
+                    Label {
+                        text: "Base impedance is used as a reference value in per-unit system calculations"
+                        font.pixelSize: 12
+                        Layout.alignment: Qt.AlignHCenter
+                        wrapMode: Text.WordWrap
+                        Layout.columnSpan: 2
+                        Layout.fillWidth: true
+                    }
                 }
             }
         }
