@@ -32,7 +32,7 @@ from models.series_helper import SeriesHelper
 from models.three_phase import ThreePhaseSineWaveModel
 from models.rlc import RLCChart
 from models.overcurrent_calculator import OvercurrentProtectionCalculator
-from utils.AboutProgram import ConfigBridge
+from utils.about_program import ConfigBridge
 from models.solkor_rf_calculator import SolkorRfCalculator
 from models.vr32_cl7_calculator import VR32CL7Calculator
 from models.results_manager import ResultsManager

@@ -37,7 +37,7 @@ Page {
             Repeater {
                 model: MenuItems.renewables
 
-                HButton {
+                HomeButton {
                     id: hbuttonParent
                     Layout.fillWidth: true
                     Layout.preferredHeight: 120

@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls.Universal
+
 import "calculators"
 import "components"
 import "pages"
@@ -66,7 +67,7 @@ ApplicationWindow {
     // Non-intrusive performance monitor that won't interfere with input
     LightPerformanceDisplay {
         id: performanceDisplay
-        // This is positioned in the bottom-right corner by default
+        // This is positioned in the bottom-left corner by default
         z: 999 // Keep it above regular content but below popups
     }
 
@@ -144,7 +145,6 @@ ApplicationWindow {
                             text: modelData.name
                             onTriggered: { 
                                 calculatorLoader.push(modelData.source)
-                                
                             }
                         }
                     }
@@ -158,7 +158,6 @@ ApplicationWindow {
                             text: modelData.name
                             onTriggered: {
                                 calculatorLoader.push(modelData.source)
-                                
                             }
                         }
                     }
@@ -172,7 +171,6 @@ ApplicationWindow {
                             text: modelData.name
                             onTriggered: {
                                 calculatorLoader.push(modelData.source)
-                                
                             }
                         }
                     }
@@ -186,7 +184,6 @@ ApplicationWindow {
                             text: modelData.name
                             onTriggered: {
                                 calculatorLoader.push(modelData.source)
-                                
                             }
                         }
                     }
@@ -200,7 +197,6 @@ ApplicationWindow {
                             text: modelData.name
                             onTriggered: {
                                 calculatorLoader.push(modelData.source)
-                                
                             }
                         }
                     }

@@ -38,7 +38,7 @@ Page {
             Repeater {
                 model: MenuItems.basic
 
-                HButton {
+                HomeButton {
                     id: hbuttonParent
                     Layout.fillWidth: true
                     Layout.preferredHeight: 120
