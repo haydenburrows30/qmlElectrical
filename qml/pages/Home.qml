@@ -16,8 +16,7 @@ Page {
     id: home
 
     property ConfigBridge calculator: ConfigBridge {}
-    
-    // Pass the calculator instance to the About popup
+
     About {
         id: about
         configBridge: home.calculator
@@ -63,8 +62,6 @@ Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/calculate.svg"
-                back: Qt.lighter(palette.accent, 1.5)
-                fore: Qt.lighter(palette.accent, 1.0)
                 
                 Item {
                     anchors.fill: parent
@@ -105,14 +102,12 @@ Page {
                     onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
                 }
             }
-            
+
             // Protection
             HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/shield.svg"
-                back: Qt.lighter(palette.accent, 1.5)
-                fore: Qt.lighter(palette.accent, 1.0)
 
                 Behavior on scale { NumberAnimation { duration: 100 } }
 
@@ -160,8 +155,6 @@ Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/cable.svg"
-                back: Qt.lighter(palette.accent, 1.5)
-                fore: Qt.lighter(palette.accent, 1.0)
                 
                 Item {
                     anchors.fill: parent
@@ -208,8 +201,6 @@ Page {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/book_5.svg"
-                back: Qt.lighter(palette.accent, 1.5)
-                fore: Qt.lighter(palette.accent, 1.0)
                 
                 Item {
                     anchors.fill: parent
@@ -250,14 +241,12 @@ Page {
                     onHoveredChanged: parent.scale = hovered ? 1.05 : 1.0
                 }
             }
-            
+
             // Renewables
             HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/energy.svg"
-                back: Qt.lighter(palette.accent, 1.5)
-                fore: Qt.lighter(palette.accent, 1.0)
                 
                 Item {
                     anchors.fill: parent

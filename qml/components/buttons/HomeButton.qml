@@ -3,61 +3,38 @@ import QtCore
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 
 Button {
     id: control
-    text: ""
 
     icon.width: 60
     icon.height: 60
     Layout.minimumWidth: 150
     Layout.minimumHeight: 150
 
-    property var gradient: null
-
-    display: AbstractButton.TextUnderIcon
-
     property string tooltip_text: ""
 
-    property color back : Qt.lighter(palette.accent,1.5)
-    property color fore : Qt.lighter(palette.accent,1.5)
+    display: AbstractButton.TextUnderIcon
 
     background: Item {
 
         Rectangle {
             id: backgroundID
             anchors.fill: parent
-            gradient: control.gradient
-            visible: !control.flat || control.down || control.checked || control.highlighted
-            color: control.down ? control.Universal.baseMediumLowColor :
-            control.enabled && (control.highlighted || control.checked) ? control.Universal.accent :
-                                                                            back
-
-            Rectangle {
-                width: parent.width
-                height: parent.height
-                color: fore
-                visible: enabled && control.hovered
-                border.width: 2
-                border.color: control.Universal.baseMediumLowColor
-            }
         }
 
-        DropShadow {
-            anchors.fill: backgroundID
-            horizontalOffset: 2
-            verticalOffset: 2
-            radius: 8.0
-            samples: 18
-            color: alphaColor("#80000000",0.3)
+        MultiEffect {
             source: backgroundID
+            anchors.fill: backgroundID
+            autoPaddingEnabled: true
+            colorization: window.modeToggled ? 0.7 : 0.5
+            colorizationColor: Universal.accent
+            shadowBlur: window.modeToggled ? 2.0 : 1.0
+            blurMax: window.modeToggled ? 60 : 20
+            shadowEnabled: true
+            shadowColor: window.modeToggled ? Qt.rgba(1, 1, 1, 0.5) : "#000000" // Brighter shadow in dark mode
+            shadowOpacity: window.modeToggled ? 0.3 : 0.6
         }
-    }
-
-    function alphaColor(color, alpha) {
-        let actualColor = Qt.darker(color, 1)
-        actualColor.a = alpha
-        return actualColor
     }
 }

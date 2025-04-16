@@ -16,14 +16,14 @@ import "components/menus"
 
 ApplicationWindow {
     id: window
-   
+
     minimumWidth: 1280
     minimumHeight: 860
     visible: true
 
     Universal.theme: modeToggled ? Universal.Dark : Universal.Light
     Universal.accent: Universal.Cyan
-    
+
     property var logViewerPopup: logViewerPopupInstance
     property var logManagerInstance: null
     property bool modeToggled: false
@@ -79,7 +79,7 @@ ApplicationWindow {
             perfMonitor.beginRenderTiming()
         }
     }
-    
+
     // Render timing hooks - only run if performance monitor is available
     onAfterRendering: {
         if (typeof perfMonitor !== 'undefined') {

@@ -11,9 +11,6 @@ import "../components/menus"
 
 Page {
     id: protectionCalc
-    background: Rectangle {
-        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
-    }
 
     ColumnLayout {
         id: menuText
@@ -42,8 +39,6 @@ Page {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 120
                     icon.source: "../../icons/rounded/" + modelData.icon + ".svg"
-                    back: Qt.lighter(palette.accent, 1.5)
-                    fore: Qt.lighter(palette.accent, 1.0)
 
                     Behavior on scale { NumberAnimation { duration: 100 } }
 
