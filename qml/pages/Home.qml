@@ -37,6 +37,7 @@ Page {
             font.pixelSize: 32
             font.bold: true
             Layout.alignment: Qt.AlignHCenter
+            color: window.modeToggled ? "white" : "black"
         }
         
         Label {
@@ -46,6 +47,7 @@ Page {
             opacity: 0.7
             Layout.alignment: Qt.AlignHCenter
             Layout.bottomMargin: 50
+            color: window.modeToggled ? "white" : "black"
         }
 
         // Main buttons
@@ -57,7 +59,7 @@ Page {
             columnSpacing: 20
 
             // Basic
-            HButton {
+            HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/calculate.svg"
@@ -105,7 +107,7 @@ Page {
             }
             
             // Protection
-            HButton {
+            HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/shield.svg"
@@ -154,7 +156,7 @@ Page {
             }
 
             // Cable
-            HButton {
+            HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/cable.svg"
@@ -202,7 +204,7 @@ Page {
             }
 
             // Theory
-            HButton {
+            HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/book_5.svg"
@@ -250,7 +252,7 @@ Page {
             }
             
             // Renewables
-            HButton {
+            HomeButton {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 icon.source: "../../icons/rounded/energy.svg"

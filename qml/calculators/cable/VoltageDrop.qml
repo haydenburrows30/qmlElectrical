@@ -6,7 +6,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Universal
 import QtCharts
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"

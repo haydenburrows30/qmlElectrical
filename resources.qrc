@@ -4,10 +4,9 @@
     <!-- QML Files -->
     <file>qml/main.qml</file>
     <file>qml/pages/Home.qml</file>
-    <file>qml/pages/Playground.qml</file>
 
     <!-- Buttons -->
-    <file>qml/components/buttons/HButton.qml</file>
+    <file>qml/components/buttons/HomeButton.qml</file>
     <file>qml/components/buttons/DarkLightButton.qml</file>
     <file>qml/components/buttons/StyledButton.qml</file>
 
@@ -139,16 +138,13 @@
     <file>qml/components/visualizers/ImpedanceVectorViz.qml</file>
     <file>qml/components/visualizers/InstrumentTransformerVisualization.qml</file>
     <file>qml/components/visualizers/MotorStartingViz.qml</file>
-    <file>qml/components/visualizers/MotorTypesInfo.qml</file>
     <file>qml/components/visualizers/PhaseVector.qml</file>
     <file>qml/components/visualizers/PhasorDiagram.qml</file>
     <file>qml/components/visualizers/PowerTransformerVisualization.qml</file>
     <file>qml/components/visualizers/PowerTriangle.qml</file>
-    <file>qml/components/visualizers/PowerTriangleViz.qml</file>
     <file>qml/components/visualizers/RLCSeriesParallelViz.qml</file>
     <file>qml/components/visualizers/SwitchboardDiagram.qml</file>
     <file>qml/components/visualizers/TransformerLineViz.qml</file>
-    <file>qml/components/visualizers/TransmissionLineVIViz.qml</file>
     <file>qml/components/visualizers/TransmissionLineViz.qml</file>
 
     <!-- Voltage Drop -->

@@ -4,7 +4,6 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Qt.labs.platform as Platform
 
-
 import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
