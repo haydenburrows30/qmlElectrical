@@ -22,6 +22,7 @@ Button {
         Rectangle {
             id: backgroundID
             anchors.fill: parent
+            radius: window.modeToggled ? 3 : 0
         }
 
         MultiEffect {
@@ -30,11 +31,11 @@ Button {
             autoPaddingEnabled: true
             colorization: window.modeToggled ? 0.7 : 0.5
             colorizationColor: Universal.accent
-            shadowBlur: window.modeToggled ? 2.0 : 1.0
+            shadowBlur: 1 //window.modeToggled ? 2.0 : 1.0
             blurMax: window.modeToggled ? 60 : 20
             shadowEnabled: true
-            shadowColor: window.modeToggled ? Qt.rgba(1, 1, 1, 0.5) : "#000000" // Brighter shadow in dark mode
-            shadowOpacity: window.modeToggled ? 0.3 : 0.6
+            shadowColor: window.modeToggled ? Qt.rgba(1, 1, 1, 0.12) : "#000000" // Brighter shadow in dark mode
+            shadowOpacity: 0.4 //window.modeToggled ? 0.4 : 0.4
         }
     }
 }
