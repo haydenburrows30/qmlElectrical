@@ -12,7 +12,9 @@ QtObject {
         { name: qsTr("Ohm's Law"), source: "calculators/basic/OhmsLawCalculator.qml", icon: "calculate"  },
         { name: qsTr("Power Factor Correction"), source: "calculators/basic/PowerFactorCorrection.qml", icon: "trending_down"  },
         { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml", icon: "change_circle"  },
-        { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml", icon: "call_split"  }
+        { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml", icon: "call_split"  },
+        { name: qsTr("Base Impedance"), source: "calculators/basic/BaseImpedanceCalculator.qml", icon: "call_split"  },
+        { name: qsTr("Per Unit Impedance"), source: "calculators/basic/PerUnitImpedanceCalculator.qml", icon: "call_split" }
     ]
 
     property var protection: [

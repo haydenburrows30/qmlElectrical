@@ -40,6 +40,8 @@ from utils.system_resources import SystemResources
 from utils.perf_monitor import PerformanceMonitor
 from utils.logger import QLogManager
 from models.transformer_naming import TransformerNamingGuide
+from models.base_impedance_calculator import BaseImpedanceCalculator
+from models.per_unit_impedance_calculator import PerUnitImpedanceCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -93,5 +95,7 @@ def register_qml_types(engine, current_dir):
         (SolkorRfCalculator, "SolkorRfCalculator", 1, 0, "SolkorRfCalculator"),
         (VR32CL7Calculator, "VR32CL7Calculator", 1, 0, "VR32CL7Calculator"),
         (OvercurrentProtectionCalculator, "OvercurrentProtectionCalculator", 1, 0, "OvercurrentProtectionCalculator"),
-        (TransformerNamingGuide, "TransformerNamingGuide", 1, 0, "TransformerNamingGuide")
+        (TransformerNamingGuide, "TransformerNamingGuide", 1, 0, "TransformerNamingGuide"),
+        (BaseImpedanceCalculator, "BaseImpedanceCalculator", 1, 0, "BaseImpedanceCalculator"),
+        (PerUnitImpedanceCalculator, "PerUnitImpedance", 1, 0, "PerUnitImpedanceCalculator")
     ]
