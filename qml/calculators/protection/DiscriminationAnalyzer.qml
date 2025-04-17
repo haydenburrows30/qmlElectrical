@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 import QtQuick.Controls.Universal
+import QtQuick.Dialogs
 
 import "../../components"
 import "../../components/buttons"
@@ -196,28 +197,49 @@ Item {
                                     width: ListView.view.width
                                     height: relayInfo.height + 10
                                     radius: 3
+                                    color: Universal.theme === Universal.Dark ? 
+                                           Qt.rgba(0.2, 0.2, 0.2, 0.3) : 
+                                           Qt.rgba(0.9, 0.9, 0.9, 0.3)
 
-                                    Column {
-                                        id: relayInfo
-                                        width: parent.width
+                                    RowLayout {
+                                        width: parent.width - 10
+                                        anchors.centerIn: parent
 
-                                        Text {
-                                            width: parent.width
-                                            text: modelData ? modelData.name : ""
-                                            font.bold: true
-                                            elide: Text.ElideRight
+                                        Column {
+                                            id: relayInfo
+                                            Layout.fillWidth: true
+
+                                            Text {
+                                                width: parent.width
+                                                text: modelData ? modelData.name : ""
+                                                font.bold: true
+                                                color: Universal.foreground
+                                                elide: Text.ElideRight
+                                            }
+                                            Text {
+                                                width: parent.width
+                                                text: modelData ? "Pickup: " + modelData.pickup + "A" : ""
+                                                font.pixelSize: 12
+                                                color: Universal.foreground
+                                                elide: Text.ElideRight
+                                            }
+                                            Text {
+                                                width: parent.width
+                                                text: modelData ? "TDS: " + modelData.tds : ""
+                                                font.pixelSize: 12
+                                                color: Universal.foreground
+                                                elide: Text.ElideRight
+                                            }
                                         }
-                                        Text {
-                                            width: parent.width
-                                            text: modelData ? "Pickup: " + modelData.pickup + "A" : ""
-                                            font.pixelSize: 12
-                                            elide: Text.ElideRight
-                                        }
-                                        Text {
-                                            width: parent.width
-                                            text: modelData ? "TDS: " + modelData.tds : ""
-                                            font.pixelSize: 12
-                                            elide: Text.ElideRight
+
+                                        StyledButton {
+                                            icon.source: "../../../icons/rounded/delete.svg"
+                                            icon.color: Universal.theme === Universal.Dark ? "#ff8080" : "red"
+                                            
+                                            ToolTip.text: "Remove Relay"
+                                            onClicked: {
+                                                calculator.removeRelay(index)
+                                            }
                                         }
                                     }
                                 }
@@ -229,12 +251,12 @@ Item {
                             title: "Configuration"
                             
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 180
+                            Layout.minimumHeight: 250
                             
                             GridLayout {
+                                id: showFaultPointsGrid
                                 columns: 3
                                 anchors.fill: parent
-                                // uniformCellHeights: true
 
                                 Label {text: "Margin: "}
 
@@ -291,6 +313,106 @@ Item {
                                         }
                                     }
                                 }
+
+                                Label {
+                                    text: "Export Data: "
+                                    visible: calculator.relayCount >= 2
+                                }
+
+                                StyledButton {
+                                    id: exportButton
+                                    text: "Export Results"
+                                    Layout.columnSpan: 2
+                                    visible: calculator.relayCount >= 2
+                                    icon.source: "../../../icons/rounded/download.svg"
+                                    
+                                    onClicked: {
+                                        let filename = calculator.exportResults()
+                                        if (filename) {
+                                            exportSuccessPopup.filepath = filename
+                                            exportSuccessPopup.open()
+                                        } else {
+                                            // Show error message
+                                        }
+                                    }
+                                }
+
+                                Label {
+                                    text: "Show Fault Points: "
+                                    visible: calculator.relayCount >= 2
+                                }
+
+                                CheckBox {
+                                    id: showFaultPoints
+                                    checked: false
+                                    Layout.columnSpan: 1
+                                    visible: calculator.relayCount >= 2
+                                    
+                                    onCheckedChanged: {
+                                        showFaultPointsGrid.updateFaultPoints()
+                                    }
+                                }
+                                
+                                StyledButton {
+                                    icon.source: "../../../icons/rounded/refresh.svg"
+                                    visible: calculator.relayCount >= 2 && showFaultPoints.checked
+                                    ToolTip.text: "Refresh Fault Points"
+                                    
+                                    onClicked: {
+                                        showFaultPointsGrid.updateFaultPoints();
+                                    }
+                                }
+
+                                function updateFaultPoints() {
+                                    // Check if we have fault currents
+                                    if (!showFaultPoints || !showFaultPoints.checked) {
+                                        // Hide fault points
+                                        marginChart.clearFaultPoints();
+                                        return;
+                                    }
+                                    
+                                    // Get fault levels directly from calculator
+                                    let faultLevels = calculator.faultLevels;
+                                    console.log("Got fault levels:", JSON.stringify(faultLevels));
+                                    
+                                    // Fix the condition that's failing
+                                    if (!faultLevels || faultLevels.length === 0) {
+                                        console.log("No fault levels available");
+                                        return;
+                                    }
+                                    
+                                    // Log more details to debug
+                                    console.log("Fault levels type:", typeof faultLevels, "Is array:", Array.isArray(faultLevels), "Length:", faultLevels.length);
+                                    
+                                    // Ensure faultLevels is in the right format - convert from QML list to JS array if needed
+                                    let faultLevelsArray = [];
+                                    try {
+                                        for (let i = 0; i < faultLevels.length; i++) {
+                                            faultLevelsArray.push(faultLevels[i]);
+                                        }
+                                        console.log("Converted fault levels to array:", faultLevelsArray);
+                                    } catch (e) {
+                                        console.error("Error converting fault levels:", e);
+                                        faultLevelsArray = faultLevels; // Fallback
+                                    }
+                                    
+                                    // Process fault levels as individual numbers
+                                    marginChart.clearFaultPoints();
+                                    
+                                    // For each relay, get the points at the fault levels
+                                    for (let i = 0; i < calculator.relayCount; i++) {
+                                        try {
+                                            console.log("Processing relay index:", i);
+                                            // Pass an explicit array
+                                            marginChart.addFaultPoints(i, faultLevelsArray);
+                                        } catch (e) {
+                                            console.error("Error adding fault points for relay", i, ":", e);
+                                        }
+                                    }
+                                    
+                                    // Force chart to update
+                                    marginChart.adjustAxes();
+                                }
                             }
                         }
 
@@ -298,51 +420,82 @@ Item {
                         WaveCard {
                             title: "Discrimination Results"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 200
+                            Layout.minimumHeight: 250
 
-                            ListView {
-                                id: resultsList
+                            ColumnLayout {
                                 anchors.fill: parent
-                                model: calculator.results
-                                clip: true
+                                spacing: 8
 
                                 Text {
-                                    text: "Add at least 2 relays to see discrimination results"
-                                    visible: calculator.relayCount < 2
-                                    anchors.fill: parent
-                                    color: Universal.foreground
-                                    wrapMode: Text.Wrap
-
+                                    text: "System Coordination Status: " + 
+                                          (calculator.isFullyCoordinated ? "Fully Coordinated" : "Coordination Issues")
+                                    visible: calculator.relayCount >= 2
+                                    font.bold: true
+                                    color: calculator.isFullyCoordinated ? 
+                                           Universal.theme === Universal.Dark ? "#90EE90" : "green" : 
+                                           Universal.theme === Universal.Dark ? "#ff8080" : "red"
+                                    Layout.fillWidth: true
                                 }
 
-                                delegate: Column {
-                                    required property var resultData
-                                    width: ListView.view.width
-                                    spacing: 4
-                                    visible: resultData !== undefined && resultData !== null
-                                    
+                                ListView {
+                                    id: resultsList
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    model: calculator.results
+                                    clip: true
+
                                     Text {
-                                        text: {
-                                            if (!resultData || !resultData.primary || !resultData.backup) return ""
-                                            return resultData.primary + " → " + resultData.backup
-                                        }
-                                        font.bold: true
+                                        text: "Add at least 2 relays to see discrimination results"
+                                        visible: calculator.relayCount < 2
+                                        anchors.fill: parent
                                         color: Universal.foreground
+                                        wrapMode: Text.Wrap
                                     }
-                                    Repeater {
-                                        model: (resultData && resultData.margins) ? resultData.margins : []
-                                        delegate: Text {
-                                            required property var modelData
-                                            visible: modelData !== undefined && modelData !== null
-                                            text: {
-                                                if (!modelData || !modelData.fault_current || modelData.margin === undefined) 
-                                                    return ""
-                                                return "  " + modelData.fault_current.toFixed(1) + "A: " + 
-                                                    modelData.margin.toFixed(2) + "s"
+
+                                    delegate: Column {
+                                        required property var resultData
+                                        width: ListView.view.width
+                                        spacing: 4
+                                        visible: resultData !== undefined && resultData !== null
+                                        
+                                        Rectangle {
+                                            width: parent.width
+                                            height: headerText.height + 8
+                                            color: resultData.coordinated ? 
+                                                   Universal.theme === Universal.Dark ? Qt.rgba(0, 0.5, 0, 0.2) : Qt.rgba(0, 0.8, 0, 0.1) : 
+                                                   Universal.theme === Universal.Dark ? Qt.rgba(0.5, 0, 0, 0.2) : Qt.rgba(0.8, 0, 0, 0.1)
+                                            radius: 3
+
+                                            Text {
+                                                id: headerText
+                                                anchors.centerIn: parent
+                                                width: parent.width - 16
+                                                text: {
+                                                    if (!resultData || !resultData.primary || !resultData.backup) return ""
+                                                    return resultData.primary + " → " + resultData.backup + 
+                                                           (resultData.coordinated ? " (Coordinated)" : " (Coordination Issue)")
+                                                }
+                                                font.bold: true
+                                                color: Universal.foreground
                                             }
-                                            color: modelData && modelData.coordinated ? 
-                                                Universal.theme === Universal.Dark ? "#90EE90" : "green" : 
-                                                Universal.theme === Universal.Dark ? "#ff8080" : "red"
+                                        }
+
+                                        Repeater {
+                                            model: (resultData && resultData.margins) ? resultData.margins : []
+                                            delegate: Text {
+                                                required property var modelData
+                                                visible: modelData !== undefined && modelData !== null
+                                                text: {
+                                                    if (!modelData || !modelData.fault_current || modelData.margin === undefined) 
+                                                        return ""
+                                                    return "  " + modelData.fault_current.toFixed(1) + "A: " + 
+                                                        modelData.margin.toFixed(2) + "s " +
+                                                        (modelData.coordinated ? "✓" : "✗")
+                                                }
+                                                color: modelData && modelData.coordinated ? 
+                                                    Universal.theme === Universal.Dark ? "#90EE90" : "green" : 
+                                                    Universal.theme === Universal.Dark ? "#ff8080" : "red"
+                                            }
                                         }
                                     }
                                 }
@@ -355,20 +508,23 @@ Item {
                         Layout.fillWidth: true
                         Layout.minimumHeight: leftColumn.height
 
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 10
-                            
+                        ColumnLayout {
+                            width: parent.width
+                            height: parent.height
+                            spacing: 10
 
                             Label {
-                                width: parent.width
-                                text: "Margin Analysis Chart"
+                                Layout.fillWidth: true
+                                text: "Time-Current Curves and Margin Analysis"
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
                             }
 
-                            DiscriminationChart {id: marginChart}
-
+                            DiscriminationChart {
+                                id: marginChart
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
                         }
                     }
                 }
@@ -376,14 +532,53 @@ Item {
         }
     }
 
+    // Export success popup
+    Popup {
+        id: exportSuccessPopup
+        anchors.centerIn: parent
+        width: 400
+        height: 180
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        property string filepath: ""
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 16
+            spacing: 16
+
+            Label {
+                text: "Results Exported Successfully"
+                font.bold: true
+                font.pixelSize: 16
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Label {
+                text: "File saved to:\n" + exportSuccessPopup.filepath
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: exportSuccessPopup.close()
+            }
+        }
+    }
+
     Connections {
         target: calculator
+        
         function onAnalysisComplete() {
             console.log("Analysis complete signal received")
             marginChart.scatterSeries.clear()
             let model = calculator.results
             console.log("Model rowCount:", model.rowCount())
-            
             try {
                 for(let i = 0; i < model.rowCount(); i++) {
                     let modelIndex = model.index(i, 0)
@@ -399,16 +594,38 @@ Item {
                         })
                     }
                 }
+                
+                // Update fault points after the analysis is complete
+                Qt.callLater(function() {
+                    if (showFaultPoints && showFaultPoints.checked) {
+                        showFaultPointsGrid.updateFaultPoints();
+                    }
+                });
             } catch (e) {
                 console.error("Error updating chart:", e)
             }
         }
-
+        
         function onRelayCountChanged() {
             marginChart.createRelaySeries()
         }
+        
         function onMarginChanged() {
             marginChart.updateMarginLine()
         }
+        
+        function onExportComplete(filename) {
+            console.log("Export completed:", filename)
+        }
+    }
+        
+    Component.onCompleted: {
+        // Wait for all components to be fully initialized before accessing them
+        Qt.callLater(function() {
+            // Initialize chart if it exists
+            if (marginChart && marginChart.createRelaySeries) {
+                marginChart.createRelaySeries();
+            }
+        });
     }
 }

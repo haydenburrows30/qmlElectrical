@@ -1,5 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot, QAbstractListModel, Qt, QModelIndex
 import math
+import json
+import os
 
 class ResultsModel(QAbstractListModel):
     DataRole = Qt.UserRole + 1
@@ -48,6 +50,7 @@ class DiscriminationAnalyzer(QObject):
     analysisComplete = Signal()
     relayCountChanged = Signal()
     marginChanged = Signal()
+    exportComplete = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -92,6 +95,80 @@ class DiscriminationAnalyzer(QObject):
         self._results_model.setResults([])
         self.relayCountChanged.emit()
         self.analysisComplete.emit()
+
+    @Slot(int)
+    def removeRelay(self, index):
+        """Remove a relay from the discrimination study"""
+        if 0 <= index < len(self._relays):
+            print(f"Removing relay at index {index}")
+            self._relays.pop(index)
+            self.relayCountChanged.emit()
+            self._analyze_discrimination()
+
+    @Slot(result=str)
+    def exportResults(self):
+        """Export results to a JSON file"""
+        try:
+            # Create a data structure to export
+            export_data = {
+                "relays": self._relays,
+                "fault_levels": self._fault_levels,
+                "min_margin": self._min_margin,
+                "results": []
+            }
+            
+            # Get results from the model
+            for i in range(self._results_model.rowCount()):
+                index = self._results_model.index(i, 0)
+                result = self._results_model.data(index, self._results_model.DataRole)
+                if result:
+                    export_data["results"].append(result)
+            
+            # Create a timestamp for the filename
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get home directory
+            home_dir = os.path.expanduser("~")
+            export_dir = os.path.join(home_dir, "Documents", "qmltest", "exports")
+            
+            # Create directory if it doesn't exist
+            os.makedirs(export_dir, exist_ok=True)
+            
+            # Create filename
+            filename = os.path.join(export_dir, f"discrimination_results_{timestamp}.json")
+            
+            # Write to file
+            with open(filename, 'w') as f:
+                json.dump(export_data, f, indent=2)
+            
+            print(f"Results exported to {filename}")
+            self.exportComplete.emit(filename)
+            return filename
+            
+        except Exception as e:
+            print(f"Error exporting results: {e}")
+            self.exportComplete.emit("")
+            return ""
+
+    @Slot(float, result='QVariantList')
+    def calculateFaultPoints(self, relayIndex):
+        """Calculate operating points for given relay at each fault level"""
+        if relayIndex < 0 or relayIndex >= len(self._relays):
+            return []
+            
+        relay = self._relays[relayIndex]
+        points = []
+        
+        for fault_current in self._fault_levels:
+            time = self._calculate_operating_time(relay, fault_current)
+            if time and time > 0 and not math.isinf(time):
+                points.append({
+                    "current": fault_current,
+                    "time": time
+                })
+                
+        return points
 
     def _analyze_discrimination(self):
         print(f"Starting discrimination analysis...")
@@ -203,3 +280,8 @@ class DiscriminationAnalyzer(QObject):
     def getCurveConstants(self, curve_name):
         """Get curve constants for the given curve type"""
         return self.CURVE_TYPES.get(curve_name, self.CURVE_TYPES["IEC Standard Inverse"])
+
+    @Property('QVariantList', constant=True)
+    def faultLevels(self):
+        """Provide access to fault levels from QML"""
+        return self._fault_levels

@@ -29,7 +29,7 @@ Button {
             source: backgroundID
             anchors.fill: backgroundID
             autoPaddingEnabled: true
-            colorization: window.modeToggled ? 0.7 : 0.5
+            colorization: 0.7
             colorizationColor: Universal.accent
             shadowBlur: 1 //window.modeToggled ? 2.0 : 1.0
             blurMax: window.modeToggled ? 60 : 20
