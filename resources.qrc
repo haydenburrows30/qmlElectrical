@@ -131,7 +131,6 @@
     <file>qml/components/visualizers/PhaseVector.qml</file>
     <file>qml/components/visualizers/PhasorDiagram.qml</file>
     <file>qml/components/visualizers/PowerTransformerVisualization.qml</file>
-    <file>qml/components/visualizers/PowerTriangle.qml</file>
     <file>qml/components/visualizers/RLCSeriesParallelViz.qml</file>
     <file>qml/components/visualizers/SwitchboardDiagram.qml</file>
     <file>qml/components/visualizers/TransmissionLineViz.qml</file>

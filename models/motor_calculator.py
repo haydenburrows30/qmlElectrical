@@ -17,6 +17,7 @@ class MotorCalculator(QObject):
     nominalTorqueChanged = Signal()
     motorTypeChanged = Signal()
     motorSpeedChanged = Signal()
+    recommendationsChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -199,6 +200,7 @@ class MotorCalculator(QObject):
             self.startingTorqueChanged.emit()
             self.nominalTorqueChanged.emit()
             self.resultsCalculated.emit()
+            self.recommendationsChanged.emit()
         except ZeroDivisionError as e:
             print(f"Division by zero error: {e}")
             # Clear results to avoid displaying incorrect values
@@ -366,6 +368,69 @@ class MotorCalculator(QObject):
         if self._duty_cycle != value:
             self._duty_cycle = value
         
+    @Property(str, notify=recommendationsChanged)
+    def startingRecommendations(self):
+        """Generate recommendations based on current motor parameters"""
+        try:
+            recommendations = []
+            
+            # Base recommendations by motor type
+            motor_type_recommendations = {
+                "Induction Motor": "Standard induction motors are robust and suitable for most applications.",
+                "Synchronous Motor": "Synchronous motors require field excitation control during starting.",
+                "Wound Rotor Motor": "Wound rotor motors allow for customizable starting characteristics.",
+                "Permanent Magnet Motor": "PM motors must use VFD control - never use DOL starting!",
+                "Single Phase Motor": "Single phase motors are suitable for small residential applications."
+            }
+            
+            if self._motor_type in motor_type_recommendations:
+                recommendations.append(motor_type_recommendations[self._motor_type])
+            
+            # Starting method recommendations
+            method_recommendations = {
+                "DOL": "DOL starting creates high inrush current. Consider using soft starter if supply is limited.",
+                "Star-Delta": "Star-Delta reduces starting current to about 33% of DOL values.",
+                "Soft Starter": "Set ramp time according to load characteristics (typically 2-10 seconds).",
+                "VFD": "VFDs offer the best control but consider harmonics filtering."
+            }
+            
+            if self._starting_method in method_recommendations:
+                recommendations.append(method_recommendations[self._starting_method])
+            
+            # Power-specific recommendations
+            if self._motor_power > 30 and self._starting_method == "DOL":
+                recommendations.append("For motors > 30kW, star-delta or soft starting is often preferred due to utility restrictions.")
+            
+            # Protection recommendations
+            if self._starting_current > 200:
+                recommendations.append("High starting current may cause significant voltage drop. Check supply capacity.")
+            
+            # Cable sizing recommendation
+            flc = self._starting_current / self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0)
+            cable_size = "Standard"
+            
+            if flc <= 10:
+                cable_size = "1.5 mm²"
+            elif flc <= 16:
+                cable_size = "2.5 mm²"
+            elif flc <= 25:
+                cable_size = "4 mm²"
+            elif flc <= 32:
+                cable_size = "6 mm²"
+            elif flc <= 50:
+                cable_size = "10 mm²"
+            elif flc <= 63:
+                cable_size = "16 mm²"
+            elif flc > 63:
+                cable_size = "Consult electrical standards for cables above 16 mm²"
+            
+            recommendations.append(f"Use minimum {cable_size} cables for power connections.")
+            
+            return "\n• ".join(recommendations)
+        except Exception as e:
+            print(f"Error generating recommendations: {e}")
+            return "Could not generate recommendations due to an error."
+
     # QML slots
     @Slot(float)
     def setMotorPower(self, power):
@@ -393,6 +458,8 @@ class MotorCalculator(QObject):
                 self.startingMethodChanged.emit()
                 # Emit the multiplier changed signal since it depends on the method
                 self.startingMultiplierChanged.emit()
+                # Also emit the recommendations changed signal
+                self.recommendationsChanged.emit()
                 self._calculate()
         else:
             print(f"Warning: Attempted to set invalid starting method: {method}")
@@ -635,63 +702,5 @@ class MotorCalculator(QObject):
     
     @Slot(result=str)
     def getStartingRecommendations(self):
-        """Generate recommendations based on current motor parameters"""
-        try:
-            recommendations = []
-            
-            # Base recommendations by motor type
-            motor_type_recommendations = {
-                "Induction Motor": "Standard induction motors are robust and suitable for most applications.",
-                "Synchronous Motor": "Synchronous motors require field excitation control during starting.",
-                "Wound Rotor Motor": "Wound rotor motors allow for customizable starting characteristics.",
-                "Permanent Magnet Motor": "PM motors must use VFD control - never use DOL starting!",
-                "Single Phase Motor": "Single phase motors are suitable for small residential applications."
-            }
-            
-            if self._motor_type in motor_type_recommendations:
-                recommendations.append(motor_type_recommendations[self._motor_type])
-            
-            # Starting method recommendations
-            method_recommendations = {
-                "DOL": "DOL starting creates high inrush current. Consider using soft starter if supply is limited.",
-                "Star-Delta": "Star-Delta reduces starting current to about 33% of DOL values.",
-                "Soft Starter": "Set ramp time according to load characteristics (typically 2-10 seconds).",
-                "VFD": "VFDs offer the best control but consider harmonics filtering."
-            }
-            
-            if self._starting_method in method_recommendations:
-                recommendations.append(method_recommendations[self._starting_method])
-            
-            # Power-specific recommendations
-            if self._motor_power > 30 and self._starting_method == "DOL":
-                recommendations.append("For motors > 30kW, star-delta or soft starting is often preferred due to utility restrictions.")
-            
-            # Protection recommendations
-            if self._starting_current > 200:
-                recommendations.append("High starting current may cause significant voltage drop. Check supply capacity.")
-            
-            # Cable sizing recommendation
-            flc = self._starting_current / self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0)
-            cable_size = "Standard"
-            
-            if flc <= 10:
-                cable_size = "1.5 mm²"
-            elif flc <= 16:
-                cable_size = "2.5 mm²"
-            elif flc <= 25:
-                cable_size = "4 mm²"
-            elif flc <= 32:
-                cable_size = "6 mm²"
-            elif flc <= 50:
-                cable_size = "10 mm²"
-            elif flc <= 63:
-                cable_size = "16 mm²"
-            elif flc > 63:
-                cable_size = "Consult electrical standards for cables above 16 mm²"
-            
-            recommendations.append(f"Use minimum {cable_size} cables for power connections.")
-            
-            return "\n• ".join(recommendations)
-        except Exception as e:
-            print(f"Error generating recommendations: {e}")
-            return "Could not generate recommendations due to an error."
+        """Legacy method for backwards compatibility"""
+        return self.startingRecommendations

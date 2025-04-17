@@ -164,14 +164,14 @@ Item {
         }
     }
 
-    // PopUpText {
-    //     id: popUpText
-    //     parentCard: results
-    //     popupText: "<h3>Motor Starting Calculator </h3><br>" +
-    //             "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. <br>" +
-    //             "You can also select the starting method to see how the current profile changes. <br>" +
-    //             "The starting current profile is displayed below the results."
-    // }
+    PopUpText {
+        id: popUpText
+        parentCard: helpButton
+        popupText: "<h3>Motor Starting Calculator </h3><br>" +
+                "This calculator helps you determine the starting current and torque of an electric motor based on its power, efficiency, and power factor. <br>" +
+                "You can also select the starting method to see how the current profile changes. <br>" +
+                "The starting current profile is displayed below the results."
+    }
 
     Popup {
         id: messagePopup
@@ -719,23 +719,20 @@ Item {
                                 font.bold: true
                                 Layout.topMargin: 10
                             }
-                            
-                            ScrollView {
+
+                            TextArea {
+                                id: recommendationsText
                                 Layout.columnSpan: 2
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 60
-                                
-                                TextArea {
-                                    id: recommendationsText
-                                    readOnly: true
-                                    wrapMode: TextArea.Wrap
-                                    text: calculator.getStartingRecommendations()
-                                    background: Rectangle {
-                                        color: Universal.background
-                                        border.color: Universal.foreground
-                                        border.width: 1
-                                        radius: 5
-                                    }
+                                Layout.preferredHeight: 120
+                                readOnly: true
+                                wrapMode: TextArea.Wrap
+                                text: calculator.startingRecommendations
+                                background: Rectangle {
+                                    color: Universal.background
+                                    border.color: Universal.foreground
+                                    border.width: 1
+                                    radius: 5
                                 }
                             }
                             

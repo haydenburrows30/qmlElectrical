@@ -24,11 +24,17 @@ WaveCard {
         width: parent.width
         TabButton {
             text: "Current Profile"
-            onClicked: activeTab = "current"
+            onClicked: {
+                activeTab = "current"
+                showTorqueCurve = false // Reset combined view flag
+            }
         }
         TabButton {
             text: "Torque Curve"
-            onClicked: activeTab = "torque"
+            onClicked: {
+                activeTab = "torque"
+                showTorqueCurve = false // Reset combined view flag
+            }
         }
         TabButton {
             text: "Combined View"
