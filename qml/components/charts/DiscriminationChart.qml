@@ -169,8 +169,6 @@ ChartView {
 
     // Revised approach using signals to bridge to Python
     function saveChartAsSVG(filename) {
-        console.log(`Preparing SVG content for ${filename}`)
-        
         // Temporarily increase line widths for better visibility in SVG
         let originalWidths = []
         relaySeries.forEach((series, index) => {
@@ -187,7 +185,6 @@ ChartView {
         
         // Generate SVG content
         let svgContent = generateSVG()
-        console.log("Generated SVG content with length:", svgContent.length)
         
         // Emit signal to let Python handle the file writing
         svgContentReady(svgContent, filename)
@@ -212,8 +209,6 @@ ChartView {
 
     // Legacy function for backward compatibility
     function saveChartImage(filename) {
-        console.log("saveChartImage called with: " + filename)
-        
         // Always try to save as SVG first
         let svgFilename = filename
         if (!svgFilename.endsWith(".svg")) {
@@ -496,18 +491,15 @@ ChartView {
         let aspectRatio = originalHeight / originalWidth
         
         // Use extremely high resolution for vector-like quality
-        let targetWidth = 8000  // Much higher resolution
+        let targetWidth = 8000
         let targetHeight = Math.round(targetWidth * aspectRatio)
-        
-        console.log(`Capturing fallback PNG at resolution ${targetWidth}x${targetHeight}`)
         
         return chart.grabToImage(function(result) {
             // Restore original settings
             chart.antialiasing = originalAntialiasing
             
             // Save with maximum quality
-            let success = result.saveToFile(filename)
-            console.log("Fallback PNG save result:", success ? "success" : "failed")
+            result.saveToFile(filename)
         }, Qt.size(targetWidth, targetHeight))
     }
 }
