@@ -71,7 +71,12 @@ Item {
                             pickupCurrent.text = ""
                             tds.text = ""
                             faultCurrent.text = ""
-                            marginChart.scatterSeries.clear()
+                            
+                            // Use the complete chart reset function
+                            marginChart.resetChart()
+                            
+                            // Reset the checkbox
+                            showFaultPoints.checked = false
                         }
                     }
 
@@ -364,54 +369,10 @@ Item {
                                 }
 
                                 function updateFaultPoints() {
-                                    // Check if we have fault currents
-                                    if (!showFaultPoints || !showFaultPoints.checked) {
-                                        // Hide fault points
-                                        marginChart.clearFaultPoints();
-                                        return;
-                                    }
-                                    
-                                    // Get fault levels directly from calculator
-                                    let faultLevels = calculator.faultLevels;
-                                    console.log("Got fault levels:", JSON.stringify(faultLevels));
-                                    
-                                    // Fix the condition that's failing
-                                    if (!faultLevels || faultLevels.length === 0) {
-                                        console.log("No fault levels available");
-                                        return;
-                                    }
-                                    
-                                    // Log more details to debug
-                                    console.log("Fault levels type:", typeof faultLevels, "Is array:", Array.isArray(faultLevels), "Length:", faultLevels.length);
-                                    
-                                    // Ensure faultLevels is in the right format - convert from QML list to JS array if needed
-                                    let faultLevelsArray = [];
-                                    try {
-                                        for (let i = 0; i < faultLevels.length; i++) {
-                                            faultLevelsArray.push(faultLevels[i]);
-                                        }
-                                        console.log("Converted fault levels to array:", faultLevelsArray);
-                                    } catch (e) {
-                                        console.error("Error converting fault levels:", e);
-                                        faultLevelsArray = faultLevels; // Fallback
-                                    }
-                                    
-                                    // Process fault levels as individual numbers
-                                    marginChart.clearFaultPoints();
-                                    
-                                    // For each relay, get the points at the fault levels
-                                    for (let i = 0; i < calculator.relayCount; i++) {
-                                        try {
-                                            console.log("Processing relay index:", i);
-                                            // Pass an explicit array
-                                            marginChart.addFaultPoints(i, faultLevelsArray);
-                                        } catch (e) {
-                                            console.error("Error adding fault points for relay", i, ":", e);
-                                        }
-                                    }
-                                    
-                                    // Force chart to update
-                                    marginChart.adjustAxes();
+                                    marginChart.updateFaultPoints(
+                                        calculator.faultPoints, 
+                                        showFaultPoints && showFaultPoints.checked
+                                    );
                                 }
                             }
                         }
