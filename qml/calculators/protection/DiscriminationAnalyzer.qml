@@ -536,15 +536,12 @@ Item {
         target: calculator
         
         function onAnalysisComplete() {
-            console.log("Analysis complete signal received")
             marginChart.scatterSeries.clear()
             let model = calculator.results
-            console.log("Model rowCount:", model.rowCount())
             try {
                 for(let i = 0; i < model.rowCount(); i++) {
                     let modelIndex = model.index(i, 0)
                     let result = model.data(modelIndex, calculator.results.DataRole)
-                    console.log("Chart data for index", i, ":", JSON.stringify(result))
                     if (result && result.margins) {
                         result.margins.forEach(function(margin) {
                             if (margin.fault_current && margin.margin != null && 
@@ -575,8 +572,16 @@ Item {
             marginChart.updateMarginLine()
         }
         
-        function onExportComplete(filename) {
-            console.log("Export completed:", filename)
+        function onExportChart(filename) {
+            marginChart.saveChartImage(filename)
+        }
+    }
+    
+    Connections {
+        target: marginChart
+        
+        function onSvgContentReady(svgContent, filename) {
+            calculator.saveSvgContent(svgContent, filename)
         }
     }
         

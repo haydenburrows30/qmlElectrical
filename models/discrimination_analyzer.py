@@ -2,6 +2,295 @@ from PySide6.QtCore import QObject, Property, Signal, Slot, QAbstractListModel, 
 import math
 import json
 import os
+from datetime import datetime
+import sys
+import importlib.util
+
+# Ensure the utils directory is in the path
+utils_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "utils")
+if utils_path not in sys.path:
+    sys.path.append(utils_path)
+
+# Try to import our PDF generator
+try:
+    # Use relative import with full path to avoid import errors
+    from utils.pdf_generator_overcurrent import generate_pdf, cleanup_temp_files
+except ImportError:
+    # If import fails, dynamically load the module
+    try:
+        pdf_generator_path = os.path.join(utils_path, "pdf_generator.py")
+        if not os.path.exists(pdf_generator_path):
+            # Create the utils directory if it doesn't exist
+            os.makedirs(os.path.dirname(pdf_generator_path), exist_ok=True)
+            # Create the pdf_generator.py file
+            with open(pdf_generator_path, 'w') as f:
+                f.write('''
+# filepath: /home/hayden/Documents/qmltest/utils/pdf_generator.py
+import os
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
+
+def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_image, png_fallback):
+    """
+    Generate a PDF report for relay discrimination analysis
+    
+    Args:
+        pdf_file (str): Path to save the PDF
+        relays (list): List of relay data dictionaries
+        fault_levels (list): List of fault current levels
+        results (list): Analysis results
+        curve_types (dict): Curve type definitions
+        chart_image (str): Path to SVG chart image
+        png_fallback (str): Path to PNG fallback image
+        
+    Returns:
+        str: Path to the generated PDF or empty string on failure
+    """
+    try:
+        # Create the PDF document
+        doc = SimpleDocTemplate(pdf_file, pagesize=A4)
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # Title
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            spaceAfter=30
+        )
+        elements.append(Paragraph("Discrimination Analysis Report", title_style))
+        elements.append(Spacer(1, 0.2*inch))
+
+        # Relay Information
+        elements.append(Paragraph("Relay Settings", styles['Heading2']))
+        relay_data = [['Relay', 'Pickup Current (A)', 'Time Dial', 'Curve Type']]
+        for relay in relays:
+            curve_type = next((k for k, v in curve_types.items() 
+                             if v == relay['curve_constants']), 'Unknown')
+            relay_data.append([
+                relay['name'],
+                f"{relay['pickup']:.2f}",
+                f"{relay['tds']:.2f}",
+                curve_type
+            ])
+
+        relay_table = Table(relay_data)
+        relay_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('TOPPADDING', (0, 1), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+        ]))
+        elements.append(relay_table)
+        elements.append(Spacer(1, 0.2*inch))
+
+        # Fault Levels
+        elements.append(Paragraph("Fault Levels", styles['Heading2']))
+        fault_text = ", ".join([f"{current:.1f}A" for current in fault_levels])
+        elements.append(Paragraph(f"Analysis performed at: {fault_text}", styles['Normal']))
+        elements.append(Spacer(1, 0.2*inch))
+
+        # Coordination Results
+        elements.append(Paragraph("Coordination Results", styles['Heading2']))
+        for result in results:
+            header = f"{result['primary']} → {result['backup']}"
+            status = "Coordinated" if result['coordinated'] else "Coordination Issue"
+            elements.append(Paragraph(f"{header}: {status}", styles['Heading3']))
+            
+            margin_data = [['Fault Current (A)', 'Time Margin (s)', 'Status']]
+            for margin in result['margins']:
+                margin_data.append([
+                    f"{margin['fault_current']:.1f}",
+                    f"{margin['margin']:.2f}",
+                    "✓" if margin['coordinated'] else "✗"
+                ])
+            
+            margin_table = Table(margin_data)
+            margin_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ]))
+            elements.append(margin_table)
+            elements.append(Spacer(1, 0.2*inch))
+
+        # Add Chart Section
+        elements.append(Paragraph("Time-Current Curves", styles['Heading2']))
+        
+        # Explicitly prioritize SVG over PNG
+        if os.path.exists(chart_image):
+            actual_chart_image = chart_image
+            chart_format = "SVG"
+        elif os.path.exists(png_fallback):
+            actual_chart_image = png_fallback
+            chart_format = "PNG"
+        else:
+            actual_chart_image = None
+            chart_format = None
+        
+        # Check if chart image exists before trying to include it
+        if actual_chart_image and os.path.exists(actual_chart_image):
+            try:
+                # Only do rasterization and processing if it's a PNG
+                if chart_format == "PNG":
+                    # Get the image dimensions directly from the PIL library
+                    from PIL import Image as PILImage
+                    from PIL import ImageEnhance
+                    
+                    # Load the image with maximum quality processing
+                    img = PILImage.open(actual_chart_image)
+                    
+                    # Apply some image enhancements to improve line sharpness
+                    sharpener = ImageEnhance.Sharpness(img)
+                    img = sharpener.enhance(1.5)
+                    
+                    enhancer = ImageEnhance.Contrast(img)
+                    img = enhancer.enhance(1.2)
+                    
+                    # Optimize the high-resolution image while preserving quality
+                    img_width, img_height = img.size
+                    aspect_ratio = img_height / img_width
+                    
+                    optimal_width = 3500
+                    optimal_height = int(optimal_width * aspect_ratio)
+                    
+                    img = img.resize((optimal_width, optimal_height), PILImage.LANCZOS)
+                    
+                    enhanced_image = actual_chart_image.replace('.png', '_enhanced.png')
+                    img.save(enhanced_image, format='PNG', compress_level=1, optimize=False)
+                    actual_chart_image = enhanced_image
+                    
+                    img_width, img_height = img.size
+                    aspect_ratio = img_height / img_width
+                else:
+                    aspect_ratio = 0.75
+                    
+                    try:
+                        try:
+                            import cairosvg
+                            has_cairosvg = True
+                        except ImportError:
+                            has_cairosvg = False
+                            
+                        from PIL import Image as PILImage
+                        from PIL import ImageEnhance
+                        
+                        png_from_svg = actual_chart_image.replace('.svg', '_rasterized.png')
+                        
+                        if has_cairosvg:
+                            cairosvg.svg2png(url=actual_chart_image, write_to=png_from_svg, scale=2.0)
+                        else:
+                            try:
+                                import subprocess
+                                
+                                try:
+                                    subprocess.run(['convert', '-density', '300', actual_chart_image, 
+                                                  '-quality', '100', png_from_svg], 
+                                                  check=True)
+                                except (subprocess.SubprocessError, FileNotFoundError):
+                                    png_from_svg = png_fallback
+                            except Exception:
+                                png_from_svg = png_fallback
+                        
+                        actual_chart_image = png_from_svg
+                        
+                        if os.path.exists(actual_chart_image):
+                            try:
+                                img = PILImage.open(actual_chart_image)
+                                img_width, img_height = img.size
+                                aspect_ratio = img_height / img_width
+                                
+                                if actual_chart_image.lower().endswith('.png'):
+                                    sharpener = ImageEnhance.Sharpness(img)
+                                    img = sharpener.enhance(1.5)
+                                    enhancer = ImageEnhance.Contrast(img)
+                                    img = enhancer.enhance(1.2)
+                                    img.save(actual_chart_image, format='PNG', compress_level=1, optimize=False)
+                            except Exception:
+                                pass
+                    except Exception:
+                        if os.path.exists(png_fallback):
+                            actual_chart_image = png_fallback
+                            try:
+                                img = PILImage.open(png_fallback)
+                                img_width, img_height = img.size
+                                aspect_ratio = img_height / img_width
+                            except Exception:
+                                pass
+                
+                elements.append(PageBreak())
+                elements.append(Paragraph("Time-Current Curves", styles['Heading2']))
+                
+                pdf_width = doc.width * 0.95
+                pdf_height = pdf_width * aspect_ratio
+                
+                elements.append(Image(actual_chart_image, width=pdf_width, height=pdf_height))
+                elements.append(Spacer(1, 0.1*inch))
+                
+                elements.append(Paragraph("Figure 1: Time-Current Characteristic Curves and Discrimination Margins", 
+                    ParagraphStyle('Caption', parent=styles['Normal'], fontSize=9, alignment=1)))
+                
+            except Exception:
+                import traceback
+                traceback.print_exc()
+                elements.append(Paragraph("Error displaying chart image", styles['Normal']))
+        else:
+            elements.append(Paragraph("Chart image not available", styles['Normal']))
+        
+        # Build the PDF
+        doc.build(elements)
+        
+        return pdf_file
+        
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        return ""
+
+def cleanup_temp_files(files_list):
+    """
+    Clean up temporary files created during PDF generation
+    
+    Args:
+        files_list (list): List of file paths to clean up
+    """
+    for temp_file in files_list:
+        if os.path.exists(temp_file):
+            try:
+                os.remove(temp_file)
+            except Exception:
+                pass
+''')
+        
+        # Now load the module dynamically
+        spec = importlib.util.spec_from_file_location("pdf_generator", pdf_generator_path)
+        pdf_generator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(pdf_generator)
+        generate_pdf = pdf_generator.generate_pdf
+        cleanup_temp_files = pdf_generator.cleanup_temp_files
+    except Exception:
+        # Define fallback functions in case import fails
+        import traceback
+        traceback.print_exc()
+        def generate_pdf(*args, **kwargs):
+            return ""
+        def cleanup_temp_files(*args, **kwargs):
+            pass
 
 class ResultsModel(QAbstractListModel):
     DataRole = Qt.UserRole + 1
@@ -20,16 +309,13 @@ class ResultsModel(QAbstractListModel):
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid() or index.row() >= len(self._results):
-            print(f"Invalid data access: index={index.row()}, role={role}")
             return None
         if role == self.DataRole or role == Qt.DisplayRole:
             result = self._results[index.row()]
-            print(f"Returning data for index {index.row()}: {result}")
             return result
         return None
 
     def setResults(self, results):
-        print(f"Setting new results: {results}")
         self.beginResetModel()
         self._results = results
         self.endResetModel()
@@ -51,6 +337,7 @@ class DiscriminationAnalyzer(QObject):
     relayCountChanged = Signal()
     marginChanged = Signal()
     exportComplete = Signal(str)
+    exportChart = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -78,27 +365,22 @@ class DiscriminationAnalyzer(QObject):
     def addRelay(self, relay_data):
         """Add a relay to the discrimination study"""
         if not all(key in relay_data for key in ['name', 'pickup', 'tds', 'curve_constants']):
-            print("Invalid relay data")
             return
-        print(f"Adding relay: {relay_data}")
         self._relays.append(relay_data)
         # Clear cache for this relay
         self._curve_points_cache.pop(relay_data['name'], None)
-        print(f"Total relays: {len(self._relays)}")
         self.relayCountChanged.emit()
         self._analyze_discrimination()
 
     @Slot(float)
     def addFaultLevel(self, current):
         """Add a fault current level to analyze"""
-        print(f"Adding fault level: {current}")
         self._fault_levels.append(current)
         self._analyze_discrimination()
 
     @Slot()
     def reset(self):
         """Reset all data"""
-        print("Resetting analyzer")
         self._relays.clear()
         self._fault_levels.clear()
         self._results_model.setResults([])
@@ -111,7 +393,6 @@ class DiscriminationAnalyzer(QObject):
     def removeRelay(self, index):
         """Remove a relay from the discrimination study"""
         if 0 <= index < len(self._relays):
-            print(f"Removing relay at index {index}")
             relay_name = self._relays[index]["name"]
             self._relays.pop(index)
             # Clear cache for this relay
@@ -121,47 +402,85 @@ class DiscriminationAnalyzer(QObject):
 
     @Slot(result=str)
     def exportResults(self):
-        """Export results to a JSON file"""
+        """Export results to a PDF file"""
         try:
-            # Create a data structure to export
-            export_data = {
-                "relays": self._relays,
-                "fault_levels": self._fault_levels,
-                "min_margin": self._min_margin,
-                "results": []
-            }
-            
-            # Get results from the model
-            for i in range(self._results_model.rowCount()):
-                index = self._results_model.index(i, 0)
-                result = self._results_model.data(index, self._results_model.DataRole)
-                if result:
-                    export_data["results"].append(result)
-            
-            # Create a timestamp for the filename
-            import datetime
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            
-            # Get home directory
+            # Create timestamp and filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             home_dir = os.path.expanduser("~")
             export_dir = os.path.join(home_dir, "Documents", "qmltest", "exports")
-            
-            # Create directory if it doesn't exist
             os.makedirs(export_dir, exist_ok=True)
             
-            # Create filename
-            filename = os.path.join(export_dir, f"discrimination_results_{timestamp}.json")
+            # Create chart image filename
+            chart_image = os.path.join(export_dir, f"chart_{timestamp}.svg")
+            png_fallback = os.path.join(export_dir, f"chart_{timestamp}.png")
+            pdf_file = os.path.join(export_dir, f"discrimination_results_{timestamp}.pdf")
             
-            # Write to file
-            with open(filename, 'w') as f:
-                json.dump(export_data, f, indent=2)
+            # Signal to QML to save chart image
+            self.exportChart.emit(chart_image)
             
-            print(f"Results exported to {filename}")
-            self.exportComplete.emit(filename)
-            return filename
+            # Wait for image to be saved
+            from PySide6.QtCore import QEventLoop, QTimer
+            loop = QEventLoop()
+            timer = QTimer()
+            timer.setSingleShot(True)
+            timer.timeout.connect(loop.quit)
+            timer.start(5000)
+            loop.exec()
             
-        except Exception as e:
-            print(f"Error exporting results: {e}")
+            # Additional check and wait if image not found
+            max_retries = 3
+            retry_count = 0
+            while not (os.path.exists(chart_image) or os.path.exists(png_fallback)) and retry_count < max_retries:
+                timer = QTimer()
+                timer.setSingleShot(True)
+                timer.timeout.connect(loop.quit)
+                timer.start(1000)
+                loop.exec()
+                retry_count += 1
+
+            # If SVG didn't save, try to manually create it
+            if not os.path.exists(chart_image) and os.path.exists(png_fallback):
+                svg_txt_backup = chart_image + ".txt"
+                
+                if os.path.exists(svg_txt_backup):
+                    try:
+                        with open(svg_txt_backup, 'r') as src:
+                            svg_content = src.read()
+                        with open(chart_image, 'w') as dst:
+                            dst.write(svg_content)
+                    except Exception:
+                        pass
+
+            # Use our PDF generator module to create the PDF
+            # Pass all required data to the generator
+            result = generate_pdf(
+                pdf_file=pdf_file,
+                relays=self._relays,
+                fault_levels=self._fault_levels,
+                results=self._results_model._results,
+                curve_types=self.CURVE_TYPES,
+                chart_image=chart_image,
+                png_fallback=png_fallback
+            )
+            
+            # Clean up all temporary files
+            temp_files = [
+                chart_image,
+                png_fallback,
+                chart_image + ".txt",
+                png_fallback.replace('.png', '_enhanced.png'),
+                png_fallback.replace('.png', '_optimized.png'),
+                chart_image.replace('.svg', '_rasterized.png')
+            ]
+            
+            cleanup_temp_files(temp_files)
+            
+            self.exportComplete.emit(result)
+            return result
+            
+        except Exception:
+            import traceback
+            traceback.print_exc()
             self.exportComplete.emit("")
             return ""
 
@@ -293,11 +612,9 @@ class DiscriminationAnalyzer(QObject):
         return self._chart_ranges
 
     def _analyze_discrimination(self):
-        print(f"Starting discrimination analysis...")
         results = []
         
         if len(self._relays) < 2 or not self._fault_levels:
-            print(f"Not enough data: relays={len(self._relays)}, fault_levels={len(self._fault_levels)}")
             self._results_model.setResults([])
             self.analysisComplete.emit()
             return
@@ -319,7 +636,6 @@ class DiscriminationAnalyzer(QObject):
             
             # Check margin at each fault level
             for fault_current in self._fault_levels:
-                print(f"Analyzing fault current: {fault_current}")
                 if not fault_current or fault_current <= 0:
                     continue
 
@@ -344,7 +660,6 @@ class DiscriminationAnalyzer(QObject):
                 results.append(result)
         
         self._results_model.setResults(results)
-        print(f"Analysis complete with {len(results)} results")
         self.analysisComplete.emit()
 
     def _calculate_operating_time(self, relay, fault_current):
@@ -352,7 +667,6 @@ class DiscriminationAnalyzer(QObject):
         try:
             pickup = float(relay["pickup"])
             if pickup <= 0:
-                print(f"Invalid pickup current: {pickup}")
                 return None
                 
             multiple = fault_current / pickup
@@ -365,14 +679,12 @@ class DiscriminationAnalyzer(QObject):
             # Calculation using the standard formula
             denominator = (multiple ** constants["b"]) - 1
             if denominator <= 0:
-                print(f"Invalid calculation: multiple={multiple}, b={constants['b']}, denominator={denominator}")
                 return None
                 
             time = (constants["a"] * tds) / denominator
             return time if time >= 0 else None
             
-        except Exception as e:
-            print(f"Error in relay time calculation: {e}")
+        except Exception:
             return None
 
     @Property(QObject, notify=analysisComplete)
@@ -407,3 +719,13 @@ class DiscriminationAnalyzer(QObject):
     def faultLevels(self):
         """Provide access to fault levels from QML"""
         return self._fault_levels
+
+    @Slot(str, str)
+    def saveSvgContent(self, svg_content, filename):
+        """Save SVG content to a file directly from Python"""
+        try:
+            with open(filename, 'w') as file:
+                file.write(svg_content)
+            return True
+        except Exception:
+            return False
