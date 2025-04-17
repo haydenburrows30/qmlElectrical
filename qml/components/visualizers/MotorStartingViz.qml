@@ -6,8 +6,8 @@ import QtQuick.Controls.Universal
 import "../style"
 
 WaveCard {
-    Layout.fillHeight: true
-    Layout.fillWidth: true
+    // Layout.fillHeight: true
+    // Layout.fillWidth: true
     title: "Starting Current Profile"
 
     property bool darkMode: false

@@ -250,7 +250,7 @@ Item {
         Flickable {
             id: flickableContainer
             contentWidth: parent.width
-            contentHeight: mainLayout.height
+            contentHeight: parent.height + 20
             bottomMargin : 5
             leftMargin : 5
             rightMargin : 5
@@ -260,9 +260,11 @@ Item {
                 id: mainLayout
                 width: flickableContainer.width - 20
 
-                //buttons
+                // buttons
                 RowLayout {
-                    Layout.fillWidth: true
+                    // Layout.fillWidth: true
+                    Layout.maximumWidth: inputResultsLayout.width
+                    Layout.alignment: Qt.AlignHCenter
                     Layout.bottomMargin: 5
                     Layout.leftMargin: 5
 
@@ -299,7 +301,7 @@ Item {
                         }
                     }
                 }
-
+                // comparison tabbar
                 TabBar {
                     id: comparisonTabBar
                     Layout.fillWidth: true
@@ -330,7 +332,7 @@ Item {
                             // Don't set width here - it will be set by updateTabWidths()
                         }
                     }
-                    
+
                     onCurrentIndexChanged: {
                         if (compareMode) {
                             activeComparisonTab = currentIndex
@@ -339,27 +341,29 @@ Item {
                     }
                 }
 
+                // Comparison mode button
                 RowLayout {
                     visible: compareMode
-                    Layout.fillWidth: true
-                    
-                    Item { Layout.fillWidth: true }
-                    
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.minimumWidth: inputResultsLayout.width
+
                     StyledButton {
                         text: "Exit Comparison Mode"
                         onClicked: clearComparison()
                     }
                 }
 
+                // Inputs and results
                 RowLayout {
-                    Layout.minimumWidth: 800
+                    id: inputResultsLayout
+                    Layout.alignment: Qt.AlignHCenter
 
                     WaveCard {
                         id: input
                         title: "Motor Parameters"
                         Layout.minimumHeight: 600
-                        Layout.fillWidth: true
-                    
+                        Layout.minimumWidth: 500
+
                         GridLayout {
                             columns: 2
                             anchors.fill: parent
@@ -369,7 +373,7 @@ Item {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                
+
                                 ComboBoxRound {
                                     id: motorType
                                     model: ["Induction Motor", "Synchronous Motor", "Wound Rotor Motor", 
@@ -381,7 +385,7 @@ Item {
                                         }
                                     }
                                 }
-                                
+
                                 StyledButton {
                                     text: "ⓘ"
                                     implicitWidth: 30
@@ -403,7 +407,7 @@ Item {
                                 validator: DoubleValidator { bottom: 0 ; top: 999 }
                                 maximumLength: 4
                             }
-                            
+
                             Label {
                                 text: "Voltage (V):"
                                 Layout.fillWidth: true
@@ -416,9 +420,10 @@ Item {
                                 onTextChanged: if(text.length > 0) calculator.setVoltage(parseFloat(text))
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignRight
-                                validator: DoubleValidator { bottom: 0; top: 15000 }
+                                validator: 
+                                    DoubleValidator { bottom: 0; top: 15000 }
                             }
-                            
+
                             Label {
                                 text: "Efficiency (%):"
                                 Layout.fillWidth: true
@@ -459,15 +464,15 @@ Item {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                
+
                                 ComboBoxRound {
                                     id: motorSpeed
                                     model: ["1500 RPM (4 Pole 50Hz)", "3000 RPM (2 Pole 50Hz)", 
                                             "1000 RPM (6 Pole 50Hz)", "750 RPM (8 Pole 50Hz)"]
                                     Layout.fillWidth: true
-                                    
+
                                     Component.onCompleted: currentIndex = 0
-                                    
+
                                     onCurrentTextChanged: {
                                         if (currentText) {
                                             let rpm = parseInt(currentText.match(/\d+/)[0])
@@ -476,7 +481,7 @@ Item {
                                     }
                                 }
                             }
-                            
+
                             Label {
                                 text: "Starting Method:"
                                 Layout.fillWidth: true
@@ -484,18 +489,18 @@ Item {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                
+
                                 ComboBoxRound {
                                     id: startingMethod
                                     model: ["DOL", "Star-Delta", "Soft Starter", "VFD"]
                                     Layout.fillWidth: true
-                                    
+
                                     delegate: ItemDelegate {
                                         width: startingMethod.width
                                         text: modelData
                                         highlighted: startingMethod.highlightedIndex === index
                                         enabled: calculator.isMethodApplicable(modelData)
-                                        
+
                                         contentItem: Text {
                                             text: modelData
                                             color: enabled ? Universal.foreground : Universal.foreground + "80"
@@ -503,7 +508,7 @@ Item {
                                             verticalAlignment: Text.AlignVCenter
                                         }
                                     }
-                                    
+
                                     onCurrentTextChanged: {
                                         if (currentText && calculator.isMethodApplicable(currentText)) {
                                             console.log("Selecting starting method:", currentText)
@@ -512,7 +517,7 @@ Item {
                                     }
                                 }
                             }
-                            
+
                             Label {
                                 text: "Starting Duration (s):"
                                 Layout.fillWidth: true
@@ -531,7 +536,7 @@ Item {
                                     if(text.length > 0) calculator.setStartingDuration(parseFloat(text))
                                 }
                             }
-                            
+
                             Label {
                                 text: "Ambient Temp (°C):"
                                 Layout.fillWidth: true
@@ -550,7 +555,7 @@ Item {
                                     if(text.length > 0) calculator.setAmbientTemperature(parseFloat(text))
                                 }
                             }
-                            
+
                             Label {
                                 text: "Duty Cycle:"
                                 Layout.fillWidth: true
@@ -567,7 +572,7 @@ Item {
                                     calculator.setDutyCycle(currentText)
                                 }
                             }
-                            
+
                             StyledButton {
                                 text: "Calculate"
                                 Layout.columnSpan: 2
@@ -575,7 +580,7 @@ Item {
                                 Layout.topMargin: 5
                                 enabled: hasValidInputs
                                 icon.source: "../../../icons/rounded/calculate.svg"
-                                
+
                                 onClicked: {
                                     if (hasValidInputs) {
                                         calculator.setMotorPower(parseFloat(motorPower.text))
@@ -592,7 +597,7 @@ Item {
 
                     WaveCard {
                         title: "Results"
-                        Layout.fillWidth: true
+                        Layout.minimumWidth: 500
                         Layout.minimumHeight: input.height
 
                         GridLayout {
@@ -749,7 +754,8 @@ Item {
                 }
 
                 MotorStartingViz {
-                    Layout.minimumWidth: mainLayout.width
+                    Layout.minimumWidth: inputResultsLayout.width
+                    Layout.alignment: Qt.AlignHCenter
                     Layout.minimumHeight: 400
 
                     darkMode: window.modeToggled
