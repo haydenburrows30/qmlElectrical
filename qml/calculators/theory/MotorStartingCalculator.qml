@@ -132,7 +132,7 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
                 
-                Text {
+                Label {
                     text: "Select methods to compare:"
                     font.bold: true
                 }
@@ -152,7 +152,7 @@ Item {
                             onCheckedChanged: methodModel.setProperty(index, "checked", checked)
                         }
                         
-                        Text {
+                        Label {
                             visible: !calculator.isMethodApplicable(model.name)
                             text: "(Not applicable for this motor)"
                             color: "gray"
@@ -189,13 +189,13 @@ Item {
         ColumnLayout {
             anchors.fill: parent
             
-            Text {
+            Label {
                 text: messagePopup.title
                 font.bold: true
                 font.pixelSize: 16
             }
             
-            Text {
+            Label {
                 text: messagePopup.message
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
