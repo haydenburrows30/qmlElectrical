@@ -250,7 +250,7 @@ Item {
         Flickable {
             id: flickableContainer
             contentWidth: parent.width
-            contentHeight: parent.height + 20
+            contentHeight: mainLayout.height + 20
             bottomMargin : 5
             leftMargin : 5
             rightMargin : 5
@@ -511,7 +511,6 @@ Item {
 
                                     onCurrentTextChanged: {
                                         if (currentText && calculator.isMethodApplicable(currentText)) {
-                                            console.log("Selecting starting method:", currentText)
                                             calculator.setStartingMethod(currentText)
                                         }
                                     }
