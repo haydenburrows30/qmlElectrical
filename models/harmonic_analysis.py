@@ -651,17 +651,27 @@ class HarmonicAnalysisCalculator(QObject):
 
     @Slot(result=bool)
     def exportData(self):
-        """Export harmonic data to CSV file."""
+        """Export harmonic data to CSV file using default location."""
+        # Default to Documents folder
+        export_dir = os.path.expanduser("~/Documents/harmonics_export")
+        return self._exportDataToFolder(export_dir)
+
+    @Slot(str, result=bool)
+    def exportDataToFolder(self, folder_path):
+        """Export harmonic data to CSV file in the specified folder."""
+        return self._exportDataToFolder(folder_path)
+    
+    def _exportDataToFolder(self, export_dir):
+        """Internal method to export data to the specified folder."""
         try:
             # Create directory if it doesn't exist
-            export_dir = os.path.expanduser("~/Documents/harmonics_export")
             os.makedirs(export_dir, exist_ok=True)
             
             # Generate filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{export_dir}/harmonics_data_{timestamp}.csv"
             
-            # Create directory if it doesn't exist
+            # Create CSV file
             with open(filename, 'w', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(['Harmonic Order', 'Magnitude (%)', 'Phase (degrees)'])

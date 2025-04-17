@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
+import QtQuick.Dialogs
 
 import "../../components"
 import "../../components/buttons"
@@ -46,6 +47,61 @@ Item {
         }
     }
 
+    FolderDialog {
+        id: folderDialog
+        title: "Choose Export Directory"
+        onAccepted: {
+            var folderPath = folderDialog.selectedFolder.toString();
+            if (folderPath.startsWith("file://")) {
+                folderPath = folderPath.substring(7);
+                if (Qt.platform.os === "windows" && folderPath.startsWith("/") && folderPath.charAt(2) === ":") {
+                    folderPath = folderPath.substring(1);
+                }
+            }
+            var success = calculator.exportDataToFolder(folderPath);
+            if (success) {
+                exportStatusPopup.status = "success";
+                exportStatusPopup.message = "Export successful!";
+            } else {
+                exportStatusPopup.status = "error";
+                exportStatusPopup.message = "Export failed. Check console for details.";
+            }
+            exportStatusPopup.open();
+        }
+    }
+    
+    Popup {
+        id: exportStatusPopup
+        width: 300
+        height: 100
+        anchors.centerIn: parent
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property string status: "success"
+        property string message: ""
+        
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            
+            Label {
+                text: exportStatusPopup.message
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
+                color: exportStatusPopup.status === "success" ? "green" : "red"
+                font.bold: true
+            }
+            
+            Button {
+                text: "OK"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: exportStatusPopup.close()
+            }
+        }
+    }
+
     PopUpText {
         id: popUpText
         parentCard: results
@@ -61,7 +117,6 @@ Item {
         id: mainLayout
         anchors.fill: parent
 
-        // Header with title and help button
         RowLayout {
             Layout.fillWidth: true
             Layout.bottomMargin: 5
@@ -111,35 +166,62 @@ Item {
                     }
                 }
                 
-                // Export buttons
-                StyledButton {
-                    text: "Export Data"
-                    icon.source: "../../../icons/rounded/download.svg"
+                RowLayout {
                     Layout.fillWidth: true
-                    onClicked: {
-                        calculator.exportData()
-                    }
-                    ToolTip.text: "Export harmonic data to CSV"
-                    ToolTip.visible: exportMouseArea.containsMouse
-                    ToolTip.delay: 500
                     
-                    MouseArea {
-                        id: exportMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        propagateComposedEvents: true
-                        onPressed: function(mouse) { mouse.accepted = false }
+                    StyledButton {
+                        text: "Quick Export"
+                        icon.source: "../../../icons/rounded/download.svg"
+                        Layout.fillWidth: true
+                        onClicked: {
+                            var success = calculator.exportData();
+                            if (success) {
+                                exportStatusPopup.status = "success";
+                                exportStatusPopup.message = "Export successful to Documents folder!";
+                                exportStatusPopup.open();
+                            } else {
+                                exportStatusPopup.status = "error";
+                                exportStatusPopup.message = "Export failed. Check console for details.";
+                                exportStatusPopup.open();
+                            }
+                        }
+                        ToolTip.text: "Export to default location (~/Documents/harmonics_export)"
+                        ToolTip.visible: quickExportMouseArea.containsMouse
+                        ToolTip.delay: 500
+                        
+                        MouseArea {
+                            id: quickExportMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            propagateComposedEvents: true
+                            onPressed: function(mouse) { mouse.accepted = false }
+                        }
+                    }
+                    
+                    StyledButton {
+                        text: "Browse..."
+                        icon.source: "../../../icons/rounded/folder_open.svg"
+                        Layout.fillWidth: true
+                        onClicked: folderDialog.open()
+                        ToolTip.text: "Choose folder to export data"
+                        ToolTip.visible: browseMouseArea.containsMouse
+                        ToolTip.delay: 500
+                        
+                        MouseArea {
+                            id: browseMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            propagateComposedEvents: true
+                            onPressed: function(mouse) { mouse.accepted = false }
+                        }
                     }
                 }
-                
             }
 
-            // Right Panel - Visualizations
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 
-                // Waveform Chart
                 WaveCard {
                     id: waveformCard
                     title: "Waveform"
