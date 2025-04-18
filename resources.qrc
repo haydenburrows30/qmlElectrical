@@ -22,6 +22,8 @@
     <file>qml/calculators/cable/CableAmpacityCalculator.qml</file>
     <file>qml/calculators/cable/ChargingCurrentCalculator.qml</file>
     <file>qml/calculators/cable/TransmissionLineCalculator.qml</file>
+    <file>qml/calculators/cable/NetworkCabinetCalculator.qml</file>
+    <file>qml/calculators/cable/NetworkCabinetConfig.qml</file>
 
     <!-- Calculators: Protection -->
     <file>qml/calculators/protection/BatteryCalculator.qml</file>
@@ -134,6 +136,7 @@
     <file>qml/components/visualizers/RLCSeriesParallelViz.qml</file>
     <file>qml/components/visualizers/SwitchboardDiagram.qml</file>
     <file>qml/components/visualizers/TransmissionLineViz.qml</file>
+    <file>qml/components/visualizers/NetworkCabinetDiagram.qml</file>
 
     <!-- Voltage Drop -->
     <file>qml/calculators/voltage_drop/CableSelectionSettings.qml</file>

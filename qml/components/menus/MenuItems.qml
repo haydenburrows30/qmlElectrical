@@ -38,7 +38,8 @@ QtObject {
         { name: qsTr("Switchboard"), source: "calculators/cable/SwitchboardPanel.qml", icon: "power" },
         { name: qsTr("Transmission Line"), source: "calculators/cable/TransmissionLineCalculator.qml", icon: "cell_tower" },
         { name: qsTr("Voltage Drop"), source: "calculators/cable/VoltageDropCalculator.qml", icon: "bolt" },
-        { name: qsTr("Voltage Drop Orion"), source: "calculators/cable/VoltageDrop.qml", icon: "bolt" }
+        { name: qsTr("Voltage Drop Orion"), source: "calculators/cable/VoltageDrop.qml", icon: "bolt" },
+        { name: qsTr("Network Cabinet"), source: "calculators/cable/NetworkCabinetCalculator.qml", icon: "bolt" }
     ]
 
     property var theory: [
