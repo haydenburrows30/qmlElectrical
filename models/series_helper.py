@@ -1,5 +1,6 @@
-from PySide6.QtCore import QObject, Slot, QPointF
+from PySide6.QtCore import QObject, Slot, QPointF, QThread, Signal, QMetaObject, Qt, Q_ARG
 from PySide6.QtCharts import QXYSeries
+
 import numpy as np
 
 class SeriesHelper(QObject):
@@ -88,9 +89,7 @@ class SeriesHelper(QObject):
             x_preview, y_preview = self.downsample(x_values, y_values, min_points)
             self.fillSeriesFromArrays(series, x_preview, y_preview)
             
-            # Then schedule full-resolution update using a safer approach
-            from PySide6.QtCore import QThread, Signal, QObject
-            
+           
             class DownsampleWorker(QObject):
                 resultReady = Signal(list, list)
                 

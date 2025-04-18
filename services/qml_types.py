@@ -4,43 +4,43 @@ from PySide6.QtQml import qmlRegisterSingletonType, qmlRegisterType
 import os
 
 from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
-from models.real_time_chart import RealTimeChart
-from models.calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
-from models.transformer_calculator import TransformerCalculator
-from models.voltage_drop_calculator import VoltageDropCalc
-from models.motor_calculator import MotorCalculator
-from models.power_factor_correction import PowerFactorCorrectionCalculator
-from models.cable_ampacity import CableAmpacityCalculator
-from models.protection_relay import ProtectionRelayCalculator
-from models.harmonic_analysis import HarmonicAnalysisCalculator
-from models.instrument_transformer import InstrumentTransformerCalculator
-from models.discrimination_analyzer import DiscriminationAnalyzer
-from models.charging_calculator import ChargingCalculator
-from models.battery_calculator import BatteryCalculator
-from models.machine_calculator import MachineCalculator
-from models.earthing_calculator import EarthingCalculator
-from models.transmission_calculator import TransmissionLineCalculator
-from models.delta_transformer import DeltaTransformerCalculator
-from models.switchboard_manager import SwitchboardManager
-from models.wind_turbine_calculator import WindTurbineCalculator
-from models.transformer_line_calculator import TransformerLineCalculator
-from models.fault_current_calculator import FaultCurrentCalculator
-from models.ref_rgf_calculator import RefRgfCalculator
-from models.voltage_divider_calculator import VoltageDividerCalculator
-from models.ohms_law_calculator import OhmsLawCalculator
+from models.theory.real_time_chart import RealTimeChart
+from models.basic.calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
+from models.theory.transformer_calculator import TransformerCalculator
+from models.cable.voltage_drop_calculator import VoltageDropCalc
+from models.theory.motor_calculator import MotorCalculator
+from models.basic.power_factor_correction import PowerFactorCorrectionCalculator
+from models.cable.cable_ampacity import CableAmpacityCalculator
+from models.protection.protection_relay import ProtectionRelayCalculator
+from models.theory.harmonic_analysis import HarmonicAnalysisCalculator
+from models.theory.instrument_transformer import InstrumentTransformerCalculator
+from models.protection.discrimination_analyzer import DiscriminationAnalyzer
+from models.cable.charging_calculator import ChargingCalculator
+from models.protection.battery_calculator import BatteryCalculator
+from models.theory.machine_calculator import MachineCalculator
+from models.protection.earthing_calculator import EarthingCalculator
+from models.protection.transmission_calculator import TransmissionLineCalculator
+from models.protection.delta_transformer import DeltaTransformerCalculator
+from models.cable.switchboard_manager import SwitchboardManager
+from models.grid_wind.wind_turbine_calculator import WindTurbineCalculator
+from models.protection.transformer_line_calculator import TransformerLineCalculator
+from models.protection.fault_current_calculator import FaultCurrentCalculator
+from models.protection.ref_rgf_calculator import RefRgfCalculator
+from models.basic.voltage_divider_calculator import VoltageDividerCalculator
+from models.basic.ohms_law_calculator import OhmsLawCalculator
 from models.series_helper import SeriesHelper
-from models.three_phase import ThreePhaseSineWaveModel
-from models.rlc import RLCChart
-from models.overcurrent_calculator import OvercurrentProtectionCalculator
+from models.theory.three_phase import ThreePhaseSineWaveModel
+from models.theory.rlc import RLCChart
+from models.protection.overcurrent_calculator import OvercurrentProtectionCalculator
 from utils.about_program import ConfigBridge
-from models.solkor_rf_calculator import SolkorRfCalculator
-from models.vr32_cl7_calculator import VR32CL7Calculator
-from models.results_manager import ResultsManager
+from models.protection.solkor_rf_calculator import SolkorRfCalculator
+from models.grid_wind.vr32_cl7_calculator import VR32CL7Calculator
+from models.voltdrop.results_manager import ResultsManager
 from utils.logger import QLogManager
-from models.transformer_naming import TransformerNamingGuide
-from models.base_impedance_calculator import BaseImpedanceCalculator
-from models.per_unit_impedance_calculator import PerUnitImpedanceCalculator
-from models.network_cabinet_calculator import NetworkCabinetCalculator
+from models.theory.transformer_naming import TransformerNamingGuide
+from models.basic.base_impedance_calculator import BaseImpedanceCalculator
+from models.basic.per_unit_impedance_calculator import PerUnitImpedanceCalculator
+from models.cable.network_cabinet_calculator import NetworkCabinetCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
