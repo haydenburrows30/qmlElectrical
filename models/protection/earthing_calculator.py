@@ -242,5 +242,3 @@ class EarthingCalculator(QObject):
     @Slot(float)
     def setFaultDuration(self, value):
         self.faultDuration = value
-
-    # ... similar slots for other setters ...

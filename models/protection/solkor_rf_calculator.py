@@ -1,11 +1,5 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Slot, Signal, Property
-import os
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.platypus import Spacer
+from utils.pdf_generator_solkor_rf import SolkorRfPdfGenerator
 
 class SolkorRfCalculator(QAbstractTableModel):
 
@@ -387,199 +381,32 @@ class SolkorRfCalculator(QAbstractTableModel):
 
     @Slot(str)
     def exportToPdf(self, filePath):
-        """Export the table data to a PDF file using ReportLab."""
+        """Export the table data to a PDF file."""
         try:
-            print(f"Raw filePath received: '{filePath}'")
+            # Gather site information for the PDF
+            site_info = {
+                'site_name_relay1': self._site_name_relay1,
+                'site_name_relay2': self._site_name_relay2,
+                'serial_number_relay1': self._serial_number_relay1,
+                'serial_number_relay2': self._serial_number_relay2,
+                'loop_resistance': self._loop_resistance,
+                'l1_l2_e': self._l1_l2_e,
+                'l2_l1_e': self._l2_l1_e,
+                'padding_resistance': self.get_padding_resistance(),
+                'std_padding_resistance': self.get_standard_padding_resistance()
+            }
             
-            if filePath.startswith("file:///"):
-                if ':' in filePath[8:]:
-                    filePath = filePath[8:]
-                else:
-                    filePath = filePath[7:]
-                print(f"Removed file prefix: '{filePath}'")
-
-            if not filePath:
-                raise ValueError("Empty file path provided")
-
-            if not os.path.isabs(filePath):
-                filePath = os.path.abspath(filePath)
-                print(f"Converted to absolute path: '{filePath}'")
-
-            if filePath.startswith('/') and ':' in filePath[1:3]:
-                filePath = filePath[1:]
-                print(f"Removed leading slash from Windows path: '{filePath}'")
-
-            directory = os.path.dirname(filePath)
-            print(f"Directory path: '{directory}'")
-            if not os.path.exists(directory):
-                print(f"Directory doesn't exist, creating: '{directory}'")
-                os.makedirs(directory)
-
-            if not filePath.lower().endswith('.pdf'):
-                filePath += '.pdf'
-                print(f"Added .pdf extension: '{filePath}'")
-                
-            print(f"Final path for PDF: '{filePath}'")
-
-            try:
-                with open(filePath + ".test", 'w') as f:
-                    f.write("Test")
-                os.remove(filePath + ".test")
-                print("Write test successful")
-            except Exception as e:
-                print(f"Write test failed: {e}")
-                raise ValueError(f"Cannot write to the specified location: {e}")
-
-            print(f"Creating PDF document at: {filePath}")
-            doc = SimpleDocTemplate(filePath, pagesize=landscape(A4), 
-                                   rightMargin=12*mm, leftMargin=12*mm,
-                                   topMargin=12*mm, bottomMargin=12*mm)
+            # Call the PDF generator
+            success, result = SolkorRfPdfGenerator.generate_pdf(
+                filePath, 
+                self.data_matrix,
+                self.headers,
+                self.row_headers,
+                site_info
+            )
             
-            elements = []
-            
-            styles = getSampleStyleSheet()
-            title_style = styles['Title']
-            title_style.alignment = 1
-            title_style.fontSize = 16
-            title = Paragraph("SOLKOR Rf with N", title_style)
-            elements.append(title)
-            elements.append(Spacer(1, 8))
-
-            site_info = []
-            if self._site_name_relay1 or self._site_name_relay2 or self._serial_number_relay1 or self._serial_number_relay2 or self._loop_resistance or self._l1_l2_e or self._l2_l1_e:
-
-                padding_res = self.get_padding_resistance()
-                std_padding_res = self.get_standard_padding_resistance()
-                
-                site_info_data = [
-                    ["Site Name Relay 1:", self._site_name_relay1, "Site Name Relay 2:", self._site_name_relay2],
-                    ["Serial Number Relay 1:", self._serial_number_relay1, "Serial Number Relay 2:", self._serial_number_relay2],
-                    ["Loop Resistance:", self._loop_resistance, "Padding Resistance:", padding_res],
-                    ["L1-L2+E:", self._l1_l2_e, "L2-L1+E:", self._l2_l1_e],
-                    ["Std Padding Resistance:", std_padding_res, "", ""]
-                ]
-
-                col_widths = [150, 180, 150, 180]
-                site_info = Table(site_info_data, colWidths=col_widths)
-                site_info.setStyle(TableStyle([
-                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                    ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 9),
-                    ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-                    ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                    ('TOPPADDING', (0, 0), (-1, -1), 6),
-                    ('LEFTPADDING', (0, 0), (-1, -1), 5),
-                    ('RIGHTPADDING', (0, 0), (-1, -1), 5),
-                    ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
-                    ('BACKGROUND', (0, 0), (-1, -1), colors.white),
-                ]))
-                
-                elements.append(site_info)
-                elements.append(Spacer(1, 10))
-
-            data = []
-            
-            header_style = styles['Normal']
-            header_style.alignment = 1
-            header_style.fontName = 'Helvetica-Bold'
-            header_style.fontSize = 9
-
-            header_paragraphs = []
-            for header in self.headers:
-                header_paragraphs.append(Paragraph(header, header_style))
-
-            header_row = [Paragraph('Fault Type', header_style)] + header_paragraphs
-            data.append(header_row)
-
-            for row_idx, row_header in enumerate(self.row_headers):
-                row_data = [row_header]
-                for col_idx in range(len(self.headers)):
-                    row_data.append(str(self.data_matrix[row_idx][col_idx]))
-                data.append(row_data)
-
-            first_col_width = 65
-            data_col_width = 90
-            col_widths = [first_col_width] + [data_col_width] * len(self.headers)
-            
-            table = Table(data, colWidths=col_widths, rowHeights=[45] + [30] * len(self.row_headers))
-
-            style = TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Header row
-                ('BACKGROUND', (0, 1), (0, -1), colors.lightgrey),  # Row headers column
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 9),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-                ('TOPPADDING', (0, 0), (-1, -1), 5),
-                ('LEFTPADDING', (0, 0), (-1, -1), 4),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 4),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('BACKGROUND', (-1, 1), (-1, -1), colors.whitesmoke),
-            ])
-
-            out_of_spec_color = colors.HexColor('#ffe0e0')
-            ok_color = colors.HexColor('#e0ffe0')
-            
-            # Add cell background colors based on value checks
-            for row_idx in range(6):
-                for col_idx in range(7):
-                    if col_idx == 6:
-                        continue
-                    
-                    cell_value = 0
-                    try:
-                        cell_value = float(self.data_matrix[row_idx][col_idx])
-                    except (ValueError, TypeError):
-                        continue
-                    
-                    # Skip empty cells
-                    if cell_value == 0:
-                        continue
-
-                    table_col_idx = col_idx + 1
-                    is_out_of_spec = False
-                    is_ok = False
-                    
-                    # For mA DC columns (1, 2, 4, 5) - Check against 11 mA reference
-                    if col_idx in [1, 2, 4, 5]:
-                        if abs(cell_value - 11.0) > 0.5:
-                            is_out_of_spec = True
-                        else:
-                            is_ok = True
-                    
-                    # For injection current columns (0, 3) - Check against fault setting
-                    elif col_idx in [0, 3]:
-                        fault_setting = float(self.data_matrix[row_idx][6])
-                        if fault_setting > 0:
-                            percentage = (cell_value / fault_setting) * 100
-                            if percentage < 90 or percentage > 110:
-                                is_out_of_spec = True
-                            else:
-                                is_ok = True
-
-                    if is_out_of_spec:
-                        style.add('BACKGROUND', (table_col_idx, row_idx + 1), (table_col_idx, row_idx + 1), out_of_spec_color)
-                    elif is_ok:
-                        style.add('BACKGROUND', (table_col_idx, row_idx + 1), (table_col_idx, row_idx + 1), ok_color)
-            
-            table.setStyle(style)
-            
-            elements.append(table)
-
-            doc.build(elements)
-            
-            print(f"PDF successfully saved to: '{filePath}'")
-            print(f"File exists after save: {os.path.exists(filePath)}")
-            print(f"File size: {os.path.getsize(filePath)} bytes")
-            
-            self.pdfSaved.emit(True, filePath)
-            return True
+            self.pdfSaved.emit(success, result)
+            return success
         except Exception as e:
             import traceback
             traceback.print_exc()

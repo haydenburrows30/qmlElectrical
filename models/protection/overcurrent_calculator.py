@@ -669,7 +669,6 @@ class OvercurrentProtectionCalculator(QObject):
             self.cableInstallationChanged.emit()
             self._calculate()
 
-    # Add these new property definitions after your other properties
     @Property(float, notify=cableRChanged)
     def cableR(self):
         """Get cable R value with safe default"""

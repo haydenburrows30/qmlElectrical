@@ -34,7 +34,7 @@ from models.theory.rlc import RLCChart
 from models.protection.overcurrent_calculator import OvercurrentProtectionCalculator
 from utils.about_program import ConfigBridge
 from models.protection.solkor_rf_calculator import SolkorRfCalculator
-from models.grid_wind.vr32_cl7_calculator import VR32CL7Calculator
+from models.protection.vr32_cl7_calculator import VR32CL7Calculator
 from models.voltdrop.results_manager import ResultsManager
 from utils.logger import QLogManager
 from models.theory.transformer_naming import TransformerNamingGuide
