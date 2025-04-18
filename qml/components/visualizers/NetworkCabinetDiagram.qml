@@ -51,31 +51,15 @@ Item {
             ctx.lineWidth = 2;
             
             // Main cabinet body
-            ctx.fillRect(width * 0.1, height * 0.1, width * 0.8, height * 0.8);
-            ctx.strokeRect(width * 0.1, height * 0.1, width * 0.8, height * 0.8);
-            
-            // Cabinet title
-            ctx.fillStyle = textColor;
-            ctx.font = "bold 16px sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText("DC-M1 Network Cabinet", width * 0.5, height * 0.05);
+            ctx.fillRect(width * 0.15, height * 0.05, width * 0.7, height * 0.8);
+            ctx.strokeRect(width * 0.15, height * 0.05, width * 0.7, height * 0.8);
             
             // Calculate positions for disconnectors
             var cabinetWidth = width * 0.8;
             var cabinetHeight = height * 0.8;
             var cabinetX = width * 0.1;
             var cabinetY = height * 0.1;
-            
-            // Draw input feed at top
-            ctx.fillStyle = "#aa0000";
-            ctx.beginPath();
-            ctx.moveTo(width * 0.5, cabinetY);
-            ctx.lineTo(width * 0.45, cabinetY - height * 0.05);
-            ctx.lineTo(width * 0.55, cabinetY - height * 0.05);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
+
             // Calculate spacing for vertical disconnectors
             var disconnectorWidth = cabinetWidth * 0.15;
             var disconnectorHeight = cabinetHeight * 0.6;
@@ -472,7 +456,7 @@ Item {
                 // Small distribution board on left side
                 var panelWidth = cabinetWidth * 0.15;
                 var panelHeight = cabinetHeight * 0.25;
-                var panelX = cabinetX - panelWidth * 0.8;
+                var panelX = cabinetX - panelWidth * 0.6;
                 var panelY = cabinetY + cabinetHeight * 0.4;
                 
                 // Draw the panel box
@@ -538,9 +522,10 @@ Item {
             // Draw local service disconnects if enabled
             if (showServicePanel) {
                 // Service panel on right side
+                
                 var servicePanelWidth = cabinetWidth * 0.15;
                 var servicePanelHeight = cabinetHeight * 0.4;
-                var servicePanelX = cabinetX + cabinetWidth + servicePanelWidth * 0.2;
+                var servicePanelX = cabinetX + cabinetWidth - servicePanelWidth * 0.4;
                 var servicePanelY = cabinetY + cabinetHeight * 0.3;
                 
                 // Draw the panel box
@@ -558,8 +543,8 @@ Item {
                 
                 // Draw Fuse Disconnects
                 var fuseWidth = servicePanelWidth * 0.7;
-                var fuseHeight = servicePanelHeight * 0.25;
-                var fuseSpacing = servicePanelHeight * 0.15;
+                var fuseHeight = servicePanelHeight * 0.2;
+                var fuseSpacing = servicePanelHeight * 0.1;
                 var fuseX = servicePanelX + (servicePanelWidth - fuseWidth) / 2;
                 var fuseY = servicePanelY + servicePanelHeight * 0.1;
                 
@@ -574,7 +559,7 @@ Item {
                     ctx.fillStyle = "#ffffff";
                     ctx.font = "8px sans-serif";
                     ctx.textAlign = "center";
-                    var fuseRating = (k === 0) ? "160A" : (k === 1) ? "100A" : "50A";
+                    var fuseRating = "63A" //(k === 0) ? "160A" : (k === 1) ? "100A" : "50A";
                     ctx.fillText(fuseRating + " Fuse", fuseX + fuseWidth/2, fuseY + fuseHeight/2 + 3);
                     
                     // Cable out to right

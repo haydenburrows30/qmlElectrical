@@ -1,11 +1,17 @@
+# QT for Python
 PySide6==6.9.0
 PySide6-Addons==6.9.0
 PySide6-Essentials==6.9.0
-numpy==2.2.4
+
+# PDF generation
 reportlab
+
+# Other dependencies
+numpy==2.2.4
 psutil
 tabulate
 scipy
 pandas
 matplotlib
 cairosvg
+Pillow
