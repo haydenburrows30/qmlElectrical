@@ -89,8 +89,16 @@ Item {
                                             ratingCombo.model = ratings
                                             breakingCapacity.text = device.breaking_capacity
                                             
-                                            // Update breakerCurveCombo visibility immediately
+                                            // Update breaker curve visibility and reset to default
                                             breakerCurveCombo.visible = device.type === "MCB"
+                                            if (device.type === "MCB") {
+                                                breakerCurveCombo.currentIndex = 1  // Default to C curve
+                                            } else {
+                                                // For non-MCB devices, set pickup to rating directly
+                                                if (ratingCombo.currentIndex >= 0) {
+                                                    pickupCurrent.text = ratingCombo.model[ratingCombo.currentIndex].rating
+                                                }
+                                            }
                                         }
                                     }
                                     Layout.fillWidth: true
@@ -99,6 +107,10 @@ Item {
                                     Component.onCompleted: {
                                         if (count > 0) {
                                             currentIndex = 0
+                                            // Default curve to B for MCB
+                                            if (model[0].type === "MCB") {
+                                                breakerCurveCombo.currentIndex = 0 // Select B curve
+                                            }
                                         }
                                     }
                                 }
@@ -111,7 +123,14 @@ Item {
                                     onCurrentIndexChanged: {
                                         if (currentIndex >= 0 && model) {
                                             let rating = model[currentIndex]
-                                            pickupCurrent.text = rating.rating
+                                            // For MCBs, set pickup current to actual trip point based on curve type
+                                            if (deviceType.currentText === "MCB") {
+                                                let multiplier = breakerCurveCombo.currentText === "B" ? 3 :
+                                                               breakerCurveCombo.currentText === "C" ? 5 : 10
+                                                pickupCurrent.text = (parseFloat(rating.rating) * multiplier).toString()
+                                            } else {
+                                                pickupCurrent.text = rating.rating
+                                            }
                                             deviceDescription.text = rating.description
                                             
                                             // Determine curve type based on breaker type and rating
@@ -137,12 +156,22 @@ Item {
                                     visible: false // Initialize as invisible, will be set by deviceType selection
                                     model: ["B", "C", "D"]
                                     onCurrentTextChanged: {
-                                        if (currentText) {
-                                            // Set curveType index based on breaker curve
+                                        if (currentText && deviceType.currentText === "MCB" && ratingCombo.currentIndex >= 0) {
+                                            // Update pickup current based on MCB curve selection
+                                            let rating = ratingCombo.model[ratingCombo.currentIndex].rating
+                                            let multiplier = {
+                                                "B": 3,
+                                                "C": 5,
+                                                "D": 10
+                                            }[currentText] || 5
+                                            
+                                            pickupCurrent.text = (rating * multiplier).toString()
+                                            
+                                            // Update curve type
                                             switch(currentText) {
-                                                case "B": curveType.currentIndex = 0; break; // Standard Inverse
-                                                case "C": curveType.currentIndex = 1; break; // Very Inverse
-                                                case "D": curveType.currentIndex = 2; break; // Extremely Inverse
+                                                case "B": curveType.currentIndex = 0; break;
+                                                case "C": curveType.currentIndex = 1; break;
+                                                case "D": curveType.currentIndex = 2; break;
                                             }
                                         }
                                     }

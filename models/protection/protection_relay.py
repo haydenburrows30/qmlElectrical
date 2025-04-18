@@ -19,7 +19,7 @@ class ProtectionRelayCalculator(QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._pickup_current = 100.0  # Primary amps
+        self._pickup_current = 18.0  # Default to 3x6A for B curve MCB
         self._time_dial = 0.5
         self._curve_type = "IEC Standard Inverse"
         self._fault_current = 1000.0  # Maximum fault current
@@ -40,7 +40,7 @@ class ProtectionRelayCalculator(QObject):
         self._curve_points = []
         self._curve_type_names = list(self._curve_constants.keys())
         
-        self.db_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'application_data.db')
+        self.db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'application_data.db')
         
         # Initialize database tables first
         self._init_database()
@@ -50,7 +50,7 @@ class ProtectionRelayCalculator(QObject):
         self._saved_settings = []
         
         # Load saved settings from file if it exists
-        self._settings_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'saved_relay_settings.json')
+        self._settings_file = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'saved_relay_settings.json')
         self._load_saved_settings()
         
         self._calculate()
@@ -465,14 +465,18 @@ class ProtectionRelayCalculator(QObject):
             cursor.execute("""
                 SELECT current_multiplier, tripping_time
                 FROM protection_curves 
-                WHERE device_type = ? AND rating = ?
+                WHERE device_type = ? AND rating = ? AND curve_type = ?
                 ORDER BY current_multiplier
-            """, (device_type, rating))
+            """, (device_type, rating, self._curve_type))
             
+            points = cursor.fetchall()
+            
+            # Transform the points to actual current values based on the rating
             return [{
-                'multiplier': row[0],
+                'current': row[0] * rating,  # Convert multiplier to actual current
                 'time': row[1]
-            } for row in cursor.fetchall()]
+            } for row in points]
+            
         finally:
             if 'conn' in locals():
                 conn.close()
