@@ -19,7 +19,6 @@ Item {
         id: networkCabinet
     }
     
-    // Remove individual properties and use Python properties directly
     property bool darkMode: window.modeToggled
     
     // Help popup
@@ -41,8 +40,8 @@ Item {
                    "• Optional streetlighting panel with 16A MCBs<br>" +
                    "• Optional service panel for additional connections<br><br>" +
                    "Customize the configuration to match your installation requirements."
-        widthFactor: 0.3
-        heightFactor: 0.3
+        widthFactor: 0.4
+        heightFactor: 0.6
     }
     
     ColumnLayout {
@@ -74,80 +73,76 @@ Item {
         
         // Main content
         WaveCard {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            titleVisible: false
+                
+            // Configuration panel
+            NetworkCabinetConfig {
+                id: cabinetConfig
+                anchors.fill: parent
+                darkMode: cabinetCalculator.darkMode
+
+                calculator: networkCabinet
+            }
+        }
+        WaveCard {
             title: "DC-M1 Network Cabinet"
             Layout.fillWidth: true
             Layout.fillHeight: true
-            
-            RowLayout {
+
+            // Cabinet visualization
+            NetworkCabinetDiagram {
+                id: cabinetDiagram
                 anchors.fill: parent
-                spacing: 20
-                
-                // Cabinet visualization - pass the calculator directly
-                NetworkCabinetDiagram {
-                    id: cabinetDiagram
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: parent.width * 0.55
-                    darkMode: cabinetCalculator.darkMode
-                    
-                    // Pass the Python calculator directly
-                    calculator: networkCabinet
-                }
-                
-                // Configuration panel - pass the calculator directly
-                NetworkCabinetConfig {
-                    id: cabinetConfig
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    darkMode: cabinetCalculator.darkMode
-                    
-                    // Pass the Python calculator directly
-                    calculator: networkCabinet
-                }
+                darkMode: cabinetCalculator.darkMode
+
+                calculator: networkCabinet
             }
         }
         
-        // Bottom section with additional info
-        WaveCard {
-            title: "Cabinet Specifications"
-            Layout.fillWidth: true
-            Layout.preferredHeight: 220
+        // // Bottom section with additional info
+        // WaveCard {
+        //     title: "Cabinet Specifications"
+        //     Layout.fillWidth: true
+        //     Layout.preferredHeight: 220
             
-            GridLayout {
-                anchors.fill: parent
-                columns: 2
-                columnSpacing: 20
-                rowSpacing: 10
+        //     GridLayout {
+        //         anchors.fill: parent
+        //         columns: 2
+        //         columnSpacing: 20
+        //         rowSpacing: 10
                 
-                // Static cabinet specifications
-                Label { text: "Cabinet Type:"; font.bold: true; Layout.alignment: Qt.AlignRight }
-                Label { text: "DC-M1 Network Distribution Cabinet"; Layout.fillWidth: true }
+        //         // Static cabinet specifications
+        //         Label { text: "Cabinet Type:"; font.bold: true; Layout.alignment: Qt.AlignRight }
+        //         Label { text: "DC-M1 Network Distribution Cabinet"; Layout.fillWidth: true }
                 
-                Label { text: "Voltage System:"; font.bold: true; Layout.alignment: Qt.AlignRight }
-                Label { text: "415V Three-Phase"; Layout.fillWidth: true }
+        //         Label { text: "Voltage System:"; font.bold: true; Layout.alignment: Qt.AlignRight }
+        //         Label { text: "415V Three-Phase"; Layout.fillWidth: true }
                 
-                Label { text: "Disconnector Rating:"; font.bold: true; Layout.alignment: Qt.AlignRight }
-                Label { text: "630A DIN Fuse Disconnects"; Layout.fillWidth: true }
+        //         Label { text: "Disconnector Rating:"; font.bold: true; Layout.alignment: Qt.AlignRight }
+        //         Label { text: "630A DIN Fuse Disconnects"; Layout.fillWidth: true }
                 
-                Label { text: "Maximum Cable Size:"; font.bold: true; Layout.alignment: Qt.AlignRight }
-                Label { text: "300mm² Aluminum"; Layout.fillWidth: true }
+        //         Label { text: "Maximum Cable Size:"; font.bold: true; Layout.alignment: Qt.AlignRight }
+        //         Label { text: "300mm² Aluminum"; Layout.fillWidth: true }
                 
-                Label { text: "Typical Cable Size:"; font.bold: true; Layout.alignment: Qt.AlignRight }
-                Label { text: "185mm² Aluminum"; Layout.fillWidth: true }
+        //         Label { text: "Typical Cable Size:"; font.bold: true; Layout.alignment: Qt.AlignRight }
+        //         Label { text: "185mm² Aluminum"; Layout.fillWidth: true }
                 
-                // Dynamic specifications based on current configuration
-                Label {
-                    text: "Service Connections:"
-                    font.bold: true
-                    Layout.alignment: Qt.AlignRight
-                    visible: networkCabinet.showServicePanel || (networkCabinet.wayTypes && networkCabinet.wayTypes.indexOf(1) >= 0)
-                }
+        //         // Dynamic specifications based on current configuration
+        //         Label {
+        //             text: "Service Connections:"
+        //             font.bold: true
+        //             Layout.alignment: Qt.AlignRight
+        //             visible: networkCabinet.showServicePanel || (networkCabinet.wayTypes && networkCabinet.wayTypes.indexOf(1) >= 0)
+        //         }
                 
-                Label {
-                    text: "50-160A 3-Phase Fuse Disconnects"
-                    Layout.fillWidth: true
-                    visible: networkCabinet.showServicePanel || (networkCabinet.wayTypes && networkCabinet.wayTypes.indexOf(1) >= 0)
-                }
-            }
-        }
+        //         Label {
+        //             text: "50-160A 3-Phase Fuse Disconnects"
+        //             Layout.fillWidth: true
+        //             visible: networkCabinet.showServicePanel || (networkCabinet.wayTypes && networkCabinet.wayTypes.indexOf(1) >= 0)
+        //         }
+        //     }
+        // }
     }
 }

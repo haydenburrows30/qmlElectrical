@@ -59,7 +59,6 @@ Item {
             ctx.font = "bold 16px sans-serif";
             ctx.textAlign = "center";
             ctx.fillText("DC-M1 Network Cabinet", width * 0.5, height * 0.05);
-            ctx.fillText("415V - 3 Phase", width * 0.5, height * 0.95);
             
             // Calculate positions for disconnectors
             var cabinetWidth = width * 0.8;

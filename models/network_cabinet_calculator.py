@@ -17,21 +17,29 @@ class NetworkCabinetCalculator(QObject):
     serviceConductorTypesChanged = Signal(list)
     connectionCountsChanged = Signal(list)
     configChanged = Signal()
+    servicePanelCableSizeChanged = Signal(str)
+    servicePanelConductorTypeChanged = Signal(str)
+    servicePanelConnectionCountChanged = Signal(int)
     
     def __init__(self):
         super().__init__()
         
         # Initialize cabinet properties with defaults
         self._active_ways = 4
-        self._cable_sizes = ["300mm²", "185mm²", "185mm²", "185mm²"]
-        self._show_streetlighting_panel = True
-        self._show_service_panel = True
+        self._cable_sizes = ["185mm²", "185mm²", "185mm²", "185mm²"]
+        self._show_streetlighting_panel = False
+        self._show_service_panel = False
         self._way_types = [0, 0, 0, 0]  # 0 = 630A disconnect, 1 = 2x160A services, 2 = 1x160A + cover
         self._fuse_ratings = ["63A", "63A", "63A", "63A"]
-        self._service_cable_sizes = ["35mm²", "35mm²", "35mm²", "35mm²"]
+        self._service_cable_sizes = ["16mm²", "16mm²", "16mm²", "16mm²"]
         self._conductor_types = ["Al", "Al", "Al", "Al"]  # For main ways
-        self._service_conductor_types = ["Al", "Al", "Al", "Al"]  # For service ways
+        self._service_conductor_types = ["Cu", "Cu", "Cu", "Cu"]  # For service ways
         self._connection_counts = [2, 2, 2, 2]  # New property for number of connections
+        
+        # New properties for service panel configuration
+        self._service_panel_cable_size = "35mm²"
+        self._service_panel_conductor_type = "Al"
+        self._service_panel_connection_count = 2
     
     # Define properties with standard QML naming convention
     @Property(int, notify=activeWaysChanged)
@@ -84,6 +92,46 @@ class NetworkCabinetCalculator(QObject):
         if self._show_service_panel != value:
             self._show_service_panel = value
             self.showServicePanelChanged.emit(value)
+            self.configChanged.emit()
+    
+    # New properties for service panel configuration
+    @Property(str, notify=servicePanelCableSizeChanged)
+    def servicePanelCableSize(self):
+        """Get service panel cable size."""
+        return self._service_panel_cable_size
+    
+    @servicePanelCableSize.setter
+    def servicePanelCableSize(self, value):
+        """Set service panel cable size."""
+        if self._service_panel_cable_size != value:
+            self._service_panel_cable_size = value
+            self.servicePanelCableSizeChanged.emit(value)
+            self.configChanged.emit()
+    
+    @Property(str, notify=servicePanelConductorTypeChanged)
+    def servicePanelConductorType(self):
+        """Get service panel conductor type."""
+        return self._service_panel_conductor_type
+    
+    @servicePanelConductorType.setter
+    def servicePanelConductorType(self, value):
+        """Set service panel conductor type."""
+        if self._service_panel_conductor_type != value:
+            self._service_panel_conductor_type = value
+            self.servicePanelConductorTypeChanged.emit(value)
+            self.configChanged.emit()
+    
+    @Property(int, notify=servicePanelConnectionCountChanged)
+    def servicePanelConnectionCount(self):
+        """Get service panel connection count."""
+        return self._service_panel_connection_count
+    
+    @servicePanelConnectionCount.setter
+    def servicePanelConnectionCount(self, value):
+        """Set service panel connection count."""
+        if self._service_panel_connection_count != value and 1 <= value <= 6:
+            self._service_panel_connection_count = value
+            self.servicePanelConnectionCountChanged.emit(value)
             self.configChanged.emit()
     
     @Property(list, notify=wayTypesChanged)
@@ -169,15 +217,20 @@ class NetworkCabinetCalculator(QObject):
         """Reset all cabinet properties to default values."""
         # Set all properties back to defaults
         self._active_ways = 4
-        self._cable_sizes = ["300mm²", "185mm²", "185mm²", "185mm²"]
-        self._show_streetlighting_panel = True
-        self._show_service_panel = True
+        self._cable_sizes = ["185mm²", "185mm²", "185mm²", "185mm²"]
+        self._show_streetlighting_panel = False
+        self._show_service_panel = False
         self._way_types = [0, 0, 0, 0]
         self._fuse_ratings = ["63A", "63A", "63A", "63A"]
         self._service_cable_sizes = ["35mm²", "35mm²", "35mm²", "35mm²"]
         self._conductor_types = ["Al", "Al", "Al", "Al"]
         self._service_conductor_types = ["Al", "Al", "Al", "Al"]
         self._connection_counts = [2, 2, 2, 2]
+        
+        # Reset service panel configuration
+        self._service_panel_cable_size = "35mm²"
+        self._service_panel_conductor_type = "Al"
+        self._service_panel_connection_count = 2
         
         # Emit all signals
         self.activeWaysChanged.emit(self._active_ways)
@@ -190,6 +243,9 @@ class NetworkCabinetCalculator(QObject):
         self.conductorTypesChanged.emit(self._conductor_types)
         self.serviceConductorTypesChanged.emit(self._service_conductor_types)
         self.connectionCountsChanged.emit(self._connection_counts)
+        self.servicePanelCableSizeChanged.emit(self._service_panel_cable_size)
+        self.servicePanelConductorTypeChanged.emit(self._service_panel_conductor_type)
+        self.servicePanelConnectionCountChanged.emit(self._service_panel_connection_count)
         self.configChanged.emit()
     
     @Slot(int, str)
