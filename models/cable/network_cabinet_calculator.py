@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot
 
 # Import the new modules
-from .pdf_generator_dcm import generate_dcm_pdf
+from utils.pdf_generator_dcm import generate_dcm_pdf
 from .config_manager_dcm import save_config, load_config
 
 class NetworkCabinetCalculator(QObject):

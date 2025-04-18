@@ -5,7 +5,7 @@ import logging
 
 from .table_model import VoltageDropTableModel
 from .file_utils import FileUtils
-from .pdf_generator import PDFGenerator
+from utils.pdf_generator_volt_drop import PDFGenerator
 from .data_manager import DataManager
 
 # Setup logging
