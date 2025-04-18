@@ -28,7 +28,7 @@ from models.protection.fault_current_calculator import FaultCurrentCalculator
 from models.protection.ref_rgf_calculator import RefRgfCalculator
 from models.basic.voltage_divider_calculator import VoltageDividerCalculator
 from models.basic.ohms_law_calculator import OhmsLawCalculator
-from models.series_helper import SeriesHelper
+from utils.series_helper import SeriesHelper
 from models.theory.three_phase import ThreePhaseSineWaveModel
 from models.theory.rlc import RLCChart
 from models.protection.overcurrent_calculator import OvercurrentProtectionCalculator

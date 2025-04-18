@@ -33,7 +33,7 @@ def verify_fuse_sizes():
         if not cursor.fetchone():
             print("\nNo fuse_sizes table found in database!")
             print("Current memory store values are:")
-            from models.data_store import DataStore
+            from utils.data_store import DataStore
             store = DataStore()
             print(store._memory_store['fuse_sizes'])
             print("\nCurrent database tables:")

@@ -6,7 +6,7 @@ import sqlite3
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
-from models.data_store import DataStore
+from utils.data_store import DataStore
 
 def test_sqlite_functionality():
     """Test basic SQLite functionality in the application."""
