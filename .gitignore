@@ -13,4 +13,4 @@ icons/all_icons.svg
 cache
 cache/*
 cpp_backend
-.spec
+ElectricalCalculator.spec
