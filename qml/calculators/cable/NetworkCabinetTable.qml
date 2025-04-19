@@ -21,7 +21,7 @@ ColumnLayout {
     // Column headers for the table
     Rectangle {
         Layout.fillWidth: true
-        height: 50
+        height: 40
         color: darkMode ? "#444444" : "#e0e0e0"
         
         RowLayout {

@@ -46,10 +46,10 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         doc = SimpleDocTemplate(
             full_path,
             pagesize=landscape(A4),
-            rightMargin=72,
+            rightMargin=12,
             leftMargin=10,    # Reduced even further
             topMargin=10,     # Reduced even further
-            bottomMargin=72   # Keep bottom margin for footer space
+            bottomMargin=12   # Keep bottom margin for footer space
         )
         
         # Define styles
@@ -245,15 +245,15 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),  # Reduced from 12
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
             ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
             ('FONTSIZE', (0, 1), (-1, -1), 9),
-            ('TOPPADDING', (0, 1), (-1, -1), 6),
-            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+            ('TOPPADDING', (0, 1), (-1, -1), 3),  # Reduced from 6
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 3),  # Reduced from 6
             # Left align text fields
             ('ALIGN', (4, 1), (5, -1), 'LEFT'),  # Source, Destination
             ('ALIGN', (7, 1), (7, -1), 'LEFT'),  # Notes
@@ -441,9 +441,9 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             # Borders
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            # Padding
-            ('TOPPADDING', (0, 0), (-1, -1), 4),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            # Padding - reduced for smaller rows
+            ('TOPPADDING', (0, 0), (-1, -1), 2),    # Reduced from 4
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2), # Reduced from 4
         ])
         
         # Add alternating row colors for better readability
