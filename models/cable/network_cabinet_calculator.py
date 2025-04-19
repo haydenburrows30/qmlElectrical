@@ -84,7 +84,7 @@ class NetworkCabinetCalculator(QObject):
             "service_panel_source": "",
             "service_panel_destination": "",
             "service_panel_notes": "",
-            "service_panel_phase": "3Φ",
+            "service_panel_phase": "1Φ",
             
             # Site information
             "site_name": "",

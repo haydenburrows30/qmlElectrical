@@ -648,10 +648,13 @@ Item {
         return imageData
     }
     
-    // Explicitly update panel visibility from calculator
+    // Update function to force a canvas repaint
+    function forceRefresh() {
+        canvas.requestPaint()
+    }
+    
+    // Force update panel visibility and repaint
     function updatePanelVisibility() {
-        if (calculator) {
-            canvas.requestPaint()
-        }
+        canvas.requestPaint()
     }
 }

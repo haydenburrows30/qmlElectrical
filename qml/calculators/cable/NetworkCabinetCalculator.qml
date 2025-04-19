@@ -256,6 +256,12 @@ Item {
 
                                 darkMode: cabinetCalculator.darkMode
                                 calculator: networkCabinet
+                                
+                                onConfigChanged: {
+                                    // Force diagram to update when config changes
+                                    cabinetDiagram.updatePanelVisibility()
+                                    cabinetDiagram.forceRefresh()
+                                }
                             }
 
                             // Visual and notes section
