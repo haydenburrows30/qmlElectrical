@@ -41,6 +41,18 @@ class NetworkCabinetCalculator(QObject):
     notesChanged = Signal(list)
     phasesChanged = Signal(list)
     
+    # Add new signals for header information
+    customerNameChanged = Signal(str)
+    customerEmailChanged = Signal(str)
+    projectNameChanged = Signal(str)
+    ornChanged = Signal(str)
+    
+    # Add new signals for footer information
+    designerChanged = Signal(str)
+    revisionNumberChanged = Signal(str)
+    revisionDescriptionChanged = Signal(str)
+    checkedByChanged = Signal(str)
+    
     def __init__(self):
         super().__init__()
         
@@ -81,7 +93,19 @@ class NetworkCabinetCalculator(QObject):
             "phases": ["3Φ", "3Φ", "3Φ", "3Φ"],
             
             # General notes
-            "general_notes": "All network cable trifurcated before entering cabinet. Lengths includes tails."
+            "general_notes": "All network cable trifurcated before entering cabinet. Lengths includes tails.",
+            
+            # Add header information
+            "customer_name": "",
+            "customer_email": "",
+            "project_name": "",
+            "orn": "",
+            
+            # Add footer information
+            "designer": "",
+            "revision_number": "1",
+            "revision_description": "",
+            "checked_by": ""
         }
         
         # Initialize all properties with default values
@@ -350,6 +374,72 @@ class NetworkCabinetCalculator(QObject):
     def generalNotes(self, value):
         self._set_and_notify("_general_notes", value, self.generalNotesChanged)
     
+    # Add header properties
+    @Property(str, notify=customerNameChanged)
+    def customerName(self):
+        return self._customer_name
+    
+    @customerName.setter
+    def customerName(self, value):
+        self._set_and_notify("_customer_name", value, self.customerNameChanged)
+    
+    @Property(str, notify=customerEmailChanged)
+    def customerEmail(self):
+        return self._customer_email
+    
+    @customerEmail.setter
+    def customerEmail(self, value):
+        self._set_and_notify("_customer_email", value, self.customerEmailChanged)
+    
+    @Property(str, notify=projectNameChanged)
+    def projectName(self):
+        return self._project_name
+    
+    @projectName.setter
+    def projectName(self, value):
+        self._set_and_notify("_project_name", value, self.projectNameChanged)
+    
+    @Property(str, notify=ornChanged)
+    def orn(self):
+        return self._orn
+    
+    @orn.setter
+    def orn(self, value):
+        self._set_and_notify("_orn", value, self.ornChanged)
+    
+    # Add footer properties
+    @Property(str, notify=designerChanged)
+    def designer(self):
+        return self._designer
+    
+    @designer.setter
+    def designer(self, value):
+        self._set_and_notify("_designer", value, self.designerChanged)
+    
+    @Property(str, notify=revisionNumberChanged)
+    def revisionNumber(self):
+        return self._revision_number
+    
+    @revisionNumber.setter
+    def revisionNumber(self, value):
+        self._set_and_notify("_revision_number", value, self.revisionNumberChanged)
+    
+    @Property(str, notify=revisionDescriptionChanged)
+    def revisionDescription(self):
+        return self._revision_description
+    
+    @revisionDescription.setter
+    def revisionDescription(self, value):
+        self._set_and_notify("_revision_description", value, self.revisionDescriptionChanged)
+    
+    @Property(str, notify=checkedByChanged)
+    def checkedBy(self):
+        return self._checked_by
+    
+    @checkedBy.setter
+    def checkedBy(self, value):
+        self._set_and_notify("_checked_by", value, self.checkedByChanged)
+    
     @Slot()
     def resetToDefaults(self):
         """Reset all cabinet properties to default values."""
@@ -386,7 +476,17 @@ class NetworkCabinetCalculator(QObject):
             "sources": self.sourcesChanged,
             "destinations": self.destinationsChanged,
             "notes": self.notesChanged,
-            "phases": self.phasesChanged
+            "phases": self.phasesChanged,
+            # Add header information signals
+            "customer_name": self.customerNameChanged,
+            "customer_email": self.customerEmailChanged,
+            "project_name": self.projectNameChanged,
+            "orn": self.ornChanged,
+            # Add footer information signals
+            "designer": self.designerChanged,
+            "revision_number": self.revisionNumberChanged,
+            "revision_description": self.revisionDescriptionChanged,
+            "checked_by": self.checkedByChanged
         }
         
         # Emit all signals
@@ -455,16 +555,17 @@ class NetworkCabinetCalculator(QObject):
         """Set phase at specified index."""
         self._update_list_property(index, phase, "phases", self.phasesChanged)
     
-    @Slot(str)
-    def exportToPdf(self, folder_path):
+    @Slot(str, str)
+    def exportToPdf(self, folder_path, diagram_image=None):
         """
         Export cabinet configuration to PDF
         
         Args:
             folder_path: The folder path to save the PDF (from QML file dialog)
+            diagram_image: Optional data URL of diagram image to include
         """
         # Use the dedicated PDF generator module
-        success, message = generate_dcm_pdf(self, folder_path)
+        success, message = generate_dcm_pdf(self, folder_path, diagram_image)
         # Emit status signal
         self.pdfExportStatusChanged.emit(message)
         return success
@@ -524,7 +625,17 @@ class NetworkCabinetCalculator(QObject):
                 "sources": self.sourcesChanged,
                 "destinations": self.destinationsChanged,
                 "notes": self.notesChanged,
-                "phases": self.phasesChanged
+                "phases": self.phasesChanged,
+                # Add header information signals
+                "customer_name": self.customerNameChanged,
+                "customer_email": self.customerEmailChanged,
+                "project_name": self.projectNameChanged,
+                "orn": self.ornChanged,
+                # Add footer information signals
+                "designer": self.designerChanged,
+                "revision_number": self.revisionNumberChanged,
+                "revision_description": self.revisionDescriptionChanged,
+                "checked_by": self.checkedByChanged
             }
             
             # Emit all signals with the updated values

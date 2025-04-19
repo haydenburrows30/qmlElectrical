@@ -38,8 +38,23 @@ Item {
         title: "Select Folder to Save PDF"
         
         onAccepted: {
-            // Use the selected folder directly
-            calculator.exportToPdf(folderDialog.folder)
+            // Force diagram to update before capture to ensure current settings
+            cabinetDiagram.updatePanelVisibility()
+            
+            // Use Qt.callLater to ensure UI updates have completed
+            Qt.callLater(function() {
+                // Capture the diagram image
+                let diagramImage = cabinetDiagram.captureImage()
+                
+                // Export to PDF
+                calculator.exportToPdf(folderDialog.folder, diagramImage)
+                
+                // Force refresh the diagram after PDF generation to ensure it's fully restored
+                Qt.callLater(function() {
+                    cabinetDiagram.updatePanelVisibility()
+                    cabinetDiagram.forceRefresh()
+                })
+            })
         }
     }
     
@@ -62,6 +77,20 @@ Item {
         
         onAccepted: {
             calculator.loadConfig(loadConfigDialog.file)
+            
+            // Add debug output after loading to check values
+            console.log("After loading - Streetlighting: " + calculator.showStreetlightingPanel + 
+                        ", Service Panel: " + calculator.showServicePanel +
+                        ", Dropper Plates: " + calculator.showDropperPlates)
+            
+            // Make sure the UI matches the loaded values
+            cabinetConfig.updateUI()
+            
+            // Force update of diagram with explicit delay to ensure model is updated first
+            Qt.callLater(function() {
+                cabinetDiagram.updatePanelVisibility()
+                cabinetDiagram.forceRefresh()
+            })
         }
     }
     
@@ -69,7 +98,7 @@ Item {
     Popup {
         id: statusPopup
         width: 400
-        height: 100
+        height: 200
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         modal: true
@@ -231,6 +260,34 @@ Item {
                             wrapMode: TextEdit.Wrap
                             text: calculator.generalNotes
                             onTextChanged: calculator.generalNotes = text
+                        }
+                    }
+                }
+                
+                RowLayout {
+                    // Footer Information Section
+                    WaveCard {
+                        title: "Document Footer Information"
+                        Layout.minimumWidth: 400
+                        Layout.minimumHeight: 200
+                        
+                        FooterSection {
+                            anchors.fill: parent
+                            calculator: networkCabinet
+                        }
+                    }
+
+                    WaveCard {
+                        title: "Header Information"
+                        Layout.maximumWidth: 300
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.alignment: Qt.AlignTop
+
+                        HeaderSection {
+                            anchors.fill: parent
+                            calculator: networkCabinet
+                            onConfigChanged: networkCabinet.configChanged()
                         }
                     }
                 }

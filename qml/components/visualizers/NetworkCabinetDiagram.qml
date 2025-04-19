@@ -10,11 +10,13 @@ Item {
     property var calculator
     property bool darkMode: false
     
-    // Define read-only properties that read from the calculator model
+    // Change from readonly to direct properties for panel visibility settings
+    property bool showStreetlightingPanel: false
+    property bool showServicePanel: false
+    
+    // Other readonly properties are fine
     readonly property int activeWays: calculator ? calculator.activeWays : 4
     readonly property var cableSizes: calculator ? calculator.cableSizes : ["300mm²", "185mm²", "185mm²", "185mm²"]
-    readonly property bool showStreetlightingPanel: calculator ? calculator.showStreetlightingPanel : true
-    readonly property bool showServicePanel: calculator ? calculator.showServicePanel : true
     readonly property var wayTypes: calculator ? calculator.wayTypes : [0, 0, 0, 0]
     readonly property var fuseRatings: calculator ? calculator.fuseRatings : ["63A", "63A", "63A", "63A"]
     readonly property var serviceCableSizes: calculator ? calculator.serviceCableSizes : ["35mm²", "35mm²", "35mm²", "35mm²"]
@@ -36,7 +38,12 @@ Item {
     
     Canvas {
         id: canvas
+        objectName: "diagramCanvas"
         anchors.fill: parent
+        
+        // Ensure highest quality rendering
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Cooperative
         
         onPaint: {
             var ctx = getContext("2d");
@@ -559,7 +566,7 @@ Item {
                     ctx.fillStyle = "#ffffff";
                     ctx.font = "8px sans-serif";
                     ctx.textAlign = "center";
-                    var fuseRating = "63A" //(k === 0) ? "160A" : (k === 1) ? "100A" : "50A";
+                    var fuseRating = "63A";
                     ctx.fillText(fuseRating + " Fuse", fuseX + fuseWidth/2, fuseY + fuseHeight/2 + 3);
                     
                     // Cable out to right
@@ -603,11 +610,88 @@ Item {
         }
     }
     
-    // Connect to calculator's configChanged signal to request a repaint
+    // Initialize when component completes
+    Component.onCompleted: {
+        updatePanelVisibility()
+    }
+    
+    // Update function to capture a diagram optimized for PDF inclusion
+    function captureImage() {
+        // First ensure we have the latest panel visibility
+        updatePanelVisibility()
+        
+        // Save current panel visibility states
+        const savedStreetlighting = showStreetlightingPanel
+        const savedService = showServicePanel
+        
+        // Determine optimal scale factor based on canvas size
+        let scaleFactor
+        if (canvas.width > 800 || canvas.height > 800) {
+            scaleFactor = 1.5  // For very large canvases
+        } else if (canvas.width > 500 || canvas.height > 500) {
+            scaleFactor = 1.75  // For medium canvases
+        } else {
+            scaleFactor = 2.0  // For small canvases
+        }
+        
+        // Create a higher resolution image
+        canvas.canvasSize = Qt.size(canvas.width * scaleFactor, canvas.height * scaleFactor)
+        canvas.requestPaint()
+        
+        // Save the high-res image data
+        let imageData = canvas.toDataURL("image/png")
+        
+        // Reset canvas to normal size
+        canvas.canvasSize = Qt.size(0, 0) // Reset to automatic sizing
+        
+        // Ensure panel visibility states are preserved
+        showStreetlightingPanel = savedStreetlighting
+        showServicePanel = savedService
+        
+        // Force a repaint to restore the canvas
+        canvas.requestPaint()
+        
+        return imageData
+    }
+    
+    // Explicitly update panel visibility from calculator
+    function updatePanelVisibility() {
+        if (calculator) {
+            showStreetlightingPanel = calculator.showStreetlightingPanel
+            showServicePanel = calculator.showServicePanel
+            canvas.requestPaint()
+        }
+    }
+    
+    // Force refresh the diagram
+    function forceRefresh() {
+        updatePanelVisibility()
+        canvas.requestPaint()
+    }
+    
+    // Panel visibility property change signals
+    onShowStreetlightingPanelChanged: {
+        canvas.requestPaint()
+    }
+    
+    onShowServicePanelChanged: {
+        canvas.requestPaint()
+    }
+    
+    // Connect to calculator's signals to ensure panel visibility stays in sync
     Connections {
         target: calculator
+        
         function onConfigChanged() {
-            canvas.requestPaint()
+            updatePanelVisibility()
+        }
+        
+        function onShowStreetlightingPanelChanged() {
+            showStreetlightingPanel = calculator.showStreetlightingPanel
+        }
+        
+        function onShowServicePanelChanged() {
+            showServicePanel = calculator.showServicePanel
         }
     }
 }

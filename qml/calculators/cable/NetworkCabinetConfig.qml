@@ -22,7 +22,7 @@ Item {
     
     RowLayout {
         anchors.fill: parent
-        
+
         WaveCard {
             title: "Site Information"
             Layout.maximumWidth: 300
@@ -124,6 +124,9 @@ Item {
                         onCheckedChanged: {
                             if (calculator && calculator.showStreetlightingPanel !== checked) {
                                 calculator.showStreetlightingPanel = checked
+                                // Force immediate diagram update
+                                cabinetDiagram.updatePanelVisibility()
+                                cabinetDiagram.forceRefresh()
                                 configChanged()
                             }
                         }
@@ -146,6 +149,9 @@ Item {
                         onCheckedChanged: {
                             if (calculator && calculator.showServicePanel !== checked) {
                                 calculator.showServicePanel = checked
+                                // Force immediate diagram update
+                                cabinetDiagram.updatePanelVisibility()
+                                cabinetDiagram.forceRefresh()
                                 configChanged()
                             }
                         }
@@ -217,24 +223,51 @@ Item {
         }
     }
     
+    // Method to force update all UI controls from calculator values
+    function updateUI() {
+        if (calculator) {
+            // Update all controls from calculator values
+            waysSpinBox.value = calculator.activeWays
+            siteNameField.text = calculator.siteName
+            siteNumberField.text = calculator.siteNumber
+            
+            // Update toggle switches
+            streetlightingSwitch.checked = calculator.showStreetlightingPanel
+            serviceSwitch.checked = calculator.showServicePanel
+            dropperPlatesSwitch.checked = calculator.showDropperPlates
+            
+            // Force the table component to refresh
+            cabinetTable.forceRefresh()
+        }
+    }
+    
     // Watch for calculator changes and refresh UI
     Connections {
         target: calculator
         function onConfigChanged() {
             // Update UI controls when calculator model changes
             if (calculator) {
-                // Manually update the ways spinbox first to ensure correct rendering
-                waysSpinBox.value = calculator.activeWays
-                
-                // Update simple properties with direct assignments
-                siteNameField.text = calculator.siteName
-                siteNumberField.text = calculator.siteNumber
+                // Use the updateUI function to ensure consistent behavior
+                updateUI()
+            }
+        }
+        
+        // Specific handlers for key properties
+        function onShowStreetlightingPanelChanged() {
+            if (calculator && streetlightingSwitch.checked !== calculator.showStreetlightingPanel) {
                 streetlightingSwitch.checked = calculator.showStreetlightingPanel
+            }
+        }
+        
+        function onShowServicePanelChanged() {
+            if (calculator && serviceSwitch.checked !== calculator.showServicePanel) {
                 serviceSwitch.checked = calculator.showServicePanel
+            }
+        }
+        
+        function onShowDropperPlatesChanged() {
+            if (calculator && dropperPlatesSwitch.checked !== calculator.showDropperPlates) {
                 dropperPlatesSwitch.checked = calculator.showDropperPlates
-                
-                // Force the table component to refresh
-                cabinetTable.forceRefresh()
             }
         }
         
