@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['Z:\\home\\hayden\\Documents\\qmltest\\main.py'],
+    ['c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\main.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('Z:\\home\\hayden\\Documents\\qmltest\\qml', 'qml'), ('Z:\\home\\hayden\\Documents\\qmltest\\data', 'data'), ('Z:\\home\\hayden\\Documents\\qmltest\\icons', 'icons')],
+    datas=[('c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\qml', 'qml'), ('c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\data', 'data'), ('c:\\Users\\HBAdmin.INDLINE-L1032\\qmlTableView\\icons', 'icons')],
     hiddenimports=['PySide6.QtQml', 'PySide6.QtQuick', 'PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets', 'PySide6.QtCharts'],
     hookspath=[],
     hooksconfig={},
