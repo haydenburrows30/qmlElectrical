@@ -1,106 +1,123 @@
 import os
-import sys
+import json
+import hashlib
+import time
 from pathlib import Path
+from typing import Dict, Any, Optional
+from functools import lru_cache
 
 class CacheManager:
-    """Manages QML cache for the application to improve load times."""
+    CACHE_VERSION = "1.0"
     
     def __init__(self):
-        self._cache_dir = None
-        self._cache_enabled = True
-        self._cache_stats = {"hits": 0, "misses": 0}
-    
-    def initialize(self, app_name="QmlTableView"):
-        """Initialize the cache directory and settings."""
-        try:
-            # Check if caching is explicitly disabled
-            if "QT_QPA_DISABLE_DISK_CACHE" in os.environ:
-                self._cache_enabled = False
-                print("QML cache is explicitly disabled via environment variable")
-                return False
-                
-            # Determine appropriate cache location based on platform and app state
-            if hasattr(sys, 'frozen'):  # Running as packaged executable
-                # Use user's AppData folder for packaged apps
-                import tempfile
-                self._cache_dir = os.path.join(tempfile.gettempdir(), app_name, "QmlCache")
-            else:
-                # Use local cache directory in development
-                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                self._cache_dir = os.path.join(base_dir, "cache")
-            
-            # Ensure the cache directory exists
-            os.makedirs(self._cache_dir, exist_ok=True)
-            
-            # Set environment variables for Qt to use the cache
-            os.environ["QML_DISK_CACHE_PATH"] = self._cache_dir
-            
-            # Set reasonable cache size limit (512MB)
-            os.environ["QML_DISK_CACHE_MAX_SIZE"] = "512"
-            
-            # Verify cache is working by checking directory
-            self._verify_cache_directory()
-            
-            return True
-            
-        except Exception as e:
-            print(f"Warning: Cache initialization failed: {e}")
-            self._cache_enabled = False
-            return False
-    
-    def _verify_cache_directory(self):
-        """Verify the cache directory exists and is writable."""
-        if not self._cache_dir or not os.path.exists(self._cache_dir):
-            print(f"Warning: Cache directory doesn't exist: {self._cache_dir}")
-            return False
-            
-        # Check if directory is writable by creating a test file
-        test_file = os.path.join(self._cache_dir, "write_test.tmp")
-        try:
-            with open(test_file, 'w') as f:
-                f.write("test")
-            os.remove(test_file)
-            return True
-        except Exception as e:
-            print(f"Warning: Cache directory is not writable: {e}")
-            return False
-    
-    def get_cache_info(self):
-        """Get information about the cache status and statistics."""
-        if not self._cache_enabled or not self._cache_dir:
-            return {"enabled": False, "directory": None, "size": 0, "files": 0}
+        self.cache_dir = None
+        self.metadata_file = None
+        self.memory_cache: Dict[str, Any] = {}
+        self.max_cache_size = 100 * 1024 * 1024  # 100MB
+
+    def initialize(self, app_name: str) -> None:
+        """Initialize cache manager with application specific settings"""
+        self.cache_dir = Path.home() / ".cache" / app_name
+        self.metadata_file = self.cache_dir / "cache_metadata.json"
+        self._init_cache_dir()
+
+    def _init_cache_dir(self) -> None:
+        """Initialize cache directory and metadata"""
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        if not self.metadata_file.exists():
+            self._save_metadata({
+                "version": self.CACHE_VERSION,
+                "last_cleanup": time.time(),
+                "file_hashes": {}
+            })
+
+    @lru_cache(maxsize=1000)
+    def get_cached_calculation(self, key: str) -> Optional[Any]:
+        """Get cached calculation result with memory caching"""
+        if key in self.memory_cache:
+            return self.memory_cache[key]
         
-        # Calculate cache size and file count
-        total_size = 0
-        file_count = 0
+        cache_file = self.cache_dir / f"{key}.cache"
+        if cache_file.exists():
+            try:
+                with open(cache_file, 'r') as f:
+                    result = json.load(f)
+                self.memory_cache[key] = result
+                return result
+            except Exception:
+                return None
+        return None
+
+    def cache_calculation(self, key: str, value: Any) -> None:
+        """Cache calculation result both in memory and on disk"""
+        self.memory_cache[key] = value
+        cache_file = self.cache_dir / f"{key}.cache"
         
         try:
-            for path in Path(self._cache_dir).rglob('*'):
-                if path.is_file():
-                    total_size += path.stat().st_size
-                    file_count += 1
+            with open(cache_file, 'w') as f:
+                json.dump(value, f)
+            self._manage_cache_size()
         except Exception as e:
-            print(f"Error calculating cache size: {e}")
+            print(f"Failed to cache calculation: {e}")
+
+    def _manage_cache_size(self) -> None:
+        """Manage cache size and cleanup old entries"""
+        total_size = sum(f.stat().st_size for f in self.cache_dir.glob('*.cache'))
         
-        return {
-            "enabled": self._cache_enabled,
-            "directory": self._cache_dir,
-            "size": total_size,
-            "size_mb": round(total_size / (1024 * 1024), 2),
-            "files": file_count,
-            "stats": self._cache_stats
-        }
-    
-    def clear_cache(self):
-        """Clear all cache files."""
-        if not self._cache_enabled or not self._cache_dir:
-            return False
+        if total_size > self.max_cache_size:
+            files = sorted(
+                self.cache_dir.glob('*.cache'),
+                key=lambda x: x.stat().st_atime
+            )
             
-        try:
-            for path in Path(self._cache_dir).rglob('*'):
-                if path.is_file():
-                    path.unlink()
+            # Remove oldest files until under max size
+            for file in files:
+                if total_size <= self.max_cache_size:
+                    break
+                total_size -= file.stat().st_size
+                file.unlink()
+
+    def is_qml_modified(self, file_path: str) -> bool:
+        """Check if QML file has been modified since last cache"""
+        metadata = self._load_metadata()
+        file_path = str(Path(file_path).resolve())
+        current_hash = self._calculate_file_hash(file_path)
+        
+        if file_path not in metadata["file_hashes"]:
+            metadata["file_hashes"][file_path] = current_hash
+            self._save_metadata(metadata)
             return True
-        except Exception as e:
-            print(f"Error clearing cache: {e}")
-            return False
+            
+        return metadata["file_hashes"][file_path] != current_hash
+
+    def _calculate_file_hash(self, file_path: str) -> str:
+        """Calculate file hash for cache invalidation"""
+        try:
+            with open(file_path, 'rb') as f:
+                return hashlib.md5(f.read()).hexdigest()
+        except Exception:
+            return ""
+
+    def _load_metadata(self) -> Dict:
+        """Load cache metadata"""
+        try:
+            with open(self.metadata_file, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return {"version": self.CACHE_VERSION, "file_hashes": {}}
+
+    def _save_metadata(self, metadata: Dict) -> None:
+        """Save cache metadata"""
+        with open(self.metadata_file, 'w') as f:
+            json.dump(metadata, f)
+
+    def clear_cache(self) -> None:
+        """Clear all cache data"""
+        self.memory_cache.clear()
+        for cache_file in self.cache_dir.glob('*.cache'):
+            cache_file.unlink()
+        self._save_metadata({
+            "version": self.CACHE_VERSION,
+            "last_cleanup": time.time(),
+            "file_hashes": {}
+        })

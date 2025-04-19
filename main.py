@@ -18,6 +18,7 @@ from services.worker_pool import WorkerPool
 
 # Utilities
 from utils.config import app_config
+from utils.config_manager import ConfigManager
 from utils.qml_debug import register_debug_helper
 from utils.logger import QLogManager
 from utils.platform_helper import PlatformHelper
@@ -153,24 +154,20 @@ class Application:
 def main():
     """Application entry point."""
     try:
-        # Setup environment from config
-        app_config.setup_environment()
+        config = ConfigManager()
         
         # Setup Windows-specific configuration
         setup_windows_specifics()
         
         # Handle cache setup
-        if app_config.args.clear_cache:
-            cache_manager = CacheManager()
-            print("Clearing QML cache...")
-            cache_manager.clear_cache()
-        
-        # Set up QML cache unless disabled
-        if not app_config.args.no_cache:
-            cache_manager = CacheManager()
-            app_name = app_config.app_name
-            cache_manager.initialize(app_name)
-            setup_qml_cache(str(CURRENT_DIR), app_name)
+        if config.get("cache.enabled", True):
+            try:
+                cache_manager = CacheManager()
+                app_name = config.get("app.name", "ElectricalCalculator")
+                cache_manager.initialize(app_name)
+                setup_qml_cache(str(CURRENT_DIR), app_name)
+            except Exception as e:
+                print(f"Warning: Cache initialization failed: {e}")
         
         # Set GPU-specific attributes
         set_gpu_attributes()
