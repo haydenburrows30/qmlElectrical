@@ -69,10 +69,10 @@ class MachineCalculator(QObject):
                 # Calculate current from power and voltage
                 if "DC" in self._machine_type:
                     # DC machines: I = P/V
-                    self._rated_current = (self._rated_power * 1000) / self._rated_voltage
+                    self._rated_current = (self._rated_power * 1000) / (self._rated_voltage * self._efficiency)
                 else:
-                    # 3-phase AC: I = P/(√3 * V * PF)
-                    self._rated_current = (self._rated_power * 1000) / (math.sqrt(3) * self._rated_voltage * self._power_factor)
+                    # 3-phase AC: I = P/(√3 * V * PF * efficiency)
+                    self._rated_current = (self._rated_power * 1000) / (math.sqrt(3) * self._rated_voltage * self._power_factor * self._efficiency)
                 self.ratedCurrentChanged.emit()
 
             # Input power calculation - now using the updated values
@@ -88,19 +88,13 @@ class MachineCalculator(QObject):
                 if self._input_mode == "VC":  # Only update rated power if not directly set
                     self._rated_power = input_power * self._efficiency
                     self.ratedPowerChanged.emit()
-                self._losses = input_power - self._rated_power
+                self._losses = input_power * (1 - self._efficiency)  # More accurate loss calculation
             else:
-                # Generator: Input is mechanical power, Output = Input * Efficiency
-                if self._input_mode == "VC":  # Only update rated power if not directly set
-                    self._rated_power = input_power  # Electrical output power
-                    self.ratedPowerChanged.emit()
-                mechanical_power = input_power / self._efficiency
-                self._losses = mechanical_power - self._rated_power
+                # Generator: Input is mechanical power, Output is electrical
+                mechanical_power = self._rated_power / self._efficiency  # Calculate mechanical input power
+                self._losses = mechanical_power - self._rated_power  # Losses = input - output
             
-            # Emit signal to ensure UI updates
-            self.ratedPowerChanged.emit()
-            
-            # Speed and torque
+            # Speed calculations
             if self._machine_type == "Induction Motor":
                 # Synchronous speed
                 sync_speed = 120 * self._frequency / self._poles
@@ -111,39 +105,47 @@ class MachineCalculator(QObject):
                 self._rotational_speed = 120 * self._frequency / self._poles
                 self._slip = 0
             
-            # Torque calculation (N·m)
-            self._torque = 9550 * self._rated_power / self._rotational_speed
+            # Torque calculation with protection against division by zero
+            if self._rotational_speed > 10:  # Prevent division by near-zero values
+                self._torque = 9550 * self._rated_power / self._rotational_speed
+            else:
+                self._torque = 0  # Set torque to zero for very low speeds
             
-            # Calculate temperature rise based on losses and cooling
+            # Improved temperature rise calculation
             cooling_factor = {
                 "TEFC": 1.0,
                 "ODP": 1.2,
                 "TENV": 0.8
             }[self._cooling_method]
             
-            # Improved temperature rise calculation considering machine size
-            thermal_mass = self._rated_power * 50  # Larger machines have more thermal mass
-            self._temperature_rise = (self._losses * 1000 * cooling_factor) / (10 + thermal_mass)
+            # More realistic thermal model that considers machine size
+            # Thermal resistance decreases with machine size
+            thermal_resistance = 0.05 / (0.1 + self._rated_power ** 0.7)  # °C/W
+            self._temperature_rise = self._losses * 1000 * thermal_resistance * cooling_factor
             self.temperatureRiseChanged.emit()
             
             # Check if temperature rise exceeds class limit and adjust efficiency
             max_allowed_rise = self._temperature_classes[self._temperature_class] - self._ambient_temp
+            
+            # Avoid recalculation loops by checking significant changes
             if self._temperature_rise > max_allowed_rise:
-                temp_exceed_ratio = self._temperature_rise / max_allowed_rise
+                temp_exceed_ratio = (self._temperature_rise / max_allowed_rise) - 1
+                # Cap the derating to avoid excessive reduction
+                temp_exceed_ratio = min(temp_exceed_ratio, 0.5)
                 new_efficiency = self._efficiency * (1 - 0.05 * temp_exceed_ratio)
                 
-                # Only update if efficiency would actually change
-                if abs(new_efficiency - self._efficiency) > 0.0001:
-                    self._efficiency = new_efficiency
+                # Only update if efficiency would significantly change
+                if abs(new_efficiency - self._efficiency) > 0.005:
+                    self._efficiency = max(new_efficiency, 0.6)  # Don't let efficiency drop below 60%
                     self.efficiencyChanged.emit()
                     
-                    # Recalculate power and losses with new efficiency
+                    # Recalculate once with new efficiency but don't loop
                     if self._machine_type.endswith("Motor"):
-                        input_power = self._rated_voltage * self._rated_current * math.sqrt(3) * self._power_factor / 1000
-                        self._rated_power = input_power * self._efficiency
-                        self._losses = input_power - self._rated_power
+                        self._losses = input_power * (1 - self._efficiency)
+                        if self._input_mode == "VC":
+                            self._rated_power = input_power * self._efficiency
                     else:
-                        self._losses = self._rated_power * (1 - self._efficiency)
+                        self._losses = (self._rated_power / self._efficiency) - self._rated_power
                     
                     self.ratedPowerChanged.emit()
                     self.lossesChanged.emit()

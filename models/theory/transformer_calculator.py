@@ -363,11 +363,14 @@ class TransformerCalculator(QObject):
     def _apply_vector_group_current_correction(self):
         """Apply vector group current correction factor to secondary current"""
         if self._primary_current > 0 and self._primary_voltage > 0 and self._secondary_voltage > 0:
-            # For a Dyn11 configuration (and similar D-Y configs), handle secondary current differently
-            if self._vector_group in ["Dyn11", "Dyn1"] or (self._vector_group[0] == "D" and self._vector_group[1].lower() == "y"):
+            # For delta-wye configurations (Dyn11, Dyn1, etc.)
+            if self._vector_group.startswith("D") and self._vector_group[1].lower() == "y":
                 # For delta-wye configurations, secondary current calculation is direct
                 # using S = √3 × V_line × I_line for both sides
                 self._secondary_current = self._apparent_power * 1000 / (math.sqrt(3) * self._secondary_voltage)
+            elif self._vector_group.startswith("Y") and self._vector_group[1].lower() == "d":
+                # For wye-delta, secondary current calculation
+                self._secondary_current = (self._primary_current * self._primary_voltage) / (self._secondary_voltage / math.sqrt(3))
             else:
                 # Get the current correction factor for this vector group
                 factor = self._vector_group_factors.get(self._vector_group, {"current": 1})["current"]
@@ -398,27 +401,7 @@ class TransformerCalculator(QObject):
                 self._primary_current = apparent_power_va / (math.sqrt(3) * self._primary_voltage)
                 print(f"Primary current calculated: {self._primary_current} A from {self._apparent_power} kVA / (√3 × {self._primary_voltage} V)")
                 self.primaryCurrentChanged.emit()
-            else:
-                print(f"Primary voltage is {self._primary_voltage}, can't calculate current")
-                
-            # Calculate secondary current if secondary voltage is provided
-            # For Dyn11 and similar vector groups, the LV side needs direct calculation:
-            if self._secondary_voltage > 0:
-                if self._vector_group in ["Dyn11", "Dyn1"] or (self._vector_group[0] == "D" and self._vector_group[1].lower() == "y"):
-                    # For delta-wye, secondary is wye connected, so S/(√3 × V_line) gives the correct current
-                    self._secondary_current = apparent_power_va / (math.sqrt(3) * self._secondary_voltage)
-                elif self._vector_group[0].upper() == "Y" and self._vector_group[1].lower() == "d":
-                    # For wye-delta secondary currents
-                    self._secondary_current = apparent_power_va / (math.sqrt(3) * self._secondary_voltage) * math.sqrt(3)
-                else:
-                    # Default calculation
-                    self._secondary_current = apparent_power_va / (math.sqrt(3) * self._secondary_voltage)
-                    
-                print(f"Secondary current calculated: {self._secondary_current} A from {self._apparent_power} kVA / (√3 × {self._secondary_voltage} V)")
-                self.secondaryCurrentChanged.emit()
-            else:
-                print(f"Secondary voltage is {self._secondary_voltage}, can't calculate current")
-                
+            
             # If we have both voltages, recalculate the turns ratio
             if self._primary_voltage > 0 and self._secondary_voltage > 0:
                 self._turns_ratio = self._primary_voltage / self._secondary_voltage
@@ -429,6 +412,22 @@ class TransformerCalculator(QObject):
                 
                 # Apply vector group correction to secondary current
                 self._apply_vector_group_current_correction()
+            else:
+                # If we don't have both voltages, but we have secondary voltage,
+                # calculate secondary current directly from apparent power
+                if self._secondary_voltage > 0:
+                    if self._vector_group.startswith("D") and self._vector_group[1].lower() == "y":
+                        # For delta-wye connections
+                        self._secondary_current = apparent_power_va / (math.sqrt(3) * self._secondary_voltage)
+                    elif self._vector_group.startswith("Y") and self._vector_group[1].lower() == "d":
+                        # For wye-delta connections
+                        self._secondary_current = apparent_power_va / (self._secondary_voltage / math.sqrt(3))
+                    else:
+                        # Default calculation for other connections
+                        self._secondary_current = apparent_power_va / (math.sqrt(3) * self._secondary_voltage)
+                    
+                    print(f"Secondary current calculated: {self._secondary_current} A from {self._apparent_power} kVA / (√3 × {self._secondary_voltage} V)")
+                    self.secondaryCurrentChanged.emit()
             
         except Exception as e:
             print(f"Calculation error in kVA: {e}")
@@ -444,22 +443,28 @@ class TransformerCalculator(QObject):
             # Calculate turns ratio if both voltages are available (using line-to-line voltages)
             if self._primary_voltage > 0 and self._secondary_voltage > 0:
                 self._turns_ratio = self._primary_voltage / self._secondary_voltage
+                self.turnsRatioChanged.emit()
+                
+                # Calculate the corrected ratio
+                self._calculate_corrected_ratio()
                 
                 # Calculate secondary current based on power conservation including vector group correction
                 if self._primary_current > 0:
-                    # The base relation between currents is modified by the vector group
-                    factor = self._vector_group_factors.get(self._vector_group, {"current": 1})["current"]
-                    base_secondary_current = (self._primary_current * self._primary_voltage) / self._secondary_voltage
-                    self._secondary_current = base_secondary_current * factor
-
-            self.turnsRatioChanged.emit()
-            self.secondaryCurrentChanged.emit()
-            
-            # Calculate corrected ratio if turns ratio was updated
-            self._calculate_corrected_ratio()
+                    self._apply_vector_group_current_correction()
+                    # We moved the current calculation to the dedicated method
+                else:
+                    # If we don't have primary current but we have apparent power, use that
+                    if self._apparent_power > 0:
+                        self._calculate_from_apparent_power()
             
             # Also calculate impedance parameters
             self._calculate_impedance_parameters()
+            
+            # Calculate efficiency and temperature rise whenever we recalculate
+            if self._apparent_power > 0:
+                self._calculate_efficiency()
+                self._calculate_temperature_rise()
+                self._validate_parameters()
             
         except Exception as e:
             print(f"Calculation error: {e}")
@@ -469,6 +474,7 @@ class TransformerCalculator(QObject):
         try:
             # Calculate short-circuit power MVA based on Z%
             if self._impedance_percent > 0 and self._apparent_power > 0:
+                # Short circuit power = S_rated × 100 / Z%
                 self._short_circuit_power = (100.0 / self._impedance_percent) * self._apparent_power / 1000.0  # MVA
                 self.shortCircuitPowerChanged.emit()
             
@@ -479,6 +485,12 @@ class TransformerCalculator(QObject):
                 sin_phi = math.sqrt(1 - power_factor**2)
                 self._voltage_drop = self._resistance_percent * power_factor + self._reactance_percent * sin_phi
                 self.voltageDropChanged.emit()
+                
+            # Calculate copper losses from resistance if not directly set
+            if self._resistance_percent > 0 and self._apparent_power > 0 and self._copper_losses == 0:
+                # P_cu = R% × S_rated × 10 (approximation)
+                self._copper_losses = self._resistance_percent * self._apparent_power * 10
+                self.copperLossesChanged.emit()
         
         except Exception as e:
             print(f"Error calculating impedance parameters: {e}")
@@ -486,17 +498,25 @@ class TransformerCalculator(QObject):
     def _calculate_efficiency(self):
         """Calculate transformer efficiency under load"""
         if self._apparent_power > 0:
+            # Total losses = copper + iron losses
             total_losses = self._iron_losses + self._copper_losses
-            input_power = self._apparent_power * 1000 * 0.8  # Assuming 0.8 power factor
+            
+            # Output power = Input power - losses
+            # Input power = S × power factor
+            power_factor = 0.8  # Assuming 0.8 power factor for calculation
+            input_power = self._apparent_power * 1000 * power_factor
+            
             if input_power > total_losses:
                 self._efficiency = ((input_power - total_losses) / input_power) * 100
                 self.efficiencyChanged.emit()
 
     def _calculate_temperature_rise(self):
         """Estimate temperature rise based on losses"""
-        if self._apparent_power > 0:
-            # Simplified estimation based on typical values
-            self._temperature_rise = (self._copper_losses / (self._apparent_power * 10)) + 35
+        if self._apparent_power > 0 and self._copper_losses > 0:
+            # More accurate temperature rise estimate based on losses and rating
+            # This is a simplified model - actual rise depends on cooling method
+            cooling_factor = 12  # Typical for ONAN cooling
+            self._temperature_rise = (self._copper_losses / (self._apparent_power * cooling_factor)) + 30
             self.temperatureRiseChanged.emit()
 
     def _validate_parameters(self):

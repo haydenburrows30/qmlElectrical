@@ -423,9 +423,11 @@ Item {
                                     Layout.fillWidth: true
                                 }
                                 TextFieldBlue { 
-                                    text: calculator.efficiency.toFixed(0) + "%"
-                                    ToolTip.text: "Efficiency"
+                                    id: efficiencyField
+                                    text: calculator.efficiency.toFixed(1) + "%"
+                                    ToolTip.text: "Efficiency at rated load, considering copper and iron losses"
                                     Layout.fillWidth: true
+                                    color: calculator.efficiency < 92 ? Universal.error : Universal.foreground
                                 }
                                 Label {
                                     text: "Vector Group:"
@@ -507,6 +509,25 @@ Item {
             if (!resistanceInput.activeFocus) {
                 resistanceInput.text = calculator.resistancePercent.toFixed(2)
             }
+        }
+        function onEfficiencyChanged() {
+            efficiencyField.text = calculator.efficiency.toFixed(1) + "%"
+        }
+        function onCopperLossesChanged() {
+            // Only update if the user is not editing
+            if (!copperLossesInput.activeFocus) {
+                copperLossesInput.text = calculator.copperLosses.toFixed(0)
+            }
+        }
+        function onIronLossesChanged() {
+            // Only update if the user is not editing
+            if (!ironLossesInput.activeFocus) {
+                ironLossesInput.text = calculator.ironLosses.toFixed(0)
+            }
+        }
+        function onWarningsChanged() {
+            // You could add visual indicators when warnings change
+            console.log("Warnings updated:", calculator.warnings)
         }
     }
 }

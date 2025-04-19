@@ -1,5 +1,6 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
+from datetime import datetime
 
 class MotorCalculator(QObject):
     """Calculator for motor starting characteristics"""
@@ -297,28 +298,9 @@ class MotorCalculator(QObject):
     def motorType(self, value):
         if self._motor_type != value and value in self._motor_types:
             self._motor_type = value
-            
-            # Update applicable starting methods
-            self._starting_methods = self._applicable_methods.get(value, ["DOL", "VFD"])
-            
-            # If current method is not applicable to new motor type, default to DOL
-            if self._starting_method not in self._starting_methods:
-                self._starting_method = "DOL"
-                self.startingMethodChanged.emit()
-            
-            # Suggest appropriate efficiency and power factor for this motor type
-            char = self._motor_characteristics.get(value, {})
-            eff_range = char.get("efficiency_range", (0.7, 0.9))
-            pf_range = char.get("power_factor_range", (0.7, 0.9))
-            
-            # Use default values from the range
-            self._efficiency = (eff_range[0] + eff_range[1]) / 2
-            self._power_factor = (pf_range[0] + pf_range[1]) / 2
-            
-            self.efficiencyChanged.emit()
-            self.powerFactorChanged.emit()
             self.motorTypeChanged.emit()
             self.startingMultiplierChanged.emit()
+            self.recommendationsChanged.emit()
             self._calculate()
     
     @Property(int, notify=motorSpeedChanged)
@@ -348,7 +330,6 @@ class MotorCalculator(QObject):
     def startingDuration(self, value):
         if self._starting_duration != value and value > 0:
             self._starting_duration = value
-            # No need for a signal as this doesn't directly affect main calculations
             
     @Property(float)
     def ambientTemperature(self):
@@ -370,66 +351,16 @@ class MotorCalculator(QObject):
         
     @Property(str, notify=recommendationsChanged)
     def startingRecommendations(self):
-        """Generate recommendations based on current motor parameters"""
-        try:
-            recommendations = []
-            
-            # Base recommendations by motor type
-            motor_type_recommendations = {
-                "Induction Motor": "Standard induction motors are robust and suitable for most applications.",
-                "Synchronous Motor": "Synchronous motors require field excitation control during starting.",
-                "Wound Rotor Motor": "Wound rotor motors allow for customizable starting characteristics.",
-                "Permanent Magnet Motor": "PM motors must use VFD control - never use DOL starting!",
-                "Single Phase Motor": "Single phase motors are suitable for small residential applications."
-            }
-            
-            if self._motor_type in motor_type_recommendations:
-                recommendations.append(motor_type_recommendations[self._motor_type])
-            
-            # Starting method recommendations
-            method_recommendations = {
-                "DOL": "DOL starting creates high inrush current. Consider using soft starter if supply is limited.",
-                "Star-Delta": "Star-Delta reduces starting current to about 33% of DOL values.",
-                "Soft Starter": "Set ramp time according to load characteristics (typically 2-10 seconds).",
-                "VFD": "VFDs offer the best control but consider harmonics filtering."
-            }
-            
-            if self._starting_method in method_recommendations:
-                recommendations.append(method_recommendations[self._starting_method])
-            
-            # Power-specific recommendations
-            if self._motor_power > 30 and self._starting_method == "DOL":
-                recommendations.append("For motors > 30kW, star-delta or soft starting is often preferred due to utility restrictions.")
-            
-            # Protection recommendations
-            if self._starting_current > 200:
-                recommendations.append("High starting current may cause significant voltage drop. Check supply capacity.")
-            
-            # Cable sizing recommendation
-            flc = self._starting_current / self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0)
-            cable_size = "Standard"
-            
-            if flc <= 10:
-                cable_size = "1.5 mm²"
-            elif flc <= 16:
-                cable_size = "2.5 mm²"
-            elif flc <= 25:
-                cable_size = "4 mm²"
-            elif flc <= 32:
-                cable_size = "6 mm²"
-            elif flc <= 50:
-                cable_size = "10 mm²"
-            elif flc <= 63:
-                cable_size = "16 mm²"
-            elif flc > 63:
-                cable_size = "Consult electrical standards for cables above 16 mm²"
-            
-            recommendations.append(f"Use minimum {cable_size} cables for power connections.")
-            
-            return "\n• ".join(recommendations)
-        except Exception as e:
-            print(f"Error generating recommendations: {e}")
-            return "Could not generate recommendations due to an error."
+        recommendations = []
+        if self._starting_method == "DOL":
+            recommendations.append("Ensure the motor can handle high inrush current.")
+        elif self._starting_method == "Star-Delta":
+            recommendations.append("Verify compatibility with motor windings.")
+        elif self._starting_method == "Soft Starter":
+            recommendations.append("Check for smooth ramp-up settings.")
+        elif self._starting_method == "VFD":
+            recommendations.append("Optimize ramp settings for energy efficiency.")
+        return "• " + "\n• ".join(recommendations)
 
     # QML slots
     @Slot(float)
@@ -450,15 +381,11 @@ class MotorCalculator(QObject):
     
     @Slot(str)
     def setStartingMethod(self, method):
-        """Set the starting method with proper validation - avoid recursive call"""
         if method in self._starting_methods:
             if self._starting_method != method:
-                # Directly set the property instead of calling self.startingMethod = method
                 self._starting_method = method
                 self.startingMethodChanged.emit()
-                # Emit the multiplier changed signal since it depends on the method
                 self.startingMultiplierChanged.emit()
-                # Also emit the recommendations changed signal
                 self.recommendationsChanged.emit()
                 self._calculate()
         else:
@@ -466,9 +393,7 @@ class MotorCalculator(QObject):
         
     @Slot(int)
     def setMotorSpeed(self, rpm):
-        if rpm > 0 and self._motor_speed != rpm:
-            self._motor_speed = rpm
-            self._calculate()
+        self.motorSpeed = rpm
     
     @Slot(str)
     def setMotorType(self, motor_type):
@@ -476,7 +401,6 @@ class MotorCalculator(QObject):
     
     @Slot(str, result=bool)
     def isMethodApplicable(self, method):
-        """Check if a starting method is applicable to the current motor type"""
         applicable = self._applicable_methods.get(self._motor_type, ["DOL"])
         return method in applicable
     
@@ -486,21 +410,14 @@ class MotorCalculator(QObject):
         
     @Slot(result=dict)
     def getMotorSpeedOptions(self):
-        """Return the available motor speed options"""
         return self._motor_speeds
         
     @Slot(str, result=bool)
     def exportResults(self, filePath):
-        """Export the calculation results to a CSV file"""
         try:
-            # Always print the file path for debugging
             print(f"Attempting to export to: '{filePath}'")
-            
-            # Handle Qt URL format if it wasn't handled on the QML side
             if filePath.startswith("file://"):
                 filePath = filePath.replace("file://", "")
-            
-            # Ensure the directory exists
             import os
             directory = os.path.dirname(filePath)
             if directory and not os.path.exists(directory):
@@ -509,13 +426,11 @@ class MotorCalculator(QObject):
                     print(f"Created directory: {directory}")
                 except Exception as e:
                     print(f"Error creating directory: {e}")
-            
-            # Print the absolute path for easier debugging
             abs_path = os.path.abspath(filePath)
             print(f"Absolute path: {abs_path}")
-            
             with open(filePath, 'w') as f:
                 f.write("Motor Starting Calculator Results\n")
+                f.write(f"Date,{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
                 f.write(f"Motor Type,{self._motor_type}\n")
                 f.write(f"Motor Power (kW),{self._motor_power}\n")
                 f.write(f"Voltage (V),{self._voltage}\n")
@@ -527,8 +442,12 @@ class MotorCalculator(QObject):
                 f.write(f"Starting Current Multiplier,{self.startingMultiplier:.2f}\n")
                 f.write(f"Nominal Torque (Nm),{self._nominal_torque:.2f}\n")
                 f.write(f"Starting Torque (% FLT),{self._starting_torque*100:.1f}\n")
-            
-            # Print success message with the absolute path
+                f.write(f"Estimated Temperature Rise (°C),{self.estimateTemperatureRise():.1f}\n")
+                f.write(f"Recommended Cable Size,{self.recommendCableSize()}\n")
+                f.write(f"Estimated Start Duration (s),{self.estimateStartDuration():.1f}\n")
+                f.write(f"Energy Usage (kWh),{self.calculateStartingEnergy():.3f}\n\n")
+                f.write("Recommendations:\n")
+                f.write(f"{self.startingRecommendations.replace('• ', '')}\n")
             print(f"Successfully exported to: '{abs_path}'")
             return True
         except Exception as e:
@@ -549,19 +468,11 @@ class MotorCalculator(QObject):
     
     @Slot(result=float)
     def estimateTemperatureRise(self):
-        """Calculate estimated temperature rise during motor starting"""
         try:
-            if self._starting_current <= 0:
+            if self._starting_current <= 0 or self._full_load_current <= 0:
                 return 0.0
-                
-            # Get current multiplier for this motor/method combination
             multiplier = self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0)
-            flc = self._starting_current / multiplier
-            
-            # Calculate heat generated based on I²t principle
-            heatGenerated = pow(self._starting_current / flc, 2) * self._starting_duration
-            
-            # Apply thermal coefficient based on motor type
+            heatGenerated = pow(self._starting_current / self._full_load_current, 2) * self._starting_duration
             thermalFactor = {
                 "Induction Motor": 1.0,
                 "Synchronous Motor": 0.9,
@@ -569,18 +480,12 @@ class MotorCalculator(QObject):
                 "Permanent Magnet Motor": 0.7,
                 "Single Phase Motor": 1.2
             }.get(self._motor_type, 1.0)
-            
-            # Apply duty cycle factor
             dutyCycleFactor = 1.0
             if "Intermittent" in self._duty_cycle:
                 dutyCycleFactor = 0.8
             elif "Short-time" in self._duty_cycle:
                 dutyCycleFactor = 0.9
-                
-            # Calculate temperature rise with factors
             tempRise = heatGenerated * 0.1 * thermalFactor * dutyCycleFactor
-            
-            # Limit to realistic values based on insulation class
             return min(tempRise, 140)
         except Exception as e:
             print(f"Error calculating temperature rise: {e}")
@@ -588,7 +493,6 @@ class MotorCalculator(QObject):
     
     @Slot(result=str)
     def getTemperatureRiseLevel(self):
-        """Get qualitative assessment of temperature rise"""
         tempRise = self.estimateTemperatureRise()
         if tempRise < 40:
             return "normal"
@@ -599,16 +503,11 @@ class MotorCalculator(QObject):
     
     @Slot(result=str)
     def recommendCableSize(self):
-        """Recommend minimum cable size based on motor full load current"""
         try:
             if self._starting_current <= 0:
                 return "N/A"
-            
-            # Get current multiplier for this motor/method combination
             multiplier = self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0)
             flc = self._starting_current / multiplier
-            
-            # Standard cable sizing based on current carrying capacity
             if flc <= 10:
                 return "1.5 mm²"
             elif flc <= 16:
@@ -641,12 +540,8 @@ class MotorCalculator(QObject):
 
     @Slot(result=float)
     def estimateStartDuration(self):
-        """Estimate the motor starting duration based on current parameters"""
         try:
-            # Simple estimation based on motor type and starting method
             base_duration = self._starting_duration
-            
-            # Adjust based on motor type
             motor_type_factor = {
                 "Induction Motor": 1.0,
                 "Synchronous Motor": 1.2,
@@ -654,53 +549,37 @@ class MotorCalculator(QObject):
                 "Permanent Magnet Motor": 0.7,
                 "Single Phase Motor": 1.1
             }
-            
-            # Adjust based on starting method
             method_factor = {
                 "DOL": 0.8,
                 "Star-Delta": 1.5,
                 "Soft Starter": 1.2,
                 "VFD": 1.1
             }
-            
             type_multiplier = motor_type_factor.get(self._motor_type, 1.0)
             method_multiplier = method_factor.get(self._starting_method, 1.0)
-            
-            # Final estimate considering motor power (larger motors take longer)
-            power_factor = 1.0 + (self._motor_power / 100.0)  # Slight increase for larger motors
-            
+            power_factor = 1.0 + (self._motor_power / 100.0)
             return base_duration * type_multiplier * method_multiplier * power_factor
         except Exception as e:
             print(f"Error estimating start duration: {e}")
-            return self._starting_duration  # Return default if calculation fails
+            return self._starting_duration
     
     @Slot(result=float)
     def calculateStartingEnergy(self):
-        """Calculate energy used during motor starting in kWh"""
         try:
             if self._starting_current <= 0:
                 return 0.0
-                
-            # Get duration from estimate or use default
             duration = self.estimateStartDuration()
-            
-            # Calculate energy based on starting current, voltage, and power factor
-            # Convert to kWh (I * V * √3 * PF * hours / 1000)
-            energy_kWh = (self._starting_current * self._voltage * math.sqrt(3) * 
-                          self._power_factor * (duration / 3600)) / 1000
-                          
-            # For VFD, energy usage is typically lower due to controlled ramp
+            energy = (math.sqrt(3) * self._voltage * self._starting_current * 
+                     self._power_factor * (duration / 3600))
             if self._starting_method == "VFD":
-                energy_kWh *= 0.6  # 60% of DOL energy usage
+                energy *= 0.6
             elif self._starting_method == "Soft Starter":
-                energy_kWh *= 0.8  # 80% of DOL energy usage
-                
-            return energy_kWh
+                energy *= 0.8
+            return energy
         except Exception as e:
             print(f"Error calculating starting energy: {e}")
             return 0.0
     
     @Slot(result=str)
     def getStartingRecommendations(self):
-        """Legacy method for backwards compatibility"""
         return self.startingRecommendations
