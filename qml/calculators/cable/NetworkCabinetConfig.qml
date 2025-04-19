@@ -24,7 +24,7 @@ Item {
         anchors.fill: parent
 
         WaveCard {
-            title: "Site Information"
+            title: "Cabinet Settings"
             Layout.maximumWidth: 300
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -34,57 +34,7 @@ Item {
                 anchors.fill: parent
                 spacing: 10
 
-                // Site information controls
-                RowLayout {
-                    Layout.fillWidth: true
-                    
-                    Label {
-                        text: "Site Name:"
-                        Layout.preferredWidth: 100
-                    }
-                    
-                    TextFieldRound {
-                        id: siteNameField
-                        Layout.fillWidth: true
-                        placeholderText: "Enter site name"
-                        selectByMouse: true
-                        text: calculator ? calculator.siteName : ""
-                        
-                        onTextChanged: {
-                            if (calculator && calculator.siteName !== text) {
-                                calculator.siteName = text
-                                configChanged()
-                            }
-                        }
-                    }
-                }
-
-                // Site Name
-                RowLayout {
-                    Layout.fillWidth: true
-                    
-                    Label {
-                        text: "Site Number:"
-                        Layout.preferredWidth: 100
-                    }
-                    
-                    TextFieldRound {
-                        id: siteNumberField
-                        Layout.fillWidth: true
-                        placeholderText: "Enter site number"
-                        selectByMouse: true
-                        text: calculator ? calculator.siteNumber : ""
-                        
-                        onTextChanged: {
-                            if (calculator && calculator.siteNumber !== text) {
-                                calculator.siteNumber = text
-                                configChanged()
-                            }
-                        }
-                    }
-                }
-
-                // Site Number
+                // Number of Ways
                 RowLayout {
                     Layout.fillWidth: true
                     
@@ -226,8 +176,6 @@ Item {
         if (calculator) {
             // Update all controls from calculator values
             waysSpinBox.value = calculator.activeWays
-            siteNameField.text = calculator.siteName
-            siteNumberField.text = calculator.siteNumber
             
             // Update toggle switches
             streetlightingSwitch.checked = calculator.showStreetlightingPanel

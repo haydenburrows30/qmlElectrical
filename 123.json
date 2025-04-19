@@ -1,0 +1,89 @@
+{
+    "active_ways": 4,
+    "cable_sizes": [
+        "185mm\u00b2",
+        "185mm\u00b2",
+        "185mm\u00b2",
+        "185mm\u00b2"
+    ],
+    "show_streetlighting_panel": false,
+    "show_service_panel": false,
+    "show_dropper_plates": false,
+    "way_types": [
+        0,
+        0,
+        0,
+        0
+    ],
+    "fuse_ratings": [
+        "63A",
+        "63A",
+        "63A",
+        "63A"
+    ],
+    "service_cable_sizes": [
+        "16mm\u00b2",
+        "16mm\u00b2",
+        "16mm\u00b2",
+        "16mm\u00b2"
+    ],
+    "conductor_types": [
+        "Al",
+        "Al",
+        "Al",
+        "Al"
+    ],
+    "service_conductor_types": [
+        "Cu",
+        "Cu",
+        "Cu",
+        "Cu"
+    ],
+    "connection_counts": [
+        2,
+        2,
+        2,
+        2
+    ],
+    "cable_lengths": [
+        0,
+        0,
+        0,
+        0
+    ],
+    "service_panel_length": 0,
+    "service_panel_cable_size": "35mm\u00b2",
+    "service_panel_conductor_type": "Al",
+    "service_panel_connection_count": 2,
+    "site_name": "1",
+    "site_number": "1",
+    "sources": [
+        "",
+        "",
+        "",
+        ""
+    ],
+    "destinations": [
+        "",
+        "",
+        "",
+        ""
+    ],
+    "notes": [
+        "",
+        "",
+        "",
+        ""
+    ],
+    "service_panel_source": "",
+    "service_panel_destination": "",
+    "service_panel_notes": "",
+    "phases": [
+        "3\u03a6",
+        "3\u03a6",
+        "3\u03a6",
+        "3\u03a6"
+    ],
+    "service_panel_phase": "3\u03a6",
+    "general_notes": "All network cable trifurcated before entering cabinet. Lengths includes tails."
+}

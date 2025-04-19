@@ -53,6 +53,10 @@ class NetworkCabinetCalculator(QObject):
     revisionDescriptionChanged = Signal(str)
     checkedByChanged = Signal(str)
     
+    # Add new signals for revision management
+    revisionCountChanged = Signal(int)
+    revisionsChanged = Signal(list)
+    
     def __init__(self):
         super().__init__()
         
@@ -105,7 +109,11 @@ class NetworkCabinetCalculator(QObject):
             "designer": "",
             "revision_number": "1",
             "revision_description": "",
-            "checked_by": ""
+            "checked_by": "",
+            
+            # New properties for multiple revisions
+            "revision_count": 1,
+            "revisions": [{"number": "1", "description": "", "designer": "", "date": "", "checkedBy": ""}]
         }
         
         # Initialize all properties with default values
@@ -440,6 +448,61 @@ class NetworkCabinetCalculator(QObject):
     def checkedBy(self, value):
         self._set_and_notify("_checked_by", value, self.checkedByChanged)
     
+    # Add multiple revisions properties
+    @Property(int, notify=revisionCountChanged)
+    def revisionCount(self):
+        return self._revision_count
+    
+    @revisionCount.setter
+    def revisionCount(self, value):
+        if 1 <= value <= 5:  # Limit to 5 revisions max
+            if self._revision_count != value:
+                self._revision_count = value
+                
+                # Make sure we have enough revision entries
+                while len(self._revisions) < value:
+                    idx = len(self._revisions) + 1
+                    self._revisions.append({
+                        "number": str(idx), 
+                        "description": "", 
+                        "designer": self._designer, 
+                        "date": "", 
+                        "checkedBy": self._checked_by
+                    })
+                
+                self.revisionCountChanged.emit(value)
+                self.configChanged.emit()
+    
+    # Methods to get and manipulate revisions
+    @Property("QVariantList", notify=revisionsChanged)
+    def revisions(self):
+        return self._revisions
+    
+    @revisions.setter
+    def revisions(self, value):
+        if self._revisions != value:
+            self._revisions = value
+            self.revisionsChanged.emit(value)
+            self.configChanged.emit()
+    
+    @Slot(int, str, str)
+    def setRevisionProperty(self, index, property_name, value):
+        """Set a property on a specific revision"""
+        if 0 <= index < len(self._revisions):
+            if self._revisions[index].get(property_name, "") != value:
+                self._revisions[index][property_name] = value
+                self.revisionsChanged.emit(self._revisions)
+                self.configChanged.emit()
+                return True
+        return False
+    
+    @Slot(int, str, result=str)
+    def getRevisionProperty(self, index, property_name):
+        """Get a property from a specific revision"""
+        if 0 <= index < len(self._revisions) and property_name in self._revisions[index]:
+            return self._revisions[index][property_name]
+        return ""
+    
     @Slot()
     def resetToDefaults(self):
         """Reset all cabinet properties to default values."""
@@ -486,7 +549,10 @@ class NetworkCabinetCalculator(QObject):
             "designer": self.designerChanged,
             "revision_number": self.revisionNumberChanged,
             "revision_description": self.revisionDescriptionChanged,
-            "checked_by": self.checkedByChanged
+            "checked_by": self.checkedByChanged,
+            # Add revision management signals
+            "revision_count": self.revisionCountChanged,
+            "revisions": self.revisionsChanged
         }
         
         # Emit all signals
@@ -635,7 +701,10 @@ class NetworkCabinetCalculator(QObject):
                 "designer": self.designerChanged,
                 "revision_number": self.revisionNumberChanged,
                 "revision_description": self.revisionDescriptionChanged,
-                "checked_by": self.checkedByChanged
+                "checked_by": self.checkedByChanged,
+                # Add revision management signals
+                "revision_count": self.revisionCountChanged,
+                "revisions": self.revisionsChanged
             }
             
             # Emit all signals with the updated values

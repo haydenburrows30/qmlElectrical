@@ -61,9 +61,6 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         
         # Create the main story starting with header content
         story = []
-
-        # Create the header and image table
-        header_table_data = []
         
         # Create the left column with header content
         left_column = []
@@ -330,7 +327,11 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         
         if diagram_added and diagram_table:
             # Add the diagram table to the story right after config items
-            story.append(Paragraph("Cabinet Diagram and Notes:", subtitle_style))
+            story.append(Paragraph("Cabinet Diagram and Notes:", ParagraphStyle(
+                'DiagramHeading',
+                parent=subtitle_style,
+                alignment=1,  # 0 means left alignment
+            )))
             
             # Create content for the right cell - general notes if available
             right_cell_content = ''
@@ -348,7 +349,7 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
             
             # Create a wider container table that spans the whole page width
             # With image on left and notes on right if available
-            page_width = landscape(A4)[0] - doc.leftMargin - doc.rightMargin
+            page_width = landscape(A4)[0] - doc.leftMargin - doc.rightMargin -100
             diagram_container = Table(
                 [[diagram_table, right_cell_content]],  # Notes in right cell
                 colWidths=[img.drawWidth, page_width - img.drawWidth]  # Second column takes remaining space
@@ -379,15 +380,46 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         # Create footer table with revision info
         footer_data = [
             ["Revision No.", "Revision Description", "Designer", "Date", "Checked"],
-            # Use calculator properties for footer fields if available
-            [
+        ]
+        
+        # Check if calculator has revisions property and if it has more than one entry
+        has_revisions = hasattr(calculator, "_revisions") and calculator._revisions and len(calculator._revisions) > 0
+        revision_count = getattr(calculator, "_revision_count", 1)  # Default to 1 if not set
+        
+        if has_revisions:
+            # Add each revision to the footer table (up to revision_count)
+            for i, revision in enumerate(calculator._revisions):
+                if i >= revision_count:
+                    break  # Only include up to revisionCount
+                
+                # Use revision properties or fall back to defaults
+                rev_number = revision.get("number", str(i+1))
+                rev_description = revision.get("description", "")
+                rev_designer = revision.get("designer", getattr(calculator, "_designer", ""))
+                
+                # Use provided date or today's date
+                rev_date = revision.get("date", "")
+                if not rev_date:
+                    rev_date = datetime.datetime.now().strftime("%d/%m/%Y")
+                
+                rev_checked = revision.get("checkedBy", getattr(calculator, "_checked_by", ""))
+                
+                footer_data.append([
+                    rev_number, 
+                    rev_description,
+                    rev_designer,
+                    rev_date,
+                    rev_checked
+                ])
+        else:
+            # Fallback to using the single revision approach
+            footer_data.append([
                 calculator._revision_number if hasattr(calculator, "_revision_number") and calculator._revision_number else "1", 
                 calculator._revision_description if hasattr(calculator, "_revision_description") and calculator._revision_description else "", 
                 calculator._designer if hasattr(calculator, "_designer") and calculator._designer else "", 
                 datetime.datetime.now().strftime("%d/%m/%Y"), 
                 calculator._checked_by if hasattr(calculator, "_checked_by") and calculator._checked_by else ""
-            ]
-        ]
+            ])
         
         # Set column widths for footer
         footer_widths = [2*cm, 8*cm, 4*cm, 2.5*cm, 2.5*cm]
@@ -414,6 +446,11 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
             ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
         ])
         
+        # Add alternating row colors for better readability
+        for i in range(1, len(footer_data)):
+            if i % 2 == 0:
+                footer_style.add('BACKGROUND', (0, i), (-1, i), colors.lightgrey)
+                
         footer_table.setStyle(footer_style)
         story.append(footer_table)
         
@@ -423,4 +460,4 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         return True, f"PDF saved: {full_path}"
             
     except Exception as e:
-        return False, f"Error exporting PDF: {str(e)}"
+        return False, f"Error exporting PDF: {str(e)}. Please fill in header "
