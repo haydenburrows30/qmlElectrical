@@ -19,7 +19,7 @@ from models.cable.charging_calculator import ChargingCalculator
 from models.protection.battery_calculator import BatteryCalculator
 from models.theory.machine_calculator import MachineCalculator
 from models.protection.earthing_calculator import EarthingCalculator
-from models.protection.transmission_calculator import TransmissionLineCalculator
+from models.cable.transmission_calculator import TransmissionLineCalculator
 from models.protection.delta_transformer import DeltaTransformerCalculator
 from models.cable.switchboard_manager import SwitchboardManager
 from models.grid_wind.wind_turbine_calculator import WindTurbineCalculator
