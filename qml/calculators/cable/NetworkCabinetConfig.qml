@@ -126,7 +126,6 @@ Item {
                                 calculator.showStreetlightingPanel = checked
                                 // Force immediate diagram update
                                 cabinetDiagram.updatePanelVisibility()
-                                cabinetDiagram.forceRefresh()
                                 configChanged()
                             }
                         }
@@ -151,7 +150,6 @@ Item {
                                 calculator.showServicePanel = checked
                                 // Force immediate diagram update
                                 cabinetDiagram.updatePanelVisibility()
-                                cabinetDiagram.forceRefresh()
                                 configChanged()
                             }
                         }

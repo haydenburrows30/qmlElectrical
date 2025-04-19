@@ -48,12 +48,6 @@ Item {
                 
                 // Export to PDF
                 calculator.exportToPdf(folderDialog.folder, diagramImage)
-                
-                // Force refresh the diagram after PDF generation to ensure it's fully restored
-                Qt.callLater(function() {
-                    cabinetDiagram.updatePanelVisibility()
-                    cabinetDiagram.forceRefresh()
-                })
             })
         }
     }

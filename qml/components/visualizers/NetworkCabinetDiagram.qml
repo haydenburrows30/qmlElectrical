@@ -10,20 +10,6 @@ Item {
     property var calculator
     property bool darkMode: false
     
-    // Change from readonly to direct properties for panel visibility settings
-    property bool showStreetlightingPanel: false
-    property bool showServicePanel: false
-    
-    // Other readonly properties are fine
-    readonly property int activeWays: calculator ? calculator.activeWays : 4
-    readonly property var cableSizes: calculator ? calculator.cableSizes : ["300mm²", "185mm²", "185mm²", "185mm²"]
-    readonly property var wayTypes: calculator ? calculator.wayTypes : [0, 0, 0, 0]
-    readonly property var fuseRatings: calculator ? calculator.fuseRatings : ["63A", "63A", "63A", "63A"]
-    readonly property var serviceCableSizes: calculator ? calculator.serviceCableSizes : ["35mm²", "35mm²", "35mm²", "35mm²"]
-    readonly property var conductorTypes: calculator ? calculator.conductorTypes : ["Al", "Al", "Al", "Al"]
-    readonly property var serviceConductorTypes: calculator ? calculator.serviceConductorTypes : ["Al", "Al", "Al", "Al"]
-    readonly property var connectionCounts: calculator ? calculator.connectionCounts : [2, 2, 2, 2]
-    
     // Colors adjusted for light/dark mode
     property color backgroundColor: darkMode ? "#2a2a2a" : "#f8f8f8"
     property color borderColor: darkMode ? "#555555" : "#333333"
@@ -103,11 +89,17 @@ Item {
                 ctx.fillText(phaseNames[p], cabinetX + cabinetWidth * 0.12, currentBusbarY + singleBusbarHeight * 0.7);
             }
             
+            // Get active ways from calculator or use default if calculator is null
+            var activeWays = calculator ? calculator.activeWays : 4;
+            
             // Draw all 4 positions - either active disconnectors, 160A disconnects, or cover plates
             for (var i = 0; i < 4; i++) {
                 if (i < activeWays) {
+                    // Get way type from calculator or use default
+                    var wayType = calculator && calculator.wayTypes ? calculator.wayTypes[i] : 0;
+                    
                     // Check the way type
-                    if (wayTypes[i] === 0) {
+                    if (wayType === 0) {
                         // Draw single 630A disconnector
                         ctx.fillStyle = disconnectorColor;
                         ctx.fillRect(disconnectorX, disconnectorY, disconnectorWidth, disconnectorHeight);
@@ -144,14 +136,18 @@ Item {
                         ctx.lineTo(disconnectorX + disconnectorWidth * 0.5, cabinetY + cabinetHeight);
                         ctx.stroke();
                         
+                        // Get cable size and conductor type from calculator or use default
+                        var cableSize = calculator && calculator.cableSizes ? calculator.cableSizes[i] : "300mm²";
+                        var conductorType = calculator && calculator.conductorTypes ? calculator.conductorTypes[i] : "Al";
+                        
                         // Cable size text
                         ctx.fillStyle = textColor;
                         ctx.font = "12px sans-serif";
                         ctx.textAlign = "center";
-                        ctx.fillText(cableSizes[i] + " " + conductorTypes[i], 
+                        ctx.fillText(cableSize + " " + conductorType, 
                                    disconnectorX + disconnectorWidth * 0.5, 
                                    cabinetY + cabinetHeight + height * 0.03);
-                    } else if (wayTypes[i] === 1) {
+                    } else if (wayType === 1) {
                         // Draw two 160A disconnects side by side but vertically oriented
                         ctx.fillStyle = cabinetColor;
                         ctx.fillRect(disconnectorX, disconnectorY, disconnectorWidth, disconnectorHeight);
@@ -186,8 +182,11 @@ Item {
                         var smallDisconnectorX2 = disconnectorX + disconnectorWidth - smallDisconnectorWidth - smallDisconnectorSpacing * 0.5;
                         var smallDisconnectorY = disconnectorY + (disconnectorHeight - smallDisconnectorHeight) * 0.5;
                         
+                        // Get number of connections from calculator or use default
+                        var connectionCount = calculator && calculator.connectionCounts ? calculator.connectionCounts[i] : 2;
+                        
                         // Get number of connections to display (max 3 per 160A disconnect, so max 6 total)
-                        var numConnections = Math.min(connectionCounts[i], 6);
+                        var numConnections = Math.min(connectionCount, 6);
                         var connectionsPerDisconnect, secondDisconnectConnections;
                         
                         // Fill up left side first (up to 3), then right side
@@ -218,6 +217,10 @@ Item {
                             ctx.fillText("63A Fuse", 0, 0);
                             ctx.restore();
                             
+                            // Get service cable size and conductor type from calculator or use default
+                            var serviceCableSize = calculator && calculator.serviceCableSizes ? calculator.serviceCableSizes[i] : "35mm²";
+                            var serviceConductorType = calculator && calculator.serviceConductorTypes ? calculator.serviceConductorTypes[i] : "Al";
+                            
                             // Draw connection cables based on number required
                             for (var c1 = 0; c1 < connectionsPerDisconnect; c1++) {
                                 // Calculate position with even spacing
@@ -236,7 +239,7 @@ Item {
                                     ctx.fillStyle = textColor;
                                     ctx.font = "10px sans-serif";
                                     ctx.textAlign = "center";
-                                    ctx.fillText(serviceCableSizes[i] + " " + serviceConductorTypes[i], 
+                                    ctx.fillText(serviceCableSize + " " + serviceConductorType, 
                                             smallDisconnectorX1 + smallDisconnectorWidth * 0.5, 
                                             cabinetY + cabinetHeight + height * 0.03);
                                 }
@@ -262,6 +265,10 @@ Item {
                             ctx.fillText("63A Fuse", 0, 0);
                             ctx.restore();
                             
+                            // Get service cable size and conductor type from calculator or use default
+                            var serviceCableSize = calculator && calculator.serviceCableSizes ? calculator.serviceCableSizes[i] : "35mm²";
+                            var serviceConductorType = calculator && calculator.serviceConductorTypes ? calculator.serviceConductorTypes[i] : "Al";
+                            
                             // Draw connection cables based on number required
                             for (var c2 = 0; c2 < secondDisconnectConnections; c2++) {
                                 // Calculate position with even spacing
@@ -280,14 +287,14 @@ Item {
                                     ctx.fillStyle = textColor;
                                     ctx.font = "10px sans-serif";
                                     ctx.textAlign = "center";
-                                    ctx.fillText(serviceCableSizes[i] + " " + serviceConductorTypes[i], 
+                                    ctx.fillText(serviceCableSize + " " + serviceConductorType, 
                                             smallDisconnectorX2 + smallDisconnectorWidth * 0.5, 
                                             cabinetY + cabinetHeight + height * 0.03);
                                 }
                             }
                         }
                         
-                    } else if (wayTypes[i] === 2) {
+                    } else if (wayType === 2) {
                         // Draw 1x160A disconnect with cover
                         ctx.fillStyle = cabinetColor;
                         ctx.fillRect(disconnectorX, disconnectorY, disconnectorWidth, disconnectorHeight);
@@ -322,8 +329,11 @@ Item {
                         var coverX = disconnectorX + disconnectorWidth - smallDisconnectorWidth - smallDisconnectorSpacing * 0.5;
                         var smallDisconnectorY = disconnectorY + (disconnectorHeight - smallDisconnectorHeight) * 0.5;
                         
+                        // Get number of connections from calculator or use default
+                        var singleConnectionCount = calculator && calculator.connectionCounts ? calculator.connectionCounts[i] : 2;
+                        
                         // Get number of connections to display (max 3)
-                        var singleNumConnections = Math.min(connectionCounts[i], 3);
+                        var singleNumConnections = Math.min(singleConnectionCount, 3);
                         
                         // Draw 160A disconnect (vertical)
                         ctx.fillStyle = smallDisconnectorColor;
@@ -386,6 +396,10 @@ Item {
                         ctx.fillText("63A Fuse", 0, 0);
                         ctx.restore();
                         
+                        // Get service cable size and conductor type from calculator or use default
+                        var serviceCableSize = calculator && calculator.serviceCableSizes ? calculator.serviceCableSizes[i] : "35mm²";
+                        var serviceConductorType = calculator && calculator.serviceConductorTypes ? calculator.serviceConductorTypes[i] : "Al";
+                        
                         // Draw connection cables based on number required
                         for (var c3 = 0; c3 < singleNumConnections; c3++) {
                             // Calculate position with even spacing
@@ -404,7 +418,7 @@ Item {
                                 ctx.fillStyle = textColor;
                                 ctx.font = "10px sans-serif";
                                 ctx.textAlign = "center";
-                                ctx.fillText(serviceCableSizes[i] + " " + serviceConductorTypes[i], 
+                                ctx.fillText(serviceCableSize + " " + serviceConductorType, 
                                         smallDisconnectorX + smallDisconnectorWidth * 0.5, 
                                         cabinetY + cabinetHeight + height * 0.03);
                             }
@@ -459,7 +473,7 @@ Item {
             }
             
             // Draw streetlighting distribution panel if enabled
-            if (showStreetlightingPanel) {
+            if (calculator.showStreetlightingPanel) {
                 // Small distribution board on left side
                 var panelWidth = cabinetWidth * 0.15;
                 var panelHeight = cabinetHeight * 0.25;
@@ -527,7 +541,7 @@ Item {
             }
             
             // Draw local service disconnects if enabled
-            if (showServicePanel) {
+            if (calculator.showServicePanel) {
                 // Service panel on right side
                 
                 var servicePanelWidth = cabinetWidth * 0.15;
@@ -610,19 +624,10 @@ Item {
         }
     }
     
-    // Initialize when component completes
-    Component.onCompleted: {
-        updatePanelVisibility()
-    }
-    
     // Update function to capture a diagram optimized for PDF inclusion
     function captureImage() {
         // First ensure we have the latest panel visibility
-        updatePanelVisibility()
-        
-        // Save current panel visibility states
-        const savedStreetlighting = showStreetlightingPanel
-        const savedService = showServicePanel
+        canvas.requestPaint()
         
         // Determine optimal scale factor based on canvas size
         let scaleFactor
@@ -633,20 +638,9 @@ Item {
         } else {
             scaleFactor = 2.0  // For small canvases
         }
-        
-        // Create a higher resolution image
-        canvas.canvasSize = Qt.size(canvas.width * scaleFactor, canvas.height * scaleFactor)
-        canvas.requestPaint()
-        
+
         // Save the high-res image data
         let imageData = canvas.toDataURL("image/png")
-        
-        // Reset canvas to normal size
-        canvas.canvasSize = Qt.size(0, 0) // Reset to automatic sizing
-        
-        // Ensure panel visibility states are preserved
-        showStreetlightingPanel = savedStreetlighting
-        showServicePanel = savedService
         
         // Force a repaint to restore the canvas
         canvas.requestPaint()
@@ -657,41 +651,7 @@ Item {
     // Explicitly update panel visibility from calculator
     function updatePanelVisibility() {
         if (calculator) {
-            showStreetlightingPanel = calculator.showStreetlightingPanel
-            showServicePanel = calculator.showServicePanel
             canvas.requestPaint()
-        }
-    }
-    
-    // Force refresh the diagram
-    function forceRefresh() {
-        updatePanelVisibility()
-        canvas.requestPaint()
-    }
-    
-    // Panel visibility property change signals
-    onShowStreetlightingPanelChanged: {
-        canvas.requestPaint()
-    }
-    
-    onShowServicePanelChanged: {
-        canvas.requestPaint()
-    }
-    
-    // Connect to calculator's signals to ensure panel visibility stays in sync
-    Connections {
-        target: calculator
-        
-        function onConfigChanged() {
-            updatePanelVisibility()
-        }
-        
-        function onShowStreetlightingPanelChanged() {
-            showStreetlightingPanel = calculator.showStreetlightingPanel
-        }
-        
-        function onShowServicePanelChanged() {
-            showServicePanel = calculator.showServicePanel
         }
     }
 }
