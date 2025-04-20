@@ -1163,7 +1163,7 @@ class TransformerLineCalculator(QObject):
             
             generator = PDFGenerator()
             generator.generate_transformer_report(export_data, clean_path)
-            print(f"Transformer report exported to: {clean_path}")
+            logger.info(f"Transformer report exported to: {clean_path}")
             
         except Exception as e:
             print(f"Error exporting transformer report: {e}")
@@ -1180,12 +1180,12 @@ class TransformerLineCalculator(QObject):
 
             # Convert QJSValue to Python dict and use directly
             js_data = data.toVariant()
-            print("Received JS data:", js_data)
+            logger.info("Received JS data:", js_data)
             
             # No data transformation - pass directly to PDF generator
             generator = PDFGenerator()
             generator.generate_protection_report(js_data, clean_path)
-            print(f"Protection report exported to: {clean_path}")
+            logger.info(f"Protection report exported to: {clean_path}")
             
         except Exception as e:
             print(f"Error exporting protection report: {e}")

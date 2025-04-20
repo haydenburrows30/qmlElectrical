@@ -268,7 +268,6 @@ class SwitchboardManager(QObject):
     # Methods
     @Slot(dict, result=bool)
     def addCircuit(self, circuit_data):
-        print("Adding circuit:", circuit_data)
         circuit_number = f"{self._next_circuit_number:02d}"
         self._next_circuit_number += 1
         
@@ -286,24 +285,19 @@ class SwitchboardManager(QObject):
         self._circuit_model.layoutChanged.emit()
         
         # Emit signals in the right order
-        print("Emitting signals: totalLoadChanged")
         self.totalLoadChanged.emit()
-        print("Emitting signals: utilizationPercentChanged")
         self.utilizationPercentChanged.emit()
-        print("Emitting signals: circuitsChanged")
         self.circuitsChanged.emit()
         self.circuitCountChanged.emit(len(self._circuit_model._circuits))
         
         # Make extra sure to notify QML about the updated count
         count = len(self._circuit_model._circuits)
-        print(f"Emitting circuit count changed: {count}")
         self.circuitCountChanged.emit(count)
         
         return True
 
     @Slot(int, dict, result=bool)
     def updateCircuit(self, index, circuit_data):
-        print(f"Updating circuit at index {index} with data: {circuit_data}")
         existing = self._circuit_model.get_circuit(index)
         if existing:
             circuit_number = existing.number
@@ -322,7 +316,6 @@ class SwitchboardManager(QObject):
             self._circuit_model.layoutChanged.emit()
             
             # Emit signals in the right order (similar to addCircuit)
-            print(f"Circuit updated successfully: {circuit_number}")
             self.totalLoadChanged.emit()
             self.utilizationPercentChanged.emit()
             self.circuitsChanged.emit()
@@ -343,7 +336,6 @@ class SwitchboardManager(QObject):
     @Slot(int, result='QVariant')
     def getCircuitAt(self, index):
         """Get circuit data at specified index for QML display"""
-        print(f"QML requesting circuit at index: {index}, total count: {len(self._circuit_model._circuits)}")
         
         try:
             if 0 <= index < len(self._circuit_model._circuits):
@@ -361,7 +353,6 @@ class SwitchboardManager(QObject):
                     'notes': circuit.notes,
                     'status': circuit.status
                 }
-                print(f"Returning circuit data for index {index}: {result['number']} - {result['destination']}")
                 return result
         except Exception as e:
             print(f"Error retrieving circuit at index {index}: {e}")

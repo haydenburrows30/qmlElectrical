@@ -9,9 +9,12 @@ import csv
 import os
 from datetime import datetime
 import time
+import logging
 
 from utils.calculation_cache import CalculationCache, generate_cache_key
 from utils.worker_pool import WorkerPoolManager, ManagedWorker
+
+logger = logging.getLogger("qmltest")
 
 class CalculationWorker(ManagedWorker):
     """Worker class to run calculations in a separate thread"""
@@ -95,7 +98,7 @@ class CalculationWorker(ManagedWorker):
             QMetaObject.invokeMethod(self.calculator, "checkPendingUpdates", 
                                    Qt.ConnectionType.QueuedConnection)
         except Exception as e:
-            print(f"Error in calculation worker: {e}")
+            logger.error(f"Error in calculation worker: {e}")
             # Always ensure we reset calculation status on error
             QMetaObject.invokeMethod(self.calculator, "_update_calculation_status",
                                    Qt.ConnectionType.QueuedConnection,
@@ -167,7 +170,7 @@ class HarmonicAnalysisCalculator(QObject):
         
         # Add thread pool for background calculations
         self._thread_pool = WorkerPoolManager.get_instance()
-        print(f"Using {self._thread_pool.maxThreadCount()} threads for calculations")
+        logger.info(f"Using {self._thread_pool.maxThreadCount()} threads for calculations")
         
         # Flag to track if updates are needed
         self._emit_pending = False
@@ -202,12 +205,6 @@ class HarmonicAnalysisCalculator(QObject):
             # Ensure the attribute exists even if not properly initialized
             self._calculation_progress = 0.0
             return 0.0
-        
-    @Slot()
-    def cancelCalculation(self):
-        """Request cancellation of any in-progress calculation"""
-        self._cancel_requested = True
-        print("Calculation cancellation requested")
         
     @Slot(bool, float)
     def _update_calculation_status(self, in_progress, progress=0.0):
@@ -262,7 +259,7 @@ class HarmonicAnalysisCalculator(QObject):
             except (ImportError, Exception):
                 pass
         except Exception as e:
-            print(f"Error emitting signals: {e}")
+            logger.error(f"Error emitting signals: {e}")
             
         # Reset state
         self._update_pending = False
@@ -383,7 +380,7 @@ class HarmonicAnalysisCalculator(QObject):
                         harmonics[order-1] = float(magnitude)
                         phases[order-1] = float(phase)
                     else:
-                        print(f"Warning: Invalid values for harmonic {order}: magnitude={magnitude}, phase={phase}")
+                        logger.warning(f"Warning: Invalid values for harmonic {order}: magnitude={magnitude}, phase={phase}")
                         harmonics[order-1] = 0.0
                         phases[order-1] = 0.0
                     
@@ -473,7 +470,7 @@ class HarmonicAnalysisCalculator(QObject):
                         self._cf = 1.414
                         self._ff = 1.11
             except Exception as inner_e:
-                print(f"Error in waveform calculation: {inner_e}")
+                logger.error(f"Error in waveform calculation: {inner_e}")
                 # Reset to safe defaults
                 self._waveform = [0.0] * 250
                 self._fundamental_wave = [0.0] * 250
@@ -524,7 +521,7 @@ class HarmonicAnalysisCalculator(QObject):
             self.batchUpdate()
             
         except Exception as e:
-            print(f"Calculation error: {e}")
+            logger.error(f"Calculation error: {e}")
             import traceback
             traceback.print_exc()
             # Reset calculation status on error
@@ -584,7 +581,7 @@ class HarmonicAnalysisCalculator(QObject):
             
             return result
         except Exception as e:
-            print(f"Error in resolution calculation: {e}")
+            logger.error(f"Error in resolution calculation: {e}")
             return None
     
     def _is_valid_number(self, value):
@@ -690,10 +687,10 @@ class HarmonicAnalysisCalculator(QObject):
                 writer.writerow(['Crest Factor', f"{self._cf:.2f}"])
                 writer.writerow(['Form Factor', f"{self._ff:.2f}"])
                 
-            print(f"Data exported to {filename}")
+            logger.info(f"Data exported to {filename}")
             return True
         except Exception as e:
-            print(f"Export error: {e}")
+            logger.error(f"Export error: {e}")
             return False
 
     @Slot()

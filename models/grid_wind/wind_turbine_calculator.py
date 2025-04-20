@@ -211,11 +211,11 @@ class WindTurbineCalculator(QObject):
         has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
         if has_rated_specs and speed >= self._rated_wind_speed:
             # Print debug information
-            print(f"Using rated power: {self._rated_power/1000:.2f} kW (speed: {speed} >= rated: {self._rated_wind_speed})")
+            logger.info(f"Using rated power: {self._rated_power/1000:.2f} kW (speed: {speed} >= rated: {self._rated_wind_speed})")
             return self._rated_power
         elif has_rated_specs:
             limited_power = min(calculated_power, self._rated_power)
-            print(f"Limited power: {limited_power/1000:.2f} kW (speed: {speed}, rated: {self._rated_wind_speed})")
+            logger.info(f"Limited power: {limited_power/1000:.2f} kW (speed: {speed}, rated: {self._rated_wind_speed})")
             return limited_power
         else:
             return calculated_power
@@ -399,7 +399,7 @@ class WindTurbineCalculator(QObject):
             # Recalculate all values
             self._calculate()
             
-            print("Reset to generic turbine parameters")
+            logger.info("Reset to generic turbine parameters")
             return True
         except Exception as e:
             print(f"Error resetting to generic turbine parameters: {e}")
@@ -450,7 +450,7 @@ class WindTurbineCalculator(QObject):
             self.calculationsComplete.emit()
             self.calculationCompleted.emit()
             
-            print(f"Loaded Vestas V27 parameters (rated power: 225kW at {self._rated_wind_speed:.1f} m/s)")
+            logger.info(f"Loaded Vestas V27 parameters (rated power: 225kW at {self._rated_wind_speed:.1f} m/s)")
             return True
         except Exception as e:
             print(f"Error loading Vestas V27 parameters: {e}")
@@ -464,7 +464,7 @@ class WindTurbineCalculator(QObject):
     @Slot()
     def refreshCalculations(self):
         """Force refresh of all calculations"""
-        print("Refreshing wind turbine calculations")
+        logger.info("Refreshing wind turbine calculations")
         self._calculate()
         # Ensure the power curve is regenerated
         self._generate_power_curve()
@@ -539,7 +539,7 @@ class WindTurbineCalculator(QObject):
             if not clean_path.lower().endswith('.pdf'):
                 clean_path += '.pdf'
             
-            print(f"Processing export to: {clean_path}")
+            logger.info(f"Processing export to: {clean_path}")
                 
             # Clean up chart image path
             if chart_image_path:
@@ -583,7 +583,7 @@ class WindTurbineCalculator(QObject):
             
             generator = PDFGenerator()
             generator.generate_wind_turbine_report(data, clean_path)
-            print(f"Wind turbine report exported to: {clean_path}")
+            logger.info(f"Wind turbine report exported to: {clean_path}")
             self._pdf = "Success"
             self.pdfSaved.emit()
 

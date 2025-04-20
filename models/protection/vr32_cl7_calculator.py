@@ -306,27 +306,3 @@ class VR32CL7Calculator(QObject):
         except Exception as e:
             print(f"Error generating plot: {e}")
             return None
-
-# Test function if run directly
-if __name__ == "__main__":
-    # Create calculator with default values
-    calculator = VR32CL7Calculator()
-    
-    # Display the parameters
-    print(f"Generation Capacity: {calculator.generation_capacity_kw} kW")
-    print(f"Cable Length: {calculator.cable_length_km} km")
-    print(f"Cable Resistance: {calculator.cable_r_per_km} Ω/km")
-    print(f"Cable Reactance: {calculator.cable_x_per_km} Ω/km")
-    print(f"Load Distance: {calculator.load_distance_km} km")
-    
-    # Display the results
-    results = calculator.calculate()
-    print("\nVR32 CL-7 Voltage Regulator Parameters:")
-    print(f"Resistance (R): {results['resistance']:.4f} Ω")
-    print(f"Reactance (X): {results['reactance']:.4f} Ω")
-    print(f"Impedance (Z): {results['impedance']:.4f} Ω")
-    print(f"Impedance Angle: {results['impedance_angle']:.2f}°")
-    
-    # Generate plot
-    plot_path = calculator.generate_plot()
-    print(f"\nPlot saved to: {plot_path}")
