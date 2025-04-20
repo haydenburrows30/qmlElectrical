@@ -175,6 +175,9 @@ Item {
                                 calculator.setVoltage(parseFloat(text))
                             }
                         }
+                        ToolTip.text: "Enter voltage in V"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     RowLayout {

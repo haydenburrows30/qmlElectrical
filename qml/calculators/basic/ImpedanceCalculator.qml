@@ -49,6 +49,9 @@ Item {
                 id: helpButton
                 icon.source: "../../../icons/rounded/info.svg"
                 ToolTip.text: "Help"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+
                 onClicked: popUpText.open()
             }
         }
@@ -77,6 +80,9 @@ Item {
                         }
                         Layout.preferredWidth: 140
                         Layout.alignment: Qt.AlignRight
+                        ToolTip.text: "Enter resistance in ohms"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     Label {
@@ -93,6 +99,9 @@ Item {
                                 calculator.setReactance(parseFloat(text))
                             }
                         }
+                        ToolTip.text: "Enter reactance in ohms"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
 
                     Label {
