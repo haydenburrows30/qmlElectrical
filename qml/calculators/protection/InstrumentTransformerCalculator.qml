@@ -133,6 +133,8 @@ Item {
                         Layout.alignment: Qt.AlignRight
                         Layout.columnSpan: 2
                         icon.source: "../../../icons/rounded/restart_alt.svg"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
 
                         onClicked: {
                             calculator.resetToDefaults()

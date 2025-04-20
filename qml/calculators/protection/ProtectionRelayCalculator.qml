@@ -338,6 +338,9 @@ Item {
                                     icon.source: "../../../icons/rounded/save.svg"
                                     Layout.columnSpan: 2
                                     Layout.alignment: Qt.AlignRight
+                                    ToolTip.text: "Save and compare settings"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
 
                                     onClicked: {
                                         // Ensure all fields have valid values before saving

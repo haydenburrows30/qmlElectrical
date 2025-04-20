@@ -245,6 +245,9 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         text: "Generate Plot"
                         Layout.fillWidth: true
+                        ToolTip.text: "Generate bar chart"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
 
                         onClicked: {
                             if (calculator) {

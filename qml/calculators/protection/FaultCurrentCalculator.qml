@@ -66,7 +66,8 @@ Item {
     }
 
     PopUpText {
-        parentCard: results
+        id: popUpText
+        parentCard: helpButton
         popupText: "<h3>Fault Current Calculator</h3><br>" +
                   "This calculator estimates fault currents in an electrical system based on:" +
                   "<ul>" +
@@ -120,12 +121,14 @@ Item {
                         Layout.fillWidth: true
                     }
 
-                    // StyledButton {
-                    //     id: helpButton
-                    //     icon.source: "../../../icons/rounded/info.svg"
-                    //     ToolTip.text: "Help"
-                    //     onClicked: popUpText.open()
-                    // }
+                    StyledButton {
+                        id: helpButton
+                        icon.source: "../../../icons/rounded/info.svg"
+                        ToolTip.text: "Information"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        onClicked: popUpText.open()
+                    }
                 }
 
                 RowLayout {
@@ -139,9 +142,6 @@ Item {
                         Layout.fillWidth: true
                         Layout.minimumHeight: 500
                         Layout.minimumWidth: 350
-
-                        id: results
-                        showSettings: true
 
                         GridLayout {
                             columns: 2

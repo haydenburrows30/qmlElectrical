@@ -64,6 +64,9 @@ Item {
 
                     StyledButton {
                         icon.source: "../../../icons/rounded/restart_alt.svg"
+                        ToolTip.text: "Reset to default values"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
 
                         onClicked: {
                             calculator.reset()
@@ -152,21 +155,26 @@ Item {
                                     Layout.alignment: Qt.AlignVCenter
                                     
                                     ToolTip.text: "Add Relay"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+
+                                    enabled: relayName.text && pickupCurrent.text && tds.text
+
                                     icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
                                         // Add input validation with user feedback
                                         if (!relayName.text) {
                                             relayName.focus = true
-                                            console.log("Please enter a relay name")
+                                            // console.log("Please enter a relay name")
                                         } else if (!pickupCurrent.text || parseFloat(pickupCurrent.text) <= 0) {
                                             pickupCurrent.focus = true
-                                            console.log("Please enter a valid pickup current")
+                                            // console.log("Please enter a valid pickup current")
                                         } else if (!tds.text || parseFloat(tds.text) <= 0) {
                                             tds.focus = true
-                                            console.log("Please enter a valid time dial setting")
+                                            // console.log("Please enter a valid time dial setting")
                                         } else {
-                                            console.log("Adding relay:", relayName.text)
+                                            // console.log("Adding relay:", relayName.text)
 
                                             calculator.addRelay({
                                                 "name": relayName.text,
@@ -243,7 +251,10 @@ Item {
                                             icon.source: "../../../icons/rounded/delete.svg"
                                             icon.color: Universal.theme === Universal.Dark ? "#ff8080" : "red"
                                             
-                                            ToolTip.text: "Remove Relay"
+                                            ToolTip.text: "Remove Relay " + modelData.name
+                                            ToolTip.visible: hovered
+                                            ToolTip.delay: 500
+
                                             onClicked: {
                                                 calculator.removeRelay(index)
                                             }
@@ -271,6 +282,7 @@ Item {
                                     id: marginSlider
                                     Layout.minimumWidth: 200
                                     Layout.fillWidth: true
+                                    enabled: calculator.relayCount >= 2
                                     from: 0.1
                                     to: 1.0
                                     value: calculator.minimumMargin
@@ -301,19 +313,23 @@ Item {
                                 StyledButton {
                                     id: addFaultLevel
                                     Layout.alignment: Qt.AlignHCenter
-                                    
+                                    enabled: calculator.relayCount >= 2 && faultCurrent.text
+
                                     ToolTip.text: "Add Fault Level"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+
                                     icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
                                         if (calculator.relayCount < 2) {
-                                            console.log("Please add at least 2 relays")
+                                            // console.log("Please add at least 2 relays")
                                         } else if (!faultCurrent.text || parseFloat(faultCurrent.text) <= 0) {
                                             faultCurrent.focus = true
-                                            console.log("Please enter a valid fault current")
+                                            // console.log("Please enter a valid fault current")
                                         } else {
                                             let current = parseFloat(faultCurrent.text)
-                                            console.log("Adding fault level:", current)
+                                            // console.log("Adding fault level:", current)
                                             calculator.addFaultLevel(current)
                                             faultCurrent.text = ""  // Clear after adding
                                             faultCurrent.focus = true
@@ -330,6 +346,11 @@ Item {
                                     id: exportButton
                                     text: "Export Results"
                                     Layout.columnSpan: 2
+
+                                    ToolTip.text: "Export results to PDF"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    
                                     visible: calculator.relayCount >= 2
                                     icon.source: "../../../icons/rounded/download.svg"
                                     
@@ -363,7 +384,10 @@ Item {
                                 StyledButton {
                                     icon.source: "../../../icons/rounded/refresh.svg"
                                     visible: calculator.relayCount >= 2 && showFaultPoints.checked
+
                                     ToolTip.text: "Refresh Fault Points"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
                                     
                                     onClicked: {
                                         showFaultPointsGrid.updateFaultPoints();
