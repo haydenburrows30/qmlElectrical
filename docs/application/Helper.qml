@@ -101,11 +101,12 @@ import "../../components/exports"
 import "../../components/charts"
 import "../../components/displays"
 
-
 // copilot checks
 
 Are you able to check the calculations in this file please?
 Are there any changes needed to the qml file?
+Can you modify this file so it looks nice please?
+Can you check the accuracy of the calculations in this file please and generate documentation?
 
 
 // section header
