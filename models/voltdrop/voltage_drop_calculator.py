@@ -723,7 +723,6 @@ class VoltageDropCalculator(QObject):
                 logger.info(f"• Final Voltage Drop: {v_drop:.2f} V")
                 logger.info(f"• Drop Percentage: {(v_drop / self._voltage * 100):.2f}%")
             
-            print("Calculations complete.")
             logger.info("\n=== Voltage Drop Calculations Complete ===\n")
             
         except Exception as e:

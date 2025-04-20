@@ -224,7 +224,6 @@ Item {
                                     onTextChanged: {
                                         var value = text ? parseFloat(text) : 0;
                                         calculator.secondaryVoltage = value;
-                                        console.log("Setting secondary voltage to: " + value);
                                         
                                         if (kvaInput.text && text) {
                                             calculator.setApparentPower(parseFloat(kvaInput.text));
@@ -490,16 +489,6 @@ Item {
 
     Connections {
         target: calculator
-        function onPrimaryCurrentChanged() {
-        }
-        function onSecondaryCurrentChanged() {
-        }
-        function onCorrectedRatioChanged() {
-            console.log("Corrected ratio changed to:", calculator.correctedRatio)
-        }
-        function onVectorGroupChanged() {
-            console.log("Vector group changed to:", calculator.vectorGroup)
-        }
         function onImpedancePercentChanged() {
             // Only update if the user is not editing
             if (!impedanceInput.activeFocus) {
@@ -526,10 +515,6 @@ Item {
             if (!ironLossesInput.activeFocus) {
                 ironLossesInput.text = calculator.ironLosses.toFixed(0)
             }
-        }
-        function onWarningsChanged() {
-            // You could add visual indicators when warnings change
-            console.log("Warnings updated:", calculator.warnings)
         }
     }
 }

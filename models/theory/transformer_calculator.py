@@ -176,7 +176,6 @@ class TransformerCalculator(QObject):
 
     @secondaryVoltage.setter
     def secondaryVoltage(self, value):
-        print(f"Setting secondary voltage: {value} (current: {self._secondary_voltage})")
         # Safe comparison with tolerance for floating point
         if abs(self._secondary_voltage - value) > 0.0001 and value >= 0:
             self._secondary_voltage = value
@@ -347,7 +346,6 @@ class TransformerCalculator(QObject):
                 factor = self._vector_group_factors.get(self._vector_group, {"voltage": 1})["voltage"]
                 old_ratio = self._corrected_ratio
                 self._corrected_ratio = self._turns_ratio * factor
-                print(f"Corrected ratio: {self._corrected_ratio} = {self._turns_ratio} × {factor} (for {self._vector_group})")
                 
                 # Only emit if the value actually changed (with a small tolerance for floating point errors)
                 if abs(old_ratio - self._corrected_ratio) > 0.0001:
@@ -381,7 +379,6 @@ class TransformerCalculator(QObject):
                 # Apply vector group correction factor to secondary current
                 self._secondary_current = base_secondary_current * factor
             
-            print(f"Secondary current with vector group correction ({self._vector_group}): {self._secondary_current} A")
             self.secondaryCurrentChanged.emit()
 
     def _calculate_from_apparent_power(self):
@@ -393,13 +390,11 @@ class TransformerCalculator(QObject):
         try:
             # Convert KVA to VA (this is 3-phase total apparent power)
             apparent_power_va = self._apparent_power * 1000  # Converting kVA to VA
-            print(f"Calculating from 3-phase apparent power: {self._apparent_power} kVA = {apparent_power_va} VA")
             
             # Calculate primary current if primary voltage is provided
             # For 3-phase balanced system: I = S / (√3 × V_line)
             if self._primary_voltage > 0:
                 self._primary_current = apparent_power_va / (math.sqrt(3) * self._primary_voltage)
-                print(f"Primary current calculated: {self._primary_current} A from {self._apparent_power} kVA / (√3 × {self._primary_voltage} V)")
                 self.primaryCurrentChanged.emit()
             
             # If we have both voltages, recalculate the turns ratio
@@ -425,8 +420,7 @@ class TransformerCalculator(QObject):
                     else:
                         # Default calculation for other connections
                         self._secondary_current = apparent_power_va / (math.sqrt(3) * self._secondary_voltage)
-                    
-                    print(f"Secondary current calculated: {self._secondary_current} A from {self._apparent_power} kVA / (√3 × {self._secondary_voltage} V)")
+
                     self.secondaryCurrentChanged.emit()
             
         except Exception as e:
@@ -548,7 +542,6 @@ class TransformerCalculator(QObject):
     # Slots for QML access
     @Slot(float)
     def setSecondaryVoltage(self, voltage):
-        print(f"setSecondaryVoltage slot called with: {voltage}")
         self.secondaryVoltage = voltage
 
     @Slot(float)
@@ -557,7 +550,6 @@ class TransformerCalculator(QObject):
 
     @Slot(float)
     def setApparentPower(self, power):
-        print(f"Setting kVA to: {power}, PV: {self._primary_voltage}, SV: {self._secondary_voltage}")
         if power >= 0:
             self._apparent_power = power
             self.apparentPowerChanged.emit()
@@ -568,7 +560,6 @@ class TransformerCalculator(QObject):
 
     @Slot(str)
     def setVectorGroup(self, vector_group):
-        print(f"Setting vector group to: {vector_group}")
         old_group = self._vector_group
         self.vectorGroup = vector_group
         
