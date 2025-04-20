@@ -1,18 +1,60 @@
-I understand you're inquiring about the main.py file structure, particularly around the setup method. Let me explain what's happening there without repeating all the code.
+# main.py File Structure Overview
 
-In the Application class, the setup method is where all the essential configuration happens after initialization. It:
+This document explains the structure of the `main.py` file, focusing on the `setup` method in the `Application` class.
 
-First calls setup_app() to configure Qt application-level settings
-Registers all QML types so they're available to the QML engine
-Sets up core context properties like the preload manager and performance monitor
-Exposes application metadata like version and app name to QML
-Loads the main QML file
-Initiates preloading of QML components as an optimization
-The resource loading in this application is handled by multiple specialized components:
+---
 
-The CacheManager handles disk caching of QML files
-The PreloadManager handles efficient preloading of QML components
-The LoadingManager handles general resource loading coordination
-You previously had a ResourceManager class, but it wasn't being utilized effectively. The current design distributes resource management responsibilities across these specialized components rather than using a single central ResourceManager.
+## The `setup` Method
 
-This architecture gives you better separation of concerns and more focused functionality in each component.
+The `setup` method is responsible for all essential configuration after initialization. It performs the following steps:
+
+1. **Configure Qt Application Settings**
+   - Calls `setup_app()` to configure Qt application-level settings.
+
+2. **Register QML Types**
+   - Registers all QML types so they're available to the QML engine.
+
+3. **Set Up Core Context Properties**
+   - Sets up core context properties like the preload manager and performance monitor.
+
+4. **Expose Application Metadata**
+   - Makes application metadata (e.g., version, app name) available to QML.
+
+5. **Load Main QML File**
+   - Loads the main QML file.
+
+6. **Initiate QML Preloading**
+   - Starts preloading of QML components as an optimization.
+
+---
+
+## Resource Loading Components
+
+Resource loading is handled by several specialized components:
+
+- **CacheManager**
+  - Handles disk caching of QML files.
+
+- **PreloadManager**
+  - Manages efficient preloading of QML components.
+
+- **LoadingManager**
+  - Coordinates general resource loading.
+
+> **Note:**  
+> There was previously a `ResourceManager` class, but it was not utilized effectively. The current design distributes resource management responsibilities across these specialized components, rather than using a single central `ResourceManager`.
+
+---
+
+## Architectural Benefits
+
+- **Separation of Concerns:**  
+  Each component has a focused responsibility.
+
+- **Improved Maintainability:**  
+  The design is modular and easier to extend or modify.
+
+- **Optimized Performance:**  
+  Preloading and caching are handled efficiently.
+
+---

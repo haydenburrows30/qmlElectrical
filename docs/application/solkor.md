@@ -1,4 +1,39 @@
-Calculates the calculated padding resistance using the formula (2000 - loop_resistance) / 2
-Finds the best combination of standard resistors (500, 260, 130, 65, 35) to match this value
-Displays the combination with a clear format (e.g., "500 + 65" or "2×260 + 35 = 555")
-Shows this information in both the UI and the exported PDF
+# Solkor Padding Resistance Calculation
+
+This feature helps determine the optimal padding resistance for Solkor protection schemes.
+
+---
+
+## Calculation Steps
+
+1. **Calculate Padding Resistance**
+
+   - Use the formula:  
+     $$
+     \text{Padding Resistance} = \frac{2000 - \text{loop resistance}}{2}
+     $$
+
+2. **Find Best Combination of Standard Resistors**
+
+   - Standard resistor values: **500, 260, 130, 65, 35** (ohms)
+   - The algorithm finds the best combination to match the calculated value.
+
+3. **Display the Combination**
+
+   - Shows the result in a clear format, for example:
+     - `500 + 65`
+     - `2×260 + 35 = 555`
+
+4. **Output**
+
+   - This information is shown in both the UI and the exported PDF.
+
+---
+
+## Example
+
+- **Loop resistance:** 890 Ω
+- **Padding resistance:** $(2000 - 890) / 2 = 555$ Ω
+- **Best combination:** `2×260 + 35 = 555`
+
+---
