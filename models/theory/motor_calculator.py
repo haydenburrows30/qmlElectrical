@@ -188,8 +188,12 @@ class MotorCalculator(QObject):
             multiplier = self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0)
             self._starting_current = self._full_load_current * multiplier
             
-            # Calculate nominal torque (Nm)
-            self._nominal_torque = (9.55 * self._motor_power * 1000) / self._motor_speed
+            # Ensure motor speed is valid
+            if self._motor_speed > 0:
+                # Calculate nominal torque (Nm)
+                self._nominal_torque = (9.55 * self._motor_power * 1000) / self._motor_speed
+            else:
+                self._nominal_torque = 0.0
             
             # Get torque multiplier for the current motor type and starting method
             torque_multiplier = self._torque_multipliers.get(self._motor_type, {}).get(self._starting_method, 1.0)
