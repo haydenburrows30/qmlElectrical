@@ -1,6 +1,9 @@
 import os
 import threading
 from PySide6.QtCore import QObject, Signal, Slot, QUrl
+import logging
+
+logger = logging.getLogger("qmltest")
 
 class LogFileHelper(QObject):
     """Helper class for file operations on logs."""
@@ -41,7 +44,7 @@ class LogFileHelper(QObject):
                 self.saveComplete.emit(True, path)
                 
             except Exception as e:
-                print(f"Error saving logs: {e}")
+                logger.error(f"Error saving logs: {e}")
                 self.saveComplete.emit(False, str(e))
         
         # Start the thread

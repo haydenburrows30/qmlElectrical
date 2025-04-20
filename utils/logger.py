@@ -7,45 +7,24 @@ import threading
 from datetime import datetime
 from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractListModel, QByteArray, Qt, QModelIndex, QTimer
 
-def setup_logger(name="qmltest", level=logging.INFO):
+from .logger_config import configure_logger, get_log_dir, get_log_file
+
+# Re-export setup function using the new configuration
+def setup_logger(name="qmltest", level=logging.INFO, component=None):
     """Configure application-wide logging system.
     
     Args:
         name: Logger name
         level: Logging level (default: INFO)
+        component: Optional component name for component-specific logging
     
     Returns:
         Logger instance
     """
-    # Create logs directory if it doesn't exist
-    log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
-    os.makedirs(log_dir, exist_ok=True)
-    
-    # Set up log file with timestamp
-    log_file = os.path.join(log_dir, f'app_{datetime.now().strftime("%Y%m%d")}.log')
-    
-    # Configure logger
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    
-    # Remove any existing handlers
-    logger.handlers = []
-    
-    # Add file handler for all logs (INFO and above)
-    file_handler = logging.FileHandler(log_file)
-    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(file_formatter)
-    file_handler.setLevel(logging.INFO)
-    logger.addHandler(file_handler)
-    
-    # Add console handler for warnings and errors only
-    console_handler = logging.StreamHandler()
-    console_formatter = logging.Formatter('%(levelname)s: %(message)s')
-    console_handler.setFormatter(console_formatter)
-    console_handler.setLevel(logging.WARNING)  # Only show warnings and errors in console
-    logger.addHandler(console_handler)
-    
-    return logger
+    return configure_logger(name, level, component)
+
+# Application-wide logger instance
+logger = setup_logger("qmltest")
 
 class LogMessage:
     """Simple class to represent a log message."""
@@ -131,6 +110,10 @@ class AsyncLogHandler(logging.Handler):
         self.handler_thread = None
         self.stop_event = threading.Event()
         self._handlers = []
+        
+        # Add processing statistics
+        self._processed_count = 0
+        self._dropped_count = 0
     
     def add_handler(self, handler):
         """Add a handler that will process log records."""
@@ -143,8 +126,10 @@ class AsyncLogHandler(logging.Handler):
             if self.handler_thread is None or not self.handler_thread.is_alive():
                 self.start_processing()
         except queue.Full:
-            # If queue is full, just drop the message
-            pass
+            # If queue is full, just drop the message but track it
+            self._dropped_count += 1
+            if self._dropped_count % 100 == 0:
+                print(f"WARNING: Dropped {self._dropped_count} log messages due to full queue")
     
     def start_processing(self):
         """Start a thread to process log records."""
@@ -163,12 +148,13 @@ class AsyncLogHandler(logging.Handler):
                         if handler:
                             handler.handle(record)
                     except Exception as e:
-                        print(f"Error in log handler: {e}")
+                        logger.error(f"Error in log handler: {e}")
                 self.log_queue.task_done()
+                self._processed_count += 1
             except queue.Empty:
                 continue
             except Exception as e:
-                print(f"Error processing log: {e}")
+                logger.error(f"Error processing log: {e}")
                 # Don't exit the loop, continue processing
     
     def stop(self):
@@ -181,6 +167,15 @@ class AsyncLogHandler(logging.Handler):
         """Close the handler and flush all records."""
         self.stop()
         super().close()
+    
+    # Add method to get statistics
+    def get_stats(self):
+        """Get statistics about log processing."""
+        return {
+            "processed": self._processed_count,
+            "dropped": self._dropped_count,
+            "queue_size": self.log_queue.qsize()
+        }
 
 class QmlLogHandler(logging.Handler):
     """Custom logging handler that sends log messages to QML."""
@@ -206,7 +201,9 @@ class QLogManager(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._model = LogMessagesModel()
-        self._logger = logging.getLogger()
+        
+        # Use the standard logger from logger_config
+        self._logger = logging.getLogger("qmltest")
         
         # Create async handler for non-blocking logging
         self._async_handler = AsyncLogHandler()
@@ -336,7 +333,7 @@ class QLogManager(QObject):
             
             return True
         except Exception as e:
-            print(f"Error saving logs: {e}")
+            logger.error(f"Error saving logs: {e}")
             return False
             
     @Slot(result=bool)
@@ -345,11 +342,10 @@ class QLogManager(QObject):
         # Run this in a separate thread to avoid blocking UI
         def open_file():
             try:
-                log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
-                log_file = os.path.join(log_dir, f'app_{datetime.now().strftime("%Y%m%d")}.log')
+                log_file = str(get_log_file())
                 
                 if not os.path.exists(log_file):
-                    print(f"Log file not found: {log_file}")
+                    logger.error(f"Log file not found: {log_file}")
                     return False
                     
                 if platform.system() == 'Windows':
@@ -362,7 +358,7 @@ class QLogManager(QObject):
                 return True
                 
             except Exception as e:
-                print(f"Error opening log file: {e}")
+                logger.error(f"Error opening log file: {e}")
                 return False
         
         # Start a thread to open the file
@@ -370,15 +366,30 @@ class QLogManager(QObject):
         thread.daemon = True
         thread.start()
         return True
-            
+    
+    @Slot(str, result=str)
+    def getComponentLogPath(self, component):
+        """Get path to a component-specific log file."""
+        if not component:
+            return self.getLogFilePath()
+        return str(get_log_file(component))
+    
     @Slot(result=str)
     def getLogFilePath(self):
         """Get the path to the current log file."""
-        log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
-        log_file = os.path.join(log_dir, f'app_{datetime.now().strftime("%Y%m%d")}.log')
-        return log_file
+        return str(get_log_file())
         
     @Slot(result=str)
     def getLogDirectory(self):
         """Get the path to the log directory."""
-        return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
+        return str(get_log_dir())
+    
+    @Slot(result=str)
+    def getLogStats(self):
+        """Get statistics about logging system."""
+        if hasattr(self, '_async_handler'):
+            stats = self._async_handler.get_stats()
+            return (f"Logs processed: {stats['processed']}, "
+                    f"dropped: {stats['dropped']}, "
+                    f"queue size: {stats['queue_size']}")
+        return "Log statistics not available"

@@ -26,12 +26,16 @@ from utils.cache_utils import setup_qml_cache
 from utils.windows_utils import setup_windows_specifics, set_gpu_attributes
 from utils.preload_manager import PreloadManager
 from utils.lightweight_performance import LightweightPerformanceMonitor
+from utils.logger_config import configure_logger
 
 # Resources
 import data.rc_resources as rc_resources
 
 # Constants
 CURRENT_DIR = Path(__file__).parent
+
+# Set up application-wide logger
+logger = configure_logger("qmltest", component="main")
 
 class Application:
     """Main application class implementing component management.
@@ -47,12 +51,8 @@ class Application:
         
         self.app = QApplication(sys.argv)
 
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
+        # Use the configured logger instead of creating a new one
+        self.logger = logger
         
         # Setup QML engine directly
         self.qml_engine = QQmlApplicationEngine()
@@ -153,6 +153,9 @@ class Application:
 def main():
     """Application entry point."""
     try:
+        # Log application startup
+        logger.info("Application starting...")
+        
         # Setup environment from config
         app_config.setup_environment()
         
@@ -179,8 +182,8 @@ def main():
         Application().run()
         
     except Exception as e:
-        print(f"ERROR during startup: {str(e)}", file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
+        logger.critical(f"ERROR during startup: {str(e)}")
+        logger.critical(traceback.format_exc())
         sys.exit(1)
 
 if __name__ == "__main__":

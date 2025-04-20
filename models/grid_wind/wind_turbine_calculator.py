@@ -3,9 +3,10 @@ import math
 import numpy as np
 from utils.pdf_generator import PDFGenerator
 import logging
+from utils.logger_config import configure_logger
 
-# Setup logging
-logger = logging.getLogger("qmltest")
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="wind_turbine")
 
 class WindTurbineCalculator(QObject):
     """Calculator for wind turbine power output and performance analysis"""
@@ -53,7 +54,6 @@ class WindTurbineCalculator(QObject):
     def _calculate(self):
         """Calculate wind turbine parameters based on inputs"""
         try:
-            logger = logging.getLogger("qmltest")
             logger.info("\n=== Starting Wind Turbine Calculations ===")
             logger.info(f"Input Parameters:")
             logger.info(f"• Blade Radius: {self._blade_radius} m")
@@ -195,7 +195,7 @@ class WindTurbineCalculator(QObject):
             self.powerCurveChanged.emit()
             
         except Exception as e:
-            print(f"Error generating power curve: {e}")
+            logger.error(f"Error generating power curve: {e}")
             self._power_curve = []
             
     def _calculate_power_at_speed(self, speed):
@@ -210,12 +210,12 @@ class WindTurbineCalculator(QObject):
         # Apply rated power limit if specified
         has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
         if has_rated_specs and speed >= self._rated_wind_speed:
-            # Print debug information
-            logger.info(f"Using rated power: {self._rated_power/1000:.2f} kW (speed: {speed} >= rated: {self._rated_wind_speed})")
+            # Use debug level for detailed calculation info instead of info level
+            logger.debug(f"Using rated power: {self._rated_power/1000:.2f} kW (speed: {speed} >= rated: {self._rated_wind_speed})")
             return self._rated_power
         elif has_rated_specs:
             limited_power = min(calculated_power, self._rated_power)
-            logger.info(f"Limited power: {limited_power/1000:.2f} kW (speed: {speed}, rated: {self._rated_wind_speed})")
+            logger.debug(f"Limited power: {limited_power/1000:.2f} kW (speed: {speed}, rated: {self._rated_wind_speed})")
             return limited_power
         else:
             return calculated_power
@@ -346,7 +346,7 @@ class WindTurbineCalculator(QObject):
             # Debug the converted data
             return result
         except Exception as e:
-            print(f"Error converting power curve data: {e}")
+            logger.error(f"Error converting power curve data: {e}")
             return []
     
     # QML slots
@@ -402,7 +402,7 @@ class WindTurbineCalculator(QObject):
             logger.info("Reset to generic turbine parameters")
             return True
         except Exception as e:
-            print(f"Error resetting to generic turbine parameters: {e}")
+            logger.error(f"Error resetting to generic turbine parameters: {e}")
             return False
 
     @Slot()
@@ -453,7 +453,7 @@ class WindTurbineCalculator(QObject):
             logger.info(f"Loaded Vestas V27 parameters (rated power: 225kW at {self._rated_wind_speed:.1f} m/s)")
             return True
         except Exception as e:
-            print(f"Error loading Vestas V27 parameters: {e}")
+            logger.error(f"Error loading Vestas V27 parameters: {e}")
             return False
     
     @Slot(float, result=float)
@@ -588,11 +588,11 @@ class WindTurbineCalculator(QObject):
             self.pdfSaved.emit()
 
         except Exception as e:
-            print(f"Error exporting wind turbine report: {e}")
-            print(f"Attempted filename: {filename}")
+            logger.error(f"Error exporting wind turbine report: {e}")
+            logger.error(f"Attempted filename: {filename}")
             # Print more details for debugging
             import traceback
-            traceback.print_exc()
+            logger.error(traceback.format_exc())
 
     @Property(str, notify=pdfSaved)
     def exportSuccess(self):
@@ -654,7 +654,7 @@ class WindTurbineCalculator(QObject):
             return energy_mwh
             
         except Exception as e:
-            print(f"Error estimating AEP: {e}")
+            logger.error(f"Error estimating AEP: {e}")
             return 0.0
     
     @Slot(float, result=float)
@@ -680,5 +680,5 @@ class WindTurbineCalculator(QObject):
                 return 0.0
             
         except Exception as e:
-            print(f"Error calculating capacity factor: {e}")
+            logger.error(f"Error calculating capacity factor: {e}")
             return 0.0
