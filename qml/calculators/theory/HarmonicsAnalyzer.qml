@@ -242,6 +242,11 @@ Item {
                         anchors.left: parent.left
                         anchors.bottom: parent.bottom
                         anchors.margins: 5
+
+                        ToolTip.text: "Show degree labels on chart"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+
                         text: "Show degree labels"
                         checked: true
                         z: 10
@@ -261,6 +266,10 @@ Item {
                             margins: 0
                         }
                         text: "Performance Settings"
+                        ToolTip.text: "Performance settings for chart"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        
                         onClicked: performancePopup.open()
                         icon.source: "../../../icons/rounded/speed.svg"
                     }
@@ -269,6 +278,11 @@ Item {
                         id: fundamentalCheckbox
                         text: "Show Fundamental"
                         checked: false
+
+                        ToolTip.text: "Show fundamental frequency in chart"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        
                         anchors {
                             right: performanceButton.left
                             top: parent.top
@@ -311,6 +325,11 @@ Item {
                         id: showPhaseCheckbox
                         text: "Show Phase Angles"
                         checked: false
+
+                        ToolTip.text: "Show phase angles on chart"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+
                         anchors {
                             top: parent.top
                             right: parent.right

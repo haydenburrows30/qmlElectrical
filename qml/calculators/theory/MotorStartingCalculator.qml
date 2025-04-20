@@ -278,27 +278,37 @@ Item {
                     StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
-                        ToolTip.text: "Help"
+
+                        ToolTip.text: "Information"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+
                         onClicked: popUpText.open()
                     }
                     
                     StyledButton {
                         id: exportButton
                         icon.source: "../../../icons/rounded/download.svg"
-                        ToolTip.text: "Export Results"
                         enabled: hasValidInputs && calculator.startingCurrent > 0
                         onClicked: fileDialog.open()
+
+                        ToolTip.text: "Export results to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
                     
                     StyledButton {
                         id: compareButton
                         icon.source: "../../../icons/rounded/compare.svg"
-                        ToolTip.text: "Compare Methods"
                         enabled: hasValidInputs
                         onClicked: {
                             var dialog = methodComparisonDialog.createObject(motorStartingCard)
                             dialog.open()
                         }
+
+                        ToolTip.text: "Compare up to 4 starting methods"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     }
                 }
                 // comparison tabbar

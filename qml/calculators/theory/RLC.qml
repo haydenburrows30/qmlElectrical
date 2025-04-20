@@ -253,6 +253,10 @@ Page {
                                         text: "Enable Animation"
                                         checked: false
                                         Layout.alignment: Qt.AlignLeft
+
+                                        ToolTip.text: "Enable chart animation"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
                                     }
                                     
                                     CheckBox {
@@ -260,6 +264,10 @@ Page {
                                         text: "Show Components"
                                         checked: true
                                         Layout.alignment: Qt.AlignLeft
+
+                                        ToolTip.text: "Show components in chart"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
                                     }
                                 }
                             }

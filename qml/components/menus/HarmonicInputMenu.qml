@@ -150,6 +150,11 @@ ColumnLayout {
         text: "Reset"
         icon.source: "../../../icons/rounded/restart_alt.svg"
         Layout.alignment: Qt.AlignHCenter
+
+        ToolTip.text: "Reset to default values"
+        ToolTip.visible: hovered
+        ToolTip.delay: 500
+        
         onClicked: {
             calculator.resetHarmonics()
             clearAllTextFields()

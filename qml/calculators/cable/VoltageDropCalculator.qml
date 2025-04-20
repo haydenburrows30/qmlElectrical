@@ -75,7 +75,7 @@ Item {
                         Label { text: "Cable Size (mm²):" ; Layout.fillWidth: true}
                         ComboBoxRound {
                             id: cableSizeCombo
-                            model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
+                            model: [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630, 800, 1000]
                             onCurrentTextChanged: calculator.cableSize = parseFloat(currentText)
                             Layout.fillWidth: true
                         }
