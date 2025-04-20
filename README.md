@@ -10,17 +10,11 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 - Vector and phase visualisations
 - Basic electrical calculations
 
-![Image](https://github.com/user-attachments/assets/3c814874-440b-44fb-b459-e6107e67dc1d)
-
-![Image](https://github.com/user-attachments/assets/2bc4fd8a-3abe-4170-8241-6631ea55d357)
-
-![Image](https://github.com/user-attachments/assets/31c4d7aa-9ada-4c2f-ac91-ae205a1098f9)
-
-![Image](https://github.com/user-attachments/assets/c7fd4e55-1122-4396-a960-bc04e94a3e1d)
-
-![Image](https://github.com/user-attachments/assets/f9eea387-1188-4149-ba90-83e4fc86a225)
-
-![Image](https://github.com/user-attachments/assets/282565db-707c-4cd7-b5ac-e7b29c5e712c)
+![Image](https://github.com/user-attachments/assets/857b621f-27da-4ad1-b36b-dfe8c9cc05e4)
+![Image](https://github.com/user-attachments/assets/1f5ff68a-f3c8-4837-97db-bd3b9b2aa37f)
+![Image](https://github.com/user-attachments/assets/e7a5ce45-a5d3-4e9e-b1b9-0734e8d3b352)
+![Image](https://github.com/user-attachments/assets/a09813e2-0783-4222-b283-362717a21894)
+![Image](https://github.com/user-attachments/assets/21a0b445-ecd2-4efb-bd03-57c7c6fb5ac1)
 
 ## Getting Started
 
