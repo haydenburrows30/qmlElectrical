@@ -39,6 +39,9 @@ Rectangle {
                                                                             "transparent"
             anchors.fill: parent
         }
+        ToolTip.text: "Information"
+        ToolTip.visible: hovered
+        ToolTip.delay: 500
     }
 
     ColumnLayout {

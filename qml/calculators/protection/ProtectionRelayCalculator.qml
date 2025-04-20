@@ -23,7 +23,7 @@ Item {
         Flickable {
             id: flickableMain
             contentWidth: parent.width
-            contentHeight: parent.height + 40
+            contentHeight: mainLayout.height + 40
             bottomMargin: 5
             leftMargin: 5
             rightMargin: 5
@@ -52,7 +52,9 @@ Item {
                     StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
-                        ToolTip.text: "Help"
+                        ToolTip.text: "Information"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                         onClicked: popUpText.open()
                     }
                 }
@@ -368,7 +370,7 @@ Item {
                         // Additional card for circuit parameters
                         WaveCard {
                             title: "Circuit Parameters"
-                            Layout.minimumHeight: 300
+                            Layout.minimumHeight: 220
                             Layout.fillWidth: true
                             visible: advancedMode.checked
                             

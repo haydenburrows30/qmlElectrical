@@ -132,8 +132,10 @@ Item {
             StyledButton {
                 id: helpButton
                 icon.source: "../../../icons/rounded/info.svg"
-                ToolTip.text: "Help"
                 onClicked: popUpText.open()
+                ToolTip.text: "Information"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
             }
         }
 

@@ -98,7 +98,7 @@ Item {
         Flickable {
             id: flickableContainer
             contentWidth: mainLayout.width + 20
-            contentHeight: mainLayout.height + 20
+            contentHeight: mainLayout.height + 30
             bottomMargin : 5
             leftMargin : 5
             rightMargin : 5
@@ -127,7 +127,9 @@ Item {
                     StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
-                        ToolTip.text: "Help"
+                        ToolTip.text: "Information"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                         onClicked: popUpText.open()
                     }
                 }
