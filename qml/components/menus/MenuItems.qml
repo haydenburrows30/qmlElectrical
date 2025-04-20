@@ -23,7 +23,7 @@ QtObject {
         { name: qsTr("Earthing Calculator"), source: "calculators/protection/EarthingCalculator.qml", icon: "public" },
         { name: qsTr("Fault Current"), source: "calculators/protection/FaultCurrentCalculator.qml", icon: "electric_bolt" },
         { name: qsTr("Instrument Transformer"), source: "calculators/protection/InstrumentTransformerCalculator.qml", icon: "transform" },
-        { name: qsTr("Open Delta"), source: "calculators/protection/DeltaCalculator.qml", icon: "change_history" },
+        { name: qsTr("Open Delta"), source: "calculators/protection/OpenDeltaCalculator.qml", icon: "change_history" },
         { name: qsTr("Overcurrent Protection"), source: "calculators/protection/OvercurrentProtectionCalculator.qml", icon: "electrical_services" },
         { name: qsTr("Protection Relay"), source: "calculators/protection/ProtectionRelayCalculator.qml", icon: "computer" },
         { name: qsTr("RGF"), source: "calculators/protection/RefRgfCalculator.qml", icon: "calculate" },

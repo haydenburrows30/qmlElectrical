@@ -272,21 +272,25 @@ Item {
             }
 
             StyledButton {
+                text: "View History"
+                icon.source: "../../../icons/rounded/history.svg"
+                ToolTip.text: "View calculation history"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+
+                onClicked: historyDialog.open()
+                Layout.columnSpan: 2
+                Layout.minimumWidth: 100
+                Layout.alignment: Qt.AlignLeft
+            }
+
+            StyledButton {
                 id: helpButton
                 icon.source: "../../../icons/rounded/info.svg"
                 ToolTip.text: "Information"
                 ToolTip.visible: hovered
                 ToolTip.delay: 500
                 onClicked: popUpText.open()
-            }
-
-            StyledButton {
-                text: "View History"
-                icon.source: "../../../icons/rounded/history.svg"
-                onClicked: historyDialog.open()
-                Layout.columnSpan: 2
-                Layout.minimumWidth: 100
-                Layout.alignment: Qt.AlignLeft
             }
         }
 
@@ -378,6 +382,10 @@ Item {
                 StyledButton {
                     text: "Calculate"
                     icon.source: "../../../icons/rounded/calculate.svg"
+                    ToolTip.text: "Calculate the values"
+                    ToolTip.visible: hovered
+                    ToolTip.delay: 500
+
                     Layout.minimumWidth: 100
                     Layout.columnSpan: 2
                     Layout.alignment: Qt.AlignRight
@@ -434,6 +442,9 @@ Item {
                     Layout.alignment: Qt.AlignRight
                     icon.source: "../../../icons/rounded/close.svg"
                     text: "Clear"
+                    ToolTip.text: "Reset all values"
+                    ToolTip.visible: hovered
+                    ToolTip.delay: 500
                     onClicked: {
                         param1Value.text = ""
                         param2Value.text = ""

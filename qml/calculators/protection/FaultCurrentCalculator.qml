@@ -234,6 +234,11 @@ Item {
                                 id: advancedButton
                                 text: "Advanced Settings"
                                 icon.source: "../../../icons/rounded/settings.svg"
+
+                                ToolTip.text: "Advanced settings including motors"
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
                                 checkable: true
                                 Layout.alignment: Qt.AlignRight
                                 Layout.columnSpan: 2

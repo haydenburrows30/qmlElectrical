@@ -78,6 +78,10 @@ WaveCard {
             StyledButton {
                 Layout.alignment: Qt.AlignRight
                 icon.source: "../../../icons/rounded/restart_alt.svg"
+
+                ToolTip.text: "Reset to default values"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
                 
                 onClicked: {
                     calculator.reset()  

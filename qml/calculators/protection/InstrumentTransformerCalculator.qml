@@ -286,6 +286,8 @@ Item {
                                     StyledButton {
                                         Layout.alignment: Qt.AlignRight
                                         ToolTip.text: "Add Custom Ratio"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
                                         icon.source: "../../../icons/rounded/add.svg"
 
                                         onClicked: {

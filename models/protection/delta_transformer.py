@@ -98,7 +98,7 @@ class DeltaTransformerCalculator(QObject):
         """Return path to reference PDF document"""
         import os
         current_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        return os.path.join(current_dir, "data", "delta_transformer_guide.pdf")
+        return os.path.join(current_dir, "../", "assets", "Protection-Automation-Application-Guide-v1.pdf")
 
     @Slot(result=float)
     def getRequiredResistor(self):

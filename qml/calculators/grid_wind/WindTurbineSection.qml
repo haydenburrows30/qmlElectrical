@@ -20,7 +20,6 @@ Item {
 
     property bool saveSuccess: false
     
-    // Fix for the maximum call stack error - guard against recursive calls
     property bool isUpdatingValues: false
     property bool isUpdatingAEP: false
 
@@ -133,7 +132,10 @@ Item {
                     Label {Layout.fillWidth: true}
 
                     StyledButton {
-                        ToolTip.text: "Export"
+                        ToolTip.text: "Export report to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+
                         Layout.alignment: Qt.AlignRight
                         icon.source: "../../../icons/rounded/download.svg"
 
@@ -149,6 +151,9 @@ Item {
 
                     StyledButton {
                         ToolTip.text: "Reset to default values"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+
                         Layout.alignment: Qt.AlignRight
                         icon.source: "../../../icons/rounded/restart_alt.svg"
 
@@ -168,7 +173,9 @@ Item {
                     StyledButton {
                         id: infoButton
                         icon.source: "../../../icons/rounded/info.svg"
-                        ToolTip.text: "Info"
+                        ToolTip.text: "Information"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
                     
                         onClicked: {
                             lVPopup.open()
@@ -330,6 +337,10 @@ Item {
 
                                 StyledButton {
                                     text: "Vestas V27"
+                                    ToolTip.text: "Set to Vestas V27 parameters"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+
                                     Layout.alignment: Qt.AlignRight
                                     
                                     onClicked: {
@@ -363,6 +374,9 @@ Item {
                                     text: "Debug"
                                     visible: true // Set to true to show debug button
                                     Layout.alignment: Qt.AlignRight
+                                    ToolTip.text: "Debug turbine state. View information via the log button on the home page"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
                                     
                                     onClicked: {
                                         if (calculatorReady) {
@@ -495,7 +509,13 @@ Item {
                             
                             StyledButton {
                                 text: "Calculate AEP"
+
+                                ToolTip.text: "Calculate AEP"
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+
                                 icon.source: "../../../icons/rounded/calculate.svg"
+                                
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
                                 
@@ -535,25 +555,19 @@ Item {
                             anchors.right: parent.right
                             anchors.margins: 10
                             
-                            ToolTip.text: "Show power curve"
+                            ToolTip.text: "Update power curve"
                             ToolTip.delay: 500
                             ToolTip.visible: hovered
+
                             onClicked: {
                                 calculate()
                                 updatePowerCurve()
-                                
-                                // Signal that calculation has been completed
-                                if (calculatorReady) {
-                                    // We do NOT directly synchronize with transformer here
-                                    // This makes the component fully independent
-                                }
                             }
                         }
                         
                         ValueAxis {
                             id: axisX
                             min: 0
-                            // Remove binding that may cause recursion
                             max: 30 // Default value
                             titleText: "Wind Speed (m/s)"
                         }
@@ -712,7 +726,7 @@ Item {
         }
     }
 
-    // Regular update timer - reduced frequency
+    // Regular update timer
     Timer {
         id: updateTimer
         interval: 500

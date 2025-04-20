@@ -444,6 +444,10 @@ Item {
 
                                 StyledButton {
                                     id: calculateButton
+                                    ToolTip.text: "Recalculate parameters"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+
                                     text: "Recalculate"
                                     icon.source: "../../../icons/rounded/calculate.svg"
 
@@ -458,6 +462,10 @@ Item {
                                 StyledButton {
                                     text: "Export"
                                     icon.source: "../../../icons/rounded/download.svg"
+
+                                    ToolTip.text: "Export report to PDF"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
 
                                     onClicked: {
                                         saveDialog.open()
@@ -622,6 +630,11 @@ Item {
                                 icon.source: "../../../icons/rounded/settings.svg"
                                 Layout.columnSpan: 2
                                 Layout.alignment: Qt.AlignRight
+
+                                ToolTip.text: "Show expert protection settings and calculations"
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 500
+                                
                                 onClicked: {
                                     // Force calculator to use current MVA and power factor
                                     if (calculatorReady) {

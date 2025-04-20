@@ -81,11 +81,17 @@ Item {
                         StyledButton {
                             text: "Calculate System"
                             onClicked: calculate()
+                            ToolTip.text: "Calculate entire system"
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
                         }
                         
                         StyledButton {
                             text: "Export Settings"
                             onClicked: exportDialog.open()
+                            ToolTip.text: "Export report to PDF"
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
                         }
                     }
                 }
