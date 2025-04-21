@@ -26,7 +26,6 @@ Item {
         target: calculator
         function onPdfSaved(success, message) {
             if (success) {
-                // Pass the full message including the path to the popup
                 messagePopup.showSuccess(message)
             } else {
                 messagePopup.showError("Error saving PDF: " + message)

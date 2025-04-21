@@ -208,10 +208,8 @@ Page {
                                 
                                 onExportRequest: function(format) {
                                     if (format === "csv") {
-                                        loadingIndicator.show()
                                         voltageDrop.exportTableData(null)
                                     } else if (format === "pdf") {
-                                        loadingIndicator.show()
                                         voltageDrop.exportTableToPDF(null)
                                     } else if (format === "menu") {
                                         exportFormatMenu.popup()
@@ -275,19 +273,13 @@ Page {
         
         Component.onCompleted: {
             onCsvExport = function() {
-                loadingIndicator.show()
                 voltageDrop.exportTableData(null)
             }
             
             onPdfExport = function() {
-                loadingIndicator.show()
                 voltageDrop.exportTableToPDF(null)
             }
         }
-    }
-    
-    LoadingIndicator {
-        id: loadingIndicator
     }
 
     Connections {
@@ -304,10 +296,7 @@ Page {
         }
         
         function onGrabRequested(filepath, scale) {
-            loadingIndicator.show()
-            console.log("Grabbing image to:", filepath, "with scale:", scale)
             chartPopup.grabImage(function(result) {
-                loadingIndicator.hide()
                 if (result) {
                     var saved = result.saveToFile(filepath)
                     if (saved) {
@@ -322,7 +311,6 @@ Page {
         }
 
         function onTableExportStatusChanged(success, message) {
-            loadingIndicator.hide()
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
@@ -331,7 +319,6 @@ Page {
         }
 
         function onTablePdfExportStatusChanged(success, message) {
-            loadingIndicator.hide()
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
@@ -340,7 +327,6 @@ Page {
         }
         
         function onPdfExportStatusChanged(success, message) {
-            loadingIndicator.hide()
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
@@ -349,7 +335,6 @@ Page {
         }
         
         function onSaveStatusChanged(success, message) {
-            loadingIndicator.hide()
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
@@ -365,8 +350,6 @@ Page {
         onCloseRequested: detailsPopup.close()
 
         onSaveToPdfRequested: {
-            loadingIndicator.show()
-            
             // Helper function to sanitize values
             function safeValue(value, defaultValue = 0) {
                 return (value === undefined || value === null || isNaN(value)) ? 

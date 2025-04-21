@@ -108,8 +108,6 @@ Item {
                                 let tempDir = applicationDirPath;
                                 let tempImagePath = tempDir + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png");
                                 
-                                console.log("Saving chart to: " + tempImagePath);
-                                
                                 powerCurveChart.saveChartImage(tempImagePath);
                                 
                                 // Small delay to ensure image is saved

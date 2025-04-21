@@ -231,8 +231,6 @@ Item {
                 filePath += ".csv"
             }
             
-            console.log("Attempting to save to:", filePath)
-            
             if (calculator.exportResults(filePath)) {
                 showMessage("Export Successful", "Results have been exported to: " + filePath)
             } else {

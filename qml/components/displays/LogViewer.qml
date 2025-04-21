@@ -264,7 +264,7 @@ Rectangle {
         if (typeof clipboard !== 'undefined') {
             clipboard.setText(logText)
         } else {
-            console.log("Clipboard not available, log text:", logText)
+            // error
         }
         
         return logText
@@ -273,6 +273,5 @@ Rectangle {
     // Handle the copy request
     onCopyRequested: {
         var text = copyLogsToClipboard()
-        console.log("Copied " + text.split("\n").length + " log entries")
     }
 }

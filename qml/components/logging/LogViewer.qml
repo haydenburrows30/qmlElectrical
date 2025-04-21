@@ -267,9 +267,9 @@ Rectangle {
                 }
                 
                 if (logManager.saveLogsToFile(selectedFile, logContent)) {
-                    console.log("Logs saved successfully");
+                    // save
                 } else {
-                    console.error("Failed to save logs");
+                    // error
                 }
             }
         }
@@ -284,9 +284,7 @@ Rectangle {
         onAccepted: {
             if (logManager && logManager.exportAllLogs) {
                 if (logManager.exportAllLogs(selectedFile)) {
-                    console.log("Full log history exported successfully");
                 } else {
-                    console.error("Failed to export log history");
                 }
             }
         }

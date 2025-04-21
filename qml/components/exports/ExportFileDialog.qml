@@ -29,7 +29,6 @@ FileDialog {
         let now = new Date()
         let timestamp = now.toISOString().split('.')[0].replace(/[:\-]/g, '')
         currentFile = baseFilename + "_" + timestamp + "." + suffix
-        console.log("Prepared file:", currentFile)
     }
     
     onAccepted: {

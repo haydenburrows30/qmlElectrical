@@ -46,7 +46,6 @@ Item {
 
         function onGrabRequested(filepath, scale) {
             loadingIndicator.visible = true
-            console.log("Grabbing image to:", filepath, "with scale:", scale)
             rlcChartView.grabToImage(function(result) {
                 loadingIndicator.visible = false
                 if (result) {

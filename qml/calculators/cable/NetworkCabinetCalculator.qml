@@ -77,12 +77,7 @@ Item {
         
         onAccepted: {
             calculator.loadConfig(loadConfigDialog.file)
-            
-            // Add debug output after loading to check values
-            console.log("After loading - Streetlighting: " + calculator.showStreetlightingPanel + 
-                        ", Service Panel: " + calculator.showServicePanel +
-                        ", Dropper Plates: " + calculator.showDropperPlates)
-            
+
             // Make sure the UI matches the loaded values
             cabinetConfig.updateUI()
             
@@ -93,8 +88,7 @@ Item {
             })
         }
     }
-    
-    // Replace Popup with standardized MessagePopup
+
     MessagePopup {
         id: messagePopup
     }

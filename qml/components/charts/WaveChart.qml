@@ -245,7 +245,6 @@ ChartView {
             let values = calculator.calculate_values_at(xValue)
 
             if (!values || values.length !== 3) {
-                console.log("Invalid values returned from Python");
                 hideTracker();
                 return;
             }
@@ -255,7 +254,6 @@ ChartView {
             let valC = Number(values[2]);
 
             if (isNaN(valA) || isNaN(valB) || isNaN(valC)) {
-                console.log("Invalid number conversion");
                 hideTracker();
                 return;
             }

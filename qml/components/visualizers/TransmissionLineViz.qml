@@ -62,7 +62,6 @@ Item {
 
             // Don't try to paint if we have no size
             if (width <= 0 || height <= 0) {
-                console.log("Canvas has no size, skipping paint")
                 return
             }
 
@@ -85,8 +84,6 @@ Item {
             // Fix phasor diagram drawing
             var phasorSize = Math.min(width * 0.2, height * 0.2);
             drawPhasorDiagram(ctx, width * 0.7, height * 0.8, phasorSize, voltageColor, currentColor);
-
-            // console.log("Canvas painting at size:", width, "x", height)
         }
         
         function drawTransmissionLine(ctx, x, y, width, height, color) {

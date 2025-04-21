@@ -467,7 +467,6 @@ Item {
     }
 
     function enhancedChartUpdate() {
-        console.log("Updating chart with enhanced approach")
         try {
             const knownSizes = ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", 
                                 "120", "150", "185", "240", "300", "400", "500", "630"]
@@ -573,9 +572,7 @@ Item {
                             currentDropValue.toFixed(2) + "% - " + 
                             currentText + " (" + pctText + ")"
             
-            console.log("Enhanced chart updated successfully")
         } catch (err) {
-            console.error("Enhanced chart error: " + err)
 
             dropPercentSeries.clear()
             dropPercentSeries.append(5, chartComponent.percentage)
