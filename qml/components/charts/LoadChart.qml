@@ -26,11 +26,8 @@ Item {
         loadSeries.clear();
 
         if (!manager) {
-            console.log("Load chart: manager not available");
             return;
         }
-        
-        console.log("Updating load distribution chart, circuit count:", manager.circuitCount);
         
         let loadGroups = {};
         let totalLoad = 0;
@@ -38,7 +35,6 @@ Item {
         for (let i = 0; i < manager.circuitCount; i++) {
             let circuit = manager.getCircuitAt(i);
             if (!circuit) {
-                console.log("Could not get circuit at index", i);
                 continue;
             }
 
@@ -60,9 +56,6 @@ Item {
                 totalLoad += load;
             }
         }
-        
-        console.log("Load groups:", JSON.stringify(loadGroups));
-        console.log("Total load:", totalLoad);
 
         for (let type in loadGroups) {
             if (loadGroups[type] > 0) {
@@ -75,8 +68,6 @@ Item {
                 slice.labelPosition = PieSlice.LabelOutside;
                 slice.exploded = true;
                 slice.explodeDistanceFactor = 0.05;
-                
-                console.log("Added slice:", label, loadGroups[type]);
             }
         }
         
@@ -106,18 +97,15 @@ Item {
     Connections {
         target: manager
         function onCircuitCountChanged() {
-            console.log("Load chart: circuit count changed, updating chart");
             root.updateLoadDistribution();
         }
         function onTotalLoadChanged() {
-            console.log("Load chart: total load changed, updating chart");
             root.updateLoadDistribution();
         }
     }
     
     // Update when the component is completed
     Component.onCompleted: {
-        console.log("LoadChart component completed");
         updateLoadDistribution();
     }
 }

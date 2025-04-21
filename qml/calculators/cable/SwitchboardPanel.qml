@@ -253,7 +253,6 @@ Item {
                                     function onCircuitCountChanged() {
                                         circuitList.model = 0;
                                         circuitList.model = manager.circuitCount;
-                                        console.log("ListView refreshed with new circuit count:", manager.circuitCount);
                                     }
                                 }
 
@@ -263,7 +262,6 @@ Item {
                                     height: 40
 
                                     Component.onCompleted: {
-                                        console.log("Creating delegate for index", index)
                                         if (!circuitData || Object.keys(circuitData).length === 0) {
                                             console.error("No circuit data for index", index)
                                         }
@@ -385,7 +383,6 @@ Item {
                                         circuits.push(manager.getCircuitAt(i));
                                     }
                                     singleLineDiagram.circuitsList = circuits;
-                                    console.log("Single line diagram updated with", circuits.length, "circuits");
                                 }
                             }
 
@@ -397,7 +394,6 @@ Item {
                                     circuits.push(manager.getCircuitAt(i));
                                 }
                                 circuitsList = circuits;
-                                console.log("Single line diagram initialized with", circuits.length, "circuits");
                             }
                             
                             darkMode: window.modeToggled
@@ -516,14 +512,11 @@ Item {
 
             if (editMode) {
                 let success = manager.updateCircuit(circuitIndex, circuitData);
-                console.log("Circuit updated, success =", success);
 
                 circuitList.model = 0;
                 circuitList.model = manager.circuitCount;
             } else {
                 let success = manager.addCircuit(circuitData);
-                console.log("Circuit added, success =", success);
-                console.log("Current circuit count after adding:", manager.circuitCount);
             }
         }
 

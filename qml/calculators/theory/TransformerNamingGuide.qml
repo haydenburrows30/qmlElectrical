@@ -15,6 +15,7 @@ Item {
     id: transformerNamingCard
 
     property color textColor: Universal.foreground
+    property bool darkMode: window.modeToggled
 
     property TransformerNamingGuide calculator : TransformerNamingGuide {}
 
