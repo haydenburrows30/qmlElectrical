@@ -41,6 +41,22 @@ Rectangle {
         }
     }
 
+    function openDebugTools() {
+        var component = Qt.createComponent("LogDebuggerPopup.qml")
+        if (component.status === Component.Ready) {
+            var debugPopup = component.createObject(window || logViewer, {
+                "logManager": logManager
+            })
+            if (debugPopup) {
+                debugPopup.open()
+            } else {
+                console.error("Error creating debug popup instance")
+            }
+        } else {
+            console.error("Error loading LogDebuggerPopup:", component.errorString())
+        }
+    }
+
     // Use Item instead of ColumnLayout to avoid recursion
     Item {
         id: mainContainer
@@ -119,48 +135,10 @@ Rectangle {
             }
             
             Button {
-                text: "Debug Loggers"
+                text: "Debug Tools"
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
-                    if (logManager && logManager.getLoggerDebugInfo) {
-                        // Display the logger debug info as a log entry
-                        let debugInfo = logManager.getLoggerDebugInfo()
-                        logManager.log("INFO", "Logger Debug Information:\n" + debugInfo)
-                    }
-                }
-            }
-
-            Button {
-                id: debugModeButton
-                text: "Debug Mode: Off"
-                property bool debugModeEnabled: false
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: {
-                    debugModeEnabled = !debugModeEnabled
-                    text = "Debug Mode: " + (debugModeEnabled ? "On" : "Off")
-                    
-                    if (logManager) {
-                        logManager.setDebugMode(debugModeEnabled)
-                        if (debugModeEnabled) {
-                            logManager.log("INFO", "Debug mode enabled")
-                        }
-                    }
-                }
-            }
-
-            Button {
-                text: "Analyze Logs"
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: {
-                    var component = Qt.createComponent("LogAnalyzerTool.qml")
-                    if (component.status === Component.Ready) {
-                        var analyzer = component.createObject(window || logViewer, {
-                            "logManager": logManager
-                        })
-                        analyzer.open()
-                    } else {
-                        console.error("Error creating LogAnalyzerTool:", component.errorString())
-                    }
+                    openDebugTools()
                 }
             }
         }

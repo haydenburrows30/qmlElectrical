@@ -13,6 +13,7 @@ import "components/popups"
 import "components/buttons"
 import "components/displays"
 import "components/menus"
+import "components/logging"
 
 ApplicationWindow {
     id: window

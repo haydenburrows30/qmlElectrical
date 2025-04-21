@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+// Import the module using the current directory
+import "."
 
 Dialog {
     id: logViewerPopup
@@ -29,22 +31,6 @@ Dialog {
     
     footer: DialogButtonBox {
         standardButtons: DialogButtonBox.Close
-        
-        Button {
-            text: "Test Logging"
-            DialogButtonBox.buttonRole: DialogButtonBox.ActionRole
-            onClicked: {
-                if (logManager) {
-                    // Log to several different loggers to confirm no duplicates
-                    logManager.log("INFO", "Test log message from QML")
-                    
-                    // Simulate multiple components logging to verify no duplicates
-                    Qt.callLater(function() {
-                        logManager.testComponentLogs()
-                    })
-                }
-            }
-        }
     }
     
     onOpened: {
