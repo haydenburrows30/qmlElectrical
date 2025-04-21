@@ -23,7 +23,6 @@ Item {
 
     signal calculate()
 
-    // Move function to component level
     function updateDisplayValues() {
         if (!calculatorReady) return
 
@@ -48,7 +47,6 @@ Item {
         regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
     }
 
-    // Add function to component level
     function getCurveInfoText(curveType) {
         switch(curveType) {
             case "Standard Inverse":
@@ -444,7 +442,7 @@ Item {
 
                                     onClicked: {
                                         if (calculatorReady) {
-                                            calculate() // Emit the calculate signal
+                                            calculate()
                                             calculator.refreshCalculations()
                                         }
                                     }
@@ -702,7 +700,7 @@ Item {
                             Label { text: "Connection Type:" }
                             TextFieldBlue {
                                 id: regulatorConnectionText
-                                text: "Delta"  // Using a fixed string prevents the undefined error
+                                text: "Delta"
                                 enabled: regulatorEnabledSwitch.checked
                             }
 
@@ -710,7 +708,7 @@ Item {
                             Label { text: "Capacity per Phase (kVA):" }
                             TextFieldBlue {
                                 id: regulatorCapacityText
-                                text: "185"  // Using a fixed string prevents the undefined error
+                                text: "185"
                                 enabled: regulatorEnabledSwitch.checked
                             }
 
@@ -849,7 +847,6 @@ Item {
         id: messagePopup
     }
 
-    // Rename function to remove loading reference
     function exportReport() {
         if (!calculatorReady) return;
         
@@ -887,7 +884,6 @@ Item {
         }
 
         function onPdfExportStatusChanged(success, message) {
-            // Show appropriate message popup without loading indicator
             if (success) {
                 messagePopup.showSuccess(message);
             } else {
@@ -896,7 +892,6 @@ Item {
         }
     }
 
-    // Add the ExpertProtectionPopup at the bottom of the component
     ExpertProtectionPopup {
         id: expertProtectionPopup
         calculator: transformerLineSection.calculator

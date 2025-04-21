@@ -45,11 +45,6 @@ Item {
         return "1000/1";
     }
 
-    // Add new message popup for export messages
-    MessagePopup {
-        id: messagePopup
-    }
-                
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -172,7 +167,7 @@ Item {
                         WaveCard {
                             title: "Transformer Protection (11kV)"
                             Layout.minimumWidth: 400
-                            Layout.minimumHeight: 800  // Increased height for new fields
+                            Layout.minimumHeight: 800
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -259,7 +254,7 @@ Item {
                                     Layout.fillWidth: true
                                 }
                                 
-                                // Add differential protection section
+                                // differential protection
                                 Rectangle {
                                     Layout.columnSpan: 2
                                     Layout.fillWidth: true
@@ -303,7 +298,7 @@ Item {
                                     Layout.fillWidth: true
                                 }
                                 
-                                // Add harmonics section
+                                // harmonics
                                 Rectangle {
                                     Layout.columnSpan: 2
                                     Layout.fillWidth: true
