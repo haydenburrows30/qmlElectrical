@@ -23,8 +23,6 @@ Item {
     property bool isUpdatingValues: false
     property bool isUpdatingAEP: false
 
-    property var loadingIndicator: null
-
     signal calculate()
 
     PopUpText {
@@ -64,7 +62,6 @@ Item {
 
     MessagePopup {
         id: messagePopup
-        z: 9999 // Ensure the popup appears on top of everything
         anchors.centerIn: parent
 
         // Custom property to manage visibility
@@ -112,16 +109,6 @@ Item {
                                 let tempImagePath = tempDir + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png");
                                 
                                 console.log("Saving chart to: " + tempImagePath);
-                                
-                                // Create an optional loading indicator to show while processing
-                                let loadingComponent = Qt.createComponent("../../components/LoadingIndicator.qml");
-                                if (loadingComponent.status === Component.Ready) {
-                                    let indicator = loadingComponent.createObject(windTurbineSection);
-                                    indicator.show();
-                                    
-                                    // Assign to property so connections can access it
-                                    windTurbineSection.loadingIndicator = indicator;
-                                }
                                 
                                 powerCurveChart.saveChartImage(tempImagePath);
                                 
@@ -699,7 +686,7 @@ Item {
 
     Timer {
         id: updateTimer
-        interval: 500
+        interval: 1000
         repeat: true
         running: calculatorReady
         onTriggered: {
@@ -712,22 +699,12 @@ Item {
     Connections {
         target: calculator
         
-        function onPdfSaved() {
-            // Check if loadingIndicator exists before trying to hide it
-            if (typeof windTurbineSection.loadingIndicator !== 'undefined' && 
-                windTurbineSection.loadingIndicator !== null) {
-                windTurbineSection.loadingIndicator.hide()
-            }
-            
-            // Show success message with file path
-            if (calculator.exportSuccess.startsWith("Success")) {
-                messagePopup.showSuccess(calculator.exportSuccess)
-            } else if (calculator.exportSuccess.startsWith("PDF saved")) {
-                messagePopup.showSuccess(calculator.exportSuccess)
-            } else if (calculator.exportSuccess === "Cancelled") {
-                // Don't show any message for cancelled exports
+        function onPdfExportStatusChanged(success, message) {
+            // Show appropriate message popup without loading indicator
+            if (success) {
+                messagePopup.showSuccess(message);
             } else {
-                messagePopup.showError("Failed to export wind turbine report: " + calculator.exportSuccess)
+                messagePopup.showError(message);
             }
         }
     }

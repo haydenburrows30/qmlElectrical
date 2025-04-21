@@ -20,7 +20,7 @@ class WindTurbineCalculator(QObject):
     cutInSpeedChanged = Signal()
     cutOutSpeedChanged = Signal()
     efficiencyChanged = Signal()
-    pdfSaved = Signal()
+    pdfExportStatusChanged = Signal(bool, str)
     
     # Add both signal names for compatibility
     calculationCompleted = Signal()  # Standard name
@@ -511,6 +511,30 @@ class WindTurbineCalculator(QObject):
         
         return True
     
+    def _handle_pdf_export(self, generate_callback, filename, default_name):
+        """Common PDF export handler to reduce code duplication"""
+        # If no filepath provided, use FileSaver to get one
+        if not filename:
+            filename = self._file_saver.get_save_filepath("pdf", default_name)
+            if not filename:
+                # Let QML know the export was canceled
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+        
+        # Generate PDF using the provided callback
+        result = generate_callback(filename)
+        
+        # Forward FileSaver signals to our own signal
+        if result:
+            message = f"PDF saved to: {filename}"
+            self._file_saver._emit_success_with_path(filename)
+            self.pdfExportStatusChanged.emit(True, message)
+            return True
+        else:
+            error_msg = f"Error saving PDF to {filename}"
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
     @Slot(str, str)
     def exportWindTurbineReport(self, filename, chart_image_path=""):
         """Export wind turbine calculations to PDF
@@ -523,37 +547,29 @@ class WindTurbineCalculator(QObject):
             import os
             import platform
             
-            # If no filepath provided, use FileSaver to get one
-            if not filename:
-                filename = self._file_saver.get_save_filepath("pdf", "wind_turbine_report")
-                if not filename:
-                    logger.info("Export cancelled by user")
-                    self._pdf = "Cancelled"
-                    self.pdfSaved.emit()
-                    return False
-            
             # Clean up filename - handle QML URL format
-            clean_path = filename.strip()
-            
-            # Remove the file:/// prefix if present
-            if clean_path.startswith('file:///'):
-                # On Windows, file:///C:/path becomes C:/path
-                if platform.system() == "Windows":
-                    clean_path = clean_path[8:]
-                else:
-                    # On Unix-like systems, file:///path becomes /path
-                    clean_path = clean_path[8:] if clean_path[8:10].startswith(":/") else clean_path[7:]
+            if filename:
+                clean_path = filename.strip()
+                
+                # Remove the file:/// prefix if present
+                if clean_path.startswith('file:///'):
+                    # On Windows, file:///C:/path becomes C:/path
+                    if platform.system() == "Windows":
+                        clean_path = clean_path[8:]
+                    else:
+                        # On Unix-like systems, file:///path becomes /path
+                        clean_path = clean_path[8:] if clean_path[8:10].startswith(":/") else clean_path[7:]
 
-            # Handle the case with extra leading slash on Windows paths
-            if clean_path.startswith('/') and ':' in clean_path[1:3]:  # Like '/C:/'
-                clean_path = clean_path[1:]  # Remove leading slash
+                # Handle the case with extra leading slash on Windows paths
+                if clean_path.startswith('/') and ':' in clean_path[1:3]:  # Like '/C:/'
+                    clean_path = clean_path[1:]  # Remove leading slash
+                    
+                # Ensure it has .pdf extension
+                if not clean_path.lower().endswith('.pdf'):
+                    clean_path += '.pdf'
                 
-            # Ensure it has .pdf extension
-            if not clean_path.lower().endswith('.pdf'):
-                clean_path += '.pdf'
+                filename = clean_path
             
-            logger.info(f"Processing export to: {clean_path}")
-                
             # Clean up chart image path
             if chart_image_path:
                 chart_image_path = os.path.normpath(chart_image_path)
@@ -594,42 +610,26 @@ class WindTurbineCalculator(QObject):
                 "chart_image_path": chart_image_path if chart_image_path else ""
             }
             
+            # Use helper method to handle the export
             generator = PDFGenerator()
-            result = generator.generate_wind_turbine_report(data, clean_path)
             
-            # IMPORTANT: Add direct popup notification instead of relying on FileSaver
-            if result:
-                # Don't rely on FileSaver signal, create a direct popup message
-                popup_message = f"PDF saved to: {clean_path}"
-                logger.info(popup_message)
-                
-                # Set the PDF success message with filepath to trigger popup in QML
-                self._pdf = popup_message
-                self.pdfSaved.emit()
-                
-                # Also use FileSaver's method for console logging
-                self._file_saver._emit_success_with_path(clean_path, "PDF saved")
-                return True
-            else:
-                error_msg = f"Error saving to {clean_path}"
-                logger.error(error_msg)
-                self._pdf = f"Error: {error_msg}"
-                self.pdfSaved.emit()
-                return False
+            def generate_pdf_callback(filepath):
+                return generator.generate_wind_turbine_report(data, filepath)
+            
+            # Handle the export with our common method
+            return self._handle_pdf_export(generate_pdf_callback, filename, "wind_turbine_report")
+            
         except Exception as e:
             logger.error(f"Error exporting wind turbine report: {e}")
             logger.error(f"Attempted filename: {filename}")
             # Print more details for debugging
             import traceback
             logger.error(traceback.format_exc())
-            self._pdf = f"Error: {str(e)}"
-            self.pdfSaved.emit()
+            
+            # Send error to QML
+            self.pdfExportStatusChanged.emit(False, f"Error exporting report: {str(e)}")
             return False
 
-    @Property(str, notify=pdfSaved)
-    def exportSuccess(self):
-        return self._pdf
-    
     # Advanced analysis methods
     @Slot(float, float, result=float)
     def estimateAEP(self, avg_wind_speed, weibull_k=2.0):
