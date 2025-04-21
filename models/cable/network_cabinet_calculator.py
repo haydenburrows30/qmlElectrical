@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot
+from utils.file_saver import FileSaver
 
-# Import the new modules
+# Import the PDF generator module
 from utils.pdf_generator_dcm import generate_dcm_pdf
 from .config_manager_dcm import save_config, load_config
 
@@ -9,7 +10,7 @@ class NetworkCabinetCalculator(QObject):
     Network Cabinet Calculator for DC-M1 cabinet configurations.
     """
 
-    # Signal definitions - unchanged
+    # Signal definitions - update signals to match standard approach
     activeWaysChanged = Signal(int)
     cableSizesChanged = Signal(list)
     showStreetlightingPanelChanged = Signal(bool)
@@ -29,9 +30,9 @@ class NetworkCabinetCalculator(QObject):
     showDropperPlatesChanged = Signal(bool)
     cableLengthsChanged = Signal(list)
     servicePanelLengthChanged = Signal(float)
-    pdfExportStatusChanged = Signal(str)
+    pdfExportStatusChanged = Signal(bool, str)  # Update to match standard approach
     generalNotesChanged = Signal(str)
-    saveLoadStatusChanged = Signal(str)
+    saveLoadStatusChanged = Signal(bool, str)  # Update to match standard approach
     servicePanelSourceChanged = Signal(str)
     servicePanelDestinationChanged = Signal(str)
     servicePanelNotesChanged = Signal(str)
@@ -59,6 +60,12 @@ class NetworkCabinetCalculator(QObject):
     
     def __init__(self):
         super().__init__()
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect the FileSaver signals to our signals
+        self._file_saver.saveStatusChanged.connect(self.saveLoadStatusChanged)
         
         # Default values for all properties
         self._defaults = {
@@ -627,14 +634,32 @@ class NetworkCabinetCalculator(QObject):
         Export cabinet configuration to PDF
         
         Args:
-            folder_path: The folder path to save the PDF (from QML file dialog)
+            folder_path: The folder path or complete filepath to save the PDF
             diagram_image: Optional data URL of diagram image to include
         """
-        # Use the dedicated PDF generator module
-        success, message = generate_dcm_pdf(self, folder_path, diagram_image)
-        # Emit status signal
-        self.pdfExportStatusChanged.emit(message)
-        return success
+        try:
+            # If no folder path provided, use FileSaver to get one
+            if not folder_path:
+                filename = f"cabinet_config_{self._site_name or 'untitled'}"
+                pdf_path = self._file_saver.get_save_filepath("pdf", filename)
+                if not pdf_path:
+                    self.pdfExportStatusChanged.emit(False, "Export cancelled")
+                    return False
+                folder_path = pdf_path  # This is now a complete filepath
+            
+            # Use the dedicated PDF generator module
+            success, filepath = generate_dcm_pdf(self, folder_path, diagram_image)
+            
+            # Use standardized success message with file path
+            if success:
+                self._file_saver._emit_success_with_path(filepath, "PDF saved")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving to {filepath}")
+                return False
+        except Exception as e:
+            self.pdfExportStatusChanged.emit(False, str(e))
+            return False
     
     @Slot(str)
     def saveConfig(self, file_path):
@@ -644,11 +669,32 @@ class NetworkCabinetCalculator(QObject):
         Args:
             file_path: The file path to save the configuration (from QML file dialog)
         """
-        # Use the dedicated config manager module
-        success, message = save_config(self, file_path)
-        # Emit status signal
-        self.saveLoadStatusChanged.emit(message)
-        return success
+        try:
+            # If no file path provided, use FileSaver to get one
+            if not file_path:
+                filename = f"cabinet_config_{self._site_name or 'untitled'}"
+                file_path = self._file_saver.get_save_filepath("json", filename)
+                if not file_path:
+                    self.saveLoadStatusChanged.emit(False, "Save cancelled")
+                    return False
+            
+            # Ensure we don't double-add extension
+            if not file_path.lower().endswith(".json"):
+                file_path += ".json"
+            
+            # Use the dedicated config manager module
+            success, result = save_config(self, file_path)
+            
+            # Use standardized success message with file path
+            if success:
+                self._file_saver._emit_success_with_path(file_path, "Configuration saved")
+                return True
+            else:
+                self.saveLoadStatusChanged.emit(False, f"Error saving to {file_path}")
+                return False
+        except Exception as e:
+            self.saveLoadStatusChanged.emit(False, str(e))
+            return False
     
     @Slot(str)
     def loadConfig(self, file_path):
@@ -658,62 +704,76 @@ class NetworkCabinetCalculator(QObject):
         Args:
             file_path: The file path to load the configuration from (from QML file dialog)
         """
-        # Use the dedicated config manager module
-        success, message = load_config(self, file_path)
-        
-        if success:
-            # Use signal map to emit all signals
-            signal_map = {
-                "active_ways": self.activeWaysChanged,
-                "cable_sizes": self.cableSizesChanged,
-                "show_streetlighting_panel": self.showStreetlightingPanelChanged,
-                "show_service_panel": self.showServicePanelChanged,
-                "show_dropper_plates": self.showDropperPlatesChanged,
-                "way_types": self.wayTypesChanged,
-                "fuse_ratings": self.fuseRatingsChanged,
-                "service_cable_sizes": self.serviceCableSizesChanged,
-                "conductor_types": self.conductorTypesChanged, 
-                "service_conductor_types": self.serviceConductorTypesChanged,
-                "connection_counts": self.connectionCountsChanged,
-                "cable_lengths": self.cableLengthsChanged,
-                "service_panel_length": self.servicePanelLengthChanged,
-                "service_panel_cable_size": self.servicePanelCableSizeChanged,
-                "service_panel_conductor_type": self.servicePanelConductorTypeChanged,
-                "service_panel_connection_count": self.servicePanelConnectionCountChanged,
-                "site_name": self.siteNameChanged,
-                "site_number": self.siteNumberChanged,
-                "service_panel_source": self.servicePanelSourceChanged,
-                "service_panel_destination": self.servicePanelDestinationChanged,
-                "service_panel_notes": self.servicePanelNotesChanged,
-                "service_panel_phase": self.servicePanelPhaseChanged,
-                "general_notes": self.generalNotesChanged,
-                # Add these signals to properly update text fields on load
-                "sources": self.sourcesChanged,
-                "destinations": self.destinationsChanged,
-                "notes": self.notesChanged,
-                "phases": self.phasesChanged,
-                # Add header information signals
-                "customer_name": self.customerNameChanged,
-                "customer_email": self.customerEmailChanged,
-                "project_name": self.projectNameChanged,
-                "orn": self.ornChanged,
-                # Add footer information signals
-                "designer": self.designerChanged,
-                "revision_number": self.revisionNumberChanged,
-                "revision_description": self.revisionDescriptionChanged,
-                "checked_by": self.checkedByChanged,
-                # Add revision management signals
-                "revision_count": self.revisionCountChanged,
-                "revisions": self.revisionsChanged
-            }
+        try:
+            # If no file path provided, use FileSaver to get one for loading
+            if not file_path:
+                file_path = self._file_saver.get_load_filepath("json")
+                if not file_path:
+                    self.saveLoadStatusChanged.emit(False, "Load cancelled")
+                    return False
             
-            # Emit all signals with the updated values
-            for key, signal in signal_map.items():
-                signal.emit(getattr(self, f"_{key}"))
+            # Use the dedicated config manager module
+            success, message = load_config(self, file_path)
             
-            # Emit main config changed signal
-            self.configChanged.emit()
+            if success:
+                # Update all signals
+                signal_map = {
+                    "active_ways": self.activeWaysChanged,
+                    "cable_sizes": self.cableSizesChanged,
+                    "show_streetlighting_panel": self.showStreetlightingPanelChanged,
+                    "show_service_panel": self.showServicePanelChanged,
+                    "show_dropper_plates": self.showDropperPlatesChanged,
+                    "way_types": self.wayTypesChanged,
+                    "fuse_ratings": self.fuseRatingsChanged,
+                    "service_cable_sizes": self.serviceCableSizesChanged,
+                    "conductor_types": self.conductorTypesChanged, 
+                    "service_conductor_types": self.serviceConductorTypesChanged,
+                    "connection_counts": self.connectionCountsChanged,
+                    "cable_lengths": self.cableLengthsChanged,
+                    "service_panel_length": self.servicePanelLengthChanged,
+                    "service_panel_cable_size": self.servicePanelCableSizeChanged,
+                    "service_panel_conductor_type": self.servicePanelConductorTypeChanged,
+                    "service_panel_connection_count": self.servicePanelConnectionCountChanged,
+                    "site_name": self.siteNameChanged,
+                    "site_number": self.siteNumberChanged,
+                    "service_panel_source": self.servicePanelSourceChanged,
+                    "service_panel_destination": self.servicePanelDestinationChanged,
+                    "service_panel_notes": self.servicePanelNotesChanged,
+                    "service_panel_phase": self.servicePanelPhaseChanged,
+                    "general_notes": self.generalNotesChanged,
+                    # Add these signals to properly update text fields on load
+                    "sources": self.sourcesChanged,
+                    "destinations": self.destinationsChanged,
+                    "notes": self.notesChanged,
+                    "phases": self.phasesChanged,
+                    # Add header information signals
+                    "customer_name": self.customerNameChanged,
+                    "customer_email": self.customerEmailChanged,
+                    "project_name": self.projectNameChanged,
+                    "orn": self.ornChanged,
+                    # Add footer information signals
+                    "designer": self.designerChanged,
+                    "revision_number": self.revisionNumberChanged,
+                    "revision_description": self.revisionDescriptionChanged,
+                    "checked_by": self.checkedByChanged,
+                    # Add revision management signals
+                    "revision_count": self.revisionCountChanged,
+                    "revisions": self.revisionsChanged
+                }
+                
+                # Emit all signals with the updated values
+                for key, signal in signal_map.items():
+                    signal.emit(getattr(self, f"_{key}"))
+                
+                # Emit main config changed signal
+                self.configChanged.emit()
 
-        # Emit status signal
-        self.saveLoadStatusChanged.emit(message)
-        return success
+                # Use standardized success message
+                self._file_saver._emit_success_with_path(file_path, "Configuration loaded")
+                return True
+            else:
+                self.saveLoadStatusChanged.emit(False, f"Error loading from {file_path}")
+                return False
+        except Exception as e:
+            self.saveLoadStatusChanged.emit(False, str(e))
+            return False

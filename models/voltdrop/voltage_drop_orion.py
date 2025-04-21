@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
 import json
 from utils.logger_config import configure_logger
+from utils.file_saver import FileSaver
 
 from .table_model import VoltageDropTableModel
 from .file_utils import FileUtils
@@ -57,10 +58,12 @@ class VoltageDropCalculator(QObject):
         self._file_utils = FileUtils()
         self._pdf_generator = PDFGenerator()
         self._table_model = VoltageDropTableModel()
+        self._file_saver = FileSaver()  # Add the new FileSaver
         
         # Connect signals from components to forward them
         self._file_utils.saveStatusChanged.connect(self.saveStatusChanged)
         self._pdf_generator.pdfExportStatusChanged.connect(self.pdfExportStatusChanged)
+        self._file_saver.saveStatusChanged.connect(self.tableExportStatusChanged)  # Connect the new signal
         
         # Initialize state variables
         self._current = 0.0
@@ -441,10 +444,12 @@ class VoltageDropCalculator(QObject):
     @Slot(str, float)
     def saveChart(self, filepath, scale=2.0):
         """Save chart as image with optional scale factor."""
-        # Pass this request directly to the QML view via signal
+        # If no filepath provided, use the file saver to get one
         if not filepath:
-            # Get save filepath directly without using default results_dir
-            filepath = self._file_utils.get_save_filepath("png", "voltage_drop_chart")
+            filepath = self._file_saver.get_save_filepath("png", "voltage_drop_chart")
+            if not filepath:
+                self.chartSaved.emit(False, "Export cancelled")
+                return False
         
         if filepath:
             logger.debug(f"Requesting chart capture to: {filepath} with scale {scale}")
@@ -456,14 +461,6 @@ class VoltageDropCalculator(QObject):
     def exportTableData(self, filepath):
         """Save the cable size comparison table data to a CSV file."""
         try:
-            if not filepath:
-                filepath = self._file_utils.get_save_filepath("csv", "cable_comparison")
-                
-                if not filepath:
-                    logger.warning("Table export cancelled by user")
-                    self.tableExportStatusChanged.emit(False, "Export cancelled")
-                    return False
-            
             # Ensure we have data to save
             if not hasattr(self, '_table_model') or self._table_model is None:
                 logger.error("No table data to export")
@@ -477,10 +474,10 @@ class VoltageDropCalculator(QObject):
                 self.tableExportStatusChanged.emit(False, "Table contains no data to export")
                 return False
                 
-            logger.info(f"Exporting table data to CSV: {filepath}")
+            logger.info(f"Exporting table data to CSV")
             logger.debug(f"Table contains {len(rows)} rows of data")
             
-            # Create metadata
+            # Create metadata for CSV header
             metadata = {
                 "System Voltage": self._selected_voltage,
                 "Current": f"{self._current:.1f} A",
@@ -492,18 +489,16 @@ class VoltageDropCalculator(QObject):
                 "Diversity Factor": f"{self._diversity_factor:.3f}"
             }
             
-            # Create DataFrame
+            # Create data structure for FileSaver
             headers = ['Size (mm²)', 'Material', 'Cores', 'mV/A/m', 'Rating (A)', 
                       'Voltage Drop (V)', 'Drop (%)', 'Status']
-            df = pd.DataFrame(rows, columns=headers)
+            data = {
+                'data': rows,
+                'headers': headers
+            }
             
-            # Save using file_utils
-            result = self._file_utils.save_csv(filepath, df, metadata)
-            if result:
-                logger.info(f"Successfully exported table data to: {filepath}")
-            else:
-                logger.error(f"Failed to export table data to: {filepath}")
-            return result
+            # Save using FileSaver instead of file_utils
+            return self._file_saver.save_csv(filepath, data, metadata, "cable_comparison")
             
         except Exception as e:
             error_msg = f"Error exporting table data: {e}"
@@ -582,7 +577,7 @@ class VoltageDropCalculator(QObject):
         """Export calculation details to PDF."""
         try:
             if not filepath:
-                filepath = self._file_utils.get_save_filepath("pdf", "voltage_drop_details")
+                filepath = self._file_saver.get_save_filepath("pdf", "voltage_drop_details")
                 if not filepath:
                     self.pdfExportStatusChanged.emit(False, "Export cancelled")
                     return False
@@ -592,7 +587,14 @@ class VoltageDropCalculator(QObject):
             
             # Generate PDF with converted dictionary
             result = self._pdf_generator.generate_details_pdf(filepath, details_dict)
-            return result
+            
+            # Use standardized success message
+            if result:
+                self._file_saver._emit_success_with_path(filepath, "PDF saved")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving to {filepath}")
+                return False
             
         except Exception as e:
             error_msg = f"Error exporting PDF: {e}"
@@ -605,7 +607,7 @@ class VoltageDropCalculator(QObject):
         """Export table data to PDF."""
         try:
             if not filepath:
-                filepath = self._file_utils.get_save_filepath("pdf", "voltage_drop_table")
+                filepath = self._file_saver.get_save_filepath("pdf", "voltage_drop_table")
                 if not filepath:
                     self.tablePdfExportStatusChanged.emit(False, "Export cancelled")
                     return False
@@ -635,7 +637,14 @@ class VoltageDropCalculator(QObject):
             
             # Generate PDF using the PDFGenerator
             result = self._pdf_generator.generate_table_pdf(filepath, table_data, metadata)
-            return result
+            
+            # Use standardized success message
+            if result:
+                self._file_saver._emit_success_with_path(filepath, "PDF saved")
+                return True
+            else:
+                self.tablePdfExportStatusChanged.emit(False, f"Error saving to {filepath}")
+                return False
             
         except Exception as e:
             error_msg = f"Error exporting PDF: {e}"

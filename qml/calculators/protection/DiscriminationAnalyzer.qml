@@ -30,6 +30,10 @@ Item {
                     "Developed by <b>Wave</b>."
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -48,7 +52,6 @@ Item {
                 id: mainLayout
                 width: flickableMain.width -20
 
-                // Header with title and help button
                 RowLayout {
                     id: topHeader
                     Layout.fillWidth: true
@@ -74,11 +77,7 @@ Item {
                             pickupCurrent.text = ""
                             tds.text = ""
                             faultCurrent.text = ""
-                            
-                            // Use the complete chart reset function
                             marginChart.resetChart()
-                            
-                            // Reset the checkbox
                             showFaultPoints.checked = false
                         }
                     }
@@ -95,16 +94,13 @@ Item {
 
                 RowLayout {
 
-                    // Left Column - Controls and Results
                     ColumnLayout {
                         id: leftColumn
                         Layout.maximumWidth: 400
                         Layout.minimumWidth: 400
 
-                        // Relay Input Section
                         WaveCard {
                             title: "Add New Relay"
-
                             Layout.fillWidth: true
                             Layout.minimumHeight: 240
 
@@ -163,27 +159,19 @@ Item {
                                     icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
-                                        // Add input validation with user feedback
                                         if (!relayName.text) {
                                             relayName.focus = true
-                                            // console.log("Please enter a relay name")
                                         } else if (!pickupCurrent.text || parseFloat(pickupCurrent.text) <= 0) {
                                             pickupCurrent.focus = true
-                                            // console.log("Please enter a valid pickup current")
                                         } else if (!tds.text || parseFloat(tds.text) <= 0) {
                                             tds.focus = true
-                                            // console.log("Please enter a valid time dial setting")
                                         } else {
-                                            // console.log("Adding relay:", relayName.text)
-
                                             calculator.addRelay({
                                                 "name": relayName.text,
                                                 "pickup": parseFloat(pickupCurrent.text),
                                                 "tds": parseFloat(tds.text),
                                                 "curve_constants": calculator.getCurveConstants(curveType.currentText)
                                             })
-                                            
-                                            // Clear fields after adding relay for better UX
                                             relayName.text = ""
                                             pickupCurrent.text = ""
                                             tds.text = ""
@@ -194,7 +182,6 @@ Item {
                             }
                         }
 
-                        // Added Relays List
                         WaveCard {
                             title: "Relays"
                             Layout.fillWidth: true
@@ -264,10 +251,8 @@ Item {
                             }
                         }
 
-                        // Configuration Section
                         WaveCard {
                             title: "Configuration"
-                            
                             Layout.fillWidth: true
                             Layout.minimumHeight: 250
                             
@@ -304,7 +289,6 @@ Item {
                                 TextFieldRound {
                                     id: faultCurrent
                                     Layout.fillWidth: true
-
                                     placeholderText: "Add Fault Current Level (A)"
                                     validator: DoubleValidator { bottom: 0 }
                                     enabled: calculator.relayCount >= 2
@@ -323,15 +307,12 @@ Item {
 
                                     onClicked: {
                                         if (calculator.relayCount < 2) {
-                                            // console.log("Please add at least 2 relays")
                                         } else if (!faultCurrent.text || parseFloat(faultCurrent.text) <= 0) {
                                             faultCurrent.focus = true
-                                            // console.log("Please enter a valid fault current")
                                         } else {
                                             let current = parseFloat(faultCurrent.text)
-                                            // console.log("Adding fault level:", current)
                                             calculator.addFaultLevel(current)
-                                            faultCurrent.text = ""  // Clear after adding
+                                            faultCurrent.text = ""
                                             faultCurrent.focus = true
                                         }
                                     }
@@ -355,13 +336,7 @@ Item {
                                     icon.source: "../../../icons/rounded/download.svg"
                                     
                                     onClicked: {
-                                        let filename = calculator.exportResults()
-                                        if (filename) {
-                                            exportSuccessPopup.filepath = filename
-                                            exportSuccessPopup.open()
-                                        } else {
-                                            // Show error message
-                                        }
+                                        calculator.exportResults()
                                     }
                                 }
 
@@ -403,7 +378,6 @@ Item {
                             }
                         }
 
-                        // Results Section
                         WaveCard {
                             title: "Discrimination Results"
                             Layout.fillWidth: true
@@ -490,7 +464,6 @@ Item {
                         }
                     }
 
-                    // Right Column - Visualization
                     WaveCard {
                         Layout.fillWidth: true
                         Layout.minimumHeight: leftColumn.height
@@ -519,45 +492,6 @@ Item {
         }
     }
 
-    // Export success popup
-    Popup {
-        id: exportSuccessPopup
-        anchors.centerIn: parent
-        width: 400
-        height: 180
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        property string filepath: ""
-
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 16
-            spacing: 16
-
-            Label {
-                text: "Results Exported Successfully"
-                font.bold: true
-                font.pixelSize: 16
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            Label {
-                text: "File saved to:\n" + exportSuccessPopup.filepath
-                Layout.fillWidth: true
-                wrapMode: Text.Wrap
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: exportSuccessPopup.close()
-            }
-        }
-    }
-
     Connections {
         target: calculator
         
@@ -579,7 +513,6 @@ Item {
                     }
                 }
                 
-                // Update fault points after the analysis is complete
                 Qt.callLater(function() {
                     if (showFaultPoints && showFaultPoints.checked) {
                         showFaultPointsGrid.updateFaultPoints();
@@ -598,6 +531,14 @@ Item {
             marginChart.updateMarginLine()
         }
         
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError("Export failed: " + message)
+            }
+        }
+        
         function onExportChart(filename) {
             marginChart.saveChartImage(filename)
         }
@@ -612,9 +553,7 @@ Item {
     }
         
     Component.onCompleted: {
-        // Wait for all components to be fully initialized before accessing them
         Qt.callLater(function() {
-            // Initialize chart if it exists
             if (marginChart && marginChart.createRelaySeries) {
                 marginChart.createRelaySeries();
             }

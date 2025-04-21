@@ -23,6 +23,8 @@ Item {
     property bool isUpdatingValues: false
     property bool isUpdatingAEP: false
 
+    property var loadingIndicator: null
+
     signal calculate()
 
     PopUpText {
@@ -60,51 +62,13 @@ Item {
         id: v27StatsPopup
     }
 
-    FileDialog {
-        id: exportFileDialog
-        title: "Export Report"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["PDF files (*.pdf)"]
-        defaultSuffix: "pdf"
-        
-        onAccepted: {
-            let tempDir = applicationDirPath;
-            let tempImagePath = tempDir + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png");
-            
-            console.log("Saving chart to: " + tempImagePath);
-            
-            powerCurveChart.saveChartImage(tempImagePath);
-            
-            // Small delay to ensure image is saved
-            let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
-            timer.interval = 200;
-            timer.repeat = false;
-            timer.triggered.connect(function() {
-                // Process the file URL to ensure it's properly formatted for the Python backend
-                let filePath = exportFileDialog.selectedFile.toString();
-                
-                // More robust path handling for different platforms
-                if (Qt.platform.os === "windows") {
-                    // On Windows, remove file:/// prefix and handle drive letters
-                    if (filePath.startsWith("file:///")) {
-                        filePath = filePath.substring(8); // Remove file:///
-                    } else if (filePath.startsWith("file://")) {
-                        filePath = filePath.substring(5); // Remove file://
-                    }
-                } else {
-                    // On Unix-like systems
-                    if (filePath.startsWith("file:///")) {
-                        filePath = filePath.substring(7); // Remove file:///
-                    } else if (filePath.startsWith("file://")) {
-                        filePath = filePath.substring(5); // Remove file://
-                    }
-                }
-                
-                console.log("Exporting to file path: " + filePath);
-                calculator.exportWindTurbineReport(filePath, tempImagePath);
-            });
-            timer.start();
-        }
+    MessagePopup {
+        id: messagePopup
+        z: 9999 // Ensure the popup appears on top of everything
+        anchors.centerIn: parent
+
+        // Custom property to manage visibility
+        property bool autoOpen: false
     }
 
     ScrollView {
@@ -143,8 +107,33 @@ Item {
 
                         onClicked: {
                             if (calculatorReady) {
-                                exportFileDialog.currentFile = defaultFileName;
-                                exportFileDialog.open();
+                                // Create temporary chart image
+                                let tempDir = applicationDirPath;
+                                let tempImagePath = tempDir + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png");
+                                
+                                console.log("Saving chart to: " + tempImagePath);
+                                
+                                // Create an optional loading indicator to show while processing
+                                let loadingComponent = Qt.createComponent("../../components/LoadingIndicator.qml");
+                                if (loadingComponent.status === Component.Ready) {
+                                    let indicator = loadingComponent.createObject(windTurbineSection);
+                                    indicator.show();
+                                    
+                                    // Assign to property so connections can access it
+                                    windTurbineSection.loadingIndicator = indicator;
+                                }
+                                
+                                powerCurveChart.saveChartImage(tempImagePath);
+                                
+                                // Small delay to ensure image is saved
+                                let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
+                                timer.interval = 200;
+                                timer.repeat = false;
+                                timer.triggered.connect(function() {
+                                    // Pass null to let calculator's FileSaver handle the dialog
+                                    calculator.exportWindTurbineReport(null, tempImagePath);
+                                });
+                                timer.start();
                             }
                         }
                     }
@@ -599,15 +588,12 @@ Item {
         }
         
         try {
-            // Clear existing points
             powerSeries.clear()
             
-            // Get data from calculator
             var powerCurveData = calculator.powerCurve || []
             
             var maxPower = 0.1
             
-            // Process points
             for (var i = 0; i < powerCurveData.length; i++) {
                 var point = powerCurveData[i]
                 
@@ -626,16 +612,13 @@ Item {
                     continue
                 }
                 
-                // Add point to series
                 powerSeries.append(x, y)
                 
-                // Track maximum power for Y-axis scaling
                 if (y > maxPower) {
                     maxPower = y
                 }
             }
             
-            // Calculate appropriate Y axis maximum
             var yAxisMax;
             if (maxPower < 1) {
                 yAxisMax = 1;
@@ -649,14 +632,11 @@ Item {
                 yAxisMax = Math.max(yAxisMax, 100);
             }
             
-            // Set axis ranges
             axisY.max = yAxisMax;
             
-            // Safely get cut-out speed
             var cutOut = calculatorReady ? calculator.cutOutSpeed : 25;
             axisX.max = Math.max(cutOut + 5, 30);
             
-            // Force chart update
             powerCurveChart.update()
         } catch (e) {
             console.error("Error updating power curve:", e)
@@ -664,14 +644,11 @@ Item {
         }
     }
 
-    // Helper function for path formatting
     function platformPath(path) {
         return Qt.platform.os === "windows" ? path.replace(/\//g, "\\") : path;
     }
 
-    // Safe value handling without recursion risk
     function safeValue(value, defaultVal) {
-        // Improved safeValue function to handle more edge cases
         if (value === undefined || value === null || 
             typeof value !== 'number' || 
             isNaN(value) || !isFinite(value)) {
@@ -680,21 +657,17 @@ Item {
         return value;
     }
 
-    // Fixed implementation of advanced AEP calculation
     function calculateAdvancedAEP() {
         if (!calculatorReady || isUpdatingAEP) return;
         
         try {
             isUpdatingAEP = true;
             
-            // Get values directly from spinboxes
             var windSpeed = avgWindSpeedSpinBox.value;
             var weibullK = weibullKSpinBox.value / 10;
             
-            // Call Python function directly
             var aep = calculator.estimateAEP(windSpeed, weibullK);
             
-            // Update text field with result
             advancedAepText.text = safeValue(aep, 0).toFixed(2);
         } catch (e) {
             console.error("Error calculating AEP:", e);
@@ -704,14 +677,12 @@ Item {
         }
     }
     
-    // Update display values from calculator
     function updateDisplayValues() {
         if (!calculatorReady || isUpdatingValues) return;
         
         try {
             isUpdatingValues = true;
             
-            // Update text fields with values from calculator
             sweptAreaText.text = safeValue(calculator.sweptArea, 0).toFixed(2);
             theoreticalPowerText.text = safeValue(calculator.theoreticalPower, 0).toFixed(2);
             actualPowerText.text = safeValue(calculator.actualPower, 0).toFixed(2);
@@ -726,7 +697,6 @@ Item {
         }
     }
 
-    // Regular update timer
     Timer {
         id: updateTimer
         interval: 500
@@ -739,16 +709,41 @@ Item {
         }
     }
     
-    // Initial setup
+    Connections {
+        target: calculator
+        
+        function onPdfSaved() {
+            // Check if loadingIndicator exists before trying to hide it
+            if (typeof windTurbineSection.loadingIndicator !== 'undefined' && 
+                windTurbineSection.loadingIndicator !== null) {
+                windTurbineSection.loadingIndicator.hide()
+            }
+            
+            // Show success message with file path
+            if (calculator.exportSuccess.startsWith("Success")) {
+                messagePopup.showSuccess(calculator.exportSuccess)
+            } else if (calculator.exportSuccess.startsWith("PDF saved")) {
+                messagePopup.showSuccess(calculator.exportSuccess)
+            } else if (calculator.exportSuccess === "Cancelled") {
+                // Don't show any message for cancelled exports
+            } else {
+                messagePopup.showError("Failed to export wind turbine report: " + calculator.exportSuccess)
+            }
+        }
+    }
+    
     Component.onCompleted: {
-        // Initial one-time calculations
         if (calculatorReady) {
-            // Do initial display update
             Qt.callLater(function() {
                 updateDisplayValues();
                 calculateAdvancedAEP();
                 updatePowerCurve();
             });
+        }
+
+        // Check if the popup needs to be parented to the Overlay
+        if (typeof Overlay !== 'undefined') {
+            messagePopup.parent = Overlay.overlay;
         }
     }
 }

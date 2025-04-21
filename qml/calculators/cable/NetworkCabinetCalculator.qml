@@ -19,14 +19,20 @@ Item {
     property NetworkCabinetCalculator calculator: NetworkCabinetCalculator {
         id: networkCabinet
         
-        onPdfExportStatusChanged: function(message) {
-            statusPopup.message = message
-            statusPopup.visible = true
+        onPdfExportStatusChanged: function(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
         }
         
-        onSaveLoadStatusChanged: function(message) {
-            statusPopup.message = message
-            statusPopup.visible = true
+        onSaveLoadStatusChanged: function(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
         }
     }
     
@@ -88,33 +94,9 @@ Item {
         }
     }
     
-    // Status popup for messages
-    Popup {
-        id: statusPopup
-        width: 400
-        height: 200
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        
-        property string message: ""
-        
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 10
-            
-            Label {
-                text: statusPopup.message
-                Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-            }
-            
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignRight
-                onClicked: statusPopup.visible = false
-            }
-        }
+    // Replace Popup with standardized MessagePopup
+    MessagePopup {
+        id: messagePopup
     }
     
     // Help popup
@@ -181,7 +163,7 @@ Item {
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                         onClicked: {
-                            saveConfigDialog.open()
+                            calculator.saveConfig(null)
                         }
                     }
 
@@ -193,7 +175,7 @@ Item {
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                         onClicked: {
-                            loadConfigDialog.open()
+                            calculator.loadConfig(null)
                         }
                     }
 
@@ -205,7 +187,17 @@ Item {
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                         onClicked: {
-                            folderDialog.open()
+                            // Force diagram to update before capture to ensure current settings
+                            cabinetDiagram.updatePanelVisibility()
+                            
+                            // Use Qt.callLater to ensure UI updates have completed
+                            Qt.callLater(function() {
+                                // Capture the diagram image
+                                let diagramImage = cabinetDiagram.captureImage()
+                                
+                                // Export to PDF with null folder path to trigger FileSaver dialog
+                                calculator.exportToPdf(null, diagramImage)
+                            })
                         }
                     }
 

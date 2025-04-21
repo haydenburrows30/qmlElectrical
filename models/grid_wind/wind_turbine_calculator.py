@@ -4,6 +4,7 @@ import numpy as np
 
 from utils.pdf_generator import PDFGenerator
 from utils.logger_config import configure_logger
+from utils.file_saver import FileSaver
 
 # Setup component-specific logger
 logger = configure_logger("qmltest", component="wind_turbine")
@@ -47,6 +48,9 @@ class WindTurbineCalculator(QObject):
         self._power_curve = []         # List of (wind_speed, power) tuples
 
         self._pdf = "Success"
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
         
         # Initialize calculations
         self._calculate()
@@ -519,6 +523,15 @@ class WindTurbineCalculator(QObject):
             import os
             import platform
             
+            # If no filepath provided, use FileSaver to get one
+            if not filename:
+                filename = self._file_saver.get_save_filepath("pdf", "wind_turbine_report")
+                if not filename:
+                    logger.info("Export cancelled by user")
+                    self._pdf = "Cancelled"
+                    self.pdfSaved.emit()
+                    return False
+            
             # Clean up filename - handle QML URL format
             clean_path = filename.strip()
             
@@ -582,22 +595,41 @@ class WindTurbineCalculator(QObject):
             }
             
             generator = PDFGenerator()
-            generator.generate_wind_turbine_report(data, clean_path)
-            logger.info(f"Wind turbine report exported to: {clean_path}")
-            self._pdf = "Success"
-            self.pdfSaved.emit()
-
+            result = generator.generate_wind_turbine_report(data, clean_path)
+            
+            # IMPORTANT: Add direct popup notification instead of relying on FileSaver
+            if result:
+                # Don't rely on FileSaver signal, create a direct popup message
+                popup_message = f"PDF saved to: {clean_path}"
+                logger.info(popup_message)
+                
+                # Set the PDF success message with filepath to trigger popup in QML
+                self._pdf = popup_message
+                self.pdfSaved.emit()
+                
+                # Also use FileSaver's method for console logging
+                self._file_saver._emit_success_with_path(clean_path, "PDF saved")
+                return True
+            else:
+                error_msg = f"Error saving to {clean_path}"
+                logger.error(error_msg)
+                self._pdf = f"Error: {error_msg}"
+                self.pdfSaved.emit()
+                return False
         except Exception as e:
             logger.error(f"Error exporting wind turbine report: {e}")
             logger.error(f"Attempted filename: {filename}")
             # Print more details for debugging
             import traceback
             logger.error(traceback.format_exc())
+            self._pdf = f"Error: {str(e)}"
+            self.pdfSaved.emit()
+            return False
 
     @Property(str, notify=pdfSaved)
     def exportSuccess(self):
         return self._pdf
-
+    
     # Advanced analysis methods
     @Slot(float, float, result=float)
     def estimateAEP(self, avg_wind_speed, weibull_k=2.0):
@@ -606,7 +638,6 @@ class WindTurbineCalculator(QObject):
         Args:
             avg_wind_speed: Average wind speed at hub height (m/s)
             weibull_k: Weibull shape parameter (typically 1.5-3)
-            
         Returns:
             Estimated annual energy production in MWh
         """
@@ -650,7 +681,6 @@ class WindTurbineCalculator(QObject):
             
             # Convert kWh to MWh
             energy_mwh = energy / 1000
-            
             return energy_mwh
             
         except Exception as e:
@@ -678,7 +708,6 @@ class WindTurbineCalculator(QObject):
                 return aep / max_production
             else:
                 return 0.0
-            
         except Exception as e:
             logger.error(f"Error calculating capacity factor: {e}")
             return 0.0

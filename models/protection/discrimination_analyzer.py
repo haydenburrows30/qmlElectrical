@@ -2,6 +2,7 @@ from PySide6.QtCore import QObject, Property, Signal, Slot, QAbstractListModel, 
 import math
 import os
 from datetime import datetime
+from utils.file_saver import FileSaver
 
 from utils.pdf_generator_overcurrent import generate_pdf, cleanup_temp_files
 
@@ -49,7 +50,7 @@ class DiscriminationAnalyzer(QObject):
     analysisComplete = Signal()
     relayCountChanged = Signal()
     marginChanged = Signal()
-    exportComplete = Signal(str)
+    exportComplete = Signal(bool, str)  # Update signal to match standard approach
     exportChart = Signal(str)
 
     def __init__(self, parent=None):
@@ -65,6 +66,8 @@ class DiscriminationAnalyzer(QObject):
             "yMin": 0.01,
             "yMax": 10
         }
+        # Initialize the file saver
+        self._file_saver = FileSaver()
 
     @Property(int, notify=relayCountChanged)
     def relayCount(self):
@@ -117,16 +120,19 @@ class DiscriminationAnalyzer(QObject):
     def exportResults(self):
         """Export results to a PDF file"""
         try:
-            # Create timestamp and filename
+            # Create timestamp for filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            home_dir = os.path.expanduser("~")
-            export_dir = os.path.join(home_dir, "Documents", "qmltest", "exports")
-            os.makedirs(export_dir, exist_ok=True)
             
-            # Create chart image filename
-            chart_image = os.path.join(export_dir, f"chart_{timestamp}.svg")
-            png_fallback = os.path.join(export_dir, f"chart_{timestamp}.png")
-            pdf_file = os.path.join(export_dir, f"discrimination_results_{timestamp}.pdf")
+            # Use FileSaver to get save location
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"discrimination_results_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "Export cancelled")
+                return ""
+            
+            # Create temporary chart image filenames
+            temp_dir = os.path.dirname(pdf_file)
+            chart_image = os.path.join(temp_dir, f"chart_{timestamp}.svg")
+            png_fallback = os.path.join(temp_dir, f"chart_{timestamp}.png")
             
             # Signal to QML to save chart image
             self.exportChart.emit(chart_image)
@@ -188,13 +194,19 @@ class DiscriminationAnalyzer(QObject):
             
             cleanup_temp_files(temp_files)
             
-            self.exportComplete.emit(result)
-            return result
+            # Use standardized success message
+            if result:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                self.exportComplete.emit(True, pdf_file)
+                return pdf_file
+            else:
+                self.exportComplete.emit(False, f"Error saving to {pdf_file}")
+                return ""
             
-        except Exception:
+        except Exception as e:
             import traceback
             traceback.print_exc()
-            self.exportComplete.emit("")
+            self.exportComplete.emit(False, str(e))
             return ""
 
     @Slot(float, result='QVariantList')

@@ -225,8 +225,14 @@ class PDFGenerator:
         Args:
             data: Dictionary containing wind turbine data
             filename: Output PDF filename
+            
+        Returns:
+            bool: True if successful, False otherwise
         """
         try:
+            # Log the exact file path for debugging
+            print(f"Generating wind turbine report to file: {filename}")
+            
             doc = SimpleDocTemplate(
                 filename,
                 pagesize=A4,
@@ -337,6 +343,9 @@ class PDFGenerator:
             
             # Build the PDF
             doc.build(story)
+            
+            # Log success message with file path
+            print(f"Successfully generated wind turbine report: {filename}")
             return True
             
         except KeyError as e:

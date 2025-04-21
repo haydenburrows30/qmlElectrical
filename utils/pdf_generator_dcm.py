@@ -22,25 +22,29 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         diagram_image: Optional data URL of diagram image to include
         
     Returns:
-        tuple: (success, message)
+        tuple: (success, filepath)
     """
     try:
         # Convert QUrl to local path if needed
         if folder_path.startswith('file:///'):
             folder_path = QUrl(folder_path).toLocalFile()
         
-        # Create filename based on site info or default name
-        if calculator._site_name and calculator._site_number:
-            filename = f"DC-M1_Cabinet_{calculator._site_name}_{calculator._site_number}.pdf"
-        elif calculator._site_name:
-            filename = f"DC-M1_Cabinet_{calculator._site_name}.pdf"
-        elif calculator._site_number:
-            filename = f"DC-M1_Cabinet_{calculator._site_number}.pdf"
+        # Check if folder_path already has .pdf extension - this means FileSaver provided a complete filepath
+        if folder_path.lower().endswith('.pdf'):
+            full_path = folder_path
         else:
-            filename = "DC-M1_Cabinet_Configuration.pdf"
-        
-        # Create the full path
-        full_path = os.path.join(folder_path, filename)
+            # Create filename based on site info or default name
+            if calculator._site_name and calculator._site_number:
+                filename = f"DC-M1_Cabinet_{calculator._site_name}_{calculator._site_number}.pdf"
+            elif calculator._site_name:
+                filename = f"DC-M1_Cabinet_{calculator._site_name}.pdf"
+            elif calculator._site_number:
+                filename = f"DC-M1_Cabinet_{calculator._site_number}.pdf"
+            else:
+                filename = "DC-M1_Cabinet_Configuration.pdf"
+            
+            # Create the full path
+            full_path = os.path.join(folder_path, filename)
         
         # Create the PDF document with minimal margins for header and footer
         doc = SimpleDocTemplate(
@@ -457,7 +461,7 @@ def generate_dcm_pdf(calculator, folder_path, diagram_image=None):
         # Build the PDF document
         doc.build(story)
         
-        return True, f"PDF saved: {full_path}"
+        return True, full_path
             
     except Exception as e:
         return False, f"Error exporting PDF: {str(e)}. Please fill in header "

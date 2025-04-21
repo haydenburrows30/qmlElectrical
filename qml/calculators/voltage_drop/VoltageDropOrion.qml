@@ -311,7 +311,7 @@ Page {
                 if (result) {
                     var saved = result.saveToFile(filepath)
                     if (saved) {
-                        messagePopup.showSuccess("Chart saved successfully")
+                        messagePopup.showSuccess("Chart image saved to: " + filepath)
                     } else {
                         messagePopup.showError("Failed to save chart")
                     }

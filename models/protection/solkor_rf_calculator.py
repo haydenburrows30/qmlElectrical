@@ -1,8 +1,11 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Slot, Signal, Property
 from utils.pdf_generator_solkor_rf import SolkorRfPdfGenerator
+from utils.file_saver import FileSaver
 
 class SolkorRfCalculator(QAbstractTableModel):
-
+    """
+    Calculator for Solkor RF relay testing and coordination.
+    """
     siteInfoChanged = Signal()
     pdfSaved = Signal(bool, str)
     comparisonResultsChanged = Signal()
@@ -29,6 +32,12 @@ class SolkorRfCalculator(QAbstractTableModel):
         fault_settings = [0.22, 0.275, 0.370, 1.10, 1.10, 0.55]
         for i in range(6):
             self.data_matrix[i][6] = fault_settings[i]
+
+        # Initialize the file saver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfSaved signal
+        self._file_saver.saveStatusChanged.connect(self.pdfSaved)
 
         self._site_name_relay1 = ""
         self._site_name_relay2 = ""
@@ -305,38 +314,14 @@ class SolkorRfCalculator(QAbstractTableModel):
             self.comparisonResultsChanged.emit()
         except Exception as e:
             print(f"Error updating mA comparisons: {e}")
-            
-    def setData(self, index, value, role=Qt.EditRole):
-        if not index.isValid():
-            return False
 
-        if role == Qt.EditRole:
-            try:
-                # Don't allow editing the Fault Settings column (now column index 6)
-                if index.column() == 6:
-                    return False
-                
-                self.data_matrix[index.row()][index.column()] = float(value)
-                self.dataChanged.emit(index, index, [role])
-                
-                # Update comparisons when injection current values change (columns 0 and 3)
-                if index.column() == 0 or index.column() == 3:
-                    self.updateComparisons()
-                
-                # Update mA comparisons when mA values change (columns 1, 2, 4, 5)
-                if index.column() in [1, 2, 4, 5]:
-                    self.updateMAComparisons()
-                
-                return True
-            except ValueError:
-                return False
-        return False
-
+    # Make properties accessible to QML
     test1_relay1_ma_comparison = Property("QVariantList", get_test1_relay1_ma_comparison, notify=comparisonResultsChanged)
     test1_relay2_ma_comparison = Property("QVariantList", get_test1_relay2_ma_comparison, notify=comparisonResultsChanged)
     test2_relay1_ma_comparison = Property("QVariantList", get_test2_relay1_ma_comparison, notify=comparisonResultsChanged)
     test2_relay2_ma_comparison = Property("QVariantList", get_test2_relay2_ma_comparison, notify=comparisonResultsChanged)
 
+    # Table model methods
     def rowCount(self, parent=QModelIndex()):
         return len(self.row_headers)
 
@@ -379,10 +364,43 @@ class SolkorRfCalculator(QAbstractTableModel):
             return Qt.AlignCenter
         return None
 
+    def setData(self, index, value, role=Qt.EditRole):
+        if not index.isValid():
+            return False
+
+        if role == Qt.EditRole:
+            try:
+                # Don't allow editing the Fault Settings column (now column index 6)
+                if index.column() == 6:
+                    return False
+                
+                self.data_matrix[index.row()][index.column()] = float(value)
+                self.dataChanged.emit(index, index, [role])
+                
+                # Update comparisons when injection current values change (columns 0 and 3)
+                if index.column() == 0 or index.column() == 3:
+                    self.updateComparisons()
+                
+                # Update mA comparisons when mA values change (columns 1, 2, 4, 5)
+                if index.column() in [1, 2, 4, 5]:
+                    self.updateMAComparisons()
+                
+                return True
+            except ValueError:
+                return False
+        return False
+
     @Slot(str)
     def exportToPdf(self, filePath):
         """Export the table data to a PDF file."""
         try:
+            # If no filePath provided, use the file saver to get one
+            if not filePath:
+                filePath = self._file_saver.get_save_filepath("pdf", "solkor_rf_results")
+                if not filePath:
+                    self.pdfSaved.emit(False, "PDF export canceled")
+                    return False
+
             # Gather site information for the PDF
             site_info = {
                 'site_name_relay1': self._site_name_relay1,
@@ -405,8 +423,14 @@ class SolkorRfCalculator(QAbstractTableModel):
                 site_info
             )
             
-            self.pdfSaved.emit(success, result)
-            return success
+            # Let file_saver handle the success message for consistency
+            if success:
+                self._file_saver._emit_success_with_path(filePath, "PDF saved")
+                return True
+            else:
+                self.pdfSaved.emit(False, f"Error saving to {filePath}")
+                return False
+                
         except Exception as e:
             import traceback
             traceback.print_exc()

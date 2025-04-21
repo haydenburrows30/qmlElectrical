@@ -8,6 +8,7 @@ import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
 import "../../components/style"
+import "../../components/exports"
 
 import SolkorRfCalculator 1.0
 
@@ -16,48 +17,27 @@ Item {
     property SolkorRfCalculator calculator: SolkorRfCalculator {}
 
     function saveToPdf() {
-        fileDialog.open()
-    }
-
-    function showNotification(message, isError = false) {
-        notification.color = isError ? "#ffcccc" : "#ccffcc"
-        notificationText.text = message
-        notification.visible = true
-        notificationTimer.restart()
+        // Use the calculator's exportToPdf with null parameter
+        // to let FileSaver handle the file dialog
+        calculator.exportToPdf(null)
     }
 
     Connections {
         target: calculator
         function onPdfSaved(success, message) {
             if (success) {
-                showNotification("PDF saved successfully at: " + message)
+                // Pass the full message including the path to the popup
+                messagePopup.showSuccess(message)
             } else {
-                showNotification("Error saving PDF: " + message, true)
+                messagePopup.showError("Error saving PDF: " + message)
             }
         }
 
         Component.onCompleted: calculator.updateComparisons()
     }
 
-    Platform.FileDialog {
-        id: fileDialog
-        title: "Save as PDF"
-        fileMode: Platform.FileDialog.SaveFile
-        nameFilters: ["PDF files (*.pdf)"]
-        
-        onAccepted: {
-            const fileUrl = fileDialog.file
-
-            let filePath
-            if (fileUrl.toString().startsWith("file:///")) {
-
-                filePath = fileUrl.toString().replace(/^file:\/\/\//, "/")
-            } else {
-                filePath = fileUrl.toString()
-            }
-
-            calculator.exportToPdf(filePath)
-        }
+    MessagePopup {
+        id: messagePopup
     }
 
     ScrollView {
@@ -253,27 +233,6 @@ Item {
                                 wrapMode: Text.WordWrap
                             }
                         }
-                    }
-                }
-
-                // Notification area
-                Rectangle {
-                    id: notification
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 40
-                    color: "#ccffcc"
-                    visible: false
-                    
-                    Text {
-                        id: notificationText
-                        anchors.centerIn: parent
-                        font.pixelSize: 14
-                    }
-                    
-                    Timer {
-                        id: notificationTimer
-                        interval: 5000
-                        onTriggered: notification.visible = false
                     }
                 }
 
