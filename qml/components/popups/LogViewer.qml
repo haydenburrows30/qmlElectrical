@@ -17,7 +17,6 @@ Rectangle {
     property bool autoScroll: true
     property var filterModel: ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     property string currentFilter: "INFO"
-    property string componentFilter: "" // New property for component filtering
 
     function refreshLogView() {
         if (logManager) {
@@ -72,32 +71,6 @@ Rectangle {
                 onCurrentTextChanged: {
                     if (currentText !== currentFilter) {
                         currentFilter = currentText
-                        refreshLogView()
-                    }
-                }
-            }
-
-            Item { 
-                width: 10
-                height: 1 
-            }
-            
-            Label {
-                text: "Component:"
-                color: textColor
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 14
-            }
-            
-            TextField {
-                id: componentFilterField
-                placeholderText: "Filter by component"
-                width: 120
-                text: componentFilter
-                anchors.verticalCenter: parent.verticalCenter
-                onTextChanged: {
-                    componentFilter = text
-                    if (logManager) {
                         refreshLogView()
                     }
                 }
@@ -206,18 +179,6 @@ Rectangle {
                                 return window && window.modeToggled ? "#ffcc66" : "#996600"
                             else
                                 return window && window.modeToggled ? "white" : "black"
-                        }
-                        
-                        // Highlight component name in square brackets if it matches the filter
-                        Component.onCompleted: {
-                            if (componentFilter && componentFilter !== "") {
-                                // If there's a component filter, highlight matching components
-                                let regex = new RegExp("\\[" + componentFilter + "\\]", "i") // Case insensitive
-                                if (regex.test(text)) {
-                                    // This text contains the filtered component
-                                    parent.color = window && window.modeToggled ? "#223344" : "#e8f0ff"
-                                }
-                            }
                         }
                     }
                 }

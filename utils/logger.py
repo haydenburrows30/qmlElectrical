@@ -252,15 +252,6 @@ class QLogManager(QObject):
                 break
                 
         if not root_handler_added:
-            # Create a filter to only handle qmltest.* logs
-            class QmlTestFilter(logging.Filter):
-                def filter(self, record):
-                    return record.name.startswith('qmltest')
-            
-            # Add filter to our handler
-            self._async_handler.addFilter(QmlTestFilter())
-            
-            # Add the handler to the root logger to capture all component logs
             root_logger.addHandler(self._async_handler)
         
         self._count = 0
@@ -310,23 +301,15 @@ class QLogManager(QObject):
                     parts = line.strip().split(' - ', 3)
                     if len(parts) >= 3:
                         timestamp_str = parts[0]
-                        logger_name = parts[1]
                         level_message = parts[2].split(' ', 1)
                         
                         if len(level_message) >= 2:
                             level = level_message[0]
                             message = level_message[1]
                             
-                            # Create a more informative message that includes the component
-                            if logger_name != "qmltest":
-                                component = logger_name.replace("qmltest.", "")
-                                enriched_message = f"[{component}] {message}"
-                            else:
-                                enriched_message = message
-                            
                             # Add to history
                             timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S,%f')
-                            self._all_logs.append((level, enriched_message, timestamp))
+                            self._all_logs.append((level, message, timestamp))
                 except Exception:
                     # Skip lines that can't be parsed
                     continue
@@ -339,29 +322,6 @@ class QLogManager(QObject):
     
     def handle_log(self, level, message):
         """Process a log message from the handler."""
-        # Handle component-specific log entries
-        if '.' in level:
-            # This is a special case for older formatting - parse it out
-            parts = level.split('.')
-            level = parts[-1]  # Last part should be the level
-            component = '.'.join(parts[:-1])  # Earlier parts form the component name
-            message = f"[{component}] {message}"
-        
-        # Extract component from logger name in message if possible
-        if hasattr(message, 'split') and ' - ' in message:
-            try:
-                parts = message.split(' - ')
-                if len(parts) >= 3:
-                    component = parts[1].replace('qmltest.', '')
-                    if component and component != 'qmltest':
-                        # Format component logs with component name in brackets
-                        message = f"[{component}] {parts[2]}"
-                    else:
-                        message = parts[2]  # Main component, just use the message
-            except Exception:
-                # If parsing fails, just use original message
-                pass
-            
         # Deduplicate messages that are identical and arrive within a short time window
         current_time = time.time()
         dedup_key = f"{level}:{message}"
