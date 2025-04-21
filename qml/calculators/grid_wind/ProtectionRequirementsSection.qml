@@ -8,6 +8,7 @@ import "../../components/buttons"
 import "../../components/popups"
 import "../../components/style"
 import "../../components/displays"
+import "../../components/monitors"
 
 Item {
     id: protectionSection
@@ -42,6 +43,16 @@ Item {
             }
         }
         return "1000/1";
+    }
+
+    // Add new message popup for export messages
+    MessagePopup {
+        id: messagePopup
+    }
+    
+    // Add loading indicator to show during PDF export
+    LoadingIndicator {
+        id: loadingIndicator
     }
                 
     ScrollView {
@@ -88,7 +99,18 @@ Item {
                         
                         StyledButton {
                             text: "Export Settings"
-                            onClicked: exportDialog.open()
+                            onClicked: {
+                                // Show loading indicator
+                                loadingIndicator.show()
+                                
+                                // Use null to make transformer calculator use FileSaver
+                                if (transformerReady && windTurbineReady) {
+                                    exportProtectionSettings(null)
+                                } else {
+                                    messagePopup.showError("Please calculate the system first")
+                                    loadingIndicator.hide()
+                                }
+                            }
                             ToolTip.text: "Export report to PDF"
                             ToolTip.visible: hovered
                             ToolTip.delay: 500
@@ -780,77 +802,80 @@ Item {
         }
     }
     
-    FileDialog {
-        id: exportDialog
-        title: "Export Protection Settings"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["PDF files (*.pdf)"]
-        defaultSuffix: "pdf"
-        
-        onAccepted: {
-            if (transformerReady && windTurbineReady) {
-                // Process file path
-                let filePath = exportDialog.selectedFile.toString();
-                if (filePath.startsWith("file:///")) {
-                    filePath = filePath.substring(Qt.platform.os === "windows" ? 8 : 7);
-                } else if (filePath.startsWith("file://")) {
-                    filePath = filePath.substring(5);
+    // Add function to handle exporting protection settings with FileSaver
+    function exportProtectionSettings(filePath) {
+        if (transformerReady && windTurbineReady) {
+            // Calculate needed values
+            let generatorCurrent = (windTurbineCalculator.actualPower * 1000) / (Math.sqrt(3) * 400);
+            let transformerCurrent = calculateTransformerFullLoadCurrent();
+            
+            // Build complete data structure with all required values
+            const exportData = {
+                "generator": {
+                    "power": Number(windTurbineCalculator.actualPower),
+                    "current": Number(generatorCurrent),
+                    "capacity": Number(windTurbineCalculator.actualPower * 1.2),
+                    "voltage_range": "±15% (340V - 460V)",
+                    "frequency_range": "±2% (49Hz - 51Hz)",
+                    "earth_fault": "30% of FLC",
+                    "anti_islanding": "Required",
+                    "overcurrent_pickup": Number(generatorCurrent * 1.5),
+                    "time_delay": "0.5s",
+                    "ct_ratio": determineCtRatio(generatorCurrent)
+                },
+                "transformer": {
+                    "rating": Number(transformerCalculator.transformerRating),
+                    "voltage": "11kV/400V",
+                    "full_load_current": Number(transformerCurrent),
+                    "fault_current": Number(transformerCalculator.faultCurrentHV),
+                    "ground_fault": Number(transformerCalculator.groundFaultCurrent),
+                    "ct_ratio": transformerCalculator.relayCtRatio,
+                    "relay_pickup_current": Number(transformerCalculator.relayPickupCurrent),
+                    "relay_curve_type": transformerCalculator.relayCurveType,
+                    "time_dial": Number(transformerCalculator.relayTimeDial),
+                    "differential_slope": Number(transformerCalculator.differentialRelaySlope),
+                    "reverse_power": Number(transformerCalculator.reversePowerThreshold),
+                    "instantaneous_pickup": Number(transformerCurrent * 8)
+                },
+                "line": {
+                    "voltage": "11 kV",
+                    "fault_current": Number(transformerCalculator.faultCurrentHV),
+                    "cable_size": transformerCalculator.recommendedHVCable,
+                    "length": Number(transformerCalculator.lineLength),
+                    "voltage_drop": Number(transformerCalculator.voltageDrop)
+                },
+                "protection_settings": {
+                    "voltage": [
+                        {"type": "Under Voltage", "stage": "Stage 1", "setting": "V < 0.8pu", "time": "2.5s"},
+                        {"type": "Under Voltage", "stage": "Stage 2", "setting": "V < 0.87pu", "time": "5.0s"},
+                        {"type": "Over Voltage", "stage": "Stage 1", "setting": "V > 1.1pu", "time": "1.0s"},
+                        {"type": "Over Voltage", "stage": "Stage 2", "setting": "V > 1.14pu", "time": "0.5s"}
+                    ],
+                    "frequency": [
+                        {"type": "Under Frequency", "stage": "Stage 1", "setting": "f < 47.5Hz", "time": "20s"},
+                        {"type": "Over Frequency", "stage": "Stage 1", "setting": "f > 52Hz", "time": "0.5s"}
+                    ]
                 }
-                
-                // Calculate needed values
-                let generatorCurrent = (windTurbineCalculator.actualPower * 1000) / (Math.sqrt(3) * 400);
-                let transformerCurrent = calculateTransformerFullLoadCurrent();
-                
-                // Build complete data structure with all required values
-                const exportData = {
-                    "generator": {
-                        "power": Number(windTurbineCalculator.actualPower),
-                        "current": Number(generatorCurrent),
-                        "capacity": Number(windTurbineCalculator.actualPower * 1.2),
-                        "voltage_range": "±15% (340V - 460V)",
-                        "frequency_range": "±2% (49Hz - 51Hz)",
-                        "earth_fault": "30% of FLC",
-                        "anti_islanding": "Required",
-                        "overcurrent_pickup": Number(generatorCurrent * 1.5),
-                        "time_delay": "0.5s",
-                        "ct_ratio": determineCtRatio(generatorCurrent)
-                    },
-                    "transformer": {
-                        "rating": Number(transformerCalculator.transformerRating),
-                        "voltage": "11kV/400V",
-                        "full_load_current": Number(transformerCurrent),
-                        "fault_current": Number(transformerCalculator.faultCurrentHV),
-                        "ground_fault": Number(transformerCalculator.groundFaultCurrent),
-                        "ct_ratio": transformerCalculator.relayCtRatio,
-                        "relay_pickup_current": Number(transformerCalculator.relayPickupCurrent),
-                        "relay_curve_type": transformerCalculator.relayCurveType,
-                        "time_dial": Number(transformerCalculator.relayTimeDial),
-                        "differential_slope": Number(transformerCalculator.differentialRelaySlope),
-                        "reverse_power": Number(transformerCalculator.reversePowerThreshold),
-                        "instantaneous_pickup": Number(transformerCurrent * 8)
-                    },
-                    "line": {
-                        "voltage": "11 kV",
-                        "fault_current": Number(transformerCalculator.faultCurrentHV),
-                        "cable_size": transformerCalculator.recommendedHVCable,
-                        "length": Number(transformerCalculator.lineLength),
-                        "voltage_drop": Number(transformerCalculator.voltageDrop)
-                    },
-                    "protection_settings": {
-                        "voltage": [
-                            {"type": "Under Voltage", "stage": "Stage 1", "setting": "V < 0.8pu", "time": "2.5s"},
-                            {"type": "Under Voltage", "stage": "Stage 2", "setting": "V < 0.87pu", "time": "5.0s"},
-                            {"type": "Over Voltage", "stage": "Stage 1", "setting": "V > 1.1pu", "time": "1.0s"},
-                            {"type": "Over Voltage", "stage": "Stage 2", "setting": "V > 1.14pu", "time": "0.5s"}
-                        ],
-                        "frequency": [
-                            {"type": "Under Frequency", "stage": "Stage 1", "setting": "f < 47.5Hz", "time": "20s"},
-                            {"type": "Over Frequency", "stage": "Stage 1", "setting": "f > 52Hz", "time": "0.5s"}
-                        ]
-                    }
-                };
-                
-                transformerCalculator.exportProtectionReport(exportData, filePath);
+            };
+            
+            transformerCalculator.exportProtectionReport(exportData, filePath);
+        }
+    }
+    
+    // Add connection to transformerCalculator to handle PDF export status
+    Connections {
+        target: transformerCalculator
+        enabled: transformerReady
+        
+        function onPdfExportStatusChanged(success, message) {
+            // Hide loading indicator
+            loadingIndicator.hide()
+            
+            // Show appropriate message
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

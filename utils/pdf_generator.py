@@ -62,87 +62,257 @@ class PDFGenerator:
             story.append(Paragraph(f"Generated: {timestamp}", normal_style))
             story.append(Spacer(1, 24))
             
-            # System parameters section
-            story.append(Paragraph("System Parameters", heading_style))
-            story.append(Spacer(1, 12))
+            # Debug information - print what data was received
+            print(f"Protection report data received: {type(data)}")
+            if isinstance(data, dict):
+                print(f"Keys in data: {data.keys()}")
             
             # Convert QJSValue data to Python dictionary if needed
             if hasattr(data, 'toVariant'):
                 data = data.toVariant()
             
-            # Extract system parameters
-            system_data = [
-                ["Parameter", "Value"],
-                ["Transformer Rating", f"{data.get('transformer_rating', 'N/A')} kVA"],
-                ["Transformer HV", f"{data.get('transformer_hv', 'N/A')} V"],
-                ["Transformer LV", f"{data.get('transformer_lv', 'N/A')} V"],
-                ["Transformer Z%", f"{data.get('transformer_z', 'N/A')} %"],
-                ["Fault Current HV", f"{data.get('fault_current_hv', 'N/A')} kA"],
-                ["Fault Current LV", f"{data.get('fault_current_lv', 'N/A')} kA"]
-            ]
-            
-            # Create system table
-            system_table = Table(system_data)
-            system_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
-                ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (1, 0), 'CENTER'),
-                ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (1, 0), 6),
-                ('BACKGROUND', (0, 1), (1, -1), colors.white),
-                ('GRID', (0, 0), (1, -1), 1, colors.black),
-                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('ALIGN', (1, 0), (1, -1), 'RIGHT')
-            ]))
-            
-            story.append(system_table)
-            story.append(Spacer(1, 24))
-            
-            # Protection requirements section
-            story.append(Paragraph("Protection Requirements", heading_style))
+            # System parameters section
+            story.append(Paragraph("System Parameters", heading_style))
             story.append(Spacer(1, 12))
             
-            # Extract protection requirements
-            protection_data = [
-                ["Requirement", "Details"],
-                ["Overcurrent Protection", data.get('overcurrent_protection', 'N/A')],
-                ["Earth Fault Protection", data.get('earth_fault_protection', 'N/A')],
-                ["Differential Protection", data.get('differential_protection', 'N/A')],
-                ["Voltage Protection", data.get('voltage_protection', 'N/A')],
-                ["Frequency Protection", data.get('frequency_protection', 'N/A')],
-                ["Auto-Reclosing", data.get('auto_reclosing', 'N/A')],
-                ["Undervoltage Protection", data.get('undervoltage', 'N/A')],
-                ["Special Requirements", data.get('special_requirements', 'N/A')]
-            ]
-            
-            # Create protection table
-            protection_table = Table(protection_data, colWidths=[150, 300])
-            protection_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
-                ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (1, 0), 'CENTER'),
-                ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (1, 0), 6),
-                ('BACKGROUND', (0, 1), (1, -1), colors.white),
-                ('GRID', (0, 0), (1, -1), 1, colors.black),
-                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('VALIGN', (0, 0), (1, -1), 'TOP'),
-                ('WORDWRAP', (1, 1), (1, -1), True)
-            ]))
-            
-            story.append(protection_table)
-            story.append(Spacer(1, 24))
-            
-            # Notes section if provided
-            if data.get('notes'):
-                story.append(Paragraph("Notes", heading_style))
-                story.append(Spacer(1, 12))
-                story.append(Paragraph(data.get('notes', ''), normal_style))
+            # Extract system parameters
+            if isinstance(data, dict) and 'generator' in data and 'transformer' in data and 'line' in data:
+                # Get generator data
+                generator = data.get('generator', {})
+                transformer = data.get('transformer', {})
+                line = data.get('line', {})
+                
+                # Create system parameters table
+                system_data = [
+                    ["Parameter", "Value"],
+                    ["Wind Turbine Rating", f"{generator.get('power', 'N/A')} kW"],
+                    ["Wind Turbine Output Current", f"{generator.get('current', 'N/A')} A"],
+                    ["Transformer Rating", f"{transformer.get('rating', 'N/A')} kVA"],
+                    ["Transformer Voltage", f"{transformer.get('voltage', 'N/A')}"],
+                    ["Fault Current HV", f"{transformer.get('fault_current', 'N/A')} kA"],
+                    ["Ground Fault Current", f"{transformer.get('ground_fault', 'N/A')} kA"],
+                    ["Line Length", f"{line.get('length', 'N/A')} km"],
+                    ["Line Voltage Drop", f"{line.get('voltage_drop', 'N/A')} %"]
+                ]
+                
+                # Create system table
+                system_table = Table(system_data)
+                system_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                    ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (1, 0), 6),
+                    ('BACKGROUND', (0, 1), (1, -1), colors.white),
+                    ('GRID', (0, 0), (1, -1), 1, colors.black),
+                    ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('ALIGN', (1, 0), (1, -1), 'RIGHT')
+                ]))
+                
+                story.append(system_table)
                 story.append(Spacer(1, 24))
+                
+                # Protection requirements section
+                story.append(Paragraph("Protection Requirements", heading_style))
+                story.append(Spacer(1, 12))
+                
+                # Generator protection
+                story.append(Paragraph("Generator Protection (400V)", styles["Heading2"]))
+                story.append(Spacer(1, 6))
+                
+                generator_protection = [
+                    ["Protection", "Setting/Value"],
+                    ["Overcurrent Pickup", f"{generator.get('overcurrent_pickup', 'N/A')} A ({generator.get('ct_ratio', 'N/A')})"],
+                    ["Under/Over Voltage", f"{generator.get('voltage_range', 'N/A')}"],
+                    ["Under/Over Frequency", f"{generator.get('frequency_range', 'N/A')}"],
+                    ["Earth Fault Setting", f"{generator.get('earth_fault', 'N/A')}"],
+                    ["Anti-Islanding", f"{generator.get('anti_islanding', 'N/A')}"]
+                ]
+                
+                generator_table = Table(generator_protection, colWidths=[200, 300])
+                generator_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                    ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (1, 0), 6),
+                    ('BACKGROUND', (0, 1), (1, -1), colors.white),
+                    ('GRID', (0, 0), (1, -1), 1, colors.black),
+                    ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('VALIGN', (0, 0), (1, -1), 'TOP')
+                ]))
+                
+                story.append(generator_table)
+                story.append(Spacer(1, 12))
+                
+                # Transformer protection
+                story.append(Paragraph("Transformer Protection (11kV)", styles["Heading2"]))
+                story.append(Spacer(1, 6))
+                
+                transformer_protection = [
+                    ["Protection", "Setting/Value"],
+                    ["CT Ratio", f"{transformer.get('ct_ratio', 'N/A')}"],
+                    ["Relay Pickup Current", f"{transformer.get('relay_pickup_current', 'N/A')} A"],
+                    ["Time-Current Curve", f"{transformer.get('relay_curve_type', 'N/A')}"],
+                    ["Time Dial Setting", f"{transformer.get('time_dial', 'N/A')}"],
+                    ["Instantaneous Pickup", f"{transformer.get('instantaneous_pickup', 'N/A')} A"],
+                    ["Differential Protection", f"Slope: {transformer.get('differential_slope', 'N/A')}%"],
+                    ["Reverse Power Protection", f"{transformer.get('reverse_power', 'N/A')}"]
+                ]
+                
+                transformer_table = Table(transformer_protection, colWidths=[200, 300])
+                transformer_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                    ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (1, 0), 6),
+                    ('BACKGROUND', (0, 1), (1, -1), colors.white),
+                    ('GRID', (0, 0), (1, -1), 1, colors.black),
+                    ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('VALIGN', (0, 0), (1, -1), 'TOP')
+                ]))
+                
+                story.append(transformer_table)
+                story.append(Spacer(1, 12))
+                
+                # Line protection
+                story.append(Paragraph("Line Protection Requirements", styles["Heading2"]))
+                story.append(Spacer(1, 6))
+                
+                line_protection = [
+                    ["Protection", "Setting/Value"],
+                    ["Fault Current at 11kV", f"{line.get('fault_current', 'N/A')} kA"],
+                    ["Minimum Cable Size", f"{line.get('cable_size', 'N/A')}"],
+                    ["Distance Protection", f"{'Required' if line.get('length', 0) > 10 else 'Not Required'}"],
+                    ["Auto-Reclosure", "Single-shot"]
+                ]
+                
+                line_table = Table(line_protection, colWidths=[200, 300])
+                line_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                    ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (1, 0), 6),
+                    ('BACKGROUND', (0, 1), (1, -1), colors.white),
+                    ('GRID', (0, 0), (1, -1), 1, colors.black),
+                    ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('VALIGN', (0, 0), (1, -1), 'TOP')
+                ]))
+                
+                story.append(line_table)
+                story.append(Spacer(1, 12))
+                
+                # G99 Requirements
+                story.append(Paragraph("G99 Connection Requirements", styles["Heading2"]))
+                story.append(Spacer(1, 6))
+                
+                g99_requirements = [
+                    ["Requirement", "Setting"],
+                    ["Frequency Range", "47.5Hz - 52Hz"],
+                    ["Voltage Range", "-10% to +10% of nominal"],
+                    ["Power Factor Control", "0.95 lagging to 0.95 leading"],
+                    ["LVRT Capability", "Required"],
+                    ["RoCoF Protection", "1Hz/s"],
+                    ["Vector Shift Protection", "12 degrees"]
+                ]
+                
+                g99_table = Table(g99_requirements, colWidths=[200, 300])
+                g99_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                    ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (1, 0), 6),
+                    ('BACKGROUND', (0, 1), (1, -1), colors.white),
+                    ('GRID', (0, 0), (1, -1), 1, colors.black),
+                    ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('VALIGN', (0, 0), (1, -1), 'TOP')
+                ]))
+                
+                story.append(g99_table)
+                
+                # Add protection settings from data if available
+                if 'protection_settings' in data:
+                    story.append(Spacer(1, 24))
+                    story.append(Paragraph("Protection Relay Settings", heading_style))
+                    story.append(Spacer(1, 12))
+                    
+                    # Voltage protection settings
+                    if 'voltage' in data['protection_settings']:
+                        story.append(Paragraph("Voltage Protection Settings", styles["Heading2"]))
+                        story.append(Spacer(1, 6))
+                        
+                        voltage_settings = [["Type", "Stage", "Setting", "Time"]]
+                        for setting in data['protection_settings']['voltage']:
+                            voltage_settings.append([
+                                setting.get('type', 'N/A'),
+                                setting.get('stage', 'N/A'),
+                                setting.get('setting', 'N/A'),
+                                setting.get('time', 'N/A')
+                            ])
+                        
+                        voltage_table = Table(voltage_settings, colWidths=[100, 80, 200, 100])
+                        voltage_table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (3, 0), colors.lightblue),
+                            ('TEXTCOLOR', (0, 0), (3, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+                            ('FONTNAME', (0, 0), (3, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (3, 0), 12),
+                            ('BOTTOMPADDING', (0, 0), (3, 0), 6),
+                            ('BACKGROUND', (0, 1), (3, -1), colors.white),
+                            ('GRID', (0, 0), (3, -1), 1, colors.black),
+                            ('ALIGN', (0, 0), (3, -1), 'CENTER'),
+                            ('VALIGN', (0, 0), (3, -1), 'TOP')
+                        ]))
+                        
+                        story.append(voltage_table)
+                        story.append(Spacer(1, 12))
+                    
+                    # Frequency protection settings
+                    if 'frequency' in data['protection_settings']:
+                        story.append(Paragraph("Frequency Protection Settings", styles["Heading2"]))
+                        story.append(Spacer(1, 6))
+                        
+                        frequency_settings = [["Type", "Stage", "Setting", "Time"]]
+                        for setting in data['protection_settings']['frequency']:
+                            frequency_settings.append([
+                                setting.get('type', 'N/A'),
+                                setting.get('stage', 'N/A'),
+                                setting.get('setting', 'N/A'),
+                                setting.get('time', 'N/A')
+                            ])
+                        
+                        frequency_table = Table(frequency_settings, colWidths=[100, 80, 200, 100])
+                        frequency_table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (3, 0), colors.lightblue),
+                            ('TEXTCOLOR', (0, 0), (3, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (3, 0), 'CENTER'),
+                            ('FONTNAME', (0, 0), (3, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (3, 0), 12),
+                            ('BOTTOMPADDING', (0, 0), (3, 0), 6),
+                            ('BACKGROUND', (0, 1), (3, -1), colors.white),
+                            ('GRID', (0, 0), (3, -1), 1, colors.black),
+                            ('ALIGN', (0, 0), (3, -1), 'CENTER'),
+                            ('VALIGN', (0, 0), (3, -1), 'TOP')
+                        ]))
+                        
+                        story.append(frequency_table)
+                
+            else:
+                # If we don't have the expected data structure, show a simple message
+                story.append(Paragraph("No detailed protection data available. Please check the input parameters.", normal_style))
             
             # Build PDF
             doc.build(story)
