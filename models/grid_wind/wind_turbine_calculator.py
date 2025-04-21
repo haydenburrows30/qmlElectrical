@@ -1,8 +1,8 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import numpy as np
+
 from utils.pdf_generator import PDFGenerator
-import logging
 from utils.logger_config import configure_logger
 
 # Setup component-specific logger
