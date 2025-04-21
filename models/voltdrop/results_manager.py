@@ -2,10 +2,10 @@ from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractTableModel,
 import pandas as pd
 from dataclasses import dataclass
 from typing import Dict, Any
-from utils.logger import setup_logger
+from utils.logger_config import configure_logger
 
-# Set up logger for this module
-logger = setup_logger("ResultsManager")
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="results_manager")
 
 @dataclass
 class CalculationResult:

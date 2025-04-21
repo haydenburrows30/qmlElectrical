@@ -9,12 +9,13 @@ import csv
 import os
 from datetime import datetime
 import time
-import logging
+from utils.logger_config import configure_logger
 
 from utils.calculation_cache import CalculationCache, generate_cache_key
 from utils.worker_pool import WorkerPoolManager, ManagedWorker
 
-logger = logging.getLogger("qmltest")
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="harmonic_analysis")
 
 class CalculationWorker(ManagedWorker):
     """Worker class to run calculations in a separate thread"""
@@ -38,6 +39,7 @@ class CalculationWorker(ManagedWorker):
                 
                 if cached_result:
                     # Use cached result
+                    logger.debug(f"Cache hit for resolution calculation with {points} points")
                     self.calculator._waveform = cached_result['waveform']
                     self.calculator._fundamental_wave = cached_result['fundamental']
                     self.calculator._waveform_points = cached_result['waveform_points']
@@ -48,6 +50,7 @@ class CalculationWorker(ManagedWorker):
                     self.calculator._emit_pending = True
                 else:
                     # Calculate and cache
+                    logger.debug(f"Cache miss for resolution calculation with {points} points")
                     result = self.calculator.calculateWithResolution(points)
                     if result:
                         self.calculator._waveform = result['waveform']
@@ -68,6 +71,7 @@ class CalculationWorker(ManagedWorker):
                 # Check cache to avoid duplicate work
                 cached_result = CalculationCache.get_instance().get(cache_key)
                 if cached_result:
+                    logger.debug("Cache hit for full harmonic calculation")
                     # Load values from cache
                     self.calculator._thd = cached_result['thd']
                     self.calculator._cf = cached_result['cf']
@@ -85,6 +89,7 @@ class CalculationWorker(ManagedWorker):
                                            Q_ARG(bool, False),
                                            Q_ARG(float, 1.0))
                 else:
+                    logger.debug("Cache miss for full harmonic calculation")
                     # Perform full calculation
                     self.calculator._calculate_full()
                 
@@ -99,13 +104,12 @@ class CalculationWorker(ManagedWorker):
                                    Qt.ConnectionType.QueuedConnection)
         except Exception as e:
             logger.error(f"Error in calculation worker: {e}")
+            logger.exception(e)
             # Always ensure we reset calculation status on error
             QMetaObject.invokeMethod(self.calculator, "_update_calculation_status",
                                    Qt.ConnectionType.QueuedConnection,
                                    Q_ARG(bool, False),
                                    Q_ARG(float, 0.0))
-            import traceback
-            traceback.print_exc()
 
 class HarmonicAnalysisCalculator(QObject):
     """Calculator for harmonic analysis and THD calculation"""
@@ -271,6 +275,8 @@ class HarmonicAnalysisCalculator(QObject):
         self._cancel_requested = False
         self._update_calculation_status(True, 0.0)
         
+        logger.info("Starting harmonic analysis calculation")
+        
         # Create a worker and start it in the thread pool
         worker = CalculationWorker(self)
         self._thread_pool.start(worker)
@@ -296,6 +302,7 @@ class HarmonicAnalysisCalculator(QObject):
             
             # Check cancellation
             if self._cancel_requested:
+                logger.info("Harmonic calculation cancelled by user")
                 self._update_calculation_status(False)
                 return
             
@@ -303,6 +310,7 @@ class HarmonicAnalysisCalculator(QObject):
             sorted_harmonics = sorted(self._harmonics_dict.items())
             memory_key = str(sorted_harmonics) + str(self._fundamental)
             if memory_key in self._memory_cache:
+                logger.debug("Memory cache hit for harmonic calculation")
                 self._memory_cache_hits += 1
                 result = self._memory_cache[memory_key]
                 # Use memory cached result
@@ -334,6 +342,7 @@ class HarmonicAnalysisCalculator(QObject):
             cached_result = self._calculation_cache.get(cache_key)
             if cached_result:
                 # Cache hit - use stored results
+                logger.debug("Disk cache hit for harmonic calculation")
                 self._cache_hits += 1
                 self._thd = cached_result['thd']
                 self._cf = cached_result['cf']
@@ -358,13 +367,23 @@ class HarmonicAnalysisCalculator(QObject):
                 return
                 
             # Cache miss - perform full calculation
+            logger.debug("Cache miss - performing full harmonic calculation")
             self._cache_misses += 1
+            
+            # Log calculation parameters
+            logger.info("\n=== Starting Harmonic Analysis ===")
+            logger.info(f"Fundamental: {self._fundamental:.1f}")
+            
+            # Log active harmonics
+            active_harmonics = {order: (mag, phase) for order, (mag, phase) in self._harmonics_dict.items() if mag > 0}
+            logger.info(f"Active harmonics: {active_harmonics}")
                 
             # Update progress
             self._update_calculation_status(True, 0.2)
             
             # Check cancellation
             if self._cancel_requested:
+                logger.info("Calculation cancelled during harmonic analysis")
                 self._update_calculation_status(False)
                 return
             
@@ -380,7 +399,7 @@ class HarmonicAnalysisCalculator(QObject):
                         harmonics[order-1] = float(magnitude)
                         phases[order-1] = float(phase)
                     else:
-                        logger.warning(f"Warning: Invalid values for harmonic {order}: magnitude={magnitude}, phase={phase}")
+                        logger.warning(f"Invalid values for harmonic {order}: magnitude={magnitude}, phase={phase}")
                         harmonics[order-1] = 0.0
                         phases[order-1] = 0.0
                     
@@ -407,6 +426,11 @@ class HarmonicAnalysisCalculator(QObject):
                 self._safe_value(phases[order-1], 0.0) 
                 for order in display_orders
             ]
+
+            # Log calculated values
+            logger.info(f"THD: {self._thd:.2f}%")
+            logger.info(f"Individual Distortion: {self._individual_distortion}")
+            logger.info(f"Harmonic Phases: {self._harmonic_phases}")
 
             numpoints = self._resolution  # Use stored resolution
             
@@ -471,6 +495,7 @@ class HarmonicAnalysisCalculator(QObject):
                         self._ff = 1.11
             except Exception as inner_e:
                 logger.error(f"Error in waveform calculation: {inner_e}")
+                logger.exception(inner_e)
                 # Reset to safe defaults
                 self._waveform = [0.0] * 250
                 self._fundamental_wave = [0.0] * 250
@@ -480,6 +505,11 @@ class HarmonicAnalysisCalculator(QObject):
             # Only generate these arrays when actually needed by the UI
             self._waveform_points = self._generate_points_array(t, wave)
             self._fundamental_points = self._generate_points_array(t, fundamental_wave)
+            
+            # Log waveform generation
+            logger.info(f"Generated waveform with {len(self._waveform)} points")
+            logger.info(f"Crest Factor: {self._cf:.3f}")
+            logger.info(f"Form Factor: {self._ff:.3f}")
             
             # Store in memory cache
             result = {
@@ -520,10 +550,11 @@ class HarmonicAnalysisCalculator(QObject):
             # Trigger batch update
             self.batchUpdate()
             
+            logger.info("=== Harmonic Analysis Complete ===\n")
+            
         except Exception as e:
-            logger.error(f"Calculation error: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"Harmonic calculation error: {e}")
+            logger.exception(e)
             # Reset calculation status on error
             self._update_calculation_status(False)
     
@@ -582,6 +613,7 @@ class HarmonicAnalysisCalculator(QObject):
             return result
         except Exception as e:
             logger.error(f"Error in resolution calculation: {e}")
+            logger.exception(e)
             return None
     
     def _is_valid_number(self, value):
@@ -668,6 +700,8 @@ class HarmonicAnalysisCalculator(QObject):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{export_dir}/harmonics_data_{timestamp}.csv"
             
+            logger.info(f"Exporting harmonic data to {filename}")
+            
             # Create CSV file
             with open(filename, 'w', newline='') as csvfile:
                 writer = csv.writer(csvfile)
@@ -687,10 +721,11 @@ class HarmonicAnalysisCalculator(QObject):
                 writer.writerow(['Crest Factor', f"{self._cf:.2f}"])
                 writer.writerow(['Form Factor', f"{self._ff:.2f}"])
                 
-            logger.info(f"Data exported to {filename}")
+            logger.info(f"Successfully exported harmonic data to {filename}")
             return True
         except Exception as e:
-            logger.error(f"Export error: {e}")
+            logger.error(f"Error exporting harmonic data: {e}")
+            logger.exception(e)
             return False
 
     @Slot()

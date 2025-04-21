@@ -9,7 +9,7 @@ import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import sqlite3
-from .logger import setup_logger
+from utils.logger_config import configure_logger
 
 # Base paths
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,8 +21,8 @@ QML_DIR = ROOT_DIR / 'qml'
 DATA_DIR.mkdir(exist_ok=True)
 LOGS_DIR.mkdir(exist_ok=True)
 
-# Add logger instance
-logger = setup_logger("config")
+# Add logger instance with component-specific configuration
+logger = configure_logger("qmltest", component="config")
 
 @dataclass
 class AppConfig:
@@ -227,7 +227,7 @@ async def initialize_config() -> AppConfig:
     config = await loop.run_in_executor(executor, AppConfig)
     
     # Initialize logging in background
-    await loop.run_in_executor(executor, setup_logger)
+    await loop.run_in_executor(executor, configure_logger)
     
     return config
 

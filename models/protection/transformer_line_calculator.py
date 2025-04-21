@@ -3,9 +3,10 @@ import math
 import cmath
 import logging
 from utils.pdf_generator import PDFGenerator
+from utils.logger_config import configure_logger
 
-# Setup logging
-logger = logging.getLogger("qmltest")
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="transformer_line")
 
 class TransformerLineCalculator(QObject):
     """Calculator for transformer-line system analysis including protection parameters"""
@@ -180,7 +181,6 @@ class TransformerLineCalculator(QObject):
             return max(trip_time, 0.025)  # Minimum 25ms operating time
             
         except Exception as e:
-            
             logger.error(f"Error calculating trip time: {e}")
             return 0.0
 
@@ -233,7 +233,6 @@ class TransformerLineCalculator(QObject):
                 "breakpoint": 2.0  # Current where slope changes
             }
         except Exception as e:
-            
             logger.error(f"Error calculating differential protection: {e}")
             return None
 
@@ -245,14 +244,12 @@ class TransformerLineCalculator(QObject):
                 limits[harmonic] = (percent / 100.0) * current
             return limits
         except Exception as e:
-            
             logger.error(f"Error calculating harmonic limits: {e}")
             return {}
 
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
         try:
-            
             logger.info("\n=== Starting Transformer-Line Calculations ===")
             
             # 1. Calculate base values
@@ -519,12 +516,11 @@ class TransformerLineCalculator(QObject):
             ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
             self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
             
-            
-            logger.info(f"Recalculated load values: FLC={self._full_load_current:.2f}A, Pickup={self._relay_pickup_current:.2f}A")
+            logger.debug(f"Recalculated load values: FLC={self._full_load_current:.2f}A, Pickup={self._relay_pickup_current:.2f}A")
             
         except Exception as e:
             print(f"Error in recalculate_load_values: {str(e)}")
-            logging.getLogger("qmltest").error(f"Error in recalculate_load_values: {str(e)}")
+            logger.error(f"Error in recalculate_load_values: {str(e)}")
     
     def _calculate_additional_parameters(self):
         """Calculate additional parameters for expert protection popup"""
@@ -581,7 +577,6 @@ class TransformerLineCalculator(QObject):
             self._remote_backup_trip_time = 0.3 + 0.4  # Main trip + coordination margin
             
         except Exception as e:
-            
             logger.error(f"Error in calculating additional parameters: {e}")
 
     @Property(float, notify=transformerChanged)
@@ -724,8 +719,6 @@ class TransformerLineCalculator(QObject):
             
             # Calculate new MVA needed to maintain same real power at new PF
             new_mva = current_real_power / new_pf
-            
-            # Log the change
             
             logger.info(f"Updating power factor from {self._load_pf:.2f} to {new_pf:.2f}")
             logger.info(f"Maintaining real power at {current_real_power:.4f} MW")
@@ -1036,12 +1029,10 @@ class TransformerLineCalculator(QObject):
         
     @Slot(float)
     def setLoadMVA(self, value):
-        
-        logger.info(f"setLoadMVA called with value: {value} from caller: {__import__('traceback').format_stack()[-2]}")
+        logger.debug(f"setLoadMVA called with value: {value}")
         self._load_mva = value
         self.loadChanged.emit()
         # Don't immediately calculate to avoid repeated calculations
-        # self._calculate()
         
     @Slot(float)
     def setDisplayLoadMVA(self, value):
@@ -1166,8 +1157,8 @@ class TransformerLineCalculator(QObject):
             logger.info(f"Transformer report exported to: {clean_path}")
             
         except Exception as e:
-            print(f"Error exporting transformer report: {e}")
-            print(f"Attempted filename: {filename}")
+            logger.error(f"Error exporting transformer report: {e}")
+            logger.error(f"Attempted filename: {filename}")
 
     @Slot("QVariant", str)
     def exportProtectionReport(self, data, filename):
@@ -1180,7 +1171,7 @@ class TransformerLineCalculator(QObject):
 
             # Convert QJSValue to Python dict and use directly
             js_data = data.toVariant()
-            logger.info("Received JS data:", js_data)
+            logger.debug("Received JS data: %s", js_data)
             
             # No data transformation - pass directly to PDF generator
             generator = PDFGenerator()
@@ -1188,9 +1179,9 @@ class TransformerLineCalculator(QObject):
             logger.info(f"Protection report exported to: {clean_path}")
             
         except Exception as e:
-            print(f"Error exporting protection report: {e}")
-            print(f"Attempted filename: {filename}")
-            print(f"Data received: {data}")
+            logger.error(f"Error exporting protection report: {e}")
+            logger.error(f"Attempted filename: {filename}")
+            logger.error(f"Data received: {data}")
 
     @Slot(float, float, str, result=float)
     def calculateTripTimeWithParams(self, current_multiple, time_dial, curve_type):
@@ -1209,7 +1200,6 @@ class TransformerLineCalculator(QObject):
             return max(trip_time, 0.025)  # Minimum 25ms operating time
             
         except Exception as e:
-            
             logger.error(f"Error calculating trip time with params: {e}")
             return 0.0
 

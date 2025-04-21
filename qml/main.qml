@@ -24,8 +24,7 @@ ApplicationWindow {
     Universal.theme: modeToggled ? Universal.Dark : Universal.Light
     Universal.accent: Universal.Cyan
 
-    property var logViewerPopup: logViewerPopupInstance
-    property var logManagerInstance: null
+    // property var logManagerInstance: null
     property bool modeToggled: false
 
     ResultsManager {id: resultsManager}
@@ -35,23 +34,34 @@ ApplicationWindow {
     }
 
     LogViewerPopup {
-        id: logViewerPopupInstance
-        logManager: logManagerInstance
+        id: logViewerPopup
     }
 
+    // Initialize logManager with a Timer to avoid binding loops
     Timer {
-        interval: 10
+        interval: 100
         running: true
         repeat: false
         onTriggered: {
             if (typeof logManager !== 'undefined') {
-                logManagerInstance = logManager
-                logManager.log("INFO", "Application started successfully")
-            } else {
-                console.error("Log manager not available after timeout")
+                logViewerPopup.logManager = logManager;
             }
         }
     }
+
+    // Timer {
+    //     interval: 200  // Increased to allow UI to stabilize first
+    //     running: true
+    //     repeat: false
+    //     onTriggered: {
+    //         if (typeof logManager !== 'undefined') {
+    //             logManagerInstance = logManager
+    //             logManager.log("INFO", "Application started successfully")
+    //         } else {
+    //             console.error("Log manager not available after timeout")
+    //         }
+    //     }
+    // }
 
     Timer {
         interval: 100
@@ -245,15 +255,5 @@ ApplicationWindow {
         id: settings
         property real menuX
         property real menuY
-    }
-
-    // Expose a global function to open logs from anywhere in the app
-    function openLogViewer() {
-        console.log("openLogViewer function called")
-        if (logViewerPopupInstance) {
-            logViewerPopupInstance.open()
-        } else {
-            console.error("Log viewer popup not available")
-        }
     }
 }

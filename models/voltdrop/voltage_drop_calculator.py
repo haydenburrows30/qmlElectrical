@@ -1,15 +1,14 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
-import json
-import logging
+from utils.logger_config import configure_logger
 
 from .table_model import VoltageDropTableModel
 from .file_utils import FileUtils
 from utils.pdf_generator_volt_drop import PDFGenerator
 from .data_manager import DataManager
 
-# Setup logging
-logger = logging.getLogger("qmltest")
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="voltdrop")
 
 class VoltageDropCalculator(QObject):
     """
@@ -427,12 +426,15 @@ class VoltageDropCalculator(QObject):
                 'admd_enabled': self._admd_enabled
             }
             
+            logger.info(f"Saving voltage drop calculation: {timestamp}")
+            logger.debug(f"Calculation details: {result}")
+            
             # Save using file utils
             return self._file_utils.save_calculation_history(result)
             
         except Exception as e:
             error_msg = f"Error saving calculation: {e}"
-            print(error_msg)
+            logger.error(error_msg)
             self.saveStatusChanged.emit(False, error_msg)
             return False
 
@@ -445,6 +447,7 @@ class VoltageDropCalculator(QObject):
             filepath = self._file_utils.get_save_filepath("png", "voltage_drop_chart")
         
         if filepath:
+            logger.debug(f"Requesting chart capture to: {filepath} with scale {scale}")
             self.grabRequested.emit(filepath, scale)
             return True
         return False
@@ -457,20 +460,26 @@ class VoltageDropCalculator(QObject):
                 filepath = self._file_utils.get_save_filepath("csv", "cable_comparison")
                 
                 if not filepath:
+                    logger.warning("Table export cancelled by user")
                     self.tableExportStatusChanged.emit(False, "Export cancelled")
                     return False
             
             # Ensure we have data to save
             if not hasattr(self, '_table_model') or self._table_model is None:
+                logger.error("No table data to export")
                 self.tableExportStatusChanged.emit(False, "No table data to export")
                 return False
                 
             # Extract data from the table model
             rows = self._table_model._data
             if not rows:
+                logger.error("Table contains no data to export")
                 self.tableExportStatusChanged.emit(False, "Table contains no data to export")
                 return False
                 
+            logger.info(f"Exporting table data to CSV: {filepath}")
+            logger.debug(f"Table contains {len(rows)} rows of data")
+            
             # Create metadata
             metadata = {
                 "System Voltage": self._selected_voltage,
@@ -489,162 +498,16 @@ class VoltageDropCalculator(QObject):
             df = pd.DataFrame(rows, columns=headers)
             
             # Save using file_utils
-            return self._file_utils.save_csv(filepath, df, metadata)
+            result = self._file_utils.save_csv(filepath, df, metadata)
+            if result:
+                logger.info(f"Successfully exported table data to: {filepath}")
+            else:
+                logger.error(f"Failed to export table data to: {filepath}")
+            return result
             
         except Exception as e:
             error_msg = f"Error exporting table data: {e}"
-            print(error_msg)
-            self.tableExportStatusChanged.emit(False, error_msg)
-            return False
-
-    @Slot(str)
-    def exportTableToPDF(self, filepath):
-        """Export cable comparison table to PDF format."""
-        try:
-            if not filepath:
-                filepath = self._file_utils.get_save_filepath("pdf", "cable_comparison")
-                
-                if not filepath:
-                    self.tablePdfExportStatusChanged.emit(False, "Export cancelled")
-                    return False
-            
-            # Ensure we have data to save
-            if not hasattr(self, '_table_model') or self._table_model is None:
-                self.tablePdfExportStatusChanged.emit(False, "No table data to export to PDF")
-                return False
-                
-            # Extract data from the table model
-            rows = self._table_model._data
-            if not rows:
-                self.tablePdfExportStatusChanged.emit(False, "Table contains no data to export to PDF")
-                return False
-            
-            # Create metadata
-            metadata = {
-                "System Voltage": self._selected_voltage,
-                "Current": f"{self._current:.1f} A",
-                "Length": f"{self._length:.1f} m",
-                "Installation Method": self._installation_method,
-                "Temperature": f"{self._temperature:.1f} °C",
-                "Grouping Factor": f"{self._grouping_factor:.2f}",
-                "ADMD Enabled": 'Yes' if self._admd_enabled else 'No',
-                "Diversity Factor": f"{self._diversity_factor:.3f}"
-            }
-            
-            # Create table data
-            table_data = {
-                "headers": ['Size (mm²)', 'Material', 'Cores', 'mV/A/m', 'Rating (A)', 
-                          'V-Drop (V)', 'Drop (%)', 'Status'],
-                "data": rows
-            }
-            
-            # Use PDF generator
-            return self._pdf_generator.generate_table_pdf(filepath, table_data, metadata)
-            
-        except Exception as e:
-            error_msg = f"Error exporting table to PDF: {e}"
-            print(error_msg)
-            self.tablePdfExportStatusChanged.emit(False, error_msg)
-            return False
-
-    @Slot(str, dict)
-    def exportDetailsToPDF(self, filepath, details=None):
-        """Export voltage drop calculation details to PDF format."""
-        try:
-            if not filepath:
-                filepath = self._file_utils.get_save_filepath("pdf", "voltage_drop_details")
-                
-                if not filepath:
-                    self.pdfExportStatusChanged.emit(False, "Export cancelled")
-                    return False
-            
-            # If no details provided, use current calculation state
-            if details is None:
-                if self._selected_cable is None:
-                    self.pdfExportStatusChanged.emit(False, "No current calculation")
-                    return False
-                
-                details = {
-                    "voltage_system": self._selected_voltage,
-                    "admd_enabled": self._admd_enabled,
-                    "kva_per_house": self._total_kva / self._num_houses if self._num_houses > 0 else self._total_kva,
-                    "num_houses": self._num_houses,
-                    "diversity_factor": self._diversity_factor,
-                    "total_kva": self._total_kva,
-                    "current": self._current,
-                    "cable_size": float(self._selected_cable['size']),
-                    "conductor_material": self._conductor_material,
-                    "core_type": self._core_type,
-                    "length": self._length,
-                    "installation_method": self._installation_method,
-                    "temperature": self._temperature,
-                    "grouping_factor": self._grouping_factor,
-                    "voltage_drop": self._voltage_drop,
-                    "drop_percent": (self._voltage_drop / self._voltage) * 100,
-                    "combined_rating_info": self._combined_rating_info
-                }
-            
-            # Use PDF generator
-            return self._pdf_generator.generate_details_pdf(filepath, details)
-            
-        except Exception as e:
-            error_msg = f"Error exporting details to PDF: {e}"
-            print(error_msg)
-            self.pdfExportStatusChanged.emit(False, error_msg)
-            return False
-
-    @Slot(str)
-    def exportChartDataCSV(self, data_json):
-        """Export chart data as CSV."""
-        try:
-            data = json.loads(data_json)
-            filepath = self._file_utils.get_save_filepath("csv", "voltage_drop_chart")
-            
-            if not filepath:
-                self.tableExportStatusChanged.emit(False, "Export cancelled")
-                return False
-
-            # Create rows from chart data
-            rows = []
-            rows.append({
-                'cable_size': data['currentPoint']['cableSize'],
-                'drop_percentage': data['currentPoint']['dropPercentage'],
-                'current': data['currentPoint']['current'],
-                'type': 'current'
-            })
-            
-            for point in data['comparisonPoints']:
-                rows.append({
-                    'cable_size': point['cableSize'],
-                    'drop_percentage': point['dropPercent'],
-                    'status': point['status'],
-                    'type': 'comparison'
-                })
-                
-            df = pd.DataFrame(rows)
-            return self._file_utils.save_csv(filepath, df)
-            
-        except Exception as e:
-            self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
-            return False
-
-    @Slot(str)
-    def exportChartDataJSON(self, data_json):
-        """Export chart data as JSON."""
-        try:
-            data = json.loads(data_json)
-            filepath = self._file_utils.get_save_filepath("json", "voltage_drop_chart")
-            
-            if not filepath:
-                self.tableExportStatusChanged.emit(False, "Export cancelled")
-                return False
-            
-            # Save using file utils
-            return self._file_utils.save_json(filepath, data)
-            
-        except Exception as e:
-            error_msg = f"Error exporting chart data: {e}"
-            print(error_msg)
+            logger.error(error_msg)
             self.tableExportStatusChanged.emit(False, error_msg)
             return False
 

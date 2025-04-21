@@ -9,7 +9,10 @@ from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractListModel, 
 
 from .logger_config import configure_logger, get_log_dir, get_log_file
 
-# Re-export setup function using the new configuration
+# Application-wide logger instance
+logger = configure_logger("qmltest")
+
+# Add back the setup_logger function for backward compatibility
 def setup_logger(name="qmltest", level=logging.INFO, component=None):
     """Configure application-wide logging system.
     
@@ -22,9 +25,6 @@ def setup_logger(name="qmltest", level=logging.INFO, component=None):
         Logger instance
     """
     return configure_logger(name, level, component)
-
-# Application-wide logger instance
-logger = setup_logger("qmltest")
 
 class LogMessage:
     """Simple class to represent a log message."""

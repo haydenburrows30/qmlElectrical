@@ -359,22 +359,7 @@ Page {
                 }
             
             onClicked: {
-                // access the logViewerPopup from the application window
-                var appWindow = window || applicationWindow
-                if (appWindow && appWindow.logViewerPopup) {
-                    appWindow.logViewerPopup.open()
-                } else {
-                    console.error("Could not find log viewer popup")
-                }
-                
-                // Log that the user viewed logs if logManager is available
-                if (typeof logManager !== "undefined") {
-                    logManager.log("INFO", "User opened log viewer from home page")
-                } else if (appWindow && appWindow.logManagerInstance) {
-                    appWindow.logManagerInstance.log("INFO", "User opened log viewer from home page")
-                } else {
-                    console.log("No log manager available")
-                }
+                logViewerPopup.open()
             }
         }
     }

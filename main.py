@@ -19,6 +19,7 @@ from services.worker_pool import WorkerPool
 # Utilities
 from utils.config import app_config
 from utils.qml_debug import register_debug_helper
+# Use the new logger directly
 from utils.logger import QLogManager
 from utils.platform_helper import PlatformHelper
 from utils.cache_manager import CacheManager
