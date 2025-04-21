@@ -29,6 +29,8 @@ from utils.preload_manager import PreloadManager
 from utils.lightweight_performance import LightweightPerformanceMonitor
 from utils.logger_config import configure_logger
 from utils.about_program import ConfigBridge
+# Import the new FileSaver class
+from utils.file_saver import FileSaver
 
 # Resources
 import data.rc_resources as rc_resources
@@ -91,6 +93,9 @@ class Application:
                 qmlRegisterType(type_class, uri, major, minor, name)
             except Exception as e:
                 self.logger.warning(f"Could not register type: {e}")
+        
+        # Register the FileSaver class
+        qmlRegisterType(FileSaver, "FileSaverUtils", 1, 0, "FileSaver")
 
     def load_qml(self):
         """Load main QML file and register context properties."""
