@@ -1,0 +1,4 @@
+module popups
+LogViewer 1.0 LogViewer.qml
+LogViewerPopup 1.0 LogViewerPopup.qml
+LogAnalyzerTool 1.0 LogAnalyzerTool.qml

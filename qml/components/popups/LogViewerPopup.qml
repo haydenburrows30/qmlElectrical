@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "."
 
 Dialog {
     id: logViewerPopup
@@ -29,9 +28,22 @@ Dialog {
     }
     
     footer: DialogButtonBox {
+        standardButtons: DialogButtonBox.Close
+        
         Button {
-            text: "Close"
-            DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
+            text: "Test Logging"
+            DialogButtonBox.buttonRole: DialogButtonBox.ActionRole
+            onClicked: {
+                if (logManager) {
+                    // Log to several different loggers to confirm no duplicates
+                    logManager.log("INFO", "Test log message from QML")
+                    
+                    // Simulate multiple components logging to verify no duplicates
+                    Qt.callLater(function() {
+                        logManager.testComponentLogs()
+                    })
+                }
+            }
         }
     }
     
@@ -42,9 +54,5 @@ Dialog {
             logManager.log("INFO", "Log viewer opened by user")
             lastOpenTime = currentTime
         }
-    }
-    
-    Component.onCompleted: {
-        // Remove debug log
     }
 }

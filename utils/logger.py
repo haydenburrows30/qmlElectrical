@@ -34,6 +34,8 @@ class LogMessage:
         self.level = level
         self.message = message
         self.timestamp = timestamp or datetime.now()
+        # Add a unique identifier for deduplication in the UI
+        self.uid = f"{timestamp.timestamp() if timestamp else time.time()}_{id(message)}"
     
     @property
     def formatted_time(self):
@@ -50,11 +52,14 @@ class LogMessagesModel(QAbstractListModel):
     MessageRole = Qt.UserRole + 2
     TimestampRole = Qt.UserRole + 3
     FormattedRole = Qt.UserRole + 4
+    UidRole = Qt.UserRole + 5  # Add a UID role
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self._messages = []
         self._max_messages = 1000  # Limit number of messages to prevent memory issues
+        # Add a set to track unique message IDs
+        self._message_uids = set()
     
     def rowCount(self, parent=QModelIndex()):
         return len(self._messages)
@@ -73,6 +78,8 @@ class LogMessagesModel(QAbstractListModel):
             return message.timestamp
         elif role == self.FormattedRole:
             return str(message)
+        elif role == self.UidRole:
+            return message.uid
             
         return None
     
@@ -81,19 +88,39 @@ class LogMessagesModel(QAbstractListModel):
             self.LevelRole: QByteArray(b"level"),
             self.MessageRole: QByteArray(b"message"),
             self.TimestampRole: QByteArray(b"timestamp"),
-            self.FormattedRole: QByteArray(b"formatted")
+            self.FormattedRole: QByteArray(b"formatted"),
+            self.UidRole: QByteArray(b"uid")
         }
     
     def add_message(self, level, message):
+        # Create message object
+        log_msg = LogMessage(level, message)
+        
+        # Check if this is a duplicate message (exactly same content in last 5 entries)
+        is_duplicate = False
+        for i in range(min(5, len(self._messages))):
+            if self._messages[i].message == message and self._messages[i].level == level:
+                is_duplicate = True
+                break
+        
+        # If duplicate, don't add it
+        if is_duplicate:
+            return
+            
         # Insert at the beginning for newest-first order
         self.beginInsertRows(QModelIndex(), 0, 0)
-        self._messages.insert(0, LogMessage(level, message))
+        self._messages.insert(0, log_msg)
+        self._message_uids.add(log_msg.uid)
         self.endInsertRows()
         
         # Trim if we exceed the maximum number of messages
         if len(self._messages) > self._max_messages:
             self.beginRemoveRows(QModelIndex(), self._max_messages, len(self._messages) - 1)
+            removed_msgs = self._messages[self._max_messages:]
             self._messages = self._messages[:self._max_messages]
+            # Also remove UIDs from the set
+            for msg in removed_msgs:
+                self._message_uids.discard(msg.uid)
             self.endRemoveRows()
     
     @Slot()
@@ -101,6 +128,7 @@ class LogMessagesModel(QAbstractListModel):
         """Clear all log messages"""
         self.beginResetModel()
         self._messages = []
+        self._message_uids.clear()
         self.endResetModel()
 
 class AsyncLogHandler(logging.Handler):
@@ -186,8 +214,6 @@ class AsyncLogHandler(logging.Handler):
                 "dropped": self._dropped_count,
                 "queue_size": self.log_queue.qsize()
             }
-        # Instead of returning an empty dict, always return the stats
-        # but don't update the timestamp
         return {
             "processed": self._processed_count,
             "dropped": self._dropped_count,
@@ -233,26 +259,14 @@ class QLogManager(QObject):
         self._handler.setFormatter(logging.Formatter('%(message)s'))
         self._async_handler.add_handler(self._handler)
         
-        # Add the async handler to the logger only if not already added
-        handler_already_added = False
-        for handler in self._logger.handlers:
-            if isinstance(handler, AsyncLogHandler):
-                handler_already_added = True
-                break
+        # Debug duplicate handlers
+        self._debug_logger_setup()
         
-        if not handler_already_added:
-            self._logger.addHandler(self._async_handler)
-            
-        # Also add our async handler to the root logger to capture all component logs
-        root_logger = logging.getLogger()
-        root_handler_added = False
-        for handler in root_logger.handlers:
-            if isinstance(handler, AsyncLogHandler):
-                root_handler_added = True
-                break
-                
-        if not root_handler_added:
-            root_logger.addHandler(self._async_handler)
+        # Track already checked loggers to avoid redundant processing
+        self._checked_loggers = set()
+        
+        # Add our async handler to the root and all component loggers
+        self._add_handlers_to_all_loggers()
         
         self._count = 0
         self._filter_level = "INFO"  # Default filter level
@@ -273,13 +287,39 @@ class QLogManager(QObject):
         self._stats_throttle_interval = 0.5  # Only update stats every 0.5 seconds
         
         # Add deduplication cache to prevent duplicate log messages in quick succession
-        # Reduce timeout to allow more frequent messages
         self._dedup_cache = {}
         self._dedup_timeout = 0.5  # Reduce from 2.0 to 0.5 seconds
         
         # Force initial rebuild of the model with existing logs
-        # Get the last 500 log entries from any existing handlers
         self._load_existing_logs()
+    
+    def _debug_logger_setup(self):
+        """Debug the logger setup to identify duplicate handlers."""
+        debug_enabled = os.environ.get("QMLTEST_DEBUG_LOGGING", "0") == "1"
+        if not debug_enabled:
+            return
+            
+        print("\n--- LOGGER DEBUG INFO ---")
+        
+        # Check main logger
+        print(f"Main logger '{self._logger.name}' handlers: {len(self._logger.handlers)}")
+        for i, handler in enumerate(self._logger.handlers):
+            print(f"  Handler {i+1}: {type(handler).__name__}")
+        
+        # Check root logger
+        root_logger = logging.getLogger()
+        print(f"Root logger handlers: {len(root_logger.handlers)}")
+        for i, handler in enumerate(root_logger.handlers):
+            print(f"  Handler {i+1}: {type(handler).__name__}")
+            
+        # Check all named loggers
+        loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+        print(f"Total named loggers: {len(loggers)}")
+        for logger in loggers:
+            if logger.handlers:
+                print(f"  Logger '{logger.name}' has {len(logger.handlers)} handlers, propagate={logger.propagate}")
+        
+        print("--- END LOGGER DEBUG ---\n")
     
     def _load_existing_logs(self):
         """Load existing logs from log file to populate the initial view."""
@@ -294,22 +334,46 @@ class QLogManager(QObject):
                 lines = f.readlines()
                 lines = lines[-500:] if len(lines) > 500 else lines
             
+            # Use a set to track unique log lines from the file
+            seen_log_lines = set()
+            
             # Parse and add log entries
             for line in lines:
                 try:
-                    # Simple parsing of standard log format
-                    parts = line.strip().split(' - ', 3)
-                    if len(parts) >= 3:
-                        timestamp_str = parts[0]
-                        level_message = parts[2].split(' ', 1)
+                    # Improved parsing of standard log format
+                    # Format: 2023-12-31 12:34:56,789 - logger_name - LEVEL - Message
+                    line = line.strip()
+                    if ' - ' not in line:
+                        continue
+                    
+                    # Skip duplicate lines in the log file
+                    if line in seen_log_lines:
+                        continue
+                    seen_log_lines.add(line)
                         
-                        if len(level_message) >= 2:
-                            level = level_message[0]
-                            message = level_message[1]
-                            
-                            # Add to history
+                    # Split by first three occurrences of " - "
+                    parts = []
+                    remainder = line
+                    for _ in range(3):
+                        if ' - ' not in remainder:
+                            break
+                        pos = remainder.find(' - ')
+                        parts.append(remainder[:pos])
+                        remainder = remainder[pos + 3:]  # Skip past the " - "
+                    
+                    # The remainder is the full message
+                    if len(parts) >= 3 and remainder:
+                        timestamp_str = parts[0]
+                        level = parts[2]  # The third part is the level
+                        message = remainder  # Everything after the last " - " is the message
+                        
+                        # Add to history
+                        try:
                             timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S,%f')
                             self._all_logs.append((level, message, timestamp))
+                        except ValueError:
+                            # Skip if timestamp parsing fails
+                            continue
                 except Exception:
                     # Skip lines that can't be parsed
                     continue
@@ -319,6 +383,42 @@ class QLogManager(QObject):
             
         except Exception as e:
             logger.error(f"Error loading existing logs: {e}")
+    
+    def _add_handlers_to_all_loggers(self):
+        """Add our AsyncLogHandler to all relevant loggers."""
+        # Process the main logger first
+        self._add_handler_to_logger(self._logger)
+        
+        # Then add to all existing component loggers
+        for name in list(logging.root.manager.loggerDict.keys()):
+            if name.startswith('qmltest.'):
+                logger = logging.getLogger(name)
+                self._add_handler_to_logger(logger)
+        
+        # Only add to root logger if specifically configured to do so
+        from .logger_config import ROOT_CAPTURE_ENABLED
+        if ROOT_CAPTURE_ENABLED:
+            root_logger = logging.getLogger()
+            self._add_handler_to_logger(root_logger)
+            
+    def _add_handler_to_logger(self, logger):
+        """Add AsyncLogHandler to a logger if not already present."""
+        if logger.name in self._checked_loggers:
+            return
+            
+        self._checked_loggers.add(logger.name)
+        
+        # Check if AsyncLogHandler is already added
+        handler_already_added = False
+        for handler in logger.handlers:
+            if isinstance(handler, AsyncLogHandler):
+                handler_already_added = True
+                break
+                
+        if not handler_already_added:
+            logger.addHandler(self._async_handler)
+            if os.environ.get("QMLTEST_DEBUG_LOGGING", "0") == "1":
+                print(f"Added AsyncLogHandler to logger: {logger.name}")
     
     def handle_log(self, level, message):
         """Process a log message from the handler."""
@@ -375,9 +475,20 @@ class QLogManager(QObject):
         
         # Add all logs in batch at once
         for level, message in batch:
-            self._model.add_message(level, message)
-            self._count += 1
-            self.newLogMessage.emit(level, message)
+            # Improve duplicate check by looking at recent messages
+            is_duplicate = False
+            
+            # Check the last few messages in the model for this exact message
+            for i in range(min(5, len(self._model._messages))):
+                if (self._model._messages[i].message == message and 
+                    self._model._messages[i].level == level):
+                    is_duplicate = True
+                    break
+            
+            if not is_duplicate:
+                self._model.add_message(level, message)
+                self._count += 1
+                self.newLogMessage.emit(level, message)
         
         # Only emit count changed signal once per batch
         self.logCountChanged.emit(self._count)
@@ -411,26 +522,39 @@ class QLogManager(QObject):
             filtered_logs = []
             max_display_logs = 1000  # Limit displayed logs for performance
             
-            # Filter logs that pass the current level
-            for level, message, timestamp in self._all_logs:
-                if self._should_show_message(level):
-                    filtered_logs.append((level, message, timestamp))
-                    if len(filtered_logs) >= max_display_logs:
-                        break
+            # First, deduplicate the logs based on message content
+            seen_messages = set()
+            unique_logs = []
             
-            # Sort logs by newest first (they're appended in chronological order)
-            filtered_logs.reverse()
+            for level, message, timestamp in self._all_logs:
+                # Only consider logs that pass the filter
+                if self._should_show_message(level):
+                    # Create a deduplication key from the message content (ignore timestamp)
+                    dedup_key = f"{level}:{message}"
+                    
+                    # Only add if we haven't seen this exact message
+                    if dedup_key not in seen_messages:
+                        seen_messages.add(dedup_key)
+                        unique_logs.append((level, message, timestamp))
+                        
+                        # Break if we hit the display limit
+                        if len(unique_logs) >= max_display_logs:
+                            break
+            
+            # Sort logs by newest first
+            unique_logs.sort(key=lambda x: x[2], reverse=True)
             
             # Display the filtered logs
-            for level, message, _ in filtered_logs:
+            for level, message, _ in unique_logs:
                 self._model.add_message(level, message)
                 self._count += 1
             
             self.logCountChanged.emit(self._count)
             
             # Inform user if logs were truncated
-            if len(filtered_logs) == max_display_logs and len(self._all_logs) > max_display_logs:
-                self._model.add_message("INFO", f"Showing {max_display_logs} most recent logs of {len(self._all_logs)} total logs")
+            total_filtered = sum(1 for l, m, t in self._all_logs if self._should_show_message(l))
+            if len(unique_logs) == max_display_logs and total_filtered > max_display_logs:
+                self._model.add_message("INFO", f"Showing {max_display_logs} most recent unique logs of {total_filtered} filtered logs")
                 self._count += 1
                 self.logCountChanged.emit(self._count)
     
@@ -439,7 +563,6 @@ class QLogManager(QObject):
         """Clear all log messages."""
         self._model.clear()
         self._count = 0
-        # Also clear all stored logs
         self._all_logs.clear()
         self._pending_logs = []
         self.logCountChanged.emit(self._count)
@@ -600,7 +723,6 @@ class QLogManager(QObject):
         """Get statistics about logging system."""
         if hasattr(self, '_async_handler'):
             stats = self._async_handler.get_stats()
-            # Add defensive check for stats keys to avoid KeyError
             if stats and all(k in stats for k in ["processed", "dropped", "queue_size"]):
                 return (f"Logs processed: {stats['processed']}, "
                         f"dropped: {stats['dropped']}, "
@@ -621,3 +743,73 @@ class QLogManager(QObject):
         self._load_existing_logs()
         self.statisticsChanged.emit()
         return True
+    
+    @Slot(result=str)
+    def getLoggerDebugInfo(self):
+        """Return debug information about loggers for QML."""
+        output = []
+        output.append("=== LOGGER DEBUG INFO ===")
+        
+        # Check main logger
+        output.append(f"Main logger '{self._logger.name}' handlers: {len(self._logger.handlers)}")
+        for i, handler in enumerate(self._logger.handlers):
+            output.append(f"  Handler {i+1}: {type(handler).__name__}")
+        
+        # Check root logger
+        root_logger = logging.getLogger()
+        output.append(f"Root logger handlers: {len(root_logger.handlers)}")
+        for i, handler in enumerate(root_logger.handlers):
+            output.append(f"  Handler {i+1}: {type(handler).__name__}")
+            
+        # Check all named loggers
+        loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+        output.append(f"Total named loggers: {len(loggers)}")
+        logger_count = 0
+        for logger in loggers:
+            if logger.handlers:
+                output.append(f"  Logger '{logger.name}' has {len(logger.handlers)} handlers, propagate={logger.propagate}")
+                logger_count += 1
+                if logger_count >= 10:  # Limit to 10 loggers to avoid huge output
+                    output.append(f"  ... and {len(loggers) - 10} more loggers")
+                    break
+        
+        if hasattr(self, '_async_handler'):
+            stats = self._async_handler.get_stats()
+            output.append(f"Async handler stats: processed={stats['processed']}, dropped={stats['dropped']}")
+        
+        output.append("=== END LOGGER DEBUG ===")
+        return "\n".join(output)
+    
+    @Slot(bool)
+    def setDebugMode(self, enabled):
+        """Enable or disable debug mode for logging."""
+        os.environ["QMLTEST_DEBUG_LOGGING"] = "1" if enabled else "0"
+        
+        if enabled:
+            for handler in self._logger.handlers:
+                if isinstance(handler, logging.StreamHandler):
+                    handler.setLevel(logging.DEBUG)
+        else:
+            for handler in self._logger.handlers:
+                if isinstance(handler, logging.StreamHandler):
+                    handler.setLevel(logging.WARNING)
+    
+    @Slot()
+    def testComponentLogs(self):
+        """Test logging from different components to verify no duplicates."""
+        # Get separate loggers for different components
+        main_logger = logging.getLogger("qmltest.main")
+        config_logger = logging.getLogger("qmltest.config")
+        results_logger = logging.getLogger("qmltest.results_manager")
+        
+        # Add our handler to ensure these loggers are properly connected to UI
+        for logger in [main_logger, config_logger, results_logger]:
+            self._add_handler_to_logger(logger)
+        
+        # Log to each logger
+        main_logger.info("Test log from main component")
+        config_logger.info("Test log from config component")
+        results_logger.info("Test log from results component")
+        
+        # Log to main logger again
+        self._logger.info("Test complete - check for duplicate logs")

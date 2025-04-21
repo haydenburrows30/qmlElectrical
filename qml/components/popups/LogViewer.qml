@@ -117,6 +117,52 @@ Rectangle {
                     }
                 }
             }
+            
+            Button {
+                text: "Debug Loggers"
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: {
+                    if (logManager && logManager.getLoggerDebugInfo) {
+                        // Display the logger debug info as a log entry
+                        let debugInfo = logManager.getLoggerDebugInfo()
+                        logManager.log("INFO", "Logger Debug Information:\n" + debugInfo)
+                    }
+                }
+            }
+
+            Button {
+                id: debugModeButton
+                text: "Debug Mode: Off"
+                property bool debugModeEnabled: false
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: {
+                    debugModeEnabled = !debugModeEnabled
+                    text = "Debug Mode: " + (debugModeEnabled ? "On" : "Off")
+                    
+                    if (logManager) {
+                        logManager.setDebugMode(debugModeEnabled)
+                        if (debugModeEnabled) {
+                            logManager.log("INFO", "Debug mode enabled")
+                        }
+                    }
+                }
+            }
+
+            Button {
+                text: "Analyze Logs"
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: {
+                    var component = Qt.createComponent("LogAnalyzerTool.qml")
+                    if (component.status === Component.Ready) {
+                        var analyzer = component.createObject(window || logViewer, {
+                            "logManager": logManager
+                        })
+                        analyzer.open()
+                    } else {
+                        console.error("Error creating LogAnalyzerTool:", component.errorString())
+                    }
+                }
+            }
         }
 
         // Log view area
@@ -152,6 +198,9 @@ Rectangle {
                 delegate: Rectangle {
                     width: logListView.width
                     height: logText.height + 10
+                    // Add a property to store the UID for this log entry
+                    property string messageUid: uid ? uid : ""
+                    
                     color: {
                         if (level === "ERROR" || level === "CRITICAL")
                             return window && window.modeToggled ? "#552222" : "#ffeeee"
@@ -165,7 +214,7 @@ Rectangle {
                     Text {
                         id: logText
                         text: formatted
-                        width: parent.width
+                        width: parent.width - 16  // Leave space for padding
                         wrapMode: Text.Wrap
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
@@ -194,7 +243,7 @@ Rectangle {
                 }
             }
         }
-        
+
         // Status row at bottom
         RowLayout {
             id: statusRow
@@ -273,7 +322,11 @@ Rectangle {
         }
         
         function onFilterLevelChanged(level) {
-            updateStatistics()
+            if (level !== currentFilter) {
+                currentFilter = level
+                filterCombo.currentIndex = filterModel.indexOf(level)
+                refreshLogView()
+            }
         }
         
         function onStatisticsChanged() {
@@ -290,22 +343,11 @@ Rectangle {
     }
     
     Component.onCompleted: {
-        refreshLogView()
-        updateStatistics() // Initial statistics update
+        updateStatistics()
         
         // Force a reload of logs from file
         if (logManager && logManager.reloadLogsFromFile) {
             logManager.reloadLogsFromFile()
-        }
-        
-        // Listen for filter level changes from the LogManager
-        if (logManager) {
-            logManager.filterLevelChanged.connect(function(level) {
-                if (level !== currentFilter) {
-                    currentFilter = level
-                    filterCombo.currentIndex = filterModel.indexOf(level)
-                }
-            })
         }
     }
 }

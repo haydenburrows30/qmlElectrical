@@ -13,6 +13,10 @@ MAX_LOG_SIZE = 10 * 1024 * 1024
 # Number of backup log files to keep
 BACKUP_COUNT = 5
 
+# Global configuration options
+ROOT_CAPTURE_ENABLED = False  # Set to False to prevent double logging
+DEBUG_LOGGING = os.environ.get("QMLTEST_DEBUG_LOGGING", "0") == "1"
+
 # Cache the log directory
 _LOG_DIR = None
 _LOG_DIR_LOCK = threading.Lock()
@@ -101,14 +105,40 @@ def configure_logger(name="qmltest", level=logging.INFO, component=None):
             console_handler.setLevel(logging.WARNING)
             logger.addHandler(console_handler)
         
-        # Allow propagation to the root logger so QLogManager can capture logs
-        logger.propagate = True
+        # IMPORTANT: Disable propagation to the root logger to avoid duplicate logs
+        # This is the key setting that prevents duplicates:
+        logger.propagate = ROOT_CAPTURE_ENABLED  # Set to False
+        
+        # Print debug info if enabled
+        if DEBUG_LOGGING:
+            print(f"Configured logger: {logger_name}, propagate={logger.propagate}")
         
         # Cache the configured logger
         with _LOGGERS_LOCK:
             _LOGGERS[logger_name] = logger
     
     return logger
+
+# Configure root logger to have a higher threshold to reduce noise
+def configure_root_logger():
+    """Configure the root logger with minimal handlers to prevent duplicates."""
+    root_logger = logging.getLogger()
+    
+    # Only set up once
+    if not root_logger.handlers:
+        # Set a higher threshold for the root logger
+        root_logger.setLevel(logging.WARNING)
+        
+        if DEBUG_LOGGING:
+            # Add a minimal console handler for debugging
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter('ROOT: %(levelname)s - %(name)s - %(message)s'))
+            handler.setLevel(logging.DEBUG)
+            root_logger.addHandler(handler)
+            print("Root logger configured with DEBUG handler")
+
+# Configure the root logger immediately
+configure_root_logger()
 
 # Create root application logger
 root_logger = configure_logger()

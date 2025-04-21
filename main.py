@@ -1,6 +1,7 @@
 # Standard library imports
 import sys
 import traceback
+import os
 from pathlib import Path
 
 # Qt imports
@@ -157,6 +158,11 @@ class Application:
 def main():
     """Application entry point."""
     try:
+        # Enable debug logging if requested via command line
+        if "--debug-logging" in sys.argv:
+            os.environ["QMLTEST_DEBUG_LOGGING"] = "1"
+            print("DEBUG LOGGING ENABLED")
+        
         # Log application startup
         logger.info("Application starting...")
         
