@@ -47,7 +47,6 @@ Item {
         
         onAccepted: {
             const fileUrl = fileDialog.file
-            console.log("Original file URL:", fileUrl)
 
             let filePath
             if (fileUrl.toString().startsWith("file:///")) {

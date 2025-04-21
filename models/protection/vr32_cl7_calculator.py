@@ -3,6 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PySide6.QtCore import QObject, Signal, Slot, Property
 
+from utils.logger_config import configure_logger
+
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="vr32")
+
 class VR32CL7Calculator(QObject):
     """
     Calculator for determining R and X values for a VR32 CL-7 voltage regulator
@@ -199,7 +204,7 @@ class VR32CL7Calculator(QObject):
             
             return output_path
         except Exception as e:
-            print(f"Error generating plot: {e}")
+            logger.error(f"Error generating plot: {e}")
             return None
     
     @Slot(str)
@@ -241,10 +246,10 @@ class VR32CL7Calculator(QObject):
             plt.savefig(output_path)
             plt.close()
             
-            print(f"Plot saved to: {output_path}")
+            logger.info(f"Plot saved to: {output_path}")
             return output_path
         except Exception as e:
-            print(f"Error generating plot: {e}")
+            logger.error(f"Error generating plot: {e}")
             return None
     
     @Slot(str)
@@ -301,8 +306,8 @@ class VR32CL7Calculator(QObject):
             plt.savefig(output_path)
             plt.close()
             
-            print(f"Plot saved to: {output_path}")
+            logger.info(f"Plot saved to: {output_path}")
             return output_path
         except Exception as e:
-            print(f"Error generating plot: {e}")
+            logger.error(f"Error generating plot: {e}")
             return None

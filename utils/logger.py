@@ -14,20 +14,6 @@ from .logger_config import configure_logger, get_log_dir, get_log_file
 # Application-wide logger instance
 logger = configure_logger("qmltest")
 
-# Add back the setup_logger function for backward compatibility
-def setup_logger(name="qmltest", level=logging.INFO, component=None):
-    """Configure application-wide logging system.
-    
-    Args:
-        name: Logger name
-        level: Logging level (default: INFO)
-        component: Optional component name for component-specific logging
-    
-    Returns:
-        Logger instance
-    """
-    return configure_logger(name, level, component)
-
 class LogMessage:
     """Simple class to represent a log message."""
     def __init__(self, level, message, timestamp=None):

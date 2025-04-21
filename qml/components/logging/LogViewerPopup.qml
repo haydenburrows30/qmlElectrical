@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-// Import the module using the current directory
-import "."
 
 Dialog {
     id: logViewerPopup
