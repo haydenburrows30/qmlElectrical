@@ -8,6 +8,7 @@ class ConfigBridge(QObject):
     
     # Add signal for settings that can change
     settingChanged = Signal(str, arguments=['key'])
+    darkModeChanged = Signal(bool)
     
     def __init__(self):
         super().__init__()
@@ -15,6 +16,7 @@ class ConfigBridge(QObject):
         self._app_name = self._config.get_setting("app_name", "Default App Name")
         self._version = self._config.get_setting("version", "1.0.0")
         self._style = self._config.get_setting("style", "Test")
+        self._dark_mode = self._config.get_setting("dark_mode", False)
 
         self._system = platform.system()
         self._system_version = platform.version()
@@ -35,6 +37,17 @@ class ConfigBridge(QObject):
     @Property(str, constant=True)
     def style(self):
         return self._style
+    
+    @Property(bool, notify=darkModeChanged)
+    def darkMode(self):
+        return self._dark_mode
+    
+    @darkMode.setter
+    def darkMode(self, value):
+        if self._dark_mode != value:
+            self._dark_mode = value
+            self.save_setting("dark_mode", value)
+            self.darkModeChanged.emit(value)
     
     @Property(str, constant=True)
     def system(self):
@@ -67,6 +80,11 @@ class ConfigBridge(QObject):
         if success:
             # Emit signal to notify of changed setting
             self.settingChanged.emit(key)
+            
+            # Update property if it's a tracked property
+            if key == "dark_mode" and hasattr(self, "_dark_mode"):
+                self._dark_mode = value
+                self.darkModeChanged.emit(value)
         return success
 
     @Slot(str, 'QVariant', result='QVariant')  

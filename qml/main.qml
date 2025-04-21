@@ -21,11 +21,10 @@ ApplicationWindow {
     minimumHeight: 860
     visible: true
 
-    Universal.theme: modeToggled ? Universal.Dark : Universal.Light
+    Universal.theme: appConfig.darkMode ? Universal.Dark : Universal.Light
     Universal.accent: Universal.Cyan
 
-    // property var logManagerInstance: null
-    property bool modeToggled: false
+    property bool modeToggled: appConfig.darkMode
 
     ResultsManager {id: resultsManager}
 
@@ -53,20 +52,6 @@ ApplicationWindow {
         }
     }
 
-    // Timer {
-    //     interval: 200  // Increased to allow UI to stabilize first
-    //     running: true
-    //     repeat: false
-    //     onTriggered: {
-    //         if (typeof logManager !== 'undefined') {
-    //             logManagerInstance = logManager
-    //             logManager.log("INFO", "Application started successfully")
-    //         } else {
-    //             console.error("Log manager not available after timeout")
-    //         }
-    //     }
-    // }
-
     Timer {
         interval: 100
         running: true
@@ -87,6 +72,11 @@ ApplicationWindow {
 
     Component.onCompleted: {
         calculatorLoader.push("pages/Home.qml")
+        
+        // Initialize dark mode from configuration
+        if (typeof appConfig !== 'undefined') {
+            modeToggled = appConfig.darkMode
+        }
         
         // Start monitoring performance (using updated monitor)
         if (typeof perfMonitor !== 'undefined') {
@@ -245,9 +235,13 @@ ApplicationWindow {
                     mode_2: "Dark Mode"
                     implicitHeight: 40
                     implicitWidth: 40
+                    checked: appConfig.darkMode
 
                     onClicked: {
-                        modeButton.checked ? modeToggled = true : modeToggled = false
+                        modeToggled = modeButton.checked
+                        if (typeof appConfig !== 'undefined') {
+                            appConfig.save_setting("dark_mode", modeButton.checked)
+                        }
                     }
                 }
             }
