@@ -19,8 +19,10 @@ Dialog {
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     
     property var logManager: null
+    property var lastOpenTime: 0
     
     LogViewer {
+        id: logViewerComponent
         anchors.fill: parent
         logManager: logViewerPopup.logManager
         anchors.margins: 1
@@ -34,8 +36,15 @@ Dialog {
     }
     
     onOpened: {
-        if (logManager) {
+        // Add debouncing to prevent duplicate logs - check time since last open
+        var currentTime = Date.now()
+        if (logManager && (currentTime - lastOpenTime > 2000)) { // 2 seconds debounce
             logManager.log("INFO", "Log viewer opened by user")
+            lastOpenTime = currentTime
         }
+    }
+    
+    Component.onCompleted: {
+        // Remove debug log
     }
 }

@@ -7,7 +7,7 @@ from .file_utils import FileUtils
 from utils.pdf_generator_volt_drop import PDFGenerator
 from .data_manager import DataManager
 
-# Setup component-specific logger
+# Setup component-specific logger (will now log to the shared log file)
 logger = configure_logger("qmltest", component="voltdrop")
 
 class VoltageDropCalculator(QObject):
@@ -271,7 +271,6 @@ class VoltageDropCalculator(QObject):
             self._num_houses = num_houses
             # Force refresh diversity factor from database
             self._diversity_factor = self._data_manager.get_diversity_factor(num_houses)
-            # print(f"Set number of houses to {num_houses}, new diversity factor: {self._diversity_factor}")
             self.numberOfHousesChanged.emit(num_houses)
             self.diversityFactorChanged.emit()
             # Recalculate with new factor
@@ -589,7 +588,6 @@ class VoltageDropCalculator(QObject):
             logger.info("\n=== Voltage Drop Calculations Complete ===\n")
             
         except Exception as e:
-            print(f"Error in calculations: {str(e)}")
             logger.error(f"Error calculating voltage drops: {e}")
             logger.exception(e)
 

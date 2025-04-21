@@ -17,6 +17,7 @@ Rectangle {
     property bool autoScroll: true
     property var filterModel: ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     property string currentFilter: "INFO"
+    property string componentFilter: "" // New property for component filtering
 
     function refreshLogView() {
         if (logManager) {
@@ -77,7 +78,33 @@ Rectangle {
             }
 
             Item { 
-                width: 20
+                width: 10
+                height: 1 
+            }
+            
+            Label {
+                text: "Component:"
+                color: textColor
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: 14
+            }
+            
+            TextField {
+                id: componentFilterField
+                placeholderText: "Filter by component"
+                width: 120
+                text: componentFilter
+                anchors.verticalCenter: parent.verticalCenter
+                onTextChanged: {
+                    componentFilter = text
+                    if (logManager) {
+                        refreshLogView()
+                    }
+                }
+            }
+
+            Item { 
+                width: 10
                 height: 1 
             }
 
@@ -117,13 +144,6 @@ Rectangle {
                     }
                 }
             }
-            
-            Button {
-                text: "Export All"
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: exportFileDialog.open()
-                ToolTip.text: "Export complete log history"
-            }
         }
 
         // Log view area
@@ -147,14 +167,23 @@ Rectangle {
                 model: logManager ? logManager.model : null
                 clip: true
                 
+                // Add a placeholder text when there are no logs
+                Text {
+                    anchors.centerIn: parent
+                    text: "No log entries to display"
+                    visible: logListView.count === 0
+                    color: textColor
+                    font.pixelSize: 14
+                }
+                
                 delegate: Rectangle {
                     width: logListView.width
                     height: logText.height + 10
                     color: {
                         if (level === "ERROR" || level === "CRITICAL")
-                            return window.modeToggled ? "#552222" : "#ffeeee"
+                            return window && window.modeToggled ? "#552222" : "#ffeeee"
                         else if (level === "WARNING")
-                            return window.modeToggled ? "#554422" : "#fff8e8"
+                            return window && window.modeToggled ? "#554422" : "#fff8e8"
                         else
                             return "transparent"
                     }
@@ -172,11 +201,23 @@ Rectangle {
                         font.family: "Courier New, Courier, monospace"
                         color: {
                             if (level === "ERROR" || level === "CRITICAL")
-                                return window.modeToggled ? "#ff6666" : "#990000"
+                                return window && window.modeToggled ? "#ff6666" : "#990000"
                             else if (level === "WARNING")
-                                return window.modeToggled ? "#ffcc66" : "#996600"
+                                return window && window.modeToggled ? "#ffcc66" : "#996600"
                             else
-                                return window.modeToggled ? "white" : "black"
+                                return window && window.modeToggled ? "white" : "black"
+                        }
+                        
+                        // Highlight component name in square brackets if it matches the filter
+                        Component.onCompleted: {
+                            if (componentFilter && componentFilter !== "") {
+                                // If there's a component filter, highlight matching components
+                                let regex = new RegExp("\\[" + componentFilter + "\\]", "i") // Case insensitive
+                                if (regex.test(text)) {
+                                    // This text contains the filtered component
+                                    parent.color = window && window.modeToggled ? "#223344" : "#e8f0ff"
+                                }
+                            }
                         }
                     }
                 }
@@ -188,17 +229,7 @@ Rectangle {
                     if (autoScroll) {
                         positionViewAtEnd()
                     }
-                }
-
-                // Change this to observe the filterLevel property
-                Connections {
-                    target: logManager
-                    function onFilterLevelChanged() {
-                        if (autoScroll) {
-                            logListView.positionViewAtEnd()
-                        }
-                        updateStatistics()
-                    }
+                    updateStatistics()
                 }
             }
         }
@@ -276,23 +307,35 @@ Rectangle {
     Connections {
         target: logManager
         
-        function onLogCountChanged() {
+        function onLogCountChanged(count) {
             updateStatistics()
         }
         
-        function onFilterLevelChanged() {
+        function onFilterLevelChanged(level) {
             updateStatistics()
         }
         
-        // Connect to the statistics changed signal
         function onStatisticsChanged() {
             updateStatistics()
+        }
+        
+        function onNewLogMessage(level, message) {
+            // Force ListView to re-evaluate count
+            logListView.forceLayout()
+            if (autoScroll) {
+                logListView.positionViewAtEnd()
+            }
         }
     }
     
     Component.onCompleted: {
         refreshLogView()
         updateStatistics() // Initial statistics update
+        
+        // Force a reload of logs from file
+        if (logManager && logManager.reloadLogsFromFile) {
+            logManager.reloadLogsFromFile()
+        }
         
         // Listen for filter level changes from the LogManager
         if (logManager) {

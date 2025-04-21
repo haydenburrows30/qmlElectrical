@@ -122,6 +122,10 @@ class AsyncLogHandler(logging.Handler):
     def add_handler(self, handler):
         """Add a handler that will process log records."""
         self._handlers.append(handler)
+    
+    def addFilter(self, filter):
+        """Add a filter to the handler."""
+        super().addFilter(filter)
         
     def emit(self, record):
         """Put log record in queue instead of emitting directly."""
@@ -229,8 +233,35 @@ class QLogManager(QObject):
         self._handler.setFormatter(logging.Formatter('%(message)s'))
         self._async_handler.add_handler(self._handler)
         
-        # Add the async handler to the logger
-        self._logger.addHandler(self._async_handler)
+        # Add the async handler to the logger only if not already added
+        handler_already_added = False
+        for handler in self._logger.handlers:
+            if isinstance(handler, AsyncLogHandler):
+                handler_already_added = True
+                break
+        
+        if not handler_already_added:
+            self._logger.addHandler(self._async_handler)
+            
+        # Also add our async handler to the root logger to capture all component logs
+        root_logger = logging.getLogger()
+        root_handler_added = False
+        for handler in root_logger.handlers:
+            if isinstance(handler, AsyncLogHandler):
+                root_handler_added = True
+                break
+                
+        if not root_handler_added:
+            # Create a filter to only handle qmltest.* logs
+            class QmlTestFilter(logging.Filter):
+                def filter(self, record):
+                    return record.name.startswith('qmltest')
+            
+            # Add filter to our handler
+            self._async_handler.addFilter(QmlTestFilter())
+            
+            # Add the handler to the root logger to capture all component logs
+            root_logger.addHandler(self._async_handler)
         
         self._count = 0
         self._filter_level = "INFO"  # Default filter level
@@ -249,9 +280,106 @@ class QLogManager(QObject):
         # Add throttling for statistics updates
         self._last_stats_update = time.time()
         self._stats_throttle_interval = 0.5  # Only update stats every 0.5 seconds
+        
+        # Add deduplication cache to prevent duplicate log messages in quick succession
+        # Reduce timeout to allow more frequent messages
+        self._dedup_cache = {}
+        self._dedup_timeout = 0.5  # Reduce from 2.0 to 0.5 seconds
+        
+        # Force initial rebuild of the model with existing logs
+        # Get the last 500 log entries from any existing handlers
+        self._load_existing_logs()
+    
+    def _load_existing_logs(self):
+        """Load existing logs from log file to populate the initial view."""
+        try:
+            log_file = get_log_file()
+            if not os.path.exists(log_file):
+                return
+                
+            # Read the last 500 lines from the log file
+            lines = []
+            with open(log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                lines = lines[-500:] if len(lines) > 500 else lines
+            
+            # Parse and add log entries
+            for line in lines:
+                try:
+                    # Simple parsing of standard log format
+                    parts = line.strip().split(' - ', 3)
+                    if len(parts) >= 3:
+                        timestamp_str = parts[0]
+                        logger_name = parts[1]
+                        level_message = parts[2].split(' ', 1)
+                        
+                        if len(level_message) >= 2:
+                            level = level_message[0]
+                            message = level_message[1]
+                            
+                            # Create a more informative message that includes the component
+                            if logger_name != "qmltest":
+                                component = logger_name.replace("qmltest.", "")
+                                enriched_message = f"[{component}] {message}"
+                            else:
+                                enriched_message = message
+                            
+                            # Add to history
+                            timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S,%f')
+                            self._all_logs.append((level, enriched_message, timestamp))
+                except Exception:
+                    # Skip lines that can't be parsed
+                    continue
+            
+            # Build the model with loaded logs
+            self._rebuildModelWithFilter()
+            
+        except Exception as e:
+            logger.error(f"Error loading existing logs: {e}")
     
     def handle_log(self, level, message):
         """Process a log message from the handler."""
+        # Handle component-specific log entries
+        if '.' in level:
+            # This is a special case for older formatting - parse it out
+            parts = level.split('.')
+            level = parts[-1]  # Last part should be the level
+            component = '.'.join(parts[:-1])  # Earlier parts form the component name
+            message = f"[{component}] {message}"
+        
+        # Extract component from logger name in message if possible
+        if hasattr(message, 'split') and ' - ' in message:
+            try:
+                parts = message.split(' - ')
+                if len(parts) >= 3:
+                    component = parts[1].replace('qmltest.', '')
+                    if component and component != 'qmltest':
+                        # Format component logs with component name in brackets
+                        message = f"[{component}] {parts[2]}"
+                    else:
+                        message = parts[2]  # Main component, just use the message
+            except Exception:
+                # If parsing fails, just use original message
+                pass
+            
+        # Deduplicate messages that are identical and arrive within a short time window
+        current_time = time.time()
+        dedup_key = f"{level}:{message}"
+        
+        if dedup_key in self._dedup_cache:
+            last_time = self._dedup_cache[dedup_key]
+            if current_time - last_time < self._dedup_timeout:
+                # Skip this duplicate message but allow more frequent duplicates
+                return
+        
+        # Update deduplication cache
+        self._dedup_cache[dedup_key] = current_time
+        
+        # Cleanup old cache entries
+        for key in list(self._dedup_cache.keys()):
+            if current_time - self._dedup_cache[key] > self._dedup_timeout:
+                del self._dedup_cache[key]
+        
         # Store every log message for filtering later
         timestamp = datetime.now()  # Add timestamp when message is received
         self._all_logs.append((level, message, timestamp))
@@ -262,7 +390,6 @@ class QLogManager(QObject):
             self._pending_logs.append((level, message))
         
         # Throttle statistics updates to reduce UI overhead
-        current_time = time.time()
         if current_time - self._last_stats_update > self._stats_throttle_interval:
             self.statisticsChanged.emit()
             self._last_stats_update = current_time
@@ -372,6 +499,13 @@ class QLogManager(QObject):
             self._logger.error(message)
         elif level == "CRITICAL":
             self._logger.critical(message)
+            
+        # Force immediate processing of this message in UI
+        if self._should_show_message(level):
+            self._model.add_message(level, message)
+            self._count += 1
+            self.newLogMessage.emit(level, message)
+            self.logCountChanged.emit(self._count)
     
     @Property(QObject, notify=modelChanged)
     def model(self):
@@ -491,13 +625,6 @@ class QLogManager(QObject):
         except Exception as e:
             logger.error(f"Error exporting logs: {e}")
     
-    @Slot(str, result=str)
-    def getComponentLogPath(self, component):
-        """Get path to a component-specific log file."""
-        if not component:
-            return self.getLogFilePath()
-        return str(get_log_file(component))
-    
     @Slot(result=str)
     def getLogFilePath(self):
         """Get the path to the current log file."""
@@ -526,3 +653,11 @@ class QLogManager(QObject):
         """Get statistics about log history."""
         total_logs = len(self._all_logs)
         return f"Total log history: {total_logs}/{self._max_log_history}"
+    
+    @Slot()
+    def reloadLogsFromFile(self):
+        """Reload logs from log file."""
+        self._all_logs.clear()
+        self._load_existing_logs()
+        self.statisticsChanged.emit()
+        return True

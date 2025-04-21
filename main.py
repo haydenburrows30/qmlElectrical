@@ -94,10 +94,9 @@ class Application:
     def load_qml(self):
         """Load main QML file and register context properties."""
         # Create and expose log manager to QML
-        # We need this as a context property for direct access from QML and Python code
         self.log_manager = QLogManager()
         self.qml_engine.rootContext().setContextProperty("logManager", self.log_manager)
-        
+
         # Use ConfigBridge to expose app config to QML instead of direct exposure
         self.config_bridge = ConfigBridge()
         self.qml_engine.rootContext().setContextProperty("appConfig", self.config_bridge)
