@@ -24,6 +24,23 @@ Rectangle {
         }
     }
 
+    // Function to update statistics text
+    function updateStatistics() {
+        if (logManager) {
+            statusLogCount.text = logManager.count ? "Log count: " + logManager.count : "Log count: 0"
+            
+            let stats = "";
+            if (logManager.getLogStats) {
+                stats = logManager.getLogStats();
+            }
+            if (logManager.getHistoryStats) {
+                if (stats) stats += " | ";
+                stats += logManager.getHistoryStats();
+            }
+            statusLogStats.text = stats;
+        }
+    }
+
     // Use Item instead of ColumnLayout to avoid recursion
     Item {
         id: mainContainer
@@ -52,8 +69,10 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 
                 onCurrentTextChanged: {
-                    currentFilter = currentText
-                    refreshLogView()
+                    if (currentText !== currentFilter) {
+                        currentFilter = currentText
+                        refreshLogView()
+                    }
                 }
             }
 
@@ -78,6 +97,7 @@ Rectangle {
                 onClicked: {
                     if (logManager) {
                         logManager.clearLogs()
+                        updateStatistics()
                     }
                 }
             }
@@ -96,6 +116,13 @@ Rectangle {
                         logManager.openLogFile()
                     }
                 }
+            }
+            
+            Button {
+                text: "Export All"
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: exportFileDialog.open()
+                ToolTip.text: "Export complete log history"
             }
         }
 
@@ -162,32 +189,42 @@ Rectangle {
                         positionViewAtEnd()
                     }
                 }
+
+                // Change this to observe the filterLevel property
+                Connections {
+                    target: logManager
+                    function onFilterLevelChanged() {
+                        if (autoScroll) {
+                            logListView.positionViewAtEnd()
+                        }
+                        updateStatistics()
+                    }
+                }
             }
         }
         
         // Status row at bottom
-        Row {
+        RowLayout {
             id: statusRow
             width: parent.width
             height: 20
             anchors.bottom: parent.bottom
             
             Label {
+                id: statusLogCount
                 text: logManager && logManager.count ? "Log count: " + logManager.count : "Log count: 0"
                 color: textColor
                 font.pixelSize: 12
-                width: parent.width / 2
+                Layout.minimumWidth: 80
             }
             
-            Item { width: 20; height: 1 }
-            
             Label {
-                text: logManager && logManager.getLogStats ? logManager.getLogStats() : ""
+                id: statusLogStats
+                text: ""  // Will be set by updateStatistics()
                 color: textColor
                 font.pixelSize: 12
-                elide: Text.ElideRight
-                width: parent.width / 2 - 20
-                horizontalAlignment: Text.AlignRight
+                Layout.minimumWidth: 200
+                Layout.alignment: Qt.AlignRight
             }
         }
     }
@@ -219,7 +256,52 @@ Rectangle {
         }
     }
     
+    FileDialog {
+        id: exportFileDialog
+        title: "Export All Log History"
+        nameFilters: ["Text files (*.txt)", "All files (*)"]
+        fileMode: FileDialog.SaveFile
+        
+        onAccepted: {
+            if (logManager && logManager.exportAllLogs) {
+                if (logManager.exportAllLogs(selectedFile)) {
+                    console.log("Full log history exported successfully");
+                } else {
+                    console.error("Failed to export log history");
+                }
+            }
+        }
+    }
+    
+    Connections {
+        target: logManager
+        
+        function onLogCountChanged() {
+            updateStatistics()
+        }
+        
+        function onFilterLevelChanged() {
+            updateStatistics()
+        }
+        
+        // Connect to the statistics changed signal
+        function onStatisticsChanged() {
+            updateStatistics()
+        }
+    }
+    
     Component.onCompleted: {
         refreshLogView()
+        updateStatistics() // Initial statistics update
+        
+        // Listen for filter level changes from the LogManager
+        if (logManager) {
+            logManager.filterLevelChanged.connect(function(level) {
+                if (level !== currentFilter) {
+                    currentFilter = level
+                    filterCombo.currentIndex = filterModel.indexOf(level)
+                }
+            })
+        }
     }
 }

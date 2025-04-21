@@ -6,42 +6,65 @@ import logging
 import logging.handlers
 from datetime import datetime
 from pathlib import Path
+import threading
 
 # Maximum log file size (10 MB)
 MAX_LOG_SIZE = 10 * 1024 * 1024
 # Number of backup log files to keep
 BACKUP_COUNT = 5
 
+# Cache the log directory
+_LOG_DIR = None
+_LOG_DIR_LOCK = threading.Lock()
+
 def get_log_dir():
     """Get the log directory path."""
-    base_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    log_dir = base_dir / 'logs'
-    log_dir.mkdir(exist_ok=True)
-    return log_dir
+    global _LOG_DIR
+    
+    if _LOG_DIR is None:
+        with _LOG_DIR_LOCK:
+            if _LOG_DIR is None:  # Double-check to prevent race conditions
+                base_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                _LOG_DIR = base_dir / 'logs'
+                _LOG_DIR.mkdir(exist_ok=True)
+    
+    return _LOG_DIR
+
+# Cache log file paths to avoid repeated calculations
+_LOG_FILES = {}
+_LOG_FILES_LOCK = threading.Lock()
 
 def get_log_file(name=None):
     """Get the log file path with optional component name."""
-    log_dir = get_log_dir()
-    if name:
-        # Create component-specific log file
-        return log_dir / f"{name}_{datetime.now().strftime('%Y%m%d')}.log"
-    else:
-        # Create main application log file
-        return log_dir / f"app_{datetime.now().strftime('%Y%m%d')}.log"
+    date_key = datetime.now().strftime('%Y%m%d')
+    cache_key = f"{name}_{date_key}" if name else f"app_{date_key}"
+    
+    with _LOG_FILES_LOCK:
+        if cache_key not in _LOG_FILES:
+            log_dir = get_log_dir()
+            if name:
+                # Create component-specific log file
+                _LOG_FILES[cache_key] = log_dir / f"{name}_{date_key}.log"
+            else:
+                # Create main application log file
+                _LOG_FILES[cache_key] = log_dir / f"app_{date_key}.log"
+    
+    return _LOG_FILES[cache_key]
+
+# Cache loggers to avoid duplicating setup
+_LOGGERS = {}
+_LOGGERS_LOCK = threading.Lock()
 
 def configure_logger(name="qmltest", level=logging.INFO, component=None):
-    """Configure a logger with standard settings.
-    
-    Args:
-        name: Base logger name (default: "qmltest")
-        level: Logging level (default: INFO)
-        component: Optional component name for specialized loggers
-    
-    Returns:
-        Logger instance
-    """
+    """Configure a logger with standard settings."""
     # Create a unique logger name if component is specified
     logger_name = f"{name}.{component}" if component else name
+    
+    # Use cached logger if available
+    with _LOGGERS_LOCK:
+        if logger_name in _LOGGERS:
+            return _LOGGERS[logger_name]
+    
     logger = logging.getLogger(logger_name)
     
     # Only configure if this logger hasn't been set up already
@@ -80,6 +103,10 @@ def configure_logger(name="qmltest", level=logging.INFO, component=None):
         console_handler.setFormatter(console_formatter)
         console_handler.setLevel(logging.WARNING)
         logger.addHandler(console_handler)
+        
+        # Cache the configured logger
+        with _LOGGERS_LOCK:
+            _LOGGERS[logger_name] = logger
     
     return logger
 

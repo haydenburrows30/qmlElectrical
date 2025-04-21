@@ -4,7 +4,9 @@ import subprocess
 import platform
 import queue
 import threading
+import time
 from datetime import datetime
+from collections import deque
 from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractListModel, QByteArray, Qt, QModelIndex, QTimer
 
 from .logger_config import configure_logger, get_log_dir, get_log_file
@@ -114,6 +116,8 @@ class AsyncLogHandler(logging.Handler):
         # Add processing statistics
         self._processed_count = 0
         self._dropped_count = 0
+        self._last_stats_time = time.time()
+        self._stats_update_interval = 1.0  # Update stats max once per second
     
     def add_handler(self, handler):
         """Add a handler that will process log records."""
@@ -128,7 +132,7 @@ class AsyncLogHandler(logging.Handler):
         except queue.Full:
             # If queue is full, just drop the message but track it
             self._dropped_count += 1
-            if self._dropped_count % 100 == 0:
+            if self._dropped_count % 100 == 0:  # Only log every 100 drops to reduce spam
                 print(f"WARNING: Dropped {self._dropped_count} log messages due to full queue")
     
     def start_processing(self):
@@ -168,9 +172,18 @@ class AsyncLogHandler(logging.Handler):
         self.stop()
         super().close()
     
-    # Add method to get statistics
     def get_stats(self):
         """Get statistics about log processing."""
+        current_time = time.time()
+        if current_time - self._last_stats_time > self._stats_update_interval:
+            self._last_stats_time = current_time
+            return {
+                "processed": self._processed_count,
+                "dropped": self._dropped_count,
+                "queue_size": self.log_queue.qsize()
+            }
+        # Instead of returning an empty dict, always return the stats
+        # but don't update the timestamp
         return {
             "processed": self._processed_count,
             "dropped": self._dropped_count,
@@ -197,6 +210,8 @@ class QLogManager(QObject):
     newLogMessage = Signal(str, str)  # level, message
     logCountChanged = Signal(int)  # total log count
     modelChanged = Signal()  # Add signal for model property
+    filterLevelChanged = Signal(str)  # Add signal for filter level changes
+    statisticsChanged = Signal()  # New signal for statistics updates
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -220,19 +235,37 @@ class QLogManager(QObject):
         self._count = 0
         self._filter_level = "INFO"  # Default filter level
         
+        # Store all logs to allow refiltering - use deque with max length for better performance
+        self._max_log_history = 10000  # Set a reasonable limit for history
+        self._all_logs = deque(maxlen=self._max_log_history)
+        
         # Use a timer to update the model regularly to avoid UI freezes
         self._pending_logs = []
         self._update_timer = QTimer()
         self._update_timer.setInterval(100)  # 100ms update interval
         self._update_timer.timeout.connect(self._process_pending_logs)
         self._update_timer.start()
+        
+        # Add throttling for statistics updates
+        self._last_stats_update = time.time()
+        self._stats_throttle_interval = 0.5  # Only update stats every 0.5 seconds
     
     def handle_log(self, level, message):
         """Process a log message from the handler."""
+        # Store every log message for filtering later
+        timestamp = datetime.now()  # Add timestamp when message is received
+        self._all_logs.append((level, message, timestamp))
+        
         # Check if this message passes the current filter level
         if self._should_show_message(level):
             # Queue the message to be processed by the UI thread
             self._pending_logs.append((level, message))
+        
+        # Throttle statistics updates to reduce UI overhead
+        current_time = time.time()
+        if current_time - self._last_stats_update > self._stats_throttle_interval:
+            self.statisticsChanged.emit()
+            self._last_stats_update = current_time
     
     def _should_show_message(self, level):
         """Determine if a message should be shown based on the current filter level."""
@@ -261,24 +294,69 @@ class QLogManager(QObject):
         
         # Only emit count changed signal once per batch
         self.logCountChanged.emit(self._count)
+        
+        # Throttle statistics updates
+        current_time = time.time()
+        if current_time - self._last_stats_update > self._stats_throttle_interval:
+            self.statisticsChanged.emit()
+            self._last_stats_update = current_time
     
     @Slot(str)
     def setFilterLevel(self, level):
         """Set the minimum log level to display."""
-        if level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
+        if level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] and level != self._filter_level:
+            old_level = self._filter_level
             self._filter_level = level
+            self.filterLevelChanged.emit(level)
+            
+            # Clear and rebuild the model with the new filter
+            self._rebuildModelWithFilter()
+            self.statisticsChanged.emit()  # Emit after filter change
     
-    @Property(str)
-    def filterLevel(self):
-        """Get the current filter level."""
-        return self._filter_level
+    def _rebuildModelWithFilter(self):
+        """Rebuild the model using the current filter level."""
+        # Clear existing logs in the UI model
+        self._model.clear()
+        self._count = 0
+        
+        # Rebuild the model with all stored logs that pass the current filter
+        if self._all_logs:
+            filtered_logs = []
+            max_display_logs = 1000  # Limit displayed logs for performance
+            
+            # Filter logs that pass the current level
+            for level, message, timestamp in self._all_logs:
+                if self._should_show_message(level):
+                    filtered_logs.append((level, message, timestamp))
+                    if len(filtered_logs) >= max_display_logs:
+                        break
+            
+            # Sort logs by newest first (they're appended in chronological order)
+            filtered_logs.reverse()
+            
+            # Display the filtered logs
+            for level, message, _ in filtered_logs:
+                self._model.add_message(level, message)
+                self._count += 1
+            
+            self.logCountChanged.emit(self._count)
+            
+            # Inform user if logs were truncated
+            if len(filtered_logs) == max_display_logs and len(self._all_logs) > max_display_logs:
+                self._model.add_message("INFO", f"Showing {max_display_logs} most recent logs of {len(self._all_logs)} total logs")
+                self._count += 1
+                self.logCountChanged.emit(self._count)
     
     @Slot()
     def clearLogs(self):
         """Clear all log messages."""
         self._model.clear()
         self._count = 0
+        # Also clear all stored logs
+        self._all_logs.clear()
+        self._pending_logs = []
         self.logCountChanged.emit(self._count)
+        self.statisticsChanged.emit()  # Emit after clearing logs
     
     @Slot(str, str)
     def log(self, level, message):
@@ -295,7 +373,6 @@ class QLogManager(QObject):
         elif level == "CRITICAL":
             self._logger.critical(message)
     
-    # Fix the model property to return a QObject instead of QAbstractListModel
     @Property(QObject, notify=modelChanged)
     def model(self):
         """Get the log messages model."""
@@ -367,6 +444,53 @@ class QLogManager(QObject):
         thread.start()
         return True
     
+    @Slot(str, result=bool)
+    def exportAllLogs(self, filePath):
+        """Export all logs to a file, not just filtered ones."""
+        # Start export in a separate thread to avoid blocking UI
+        export_thread = threading.Thread(
+            target=self._export_logs_thread,
+            args=(filePath,)
+        )
+        export_thread.daemon = True
+        export_thread.start()
+        return True
+    
+    def _export_logs_thread(self, filePath):
+        """Thread worker for exporting logs."""
+        try:
+            # Convert QUrl to local path if needed
+            if hasattr(filePath, 'isLocalFile') and filePath.isLocalFile():
+                path = filePath.toLocalFile()
+            else:
+                path = str(filePath).replace('file://', '')
+            
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+            
+            # Make a copy of logs to prevent modification during export
+            with threading.Lock():
+                all_logs_list = list(self._all_logs)
+            
+            # Write all logs to file in chronological order
+            with open(path, 'w', encoding='utf-8') as f:
+                # Sort by timestamp (third element in tuple)
+                all_logs_list.sort(key=lambda x: x[2])
+                
+                # Write logs in chunks to avoid memory spikes
+                chunk_size = 1000
+                for i in range(0, len(all_logs_list), chunk_size):
+                    chunk = all_logs_list[i:i+chunk_size]
+                    for level, message, timestamp in chunk:
+                        time_str = timestamp.strftime("%H:%M:%S")
+                        f.write(f"[{time_str}] {level}: {message}\n")
+            
+            # Signal completion on the main thread
+            self.statisticsChanged.emit()
+            
+        except Exception as e:
+            logger.error(f"Error exporting logs: {e}")
+    
     @Slot(str, result=str)
     def getComponentLogPath(self, component):
         """Get path to a component-specific log file."""
@@ -389,7 +513,16 @@ class QLogManager(QObject):
         """Get statistics about logging system."""
         if hasattr(self, '_async_handler'):
             stats = self._async_handler.get_stats()
-            return (f"Logs processed: {stats['processed']}, "
-                    f"dropped: {stats['dropped']}, "
-                    f"queue size: {stats['queue_size']}")
+            # Add defensive check for stats keys to avoid KeyError
+            if stats and all(k in stats for k in ["processed", "dropped", "queue_size"]):
+                return (f"Logs processed: {stats['processed']}, "
+                        f"dropped: {stats['dropped']}, "
+                        f"queue size: {stats['queue_size']}")
+            return "Log statistics updating..."
         return "Log statistics not available"
+    
+    @Slot(result=str)
+    def getHistoryStats(self):
+        """Get statistics about log history."""
+        total_logs = len(self._all_logs)
+        return f"Total log history: {total_logs}/{self._max_log_history}"
