@@ -1,5 +1,6 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
+import json
 from utils.logger_config import configure_logger
 
 from .table_model import VoltageDropTableModel
@@ -508,6 +509,138 @@ class VoltageDropCalculator(QObject):
             error_msg = f"Error exporting table data: {e}"
             logger.error(error_msg)
             self.tableExportStatusChanged.emit(False, error_msg)
+            return False
+
+    @Slot(str)
+    def exportChartDataJSON(self, data_str):
+        """Export chart data as JSON."""
+        try:
+            data = json.loads(data_str)
+            filepath = self._file_utils.get_save_filepath("json", "voltage_drop_chart")
+            if filepath:
+                result = self._file_utils.save_json(filepath, data)
+                if result:
+                    self.tableExportStatusChanged.emit(True, "Chart data exported to JSON")
+                else:
+                    self.tableExportStatusChanged.emit(False, "Failed to export chart data")
+        except Exception as e:
+            self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
+
+    @Slot(str)
+    def exportChartDataCSV(self, data_str):
+        """Export chart data as CSV."""
+        try:
+            data = json.loads(data_str)
+            filepath = self._file_utils.get_save_filepath("csv", "voltage_drop_chart")
+            if filepath:
+                # Convert to DataFrame format
+                current_point = pd.DataFrame([{
+                    'Cable Size': data['currentPoint']['cableSize'],
+                    'Voltage Drop %': data['currentPoint']['dropPercentage'],
+                    'Current (A)': data['currentPoint']['current'],
+                    'Type': 'Current Selection'
+                }])
+                
+                comparison_points = pd.DataFrame([{
+                    'Cable Size': p['cableSize'],
+                    'Voltage Drop %': p['dropPercent'],
+                    'Type': p['status']
+                } for p in data['comparisonPoints']])
+                
+                df = pd.concat([current_point, comparison_points], ignore_index=True)
+                result = self._file_utils.save_csv(filepath, df)
+                if result:
+                    self.tableExportStatusChanged.emit(True, "Chart data exported to CSV")
+                else:
+                    self.tableExportStatusChanged.emit(False, "Failed to export chart data")
+        except Exception as e:
+            self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
+
+    def _convert_qjsvalue_to_dict(self, qjsvalue):
+        """Convert QJSValue to Python dictionary."""
+        try:
+            # Convert QJSValue to QVariant then to Python dict
+            result = {}
+            if hasattr(qjsvalue, 'toVariant'):
+                # For QJSValue objects
+                data = qjsvalue.toVariant()
+            else:
+                # For QVariant objects
+                data = qjsvalue
+                
+            # Convert to dictionary
+            if isinstance(data, dict):
+                for key, value in data.items():
+                    result[key] = value
+            return result
+        except Exception as e:
+            logger.error(f"Error converting QJSValue to dict: {e}")
+            return {}
+
+    @Slot(str, 'QVariant')
+    def exportDetailsToPDF(self, filepath, details):
+        """Export calculation details to PDF."""
+        try:
+            if not filepath:
+                filepath = self._file_utils.get_save_filepath("pdf", "voltage_drop_details")
+                if not filepath:
+                    self.pdfExportStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Convert QJSValue to Python dictionary
+            details_dict = self._convert_qjsvalue_to_dict(details)
+            
+            # Generate PDF with converted dictionary
+            result = self._pdf_generator.generate_details_pdf(filepath, details_dict)
+            return result
+            
+        except Exception as e:
+            error_msg = f"Error exporting PDF: {e}"
+            logger.error(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    @Slot(str)
+    def exportTableToPDF(self, filepath):
+        """Export table data to PDF."""
+        try:
+            if not filepath:
+                filepath = self._file_utils.get_save_filepath("pdf", "voltage_drop_table")
+                if not filepath:
+                    self.tablePdfExportStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Get table data and format it for PDF
+            if not self._table_model or not self._table_model._data:
+                self.tablePdfExportStatusChanged.emit(False, "No table data to export")
+                return False
+                
+            table_data = {
+                'data': self._table_model._data,
+                'headers': ['Size (mm²)', 'Material', 'Cores', 'mV/A/m', 'Rating (A)', 
+                          'Voltage Drop (V)', 'Drop (%)', 'Status']
+            }
+            
+            # Create metadata for PDF
+            metadata = {
+                "System Voltage": self._selected_voltage,
+                "Current": f"{self._current:.1f} A",
+                "Length": f"{self._length:.1f} m",
+                "Installation Method": self._installation_method,
+                "Temperature": f"{self._temperature:.1f} °C",
+                "Grouping Factor": f"{self._grouping_factor:.2f}",
+                "ADMD Enabled": 'Yes' if self._admd_enabled else 'No',
+                "Diversity Factor": f"{self._diversity_factor:.3f}"
+            }
+            
+            # Generate PDF using the PDFGenerator
+            result = self._pdf_generator.generate_table_pdf(filepath, table_data, metadata)
+            return result
+            
+        except Exception as e:
+            error_msg = f"Error exporting PDF: {e}"
+            logger.error(error_msg)
+            self.tablePdfExportStatusChanged.emit(False, error_msg)
             return False
 
     def _calculate_voltage_drop(self):

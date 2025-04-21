@@ -599,12 +599,16 @@ Item {
                 dropPercentage: chartComponent.percentage,
                 current: chartComponent.currentValue
             },
-            comparisonPoints: chartComponent.comparisonPoints
+            comparisonPoints: chartComponent.comparisonPoints.map(point => ({
+                cableSize: point.cableSize,
+                dropPercent: point.dropPercent,
+                status: point.status
+            }))
         }
         
         if (format === "csv") {
             voltageDrop.exportChartDataCSV(JSON.stringify(data))
-        } else {
+        } else if (format === "json") {
             voltageDrop.exportChartDataJSON(JSON.stringify(data))
         }
     }
