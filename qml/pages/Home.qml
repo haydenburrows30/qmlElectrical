@@ -10,16 +10,12 @@ import "../components"
 import "../components/buttons/"
 import "../components/popups"
 
-import ConfigBridge 1.0
-
 Page {
     id: home
 
-    property ConfigBridge calculator: ConfigBridge {}
-
     About {
         id: about
-        configBridge: home.calculator
+        configBridge: appConfig
     }
 
     WhatsNew {
@@ -323,7 +319,7 @@ Page {
         Button {
             id: aboutProgram
             contentItem: Label {
-                text: calculator.version
+                text: appConfig.version
                 color: window.modeToggled ? "white" : "black"
             }
             font.pixelSize: 14

@@ -10,6 +10,7 @@ class LightweightPerformanceMonitor(QObject):
     renderTimeChanged = Signal(float)
     memoryUsageChanged = Signal(float)
     cpuUsageChanged = Signal(float)
+    enabledChanged = Signal(bool)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -19,6 +20,7 @@ class LightweightPerformanceMonitor(QObject):
         self._render_time = 0.0
         self._memory_usage = 0.0
         self._cpu_usage = 0.0
+        self._enabled = True
         
         # Frame counting
         self._frame_counter = 0
@@ -45,16 +47,22 @@ class LightweightPerformanceMonitor(QObject):
     @Slot()
     def frameRendered(self):
         """Called when a frame is rendered"""
+        if not self._enabled:
+            return
         self._frame_counter += 1
     
     @Slot()
     def beginRenderTiming(self):
         """Start timing a render operation"""
+        if not self._enabled:
+            return
         self._render_timer.restart()
     
     @Slot()
     def endRenderTiming(self):
         """End timing a render operation"""
+        if not self._enabled:
+            return
         elapsed = self._render_timer.elapsed()
         
         # Keep a rolling window of render times
@@ -71,6 +79,9 @@ class LightweightPerformanceMonitor(QObject):
     
     def _calculate_fps(self):
         """Calculate FPS based on frame count in the last second"""
+        if not self._enabled:
+            return
+            
         current_time = time.time()
         elapsed = current_time - self._last_frame_time
         
@@ -89,6 +100,9 @@ class LightweightPerformanceMonitor(QObject):
     
     def _update_resource_usage(self):
         """Update memory and CPU usage statistics"""
+        if not self._enabled:
+            return
+            
         try:
             import psutil
             
@@ -111,6 +125,27 @@ class LightweightPerformanceMonitor(QObject):
     def setAutoOptimize(self, enabled):
         """Enable or disable automatic optimization"""
         self._auto_optimize = enabled
+    
+    @Slot(bool)
+    def setEnabled(self, enabled):
+        """Enable or disable performance monitoring"""
+        if self._enabled != enabled:
+            self._enabled = enabled
+            self.enabledChanged.emit(enabled)
+            
+            # Reset metrics when enabling to avoid stale data
+            if enabled:
+                self._fps = 0.0
+                self._render_time = 0.0
+                self._memory_usage = 0.0
+                self._cpu_usage = 0.0
+                self._frame_counter = 0
+                self._last_frame_time = time.time()
+                self._render_times = []
+                self.fpsChanged.emit(0.0)
+                self.renderTimeChanged.emit(0.0)
+                self.memoryUsageChanged.emit(0.0)
+                self.cpuUsageChanged.emit(0.0)
     
     @Slot()
     def applyOptimizations(self):
@@ -153,8 +188,12 @@ class LightweightPerformanceMonitor(QObject):
     def cpuUsage(self):
         return self._cpu_usage
     
+    def enabled(self):
+        return self._enabled
+    
     # Property definitions
     fps = Property(float, fps, notify=fpsChanged)
     renderTime = Property(float, renderTime, notify=renderTimeChanged)
     memoryUsage = Property(float, memoryUsage, notify=memoryUsageChanged)
     cpuUsage = Property(float, cpuUsage, notify=cpuUsageChanged)
+    enabled = Property(bool, enabled, setEnabled, notify=enabledChanged)

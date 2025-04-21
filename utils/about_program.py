@@ -1,10 +1,14 @@
-from PySide6.QtCore import QObject, Property
+from PySide6.QtCore import QObject, Property, Slot, Signal
 from utils.config import AppConfig
 import platform
 import PySide6.QtCore
 
 class ConfigBridge(QObject):
     """Bridge to expose AppConfig properties to QML."""
+    
+    # Add signal for settings that can change
+    settingChanged = Signal(str, arguments=['key'])
+    
     def __init__(self):
         super().__init__()
         self._config = AppConfig()
@@ -55,3 +59,17 @@ class ConfigBridge(QObject):
     @Property(str, constant=True)
     def processor(self):
         return self._processor
+
+    @Slot(str, 'QVariant')
+    def save_setting(self, key, value):
+        """Save a setting to the database."""
+        success = self._config.save_setting(key, value)
+        if success:
+            # Emit signal to notify of changed setting
+            self.settingChanged.emit(key)
+        return success
+
+    @Slot(str, 'QVariant', result='QVariant')  
+    def get_setting(self, key, default=None):
+        """Get a setting from the database."""
+        return self._config.get_setting(key, default)

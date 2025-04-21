@@ -32,7 +32,6 @@ from utils.series_helper import SeriesHelper
 from models.theory.three_phase import ThreePhaseSineWaveModel
 from models.theory.rlc import RLCChart
 from models.protection.overcurrent_calculator import OvercurrentProtectionCalculator
-from utils.about_program import ConfigBridge
 from models.protection.solkor_rf_calculator import SolkorRfCalculator
 from models.protection.vr32_cl7_calculator import VR32CL7Calculator
 from models.voltdrop.results_manager import ResultsManager
@@ -89,7 +88,6 @@ def register_qml_types(engine, current_dir):
         (FaultCurrentCalculator, "FaultCurrent", 1, 0, "FaultCurrentCalculator"),
         (VoltageDividerCalculator, "VoltDivider", 1, 0, "VoltageDividerCalculator"),
         (RLCChart, "RLC", 1, 0, "RLCChart"),
-        (ConfigBridge, "ConfigBridge", 1, 0, "ConfigBridge"),
         (SolkorRfCalculator, "SolkorRfCalculator", 1, 0, "SolkorRfCalculator"),
         (VR32CL7Calculator, "VR32CL7Calculator", 1, 0, "VR32CL7Calculator"),
         (OvercurrentProtectionCalculator, "OvercurrentProtectionCalculator", 1, 0, "OvercurrentProtectionCalculator"),

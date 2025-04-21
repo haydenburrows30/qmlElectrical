@@ -37,6 +37,10 @@ ApplicationWindow {
         id: logViewerPopup
     }
 
+    SettingsMenu {
+        id: settingsMenu
+    }
+
     // Initialize logManager with a Timer to avoid binding loops
     Timer {
         interval: 100
@@ -209,6 +213,17 @@ ApplicationWindow {
                                 calculatorLoader.push(modelData.source)
                             }
                         }
+                    }
+                }
+                Menu {
+                    title: "Tools"
+                    MenuItem {
+                        text: "Settings"
+                        onTriggered: settingsMenu.open()
+                    }
+                    MenuItem {
+                        text: "Log Viewer"
+                        onTriggered: logViewerPopup.open()
                     }
                 }
             }

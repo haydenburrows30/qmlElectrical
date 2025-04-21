@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import ConfigBridge 1.0
-
 Popup {
     id: aboutProgram
 
@@ -12,7 +10,7 @@ Popup {
 
     anchors.centerIn: Overlay.overlay
 
-    property ConfigBridge configBridge
+    property var configBridge
 
     GridLayout {
         anchors.fill: parent

@@ -63,7 +63,8 @@ class AppConfig:
             "app_name": "Electrical",
             "org_name": "QtProject",
             "icon_path": "icons/gallery/24x24/Wave_dark.ico",
-            "version": "1.1.9"
+            "version": "1.1.9",
+            "performance_monitor_enabled": True  # Add default for performance monitor
         }
 
         try:

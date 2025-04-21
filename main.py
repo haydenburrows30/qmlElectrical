@@ -1,6 +1,5 @@
 # Standard library imports
 import sys
-import logging
 import traceback
 from pathlib import Path
 
@@ -28,6 +27,7 @@ from utils.windows_utils import setup_windows_specifics, set_gpu_attributes
 from utils.preload_manager import PreloadManager
 from utils.lightweight_performance import LightweightPerformanceMonitor
 from utils.logger_config import configure_logger
+from utils.about_program import ConfigBridge
 
 # Resources
 import data.rc_resources as rc_resources
@@ -97,6 +97,10 @@ class Application:
         # We need this as a context property for direct access from QML and Python code
         self.log_manager = QLogManager()
         self.qml_engine.rootContext().setContextProperty("logManager", self.log_manager)
+        
+        # Use ConfigBridge to expose app config to QML instead of direct exposure
+        self.config_bridge = ConfigBridge()
+        self.qml_engine.rootContext().setContextProperty("appConfig", self.config_bridge)
         
         # PlatformHelper keeps a context property for backward compatibility
         self.qml_engine.rootContext().setContextProperty("PlatformHelper", PlatformHelper())
