@@ -459,8 +459,7 @@ Item {
                                     ToolTip.delay: 500
 
                                     onClicked: {
-                                        // Use null to let FileSaver handle file dialog
-                                        exportReportWithLoading()
+                                        exportReport()
                                     }
                                 }
                             }
@@ -850,31 +849,12 @@ Item {
         id: messagePopup
     }
 
-    // Add function to handle export with loading indicator
-    function exportReportWithLoading() {
+    // Rename function to remove loading reference
+    function exportReport() {
         if (!calculatorReady) return;
         
-        // Show loading indicator if available
-        if (typeof loadingIndicator !== 'undefined' && loadingIndicator !== null) {
-            loadingIndicator.show();
-        }
-        
-        let data = {
-            "transformer_rating": calculator.transformerRating,
-            "transformer_impedance": calculator.transformerImpedance,
-            "transformer_xr_ratio": calculator.transformerXRRatio,
-            "transformer_z": calculator.transformerZOhms,
-            "transformer_r": calculator.transformerROhms,
-            "transformer_x": calculator.transformerXOhms,
-            "ground_fault_current": calculator.groundFaultCurrent,
-            "ct_ratio": calculator.relayCtRatio,
-            "relay_pickup_current": calculator.relayPickupCurrent,
-            "relay_curve_type": calculator.relayCurveType,
-            "time_dial": calculator.relayTimeDial
-        };
-        
-        // Use null to trigger FileSaver
-        calculator.exportTransformerReport(data, null);
+        // Export using null to let FileSaver handle the file dialog
+        calculator.exportTransformerReport(null, null);
     }
 
     Connections {
@@ -907,11 +887,7 @@ Item {
         }
 
         function onPdfExportStatusChanged(success, message) {
-            // Hide loading indicator if available
-            if (typeof loadingIndicator !== 'undefined' && loadingIndicator !== null) {
-                loadingIndicator.hide();
-            }
-            
+            // Show appropriate message popup without loading indicator
             if (success) {
                 messagePopup.showSuccess(message);
             } else {

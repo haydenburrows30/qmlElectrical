@@ -49,11 +49,6 @@ Item {
     MessagePopup {
         id: messagePopup
     }
-    
-    // Add loading indicator to show during PDF export
-    LoadingIndicator {
-        id: loadingIndicator
-    }
                 
     ScrollView {
         id: scrollView
@@ -100,15 +95,10 @@ Item {
                         StyledButton {
                             text: "Export Settings"
                             onClicked: {
-                                // Show loading indicator
-                                loadingIndicator.show()
-                                
-                                // Use null to make transformer calculator use FileSaver
                                 if (transformerReady && windTurbineReady) {
                                     exportProtectionSettings(null)
                                 } else {
                                     messagePopup.showError("Please calculate the system first")
-                                    loadingIndicator.hide()
                                 }
                             }
                             ToolTip.text: "Export report to PDF"
@@ -858,25 +848,8 @@ Item {
                 }
             };
             
+            // Export using the transformer calculator
             transformerCalculator.exportProtectionReport(exportData, filePath);
-        }
-    }
-    
-    // Add connection to transformerCalculator to handle PDF export status
-    Connections {
-        target: transformerCalculator
-        enabled: transformerReady
-        
-        function onPdfExportStatusChanged(success, message) {
-            // Hide loading indicator
-            loadingIndicator.hide()
-            
-            // Show appropriate message
-            if (success) {
-                messagePopup.showSuccess(message)
-            } else {
-                messagePopup.showError(message)
-            }
         }
     }
 }

@@ -28,12 +28,16 @@ class PDFGenerator:
         
         Args:
             data: Dictionary containing protection requirements data
-            filepath: Output PDF filename
+            filepath: Output PDF filename - should be provided by FileSaver
             
         Returns:
             bool: True if successful, False otherwise
         """
         try:
+            # Ensure filepath ends with .pdf
+            if not filepath.lower().endswith('.pdf'):
+                filepath += '.pdf'
+                
             # Create the PDF document
             doc = SimpleDocTemplate(
                 filepath,
@@ -331,12 +335,16 @@ class PDFGenerator:
         
         Args:
             data: Dictionary containing transformer-line calculation data
-            filepath: Path to save the PDF report
+            filepath: Path to save the PDF report - should be provided by FileSaver
             
         Returns:
             bool: True if successful, False otherwise
         """
         try:
+            # Ensure filepath ends with .pdf
+            if not filepath.lower().endswith('.pdf'):
+                filepath += '.pdf'
+                
             # Create PDF document
             doc = SimpleDocTemplate(
                 filepath,

@@ -129,7 +129,143 @@ class TransformerLineCalculator(QObject):
         
         # Perform initial calculations
         self._calculate()
-    
+
+    def _handle_pdf_export(self, generate_callback, filename, default_name):
+        """Common PDF export handler to reduce code duplication"""
+        # If no filepath provided, use FileSaver to get one
+        if not filename:
+            filename = self._file_saver.get_save_filepath("pdf", default_name)
+            if not filename:
+                # Let FileSaver emit the cancel message
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+        
+        # Generate PDF using the provided callback
+        result = generate_callback(filename)
+        
+        # Forward FileSaver signals to our own signal
+        if result:
+            message = f"PDF saved to: {filename}"
+            self._file_saver.saveStatusChanged.emit(True, message)
+            self.pdfExportStatusChanged.emit(True, message)
+            return True
+        else:
+            error_msg = f"Error saving PDF to {filename}"
+            self._file_saver.saveStatusChanged.emit(False, error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    @Slot("QVariant", str)
+    def exportTransformerReport(self, data, filename):
+        """Export transformer calculations to PDF"""
+        try:
+            # Prepare data for export (keep this part as it's specific to this method)
+            export_data = {
+                # Transformer parameters
+                "transformer_rating": self._transformer_rating,
+                "transformer_impedance": self._transformer_impedance,
+                "transformer_xr_ratio": self._transformer_x_r_ratio,
+                "transformer_z": self._transformer_z,
+                "transformer_r": self._transformer_r,
+                "transformer_x": self._transformer_x,
+                
+                # Line parameters
+                "line_total_z": abs(self._line_total_z),
+                "voltage_drop": self._voltage_drop,
+                "unregulated_voltage": self._unregulated_voltage,
+                "regulated_voltage": self._regulated_voltage,
+                "recommended_hv_cable": self._recommended_hv_cable,
+                "recommended_lv_cable": self._recommended_lv_cable,
+                
+                # Regulator parameters
+                "regulator_enabled": self._voltage_regulator_enabled,
+                "regulator_type": self._voltage_regulator_type,
+                "regulator_connection": self._voltage_regulator_connection,
+                "tap_position": self._regulator_tap_position,
+                "regulator_target": self._voltage_regulator_target,
+                "regulator_bandwidth": self._voltage_regulator_bandwidth,
+                "regulator_range": self._voltage_regulator_range,
+                "regulator_three_phase_capacity": self._regulator_three_phase_capacity,
+                
+                # Fault analysis
+                "fault_current_lv": self._fault_current_lv,
+                "fault_current_hv": self._fault_current_hv,
+                "fault_current_slg": self._fault_current_slg,
+                "ground_fault_current": self._ground_fault_current,
+                
+                # Protection settings
+                "ct_ratio": self._relay_ct_ratio,
+                "relay_pickup_current": self._relay_pickup_current,
+                "relay_curve_type": self._relay_curve_type,
+                "time_dial": self._relay_time_dial,
+                "differential_slope": self._differential_relay_slope,
+                "reverse_power": self._reverse_power_threshold,
+                "frequency_settings": self._frequency_relay_settings,
+                "voltage_settings": self._voltage_relay_settings,
+                
+                # Harmonic analysis
+                "harmonic_limits": self._harmonic_limits,
+                "thd_limit": self._thd_limit,
+                "differential_settings": self._differential_settings
+            }
+            
+            # Generate PDF content
+            generator = PDFGenerator()
+            
+            # Use FileSaver to handle the file operations and emit status signals
+            # We'll define a callback to handle the actual PDF generation
+            def generate_pdf_callback(filepath):
+                return generator.generate_transformer_report(export_data, filepath)
+            
+            # Let FileSaver handle the whole process
+            result = self._handle_pdf_export(generate_pdf_callback, filename, "transformer_report")
+            
+            # Forward the result to our own signal (already emitted by FileSaver)
+            return result
+                
+        except Exception as e:
+            logger.error(f"Error exporting transformer report: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            
+            # Consistent error reporting
+            error_msg = f"Error saving PDF: {str(e)}"
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    @Slot("QVariant", str)
+    def exportProtectionReport(self, data, filename):
+        """Export protection requirements to PDF"""
+        try:
+            # Convert QJSValue to Python dict if needed
+            if hasattr(data, 'toVariant'):
+                js_data = data.toVariant()
+            else:
+                js_data = data
+            
+            # Use FileSaver to handle the file operations and emit status signals
+            generator = PDFGenerator()
+            
+            # Define callback for PDF generation
+            def generate_pdf_callback(filepath):
+                return generator.generate_protection_report(js_data, filepath)
+            
+            # Let FileSaver handle the whole process
+            result = self._handle_pdf_export(generate_pdf_callback, filename, "protection_report")
+            
+            # Forward the result to our own signal (already emitted by FileSaver)
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error exporting protection report: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            
+            # Consistent error reporting
+            error_msg = f"Error saving PDF: {str(e)}"
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
     def _calculate_cable_sizes(self):
         """Calculate recommended cable sizes based on currents"""
         # Calculate HV current
@@ -1095,140 +1231,6 @@ class TransformerLineCalculator(QObject):
         """Force refresh of all calculations"""
         self._calculate()
 
-    @Slot("QVariant", str)
-    def exportTransformerReport(self, data, filename):
-        """Export transformer calculations to PDF"""
-        try:
-            # If no filepath provided, use FileSaver to get one
-            if not filename:
-                filename = self._file_saver.get_save_filepath("pdf", "transformer_report")
-                if not filename:
-                    self.pdfExportStatusChanged.emit(False, "PDF export canceled")
-                    return False
-            
-            # Clean up the filename path
-            clean_path = filename.strip()
-            
-            # Ensure path ends with .pdf
-            if not clean_path.lower().endswith('.pdf'):
-                clean_path += '.pdf'
-            
-            # Add calculated values to the data dict
-            export_data = {
-                # Transformer parameters
-                "transformer_rating": self._transformer_rating,
-                "transformer_impedance": self._transformer_impedance,
-                "transformer_xr_ratio": self._transformer_x_r_ratio,
-                "transformer_z": self._transformer_z,
-                "transformer_r": self._transformer_r,
-                "transformer_x": self._transformer_x,
-                
-                # Line parameters
-                "line_total_z": abs(self._line_total_z),
-                "voltage_drop": self._voltage_drop,
-                "unregulated_voltage": self._unregulated_voltage,
-                "regulated_voltage": self._regulated_voltage,
-                "recommended_hv_cable": self._recommended_hv_cable,
-                "recommended_lv_cable": self._recommended_lv_cable,
-                
-                # Regulator parameters
-                "regulator_enabled": self._voltage_regulator_enabled,
-                "regulator_type": self._voltage_regulator_type,
-                "regulator_connection": self._voltage_regulator_connection,
-                "tap_position": self._regulator_tap_position,
-                "regulator_target": self._voltage_regulator_target,
-                "regulator_bandwidth": self._voltage_regulator_bandwidth,
-                "regulator_range": self._voltage_regulator_range,
-                "regulator_three_phase_capacity": self._regulator_three_phase_capacity,
-                
-                # Fault analysis
-                "fault_current_lv": self._fault_current_lv,
-                "fault_current_hv": self._fault_current_hv,
-                "fault_current_slg": self._fault_current_slg,
-                "ground_fault_current": self._ground_fault_current,
-                
-                # Protection settings
-                "ct_ratio": self._relay_ct_ratio,
-                "relay_pickup_current": self._relay_pickup_current,
-                "relay_curve_type": self._relay_curve_type,
-                "time_dial": self._relay_time_dial,
-                "differential_slope": self._differential_relay_slope,
-                "reverse_power": self._reverse_power_threshold,
-                "frequency_settings": self._frequency_relay_settings,
-                "voltage_settings": self._voltage_relay_settings,
-                
-                # Harmonic analysis
-                "harmonic_limits": self._harmonic_limits,
-                "thd_limit": self._thd_limit,
-                "differential_settings": self._differential_settings
-            }
-            
-            generator = PDFGenerator()
-            result = generator.generate_transformer_report(export_data, clean_path)
-            
-            # Use standardized success message
-            if result:
-                # Instead of using FileSaver's internal method, emit our own signal first
-                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {clean_path}")
-                # Then use FileSaver for console logging
-                self._file_saver.saveStatusChanged.emit(True, f"PDF saved to: {clean_path}")
-                return True
-            else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving to {clean_path}")
-                return False
-                
-        except Exception as e:
-            logger.error(f"Error exporting transformer report: {e}")
-            logger.error(f"Attempted filename: {filename}")
-            # Print more details for debugging
-            import traceback
-            logger.error(traceback.format_exc())
-            self.pdfExportStatusChanged.emit(False, str(e))
-            return False
-
-    @Slot("QVariant", str)
-    def exportProtectionReport(self, data, filename):
-        """Export protection requirements to PDF"""
-        try:
-            # If no filepath provided, use FileSaver to get one
-            if not filename:
-                filename = self._file_saver.get_save_filepath("pdf", "protection_report")
-                if not filename:
-                    self.pdfExportStatusChanged.emit(False, "PDF export canceled")
-                    return False
-                    
-            # Clean up filename
-            clean_path = filename.strip()
-            if not clean_path.lower().endswith('.pdf'):
-                clean_path += '.pdf'
-
-            # Convert QJSValue to Python dict and use directly
-            js_data = data.toVariant()
-            logger.debug("Received JS data: %s", js_data)
-            
-            # No data transformation - pass directly to PDF generator
-            generator = PDFGenerator()
-            result = generator.generate_protection_report(js_data, clean_path)
-            
-            # Use standardized success message
-            if result:
-                self._file_saver._emit_success_with_path(clean_path, "PDF saved")
-                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {clean_path}")
-                return True
-            else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving to {clean_path}")
-                return False
-            
-        except Exception as e:
-            logger.error(f"Error exporting protection report: {e}")
-            logger.error(f"Attempted filename: {filename}")
-            logger.error(f"Data received: {data}")
-            # Print more details for debugging
-            import traceback
-            logger.error(traceback.format_exc())
-            self.pdfExportStatusChanged.emit(False, str(e))
-            return False
-        
     @Slot(float, float, str, result=float)
     def calculateTripTimeWithParams(self, current_multiple, time_dial, curve_type):
         """Calculate trip time based on provided parameters"""
