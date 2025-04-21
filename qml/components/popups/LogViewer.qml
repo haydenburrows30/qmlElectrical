@@ -12,8 +12,6 @@ Rectangle {
     property color borderColor: window ? (window.modeToggled ? "#555555" : "#cccccc") : "#cccccc"
 
     color: bgColor
-    border.width: 1
-    border.color: borderColor
     
     property var logManager: null
     property bool autoScroll: true

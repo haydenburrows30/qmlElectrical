@@ -6,11 +6,13 @@ import QtCore
 
 Popup {
     id: settingsPopup
-    
-    width: 400
-    height: contentColumn.implicitHeight + 40
+
+    width: 350
+    height: contentColumn.implicitHeight + 50
     modal: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    padding: 0
+    anchors.centerIn: Overlay.overlay
     
     Component.onCompleted: {
         // Apply saved setting when component loads
@@ -32,16 +34,18 @@ Popup {
     
     Rectangle {
         anchors.fill: parent
+        anchors.margins: -5 // cover popup window border
         color: Universal.theme === Universal.Dark ? "#2c2c2c" : "#f0f0f0"
         border.color: Universal.theme === Universal.Dark ? "#444444" : "#cccccc"
         border.width: 1
         radius: 5
+
         
         ColumnLayout {
             id: contentColumn
             anchors.fill: parent
             anchors.margins: 20
-            spacing: 15
+            spacing: 10
             
             Label {
                 text: "Settings"
