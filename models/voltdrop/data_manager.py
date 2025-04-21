@@ -1,5 +1,5 @@
-import pandas as pd
 import os
+import pandas as pd
 import math
 import sqlite3
 
@@ -90,9 +90,8 @@ class DataManager:
             }
             
             self._fuse_sizes_data = pd.DataFrame(fuse_sizes_data)
-            # print(f"Loaded {len(self._fuse_sizes_data)} fuse size entries")
         except Exception as e:
-            # print(f"Error loading fuse size data: {e}")
+            print(f"Error loading fuse size data: {e}")
             self._fuse_sizes_data = pd.DataFrame(columns=["Material", "Size (mm2)", "Network Fuse Size (A)"])
             
     def get_cable_data(self, material="Al", core_type="3C+E"):
@@ -140,7 +139,6 @@ class DataManager:
             result = cursor.fetchone()
             if result:
                 factor = float(result[0])
-                # print(f"Found exact diversity factor: {factor} for {num_houses} houses")
                 return factor
             
             conn.close()
@@ -167,7 +165,6 @@ class DataManager:
             if result:
                 return f"{result[0]} A"
             
-            # print(f"No fuse size found for {material} {cable_size}mm²")
             return "Not specified"
                 
         except Exception as e:

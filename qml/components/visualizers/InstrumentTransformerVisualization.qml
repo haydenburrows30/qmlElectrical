@@ -34,13 +34,22 @@ Item {
     property color gridColor: darkMode ? "#606060" : "#E0E0E0"
     
     // Internal properties
-    property var ctPrimary: parseFloat(ctRatio.split('/')[0])
-    property var ctSecondary: parseFloat(ctRatio.split('/')[1])
-    property var vtPrimary: parseFloat(vtRatio.split('/')[0])
-    property var vtSecondary: parseFloat(vtRatio.split('/')[1])
+    readonly property var ctPrimary: parseFloat(ctRatio.split('/')[0])
+    readonly property var ctSecondary: parseFloat(ctRatio.split('/')[1])
+    readonly property var vtPrimary: parseFloat(vtRatio.split('/')[0])
+    readonly property var vtSecondary: parseFloat(vtRatio.split('/')[1])
     
     // Visualization Mode
     property int viewMode: 0  // 0=Circuit, 1=Saturation, 2=Waveform
+    
+    // Utility function to update visualizations
+    function updateVisualizations() {
+        if (viewMode === 1 && saturationChart) {
+            saturationChart.updateSaturationCurve();
+        } else if (viewMode === 2 && waveformChart) {
+            waveformChart.generateWaveforms();
+        }
+    }
     
     // Return a color based on the saturation level
     function saturationColor(level) {
@@ -60,6 +69,41 @@ Item {
             var excess = voltage - ctKneePoint;
             return ctSecondary + 2 * Math.pow(excess / ctKneePoint, 0.3) * ctSecondary;
         }
+    }
+    
+    // Function to adjust layout based on available space - moved to top level
+    function adjustLayout() {
+        if (!circuitView) return;
+        
+        // Adjust transformer section size based on available space
+        var availableWidth = circuitView.width;
+        var availableHeight = circuitView.height - 120; // Account for header and status sections
+        
+        if (availableWidth < 600) {
+            transformerSection.width = Math.min(160, availableWidth * 0.4);
+        } else {
+            transformerSection.width = 180;
+        }
+        
+        if (availableHeight < 300) {
+            transformerSection.height = Math.max(200, availableHeight * 0.8);
+        } else {
+            transformerSection.height = 250;
+        }
+    }
+    
+    // Connections for layout updates - moved to top level
+    Connections {
+        target: circuitView
+        function onWidthChanged() { layoutTimer.restart() }
+        function onHeightChanged() { layoutTimer.restart() }
+    }
+    
+    // Timer for layout updates - moved to top level
+    Timer {
+        id: layoutTimer
+        interval: 100
+        onTriggered: adjustLayout()
     }
     
     Rectangle {
@@ -110,7 +154,6 @@ Item {
                     color: textColor
                 }
                 
-                // Power System
                 Rectangle {
                     id: powerSystem
                     width: 80
@@ -131,7 +174,6 @@ Item {
                     }
                 }
                 
-                // Primary Circuit
                 Shape {
                     id: primaryCircuit
                     anchors.left: powerSystem.right
@@ -155,7 +197,6 @@ Item {
                         color: textColor
                     }
                     
-                    // Current arrow
                     Shape {
                         y: -15
                         x: 30
@@ -177,7 +218,6 @@ Item {
                     }
                 }
                 
-                // Transformer Section
                 Rectangle {
                     id: transformerSection
                     width: 180
@@ -187,7 +227,6 @@ Item {
                     border.width: 2
                     anchors.centerIn: parent
                     
-                    // CT Symbol (Two coils facing each other)
                     Shape {
                         id: ctSymbol
                         anchors.top: parent.top
@@ -196,7 +235,6 @@ Item {
                         width: 120
                         height: 80
                         
-                        // Left Coil (Primary)
                         ShapePath {
                             strokeWidth: 2
                             strokeColor: primaryColor
@@ -213,7 +251,6 @@ Item {
                             PathArc { x: 40; y: 70; radiusX: 20; radiusY: 10; useLargeArc: false; direction: PathArc.Counterclockwise }
                         }
                         
-                        // Right Coil (Secondary)
                         ShapePath {
                             strokeWidth: 2
                             strokeColor: secondaryColor
@@ -230,7 +267,6 @@ Item {
                             PathArc { x: 120; y: 70; radiusX: 20; radiusY: 10; useLargeArc: false; direction: PathArc.Counterclockwise }
                         }
                         
-                        // Iron Core
                         ShapePath {
                             strokeWidth: 1
                             strokeColor: textColor
@@ -252,7 +288,6 @@ Item {
                             color: textColor
                         }
                         
-                        // Knee point indicator
                         Rectangle {
                             visible: ctKneePoint > 0
                             width: 12
@@ -275,7 +310,6 @@ Item {
                         }
                     }
                     
-                    // VT Symbol (Two coils facing each other)
                     Shape {
                         id: vtSymbol
                         anchors.top: ctSymbol.bottom
@@ -284,7 +318,6 @@ Item {
                         width: 120
                         height: 80
                         
-                        // Left Coil (Primary)
                         ShapePath {
                             strokeWidth: 2
                             strokeColor: primaryColor
@@ -301,7 +334,6 @@ Item {
                             PathArc { x: 40; y: 70; radiusX: 20; radiusY: 10; useLargeArc: false; direction: PathArc.Counterclockwise }
                         }
                         
-                        // Right Coil (Secondary)
                         ShapePath {
                             strokeWidth: 2
                             strokeColor: secondaryColor
@@ -318,7 +350,6 @@ Item {
                             PathArc { x: 120; y: 70; radiusX: 20; radiusY: 10; useLargeArc: false; direction: PathArc.Counterclockwise }
                         }
                         
-                        // Iron Core
                         ShapePath {
                             strokeWidth: 1
                             strokeColor: textColor
@@ -340,7 +371,6 @@ Item {
                             color: textColor
                         }
                         
-                        // Burden indicator
                         Rectangle {
                             visible: vtUtilization > 0
                             width: 12
@@ -364,7 +394,6 @@ Item {
                     }
                 }
                 
-                // Secondary Circuit and Load
                 Rectangle {
                     id: load
                     width: 100
@@ -384,7 +413,6 @@ Item {
                     }
                 }
                 
-                // Secondary wiring
                 Shape {
                     id: secondaryCircuit
                     anchors.left: transformerSection.right
@@ -408,7 +436,6 @@ Item {
                         color: textColor
                     }
                     
-                    // Current arrow
                     Shape {
                         y: -15
                         x: 30
@@ -430,27 +457,24 @@ Item {
                     }
                 }
                 
-                // Status indicators
                 Rectangle {
                     id: statusSection
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 10
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width * 0.8
-                    height: 80
+                    width: Math.min(parent.width * 0.9, 500)
+                    height: parent.height < 400 ? 70 : 80
                     color: "transparent"
                     border.color: gridColor
                     border.width: 1
                     
-                    Grid {
+                    RowLayout {
                         anchors.centerIn: parent
-                        columns: 3
-                        columnSpacing: 10
+                        spacing: parent.width < 450 ? 5 : 10
                         
-                        // CT Status
                         Rectangle {
-                            width: 150
-                            height: 50
+                            Layout.preferredWidth: parent.parent.width < 450 ? 130 : 150
+                            Layout.preferredHeight: parent.parent.height < 400 ? 40 : 50
                             color: saturationColor(circuitView.satLevel)
                             radius: 5
                             
@@ -460,13 +484,13 @@ Item {
                                                     (circuitView.satLevel < 0.8 ? "Warning" : "Saturated"))
                                 color: "white"
                                 font.bold: true
+                                font.pixelSize: parent.parent.parent.width < 450 ? 10 : 12
                             }
                         }
                         
-                        // Error Margin
                         Rectangle {
-                            width: 150
-                            height: 50
+                            Layout.preferredWidth: parent.parent.width < 450 ? 130 : 150
+                            Layout.preferredHeight: parent.parent.height < 400 ? 40 : 50
                             color: ctErrorMargin > parseFloat(ctAccuracyClass) ? "#F44336" : "#4CAF50"
                             radius: 5
                             
@@ -476,13 +500,13 @@ Item {
                                 color: "white"
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
+                                font.pixelSize: parent.parent.parent.width < 450 ? 10 : 12
                             }
                         }
                         
-                        // VT Status
                         Rectangle {
-                            width: 150
-                            height: 50
+                            Layout.preferredWidth: parent.parent.width < 450 ? 130 : 150
+                            Layout.preferredHeight: parent.parent.height < 400 ? 40 : 50
                             color: vtUtilization < 50 ? "#4CAF50" : (vtUtilization < 80 ? "#FF9800" : "#F44336")
                             radius: 5
                             
@@ -493,45 +517,33 @@ Item {
                                 color: "white"
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
+                                font.pixelSize: parent.parent.parent.width < 450 ? 10 : 12
                             }
                         }
                     }
                 }
             }
             
-            // Tab 2: Saturation Curve
             SaturationChart {id: saturationChart}
             
-            // Tab 3: Waveforms
             CTWaveFormChart {id: waveformChart}
         }
     }
 
-    onCtBurdenChanged: {
-        if (viewMode === 2 && waveformChart) {
-            waveformChart.generateWaveforms();
-        } 
-        if (viewMode === 1 && saturationChart) {
-            saturationChart.updateSaturationCurve();
-        }
-    }
-    
-    onCtKneePointChanged: {
-        if (viewMode === 2 && waveformChart) {
-            waveformChart.generateWaveforms();
-        }
-        if (viewMode === 1 && saturationChart) {
-            saturationChart.updateSaturationCurve();
-        }
-    }
+    // Property change handlers - grouped together for better organization
+    onCtBurdenChanged: updateVisualizations()
+    onCtKneePointChanged: updateVisualizations()
+    onViewModeChanged: Qt.callLater(updateVisualizations) // Removed parentheses
+    onCtRatioChanged: Qt.callLater(updateVisualizations)  // Removed parentheses
+    onCtPowerFactorChanged: Qt.callLater(updateVisualizations)  // Removed parentheses
 
-    onViewModeChanged: {
+    // Component initialization
+    Component.onCompleted: {
         Qt.callLater(function() {
-            if (viewMode === 1 && saturationChart) {
-                saturationChart.updateSaturationCurve();
-            } else if (viewMode === 2 && waveformChart) {
-                waveformChart.generateWaveforms();
+            if (circuitView) {
+                adjustLayout();
             }
+            updateVisualizations();
         });
     }
 }

@@ -3,7 +3,7 @@ from PySide6.QtQml import qmlRegisterSingletonType, qmlRegisterType
 
 import os
 
-from models.voltdrop.voltage_drop_calculator import VoltageDropCalculator
+from models.voltdrop.voltage_drop_orion import VoltageDropCalculator
 from models.theory.real_time_chart import RealTimeChart
 from models.basic.calculator import ConversionCalculator, PowerCalculator, ImpedanceCalculator, ChargingCalculator, KwFromCurrentCalculator
 from models.theory.transformer_calculator import TransformerCalculator

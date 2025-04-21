@@ -48,15 +48,6 @@ Item {
         regulatorTapPositionText.text = safeValueFunction(calculator.regulatorTapPosition, 0).toString()
     }
 
-    // Enhanced safeValueFunction implementation directly in the component
-    function safeValueFunction(value, defaultVal) {
-        // Enhanced safe value function that handles null, undefined, NaN
-        if (value === undefined || value === null || isNaN(value) || !isFinite(value)) {
-            return defaultVal;
-        }
-        return value;
-    }
-
     // Add function to component level
     function getCurveInfoText(curveType) {
         switch(curveType) {

@@ -64,25 +64,19 @@ Item {
         console.log("Load groups:", JSON.stringify(loadGroups));
         console.log("Total load:", totalLoad);
 
-        let colors = ["#FF5722", "#2196F3", "#4CAF50", "#FFC107", "#9C27B0", "#00BCD4", "#795548", "#607D8B"];
-        let colorIndex = 0;
-        
         for (let type in loadGroups) {
             if (loadGroups[type] > 0) {
                 let percentage = ((loadGroups[type] / totalLoad) * 100).toFixed(1);
                 let label = type + " (" + loadGroups[type].toFixed(2) + " kW, " + percentage + "%)";
                 let slice = loadSeries.append(label, loadGroups[type]);
 
-                slice.color = colors[colorIndex % colors.length];
                 slice.borderWidth = 2;
-                slice.borderColor = Qt.darker(slice.color, 1.2);
                 slice.labelVisible = true;
                 slice.labelPosition = PieSlice.LabelOutside;
                 slice.exploded = true;
                 slice.explodeDistanceFactor = 0.05;
                 
                 console.log("Added slice:", label, loadGroups[type]);
-                colorIndex++;
             }
         }
         
