@@ -459,7 +459,8 @@ Item {
                                     ToolTip.delay: 500
 
                                     onClicked: {
-                                        saveDialog.open()
+                                        // Use null to let FileSaver handle file dialog
+                                        exportReportWithLoading()
                                     }
                                 }
                             }
@@ -845,59 +846,35 @@ Item {
         }
     }
 
-    // Timer {
-    //     id: updateTimer
-    //     interval: 500
-    //     repeat: true
-    //     running: calculatorReady
-    //     onTriggered: {
-    //         if (calculatorReady) {
-    //             transformerLineSection.updateDisplayValues()
-    //         }
-    //     }
-    // }
+    MessagePopup {
+        id: messagePopup
+    }
 
-    // pdf export
-    FileDialog {
-        id: saveDialog
-        title: "Save PDF Report"
-        nameFilters: ["PDF files (*.pdf)"]
-        fileMode: FileDialog.SaveFile
-        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
-
-        onAccepted: {
-            if (calculatorReady) {
-                let data = {
-                    "transformer_rating": calculator.transformerRating,
-                    "transformer_impedance": calculator.transformerImpedance,
-                    "transformer_xr_ratio": calculator.transformerXRRatio,
-                    "transformer_z": calculator.transformerZOhms,
-                    "transformer_r": calculator.transformerROhms,
-                    "transformer_x": calculator.transformerXOhms,
-                    "ground_fault_current": calculator.groundFaultCurrent,
-                    "ct_ratio": calculator.relayCtRatio,
-                    "relay_pickup_current": calculator.relayPickupCurrent,
-                    "relay_curve_type": calculator.relayCurveType,
-                    "time_dial": calculator.relayTimeDial
-                }
-            }
-
-            let filePath = saveDialog.selectedFile.toString();
-                
-            // Remove the "file://" prefix properly based on platform
-            if (filePath.startsWith("file:///") && Qt.platform.os === "windows") {
-                // On Windows, file:///C:/path becomes C:/path
-                filePath = filePath.substring(8);
-            } else if (filePath.startsWith("file:///")) {
-                // On Unix-like systems, file:///path becomes /path
-                filePath = filePath.substring(7); 
-            } else if (filePath.startsWith("file://")) {
-                // Alternative format
-                filePath = filePath.substring(5);
-            }
-
-            calculator.exportTransformerReport(data, filePath)
+    // Add function to handle export with loading indicator
+    function exportReportWithLoading() {
+        if (!calculatorReady) return;
+        
+        // Show loading indicator if available
+        if (typeof loadingIndicator !== 'undefined' && loadingIndicator !== null) {
+            loadingIndicator.show();
         }
+        
+        let data = {
+            "transformer_rating": calculator.transformerRating,
+            "transformer_impedance": calculator.transformerImpedance,
+            "transformer_xr_ratio": calculator.transformerXRRatio,
+            "transformer_z": calculator.transformerZOhms,
+            "transformer_r": calculator.transformerROhms,
+            "transformer_x": calculator.transformerXOhms,
+            "ground_fault_current": calculator.groundFaultCurrent,
+            "ct_ratio": calculator.relayCtRatio,
+            "relay_pickup_current": calculator.relayPickupCurrent,
+            "relay_curve_type": calculator.relayCurveType,
+            "time_dial": calculator.relayTimeDial
+        };
+        
+        // Use null to trigger FileSaver
+        calculator.exportTransformerReport(data, null);
     }
 
     Connections {
@@ -927,6 +904,19 @@ Item {
         
         function onCalculationsComplete() {
             transformerLineSection.updateDisplayValues()
+        }
+
+        function onPdfExportStatusChanged(success, message) {
+            // Hide loading indicator if available
+            if (typeof loadingIndicator !== 'undefined' && loadingIndicator !== null) {
+                loadingIndicator.hide();
+            }
+            
+            if (success) {
+                messagePopup.showSuccess(message);
+            } else {
+                messagePopup.showError(message);
+            }
         }
     }
 

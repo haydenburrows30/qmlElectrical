@@ -64,13 +64,12 @@ class FileSaver(QObject):
         
         logger.info(success_message)
         
-        # Ensure the signal is properly emitted with the full path
-        try:
-            self.saveStatusChanged.emit(True, success_message)
-        except Exception as e:
-            logger.error(f"Error emitting saveStatusChanged signal: {e}")
-            # Fallback to direct logging
-            print(f"SUCCESS: {success_message}")
+        # Directly emit the signal without trying/catching
+        # This makes behavior more predictable
+        self.saveStatusChanged.emit(True, success_message)
+        
+        # Also log to console for debugging
+        print(f"SUCCESS: {success_message}")
     
     @Slot(str, str, result=str)
     def get_save_filepath(self, file_extension, default_filename):

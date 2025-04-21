@@ -3,6 +3,7 @@ import math
 import cmath
 from utils.pdf_generator import PDFGenerator
 from utils.logger_config import configure_logger
+from utils.file_saver import FileSaver
 
 # Setup component-specific logger
 logger = configure_logger("qmltest", component="transformer_line")
@@ -17,6 +18,7 @@ class TransformerLineCalculator(QObject):
     voltageRegulatorChanged = Signal()  # New signal for voltage regulator
     calculationCompleted = Signal()  # Main signal
     calculationsComplete = Signal()  # Additional alias signal for QML compatibility
+    pdfExportStatusChanged = Signal(bool, str)  # Add new signal for PDF export status
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -121,6 +123,9 @@ class TransformerLineCalculator(QObject):
         self._curve_b_exponent = 1.0
         self._minimum_fault_current = 0.0  # A
         self._remote_backup_trip_time = 0.7  # s
+        
+        # Initialize the file saver
+        self._file_saver = FileSaver()
         
         # Perform initial calculations
         self._calculate()
@@ -1089,11 +1094,18 @@ class TransformerLineCalculator(QObject):
     def refreshCalculations(self):
         """Force refresh of all calculations"""
         self._calculate()
-    
+
     @Slot("QVariant", str)
     def exportTransformerReport(self, data, filename):
         """Export transformer calculations to PDF"""
         try:
+            # If no filepath provided, use FileSaver to get one
+            if not filename:
+                filename = self._file_saver.get_save_filepath("pdf", "transformer_report")
+                if not filename:
+                    self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                    return False
+            
             # Clean up the filename path
             clean_path = filename.strip()
             
@@ -1152,17 +1164,39 @@ class TransformerLineCalculator(QObject):
             }
             
             generator = PDFGenerator()
-            generator.generate_transformer_report(export_data, clean_path)
-            logger.info(f"Transformer report exported to: {clean_path}")
+            result = generator.generate_transformer_report(export_data, clean_path)
             
+            # Use standardized success message
+            if result:
+                # Instead of using FileSaver's internal method, emit our own signal first
+                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {clean_path}")
+                # Then use FileSaver for console logging
+                self._file_saver.saveStatusChanged.emit(True, f"PDF saved to: {clean_path}")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving to {clean_path}")
+                return False
+                
         except Exception as e:
             logger.error(f"Error exporting transformer report: {e}")
             logger.error(f"Attempted filename: {filename}")
+            # Print more details for debugging
+            import traceback
+            logger.error(traceback.format_exc())
+            self.pdfExportStatusChanged.emit(False, str(e))
+            return False
 
     @Slot("QVariant", str)
     def exportProtectionReport(self, data, filename):
         """Export protection requirements to PDF"""
         try:
+            # If no filepath provided, use FileSaver to get one
+            if not filename:
+                filename = self._file_saver.get_save_filepath("pdf", "protection_report")
+                if not filename:
+                    self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                    return False
+                    
             # Clean up filename
             clean_path = filename.strip()
             if not clean_path.lower().endswith('.pdf'):
@@ -1174,14 +1208,27 @@ class TransformerLineCalculator(QObject):
             
             # No data transformation - pass directly to PDF generator
             generator = PDFGenerator()
-            generator.generate_protection_report(js_data, clean_path)
-            logger.info(f"Protection report exported to: {clean_path}")
+            result = generator.generate_protection_report(js_data, clean_path)
+            
+            # Use standardized success message
+            if result:
+                self._file_saver._emit_success_with_path(clean_path, "PDF saved")
+                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {clean_path}")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving to {clean_path}")
+                return False
             
         except Exception as e:
             logger.error(f"Error exporting protection report: {e}")
             logger.error(f"Attempted filename: {filename}")
             logger.error(f"Data received: {data}")
-
+            # Print more details for debugging
+            import traceback
+            logger.error(traceback.format_exc())
+            self.pdfExportStatusChanged.emit(False, str(e))
+            return False
+        
     @Slot(float, float, str, result=float)
     def calculateTripTimeWithParams(self, current_multiple, time_dial, curve_type):
         """Calculate trip time based on provided parameters"""
