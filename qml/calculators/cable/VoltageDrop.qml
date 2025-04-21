@@ -22,9 +22,30 @@ Page {
     id: root
     padding: 0
 
-    property VoltageDropCalculator calculator: VoltageDropCalculator {id: voltageDrop}
+    property VoltageDropCalculator calculator: VoltageDropCalculator {
+        id: voltageDrop
+        
+        Component.onCompleted: {
+            // Initialize from saved settings
+            if (typeof appConfig !== 'undefined') {
+                // Get the default voltage from settings
+                var defaultVoltage = appConfig.get_setting("default_voltage", "230V");
+                setSelectedVoltage(defaultVoltage);
+                
+                // Get ADMD setting, but only apply it if voltage is 415V
+                var admdEnabled = appConfig.get_setting("admd_enabled", false);
+                if (selectedVoltage === "415V" && admdEnabled) {
+                    setADMDEnabled(admdEnabled);
+                }
+            }
+        }
+    }
 
-    property real currentVoltageDropValue: voltageDrop.voltageDrop || 0
+    // Use a safer property binding that prevents undefined values
+    property real currentVoltageDropValue: {
+        var value = voltageDrop.voltageDrop;
+        return (value === undefined || value === null || isNaN(value)) ? 0.0 : value;
+    }
 
     PopUpText {
         id: popUpText
@@ -273,7 +294,13 @@ Page {
         target: voltageDrop
 
         function onVoltageDropCalculated(value) {
-            root.currentVoltageDropValue = value
+            // Add validation to prevent assigning undefined values
+            if (value === undefined || value === null || isNaN(value)) {
+                root.currentVoltageDropValue = 0.0;
+                console.warn("Received invalid voltage drop value:", value);
+            } else {
+                root.currentVoltageDropValue = value;
+            }
         }
         
         function onGrabRequested(filepath, scale) {
@@ -339,25 +366,46 @@ Page {
 
         onSaveToPdfRequested: {
             loadingIndicator.show()
+            
+            // Helper function to sanitize values
+            function safeValue(value, defaultValue = 0) {
+                return (value === undefined || value === null || isNaN(value)) ? 
+                    defaultValue : value;
+            }
+            
             voltageDrop.exportDetailsToPDF(null, {
-                "voltage_system": detailsPopup.voltageSystem,
-                "admd_enabled": detailsPopup.admdEnabled,
-                "kva_per_house": detailsPopup.kvaPerHouse,
-                "num_houses": detailsPopup.numHouses,
-                "diversity_factor": detailsPopup.diversityFactor,
-                "total_kva": detailsPopup.totalKva,
-                "current": detailsPopup.current,
-                "cable_size": detailsPopup.cableSize,
-                "conductor_material": detailsPopup.conductorMaterial,
-                "core_type": detailsPopup.coreType,
-                "length": detailsPopup.length,
-                "installation_method": detailsPopup.installationMethod,
-                "temperature": detailsPopup.temperature,
-                "grouping_factor": detailsPopup.groupingFactor,
-                "combined_rating_info": detailsPopup.combinedRatingInfo,
-                "voltage_drop": detailsPopup.voltageDropValue,
-                "drop_percent": detailsPopup.dropPercentage
+                "voltage_system": detailsPopup.voltageSystem || "Unknown",
+                "admd_enabled": !!detailsPopup.admdEnabled,
+                "kva_per_house": safeValue(detailsPopup.kvaPerHouse),
+                "num_houses": safeValue(detailsPopup.numHouses, 1),
+                "diversity_factor": safeValue(detailsPopup.diversityFactor, 1),
+                "total_kva": safeValue(detailsPopup.totalKva),
+                "current": safeValue(detailsPopup.current),
+                "cable_size": detailsPopup.cableSize || "Unknown",
+                "conductor_material": detailsPopup.conductorMaterial || "Unknown",
+                "core_type": detailsPopup.coreType || "Unknown",
+                "length": safeValue(parseFloat(detailsPopup.length)),
+                "installation_method": detailsPopup.installationMethod || "Unknown",
+                "temperature": safeValue(parseFloat(detailsPopup.temperature), 25),
+                "grouping_factor": safeValue(parseFloat(detailsPopup.groupingFactor), 1.0),
+                "combined_rating_info": detailsPopup.combinedRatingInfo || "N/A",
+                "voltage_drop": safeValue(detailsPopup.voltageDropValue),
+                "drop_percent": safeValue(detailsPopup.dropPercentage)
             })
+        }
+    }
+
+    Component.onCompleted: {
+        // Apply saved settings to UI components if necessary
+        if (typeof appConfig !== 'undefined') {
+            // Set voltage based on saved setting
+            var defaultVoltage = appConfig.get_setting("default_voltage", "230V");
+            for (var i = 0; i < cableSettings.voltageSelect.model.length; i++) {
+                if (cableSettings.voltageSelect.model[i] === defaultVoltage) {
+                    cableSettings.voltageSelect.currentIndex = i;
+                    break;
+                }
+            }
         }
     }
 }

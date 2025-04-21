@@ -18,6 +18,15 @@ Popup {
             var enabled = appConfig.get_setting("performance_monitor_enabled", true);
             perfMonitor.enabled = enabled;
             perfMonitorSwitch.checked = enabled;
+            
+            // Load voltage default
+            var defaultVoltage = appConfig.get_setting("default_voltage", "230V");
+            for (var i = 0; i < voltageComboBox.model.length; i++) {
+                if (voltageComboBox.model[i] === defaultVoltage) {
+                    voltageComboBox.currentIndex = i;
+                    break;
+                }
+            }
         }
     }
     
@@ -46,6 +55,7 @@ Popup {
                 color: Universal.theme === Universal.Dark ? "#444444" : "#dddddd"
             }
             
+            // Performance section
             Label {
                 text: "Performance"
                 font.pixelSize: 16
@@ -74,6 +84,34 @@ Popup {
                 }
             }
             
+            // Calculation defaults section
+            Label {
+                text: "Calculation Defaults"
+                font.pixelSize: 16
+                font.bold: true
+            }
+            
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+                
+                Label {
+                    text: "Default Voltage"
+                    Layout.fillWidth: true
+                }
+                
+                ComboBox {
+                    id: voltageComboBox
+                    model: ["230V", "415V"]
+                    
+                    onCurrentTextChanged: {
+                        if (typeof appConfig !== 'undefined') {
+                            appConfig.save_setting("default_voltage", currentText);
+                        }
+                    }
+                }
+            }
+            
             Item { 
                 Layout.fillHeight: true 
             }
@@ -83,8 +121,48 @@ Popup {
                 spacing: 10
                 
                 Button {
+                    text: "Reset All Settings"
+                    onClicked: {
+                        resetConfirmDialog.open();
+                    }
+                }
+                
+                Button {
                     text: "Close"
                     onClicked: settingsPopup.close()
+                }
+            }
+        }
+    }
+    
+    Dialog {
+        id: resetConfirmDialog
+        title: "Reset Settings"
+        modal: true
+        standardButtons: Dialog.Yes | Dialog.No
+        
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        
+        Label {
+            text: "Are you sure you want to reset all settings to default values?"
+            width: parent.width
+            wrapMode: Text.WordWrap
+        }
+        
+        onAccepted: {
+            // Reset all settings to default
+            if (typeof appConfig !== 'undefined') {
+                appConfig.save_setting("performance_monitor_enabled", true);
+                appConfig.save_setting("default_voltage", "230V");
+                
+                // Update UI
+                perfMonitorSwitch.checked = true;
+                voltageComboBox.currentIndex = 0;
+                
+                // Apply settings where needed
+                if (typeof perfMonitor !== 'undefined') {
+                    perfMonitor.enabled = true;
                 }
             }
         }
