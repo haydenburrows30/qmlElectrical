@@ -3,7 +3,6 @@ __pycache__/*
 venv/
 **/__pycache__/*
 .venv
-build
 dist
 logs
 logs/
