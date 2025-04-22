@@ -8,7 +8,6 @@ This script provides a GUI for manually testing export functionality in the appl
 import os
 import sys
 import json
-import subprocess
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
