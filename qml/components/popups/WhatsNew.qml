@@ -255,6 +255,24 @@ Popup {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignLeft
                     }
+
+                    Label {
+                        text: "1.2.0"
+                        font.pixelSize: 18
+                        font.bold: true
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.alignment: Qt.AlignTop
+                    }
+                
+                    Label {
+                        text:   "Database overhaul and consolidation. Added export manager for common popups. " +
+                                "Simplified image saving. Bug fixes for exporting in Voltage Drop Orion"
+                        font.pixelSize: 14
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignLeft
+                        wrapMode: Text.Wrap
+                    }
                 }
             }
         }
