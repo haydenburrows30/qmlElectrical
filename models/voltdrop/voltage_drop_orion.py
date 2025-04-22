@@ -171,7 +171,7 @@ class VoltageDropCalculator(QObject):
             self.combinedRatingChanged.emit(self._combined_rating_info)
             
         except Exception as e:
-            print(f"Error updating fuse size and rating: {e}")
+            logger.error(f"Error updating fuse size and rating: {e}")
             self._current_fuse_size = "Error"
             self._combined_rating_info = "Error"
             self.fuseSizeChanged.emit(self._current_fuse_size)
@@ -212,9 +212,9 @@ class VoltageDropCalculator(QObject):
                 self._calculate_voltage_drop()
                 self._update_fuse_size()
             else:
-                print(f"Cable size {cable_size} not found in data")
+                logger.info(f"Cable size {cable_size} not found in data")
         except ValueError:
-            print(f"Invalid cable size format: {cable_size}")
+            logger.error(f"Invalid cable size format: {cable_size}")
 
     @Slot(float)
     def setTemperature(self, temp):
@@ -357,7 +357,7 @@ class VoltageDropCalculator(QObject):
             return adjusted_kva
             
         except Exception as e:
-            print(f"Error calculating total load: {e}")
+            logger.error(f"Error calculating total load: {e}")
             return 0.0
 
     @Slot()

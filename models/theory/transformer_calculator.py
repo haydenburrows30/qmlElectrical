@@ -1,6 +1,9 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 
+from utils.logger_config import configure_logger
+logger = configure_logger("qmltest", component="transformer_calc")
+
 class TransformerCalculator(QObject):
     """Calculator for transformer voltage/current relationships"""
 
@@ -182,7 +185,7 @@ class TransformerCalculator(QObject):
             self.secondaryVoltageChanged.emit()
             self._calculate()
         elif value < 0:
-            print("Warning: Attempted to set negative secondary voltage")
+            logger.info("Warning: Attempted to set negative secondary voltage")
 
     @Property(float, notify=primaryCurrentChanged)
     def primaryCurrent(self):
@@ -356,7 +359,7 @@ class TransformerCalculator(QObject):
                     self._corrected_ratio = 0
                     self.correctedRatioChanged.emit()
         except Exception as e:
-            print(f"Error calculating corrected ratio: {e}")
+            logger.error(f"Error calculating corrected ratio: {e}")
 
     def _apply_vector_group_current_correction(self):
         """Apply vector group current correction factor to secondary current"""
@@ -424,7 +427,7 @@ class TransformerCalculator(QObject):
                     self.secondaryCurrentChanged.emit()
             
         except Exception as e:
-            print(f"Calculation error in kVA: {e}")
+            logger.error(f"Calculation error in kVA: {e}")
 
     def _calculate(self):
         """
@@ -461,7 +464,7 @@ class TransformerCalculator(QObject):
                 self._validate_parameters()
             
         except Exception as e:
-            print(f"Calculation error: {e}")
+            logger.error(f"Calculation error: {e}")
 
     def _calculate_impedance_parameters(self):
         """Calculate transformer parameters related to impedance"""
@@ -487,7 +490,7 @@ class TransformerCalculator(QObject):
                 self.copperLossesChanged.emit()
         
         except Exception as e:
-            print(f"Error calculating impedance parameters: {e}")
+            logger.error(f"Error calculating impedance parameters: {e}")
 
     def _calculate_efficiency(self):
         """Calculate transformer efficiency under load"""

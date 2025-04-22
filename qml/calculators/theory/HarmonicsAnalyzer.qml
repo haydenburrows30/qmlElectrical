@@ -47,61 +47,6 @@ Item {
         }
     }
 
-    FolderDialog {
-        id: folderDialog
-        title: "Choose Export Directory"
-        onAccepted: {
-            var folderPath = folderDialog.selectedFolder.toString();
-            if (folderPath.startsWith("file://")) {
-                folderPath = folderPath.substring(7);
-                if (Qt.platform.os === "windows" && folderPath.startsWith("/") && folderPath.charAt(2) === ":") {
-                    folderPath = folderPath.substring(1);
-                }
-            }
-            var success = calculator.exportDataToFolder(folderPath);
-            if (success) {
-                exportStatusPopup.status = "success";
-                exportStatusPopup.message = "Export successful!";
-            } else {
-                exportStatusPopup.status = "error";
-                exportStatusPopup.message = "Export failed. Check console for details.";
-            }
-            exportStatusPopup.open();
-        }
-    }
-    
-    Popup {
-        id: exportStatusPopup
-        width: 300
-        height: 100
-        anchors.centerIn: parent
-        modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        
-        property string status: "success"
-        property string message: ""
-        
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 10
-            
-            Label {
-                text: exportStatusPopup.message
-                Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                color: exportStatusPopup.status === "success" ? "green" : "red"
-                font.bold: true
-            }
-            
-            Button {
-                text: "OK"
-                Layout.alignment: Qt.AlignHCenter
-                onClicked: exportStatusPopup.close()
-            }
-        }
-    }
-
     PopUpText {
         id: popUpText
         parentCard: results
@@ -172,45 +117,16 @@ Item {
                     Layout.fillWidth: true
                     
                     StyledButton {
-                        text: "Quick Export"
+                        text: "Export to CSV"
                         icon.source: "../../../icons/rounded/download.svg"
                         Layout.fillWidth: true
-                        onClicked: {
-                            var success = calculator.exportData();
-                            if (success) {
-                                exportStatusPopup.status = "success";
-                                exportStatusPopup.message = "Export successful to Documents folder!";
-                                exportStatusPopup.open();
-                            } else {
-                                exportStatusPopup.status = "error";
-                                exportStatusPopup.message = "Export failed. Check console for details.";
-                                exportStatusPopup.open();
-                            }
-                        }
-                        ToolTip.text: "Export to default location (~/Documents/harmonics_export)"
-                        ToolTip.visible: quickExportMouseArea.containsMouse
+                        onClicked: calculator.exportDataToCSV(null)
+                        ToolTip.text: "Export harmonic data to CSV file"
+                        ToolTip.visible: exportMouseArea.containsMouse
                         ToolTip.delay: 500
                         
                         MouseArea {
-                            id: quickExportMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            propagateComposedEvents: true
-                            onPressed: function(mouse) { mouse.accepted = false }
-                        }
-                    }
-                    
-                    StyledButton {
-                        text: "Browse..."
-                        icon.source: "../../../icons/rounded/folder_open.svg"
-                        Layout.fillWidth: true
-                        onClicked: folderDialog.open()
-                        ToolTip.text: "Choose folder to export data"
-                        ToolTip.visible: browseMouseArea.containsMouse
-                        ToolTip.delay: 500
-                        
-                        MouseArea {
-                            id: browseMouseArea
+                            id: exportMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
                             propagateComposedEvents: true
@@ -347,12 +263,24 @@ Item {
         }
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     Connections {
         target: calculator
         
         function onCalculationsComplete() {
             updateWaveformTimer.start();
             updateHarmonicsTimer.start();
+        }
+
+        function onExportDataToFolderCompleted(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message);
+            } else {
+                messagePopup.showError(message);
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 import time
 from utils.logger_config import configure_logger
+from utils.file_saver import FileSaver  # Add import for FileSaver
 
 from utils.calculation_cache import CalculationCache, generate_cache_key
 from utils.worker_pool import WorkerPoolManager, ManagedWorker
@@ -123,6 +124,7 @@ class HarmonicAnalysisCalculator(QObject):
     waveformChanged = Signal()
     calculationStatusChanged = Signal()
     calculationProgressChanged = Signal(float)
+    exportDataToFolderCompleted = Signal(bool, str)  # New signal for export completion
 
     def __init__(self, parent=None):
         """Initialize the calculator."""
@@ -678,54 +680,63 @@ class HarmonicAnalysisCalculator(QObject):
         """Get current THD (Total Harmonic Distortion) value."""
         return self._thd
 
-    @Slot(result=bool)
-    def exportData(self):
-        """Export harmonic data to CSV file using default location."""
-        # Default to Documents folder
-        export_dir = os.path.expanduser("~/Documents/harmonics_export")
-        return self._exportDataToFolder(export_dir)
-
     @Slot(str, result=bool)
-    def exportDataToFolder(self, folder_path):
-        """Export harmonic data to CSV file in the specified folder."""
-        return self._exportDataToFolder(folder_path)
-    
-    def _exportDataToFolder(self, export_dir):
-        """Internal method to export data to the specified folder."""
+    def exportDataToCSV(self, filePath=None):
+        """Export harmonic data to CSV file.
+        
+        If filePath is None, a file dialog will be shown.
+        """
         try:
-            # Create directory if it doesn't exist
-            os.makedirs(export_dir, exist_ok=True)
+            # If no filePath provided, use the file saver to get one
+            file_saver = FileSaver()
+            if not filePath:
+                filePath = file_saver.get_save_filepath("csv", "harmonics_data")
+                if not filePath:
+                    self.exportDataToFolderCompleted.emit(False, "CSV export canceled")
+                    return False
             
-            # Generate filename with timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{export_dir}/harmonics_data_{timestamp}.csv"
+            # Prepare data in the format expected by save_csv
+            csv_data = []
             
-            logger.info(f"Exporting harmonic data to {filename}")
+            # Add header row
+            csv_data.append(['Harmonic Order', 'Magnitude (%)', 'Phase (degrees)'])
             
-            # Create CSV file
-            with open(filename, 'w', newline='') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(['Harmonic Order', 'Magnitude (%)', 'Phase (degrees)'])
+            # Add harmonic data rows
+            display_orders = [1, 3, 5, 7, 11, 13]
+            for i, order in enumerate(display_orders):
+                csv_data.append([
+                    order, 
+                    self._individual_distortion[i], 
+                    self._harmonic_phases[i]
+                ])
+            
+            # Add blank row between data sections
+            csv_data.append([])
+            
+            # Add analysis results header
+            csv_data.append(['Analysis Results', ''])
+            
+            # Add results rows
+            csv_data.append(['THD', f"{self._thd:.2f}%"])
+            csv_data.append(['Crest Factor', f"{self._cf:.2f}"])
+            csv_data.append(['Form Factor', f"{self._ff:.2f}"])
+            
+            # Call save_csv with the prepared data
+            result = file_saver.save_csv(filePath, csv_data)
+            
+            # Let file_saver handle the success message for consistency
+            if result:
+                # Success message will be handled by FileSaver's signal
+                return True
+            else:
+                self.exportDataToFolderCompleted.emit(False, f"Error saving to {filePath}")
+                return False
                 
-                # Write data for display harmonics
-                display_orders = [1, 3, 5, 7, 11, 13]
-                for i, order in enumerate(display_orders):
-                    writer.writerow([order, 
-                                     self._individual_distortion[i], 
-                                     self._harmonic_phases[i]])
-                
-                # Add additional results
-                writer.writerow([])
-                writer.writerow(['Analysis Results', ''])
-                writer.writerow(['THD', f"{self._thd:.2f}%"])
-                writer.writerow(['Crest Factor', f"{self._cf:.2f}"])
-                writer.writerow(['Form Factor', f"{self._ff:.2f}"])
-                
-            logger.info(f"Successfully exported harmonic data to {filename}")
-            return True
         except Exception as e:
-            logger.error(f"Error exporting harmonic data: {e}")
+            error_message = f"Error exporting harmonic data: {str(e)}"
+            logger.error(error_message)
             logger.exception(e)
+            self.exportDataToFolderCompleted.emit(False, error_message)
             return False
 
     @Slot()

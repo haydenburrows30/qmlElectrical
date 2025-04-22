@@ -353,7 +353,7 @@ Item {
                                 Label { text: "Temperature Rise:" ; Layout.fillWidth: true}
                                 TextFieldBlue {
                                     text: calculator.temperatureRise.toFixed(1) + "°C"
-                                    color: calculator.temperatureRise > 60 ? Universal.error : Universal.foreground
+                                    color: calculator.temperatureRise > 60 ? "#e81123" : Universal.foreground
                                     ToolTip.text: "Estimated temperature rise above ambient"
                                     ToolTip.visible: hovered
                                     ToolTip.delay: 500
@@ -428,7 +428,7 @@ Item {
                                     text: calculator.efficiency.toFixed(1) + "%"
                                     ToolTip.text: "Efficiency at rated load, considering copper and iron losses"
                                     Layout.fillWidth: true
-                                    color: calculator.efficiency < 92 ? Universal.error : Universal.foreground
+                                    color: calculator.efficiency < 92 ? "#e81123" : Universal.foreground
                                 }
                                 Label {
                                     text: "Vector Group:"

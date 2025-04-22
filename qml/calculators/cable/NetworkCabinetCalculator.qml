@@ -35,9 +35,9 @@ Item {
             }
         }
     }
-    
+
     property bool darkMode: window.modeToggled
-    
+
     // File dialogs for operations
     FolderDialog {
         id: folderDialog
@@ -57,7 +57,7 @@ Item {
             })
         }
     }
-    
+
     FileDialog {
         id: saveConfigDialog
         title: "Save Configuration"
@@ -68,7 +68,7 @@ Item {
             calculator.saveConfig(saveConfigDialog.file)
         }
     }
-    
+
     FileDialog {
         id: loadConfigDialog
         title: "Load Configuration"
@@ -92,7 +92,7 @@ Item {
     MessagePopup {
         id: messagePopup
     }
-    
+
     // Help popup
     PopUpText {
         id: popUpText
