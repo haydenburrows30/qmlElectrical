@@ -3,6 +3,11 @@ import os
 import sqlite3
 import json
 import math
+import sys
+
+# Import the database manager
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+from services.database_manager import DatabaseManager
 
 class ProtectionRelayCalculator(QObject):
     """Protection relay calculator and database interface."""
@@ -40,10 +45,10 @@ class ProtectionRelayCalculator(QObject):
         self._curve_points = []
         self._curve_type_names = list(self._curve_constants.keys())
         
-        self.db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'application_data.db')
+        # Get database instance instead of path
+        self.db_manager = DatabaseManager.get_instance()
         
-        # Initialize database tables first
-        self._init_database()
+        # Load device data using existing database connection
         self._load_device_data()
         
         # Add storage for saved settings
@@ -55,112 +60,10 @@ class ProtectionRelayCalculator(QObject):
         
         self._calculate()
 
-    def _init_database(self):
-        """Initialize required database tables if they don't exist."""
-        conn = None
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Create circuit breakers table
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS circuit_breakers (
-                id INTEGER PRIMARY KEY,
-                type TEXT NOT NULL,
-                rating REAL NOT NULL,
-                breaking_capacity INTEGER NOT NULL,
-                curve_type TEXT,
-                manufacturer TEXT,
-                model TEXT,
-                description TEXT
-            )''')
-            
-            # Create protection curves table
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS protection_curves (
-                id INTEGER PRIMARY KEY,
-                device_type TEXT NOT NULL,
-                rating REAL NOT NULL,
-                current_multiplier REAL NOT NULL,
-                tripping_time REAL NOT NULL,
-                curve_type TEXT,
-                temperature TEXT,
-                notes TEXT
-            )''')
-            
-            # Add default data if tables are empty
-            cursor.execute("SELECT COUNT(*) FROM circuit_breakers")
-            if cursor.fetchone()[0] == 0:
-                default_breakers = [
-                    # MCB ratings
-                    ("MCB", 6, 6000, "C", "Generic", "MCB-C6", "6A Type C MCB"),
-                    ("MCB", 10, 6000, "C", "Generic", "MCB-C10", "10A Type C MCB"),
-                    ("MCB", 16, 6000, "C", "Generic", "MCB-C16", "16A Type C MCB"),
-                    ("MCB", 20, 6000, "C", "Generic", "MCB-C20", "20A Type C MCB"),
-                    ("MCB", 25, 6000, "C", "Generic", "MCB-C25", "25A Type C MCB"),
-                    ("MCB", 32, 6000, "C", "Generic", "MCB-C32", "32A Type C MCB"),
-                    ("MCB", 40, 6000, "C", "Generic", "MCB-C40", "40A Type C MCB"),
-                    ("MCB", 50, 6000, "C", "Generic", "MCB-C50", "50A Type C MCB"),
-                    ("MCB", 63, 6000, "C", "Generic", "MCB-C63", "63A Type C MCB"),
-                    ("MCB", 80, 6000, "C", "Generic", "MCB-C80", "80A Type C MCB"),
-                    # MCCB ratings
-                    ("MCCB", 100, 25000, "C", "Generic", "MCCB-100", "100A MCCB"),
-                    ("MCCB", 125, 25000, "C", "Generic", "MCCB-125", "125A MCCB"),
-                    ("MCCB", 160, 25000, "C", "Generic", "MCCB-160", "160A MCCB"),
-                    ("MCCB", 200, 25000, "C", "Generic", "MCCB-200", "200A MCCB"),
-                    ("MCCB", 250, 35000, "C", "Generic", "MCCB-250", "250A MCCB"),
-                ]
-                cursor.executemany("""
-                    INSERT INTO circuit_breakers (type, rating, breaking_capacity, 
-                    curve_type, manufacturer, model, description)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, default_breakers)
-            
-            # Add protection curves to database if needed
-            cursor.execute("SELECT COUNT(*) FROM protection_curves")
-            if cursor.fetchone()[0] == 0:
-                # Add typical MCB curve points (B, C, D curves)
-                mcb_curve_points = [
-                    # B Curve (3-5x In)
-                    ("MCB", 6, 1.05, 3600, "B", "25°C", "No trip region"),
-                    ("MCB", 6, 2.5, 1800, "B", "25°C", "May trip region"),
-                    ("MCB", 6, 3.0, 0.2, "B", "25°C", "Trip region start"),
-                    ("MCB", 6, 5.0, 0.05, "B", "25°C", "Must trip region"),
-                    ("MCB", 6, 10.0, 0.01, "B", "25°C", "Fast trip region"),
-                    
-                    # C Curve (5-10x In)
-                    ("MCB", 6, 1.05, 3600, "C", "25°C", "No trip region"),
-                    ("MCB", 6, 3.0, 1800, "C", "25°C", "May trip region"),
-                    ("MCB", 6, 5.0, 0.2, "C", "25°C", "Trip region start"),
-                    ("MCB", 6, 10.0, 0.05, "C", "25°C", "Must trip region"),
-                    ("MCB", 6, 20.0, 0.01, "C", "25°C", "Fast trip region"),
-                    
-                    # D Curve (10-20x In)
-                    ("MCB", 6, 1.05, 3600, "D", "25°C", "No trip region"),
-                    ("MCB", 6, 5.0, 1800, "D", "25°C", "May trip region"),
-                    ("MCB", 6, 10.0, 0.2, "D", "25°C", "Trip region start"),
-                    ("MCB", 6, 20.0, 0.05, "D", "25°C", "Must trip region"),
-                    ("MCB", 6, 50.0, 0.01, "D", "25°C", "Fast trip region"),
-                ]
-                
-                cursor.executemany("""
-                    INSERT INTO protection_curves 
-                    (device_type, rating, current_multiplier, tripping_time, curve_type, temperature, notes)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, mcb_curve_points)
-            
-            conn.commit()
-            
-        except sqlite3.Error as e:
-            print(f"Database initialization error: {e}")
-        finally:
-            if conn:
-                conn.close()
-
     def _load_device_data(self):
         """Load device data from SQLite database."""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self.db_manager.connection
             cursor = conn.cursor()
             
             # Modified query to get only one entry per type with max breaking capacity
@@ -199,9 +102,6 @@ class ProtectionRelayCalculator(QObject):
             self._curve_types = list(self._curve_constants.keys())
             self.deviceTypesChanged.emit()
             self.curveTypesChanged.emit()
-        finally:
-            if 'conn' in locals():
-                conn.close()
 
     def _calculate(self):
         """Calculate operating time for relay with improved logarithmic curve generation."""
@@ -244,7 +144,7 @@ class ProtectionRelayCalculator(QObject):
     def _calculate_operating_time(self):
         """Calculate relay operating time using database curve data."""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self.db_manager.connection
             cursor = conn.cursor()
             
             # Get curve points from database
@@ -259,10 +159,8 @@ class ProtectionRelayCalculator(QObject):
             if points:
                 self._curve_points = points
                 # Calculate operating time using curve points...
-                
-        finally:
-            if 'conn' in locals():
-                conn.close()
+        except Exception as e:
+            print(f"Error calculating operating time: {e}")
 
     def _load_saved_settings(self):
         """Load saved settings from JSON file."""
@@ -415,7 +313,7 @@ class ProtectionRelayCalculator(QObject):
     def getDeviceRatings(self, device_type):
         """Get available ratings for device type."""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self.db_manager.connection
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT rating, model, description
@@ -429,15 +327,15 @@ class ProtectionRelayCalculator(QObject):
                 'model': row[1],
                 'description': row[2]
             } for row in cursor.fetchall()]
-        finally:
-            if 'conn' in locals():
-                conn.close()
+        except Exception as e:
+            print(f"Error getting device ratings: {e}")
+            return []
 
     @Slot(str, result='QVariantList')
     def getUniqueDeviceRatings(self, device_type):
         """Get available ratings for device type without duplicates."""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self.db_manager.connection
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT DISTINCT rating, MIN(model) as model, MIN(description) as description
@@ -452,15 +350,15 @@ class ProtectionRelayCalculator(QObject):
                 'model': row[1],
                 'description': row[2]
             } for row in cursor.fetchall()]
-        finally:
-            if 'conn' in locals():
-                conn.close()
+        except Exception as e:
+            print(f"Error getting unique device ratings: {e}")
+            return []
 
     @Slot(str, float, result='QVariantList')
     def getCurvePoints(self, device_type: str, rating: float) -> list:
         """Get protection curve points for device type and rating."""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self.db_manager.connection
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT current_multiplier, tripping_time
@@ -476,10 +374,9 @@ class ProtectionRelayCalculator(QObject):
                 'current': row[0] * rating,  # Convert multiplier to actual current
                 'time': row[1]
             } for row in points]
-            
-        finally:
-            if 'conn' in locals():
-                conn.close()
+        except Exception as e:
+            print(f"Error getting curve points: {e}")
+            return []
 
     @Slot(str, int, result=bool)
     def updateBreakingCapacity(self, device_type: str, breaking_capacity: int) -> bool:
@@ -499,7 +396,7 @@ class ProtectionRelayCalculator(QObject):
                           f"({min_capacity}-{max_capacity}A) for {device_type}")
                     return False
 
-            conn = sqlite3.connect(self.db_path)
+            conn = self.db_manager.connection
             cursor = conn.cursor()
             
             print(f"Updating breaking capacity for {device_type} to {breaking_capacity}A")
@@ -537,11 +434,7 @@ class ProtectionRelayCalculator(QObject):
         except Exception as e:
             print(f"Error updating breaking capacity: {e}")
             return False
-        finally:
-            if 'conn' in locals():
-                conn.close()
 
-    # QML slots
     @Slot(float)
     def setPickupCurrent(self, current):
         self.pickupCurrent = current
@@ -558,7 +451,6 @@ class ProtectionRelayCalculator(QObject):
     def setFaultCurrent(self, current):
         self.faultCurrent = current
 
-    # Add capability to calculate fault current based on circuit parameters
     @Slot(float, float, float, result=float)
     def calculateFaultCurrent(self, voltage, length, cable_size):
         """Calculate fault current based on circuit parameters with improved accuracy.
@@ -571,7 +463,6 @@ class ProtectionRelayCalculator(QObject):
         Returns:
             Estimated fault current in amps
         """
-        # Resistance per meter (ohm/m) based on cable size
         resistivity = {
             1.5: 0.0183,
             2.5: 0.0109,
@@ -587,7 +478,6 @@ class ProtectionRelayCalculator(QObject):
             120: 0.000229
         }
         
-        # Reactance per meter (approximate values for copper cables)
         reactance = {
             1.5: 0.000115,
             2.5: 0.000109,
@@ -603,24 +493,19 @@ class ProtectionRelayCalculator(QObject):
             120: 0.000084
         }
         
-        # Get values with fallback defaults
         r_per_m = resistivity.get(cable_size, 0.01)
         x_per_m = reactance.get(cable_size, 0.0001)
         
-        # Calculate cable impedance (go and return path)
         r_cable = r_per_m * length * 2
         x_cable = x_per_m * length * 2
         
-        # Source impedance (typical LV transformer and network)
         r_source = 0.03
         x_source = 0.04
         
-        # Total circuit impedance (using complex impedance)
         r_total = r_cable + r_source
         x_total = x_cable + x_source
         z_total = (r_total**2 + x_total**2)**0.5
         
-        # Calculate fault current using Ohm's law
         if z_total > 0:
             fault_current = voltage / z_total
         else:
@@ -633,7 +518,6 @@ class ProtectionRelayCalculator(QObject):
         """Clear all saved settings."""
         try:
             self._saved_settings = []
-            # Remove the settings file if it exists
             if os.path.exists(self._settings_file):
                 os.remove(self._settings_file)
             self.savedSettingsChanged.emit()

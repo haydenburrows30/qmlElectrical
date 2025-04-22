@@ -171,7 +171,7 @@ class DatabaseManager:
             category TEXT
         )''')
         
-        # Circuit breakers table
+        # Circuit breakers table - updated to match ProtectionRelayCalculator schema
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS circuit_breakers (
             id INTEGER PRIMARY KEY,
@@ -185,7 +185,7 @@ class DatabaseManager:
             description TEXT
         )''')
         
-        # Protection curves table - Fixed with correct column names
+        # Protection curves table - updated to match ProtectionRelayCalculator schema
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS protection_curves (
             id INTEGER PRIMARY KEY,
@@ -824,23 +824,25 @@ class DatabaseManager:
         if cursor.fetchone()[0] > 0:
             return
         
-        # Default circuit breaker data
+        # Default circuit breaker data - update to match the protection_relay data
         default_breakers = [
-            # MCB ratings with curve-specific types and full range
-            # B Type MCBs
-            ("MCB", 6, 6000, "B", "IEC Standard Inverse", "Generic", "MCB-B6", "6A Type B MCB"),
-            ("MCB", 10, 6000, "B", "IEC Standard Inverse", "Generic", "MCB-B10", "10A Type B MCB"),
-            ("MCB", 16, 6000, "B", "IEC Standard Inverse", "Generic", "MCB-B16", "16A Type B MCB"),
-            ("MCB", 20, 6000, "B", "IEC Standard Inverse", "Generic", "MCB-B20", "20A Type B MCB"),
-            ("MCB", 25, 6000, "B", "IEC Standard Inverse", "Generic", "MCB-B25", "25A Type B MCB"),
-            # C Type MCBs
-            ("MCB", 6, 6000, "C", "IEC Very Inverse", "Generic", "MCB-C6", "6A Type C MCB"),
-            ("MCB", 10, 6000, "C", "IEC Very Inverse", "Generic", "MCB-C10", "10A Type C MCB"),
-            ("MCB", 16, 6000, "C", "IEC Very Inverse", "Generic", "MCB-C16", "16A Type C MCB"),
-            # MCCB ratings with full range
-            ("MCCB", 100, 25000, "S", "IEC Extremely Inverse", "Generic", "MCCB-100", "100A MCCB"),
-            ("MCCB", 160, 25000, "S", "IEC Extremely Inverse", "Generic", "MCCB-160", "160A MCCB"),
-            ("MCCB", 250, 35000, "S", "IEC Extremely Inverse", "Generic", "MCCB-250", "250A MCCB"),
+            # MCB ratings
+            ("MCB", 6, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C6", "6A Type C MCB"),
+            ("MCB", 10, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C10", "10A Type C MCB"),
+            ("MCB", 16, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C16", "16A Type C MCB"),
+            ("MCB", 20, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C20", "20A Type C MCB"),
+            ("MCB", 25, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C25", "25A Type C MCB"),
+            ("MCB", 32, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C32", "32A Type C MCB"),
+            ("MCB", 40, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C40", "40A Type C MCB"),
+            ("MCB", 50, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C50", "50A Type C MCB"),
+            ("MCB", 63, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C63", "63A Type C MCB"),
+            ("MCB", 80, 6000, "C", "IEC Standard Inverse", "Generic", "MCB-C80", "80A Type C MCB"),
+            # MCCB ratings
+            ("MCCB", 100, 25000, "C", "IEC Extremely Inverse", "Generic", "MCCB-100", "100A MCCB"),
+            ("MCCB", 125, 25000, "C", "IEC Extremely Inverse", "Generic", "MCCB-125", "125A MCCB"),
+            ("MCCB", 160, 25000, "C", "IEC Extremely Inverse", "Generic", "MCCB-160", "160A MCCB"),
+            ("MCCB", 200, 25000, "C", "IEC Extremely Inverse", "Generic", "MCCB-200", "200A MCCB"),
+            ("MCCB", 250, 35000, "C", "IEC Extremely Inverse", "Generic", "MCCB-250", "250A MCCB"),
         ]
         
         cursor.executemany("""
@@ -981,17 +983,35 @@ class DatabaseManager:
         if cursor.fetchone()[0] > 0:
             return
         
-        protection_data = [
-            ("MCB", 32, 1.0, 3600, "C", "20°C", "Normal load"),
-            ("MCB", 32, 5.0, 0.1, "C", "20°C", "Overload"),
-            ("MCB", 32, 10.0, 0.01, "C", "20°C", "Short circuit")
+        # Add typical MCB curve points (B, C, D curves) to match protection_relay data
+        mcb_curve_points = [
+            # B Curve (3-5x In)
+            ("MCB", 6, 1.05, 3600, "B", "25°C", "No trip region"),
+            ("MCB", 6, 2.5, 1800, "B", "25°C", "May trip region"),
+            ("MCB", 6, 3.0, 0.2, "B", "25°C", "Trip region start"),
+            ("MCB", 6, 5.0, 0.05, "B", "25°C", "Must trip region"),
+            ("MCB", 6, 10.0, 0.01, "B", "25°C", "Fast trip region"),
+            
+            # C Curve (5-10x In)
+            ("MCB", 6, 1.05, 3600, "C", "25°C", "No trip region"),
+            ("MCB", 6, 3.0, 1800, "C", "25°C", "May trip region"),
+            ("MCB", 6, 5.0, 0.2, "C", "25°C", "Trip region start"),
+            ("MCB", 6, 10.0, 0.05, "C", "25°C", "Must trip region"),
+            ("MCB", 6, 20.0, 0.01, "C", "25°C", "Fast trip region"),
+            
+            # D Curve (10-20x In)
+            ("MCB", 6, 1.05, 3600, "D", "25°C", "No trip region"),
+            ("MCB", 6, 5.0, 1800, "D", "25°C", "May trip region"),
+            ("MCB", 6, 10.0, 0.2, "D", "25°C", "Trip region start"),
+            ("MCB", 6, 20.0, 0.05, "D", "25°C", "Must trip region"),
+            ("MCB", 6, 50.0, 0.01, "D", "25°C", "Fast trip region"),
         ]
         
         cursor.executemany("""
             INSERT INTO protection_curves 
             (device_type, rating, current_multiplier, tripping_time, curve_type, temperature, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, protection_data)
+        """, mcb_curve_points)
         
         self.connection.commit()
         logger.info("Loaded protection curves reference data")
