@@ -6,6 +6,7 @@ from datetime import datetime
 import shutil
 import threading
 import logging
+import json
 
 # Set up logger
 logger = logging.getLogger("qmltest.database")
@@ -19,6 +20,7 @@ class DatabaseManager:
     - Schema versioning
     - Reference data loading
     - Thread-safe connections
+    - Configuration storage
     """
     
     _instance = None
@@ -104,6 +106,13 @@ class DatabaseManager:
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS schema_version (
             version INTEGER PRIMARY KEY
+        )''')
+        
+        # Config table
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS config (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
         )''')
         
         # Cable data table
@@ -251,6 +260,12 @@ class DatabaseManager:
             ("schema_version", '''
             CREATE TABLE IF NOT EXISTS schema_version (
                 version INTEGER PRIMARY KEY
+            )'''),
+            
+            ("config", '''
+            CREATE TABLE IF NOT EXISTS config (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
             )'''),
             
             ("cable_data", '''
@@ -433,7 +448,7 @@ class DatabaseManager:
             
             # Check for expected tables
             expected_tables = [
-                'schema_version', 'cable_data', 'installation_methods', 'temperature_factors',
+                'schema_version', 'config', 'cable_data', 'installation_methods', 'temperature_factors',
                 'cable_materials', 'standards_reference', 'circuit_breakers', 'protection_curves',
                 'diversity_factors', 'fuse_sizes', 'calculation_history', 'settings',
                 'voltage_systems', 'insulation_types', 'soil_resistivity'
@@ -567,6 +582,9 @@ class DatabaseManager:
         self._load_insulation_types()
         self._load_soil_resistivity()
         self._load_protection_curves()
+        
+        # Load default config values
+        self._load_default_config()
         
         logger.info("Reference data loading complete")
     
@@ -978,7 +996,86 @@ class DatabaseManager:
         self.connection.commit()
         logger.info("Loaded protection curves reference data")
     
-    # Database operation methods
+    def _load_default_config(self):
+        """Load default configuration values."""
+        cursor = self.connection.cursor()
+        
+        # Check if table has any values already
+        cursor.execute("SELECT COUNT(*) FROM config")
+        if cursor.fetchone()[0] > 0:
+            return
+        
+        # Default configuration values
+        default_config = {
+            "voltage_drop_threshold": 5.0,
+            "power_factor": 0.9,
+            "default_sample_count": 100,
+            "dark_mode": False,
+            "show_tooltips": True,
+            "decimal_precision": 2,
+            "style": "Universal",
+            "app_name": "Electrical",
+            "org_name": "QtProject",
+            "icon_path": "icons/gallery/24x24/Wave_dark.ico",
+            "version": "1.1.9",
+            "performance_monitor_enabled": True
+        }
+        
+        for key, value in default_config.items():
+            cursor.execute("""
+                INSERT OR IGNORE INTO config (key, value) 
+                VALUES (?, ?)
+            """, (key, json.dumps(value)))
+        
+        self.connection.commit()
+        logger.info("Loaded default configuration values")
+    
+    def get_config(self, key, default=None):
+        """Get configuration value."""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
+            result = cursor.fetchone()
+            
+            if result:
+                return json.loads(result[0])
+            return default
+        except Exception as e:
+            logger.error(f"Error getting config value for {key}: {e}")
+            return default
+    
+    def set_config(self, key, value):
+        """Set configuration value."""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO config (key, value) 
+                VALUES (?, ?)
+            """, (key, json.dumps(value)))
+            
+            self.connection.commit()
+            logger.debug(f"Successfully saved config {key}: {value}")
+            return True
+        except Exception as e:
+            logger.error(f"Error saving config value for {key}: {e}")
+            return False
+    
+    def get_all_config(self):
+        """Get all configuration values."""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT key, value FROM config")
+            config_rows = cursor.fetchall()
+            
+            config_dict = {}
+            for key, value in config_rows:
+                config_dict[key] = json.loads(value)
+            
+            return config_dict
+        except Exception as e:
+            logger.error(f"Error retrieving all config values: {e}")
+            return {}
+    
     def execute_query(self, query, params=None):
         """Execute a query and return results."""
         try:

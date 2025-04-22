@@ -8,8 +8,8 @@ from typing import Any, Dict
 import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-import sqlite3
 from services.logger_config import configure_logger
+from services.database_manager import DatabaseManager
 
 # Base paths
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,76 +28,29 @@ logger = configure_logger("qmltest", component="config")
 class AppConfig:
     """Application configuration class."""
     def __init__(self):
-        # Connect to database
+        # Get database manager instance
         self.db_path = os.path.join(DATA_DIR, 'application_data.db')
-        self._init_db()
+        self.db_manager = DatabaseManager.get_instance(self.db_path)
         self._load_defaults()
         
         # Command line argument parsing
         self.args = self._parse_command_line_args()
 
-    def _init_db(self):
-        """Initialize config table in database."""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS config (
-            key TEXT PRIMARY KEY,
-            value TEXT NOT NULL
-        )
-        ''')
-        conn.commit()
-        conn.close()
-
     def _load_defaults(self):
         """Load or create default settings."""
-        defaults = {
-            "voltage_drop_threshold": 5.0,
-            "power_factor": 0.9,
-            "default_sample_count": 100,
-            "dark_mode": False,
-            "show_tooltips": True,
-            "decimal_precision": 2,
-            "style": "Universal",
-            "app_name": "Electrical",
-            "org_name": "QtProject",
-            "icon_path": "icons/gallery/24x24/Wave_dark.ico",
-            "version": "1.1.9",
-            "performance_monitor_enabled": True  # Add default for performance monitor
-        }
-
-        try:
-            # Use with statement for proper connection handling
-            with sqlite3.connect(self.db_path, timeout=20) as conn:
-                cursor = conn.cursor()
-
-                # Insert defaults if not exist
-                for key, value in defaults.items():
-                    cursor.execute("""
-                        INSERT OR IGNORE INTO config (key, value) 
-                        VALUES (?, ?)
-                    """, (key, json.dumps(value)))
-                    
-                    # Load value from database
-                    cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
-                    result = cursor.fetchone()
-                    if result:
-                        setattr(self, key, json.loads(result[0]))
-                        logger.debug(f"Loaded setting {key}: {json.loads(result[0])}")
-                
-                # Force update version in the same connection
-                cursor.execute("""
-                    UPDATE config SET value = ? WHERE key = ?
-                """, (json.dumps(defaults["version"]), "version"))
-                conn.commit()
-                
-                # Set local attribute
-                setattr(self, "version", defaults["version"])
-                logger.info(f"Application version set to: {self.version}")
-                
-        except sqlite3.Error as e:
-            logger.error(f"Database error in _load_defaults: {e}")
+        # Default settings are now managed by the database manager
+        # in its _load_default_config method
+        
+        # Load all config values into attributes of this object
+        config_dict = self.db_manager.get_all_config()
+        for key, value in config_dict.items():
+            setattr(self, key, value)
+            logger.debug(f"Loaded setting {key}: {value}")
+        
+        # Ensure version is set correctly (always use the value from code)
+        self.version = "1.1.9"
+        self.db_manager.set_config("version", self.version)
+        logger.info(f"Application version set to: {self.version}")
 
     def _parse_command_line_args(self) -> argparse.Namespace:
         """Parse command line arguments."""
@@ -153,65 +106,38 @@ class AppConfig:
         
     def save_setting(self, key: str, value: Any) -> bool:
         """Save a setting to the database."""
-        try:
-            # Use with statement for proper connection handling
-            with sqlite3.connect(self.db_path, timeout=20) as conn:
-                cursor = conn.cursor()
-                
-                cursor.execute("""
-                    INSERT OR REPLACE INTO config (key, value) 
-                    VALUES (?, ?)
-                """, (key, json.dumps(value)))
-                
-                conn.commit()
-            
-            # Set local attribute after database save
+        # Use the database manager to save the setting
+        success = self.db_manager.set_config(key, value)
+        
+        # Also update the local attribute
+        if success:
             setattr(self, key, value)
-            logger.debug(f"Successfully saved setting {key}: {value}")
-            return True
             
-        except Exception as e:
-            logger.error(f"Error saving setting {key}: {e}")
-            return False
+        return success
 
     def get_setting(self, key: str, default: Any = None) -> Any:
         """Get a setting from the database."""
-        try:
-            # Use with statement for proper connection handling
-            with sqlite3.connect(self.db_path, timeout=20) as conn:
-                cursor = conn.cursor()
-                
-                cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
-                result = cursor.fetchone()
-            
-            if result:
-                return json.loads(result[0])
-            return default
-            
-        except Exception as e:
-            logger.error(f"Error getting setting {key}: {e}")
-            return default
+        # Use the database manager to get the setting
+        return self.db_manager.get_config(key, default)
 
 def print_config_info() -> None:
     """Display current config settings from database."""
     logger.info("=== Configuration Information ===")
     
-    try:
-        # Use with statement for proper connection handling
-        with sqlite3.connect(app_config.db_path, timeout=20) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT key, value FROM config")
-            settings = cursor.fetchall()
-        
-        if settings:
-            logger.info(f"Database location: {app_config.db_path}")
-            logger.info("Current configuration:")
-            for key, value in settings:
-                logger.info(f"  {key}: {value}")
-        else:
-            logger.info("No configuration settings found in database.")
-    except Exception as e:
-        logger.error(f"Error reading configuration: {e}")
+    # Get database manager instance
+    db_path = os.path.join(DATA_DIR, 'application_data.db')
+    db_manager = DatabaseManager.get_instance(db_path)
+    
+    # Get all configuration
+    config_dict = db_manager.get_all_config()
+    
+    if config_dict:
+        logger.info(f"Database location: {db_path}")
+        logger.info("Current configuration:")
+        for key, value in config_dict.items():
+            logger.info(f"  {key}: {value}")
+    else:
+        logger.info("No configuration settings found in database.")
 
 # Function to expose config info to other modules
 def log_config_info():
