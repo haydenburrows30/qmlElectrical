@@ -571,6 +571,7 @@ class DatabaseManager:
         self._load_fuse_sizes()
         
         # Then load hard-coded reference data
+        self._load_cable_data()
         self._load_installation_methods()
         self._load_temperature_factors()
         self._load_cable_materials()
@@ -814,6 +815,26 @@ class DatabaseManager:
         
         self.connection.commit()
         logger.info("Loaded standards reference data")
+
+    def _load_cable_data(self):
+        """Load circuit breakers reference data."""
+        cursor = self.connection.cursor()
+        
+        # Check if table is already populated
+        cursor.execute("SELECT COUNT(*) FROM cable_data")
+        if cursor.fetchone()[0] > 0:
+            return
+        
+        default_cables = [(1,0.56,100,"Al","3C+E","PVC","XLPE","3001",0.43,0.23,0.19,512,95)]
+
+        cursor.executemany("""
+            INSERT INTO cable_data 
+            (size, mv_per_am, max_current, material, core_type, description, insulation_type, standard,dc_resistance, ac_resistance, reactance, mass_kg_per_km, temperature_rating)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, default_cables)
+        
+        self.connection.commit()
+        logger.info("Loaded cable data reference data")
     
     def _load_circuit_breakers(self):
         """Load circuit breakers reference data."""
