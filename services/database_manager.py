@@ -76,10 +76,23 @@ class DatabaseManager:
             # Load reference data
             self._load_reference_data()
             
+            # Verify schema integrity
+            self.verify_schema()
+            
             logger.info("Database initialization complete")
         except Exception as e:
             logger.error(f"Error initializing database: {e}")
-            raise
+            # Try to recover
+            try:
+                logger.info("Attempting database recovery...")
+                # Create schema again with improved error handling
+                self._safe_create_schema()
+                # Verify and fix schema
+                self.verify_schema()
+                logger.info("Database recovery complete")
+            except Exception as recovery_error:
+                logger.error(f"Database recovery failed: {recovery_error}")
+                raise
     
     def _create_schema(self):
         """Create all database tables."""
@@ -163,14 +176,17 @@ class DatabaseManager:
             description TEXT
         )''')
         
-        # Protection curves table
+        # Protection curves table - Fixed with correct column names
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS protection_curves (
             id INTEGER PRIMARY KEY,
-            type TEXT NOT NULL,
-            multiplier REAL NOT NULL,
-            time_seconds REAL NOT NULL,
-            description TEXT
+            device_type TEXT NOT NULL,
+            rating REAL NOT NULL,
+            current_multiplier REAL NOT NULL,
+            tripping_time REAL NOT NULL,
+            curve_type TEXT,
+            temperature TEXT,
+            notes TEXT
         )''')
         
         # Diversity factors table
@@ -226,6 +242,257 @@ class DatabaseManager:
         self.connection.commit()
         logger.info("Schema creation complete")
     
+    def _safe_create_schema(self):
+        """Create schema tables with individual error handling for each table."""
+        cursor = self.connection.cursor()
+        
+        # Create each table individually and catch errors
+        table_definitions = [
+            ("schema_version", '''
+            CREATE TABLE IF NOT EXISTS schema_version (
+                version INTEGER PRIMARY KEY
+            )'''),
+            
+            ("cable_data", '''
+            CREATE TABLE IF NOT EXISTS cable_data (
+                id INTEGER PRIMARY KEY,
+                size REAL NOT NULL,
+                mv_per_am REAL NOT NULL,
+                max_current REAL NOT NULL,
+                material TEXT NOT NULL,
+                core_type TEXT NOT NULL,
+                description TEXT,
+                insulation_type TEXT,
+                standard TEXT,
+                dc_resistance REAL,
+                ac_resistance REAL,
+                reactance REAL,
+                mass_kg_per_km REAL,
+                temperature_rating REAL
+            )'''),
+            
+            ("installation_methods", '''
+            CREATE TABLE IF NOT EXISTS installation_methods (
+                code TEXT PRIMARY KEY,
+                description TEXT NOT NULL,
+                base_factor REAL NOT NULL,
+                notes TEXT
+            )'''),
+            
+            ("temperature_factors", '''
+            CREATE TABLE IF NOT EXISTS temperature_factors (
+                temperature INTEGER,
+                insulation_type TEXT,
+                factor REAL NOT NULL,
+                PRIMARY KEY (temperature, insulation_type)
+            )'''),
+            
+            ("cable_materials", '''
+            CREATE TABLE IF NOT EXISTS cable_materials (
+                material TEXT PRIMARY KEY,
+                resistivity REAL NOT NULL,
+                temperature_coefficient REAL NOT NULL,
+                description TEXT
+            )'''),
+            
+            ("standards_reference", '''
+            CREATE TABLE IF NOT EXISTS standards_reference (
+                code TEXT PRIMARY KEY,
+                description TEXT NOT NULL,
+                voltage_drop_limit REAL,
+                current_rating_table TEXT,
+                category TEXT
+            )'''),
+            
+            ("circuit_breakers", '''
+            CREATE TABLE IF NOT EXISTS circuit_breakers (
+                id INTEGER PRIMARY KEY,
+                type TEXT NOT NULL,
+                rating REAL NOT NULL,
+                breaking_capacity INTEGER NOT NULL,
+                breaker_curve TEXT,
+                curve_type TEXT,
+                manufacturer TEXT,
+                model TEXT,
+                description TEXT
+            )'''),
+            
+            ("protection_curves", '''
+            CREATE TABLE IF NOT EXISTS protection_curves (
+                id INTEGER PRIMARY KEY,
+                device_type TEXT NOT NULL,
+                rating REAL NOT NULL,
+                current_multiplier REAL NOT NULL,
+                tripping_time REAL NOT NULL,
+                curve_type TEXT,
+                temperature TEXT,
+                notes TEXT
+            )'''),
+            
+            ("diversity_factors", '''
+            CREATE TABLE IF NOT EXISTS diversity_factors (
+                id INTEGER PRIMARY KEY,
+                houses INTEGER NOT NULL,
+                factor REAL NOT NULL
+            )'''),
+            
+            ("fuse_sizes", '''
+            CREATE TABLE IF NOT EXISTS fuse_sizes (
+                id INTEGER PRIMARY KEY,
+                material TEXT NOT NULL,
+                size_mm2 REAL NOT NULL,
+                fuse_size_a REAL NOT NULL,
+                fuse_type TEXT
+            )'''),
+            
+            ("calculation_history", '''
+            CREATE TABLE IF NOT EXISTS calculation_history (
+                id INTEGER PRIMARY KEY,
+                timestamp TEXT,
+                voltage_system TEXT,
+                kva_per_house REAL,
+                num_houses INTEGER,
+                diversity_factor REAL,
+                total_kva REAL,
+                current REAL,
+                cable_size TEXT,
+                conductor TEXT,
+                core_type TEXT,
+                length REAL,
+                voltage_drop REAL,
+                drop_percent REAL,
+                admd_enabled INTEGER
+            )'''),
+            
+            ("settings", '''
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )'''),
+            
+            ("voltage_systems", '''
+            CREATE TABLE IF NOT EXISTS voltage_systems (
+                id INTEGER PRIMARY KEY,
+                voltage REAL NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT,
+                frequency INTEGER DEFAULT 50,
+                phase_count INTEGER DEFAULT 3,
+                category TEXT,
+                notes TEXT
+            )'''),
+            
+            ("insulation_types", '''
+            CREATE TABLE IF NOT EXISTS insulation_types (
+                code TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                max_temp INTEGER NOT NULL,
+                description TEXT,
+                material TEXT,
+                standard TEXT
+            )'''),
+            
+            ("soil_resistivity", '''
+            CREATE TABLE IF NOT EXISTS soil_resistivity (
+                id INTEGER PRIMARY KEY,
+                soil_type TEXT NOT NULL,
+                min_resistivity REAL,
+                max_resistivity REAL,
+                typical_value REAL,
+                moisture_content TEXT,
+                notes TEXT
+            )''')
+        ]
+        
+        for table_name, sql in table_definitions:
+            try:
+                cursor.execute(sql)
+                logger.info(f"Created table: {table_name}")
+            except Exception as e:
+                logger.error(f"Error creating table {table_name}: {e}")
+        
+        # Create indexes
+        try:
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_material ON cable_data(material)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_size ON cable_data(size)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_diversity_houses ON diversity_factors(houses)')
+        except Exception as e:
+            logger.error(f"Error creating indexes: {e}")
+            
+        self.connection.commit()
+    
+    def verify_schema(self):
+        """Verify database schema integrity, fix issues if possible."""
+        try:
+            # Get list of tables
+            cursor = self.connection.cursor()
+            tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+            table_names = [table[0] for table in tables]
+            
+            logger.info(f"Verifying database schema: found {len(tables)} tables")
+            
+            # Check for expected tables
+            expected_tables = [
+                'schema_version', 'cable_data', 'installation_methods', 'temperature_factors',
+                'cable_materials', 'standards_reference', 'circuit_breakers', 'protection_curves',
+                'diversity_factors', 'fuse_sizes', 'calculation_history', 'settings',
+                'voltage_systems', 'insulation_types', 'soil_resistivity'
+            ]
+            
+            for table in expected_tables:
+                if table not in table_names:
+                    logger.warning(f"Missing table: {table}")
+            
+            # Verify table structures for critical tables
+            try:
+                # Check protection_curves
+                cursor.execute("PRAGMA table_info(protection_curves)")
+                columns = {column[1]: column for column in cursor.fetchall()}
+                
+                # Check if protection_curves has the right columns
+                if 'device_type' not in columns and 'type' in columns:
+                    logger.warning("Found old protection_curves schema, updating...")
+                    # Create a temp table with correct structure
+                    cursor.execute('''
+                    CREATE TABLE protection_curves_new (
+                        id INTEGER PRIMARY KEY,
+                        device_type TEXT NOT NULL,
+                        rating REAL NOT NULL,
+                        current_multiplier REAL NOT NULL,
+                        tripping_time REAL NOT NULL,
+                        curve_type TEXT,
+                        temperature TEXT,
+                        notes TEXT
+                    )''')
+                    
+                    # Migrate data if possible
+                    try:
+                        cursor.execute('''
+                        INSERT INTO protection_curves_new 
+                        (device_type, rating, current_multiplier, tripping_time, curve_type, temperature, notes)
+                        SELECT type, rating, multiplier, time_seconds, curve_type, temperature, description 
+                        FROM protection_curves
+                        ''')
+                    except:
+                        logger.warning("Could not migrate protection_curves data, starting fresh")
+                    
+                    # Drop old table and rename new one
+                    cursor.execute("DROP TABLE protection_curves")
+                    cursor.execute("ALTER TABLE protection_curves_new RENAME TO protection_curves")
+                    self.connection.commit()
+                    logger.info("Fixed protection_curves table schema")
+                    
+            except Exception as e:
+                logger.error(f"Error verifying protection_curves table: {e}")
+            
+            # Final verification - ensure we can load all reference data
+            self._load_reference_data()
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error during schema verification: {e}")
+            return False
+    
     def _set_schema_version(self, version):
         """Set the schema version."""
         cursor = self.connection.cursor()
@@ -256,7 +523,12 @@ class DatabaseManager:
             # Perform schema migrations based on version
             if current_version == 0:
                 # Fresh install or legacy database without version
-                self.initialize_database()
+                try:
+                    self.initialize_database()
+                except Exception as e:
+                    logger.error(f"Error during database initialization: {e}")
+                    # Try to verify and fix
+                    self.verify_schema()
             else:
                 # Incremental upgrades
                 if current_version < 1:
@@ -264,6 +536,9 @@ class DatabaseManager:
                 
                 # Update version after migration
                 self._set_schema_version(self.current_version)
+        else:
+            # Even if version is current, verify schema integrity
+            self.verify_schema()
     
     def _migrate_to_v1(self):
         """Migrate schema to version 1."""
@@ -278,6 +553,7 @@ class DatabaseManager:
         
         # Load from CSV files if available
         self._load_diversity_factors()
+        self._load_fuse_sizes()
         
         # Then load hard-coded reference data
         self._load_installation_methods()
@@ -342,6 +618,84 @@ class DatabaseManager:
         
         self.connection.commit()
         logger.info("Loaded default diversity factors")
+    
+    def _load_fuse_sizes(self):
+        """Load fuse sizes from CSV if available, or use defaults."""
+        cursor = self.connection.cursor()
+        
+        # Check if table is already populated
+        cursor.execute("SELECT COUNT(*) FROM fuse_sizes")
+        if cursor.fetchone()[0] > 0:
+            return
+        
+        # Try to load from CSV
+        project_root = os.path.abspath(os.path.join(os.path.dirname(self.db_path), '..'))
+        csv_path = os.path.join(project_root, 'data', 'network_fuse_sizes.csv')
+        
+        if os.path.exists(csv_path):
+            try:
+                logger.info(f"Loading fuse sizes from CSV: {csv_path}")
+                
+                # Clean approach to load the CSV
+                with open(csv_path, 'r') as csv_file:
+                    # Skip the first line if it starts with //
+                    first_line = csv_file.readline().strip()
+                    
+                    # Check if first line is a comment
+                    if first_line.startswith('//'):
+                        # Reset file pointer to beginning and skip first line
+                        csv_file.seek(0)
+                        next(csv_file)
+                    else:
+                        # Reset file pointer to beginning
+                        csv_file.seek(0)
+                        
+                    # Now read with pandas
+                    df = pd.read_csv(csv_file)
+                    
+                    # Verify the CSV has the required columns
+                    required_columns = ['Material', 'Size (mm2)', 'Network Fuse Size (A)']
+                    if all(col in df.columns for col in required_columns):
+                        for _, row in df.iterrows():
+                            cursor.execute(
+                                "INSERT INTO fuse_sizes (material, size_mm2, fuse_size_a) VALUES (?, ?, ?)",
+                                (row['Material'], float(row['Size (mm2)']), float(row['Network Fuse Size (A)']))
+                            )
+                        self.connection.commit()
+                        logger.info(f"Successfully loaded {len(df)} fuse sizes from {csv_path}")
+                        return
+                    else:
+                        missing_cols = [col for col in required_columns if col not in df.columns]
+                        logger.warning(f"CSV missing required columns: {missing_cols}")
+                        
+            except Exception as e:
+                logger.warning(f"Failed to load fuse sizes from CSV: {e}")
+        else:
+            logger.warning(f"Fuse sizes CSV file not found at {csv_path}")
+        
+        # Use default values if CSV loading failed
+        sample_fuses = [
+            ('Cu', 16.0, 63.0, 'NH'),
+            ('Cu', 25.0, 160.0, 'NH'),
+            ('Cu', 35.0, 160.0, 'NH'),
+            ('Cu', 70.0, 250.0, 'NH'),
+            ('Cu', 95.0, 250.0, 'NH'),
+            ('Cu', 120.0, 355.0, 'NH'),
+            ('Cu', 185.0, 500.0, 'NH'),
+            ('Al', 95.0, 200.0, 'NH'),
+            ('Al', 120.0, 250.0, 'NH'),
+            ('Al', 185.0, 355.0, 'NH'),
+            ('Al', 240.0, 400.0, 'NH'),
+            ('Al', 300.0, 500.0, 'NH')
+        ]
+        
+        cursor.executemany('''
+            INSERT INTO fuse_sizes (material, size_mm2, fuse_size_a, fuse_type)
+            VALUES (?, ?, ?, ?)
+        ''', sample_fuses)
+        
+        self.connection.commit()
+        logger.info("Loaded default fuse sizes as CSV file was not loaded")
     
     def _load_installation_methods(self):
         """Load installation methods reference data."""
@@ -591,7 +945,7 @@ class DatabaseManager:
         """Load protection curves reference data."""
         cursor = self.connection.cursor()
         
-        # Create table if not exists
+        # Create table if not exists with correct columns
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS protection_curves (
             id INTEGER PRIMARY KEY,
@@ -616,7 +970,8 @@ class DatabaseManager:
         ]
         
         cursor.executemany("""
-            INSERT INTO protection_curves (device_type, rating, current_multiplier, tripping_time, curve_type, temperature, notes)
+            INSERT INTO protection_curves 
+            (device_type, rating, current_multiplier, tripping_time, curve_type, temperature, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, protection_data)
         

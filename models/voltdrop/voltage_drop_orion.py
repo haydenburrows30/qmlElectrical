@@ -7,7 +7,7 @@ from services.file_saver import FileSaver
 from .table_model import VoltageDropTableModel
 from .file_utils import FileUtils
 from utils.pdf.pdf_generator_volt_drop import PDFGenerator
-from .data_manager import DataManager
+from services.voltage_drop_service import VoltageDropService
 
 # Setup component-specific logger (will now log to the shared log file)
 logger = configure_logger("qmltest", component="voltdrop")
@@ -54,7 +54,7 @@ class VoltageDropCalculator(QObject):
         super().__init__()
         
         # Initialize component classes
-        self._data_manager = DataManager()
+        self._data_manager = VoltageDropService()
         self._file_utils = FileUtils()
         self._pdf_generator = PDFGenerator()
         self._table_model = VoltageDropTableModel()
@@ -139,17 +139,19 @@ class VoltageDropCalculator(QObject):
             return
             
         try:
-            # Get current size and material
-            if isinstance(self._selected_cable['size'], pd.Series):
-                cable_size = float(self._selected_cable['size'].iloc[0])
+            # Get current size and material - safely extract from Series if needed
+            cable_size = self._selected_cable['size']
+            if isinstance(cable_size, pd.Series):
+                cable_size = float(cable_size.iloc[0])
             else:
-                cable_size = float(self._selected_cable['size'])
+                cable_size = float(cable_size)
                 
-            # Get conductor rating
-            if isinstance(self._selected_cable['max_current'], pd.Series):
-                self._conductor_rating = float(self._selected_cable['max_current'].iloc[0])
+            # Get conductor rating - safely extract from Series if needed
+            conductor_rating = self._selected_cable['max_current']
+            if isinstance(conductor_rating, pd.Series):
+                self._conductor_rating = float(conductor_rating.iloc[0])
             else:
-                self._conductor_rating = float(self._selected_cable['max_current'])
+                self._conductor_rating = float(conductor_rating)
             
             self.conductorRatingChanged.emit(self._conductor_rating)
             
