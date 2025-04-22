@@ -13,22 +13,30 @@ Popup {
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     padding: 0
     anchors.centerIn: Overlay.overlay
+
+    property bool componentInit: false
     
     Component.onCompleted: {
         // Apply saved setting when component loads
         if (typeof perfMonitor !== 'undefined' && typeof appConfig !== 'undefined') {
-            var enabled = appConfig.get_setting("performance_monitor_enabled", true);
+            var enabled = appConfig.get_setting("performance_monitor_enabled", false);
             perfMonitor.enabled = enabled;
             perfMonitorSwitch.checked = enabled;
             
             // Load voltage default
-            var defaultVoltage = appConfig.get_setting("default_voltage", "230V");
-            for (var i = 0; i < voltageComboBox.model.length; i++) {
-                if (voltageComboBox.model[i] === defaultVoltage) {
-                    voltageComboBox.currentIndex = i;
-                    break;
-                }
-            }
+            var defaultVoltage = appConfig.get_setting("default_voltage", "415V");
+            console.log(defaultVoltage)
+            if (defaultVoltage === "415V") {
+                voltageComboBox.currentIndex = 1
+            } else voltageComboBox.currentIndex = 0
+
+            componentInit = true
+            // for (var i = 0; i < voltageComboBox.model.length; i++) {
+            //     if (voltageComboBox.model[i] === defaultVoltage) {
+            //         voltageComboBox.currentIndex = i;
+            //         break;
+            //     }
+            // }
         }
     }
     
@@ -108,9 +116,12 @@ Popup {
                     id: voltageComboBox
                     model: ["230V", "415V"]
                     
+                    // make sure the setting is loaded from the database and combobox index is set
+                    // before saving the setting
                     onCurrentTextChanged: {
-                        if (typeof appConfig !== 'undefined') {
+                        if (typeof appConfig !== 'undefined' && componentInit == true) {
                             appConfig.save_setting("default_voltage", currentText);
+                            console.log("default voltage changed to:" + currentText)
                         }
                     }
                 }
@@ -157,16 +168,16 @@ Popup {
         onAccepted: {
             // Reset all settings to default
             if (typeof appConfig !== 'undefined') {
-                appConfig.save_setting("performance_monitor_enabled", true);
-                appConfig.save_setting("default_voltage", "230V");
+                appConfig.save_setting("performance_monitor_enabled", false);
+                appConfig.save_setting("default_voltage", "415V");
                 
                 // Update UI
-                perfMonitorSwitch.checked = true;
-                voltageComboBox.currentIndex = 0;
+                perfMonitorSwitch.checked = false;
+                voltageComboBox.currentIndex = 1;
                 
                 // Apply settings where needed
                 if (typeof perfMonitor !== 'undefined') {
-                    perfMonitor.enabled = true;
+                    perfMonitor.enabled = false;
                 }
             }
         }

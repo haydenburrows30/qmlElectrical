@@ -29,7 +29,7 @@ Page {
             // Initialize from saved settings
             if (typeof appConfig !== 'undefined') {
                 // Get the default voltage from settings
-                var defaultVoltage = appConfig.get_setting("default_voltage", "230V");
+                var defaultVoltage = appConfig.get_setting("default_voltage", "415V");
                 setSelectedVoltage(defaultVoltage);
                 
                 // Get ADMD setting, but only apply it if voltage is 415V
@@ -382,7 +382,7 @@ Page {
         // Apply saved settings to UI components if necessary
         if (typeof appConfig !== 'undefined') {
             // Set voltage based on saved setting
-            var defaultVoltage = appConfig.get_setting("default_voltage", "230V");
+            var defaultVoltage = appConfig.get_setting("default_voltage", "415V");
             for (var i = 0; i < cableSettings.voltageSelect.model.length; i++) {
                 if (cableSettings.voltageSelect.model[i] === defaultVoltage) {
                     cableSettings.voltageSelect.currentIndex = i;

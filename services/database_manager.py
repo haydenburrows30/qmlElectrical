@@ -1027,6 +1027,7 @@ class DatabaseManager:
         
         # Default configuration values
         default_config = {
+            "default_voltage": "415V",
             "voltage_drop_threshold": 5.0,
             "power_factor": 0.9,
             "default_sample_count": 100,
