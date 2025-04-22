@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Slot, Signal, Property
-from utils.pdf_generator_solkor_rf import SolkorRfPdfGenerator
+from utils.pdf.pdf_generator_solkor_rf import SolkorRfPdfGenerator
 from utils.file_saver import FileSaver
 
 class SolkorRfCalculator(QAbstractTableModel):

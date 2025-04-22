@@ -33,7 +33,7 @@ def verify_diversity_factors():
         if not cursor.fetchone():
             print("\nNo diversity_factors table found in database!")
             print("Current memory store values are:")
-            from utils.data_store import DataStore
+            from utils.database.data_store import DataStore
             store = DataStore()
             print(store._memory_store['diversity_factors'])
             return

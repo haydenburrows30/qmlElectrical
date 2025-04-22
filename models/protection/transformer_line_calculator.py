@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import cmath
-from utils.pdf_generator import PDFGenerator
+from utils.pdf.pdf_generator import PDFGenerator
 from utils.logger_config import configure_logger
 from utils.file_saver import FileSaver
 

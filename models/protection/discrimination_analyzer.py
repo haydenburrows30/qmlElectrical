@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from utils.file_saver import FileSaver
 
-from utils.pdf_generator_overcurrent import generate_pdf, cleanup_temp_files
+from utils.pdf.pdf_generator_overcurrent import generate_pdf, cleanup_temp_files
 
 class ResultsModel(QAbstractListModel):
     DataRole = Qt.UserRole + 1
