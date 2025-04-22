@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 
-from utils.logger_config import configure_logger
+from services.logger_config import configure_logger
 logger = configure_logger("qmltest", component="transformer_calc")
 
 class TransformerCalculator(QObject):

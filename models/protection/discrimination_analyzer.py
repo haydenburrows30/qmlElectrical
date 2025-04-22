@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Property, Signal, Slot, QAbstractListModel, 
 import math
 import os
 from datetime import datetime
-from utils.file_saver import FileSaver
+from services.file_saver import FileSaver
 
 from utils.pdf.pdf_generator_overcurrent import generate_pdf, cleanup_temp_files
 

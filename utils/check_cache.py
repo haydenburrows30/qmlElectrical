@@ -12,7 +12,7 @@ from pathlib import Path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from utils.cache_manager import CacheManager
+from services.cache_manager import CacheManager
 
 def check_cache_persistence():
     """Check if the QML cache exists and is being used between sessions"""

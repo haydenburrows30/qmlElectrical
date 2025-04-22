@@ -17,20 +17,20 @@ from services.loading_manager import LoadingManager
 from services.worker_pool import WorkerPool
 
 # Utilities
-from utils.config import app_config
+from services.config import app_config
 from utils.qml_debug import register_debug_helper
 # Use the new logger directly
-from utils.logger import QLogManager
-from utils.platform_helper import PlatformHelper
-from utils.cache_manager import CacheManager
-from utils.cache_utils import setup_qml_cache
+from services.logger import QLogManager
+from services.platform_helper import PlatformHelper
+from services.cache_manager import CacheManager
+from services.cache_utils import setup_qml_cache
 from utils.windows_utils import setup_windows_specifics, set_gpu_attributes
 from utils.preload_manager import PreloadManager
-from utils.lightweight_performance import LightweightPerformanceMonitor
-from utils.logger_config import configure_logger
-from utils.about_program import ConfigBridge
+from services.lightweight_performance import LightweightPerformanceMonitor
+from services.logger_config import configure_logger
+from services.about_program import ConfigBridge
 # Import the new FileSaver class
-from utils.file_saver import FileSaver
+from services.file_saver import FileSaver
 
 # Resources
 import data.rc_resources as rc_resources

@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PySide6.QtCore import QObject, Signal, Slot, Property
 
-from utils.logger_config import configure_logger
+from services.logger_config import configure_logger
 
 # Setup component-specific logger
 logger = configure_logger("qmltest", component="vr32")

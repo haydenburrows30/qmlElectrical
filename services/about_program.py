@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Property, Slot, Signal
-from utils.config import AppConfig
+from services.config import AppConfig
 import platform
 import PySide6.QtCore
 

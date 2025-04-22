@@ -1,8 +1,8 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
 import json
-from utils.logger_config import configure_logger
-from utils.file_saver import FileSaver
+from services.logger_config import configure_logger
+from services.file_saver import FileSaver
 
 from .table_model import VoltageDropTableModel
 from .file_utils import FileUtils

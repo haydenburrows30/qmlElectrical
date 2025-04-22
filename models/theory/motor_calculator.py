@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 from datetime import datetime
-from utils.file_saver import FileSaver  # Add import for FileSaver
+from services.file_saver import FileSaver  # Add import for FileSaver
 
 class MotorCalculator(QObject):
     """Calculator for motor starting characteristics"""

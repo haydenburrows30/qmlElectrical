@@ -3,8 +3,8 @@ import math
 import numpy as np
 
 from utils.pdf.pdf_generator import PDFGenerator
-from utils.logger_config import configure_logger
-from utils.file_saver import FileSaver
+from services.logger_config import configure_logger
+from services.file_saver import FileSaver
 
 # Setup component-specific logger
 logger = configure_logger("qmltest", component="wind_turbine")

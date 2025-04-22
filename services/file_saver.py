@@ -5,7 +5,7 @@ from pathlib import Path
 from PySide6.QtCore import QObject, Signal, Slot, Property, QThread, QCoreApplication
 
 try:
-    from utils.logger_config import configure_logger
+    from services.logger_config import configure_logger
     # Setup component-specific logger
     logger = configure_logger("qmltest", component="file_saver")
 except ImportError:

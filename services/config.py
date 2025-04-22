@@ -9,7 +9,7 @@ import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import sqlite3
-from utils.logger_config import configure_logger
+from services.logger_config import configure_logger
 
 # Base paths
 ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -35,7 +35,7 @@ from models.protection.overcurrent_calculator import OvercurrentProtectionCalcul
 from models.protection.solkor_rf_calculator import SolkorRfCalculator
 from models.protection.vr32_cl7_calculator import VR32CL7Calculator
 from models.voltdrop.results_manager import ResultsManager
-from utils.logger import QLogManager
+from services.logger import QLogManager
 from models.theory.transformer_naming import TransformerNamingGuide
 from models.basic.base_impedance_calculator import BaseImpedanceCalculator
 from models.basic.per_unit_impedance_calculator import PerUnitImpedanceCalculator

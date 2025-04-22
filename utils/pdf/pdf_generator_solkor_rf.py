@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
 
-from utils.logger_config import configure_logger
+from services.logger_config import configure_logger
 
 # Setup component-specific logger
 logger = configure_logger("qmltest", component="solkor_rf_pdf")

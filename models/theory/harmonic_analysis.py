@@ -1,19 +1,14 @@
-from PySide6.QtCore import (
-    QObject, Property, Signal, Slot, QPointF, QTimer,
-    QThread, QMetaObject, Qt, Q_ARG
-)
+from PySide6.QtCore import QObject, Property, Signal, Slot, QPointF, QTimer, QThread, QMetaObject, Qt, Q_ARG
 from PySide6.QtWidgets import QApplication
+
 import numpy as np
 import math
-import csv
-import os
-from datetime import datetime
 import time
-from utils.logger_config import configure_logger
-from utils.file_saver import FileSaver  # Add import for FileSaver
 
-from utils.calculation_cache import CalculationCache, generate_cache_key
-from utils.worker_pool import WorkerPoolManager, ManagedWorker
+from services.logger_config import configure_logger
+from services.file_saver import FileSaver
+from services.calculation_cache import CalculationCache, generate_cache_key
+from services.worker_pool_manager import WorkerPoolManager, ManagedWorker
 
 # Setup component-specific logger
 logger = configure_logger("qmltest", component="harmonic_analysis")
