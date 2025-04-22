@@ -30,7 +30,8 @@ class ManualExportTester:
         
     def load_export_data(self):
         """Load export function data from the JSON file"""
-        json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'export_functions.json')
+        json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'export_functions.json')
+        print(json_path)
         
         if os.path.exists(json_path):
             try:

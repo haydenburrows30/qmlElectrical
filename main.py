@@ -31,6 +31,8 @@ from services.logger_config import configure_logger
 from services.about_program import ConfigBridge
 # Import the new FileSaver class
 from services.file_saver import FileSaver
+# Import DatabaseManager for initialization
+from services.database_manager import DatabaseManager
 
 # Resources
 import data.rc_resources as rc_resources
@@ -97,6 +99,21 @@ class Application:
         # Register the FileSaver class
         qmlRegisterType(FileSaver, "FileSaverUtils", 1, 0, "FileSaver")
 
+    def init_database(self):
+        """Initialize application database."""
+        try:
+            # Get database path from config or use default
+            db_path = os.path.join(CURRENT_DIR, 'data', 'application_data.db')
+            
+            # Initialize database through manager
+            self.logger.info(f"Initializing database at {db_path}")
+            # This will create and initialize the database if it doesn't exist
+            DatabaseManager.get_instance(db_path)
+            self.logger.info("Database initialization complete")
+        except Exception as e:
+            self.logger.error(f"Database initialization error: {e}")
+            # We continue even if there's a database error, to allow the app to run
+
     def load_qml(self):
         """Load main QML file and register context properties."""
         # Create and expose log manager to QML
@@ -117,6 +134,9 @@ class Application:
     def setup(self):
         """Configure application components and initialize subsystems."""
         self.setup_app()
+
+        # Initialize database
+        self.init_database()
 
         self.register_qml_types()
 

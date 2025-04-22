@@ -236,356 +236,28 @@ This document outlines a plan for testing export functionality in the applicatio
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**2. MotorStartingCalculator**
+**2. SwitchboardPanel**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**3. HarmonicsAnalyzer**
+**3. SwitchboardPanelCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**4. SwitchboardPanelCalculator**
+**4. MotorStartingCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**5. SwitchboardPanel**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-### Testing OTHER Export
-
-#### Manual Test Steps:
-
-1. Launch the application
-2. Navigate to each calculator with export functionality
-3. Configure inputs with valid test data
-4. Trigger the export function
-5. Verify the exported file is created and contains the expected data
-6. Check file formatting and content validity
-
-#### Test Cases:
-
-**1. LogViewerCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**2. ExportFileDialogCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**3. RLC**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**4. LogExporter**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**5. TestCaseCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**6. HarmonicsAnalyzer**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**7. Config**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**8. FocusFrameCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**9. HelperCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**10. ThreePhase**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**11. FocusFrame**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**12. DiscriminationChartCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**13. ProtectionRequirementsSection**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**14. ResultsPanel**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**15. LogViewer**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**16. VoltageDropChart**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**17. HarmonicsAnalyzerCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**18. VoltageDropOrion**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**19. StyleImage**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**20. WindTurbineSection**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**21. StyleImageCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**22. SwitchboardPanel**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**23. ResultsPanelCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**24. DiscriminationAnalyzerCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**25. TransformerLineSection**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**26. VoltageDropOrionCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**27. DiscriminationChart**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**28. RLCCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**29. SolkorRf**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**30. ThreePhaseCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**31. SolkorRfCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**32. DiscriminationAnalyzer**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**33. FileSaveHandler**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**34. TestCase**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**35. Component**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**36. Helper**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**37. ConfigCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**38. SwitchboardPanelCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**39. NetworkCabinetCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**40. ExportFileDialog**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**41. LogExporterCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**42. FileSaveHandlerCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**43. MotorStartingCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**44. ComponentCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**45. VoltageDropChartCalculator**
+**5. HarmonicsAnalyzer**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
@@ -605,216 +277,105 @@ This document outlines a plan for testing export functionality in the applicatio
 
 #### Test Cases:
 
-**1. VoltageDropChart**
+**1. VoltageDropChartCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**2. NetworkCabinetDiagram**
+**2. NetworkCabinetDiagramCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**3. RLC**
+**3. DiscriminationAnalyzer**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**4. VoltageDropOrion**
+**4. VoltageDropOrionCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**5. WindTurbineSection**
+**5. RLC**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**6. NetworkCabinetDiagramCalculator**
+**6. NetworkCabinetCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**7. VR32CL7Calculator**
+**7. DiscriminationAnalyzerCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**8. DiscriminationAnalyzer**
+**8. RLCCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**9. DiscriminationAnalyzerCalculator**
+**9. NetworkCabinetDiagram**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**10. VoltageDropOrionCalculator**
+**10. DiscriminationChart**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**11. DiscriminationChart**
+**11. DiscriminationChartCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**12. DiscriminationChartCalculator**
+**12. WindTurbineSection**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**13. RLCCalculator**
+**13. VoltageDropChart**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**14. VoltageDropChartCalculator**
+**14. VoltageDropOrion**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**15. NetworkCabinetCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-### Testing PDF Export
-
-#### Manual Test Steps:
-
-1. Launch the application
-2. Navigate to each calculator with export functionality
-3. Configure inputs with valid test data
-4. Trigger the export function
-5. Verify the exported file is created and contains the expected data
-6. Check file formatting and content validity
-
-#### Test Cases:
-
-**1. VoltageDropDetails**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**2. VoltageDropOrion**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**3. SolkorRfCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**4. WindTurbineSection**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**5. VoltageDropDetailsCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**6. VR32CL7Calculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**7. DiscriminationAnalyzer**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**8. DiscriminationAnalyzerCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**9. TransformerLineSection**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**10. ProtectionRequirementsSection**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**11. MotorStartingCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**12. SolkorRf**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**13. VoltageDropCalculator**
-
-- [ ] Export completes without errors
-- [ ] File is created in the expected location
-- [ ] File content is correct and well-formatted
-- [ ] Error handling works appropriately for invalid inputs
-
-**14. NetworkCabinetCalculator**
+**15. VR32CL7Calculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
@@ -834,14 +395,14 @@ This document outlines a plan for testing export functionality in the applicatio
 
 #### Test Cases:
 
-**1. RealTime**
+**1. RealTimeCalculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**2. NetworkCabinetCalculator**
+**2. RealTime**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
@@ -855,7 +416,7 @@ This document outlines a plan for testing export functionality in the applicatio
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**4. RealTimeCalculator**
+**4. SwitchboardPanel**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location
@@ -869,7 +430,446 @@ This document outlines a plan for testing export functionality in the applicatio
 - [ ] File content is correct and well-formatted
 - [ ] Error handling works appropriately for invalid inputs
 
-**6. SwitchboardPanel**
+**6. NetworkCabinetCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+### Testing OTHER Export
+
+#### Manual Test Steps:
+
+1. Launch the application
+2. Navigate to each calculator with export functionality
+3. Configure inputs with valid test data
+4. Trigger the export function
+5. Verify the exported file is created and contains the expected data
+6. Check file formatting and content validity
+
+#### Test Cases:
+
+**1. SolkorRf**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**2. FocusFrame**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**3. DiscriminationAnalyzer**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**4. TestCase**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**5. ProtectionRequirementsSection**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**6. VoltageDropOrionCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**7. SwitchboardPanelCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**8. RLC**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**9. DiscriminationAnalyzerCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**10. HarmonicsAnalyzer**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**11. StyleImageCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**12. LogExporter**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**13. WindTurbineSection**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**14. SwitchboardPanel**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**15. ExportFileDialog**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**16. LogExporterCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**17. ConfigCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**18. StyleImage**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**19. ThreePhase**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**20. FileSaveHandler**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**21. DiscriminationChartCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**22. ResultsPanelCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**23. VoltageDropChart**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**24. VoltageDropOrion**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**25. VoltageDropChartCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**26. HelperCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**27. HarmonicsAnalyzerCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**28. ExportFileDialogCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**29. Helper**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**30. RLCCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**31. LogViewerCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**32. TestCaseCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**33. ThreePhaseCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**34. ResultsPanel**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**35. ComponentCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**36. SolkorRfCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**37. LogViewer**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**38. Config**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**39. NetworkCabinetCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**40. FileSaveHandlerCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**41. FocusFrameCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**42. Component**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**43. DiscriminationChart**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**44. TransformerLineSection**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**45. MotorStartingCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+### Testing PDF Export
+
+#### Manual Test Steps:
+
+1. Launch the application
+2. Navigate to each calculator with export functionality
+3. Configure inputs with valid test data
+4. Trigger the export function
+5. Verify the exported file is created and contains the expected data
+6. Check file formatting and content validity
+
+#### Test Cases:
+
+**1. SolkorRfCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**2. SolkorRf**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**3. VoltageDropDetailsCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**4. DiscriminationAnalyzer**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**5. ProtectionRequirementsSection**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**6. NetworkCabinetCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**7. DiscriminationAnalyzerCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**8. WindTurbineSection**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**9. VoltageDropCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**10. VoltageDropDetails**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**11. TransformerLineSection**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**12. MotorStartingCalculator**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**13. VoltageDropOrion**
+
+- [ ] Export completes without errors
+- [ ] File is created in the expected location
+- [ ] File content is correct and well-formatted
+- [ ] Error handling works appropriately for invalid inputs
+
+**14. VR32CL7Calculator**
 
 - [ ] Export completes without errors
 - [ ] File is created in the expected location

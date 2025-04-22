@@ -88,7 +88,7 @@ class ResultsManager(QObject):
         ]
         
         # Initialize DataStore for SQL storage
-        from utils.database.data_store import DataStore
+        from services.data_store import DataStore
         self._data_store = DataStore(parent)
         
         # Load initial data from SQL storage

@@ -1,9 +1,15 @@
 import pandas as pd
-import sqlite3
 import os
 import json
 import threading
 from PySide6.QtCore import QObject, Signal, QThread
+import logging
+
+# Import the database manager
+from .database_manager import DatabaseManager
+
+# Set up logger
+logger = logging.getLogger("qmltest.database.data_store")
 
 class DataStore(QObject):
     """
@@ -31,82 +37,14 @@ class DataStore(QObject):
             'settings': {}
         }
         
-        # SQLite connection (for larger datasets if needed)
-        db_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'application_data.db')
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        
-        # Use a thread-local storage for SQLite connections to ensure thread safety
-        self._local = threading.local()
-        self._db_path = db_path
-        
-        # Initialize database if needed
-        self._init_database()
+        # Get database manager instance
+        db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'application_data.db'))
+        logger.info(f"Initializing DataStore with database at: {db_path}")
+        self.db_manager = DatabaseManager.get_instance(db_path)
         
         # Initialize with default data
         self._init_default_data()
     
-    @property
-    def _connection(self):
-        """Get a thread-local database connection."""
-        if not hasattr(self._local, 'connection'):
-            self._local.connection = sqlite3.connect(self._db_path)
-        return self._local.connection
-    
-    def _init_database(self):
-        """Initialize SQLite database tables if they don't exist."""
-        cursor = self._connection.cursor()
-        
-        # Create tables
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS calculation_history (
-            id INTEGER PRIMARY KEY,
-            timestamp TEXT,
-            voltage_system TEXT,
-            kva_per_house REAL,
-            num_houses INTEGER,
-            diversity_factor REAL,
-            total_kva REAL,
-            current REAL,
-            cable_size TEXT,
-            conductor TEXT,
-            core_type TEXT,
-            length REAL,
-            voltage_drop REAL,
-            drop_percent REAL,
-            admd_enabled INTEGER
-        )
-        ''')
-        
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS settings (
-            key TEXT PRIMARY KEY,
-            value TEXT
-        )
-        ''')
-        
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS diversity_factors (
-            houses INTEGER PRIMARY KEY,
-            factor REAL NOT NULL
-        )
-        ''')
-        
-        # Initialize diversity factors if table is empty
-        cursor.execute("SELECT COUNT(*) FROM diversity_factors")
-        if cursor.fetchone()[0] == 0:
-            # Load from CSV
-            csv_path = os.path.join(os.path.dirname(self._db_path), 'diversity_factor.csv')
-            if os.path.exists(csv_path):
-                df = pd.read_csv(csv_path)
-                for _, row in df.iterrows():
-                    cursor.execute(
-                        "INSERT INTO diversity_factors (houses, factor) VALUES (?, ?)",
-                        (int(row['No Houses']), float(row['Diversity Factor']))
-                    )
-                self._connection.commit()
-        
-        self._connection.commit()
-
     def _init_default_data(self):
         """Initialize default data for the application."""
         # Setup cable data
@@ -169,14 +107,12 @@ class DataStore(QObject):
         
         # Add to SQLite database
         try:
-            cursor = self._connection.cursor()
             columns = ','.join(data.keys())
             placeholders = ','.join(['?'] * len(data))
             query = f"INSERT INTO calculation_history ({columns}) VALUES ({placeholders})"
-            cursor.execute(query, list(data.values()))
-            self._connection.commit()
-        except sqlite3.Error as e:
-            print(f"SQLite error adding calculation: {e}")
+            self.db_manager.execute_query(query, list(data.values()))
+        except Exception as e:
+            logger.error(f"Error adding calculation: {e}")
             # Continue with in-memory storage even if SQLite fails
         
         # Notify listeners (using the thread-safe Qt signal system)
@@ -187,16 +123,25 @@ class DataStore(QObject):
         """Get calculation history as DataFrame."""
         try:
             # Get from SQLite for persistence
-            cursor = self._connection.cursor()
-            cursor.execute("SELECT * FROM calculation_history ORDER BY timestamp DESC")
-            columns = [col[0] for col in cursor.description]
-            results = cursor.fetchall()
+            results = self.db_manager.fetch_all(
+                "SELECT * FROM calculation_history ORDER BY timestamp DESC"
+            )
             
             # Convert to DataFrame
-            df = pd.DataFrame(results, columns=columns)
-            return df
-        except sqlite3.Error as e:
-            print(f"SQLite error getting calculation history: {e}")
+            if results:
+                # Convert list of Row objects to list of dicts
+                data_dicts = [dict(row) for row in results]
+                df = pd.DataFrame(data_dicts)
+                return df
+            
+            # Fall back to in-memory data if no results
+            if self._memory_store['calculation_history']:
+                return pd.DataFrame(self._memory_store['calculation_history'])
+            
+            return pd.DataFrame()
+            
+        except Exception as e:
+            logger.error(f"Error getting calculation history: {e}")
             # Fall back to in-memory data if SQLite fails
             if self._memory_store['calculation_history']:
                 return pd.DataFrame(self._memory_store['calculation_history'])
@@ -208,9 +153,7 @@ class DataStore(QObject):
         self._memory_store['calculation_history'].clear()
         
         # Clear SQLite database
-        cursor = self._connection.cursor()
-        cursor.execute("DELETE FROM calculation_history")
-        self._connection.commit()
+        self.db_manager.execute_query("DELETE FROM calculation_history")
         
         # Notify listeners
         self.dataChanged.emit('calculation_history')
@@ -223,13 +166,14 @@ class DataStore(QObject):
             return self._memory_store['settings'][key]
         
         # Check SQLite database
-        cursor = self._connection.cursor()
-        cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
-        result = cursor.fetchone()
+        result = self.db_manager.fetch_one(
+            "SELECT value FROM settings WHERE key = ?", 
+            (key,)
+        )
         
         if result:
             # Cache the result in memory
-            value = json.loads(result[0])
+            value = json.loads(result['value'])
             self._memory_store['settings'][key] = value
             return value
         
@@ -242,12 +186,10 @@ class DataStore(QObject):
         
         # Update SQLite database
         value_json = json.dumps(value)
-        cursor = self._connection.cursor()
-        cursor.execute(
+        self.db_manager.execute_query(
             "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
             (key, value_json)
         )
-        self._connection.commit()
         
         # Notify listeners
         self.dataChanged.emit('settings')
@@ -300,76 +242,66 @@ class DataStore(QObject):
     def get_diversity_factor(self, num_houses):
         """Get diversity factor based on number of houses."""
         try:
-            cursor = self._connection.cursor()
-            
-            # First try exact match with row locking for reliability
-            cursor.execute("""
-                SELECT factor FROM diversity_factors 
-                WHERE houses = ? 
-                LIMIT 1
-            """, (num_houses,))
-            
-            result = cursor.fetchone()
-            print(f"Querying diversity factor for {num_houses} houses...")
+            # First try exact match
+            result = self.db_manager.fetch_one(
+                "SELECT factor FROM diversity_factors WHERE houses = ? LIMIT 1", 
+                (num_houses,)
+            )
             
             if result:
-                factor = float(result[0])
-                # print(f"Found exact match: {factor}")
+                factor = float(result['factor'])
                 return factor
             
             # If no exact match, get next lower and higher values
-            cursor.execute("""
+            closest = self.db_manager.fetch_all(
+                """
                 SELECT houses, factor, ABS(houses - ?) as diff 
                 FROM diversity_factors 
                 ORDER BY diff ASC 
                 LIMIT 2
-            """, (num_houses,))
+                """, 
+                (num_houses,)
+            )
             
-            closest = cursor.fetchall()
             if closest:
-                print(f"Found closest matches: {closest}")
                 if len(closest) == 1:
-                    return float(closest[0][1])
+                    return float(closest[0]['factor'])
                 else:
                     # Interpolate between values
-                    h1, f1, _ = closest[0]
-                    h2, f2, _ = closest[1]
+                    h1, f1 = closest[0]['houses'], closest[0]['factor']
+                    h2, f2 = closest[1]['houses'], closest[1]['factor']
                     # Linear interpolation
                     factor = f1 + (f2 - f1) * (num_houses - h1) / (h2 - h1)
-                    print(f"Interpolated value: {factor}")
                     return factor
                     
-            print("No matching diversity factor found, using default")
+            logger.warning("No matching diversity factor found, using default")
             return 1.0
             
         except Exception as e:
-            print(f"Error getting diversity factor: {e}")
+            logger.error(f"Error getting diversity factor: {e}")
             return 1.0
     
     def get_fuse_size(self, cable_size, material="Al"):
         """Get network fuse size for given cable size and material."""
         try:
-            cursor = self._connection.cursor()
-            cursor.execute("""
-                SELECT fuse_size 
+            result = self.db_manager.fetch_one(
+                """
+                SELECT fuse_size_a AS fuse_size 
                 FROM fuse_sizes 
-                WHERE material = ? AND size = ?
-            """, (material, float(cable_size)))
+                WHERE material = ? AND size_mm2 = ?
+                """, 
+                (material, float(cable_size))
+            )
             
-            result = cursor.fetchone()
             if result:
-                return f"{result[0]} A"
+                return f"{result['fuse_size']} A"
             return "Not specified"
                 
         except Exception as e:
-            print(f"Error looking up fuse size: {e}")
+            logger.error(f"Error looking up fuse size: {e}")
             return "Error"
     
     def close(self):
         """Close database connection."""
-        if hasattr(self._local, 'connection'):
-            try:
-                self._local.connection.close()
-                del self._local.connection
-            except:
-                pass
+        logger.info("Closing DataStore resources")
+        self.db_manager.close()

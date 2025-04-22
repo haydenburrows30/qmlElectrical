@@ -3,15 +3,20 @@ import os
 import sys
 import argparse
 from tabulate import tabulate
+import logging
 
 # Add parent directory to Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from utils.database.db_tools import DatabaseTools
+from services.database_tools import DatabaseTools
+from services.database_manager import DatabaseManager
+
+# Set up logger
+logger = logging.getLogger("qmltest.database.manage")
 
 def get_db_path():
     """Get path to application database."""
-    return os.path.join(os.path.dirname(__file__), '..', 'data', 'application_data.db')
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'application_data.db'))
 
 def print_table(data):
     """Print data in tabular format."""
@@ -29,13 +34,28 @@ def print_table(data):
 def main():
     parser = argparse.ArgumentParser(description='Database Management Tool')
     parser.add_argument('command', choices=['info', 'backup', 'restore', 'vacuum', 
-                                          'export', 'import', 'query', 'view'])
+                                          'export', 'import', 'query', 'view', 'init'],
+                       help='Command to execute')
     parser.add_argument('--table', help='Table name for export/import/view')
     parser.add_argument('--file', help='File path for backup/restore/export/import')
     parser.add_argument('--query', help='SQL query to execute')
     
     args = parser.parse_args()
     
+    # Special case for init command which uses DatabaseManager
+    if args.command == 'init':
+        try:
+            print("Initializing database with all reference data...")
+            db_path = get_db_path()
+            # This will create and initialize the database with all reference data
+            db_manager = DatabaseManager.get_instance(db_path)
+            print("Database initialization complete")
+            return
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            sys.exit(1)
+    
+    # For other commands, use DatabaseTools
     db = DatabaseTools(get_db_path())
     
     try:
