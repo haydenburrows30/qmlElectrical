@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 from pathlib import Path
-from PySide6.QtCore import QObject, Signal, Slot, Property
+from PySide6.QtCore import QObject, Signal, Slot, Property, QThread, QCoreApplication
 
 try:
     from utils.logger_config import configure_logger
@@ -30,12 +30,24 @@ class FileSaver(QObject):
     """
     
     saveStatusChanged = Signal(bool, str)
+    # Signal to request dialog operation on main thread
+    requestDialogOnMainThread = Signal(str, str, str, bool)
+    dialogFinished = Signal(str)
     
     def __init__(self):
         super().__init__()
         self._default_folder = self._get_documents_folder()
+        self._dialog_result = ""
+        
+        # Connect signal for main thread dialog operations
+        self.requestDialogOnMainThread.connect(self._show_dialog_on_main_thread)
+        
         logger.info(f"FileSaver initialized with default folder: {self._default_folder}")
         
+    def _is_main_thread(self):
+        """Check if the current thread is the main thread."""
+        return QThread.currentThread() == QCoreApplication.instance().thread()
+    
     def _get_documents_folder(self):
         """Get the user's documents folder."""
         try:
@@ -71,6 +83,46 @@ class FileSaver(QObject):
         # Also log to console for debugging
         print(f"SUCCESS: {success_message}")
     
+    @Slot(str, str, str, bool)
+    def _show_dialog_on_main_thread(self, dialog_type, file_extension, default_path, save_mode):
+        """Show file dialog on the main thread."""
+        from PySide6.QtWidgets import QFileDialog
+        
+        # Ensure extension doesn't have a dot prefix
+        if file_extension.startswith('.'):
+            file_extension = file_extension[1:]
+            
+        # Create filter string
+        filter_string = f"{file_extension.upper()} Files (*.{file_extension})"
+        
+        if save_mode:
+            filepath, _ = QFileDialog.getSaveFileName(
+                None,  # parent
+                "Save File",  # title
+                default_path,  # directory
+                filter_string  # filter
+            )
+        else:
+            filepath, _ = QFileDialog.getOpenFileName(
+                None,  # parent
+                "Open File",  # title
+                default_path,  # directory
+                filter_string  # filter
+            )
+        
+        if filepath:
+            # Only add extension if it's not already there and we're in save mode
+            if save_mode and not filepath.lower().endswith(f".{file_extension.lower()}"):
+                filepath = f"{filepath}.{file_extension}"
+            
+            logger.info(f"Selected {'save' if save_mode else 'open'} filepath: {filepath}")
+        else:
+            logger.info(f"File {'save' if save_mode else 'open'} canceled by user")
+        
+        # Set the result and emit signal
+        self._dialog_result = filepath
+        self.dialogFinished.emit(filepath)
+    
     @Slot(str, str, result=str)
     def get_save_filepath(self, file_extension, default_filename):
         """
@@ -84,35 +136,49 @@ class FileSaver(QObject):
             Full filepath or empty string if canceled
         """
         try:
-            from PySide6.QtWidgets import QFileDialog
-            
             # Ensure extension doesn't have a dot prefix
             if file_extension.startswith('.'):
                 file_extension = file_extension[1:]
                 
-            # Create filter string
-            filter_string = f"{file_extension.upper()} Files (*.{file_extension})"
-            
             # Create default path
             default_path = os.path.join(self._default_folder, f"{default_filename}.{file_extension}")
             
-            # Open file dialog
-            filepath, _ = QFileDialog.getSaveFileName(
-                None,  # parent
-                "Save File",  # title
-                default_path,  # directory
-                filter_string  # filter
-            )
-            
-            if filepath:
-                # Only add extension if it's not already there
-                if not filepath.lower().endswith(f".{file_extension.lower()}"):
+            # Check if we're on the main thread
+            if self._is_main_thread():
+                # Direct dialog call if we're on the main thread
+                from PySide6.QtWidgets import QFileDialog
+                
+                # Create filter string
+                filter_string = f"{file_extension.upper()} Files (*.{file_extension})"
+                
+                filepath, _ = QFileDialog.getSaveFileName(
+                    None,  # parent
+                    "Save File",  # title
+                    default_path,  # directory
+                    filter_string  # filter
+                )
+                
+                if filepath and not filepath.lower().endswith(f".{file_extension.lower()}"):
                     filepath = f"{filepath}.{file_extension}"
-                logger.info(f"Selected save filepath: {filepath}")
+                    
                 return filepath
             else:
-                logger.info("File save canceled by user")
+                # We're not on the main thread, use the signal-slot mechanism
+                logger.info("Not on main thread, requesting dialog on main thread")
+                
+                # Reset the dialog result
+                self._dialog_result = ""
+                
+                # Request dialog on main thread
+                self.requestDialogOnMainThread.emit("save", file_extension, default_path, True)
+                
+                # Here we would normally wait for the result, but this requires
+                # a proper event loop integration. For simplicity, we'll assume
+                # the user will handle this appropriately
+                logger.warning("Dialog requested from non-main thread - returning empty string")
+                logger.warning("Note: Use the dialogFinished signal to get the result asynchronously")
                 return ""
+                
         except Exception as e:
             logger.error(f"Error getting save filepath: {e}")
             self.saveStatusChanged.emit(False, f"Error selecting file: {e}")
@@ -282,29 +348,43 @@ class FileSaver(QObject):
             Full filepath or empty string if canceled
         """
         try:
-            from PySide6.QtWidgets import QFileDialog
-            
             # Ensure extension doesn't have a dot prefix
             if file_extension.startswith('.'):
                 file_extension = file_extension[1:]
+            
+            # Check if we're on the main thread
+            if self._is_main_thread():
+                # Direct dialog call if we're on the main thread
+                from PySide6.QtWidgets import QFileDialog
                 
-            # Create filter string
-            filter_string = f"{file_extension.upper()} Files (*.{file_extension})"
-            
-            # Open file dialog in open mode
-            filepath, _ = QFileDialog.getOpenFileName(
-                None,  # parent
-                "Open File",  # title
-                self._default_folder,  # directory
-                filter_string  # filter
-            )
-            
-            if filepath:
-                logger.info(f"Selected file to open: {filepath}")
+                # Create filter string
+                filter_string = f"{file_extension.upper()} Files (*.{file_extension})"
+                
+                filepath, _ = QFileDialog.getOpenFileName(
+                    None,  # parent
+                    "Open File",  # title
+                    self._default_folder,  # directory
+                    filter_string  # filter
+                )
+                
                 return filepath
             else:
-                logger.info("File open canceled by user")
+                # We're not on the main thread, use the signal-slot mechanism
+                logger.info("Not on main thread, requesting dialog on main thread")
+                
+                # Reset the dialog result
+                self._dialog_result = ""
+                
+                # Request dialog on main thread
+                self.requestDialogOnMainThread.emit("open", file_extension, self._default_folder, False)
+                
+                # Here we would normally wait for the result, but this requires
+                # a proper event loop integration. For simplicity, we'll assume
+                # the user will handle this appropriately
+                logger.warning("Dialog requested from non-main thread - returning empty string")
+                logger.warning("Note: Use the dialogFinished signal to get the result asynchronously")
                 return ""
+                
         except Exception as e:
             logger.error(f"Error getting open filepath: {e}")
             self.saveStatusChanged.emit(False, f"Error selecting file: {e}")

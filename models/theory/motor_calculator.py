@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 from datetime import datetime
+from utils.file_saver import FileSaver  # Add import for FileSaver
 
 class MotorCalculator(QObject):
     """Calculator for motor starting characteristics"""
@@ -19,6 +20,7 @@ class MotorCalculator(QObject):
     motorTypeChanged = Signal()
     motorSpeedChanged = Signal()
     recommendationsChanged = Signal()
+    exportDataToFolderCompleted = Signal(bool, str)  # Add new signal for export completion
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -417,45 +419,62 @@ class MotorCalculator(QObject):
         return self._motor_speeds
         
     @Slot(str, result=bool)
-    def exportResults(self, filePath):
+    def exportResults(self, filePath=None):
+        """Export motor starting results to CSV file."""
         try:
-            print(f"Attempting to export to: '{filePath}'")
-            if filePath.startswith("file://"):
-                filePath = filePath.replace("file://", "")
-            import os
-            directory = os.path.dirname(filePath)
-            if directory and not os.path.exists(directory):
-                try:
-                    os.makedirs(directory)
-                    print(f"Created directory: {directory}")
-                except Exception as e:
-                    print(f"Error creating directory: {e}")
-            abs_path = os.path.abspath(filePath)
-            print(f"Absolute path: {abs_path}")
-            with open(filePath, 'w') as f:
-                f.write("Motor Starting Calculator Results\n")
-                f.write(f"Date,{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-                f.write(f"Motor Type,{self._motor_type}\n")
-                f.write(f"Motor Power (kW),{self._motor_power}\n")
-                f.write(f"Voltage (V),{self._voltage}\n")
-                f.write(f"Efficiency,{self._efficiency}\n")
-                f.write(f"Power Factor,{self._power_factor}\n")
-                f.write(f"Starting Method,{self._starting_method}\n")
-                f.write(f"Full Load Current (A),{self._full_load_current:.2f}\n")
-                f.write(f"Starting Current (A),{self._starting_current:.2f}\n")
-                f.write(f"Starting Current Multiplier,{self.startingMultiplier:.2f}\n")
-                f.write(f"Nominal Torque (Nm),{self._nominal_torque:.2f}\n")
-                f.write(f"Starting Torque (% FLT),{self._starting_torque*100:.1f}\n")
-                f.write(f"Estimated Temperature Rise (°C),{self.estimateTemperatureRise():.1f}\n")
-                f.write(f"Recommended Cable Size,{self.recommendCableSize()}\n")
-                f.write(f"Estimated Start Duration (s),{self.estimateStartDuration():.1f}\n")
-                f.write(f"Energy Usage (kWh),{self.calculateStartingEnergy():.3f}\n\n")
-                f.write("Recommendations:\n")
-                f.write(f"{self.startingRecommendations.replace('• ', '')}\n")
-            print(f"Successfully exported to: '{abs_path}'")
-            return True
+            # If no filePath provided, use the file saver to get one
+            file_saver = FileSaver()
+            if not filePath:
+                filePath = file_saver.get_save_filepath("csv", "motor_starting_data")
+                if not filePath:
+                    self.exportDataToFolderCompleted.emit(False, "CSV export canceled")
+                    return False
+            
+            # Prepare data in the format expected by save_csv
+            csv_data = []
+            
+            # Add header and data
+            csv_data.append(["Motor Starting Calculator Results"])
+            csv_data.append(["Date", datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+            csv_data.append([])
+            
+            csv_data.append(["Motor Type", self._motor_type])
+            csv_data.append(["Motor Power (kW)", self._motor_power])
+            csv_data.append(["Voltage (V)", self._voltage])
+            csv_data.append(["Efficiency", self._efficiency])
+            csv_data.append(["Power Factor", self._power_factor])
+            csv_data.append(["Starting Method", self._starting_method])
+            csv_data.append(["Full Load Current (A)", f"{self._full_load_current:.2f}"])
+            csv_data.append(["Starting Current (A)", f"{self._starting_current:.2f}"])
+            csv_data.append(["Starting Current Multiplier", f"{self.startingMultiplier:.2f}"])
+            csv_data.append(["Nominal Torque (Nm)", f"{self._nominal_torque:.2f}"])
+            csv_data.append(["Starting Torque (% FLT)", f"{self._starting_torque*100:.1f}"])
+            csv_data.append(["Estimated Temperature Rise (°C)", f"{self.estimateTemperatureRise():.1f}"])
+            csv_data.append(["Recommended Cable Size", self.recommendCableSize()])
+            csv_data.append(["Estimated Start Duration (s)", f"{self.estimateStartDuration():.1f}"])
+            csv_data.append(["Energy Usage (kWh)", f"{self.calculateStartingEnergy():.3f}"])
+            csv_data.append([])
+            csv_data.append(["Recommendations"])
+            
+            # Split recommendations into separate lines
+            recommendations = self.startingRecommendations.replace('• ', '')
+            for rec in recommendations.split('\n'):
+                csv_data.append([rec])
+            
+            # Call save_csv with the prepared data
+            result = file_saver.save_csv(filePath, csv_data)
+            
+            if result:
+                self.exportDataToFolderCompleted.emit(True, f"Data saved to {filePath}")
+                return True
+            else:
+                self.exportDataToFolderCompleted.emit(False, f"Error saving to {filePath}")
+                return False
+                
         except Exception as e:
-            print(f"Error exporting results: {e}")
+            error_message = f"Error exporting motor data: {str(e)}"
+            print(error_message)
+            self.exportDataToFolderCompleted.emit(False, error_message)
             return False
 
     @Slot(float)

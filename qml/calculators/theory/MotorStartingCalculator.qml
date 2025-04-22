@@ -10,6 +10,8 @@ import "../../components/buttons"
 import "../../components/popups"
 import "../../components/style"
 import "../../components/visualizers"
+import "../../components/exports"
+import "../../components/menus"
 
 import MotorStarting 1.0
 
@@ -74,6 +76,14 @@ Item {
             motorEfficiency.text = (calculator.efficiency * 100).toFixed(0)
             motorPowerFactor.text = calculator.powerFactor.toFixed(2)
             updateMethodAvailability()
+        }
+
+        function onExportDataToFolderCompleted(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message);
+            } else {
+                messagePopup.showError(message);
+            }
         }
     }
     
@@ -173,70 +183,8 @@ Item {
                 "The starting current profile is displayed below the results."
     }
 
-    Popup {
+    MessagePopup {
         id: messagePopup
-        width: parent.width * 0.6
-        height: parent.height * 0.3
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        
-        property string title: "Message"
-        property string message: ""
-        
-        ColumnLayout {
-            anchors.fill: parent
-            
-            Label {
-                text: messagePopup.title
-                font.bold: true
-                font.pixelSize: 16
-            }
-            
-            Label {
-                text: messagePopup.message
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-            }
-            
-            Item { Layout.fillHeight: true }
-            
-            StyledButton {
-                text: "Close"
-                icon.source: "../../../icons/rounded/close.svg"
-                Layout.alignment: Qt.AlignRight
-                onClicked: messagePopup.close()
-            }
-        }
-    }
-
-    FileDialog {
-        id: fileDialog
-        title: "Export Results"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["CSV files (*.csv)"]
-        defaultSuffix: "csv"
-        currentFolder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
-        
-        onAccepted: {
-            let filePath = fileDialog.selectedFile.toString()
-            
-            if (filePath.startsWith("file://")) {
-                filePath = filePath.substring(7)
-            }
-            
-            if (!filePath.toLowerCase().endsWith(".csv")) {
-                filePath += ".csv"
-            }
-            
-            if (calculator.exportResults(filePath)) {
-                showMessage("Export Successful", "Results have been exported to: " + filePath)
-            } else {
-                showMessage("Export Failed", "An error occurred while exporting results to: " + filePath)
-            }
-        }
     }
 
     // main layout
@@ -288,9 +236,9 @@ Item {
                         id: exportButton
                         icon.source: "../../../icons/rounded/download.svg"
                         enabled: hasValidInputs && calculator.startingCurrent > 0
-                        onClicked: fileDialog.open()
+                        onClicked: calculator.exportResults(null)
 
-                        ToolTip.text: "Export results to PDF"
+                        ToolTip.text: "Export results to CSV"
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                     }
