@@ -66,11 +66,6 @@ class PDFGenerator:
             story.append(Paragraph(f"Generated: {timestamp}", normal_style))
             story.append(Spacer(1, 24))
             
-            # Debug information - print what data was received
-            print(f"Protection report data received: {type(data)}")
-            if isinstance(data, dict):
-                print(f"Keys in data: {data.keys()}")
-            
             # Convert QJSValue data to Python dictionary if needed
             if hasattr(data, 'toVariant'):
                 data = data.toVariant()
@@ -320,12 +315,10 @@ class PDFGenerator:
             
             # Build PDF
             doc.build(story)
-            
-            print(f"Protection report generated successfully at {filepath}")
+
             return True
             
         except Exception as e:
-            print(f"Error generating protection report: {e}")
             import traceback
             traceback.print_exc()
             return False
@@ -557,12 +550,10 @@ class PDFGenerator:
             
             # Build the PDF
             doc.build(content)
-            
-            print(f"Transformer report generated successfully at {filepath}")
+
             return True
             
         except Exception as e:
-            print(f"Error generating transformer report: {e}")
             import traceback
             traceback.print_exc()
             return False
@@ -578,6 +569,7 @@ class PDFGenerator:
             bool: True if successful, False otherwise
         """
         try:
+            
             # Create the PDF document
             doc = SimpleDocTemplate(
                 filepath,
@@ -681,22 +673,34 @@ class PDFGenerator:
                 try:
                     story.append(Paragraph("Power Curve", heading_style))
                     story.append(Spacer(1, 12))
+                    
+                    # Get the original image dimensions to maintain aspect ratio
+                    from PIL import Image as PILImage
+                    with PILImage.open(chart_image_path) as img:
+                        orig_width, orig_height = img.size
+                    
+                    # Calculate the aspect ratio and set maximum width
+                    max_width = 500  # Maximum width in points
+                    aspect_ratio = orig_height / orig_width
+                    
+                    # Create the image with proper scaling
                     img = Image(chart_image_path)
-                    img.drawHeight = 300
-                    img.drawWidth = 450
+                    img.drawWidth = max_width
+                    img.drawHeight = max_width * aspect_ratio
+                    
+                    # Center the image 
                     story.append(img)
                     story.append(Spacer(1, 24))
                 except Exception as e:
-                    print(f"Warning: Couldn't add power curve image to PDF: {e}")
+                    import traceback
+                    traceback.print_exc()
             
             # Build PDF
             doc.build(story)
             
-            print(f"Wind turbine report generated successfully at {filepath}")
             return True
             
         except Exception as e:
-            print(f"Error generating wind turbine report: {e}")
             import traceback
             traceback.print_exc()
             return False

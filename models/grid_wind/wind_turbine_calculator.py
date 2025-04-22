@@ -536,12 +536,12 @@ class WindTurbineCalculator(QObject):
             return False
 
     @Slot(str, str)
-    def exportWindTurbineReport(self, filename, chart_image_path=""):
-        """Export wind turbine calculations to PDF
+    def exportWindTurbineReport(self, filename, image_data=None):
+        """Export wind turbine calculations to PDF with embedded image data
         
         Args:
             filename: Path to save the PDF report
-            chart_image_path: Optional path to the chart image
+            image_data: File path to the chart image
         """
         try:
             import os
@@ -570,20 +570,24 @@ class WindTurbineCalculator(QObject):
                 
                 filename = clean_path
             
-            # Clean up chart image path
-            if chart_image_path:
-                chart_image_path = os.path.normpath(chart_image_path)
-            
             # Make sure the power curve is up-to-date
             self._generate_power_curve()
-            
-            # Updated: Make sure we're using the most current calculations for the report
             self._calculate()
             
             # Fix: Use the corrected calculations for rated capacity and output current
             power_factor = 0.85
             rated_capacity = self._actual_power / (1000 * power_factor)  # Convert W to kVA
             output_current = self._actual_power / (math.sqrt(3) * 400 * power_factor)
+            
+            # Process image file path if provided
+            chart_image_path = ""
+            temp_image = False
+            
+            if image_data and isinstance(image_data, str) and os.path.exists(image_data):
+                chart_image_path = image_data
+                # Mark as temporary if it's a temp file
+                if "temp_wind_chart" in chart_image_path:
+                    temp_image = True
             
             # Prepare power curve data (to be used if chart image isn't available)
             power_curve_data = {
@@ -614,18 +618,22 @@ class WindTurbineCalculator(QObject):
             generator = PDFGenerator()
             
             def generate_pdf_callback(filepath):
-                return generator.generate_wind_turbine_report(data, filepath)
+                result = generator.generate_wind_turbine_report(data, filepath)
+                
+                # Clean up temporary file if created
+                if temp_image and os.path.exists(chart_image_path):
+                    try:
+                        os.unlink(chart_image_path)
+                    except Exception:
+                        pass
+                
+                return result
             
             # Handle the export with our common method
             return self._handle_pdf_export(generate_pdf_callback, filename, "wind_turbine_report")
             
         except Exception as e:
             logger.error(f"Error exporting wind turbine report: {e}")
-            logger.error(f"Attempted filename: {filename}")
-            # Print more details for debugging
-            import traceback
-            logger.error(traceback.format_exc())
-            
             # Send error to QML
             self.pdfExportStatusChanged.emit(False, f"Error exporting report: {str(e)}")
             return False

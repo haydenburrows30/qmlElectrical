@@ -104,21 +104,21 @@ Item {
 
                         onClicked: {
                             if (calculatorReady) {
-                                // Create temporary chart image
-                                let tempDir = applicationDirPath;
-                                let tempImagePath = tempDir + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png");
+                                // Create temporary chart image path
+                                let tempImagePath = applicationDirPath + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png")
                                 
-                                powerCurveChart.saveChartImage(tempImagePath);
-                                
-                                // Small delay to ensure image is saved
-                                let timer = Qt.createQmlObject("import QtQuick; Timer {}", windTurbineSection);
-                                timer.interval = 200;
-                                timer.repeat = false;
-                                timer.triggered.connect(function() {
-                                    // Pass null to let calculator's FileSaver handle the dialog
-                                    calculator.exportWindTurbineReport(null, tempImagePath);
-                                });
-                                timer.start();
+                                // Capture the chart image and save directly to a file
+                                powerCurveChart.grabToImage(function(result) {
+                                    if (result) {
+                                        result.saveToFile(tempImagePath)
+                                        
+                                        // Export PDF with the saved image path
+                                        calculator.exportWindTurbineReport(null, tempImagePath)
+                                    } else {
+                                        // Export without image
+                                        calculator.exportWindTurbineReport(null, "")
+                                    }
+                                })
                             }
                         }
                     }
@@ -515,11 +515,16 @@ Item {
 
                         theme: Universal.theme
 
+                        // Modified function to get chart as image file
                         function saveChartImage(filePath) {
                             return powerCurveChart.grabToImage(function(result) {
-                                result.saveToFile(filePath);
-                                return filePath;
-                            });
+                                if (result) {
+                                    let success = result.saveToFile(filePath)
+                                    return filePath
+                                } else {
+                                    return ""
+                                }
+                            })
                         }
                                                                                 
                         StyledButton {
