@@ -91,20 +91,17 @@
 
     <!-- Monitors -->
     <file>qml/components/monitors/LoadingIndicator.qml</file>
-    <file>qml/components/menus/LogsMenu.qml</file>
 
     <!-- Popups -->
     <file>qml/components/popups/PerformancePopup.qml</file>
     <file>qml/components/popups/About.qml</file>
     <file>qml/components/popups/ChartPopup.qml</file>
     <file>qml/components/popups/MessagePopup.qml</file>
-    <file>qml/components/popups/MessageDialogExample.qml</file>
     <file>qml/components/popups/PopUpText.qml</file>
     <file>qml/components/popups/SplashScreen.qml</file>
     <file>qml/components/popups/TransformerPopUp.qml</file>
     <file>qml/components/popups/TransmissionPopUp.qml</file>
     <file>qml/components/popups/WindPopup.qml</file>
-    <file>qml/components/popups/LogViewerPopup.qml</file>
 
     <!-- Style -->
     <file>qml/components/style/ComboBoxRound.qml</file>
@@ -146,11 +143,6 @@
     <file>qml/calculators/voltage_drop/VoltageDropDetails.qml</file>
 
     <!-- Data Files -->
-    <file>data/cable_data_mv.csv</file>
-    <file>data/cable_data_cu_1c.csv</file>
-    <file>data/cable_data_cu_3c.csv</file>
-    <file>data/cable_data_al_1c.csv</file>
-    <file>data/cable_data_al_3c.csv</file>
     <file>data/diversity_factor.csv</file>
 
     <!-- Configuration -->

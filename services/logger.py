@@ -316,9 +316,17 @@ class QLogManager(QObject):
                 
             # Read the last 500 lines from the log file
             lines = []
-            with open(log_file, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
-                lines = lines[-500:] if len(lines) > 500 else lines
+            try:
+                # Use errors="replace" to handle encoding issues
+                with open(log_file, 'r', encoding='utf-8', errors="replace") as f:
+                    lines = f.readlines()
+                    lines = lines[-500:] if len(lines) > 500 else lines
+            except UnicodeDecodeError as e:
+                # If UTF-8 still fails completely, try with a different encoding
+                logger.warning(f"Failed to open log file with UTF-8: {e}. Trying fallback encoding.")
+                with open(log_file, 'r', encoding='latin-1', errors="replace") as f:
+                    lines = f.readlines()
+                    lines = lines[-500:] if len(lines) > 500 else lines
             
             # Use a set to track unique log lines from the file
             seen_log_lines = set()

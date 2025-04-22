@@ -25,7 +25,6 @@ Popup {
             
             // Load voltage default
             var defaultVoltage = appConfig.get_setting("default_voltage", "415V");
-            console.log(defaultVoltage)
             if (defaultVoltage === "415V") {
                 voltageComboBox.currentIndex = 1
             } else voltageComboBox.currentIndex = 0

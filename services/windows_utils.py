@@ -51,7 +51,7 @@ def setup_windows_specifics():
                 os.environ["QSG_RENDER_LOOP"] = "basic"
         
         # Set up QML disk cache - now use the cross-platform utility
-        from utils.cache_utils import setup_qml_cache
+        from services.cache_utils import setup_qml_cache
         setup_qml_cache(current_dir, QApplication.applicationName())
         
         # Apply renderer settings
