@@ -11,7 +11,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
-from utils.preload_manager import PreloadManager
+from services.preload_manager import PreloadManager
 
 def main():
     """Find calculators that aren't being preloaded"""

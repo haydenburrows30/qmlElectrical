@@ -113,7 +113,7 @@ class ExportScanner:
 
     def generate_test_plan(self, output_file='export_test_plan.md'):
         """Generate a markdown test plan file"""
-        test_plan_path = os.path.join(self.base_dir, 'scripts','tests',output_file)
+        test_plan_path = os.path.join(self.base_dir, 'utils','tests',output_file)
         
         with open(test_plan_path, 'w') as f:
             f.write("# Export Functionality Test Plan\n\n")
@@ -208,7 +208,7 @@ class ExportScanner:
         
     def generate_json_data(self, output_file='export_functions.json'):
         """Generate JSON data with all findings"""
-        json_path = os.path.join(self.base_dir, 'scripts','tests',output_file)
+        json_path = os.path.join(self.base_dir, 'utils','tests',output_file)
         
         data = {
             'documented_calculators': dict(self.calculator_mapping),

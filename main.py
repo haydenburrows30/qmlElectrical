@@ -18,14 +18,14 @@ from services.worker_pool import WorkerPool
 
 # Utilities
 from services.config import app_config
-from utils.qml_debug import register_debug_helper
+from services.qml_debug import register_debug_helper
 # Use the new logger directly
 from services.logger import QLogManager
 from services.platform_helper import PlatformHelper
 from services.cache_manager import CacheManager
 from services.cache_utils import setup_qml_cache
-from utils.windows_utils import setup_windows_specifics, set_gpu_attributes
-from utils.preload_manager import PreloadManager
+from services.windows_utils import setup_windows_specifics, set_gpu_attributes
+from services.preload_manager import PreloadManager
 from services.lightweight_performance import LightweightPerformanceMonitor
 from services.logger_config import configure_logger
 from services.about_program import ConfigBridge

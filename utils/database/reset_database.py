@@ -5,15 +5,15 @@ import signal
 import time
 
 # Add project root to Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..'))
 sys.path.insert(0, project_root)
 
 # Import required initialization scripts
-from scripts.init_reference_data import init_reference_data
-from scripts.add_extended_reference_data import add_extended_reference_data
-from scripts.update_cable_data import update_cable_data
-from scripts.update_diversity_factors import update_diversity_factors
-from scripts.update_fuse_sizes import update_fuse_sizes
+from init_reference_data import init_reference_data
+from add_extended_reference_data import add_extended_reference_data
+from update_cable_data import update_cable_data
+from update_diversity_factors import update_diversity_factors
+from update_fuse_sizes import update_fuse_sizes
 
 def signal_handler(signum, frame):
     print("\nReceived interrupt signal. Cleaning up...")
