@@ -17,6 +17,11 @@ Item {
 
     property VR32CL7Calculator calculator: VR32CL7Calculator {}
 
+    // Add MessagePopup component
+    MessagePopup {
+        id: messagePopup
+    }
+
     ColumnLayout {
         id: mainLayout
         anchors.centerIn: parent
@@ -251,7 +256,9 @@ Item {
 
                         onClicked: {
                             if (calculator) {
-                                folderDialog.open()
+                                // Call the method that handles export + file dialog internally
+                                // No need to interact with fileSaver directly from QML anymore
+                                calculator.exportPlot()
                             }
                         }
                     }
@@ -583,56 +590,33 @@ Item {
         }
     }
     
-    // Dialog for selecting save folder
-    FolderDialog {
-        id: folderDialog
-        title: "Select folder to save plot"
-        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+    // Replace the previous MessageDialog with Connections to FileSaver
+    // Connections {
+    //     target: calculator
         
-        onAccepted: {
-            if (calculator) {
-                // Get the selected folder URL
-                var folderUrl = folderDialog.currentFolder.toString()
-                
-                // Generate the plot and update the dialog text before showing it
-                calculator.generate_plot_with_url(folderUrl)
-                
-                // Construct a readable path for the message dialog
-                var displayPath
-                if (folderUrl.startsWith("file:///")) {
-                    // Remove the file:/// prefix for display
-                    displayPath = folderUrl.replace(/^file:\/\/\//, "")
-                    if (displayPath.match(/^[A-Za-z]:/)) {
-                        // Windows path
-                        displayPath = displayPath + "\\vr32_cl7_plot.svg"
-                    } else {
-                        // Linux/Unix path
-                        displayPath = "/" + displayPath + "/vr32_cl7_plot.svg"
-                    }
-                } else {
-                    // Fallback
-                    displayPath = folderUrl + "/vr32_cl7_plot.svg"
-                }
-                
-                plotSavedDialog.text = "The VR32 CL-7 plot has been generated and saved to:\n" + displayPath
-                plotSavedDialog.open()
-            }
-        }
-    }
-    
-    // Dialog for plot saved confirmation
-    MessageDialog {
-        id: plotSavedDialog
-        title: "Plot Generated"
-        text: "The VR32 CL-7 plot has been generated and saved."
-        buttons: MessageDialog.Ok
-    }
+    //     function onSaveStatusChanged(success, message) {
+    //         if (success) {
+    //             messagePopup.showSuccess(message)
+    //         } else {
+    //             messagePopup.showError(message)
+    //         }
+    //     }
+    // }
     
     // Connections to update UI when calculator changes
     Connections {
         target: calculator
+        
         function onResultsChanged() {
             // The UI will automatically update through property bindings
+        }
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
         }
     }
 }

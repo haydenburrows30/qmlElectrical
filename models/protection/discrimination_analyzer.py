@@ -3,8 +3,12 @@ import math
 import os
 from datetime import datetime
 from services.file_saver import FileSaver
+from services.logger_config import configure_logger
 
-from utils.pdf.pdf_generator_overcurrent import generate_pdf, cleanup_temp_files
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="discrimination")
+
+from utils.pdf.pdf_generator_overcurrent import generate_pdf
 
 class ResultsModel(QAbstractListModel):
     DataRole = Qt.UserRole + 1
@@ -116,9 +120,13 @@ class DiscriminationAnalyzer(QObject):
             self.relayCountChanged.emit()
             self._analyze_discrimination()
 
-    @Slot(result=str)
-    def exportResults(self):
-        """Export results to a PDF file"""
+    @Slot(str)
+    def exportResults(self, image_data=None):
+        """Export results to a PDF file
+        Args:
+            filename: Path to save the PDF report
+            image_data: File path to the chart image
+        """
         try:
             # Create timestamp for filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -126,87 +134,53 @@ class DiscriminationAnalyzer(QObject):
             # Use FileSaver to get save location
             pdf_file = self._file_saver.get_save_filepath("pdf", f"discrimination_results_{timestamp}")
             if not pdf_file:
-                self.exportComplete.emit(False, "Export cancelled")
+                self.exportComplete.emit(False, "PDF export canceled")
                 return ""
             
-            # Create temporary chart image filenames
-            temp_dir = os.path.dirname(pdf_file)
-            chart_image = os.path.join(temp_dir, f"chart_{timestamp}.svg")
-            png_fallback = os.path.join(temp_dir, f"chart_{timestamp}.png")
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
             
-            # Signal to QML to save chart image
-            self.exportChart.emit(chart_image)
-            
-            # Wait for image to be saved
-            from PySide6.QtCore import QEventLoop, QTimer
-            loop = QEventLoop()
-            timer = QTimer()
-            timer.setSingleShot(True)
-            timer.timeout.connect(loop.quit)
-            timer.start(5000)
-            loop.exec()
-            
-            # Additional check and wait if image not found
-            max_retries = 3
-            retry_count = 0
-            while not (os.path.exists(chart_image) or os.path.exists(png_fallback)) and retry_count < max_retries:
-                timer = QTimer()
-                timer.setSingleShot(True)
-                timer.timeout.connect(loop.quit)
-                timer.start(1000)
-                loop.exec()
-                retry_count += 1
+            # Process image file path if provided
+            chart_image_path = ""
+            temp_image = False
 
-            # If SVG didn't save, try to manually create it
-            if not os.path.exists(chart_image) and os.path.exists(png_fallback):
-                svg_txt_backup = chart_image + ".txt"
-                
-                if os.path.exists(svg_txt_backup):
-                    try:
-                        with open(svg_txt_backup, 'r') as src:
-                            svg_content = src.read()
-                        with open(chart_image, 'w') as dst:
-                            dst.write(svg_content)
-                    except Exception:
-                        pass
-
-            # Use our PDF generator module to create the PDF
-            # Pass all required data to the generator
+            if image_data and isinstance(image_data, str) and os.path.exists(image_data):
+                chart_image_path = image_data
+                # Mark as temporary if it's a temp file
+                if "temp_overcurrent_chart" in chart_image_path:
+                    temp_image = True
+            
+            # Generate PDF with chart image
             result = generate_pdf(
-                pdf_file=pdf_file,
-                relays=self._relays,
-                fault_levels=self._fault_levels,
-                results=self._results_model._results,
-                curve_types=self.CURVE_TYPES,
-                chart_image=chart_image,
-                png_fallback=png_fallback
+                pdf_file, 
+                self._relays,
+                self._fault_levels,
+                self._results_model._results,
+                self.CURVE_TYPES,
+                chart_image_path
             )
             
-            # Clean up all temporary files
-            temp_files = [
-                chart_image,
-                png_fallback,
-                chart_image + ".txt",
-                png_fallback.replace('.png', '_enhanced.png'),
-                png_fallback.replace('.png', '_optimized.png'),
-                chart_image.replace('.svg', '_rasterized.png')
-            ]
+            # Clean up temporary files after PDF is generated
+            if temp_image and os.path.exists(chart_image_path):
+                try:
+                    os.unlink(chart_image_path)
+                except Exception:
+                    pass
             
-            cleanup_temp_files(temp_files)
-            
-            # Use standardized success message
+            # Report result
             if result:
-                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
-                self.exportComplete.emit(True, pdf_file)
+                self.exportComplete.emit(True, f"PDF saved to: {pdf_file}")
                 return pdf_file
             else:
-                self.exportComplete.emit(False, f"Error saving to {pdf_file}")
+                self.exportComplete.emit(False, f"Error saving PDF to {pdf_file}")
                 return ""
-            
+                
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            self.exportComplete.emit(False, str(e))
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            # Send error to QML
+            self.exportComplete.emit(False, error_msg)
             return ""
 
     @Slot(float, result='QVariantList')
@@ -444,13 +418,3 @@ class DiscriminationAnalyzer(QObject):
     def faultLevels(self):
         """Provide access to fault levels from QML"""
         return self._fault_levels
-
-    @Slot(str, str)
-    def saveSvgContent(self, svg_content, filename):
-        """Save SVG content to a file directly from Python"""
-        try:
-            with open(filename, 'w') as file:
-                file.write(svg_content)
-            return True
-        except Exception:
-            return False

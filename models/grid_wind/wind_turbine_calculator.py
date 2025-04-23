@@ -1,6 +1,8 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import numpy as np
+from datetime import datetime
+import os
 
 from utils.pdf.pdf_generator import PDFGenerator
 from services.logger_config import configure_logger
@@ -510,71 +512,34 @@ class WindTurbineCalculator(QObject):
         logger.info("==============================\n")
         
         return True
-    
-    def _handle_pdf_export(self, generate_callback, filename, default_name):
-        """Common PDF export handler to reduce code duplication"""
-        # If no filepath provided, use FileSaver to get one
-        if not filename:
-            filename = self._file_saver.get_save_filepath("pdf", default_name)
-            if not filename:
-                # Let QML know the export was canceled
-                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
-                return False
-        
-        # Generate PDF using the provided callback
-        result = generate_callback(filename)
-        
-        # Forward FileSaver signals to our own signal
-        if result:
-            message = f"PDF saved to: {filename}"
-            self._file_saver._emit_success_with_path(filename)
-            self.pdfExportStatusChanged.emit(True, message)
-            return True
-        else:
-            error_msg = f"Error saving PDF to {filename}"
-            self.pdfExportStatusChanged.emit(False, error_msg)
-            return False
 
-    @Slot(str, str)
-    def exportWindTurbineReport(self, filename, image_data=None):
-        """Export wind turbine calculations to PDF with embedded image data
+    @Slot(str)
+    def exportWindTurbineReport(self, image_data=None):
+        """
+        Export wind turbine calculations to PDF
         
         Args:
             filename: Path to save the PDF report
             image_data: File path to the chart image
         """
         try:
-            import os
-            import platform
-            
-            # Clean up filename - handle QML URL format
-            if filename:
-                clean_path = filename.strip()
-                
-                # Remove the file:/// prefix if present
-                if clean_path.startswith('file:///'):
-                    # On Windows, file:///C:/path becomes C:/path
-                    if platform.system() == "Windows":
-                        clean_path = clean_path[8:]
-                    else:
-                        # On Unix-like systems, file:///path becomes /path
-                        clean_path = clean_path[8:] if clean_path[8:10].startswith(":/") else clean_path[7:]
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-                # Handle the case with extra leading slash on Windows paths
-                if clean_path.startswith('/') and ':' in clean_path[1:3]:  # Like '/C:/'
-                    clean_path = clean_path[1:]  # Remove leading slash
-                    
-                # Ensure it has .pdf extension
-                if not clean_path.lower().endswith('.pdf'):
-                    clean_path += '.pdf'
-                
-                filename = clean_path
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"wind_turbine_report_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return ""
+            
+            # Clean up filename using FileSaver's clean_filepath method
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
             
             # Make sure the power curve is up-to-date
             self._generate_power_curve()
             self._calculate()
             
-            # Fix: Use the corrected calculations for rated capacity and output current
+            # Fix: Use the corrected calculations
             power_factor = 0.85
             rated_capacity = self._actual_power / (1000 * power_factor)  # Convert W to kVA
             output_current = self._actual_power / (math.sqrt(3) * 400 * power_factor)
@@ -614,28 +579,30 @@ class WindTurbineCalculator(QObject):
                 "chart_image_path": chart_image_path if chart_image_path else ""
             }
             
-            # Use helper method to handle the export
+            # Generate the PDF using the PDF generator
             generator = PDFGenerator()
+            result = generator.generate_wind_turbine_report(data, pdf_file)
             
-            def generate_pdf_callback(filepath):
-                result = generator.generate_wind_turbine_report(data, filepath)
-                
-                # Clean up temporary file if created
-                if temp_image and os.path.exists(chart_image_path):
-                    try:
-                        os.unlink(chart_image_path)
-                    except Exception:
-                        pass
-                
-                return result
+            # Clean up temporary file if created
+            if temp_image and os.path.exists(chart_image_path):
+                try:
+                    os.unlink(chart_image_path)
+                except Exception:
+                    pass
             
-            # Handle the export with our common method
-            return self._handle_pdf_export(generate_pdf_callback, filename, "wind_turbine_report")
+            # Signal success or failure
+            if result:
+                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {pdf_file}")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving PDF to {pdf_file}")
+                return False
             
         except Exception as e:
-            logger.error(f"Error exporting wind turbine report: {e}")
+            error_msg = (f"Error exporting wind turbine report: {e}")
+            logger.error(error_msg)
             # Send error to QML
-            self.pdfExportStatusChanged.emit(False, f"Error exporting report: {str(e)}")
+            self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 
     # Advanced analysis methods

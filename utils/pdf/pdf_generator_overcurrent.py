@@ -1,10 +1,13 @@
 import os
 import traceback
+import logging
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
+
+logger = logging.getLogger("qmltest.pdf_generator_overcurrent")
 
 def create_title_section(styles):
     """Create title section for the PDF"""
@@ -98,29 +101,20 @@ def create_results_section(results, styles):
     
     return elements
 
-def process_image(chart_image, png_fallback):
+def process_image(chart_image):
     """Process and prepare the chart image for PDF inclusion"""
-    # Choose the best available image
-    if os.path.exists(chart_image):
-        image_path = chart_image
-        is_svg = True
-    elif os.path.exists(png_fallback):
-        image_path = png_fallback
-        is_svg = False
-    else:
-        return None, 0.75  # Default aspect ratio if no image
-    
-    aspect_ratio = 0.75  # Default aspect ratio
-    
-    try:
-        # Only process if it's a PNG or we need to convert SVG
-        if not is_svg:
+    # Check if image file exists
+    image_path = chart_image
+    if image_path and os.path.exists(image_path):
+        try:
             from PIL import Image as PILImage
             from PIL import ImageEnhance
             
             img = PILImage.open(image_path)
             img_width, img_height = img.size
             aspect_ratio = img_height / img_width
+            
+            logger.info(f"Image dimensions: {img_width}x{img_height}, aspect ratio: {aspect_ratio}")
             
             # Basic image enhancement
             sharpener = ImageEnhance.Sharpness(img)
@@ -133,78 +127,49 @@ def process_image(chart_image, png_fallback):
             enhanced_image = image_path.replace('.png', '_enhanced.png')
             img.save(enhanced_image, format='PNG', compress_level=1)
             return enhanced_image, aspect_ratio
-        else:
-            # Try to convert SVG to PNG for better compatibility
-            try:
-                # Try cairosvg first
-                png_from_svg = image_path.replace('.svg', '_rasterized.png')
-                
-                try:
-                    import cairosvg
-                    cairosvg.svg2png(url=image_path, write_to=png_from_svg, scale=2.0)
-                    
-                    # Get aspect ratio from the generated PNG
-                    from PIL import Image as PILImage
-                    img = PILImage.open(png_from_svg)
-                    img_width, img_height = img.size
-                    aspect_ratio = img_height / img_width
-                    
-                    return png_from_svg, aspect_ratio
-                except ImportError:
-                    # Fallback to ImageMagick if available
-                    import subprocess
-                    try:
-                        subprocess.run(['convert', '-density', '300', image_path, 
-                                      '-quality', '100', png_from_svg], 
-                                      check=True)
-                        
-                        # Get aspect ratio from the generated PNG
-                        from PIL import Image as PILImage
-                        img = PILImage.open(png_from_svg)
-                        img_width, img_height = img.size
-                        aspect_ratio = img_height / img_width
-                        
-                        return png_from_svg, aspect_ratio
-                    except:
-                        # If conversion fails, use the original SVG
-                        return image_path, aspect_ratio
-            except:
-                # If all conversions fail, use the original file
-                return image_path, aspect_ratio
-    except:
-        # If any processing fails, return the original file
-        return image_path, aspect_ratio
+        except Exception as e:
+            # If any processing fails, return the original file
+            logger.error(f"Image processing error: {e}")
+            return image_path, aspect_ratio
 
-def create_chart_section(chart_image, png_fallback, styles, doc):
+def create_chart_section(chart_image, styles, doc):
     """Create chart section with processed image"""
     elements = []
     
     # Process the chart image
-    actual_chart_image, aspect_ratio = process_image(chart_image, png_fallback)
+    actual_chart_image, aspect_ratio = process_image(chart_image)
     
     if actual_chart_image and os.path.exists(actual_chart_image):
         elements.append(PageBreak())
         elements.append(Paragraph("Time-Current Curves", styles['Heading2']))
         
-        # Calculate optimal image size
-        pdf_width = doc.width * 0.95
-        pdf_height = pdf_width * aspect_ratio
-        
-        # Add image to document
-        elements.append(Image(actual_chart_image, width=pdf_width, height=pdf_height))
-        elements.append(Spacer(1, 0.1*inch))
-        
-        # Add caption
-        elements.append(Paragraph(
-            "Figure 1: Time-Current Characteristic Curves and Discrimination Margins", 
-            ParagraphStyle('Caption', parent=styles['Normal'], fontSize=9, alignment=1)
-        ))
+        try:
+            # Calculate optimal image size
+            pdf_width = doc.width * 0.95
+            pdf_height = pdf_width * aspect_ratio
+            
+            # Log image details before adding to PDF
+            logger.info(f"Adding image to PDF: {actual_chart_image}")
+            logger.info(f"Image dimensions in PDF: width={pdf_width}, height={pdf_height}")
+            
+            # Add image to document with explicit width and height
+            elements.append(Image(actual_chart_image, width=pdf_width, height=pdf_height))
+            elements.append(Spacer(1, 0.1*inch))
+            
+            # Add caption
+            elements.append(Paragraph(
+                "Figure 1: Time-Current Characteristic Curves and Discrimination Margins", 
+                ParagraphStyle('Caption', parent=styles['Normal'], fontSize=9, alignment=1)
+            ))
+        except Exception as e:
+            logger.error(f"Error adding image to PDF: {e}")
+            elements.append(Paragraph(f"Error adding chart image: {str(e)}", styles['Normal']))
     else:
         elements.append(Paragraph("Chart image not available", styles['Normal']))
     
     return elements
 
-def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_image, png_fallback):
+def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_image):
     """
     Generate a PDF report for relay discrimination analysis
     
@@ -214,8 +179,7 @@ def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_ima
         fault_levels (list): List of fault current levels
         results (list): Analysis results
         curve_types (dict): Curve type definitions
-        chart_image (str): Path to SVG chart image
-        png_fallback (str): Path to PNG fallback image
+        chart_image (str): Path to PNG chart image
         
     Returns:
         str: Path to the generated PDF or empty string on failure
@@ -231,26 +195,13 @@ def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_ima
         elements.extend(create_relay_table(relays, curve_types, styles))
         elements.extend(create_fault_section(fault_levels, styles))
         elements.extend(create_results_section(results, styles))
-        elements.extend(create_chart_section(chart_image, png_fallback, styles, doc))
+        elements.extend(create_chart_section(chart_image, styles, doc))
         
         # Build the PDF
         doc.build(elements)
+        
         return pdf_file
         
     except Exception:
         traceback.print_exc()
         return ""
-
-def cleanup_temp_files(files_list):
-    """
-    Clean up temporary files created during PDF generation
-    
-    Args:
-        files_list (list): List of file paths to clean up
-    """
-    for temp_file in files_list:
-        if os.path.exists(temp_file):
-            try:
-                os.remove(temp_file)
-            except Exception:
-                pass

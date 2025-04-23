@@ -390,6 +390,51 @@ class FileSaver(QObject):
             self.saveStatusChanged.emit(False, f"Error selecting file: {e}")
             return ""
     
+    @Slot('QObject', str, result=bool)
+    def save_plot(self, calculator, default_filename="vr32_cl7_plot"):
+        """
+        Save plot from a calculator object that has a generate_plot_for_file_saver method.
+        
+        Args:
+            calculator: An object with a generate_plot_for_file_saver method
+            default_filename: Default filename without extension
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Check if the calculator has the required method
+            if not hasattr(calculator, 'generate_plot_for_file_saver'):
+                error_msg = "Calculator does not have a generate_plot_for_file_saver method"
+                logger.error(error_msg)
+                self.saveStatusChanged.emit(False, error_msg)
+                return False
+                
+            # Get a filepath from user
+            filepath = self.get_save_filepath("png", default_filename)
+            if not filepath:
+                self.saveStatusChanged.emit(False, "Plot save canceled")
+                return False
+                
+            # Generate the plot using the calculator's method
+            result_path = calculator.generate_plot_for_file_saver(filepath)
+            
+            if result_path:
+                # Use standardized success message
+                self._emit_success_with_path(result_path, "Plot saved")
+                return True
+            else:
+                error_msg = "Failed to generate plot"
+                logger.error(error_msg)
+                self.saveStatusChanged.emit(False, error_msg)
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error saving plot: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+    
     @Property(str)
     def defaultFolder(self):
         """Get the default save folder path."""
@@ -405,3 +450,75 @@ class FileSaver(QObject):
         else:
             logger.warning(f"Invalid folder path: {folder_path}")
             return False
+    
+    @Slot(str, result=str)
+    def clean_filepath(self, filepath):
+        """
+        Clean up file paths from different sources (QML, file dialogs, etc.)
+        Handles platform-specific issues and file:/// URLs
+        
+        Args:
+            filepath (str): The filepath to clean
+            
+        Returns:
+            str: Cleaned filepath
+        """
+        try:
+            import platform
+            import os
+            
+            if not filepath:
+                return ""
+                
+            # Clean up filepath - handle QML URL format
+            clean_path = filepath.strip()
+            
+            # Remove the file:/// prefix if present
+            if clean_path.startswith('file:///'):
+                # On Windows, file:///C:/path becomes C:/path
+                if platform.system() == "Windows":
+                    clean_path = clean_path[8:]
+                else:
+                    # On Unix-like systems, file:///path becomes /path
+                    clean_path = clean_path[8:] if clean_path[8:10].startswith(":/") else clean_path[7:]
+
+            # Handle the case with extra leading slash on Windows paths
+            if clean_path.startswith('/') and ':' in clean_path[1:3]:  # Like '/C:/'
+                clean_path = clean_path[1:]  # Remove leading slash
+            
+            logger.debug(f"Cleaned filepath: {filepath} -> {clean_path}")
+            return clean_path
+            
+        except Exception as e:
+            logger.error(f"Error cleaning filepath: {e}")
+            return filepath
+    
+    @Slot(str, str, result=str)
+    def ensure_file_extension(self, filepath, extension):
+        """
+        Ensure filepath has the correct extension
+        
+        Args:
+            filepath (str): The filepath to check
+            extension (str): The extension to ensure (without dot)
+            
+        Returns:
+            str: Filepath with correct extension
+        """
+        try:
+            if not filepath:
+                return ""
+                
+            # Remove any leading dot from extension
+            if extension.startswith('.'):
+                extension = extension[1:]
+                
+            # Ensure filepath has the correct extension
+            if not filepath.lower().endswith(f".{extension.lower()}"):
+                filepath += f".{extension}"
+            
+            return filepath
+            
+        except Exception as e:
+            logger.error(f"Error ensuring file extension: {e}")
+            return filepath

@@ -18,6 +18,7 @@ Item {
     id: discriminationAnalyzerCard
 
     property DiscriminationAnalyzer calculator: DiscriminationAnalyzer {}
+    property string applicationDirPath: Qt.application.directoryPath || "."
     
     PopUpText {
         id: popUpText
@@ -334,9 +335,23 @@ Item {
                                     
                                     visible: calculator.relayCount >= 2
                                     icon.source: "../../../icons/rounded/download.svg"
-                                    
+
                                     onClicked: {
-                                        calculator.exportResults()
+                                        // Create a temporary file path for the chart image
+                                        var tempImagePath = applicationDirPath + (Qt.platform.os === "windows" ? "\\temp_overcurrent_chart.png" : "/temp_overcurrent_chart.png")
+                                        
+                                        // Capture the chart image and save it to the temporary file
+                                        marginChart.grabToImage(function(result) {
+                                            if (result) {
+                                                result.saveToFile(tempImagePath)
+                                                
+                                                // Export the PDF with the saved image path
+                                                calculator.exportResults(tempImagePath)
+                                            } else {
+                                                // Export without image if grabToImage fails
+                                                calculator.exportResults("")
+                                            }
+                                        })
                                     }
                                 }
 
@@ -541,14 +556,6 @@ Item {
         
         function onExportChart(filename) {
             marginChart.saveChartImage(filename)
-        }
-    }
-    
-    Connections {
-        target: marginChart
-        
-        function onSvgContentReady(svgContent, filename) {
-            calculator.saveSvgContent(svgContent, filename)
         }
     }
         

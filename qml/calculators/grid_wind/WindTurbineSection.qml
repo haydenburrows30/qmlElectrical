@@ -100,23 +100,21 @@ Item {
                         Layout.alignment: Qt.AlignRight
                         icon.source: "../../../icons/rounded/download.svg"
 
-                        property string defaultFileName: "wind_turbine_report.pdf"
-
                         onClicked: {
                             if (calculatorReady) {
-                                // Create temporary chart image path
-                                let tempImagePath = applicationDirPath + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png")
+                                // Create a temporary file path for the chart image
+                                var tempImagePath = applicationDirPath + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png")
                                 
-                                // Capture the chart image and save directly to a file
+                                // Capture the chart image and save it to the temporary file
                                 powerCurveChart.grabToImage(function(result) {
                                     if (result) {
                                         result.saveToFile(tempImagePath)
                                         
-                                        // Export PDF with the saved image path
-                                        calculator.exportWindTurbineReport(null, tempImagePath)
+                                        // Export the PDF with the saved image path
+                                        calculator.exportWindTurbineReport(tempImagePath)
                                     } else {
-                                        // Export without image
-                                        calculator.exportWindTurbineReport(null, "")
+                                        // Export without image if grabToImage fails
+                                        calculator.exportWindTurbineReport("")
                                     }
                                 })
                             }
@@ -514,18 +512,6 @@ Item {
                         legend.visible: true
 
                         theme: Universal.theme
-
-                        // Modified function to get chart as image file
-                        function saveChartImage(filePath) {
-                            return powerCurveChart.grabToImage(function(result) {
-                                if (result) {
-                                    let success = result.saveToFile(filePath)
-                                    return filePath
-                                } else {
-                                    return ""
-                                }
-                            })
-                        }
                                                                                 
                         StyledButton {
                             text: "Update Power Curve"
@@ -634,10 +620,6 @@ Item {
         }
     }
 
-    function platformPath(path) {
-        return Qt.platform.os === "windows" ? path.replace(/\//g, "\\") : path;
-    }
-
     function safeValue(value, defaultVal) {
         if (value === undefined || value === null || 
             typeof value !== 'number' || 
@@ -703,7 +685,6 @@ Item {
         target: calculator
         
         function onPdfExportStatusChanged(success, message) {
-            // Show appropriate message popup without loading indicator
             if (success) {
                 messagePopup.showSuccess(message);
             } else {

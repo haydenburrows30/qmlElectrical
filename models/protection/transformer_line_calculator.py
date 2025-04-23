@@ -132,26 +132,33 @@ class TransformerLineCalculator(QObject):
 
     def _handle_pdf_export(self, generate_callback, filename, default_name):
         """Common PDF export handler to reduce code duplication"""
-        # If no filepath provided, use FileSaver to get one
-        if not filename:
-            filename = self._file_saver.get_save_filepath("pdf", default_name)
+        try:
+            # If no filepath provided, use FileSaver to get one
             if not filename:
-                # Let FileSaver emit the cancel message
-                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                filename = self._file_saver.get_save_filepath("pdf", default_name)
+                if not filename:
+                    # Let QML know the export was canceled
+                    self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                    return False
+            
+            # Clean up filepath using FileSaver's helper methods
+            filename = self._file_saver.clean_filepath(filename)
+            filename = self._file_saver.ensure_file_extension(filename, "pdf")
+            
+            # Generate PDF using the provided callback
+            result = generate_callback(filename)
+            
+            # Emit success/failure signal for QML
+            if result:
+                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {filename}")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving PDF to {filename}")
                 return False
-        
-        # Generate PDF using the provided callback
-        result = generate_callback(filename)
-        
-        # Forward FileSaver signals to our own signal
-        if result:
-            message = f"PDF saved to: {filename}"
-            self._file_saver.saveStatusChanged.emit(True, message)
-            self.pdfExportStatusChanged.emit(True, message)
-            return True
-        else:
-            error_msg = f"Error saving PDF to {filename}"
-            self._file_saver.saveStatusChanged.emit(False, error_msg)
+                
+        except Exception as e:
+            error_msg = f"Error handling PDF export: {e}"
+            logger.error(error_msg)
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 

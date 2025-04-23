@@ -21,6 +21,7 @@ class VR32CL7Calculator(QObject):
     cableRPerKmChanged = Signal()
     cableXPerKmChanged = Signal()
     loadDistanceChanged = Signal()
+    exportComplete = Signal(bool, str)  # Add signal for export status
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -207,19 +208,23 @@ class VR32CL7Calculator(QObject):
             logger.error(f"Error generating plot: {e}")
             return None
     
-    @Slot(str)
-    def generate_plot_with_path(self, folder_path):
+    @Slot(str, result=str)
+    def generate_plot_for_file_saver(self, filepath):
         """
-        Generate a bar chart showing R and X values and save to the specified folder
+        Generate a bar chart showing R and X values and save to the specified filepath.
+        Designed to work with FileSaver service.
         
         Args:
-            folder_path (str): Path to the folder where the plot will be saved
+            filepath (str): Complete filepath where the plot will be saved
+            
+        Returns:
+            str: The filepath if successful, empty string if failed
         """
         try:
-            # Use os.path to handle path separators correctly
-            import os
-            output_path = os.path.join(folder_path, "vr32_cl7_plot.png")
-            
+            # If the filepath doesn't end with .png, add the extension
+            if not filepath.lower().endswith('.png'):
+                filepath += '.png'
+                
             results_df = pd.DataFrame({
                 'Parameter': ['Resistance (R)', 'Reactance (X)', 'Impedance (Z)'],
                 'Value (Ω)': [
@@ -243,43 +248,52 @@ class VR32CL7Calculator(QObject):
             plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.tight_layout()
             
-            plt.savefig(output_path)
+            plt.savefig(filepath)
             plt.close()
             
-            logger.info(f"Plot saved to: {output_path}")
-            return output_path
+            logger.info(f"Plot saved to: {filepath}")
+            # Emit success signal for QML
+            self.exportComplete.emit(True, f"Plot saved to: {filepath}")
+            return filepath
         except Exception as e:
-            logger.error(f"Error generating plot: {e}")
-            return None
+            error_msg = f"Error generating plot: {e}"
+            logger.error(error_msg)
+            # Emit failure signal for QML
+            self.exportComplete.emit(False, error_msg)
+            return ""
     
-    @Slot(str)
-    def generate_plot_with_url(self, url):
+    @Slot(result=str)
+    def exportPlot(self):
         """
-        Generate a plot using a URL from QML which works cross-platform
+        Export the plot to a file selected by the user.
+        Handles file dialog and saving internally.
         
-        Args:
-            url (str): URL of the folder (file:/// format)
+        Returns:
+            str: Path to saved file or empty string if failed/canceled
         """
         try:
-            from urllib.parse import urlparse
-            import os
-            import platform
+            from datetime import datetime
+            from services.file_saver import FileSaver
             
-            # Parse the URL to get the path component
-            parsed_url = urlparse(url)
-            path = parsed_url.path
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            default_filename = f"vr32_cl7_plot_{timestamp}"
             
-            # Handle Windows vs Unix paths
-            if platform.system() == "Windows":
-                # Windows URLs start with a /, so we remove it
-                if path.startswith('/'):
-                    path = path[1:]
+            # Get the file_saver instance
+            file_saver = FileSaver()
             
-            # Create output filename
-            filename = "vr32_cl7_plot.png"
-            output_path = os.path.join(path, filename)
+            # Get save filepath from user using FileSaver service
+            filepath = file_saver.get_save_filepath("png", default_filename)
             
-            # Generate the plot
+            if not filepath:
+                self.exportComplete.emit(False, "Export canceled")
+                return ""
+            
+            # Clean up filepath using FileSaver's helper methods
+            filepath = file_saver.clean_filepath(filepath)
+            filepath = file_saver.ensure_file_extension(filepath, "png")
+            
+            # Generate the plot directly
             results_df = pd.DataFrame({
                 'Parameter': ['Resistance (R)', 'Reactance (X)', 'Impedance (Z)'],
                 'Value (Ω)': [
@@ -303,11 +317,15 @@ class VR32CL7Calculator(QObject):
             plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.tight_layout()
             
-            plt.savefig(output_path)
+            plt.savefig(filepath)
             plt.close()
             
-            logger.info(f"Plot saved to: {output_path}")
-            return output_path
+            logger.info(f"Plot saved to: {filepath}")
+            self.exportComplete.emit(True, f"Plot saved to: {filepath}")
+            return filepath
+                
         except Exception as e:
-            logger.error(f"Error generating plot: {e}")
-            return None
+            error_msg = f"Error exporting plot: {e}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return ""
