@@ -5,12 +5,13 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject
+
+from services.logger_config import configure_logger
+logger = configure_logger("qmltest", component="pdf_generator_VD")
 
 class PDFGenerator(QObject):
     """Class for generating PDF reports."""
-    
-    pdfExportStatusChanged = Signal(bool, str)
     
     def __init__(self):
         super().__init__()
@@ -123,15 +124,14 @@ class PDFGenerator(QObject):
             
             # Build the PDF
             doc.build(elements)
-            
-            success_msg = f"Table exported to PDF: {filepath}"
-            self.pdfExportStatusChanged.emit(True, success_msg)
+
             return True
             
         except Exception as e:
-            error_msg = f"Error exporting table to PDF: {e}"
-            self.pdfExportStatusChanged.emit(False, error_msg)
-            return False
+            import traceback
+            logger.error(f"Error generating PDF: {e}")
+            logger.error(traceback.format_exc())
+            return False, str(e)
 
     def generate_details_pdf(self, filepath, details):
         """Generate a PDF report with voltage drop calculation details."""
@@ -245,12 +245,11 @@ class PDFGenerator(QObject):
             
             # Build the PDF
             doc.build(elements)
-            
-            success_msg = f"Details exported to PDF: {filepath}"
-            self.pdfExportStatusChanged.emit(True, success_msg)
+
             return True
             
         except Exception as e:
-            error_msg = f"Error exporting details to PDF: {e}"
-            self.pdfExportStatusChanged.emit(False, error_msg)
-            return False
+            import traceback
+            logger.error(f"Error generating PDF: {e}")
+            logger.error(traceback.format_exc())
+            return False, str(e)

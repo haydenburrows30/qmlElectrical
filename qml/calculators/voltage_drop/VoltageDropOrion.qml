@@ -47,6 +47,12 @@ Page {
         return (value === undefined || value === null || isNaN(value)) ? 0.0 : value;
     }
 
+    // Helper function to sanitize values
+    function safeValue(value, defaultValue = 0) {
+        return (value === undefined || value === null || isNaN(value)) ? 
+            defaultValue : value;
+    }
+
     PopUpText {
         id: popUpText
         parentCard: topHeader
@@ -54,10 +60,6 @@ Page {
             "<br> <b>Results</b><br> The tool displays the voltage drop, current, and other results of the calculation. You can save the results and view the details of the calculation."
         widthFactor: 0.3
         heightFactor: 0.3
-    }
-
-    background: Rectangle {
-        color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
 
     ScrollView {
@@ -139,12 +141,6 @@ Page {
                                 current: voltageDrop.current || 0.0
                                 
                                 onSaveResultsClicked: {
-                                    // Add validation function to handle NaN values
-                                    function safeValue(value, defaultValue = 0) {
-                                        return (value === undefined || value === null || isNaN(value)) ? 
-                                            defaultValue : value;
-                                    }
-                                    
                                     resultsManager.save_calculation({
                                         "voltage_system": cableSettings.voltageSelect.currentText,
                                         "kva_per_house": safeValue(parseFloat(cableSettings.kvaPerHouseInput.text)),
@@ -208,9 +204,9 @@ Page {
                                 
                                 onExportRequest: function(format) {
                                     if (format === "csv") {
-                                        voltageDrop.exportTableData(null)
+                                        voltageDrop.exportTableData()
                                     } else if (format === "pdf") {
-                                        voltageDrop.exportTableToPDF(null)
+                                        voltageDrop.exportTableToPDF()
                                     } else if (format === "menu") {
                                         exportFormatMenu.popup()
                                     }
@@ -273,11 +269,11 @@ Page {
         
         Component.onCompleted: {
             onCsvExport = function() {
-                voltageDrop.exportTableData(null)
+                voltageDrop.exportTableData()
             }
             
             onPdfExport = function() {
-                voltageDrop.exportTableToPDF(null)
+                voltageDrop.exportTableToPDF()
             }
         }
     }
@@ -350,11 +346,6 @@ Page {
         onCloseRequested: detailsPopup.close()
 
         onSaveToPdfRequested: {
-            // Helper function to sanitize values
-            function safeValue(value, defaultValue = 0) {
-                return (value === undefined || value === null || isNaN(value)) ? 
-                    defaultValue : value;
-            }
             
             voltageDrop.exportDetailsToPDF(null, {
                 "voltage_system": detailsPopup.voltageSystem || "Unknown",
@@ -375,20 +366,6 @@ Page {
                 "voltage_drop": safeValue(detailsPopup.voltageDropValue),
                 "drop_percent": safeValue(detailsPopup.dropPercentage)
             })
-        }
-    }
-
-    Component.onCompleted: {
-        // Apply saved settings to UI components if necessary
-        if (typeof appConfig !== 'undefined') {
-            // Set voltage based on saved setting
-            var defaultVoltage = appConfig.get_setting("default_voltage", "415V");
-            for (var i = 0; i < cableSettings.voltageSelect.model.length; i++) {
-                if (cableSettings.voltageSelect.model[i] === defaultVoltage) {
-                    cableSettings.voltageSelect.currentIndex = i;
-                    break;
-                }
-            }
         }
     }
 }

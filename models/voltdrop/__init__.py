@@ -1,6 +1,5 @@
 from .voltage_drop_orion import VoltageDropCalculator
 from .table_model import VoltageDropTableModel
-from .file_utils import FileUtils
 from utils.pdf.pdf_generator_volt_drop import PDFGenerator
 from services.data_store import DataStore
 from services.voltage_drop_service import VoltageDropService
@@ -9,7 +8,6 @@ from services.voltage_drop_service import VoltageDropService
 __all__ = [
     'VoltageDropCalculator',
     'VoltageDropTableModel',
-    'FileUtils',
     'PDFGenerator',
     'DataStore',
     'VoltageDropService'

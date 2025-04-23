@@ -5,7 +5,6 @@ from services.logger_config import configure_logger
 from services.file_saver import FileSaver
 
 from .table_model import VoltageDropTableModel
-from .file_utils import FileUtils
 from utils.pdf.pdf_generator_volt_drop import PDFGenerator
 from services.voltage_drop_service import VoltageDropService
 
@@ -55,15 +54,14 @@ class VoltageDropCalculator(QObject):
         
         # Initialize component classes
         self._data_manager = VoltageDropService()
-        self._file_utils = FileUtils()
         self._pdf_generator = PDFGenerator()
         self._table_model = VoltageDropTableModel()
-        self._file_saver = FileSaver()  # Add the new FileSaver
+        self._file_saver = FileSaver()
         
         # Connect signals from components to forward them
-        self._file_utils.saveStatusChanged.connect(self.saveStatusChanged)
-        self._pdf_generator.pdfExportStatusChanged.connect(self.pdfExportStatusChanged)
-        self._file_saver.saveStatusChanged.connect(self.tableExportStatusChanged)  # Connect the new signal
+        self._file_saver.saveStatusChanged.connect(self.tableExportStatusChanged)
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
+        
         
         # Initialize state variables
         self._current = 0.0
@@ -103,6 +101,9 @@ class VoltageDropCalculator(QObject):
             "F - Cable tray/ladder/cleated",
             "G - Spaced from surface"
         ]
+
+        # Create in-memory storage for calculation history
+        self._calculation_history = []
         
         # Set initial cable data
         self._update_cable_data()
@@ -405,6 +406,63 @@ class VoltageDropCalculator(QObject):
         self.conductorRatingChanged.emit(self._conductor_rating)
         self.combinedRatingChanged.emit(self._combined_rating_info)
 
+    def save_calculation_history(self, calculation_data):
+        """Save calculation history to in-memory storage with option to export."""
+        try:
+            # Store calculation in memory
+            self._calculation_history.append(calculation_data)
+            
+            # Optional: Export to disk if needed
+            success_msg = f"Calculation saved to memory (Total: {len(self._calculation_history)})"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error saving calculation: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+            
+    def get_calculation_history(self):
+        """Get the in-memory calculation history."""
+        return self._calculation_history
+        
+    def export_calculation_history(self, filepath=None):
+        """Export in-memory calculation history to CSV file."""
+        try:
+            if not filepath:
+                filepath = self._file_saver.get_save_filepath("csv", "calculations_history")
+                if not filepath:
+                    self.saveStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Convert to DataFrame
+            df = pd.DataFrame(self._calculation_history)
+            
+            # Save to CSV
+            df.to_csv(filepath, index=False)
+            
+            success_msg = f"Calculation history exported to {filepath}"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error exporting calculation history: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+            
+    def clear_calculation_history(self):
+        """Clear the in-memory calculation history."""
+        try:
+            self._calculation_history.clear()
+            success_msg = "Calculation history cleared"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error clearing calculation history: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+
     @Slot()
     def saveCurrentCalculation(self):
         """Save current calculation results."""
@@ -431,11 +489,8 @@ class VoltageDropCalculator(QObject):
                 'admd_enabled': self._admd_enabled
             }
             
-            logger.info(f"Saving voltage drop calculation: {timestamp}")
-            logger.debug(f"Calculation details: {result}")
-            
             # Save using file utils
-            return self._file_utils.save_calculation_history(result)
+            return self.save_calculation_history(result)
             
         except Exception as e:
             error_msg = f"Error saving calculation: {e}"
@@ -454,15 +509,19 @@ class VoltageDropCalculator(QObject):
                 return False
         
         if filepath:
-            logger.debug(f"Requesting chart capture to: {filepath} with scale {scale}")
             self.grabRequested.emit(filepath, scale)
             return True
         return False
 
-    @Slot(str)
-    def exportTableData(self, filepath):
+    @Slot()
+    def exportTableData(self):
         """Save the cable size comparison table data to a CSV file."""
         try:
+            filepath = self._file_saver.get_save_filepath("csv", "voltage_drop_table")
+            if not filepath:
+                self.tableExportStatusChanged.emit(False, "Export cancelled")
+                return False
+            
             # Ensure we have data to save
             if not hasattr(self, '_table_model') or self._table_model is None:
                 logger.error("No table data to export")
@@ -475,9 +534,6 @@ class VoltageDropCalculator(QObject):
                 logger.error("Table contains no data to export")
                 self.tableExportStatusChanged.emit(False, "Table contains no data to export")
                 return False
-                
-            logger.info(f"Exporting table data to CSV")
-            logger.debug(f"Table contains {len(rows)} rows of data")
             
             # Create metadata for CSV header
             metadata = {
@@ -498,9 +554,15 @@ class VoltageDropCalculator(QObject):
                 'data': rows,
                 'headers': headers
             }
+
+            result = self._file_saver.save_csv(filepath, data, metadata, "cable_comparison")
             
-            # Save using FileSaver instead of file_utils
-            return self._file_saver.save_csv(filepath, data, metadata, "cable_comparison")
+            if result:
+                self._file_saver._emit_success_with_path(filepath, "Table data exported to CSV")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(filepath, "Failed to export table data")
+                return False
             
         except Exception as e:
             error_msg = f"Error exporting table data: {e}"
@@ -513,13 +575,15 @@ class VoltageDropCalculator(QObject):
         """Export chart data as JSON."""
         try:
             data = json.loads(data_str)
-            filepath = self._file_utils.get_save_filepath("json", "voltage_drop_chart")
+            filepath = self._file_saver.get_save_filepath("json", "voltage_drop_chart")
             if filepath:
-                result = self._file_utils.save_json(filepath, data)
+                result = self._file_saver.save_json(filepath, data)
                 if result:
-                    self.tableExportStatusChanged.emit(True, "Chart data exported to JSON")
+                    self._file_saver._emit_success_with_path(filepath, "Chart data exported to JSON")
+                    return True
                 else:
-                    self.tableExportStatusChanged.emit(False, "Failed to export chart data")
+                    self._file_saver._emit_failure_with_path(filepath, "Failed to export chart data")
+                    return False
         except Exception as e:
             self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
 
@@ -528,7 +592,7 @@ class VoltageDropCalculator(QObject):
         """Export chart data as CSV."""
         try:
             data = json.loads(data_str)
-            filepath = self._file_utils.get_save_filepath("csv", "voltage_drop_chart")
+            filepath = self._file_saver.get_save_filepath("csv", "voltage_drop_chart")
             if filepath:
                 # Convert to DataFrame format
                 current_point = pd.DataFrame([{
@@ -545,11 +609,13 @@ class VoltageDropCalculator(QObject):
                 } for p in data['comparisonPoints']])
                 
                 df = pd.concat([current_point, comparison_points], ignore_index=True)
-                result = self._file_utils.save_csv(filepath, df)
+                result = self._file_saver.save_csv(filepath, df)
+
                 if result:
-                    self.tableExportStatusChanged.emit(True, "Chart data exported to CSV")
+                    self._file_saver._emit_success_with_path(filepath, "Chart data exported to CSV")
                 else:
-                    self.tableExportStatusChanged.emit(False, "Failed to export chart data")
+                    self._file_saver._emit_failure_with_path(filepath, "Failed to export chart data")
+
         except Exception as e:
             self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
 
@@ -595,7 +661,7 @@ class VoltageDropCalculator(QObject):
                 self._file_saver._emit_success_with_path(filepath, "PDF saved")
                 return True
             else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving to {filepath}")
+                self._file_saver._emit_failure_with_path(filepath, "Error saving PDF")
                 return False
             
         except Exception as e:
@@ -604,15 +670,14 @@ class VoltageDropCalculator(QObject):
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 
-    @Slot(str)
-    def exportTableToPDF(self, filepath):
+    @Slot()
+    def exportTableToPDF(self):
         """Export table data to PDF."""
         try:
+            filepath = self._file_saver.get_save_filepath("pdf", "voltage_drop_table")
             if not filepath:
-                filepath = self._file_saver.get_save_filepath("pdf", "voltage_drop_table")
-                if not filepath:
-                    self.tablePdfExportStatusChanged.emit(False, "Export cancelled")
-                    return False
+                self.tablePdfExportStatusChanged.emit(False, "Export cancelled")
+                return False
             
             # Get table data and format it for PDF
             if not self._table_model or not self._table_model._data:
@@ -645,7 +710,7 @@ class VoltageDropCalculator(QObject):
                 self._file_saver._emit_success_with_path(filepath, "PDF saved")
                 return True
             else:
-                self.tablePdfExportStatusChanged.emit(False, f"Error saving to {filepath}")
+                self._file_saver._emit_failure_with_path(filepath, "Error saving PDF")
                 return False
             
         except Exception as e:
