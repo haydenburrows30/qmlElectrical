@@ -4,7 +4,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 import PyInstaller.__main__
-from utils.diagrams.generate_icon import create_icon
+from diagrams.generate_icon import create_icon
 import time
 
 def download_upx():
