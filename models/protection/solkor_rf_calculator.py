@@ -1,6 +1,7 @@
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, Slot, Signal, Property
 from utils.pdf.pdf_generator_solkor_rf import SolkorRfPdfGenerator
 from services.file_saver import FileSaver
+from datetime import datetime
 
 class SolkorRfCalculator(QAbstractTableModel):
     """
@@ -390,16 +391,21 @@ class SolkorRfCalculator(QAbstractTableModel):
                 return False
         return False
 
-    @Slot(str)
-    def exportToPdf(self, filePath):
+    @Slot()
+    def exportToPdf(self):
         """Export the table data to a PDF file."""
         try:
-            # If no filePath provided, use the file saver to get one
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            filePath = self._file_saver.get_save_filepath("pdf", f"solkor_rf_report_{timestamp}")
             if not filePath:
-                filePath = self._file_saver.get_save_filepath("pdf", "solkor_rf_results")
-                if not filePath:
-                    self.pdfSaved.emit(False, "PDF export canceled")
-                    return False
+                self.pdfSaved.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up filename using FileSaver's clean_filepath method
+            filePath = self._file_saver.clean_filepath(filePath)
+            filePath = self._file_saver.ensure_file_extension(filePath, "pdf")
 
             # Gather site information for the PDF
             site_info = {
@@ -415,7 +421,8 @@ class SolkorRfCalculator(QAbstractTableModel):
             }
             
             # Call the PDF generator
-            success, result = SolkorRfPdfGenerator.generate_pdf(
+            generator = SolkorRfPdfGenerator()
+            result = generator.generate_pdf(
                 filePath, 
                 self.data_matrix,
                 self.headers,
@@ -424,11 +431,11 @@ class SolkorRfCalculator(QAbstractTableModel):
             )
             
             # Let file_saver handle the success message for consistency
-            if success:
+            if result:
                 self._file_saver._emit_success_with_path(filePath, "PDF saved")
                 return True
             else:
-                self.pdfSaved.emit(False, f"Error saving to {filePath}")
+                self._file_saver._emit_failure_with_path(filePath, "Error saving PDF")
                 return False
                 
         except Exception as e:

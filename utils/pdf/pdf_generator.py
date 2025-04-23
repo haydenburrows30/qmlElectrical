@@ -7,6 +7,9 @@ from reportlab.platypus import Image
 import os
 from datetime import datetime
 
+from services.logger_config import configure_logger
+logger = configure_logger("qmltest", component="pdf_generator")
+
 class PDFGenerator:
     def __init__(self):
         self.styles = getSampleStyleSheet()
@@ -702,5 +705,6 @@ class PDFGenerator:
             
         except Exception as e:
             import traceback
-            traceback.print_exc()
-            return False
+            logger.error(f"Error generating PDF: {e}")
+            logger.error(traceback.format_exc())
+            return False, str(e)

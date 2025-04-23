@@ -53,6 +53,9 @@ class WindTurbineCalculator(QObject):
         
         # Initialize FileSaver
         self._file_saver = FileSaver()
+
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         # Initialize calculations
         self._calculate()
@@ -592,10 +595,10 @@ class WindTurbineCalculator(QObject):
             
             # Signal success or failure
             if result:
-                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {pdf_file}")
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
                 return True
             else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving PDF to {pdf_file}")
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
                 return False
             
         except Exception as e:

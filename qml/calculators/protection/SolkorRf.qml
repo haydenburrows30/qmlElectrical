@@ -17,9 +17,7 @@ Item {
     property SolkorRfCalculator calculator: SolkorRfCalculator {}
 
     function saveToPdf() {
-        // Use the calculator's exportToPdf with null parameter
-        // to let FileSaver handle the file dialog
-        calculator.exportToPdf(null)
+        calculator.exportToPdf()
     }
 
     Connections {
@@ -28,7 +26,7 @@ Item {
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
-                messagePopup.showError("Error saving PDF: " + message)
+                messagePopup.showError(message)
             }
         }
 

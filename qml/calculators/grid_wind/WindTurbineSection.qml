@@ -680,10 +680,9 @@ Item {
             }
         }
     }
-    
+
     Connections {
         target: calculator
-        
         function onPdfExportStatusChanged(success, message) {
             if (success) {
                 messagePopup.showSuccess(message);

@@ -74,6 +74,22 @@ class FileSaver(QObject):
         # Also log to console for debugging
         print(f"SUCCESS: {success_message}")
     
+    def _emit_failure_with_path(self, filepath, message=None):
+        """Emit success with standardized message including file path."""
+        if message:
+            failure_message = f"{message}: {filepath}"
+        else:
+            failure_message = f"Error saving file: {filepath}"
+        
+        logger.info(failure_message)
+        
+        # Directly emit the signal without trying/catching
+        # This makes behavior more predictable
+        self.saveStatusChanged.emit(True, failure_message)
+        
+        # Also log to console for debugging
+        print(f"FAILURE: {failure_message}")
+    
     @Slot(str, str, str, bool)
     def _show_dialog_on_main_thread(self, dialog_type, file_extension, default_path, save_mode):
         """Show file dialog on the main thread."""
