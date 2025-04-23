@@ -4,19 +4,10 @@ import pandas as pd
 from pathlib import Path
 from PySide6.QtCore import QObject, Signal, Slot, Property, QThread, QCoreApplication
 
-try:
-    from services.logger_config import configure_logger
-    # Setup component-specific logger
-    logger = configure_logger("qmltest", component="file_saver")
-except ImportError:
-    import logging
-    # Fallback logger if logger_config is not available
-    logger = logging.getLogger("file_saver")
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+from services.logger_config import configure_logger
+
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="file_saver")
 
 class FileSaver(QObject):
     """

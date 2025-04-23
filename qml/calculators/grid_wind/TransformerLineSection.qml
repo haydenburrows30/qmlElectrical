@@ -849,9 +849,8 @@ Item {
 
     function exportReport() {
         if (!calculatorReady) return;
-        
-        // Export using null to let FileSaver handle the file dialog
-        calculator.exportTransformerReport(null, null);
+
+        calculator.exportTransformerReport();
     }
 
     Connections {

@@ -1,6 +1,8 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import cmath
+from datetime import datetime
+
 from utils.pdf.pdf_generator import PDFGenerator
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
@@ -130,46 +132,30 @@ class TransformerLineCalculator(QObject):
         # Perform initial calculations
         self._calculate()
 
-    def _handle_pdf_export(self, generate_callback, filename, default_name):
-        """Common PDF export handler to reduce code duplication"""
-        try:
-            # If no filepath provided, use FileSaver to get one
-            if not filename:
-                filename = self._file_saver.get_save_filepath("pdf", default_name)
-                if not filename:
-                    # Let QML know the export was canceled
-                    self.pdfExportStatusChanged.emit(False, "PDF export canceled")
-                    return False
-            
-            # Clean up filepath using FileSaver's helper methods
-            filename = self._file_saver.clean_filepath(filename)
-            filename = self._file_saver.ensure_file_extension(filename, "pdf")
-            
-            # Generate PDF using the provided callback
-            result = generate_callback(filename)
-            
-            # Emit success/failure signal for QML
-            if result:
-                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {filename}")
-                return True
-            else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving PDF to {filename}")
-                return False
-                
-        except Exception as e:
-            error_msg = f"Error handling PDF export: {e}"
-            logger.error(error_msg)
-            self.pdfExportStatusChanged.emit(False, error_msg)
-            return False
-
-    @Slot("QVariant", str)
-    def exportTransformerReport(self, data, filename):
+    @Slot()
+    def exportTransformerReport(self):
         """Export transformer calculations to PDF"""
         try:
-            # Prepare data for export (keep this part as it's specific to this method)
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            # If no filepath provided, use FileSaver to get one
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"transformer_line_results_{timestamp}")
+            if not pdf_file:
+                # Let QML know the export was canceled
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up filepath using FileSaver's helper methods
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+
+            # Prepare data for export
             export_data = {
                 # Transformer parameters
                 "transformer_rating": self._transformer_rating,
+                "transformer_hv_voltage": self._transformer_hv_voltage,
+                "transformer_lv_voltage": self._transformer_lv_voltage,
                 "transformer_impedance": self._transformer_impedance,
                 "transformer_xr_ratio": self._transformer_x_r_ratio,
                 "transformer_z": self._transformer_z,
@@ -177,6 +163,9 @@ class TransformerLineCalculator(QObject):
                 "transformer_x": self._transformer_x,
                 
                 # Line parameters
+                "line_length": self._line_length,
+                "line_r": self._line_r,
+                "line_x": self._line_x,
                 "line_total_z": abs(self._line_total_z),
                 "voltage_drop": self._voltage_drop,
                 "unregulated_voltage": self._unregulated_voltage,
@@ -218,25 +207,21 @@ class TransformerLineCalculator(QObject):
             
             # Generate PDF content
             generator = PDFGenerator()
-            
-            # Use FileSaver to handle the file operations and emit status signals
-            # We'll define a callback to handle the actual PDF generation
-            def generate_pdf_callback(filepath):
-                return generator.generate_transformer_report(export_data, filepath)
-            
-            # Let FileSaver handle the whole process
-            result = self._handle_pdf_export(generate_pdf_callback, filename, "transformer_report")
-            
-            # Forward the result to our own signal (already emitted by FileSaver)
-            return result
-                
+
+            result = generator.generate_transformer_report(export_data, pdf_file)
+
+            # Emit success/failure signal for QML
+            if result:
+                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {pdf_file}")
+                return True
+            else:
+                self.pdfExportStatusChanged.emit(False, f"Error saving PDF to {pdf_file}")
+                return False
+
         except Exception as e:
-            logger.error(f"Error exporting transformer report: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            
-            # Consistent error reporting
-            error_msg = f"Error saving PDF: {str(e)}"
+            error_msg = (f"Error exporting transformer report: {e}")
+            logger.error(error_msg)
+            # Send error to QML
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 
