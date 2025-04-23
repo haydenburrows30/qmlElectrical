@@ -556,7 +556,6 @@ class WindTurbineCalculator(QObject):
                 # Mark as temporary if it's a temp file
                 if "temp_wind_chart" in chart_image_path:
                     temp_image = True
-            
             # Prepare power curve data (to be used if chart image isn't available)
             power_curve_data = {
                 'wind_speeds': [point[0] for point in self._power_curve],

@@ -94,6 +94,9 @@ class ResultsManager(QObject):
         # Load initial data from SQL storage
         self._load_saved_results()
 
+        # Create in-memory storage for calculation history **depreciated**
+        self._calculation_history = []
+
     def _load_saved_results(self):
         """Load existing results from SQL storage."""
         try:
@@ -296,3 +299,60 @@ class ResultsManager(QObject):
         """Cleanup database connection on deletion."""
         if hasattr(self, '_data_store'):
             self._data_store.close()
+
+    def save_calculation_history(self, calculation_data):
+        """Save calculation history to in-memory storage with option to export."""
+        try:
+            # Store calculation in memory
+            self._calculation_history.append(calculation_data)
+            
+            # Optional: Export to disk if needed
+            success_msg = f"Calculation saved to memory (Total: {len(self._calculation_history)})"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error saving calculation: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+            
+    def get_calculation_history(self):
+        """Get the in-memory calculation history."""
+        return self._calculation_history
+        
+    def export_calculation_history(self, filepath=None):
+        """Export in-memory calculation history to CSV file."""
+        try:
+            if not filepath:
+                filepath = self._file_saver.get_save_filepath("csv", "calculations_history")
+                if not filepath:
+                    self.saveStatusChanged.emit(False, "Export cancelled")
+                    return False
+            
+            # Convert to DataFrame
+            df = pd.DataFrame(self._calculation_history)
+            
+            # Save to CSV
+            df.to_csv(filepath, index=False)
+            
+            success_msg = f"Calculation history exported to {filepath}"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error exporting calculation history: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
+            
+    def clear_calculation_history(self):
+        """Clear the in-memory calculation history."""
+        try:
+            self._calculation_history.clear()
+            success_msg = "Calculation history cleared"
+            self.saveStatusChanged.emit(True, success_msg)
+            return True
+            
+        except Exception as e:
+            error_msg = f"Error clearing calculation history: {e}"
+            self.saveStatusChanged.emit(False, error_msg)
+            return False

@@ -441,7 +441,7 @@ class FileSaver(QObject):
             logger.error(error_msg)
             self.saveStatusChanged.emit(False, error_msg)
             return False
-    
+
     @Property(str)
     def defaultFolder(self):
         """Get the default save folder path."""

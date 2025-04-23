@@ -17,7 +17,6 @@ Item {
 
     property VR32CL7Calculator calculator: VR32CL7Calculator {}
 
-    // Add MessagePopup component
     MessagePopup {
         id: messagePopup
     }
@@ -39,13 +38,6 @@ Item {
                 font.bold: true
                 Layout.fillWidth: true
             }
-
-            // StyledButton {
-            //     id: helpButton
-            //     icon.source: "../../../icons/rounded/info.svg"
-            //     ToolTip.text: "Help"
-            //     onClicked: popUpText.open()
-            // }
         }
 
         // Input parameters section
@@ -256,8 +248,6 @@ Item {
 
                         onClicked: {
                             if (calculator) {
-                                // Call the method that handles export + file dialog internally
-                                // No need to interact with fileSaver directly from QML anymore
                                 calculator.exportPlot()
                             }
                         }
@@ -590,26 +580,8 @@ Item {
         }
     }
     
-    // Replace the previous MessageDialog with Connections to FileSaver
-    // Connections {
-    //     target: calculator
-        
-    //     function onSaveStatusChanged(success, message) {
-    //         if (success) {
-    //             messagePopup.showSuccess(message)
-    //         } else {
-    //             messagePopup.showError(message)
-    //         }
-    //     }
-    // }
-    
-    // Connections to update UI when calculator changes
     Connections {
         target: calculator
-        
-        function onResultsChanged() {
-            // The UI will automatically update through property bindings
-        }
         
         function onExportComplete(success, message) {
             if (success) {

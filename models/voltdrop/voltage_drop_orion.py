@@ -1,6 +1,7 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
 import json
+import os
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
 
@@ -83,7 +84,6 @@ class VoltageDropCalculator(QObject):
         self._total_kva = 0.0
         self._admd_enabled = False
         self._admd_factor = 1.5  # ADMD factor for neutral calculations
-        self._calculation_results = []  # Store calculation history
         self._current_fuse_size = "N/A"
         self._conductor_rating = 0.0
         self._combined_rating_info = "N/A"
@@ -101,9 +101,6 @@ class VoltageDropCalculator(QObject):
             "F - Cable tray/ladder/cleated",
             "G - Spaced from surface"
         ]
-
-        # Create in-memory storage for calculation history
-        self._calculation_history = []
         
         # Set initial cable data
         self._update_cable_data()
@@ -406,63 +403,6 @@ class VoltageDropCalculator(QObject):
         self.conductorRatingChanged.emit(self._conductor_rating)
         self.combinedRatingChanged.emit(self._combined_rating_info)
 
-    def save_calculation_history(self, calculation_data):
-        """Save calculation history to in-memory storage with option to export."""
-        try:
-            # Store calculation in memory
-            self._calculation_history.append(calculation_data)
-            
-            # Optional: Export to disk if needed
-            success_msg = f"Calculation saved to memory (Total: {len(self._calculation_history)})"
-            self.saveStatusChanged.emit(True, success_msg)
-            return True
-            
-        except Exception as e:
-            error_msg = f"Error saving calculation: {e}"
-            self.saveStatusChanged.emit(False, error_msg)
-            return False
-            
-    def get_calculation_history(self):
-        """Get the in-memory calculation history."""
-        return self._calculation_history
-        
-    def export_calculation_history(self, filepath=None):
-        """Export in-memory calculation history to CSV file."""
-        try:
-            if not filepath:
-                filepath = self._file_saver.get_save_filepath("csv", "calculations_history")
-                if not filepath:
-                    self.saveStatusChanged.emit(False, "Export cancelled")
-                    return False
-            
-            # Convert to DataFrame
-            df = pd.DataFrame(self._calculation_history)
-            
-            # Save to CSV
-            df.to_csv(filepath, index=False)
-            
-            success_msg = f"Calculation history exported to {filepath}"
-            self.saveStatusChanged.emit(True, success_msg)
-            return True
-            
-        except Exception as e:
-            error_msg = f"Error exporting calculation history: {e}"
-            self.saveStatusChanged.emit(False, error_msg)
-            return False
-            
-    def clear_calculation_history(self):
-        """Clear the in-memory calculation history."""
-        try:
-            self._calculation_history.clear()
-            success_msg = "Calculation history cleared"
-            self.saveStatusChanged.emit(True, success_msg)
-            return True
-            
-        except Exception as e:
-            error_msg = f"Error clearing calculation history: {e}"
-            self.saveStatusChanged.emit(False, error_msg)
-            return False
-
     @Slot()
     def saveCurrentCalculation(self):
         """Save current calculation results."""
@@ -498,20 +438,24 @@ class VoltageDropCalculator(QObject):
             self.saveStatusChanged.emit(False, error_msg)
             return False
 
-    @Slot(str, float)
-    def saveChart(self, filepath, scale=2.0):
+    @Slot(str)
+    def saveChart(self, image_data):
         """Save chart as image with optional scale factor."""
-        # If no filepath provided, use the file saver to get one
-        if not filepath:
-            filepath = self._file_saver.get_save_filepath("png", "voltage_drop_chart")
-            if not filepath:
-                self.chartSaved.emit(False, "Export cancelled")
-                return False
-        
-        if filepath:
-            self.grabRequested.emit(filepath, scale)
-            return True
-        return False
+
+        chart_image_path = ""
+
+        if image_data and isinstance(image_data, str) and os.path.exists(image_data):
+                chart_image_path = image_data
+
+        print(chart_image_path)
+        result = self._file_saver.save_png(chart_image_path)
+
+        if result:
+                self._file_saver._emit_success_with_path(chart_image_path, "Table data exported to CSV")
+                return True
+        else:
+            self._file_saver._emit_failure_with_path(chart_image_path, "Failed to export table data")
+            return False
 
     @Slot()
     def exportTableData(self):

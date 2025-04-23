@@ -226,42 +226,10 @@ Page {
 
     ChartPopup {
         id: chartPopup
-
-        onSaveRequested: function(scale) {
-            exportFileDialog.setup("Save Chart", "PNG files (*.png)", "png", 
-                                  "voltage_drop_chart", exportFileDialog.chartExport)
-            exportFileDialog.currentScale = scale
-            exportFileDialog.open()
-        }
     }
     
     MessagePopup {
         id: messagePopup
-    }
-    
-    ExportFileDialog {
-        id: exportFileDialog
-
-        function handleExport(selectedFile) {
-            switch(exportType) {
-                case chartExport:
-                    voltageDrop.saveChart(selectedFile, currentScale)
-                    break
-                case tableCsvExport:
-                    voltageDrop.exportTableData(selectedFile)
-                    break
-                case tablePdfExport:
-                    voltageDrop.exportTableToPDF(selectedFile)
-                    break
-                case detailsPdfExport:
-                    voltageDrop.exportDetailsToPDF(selectedFile, details)
-                    break
-            }
-        }
-        
-        Component.onCompleted: {
-            handler = handleExport
-        }
     }
     
     ExportFormatMenu {

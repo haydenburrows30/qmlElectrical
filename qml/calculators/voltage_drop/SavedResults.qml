@@ -16,6 +16,13 @@ WaveCard {
         RowLayout {
             Layout.fillWidth: true
 
+
+            StyledButton {
+                text: "Clear All"
+                icon.source: "../../../icons/rounded/close.svg"
+                onClicked: resultsManager.export_calculation_history()
+            }
+
             StyledButton {
                 text: "Clear All"
                 icon.source: "../../../icons/rounded/close.svg"

@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
 import QtQuick.Controls.Universal
+import QtQuick.Dialogs
+import QtCore
 
 import "../style"
 import "../buttons"
@@ -16,6 +18,8 @@ Item {
     property real currentValue: 0
     property bool showAllCables: false
     property var comparisonPoints: []
+
+    property string applicationDirPath: Qt.application.directoryPath || "."
     
     // Function to call when chart should be updated
     function updateChart() {
@@ -24,9 +28,6 @@ Item {
 
     // Signal when chart should be closed
     signal closeRequested()
-    
-    // Update signal to include scale
-    signal saveRequested(real scale)
     
     ColumnLayout {
         anchors.fill: parent
@@ -326,17 +327,19 @@ Item {
                     
                     MenuItem {
                         text: "Standard Quality (1x)"
-                        onTriggered: voltageDrop.saveChart(null, 1.0)
+                        onTriggered: {
+                            fileDialog.open()
+                        }
                     }
                     
                     MenuItem {
                         text: "High Quality (2x)"
-                        onTriggered: voltageDrop.saveChart(null, 2.0)
+                        onTriggered: voltageDrop.saveChart(2.0)
                     }
                     
                     MenuItem {
                         text: "Ultra Quality (4x)"
-                        onTriggered: voltageDrop.saveChart(null, 4.0)
+                        onTriggered: voltageDrop.saveChart(4.0)
                     }
                 }
                 
@@ -612,7 +615,21 @@ Item {
 
     // Connect signals
     onCloseRequested: chartPopup.close()
-    onSaveRequested: function(scale) {
-        voltageDrop.saveChart(null, scale)
+
+    FolderDialog {
+        id: fileDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted: {
+            var tempImagePath = selectedFolder + (Qt.platform.os === "windows" ? "\\temp_overcurrent_chart.png" : "/temp_overcurrent_chart.png")
+
+                                
+            // Capture the chart image and save it to the temporary file
+            chartView.grabToImage(function(result) {
+                if (result) {
+                    result.saveToFile(tempImagePath)
+                    console.log("saved to:" + tempImagePath)
+                }
+            })
+        }
     }
 }
