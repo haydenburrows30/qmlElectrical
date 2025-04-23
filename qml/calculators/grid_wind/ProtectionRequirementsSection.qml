@@ -91,7 +91,7 @@ Item {
                             text: "Export Settings"
                             onClicked: {
                                 if (transformerReady && windTurbineReady) {
-                                    exportProtectionSettings(null)
+                                    exportProtectionSettings()
                                 } else {
                                     messagePopup.showError("Please calculate the system first")
                                 }
@@ -788,7 +788,7 @@ Item {
     }
     
     // Add function to handle exporting protection settings with FileSaver
-    function exportProtectionSettings(filePath) {
+    function exportProtectionSettings() {
         if (transformerReady && windTurbineReady) {
             // Calculate needed values
             let generatorCurrent = (windTurbineCalculator.actualPower * 1000) / (Math.sqrt(3) * 400);
@@ -844,7 +844,7 @@ Item {
             };
             
             // Export using the transformer calculator
-            transformerCalculator.exportProtectionReport(exportData, filePath);
+            transformerCalculator.exportProtectionReport(exportData);
         }
     }
 }

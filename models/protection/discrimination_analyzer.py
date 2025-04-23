@@ -54,7 +54,7 @@ class DiscriminationAnalyzer(QObject):
     analysisComplete = Signal()
     relayCountChanged = Signal()
     marginChanged = Signal()
-    exportComplete = Signal(bool, str)  # Update signal to match standard approach
+    exportComplete = Signal(bool, str)
     exportChart = Signal(str)
 
     def __init__(self, parent=None):
@@ -72,6 +72,9 @@ class DiscriminationAnalyzer(QObject):
         }
         # Initialize the file saver
         self._file_saver = FileSaver()
+
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
 
     @Property(int, notify=relayCountChanged)
     def relayCount(self):
@@ -168,14 +171,14 @@ class DiscriminationAnalyzer(QObject):
                 except Exception:
                     pass
             
-            # Report result
+            # Signal success or failure
             if result:
-                self.exportComplete.emit(True, f"PDF saved to: {pdf_file}")
-                return pdf_file
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
             else:
-                self.exportComplete.emit(False, f"Error saving PDF to {pdf_file}")
-                return ""
-                
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+
         except Exception as e:
             error_msg = f"Error exporting report: {str(e)}"
             logger.error(error_msg)

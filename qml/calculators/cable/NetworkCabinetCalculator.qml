@@ -190,7 +190,7 @@ Item {
                                 let diagramImage = cabinetDiagram.captureImage()
                                 
                                 // Export to PDF with null folder path to trigger FileSaver dialog
-                                calculator.exportToPdf(null, diagramImage)
+                                calculator.exportToPdf(diagramImage)
                             })
                         }
                     }

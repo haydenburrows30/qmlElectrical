@@ -1,9 +1,13 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot
+from datetime import datetime
 from services.file_saver import FileSaver
 
 # Import the PDF generator module
 from utils.pdf.pdf_generator_dcm import generate_dcm_pdf
 from .config_manager_dcm import save_config, load_config
+from services.logger_config import configure_logger
+
+logger = configure_logger("qmltest", component="dc_m1")
 
 class NetworkCabinetCalculator(QObject):
     """
@@ -30,9 +34,9 @@ class NetworkCabinetCalculator(QObject):
     showDropperPlatesChanged = Signal(bool)
     cableLengthsChanged = Signal(list)
     servicePanelLengthChanged = Signal(float)
-    pdfExportStatusChanged = Signal(bool, str)  # Update to match standard approach
+    pdfExportStatusChanged = Signal(bool, str)
     generalNotesChanged = Signal(str)
-    saveLoadStatusChanged = Signal(bool, str)  # Update to match standard approach
+    saveLoadStatusChanged = Signal(bool, str)
     servicePanelSourceChanged = Signal(str)
     servicePanelDestinationChanged = Signal(str)
     servicePanelNotesChanged = Signal(str)
@@ -66,7 +70,8 @@ class NetworkCabinetCalculator(QObject):
         
         # Connect the FileSaver signals to our signals
         self._file_saver.saveStatusChanged.connect(self.saveLoadStatusChanged)
-        
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
+
         # Default values for all properties
         self._defaults = {
             # Main cabinet configuration
@@ -628,8 +633,8 @@ class NetworkCabinetCalculator(QObject):
         """Set phase at specified index."""
         self._update_list_property(index, phase, "phases", self.phasesChanged)
     
-    @Slot(str, str)
-    def exportToPdf(self, folder_path, diagram_image=None):
+    @Slot(str)
+    def exportToPdf(self, diagram_image=None):
         """
         Export cabinet configuration to PDF
         
@@ -638,29 +643,34 @@ class NetworkCabinetCalculator(QObject):
             diagram_image: Optional data URL of diagram image to include
         """
         try:
-            # If no folder path provided, use FileSaver to get one
-            if not folder_path:
-                filename = f"cabinet_config_{self._site_name or 'untitled'}"
-                pdf_path = self._file_saver.get_save_filepath("pdf", filename)
-                if not pdf_path:
-                    self.pdfExportStatusChanged.emit(False, "Export cancelled")
-                    return False
-                folder_path = pdf_path  # This is now a complete filepath
-            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"cabinet_config_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+
             # Use the dedicated PDF generator module
-            success, filepath = generate_dcm_pdf(self, folder_path, diagram_image)
-            
-            # Use standardized success message with file path
-            if success:
-                self._file_saver._emit_success_with_path(filepath, "PDF saved")
+            result = generate_dcm_pdf(self, pdf_file, diagram_image)
+
+            # Signal success or failure
+            if result:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
                 return True
             else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving to {filepath}")
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
                 return False
+
         except Exception as e:
+            error_msg = (f"Error exporting wind turbine report: {e}")
+            logger.error(error_msg)
+            # Send error to QML
             self.pdfExportStatusChanged.emit(False, str(e))
             return False
-    
+
     @Slot(str)
     def saveConfig(self, file_path):
         """

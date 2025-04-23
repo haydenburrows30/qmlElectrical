@@ -128,6 +128,9 @@ class TransformerLineCalculator(QObject):
         
         # Initialize the file saver
         self._file_saver = FileSaver()
+
+         # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         # Perform initial calculations
         self._calculate()
@@ -210,12 +213,12 @@ class TransformerLineCalculator(QObject):
 
             result = generator.generate_transformer_report(export_data, pdf_file)
 
-            # Emit success/failure signal for QML
+            # Signal success or failure
             if result:
-                self.pdfExportStatusChanged.emit(True, f"PDF saved to: {pdf_file}")
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
                 return True
             else:
-                self.pdfExportStatusChanged.emit(False, f"Error saving PDF to {pdf_file}")
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
                 return False
 
         except Exception as e:
@@ -225,8 +228,8 @@ class TransformerLineCalculator(QObject):
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 
-    @Slot("QVariant", str)
-    def exportProtectionReport(self, data, filename):
+    @Slot("QVariant")
+    def exportProtectionReport(self, data):
         """Export protection requirements to PDF"""
         try:
             # Convert QJSValue to Python dict if needed
@@ -234,19 +237,33 @@ class TransformerLineCalculator(QObject):
                 js_data = data.toVariant()
             else:
                 js_data = data
+
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            # If no filepath provided, use FileSaver to get one
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"wind_protection_results_{timestamp}")
+            if not pdf_file:
+                # Let QML know the export was canceled
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
             
-            # Use FileSaver to handle the file operations and emit status signals
+            # Clean up filepath using FileSaver's helper methods
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Generate PDF content
             generator = PDFGenerator()
-            
-            # Define callback for PDF generation
-            def generate_pdf_callback(filepath):
-                return generator.generate_protection_report(js_data, filepath)
-            
-            # Let FileSaver handle the whole process
-            result = self._handle_pdf_export(generate_pdf_callback, filename, "protection_report")
-            
-            # Forward the result to our own signal (already emitted by FileSaver)
-            return result
+
+            result = generator.generate_protection_report(js_data, pdf_file)
+
+            # Signal success or failure
+            if result:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
             
         except Exception as e:
             logger.error(f"Error exporting protection report: {e}")

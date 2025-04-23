@@ -550,7 +550,7 @@ Item {
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
-                messagePopup.showError("Export failed: " + message)
+                messagePopup.showError(message)
             }
         }
         
