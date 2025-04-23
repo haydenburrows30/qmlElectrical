@@ -101,59 +101,21 @@ def create_results_section(results, styles):
     
     return elements
 
-def process_image(chart_image):
-    """Process and prepare the chart image for PDF inclusion"""
-    # Check if image file exists
-    image_path = chart_image
-    if image_path and os.path.exists(image_path):
-        try:
-            from PIL import Image as PILImage
-            from PIL import ImageEnhance
-            
-            img = PILImage.open(image_path)
-            img_width, img_height = img.size
-            aspect_ratio = img_height / img_width
-            
-            logger.info(f"Image dimensions: {img_width}x{img_height}, aspect ratio: {aspect_ratio}")
-            
-            # Basic image enhancement
-            sharpener = ImageEnhance.Sharpness(img)
-            img = sharpener.enhance(1.5)
-            
-            enhancer = ImageEnhance.Contrast(img)
-            img = enhancer.enhance(1.2)
-            
-            # Save enhanced version
-            enhanced_image = image_path.replace('.png', '_enhanced.png')
-            img.save(enhanced_image, format='PNG', compress_level=1)
-            return enhanced_image, aspect_ratio
-        except Exception as e:
-            # If any processing fails, return the original file
-            logger.error(f"Image processing error: {e}")
-            return image_path, aspect_ratio
-
 def create_chart_section(chart_image, styles, doc):
     """Create chart section with processed image"""
     elements = []
     
-    # Process the chart image
-    actual_chart_image, aspect_ratio = process_image(chart_image)
-    
-    if actual_chart_image and os.path.exists(actual_chart_image):
+    if chart_image and os.path.exists(chart_image):
         elements.append(PageBreak())
         elements.append(Paragraph("Time-Current Curves", styles['Heading2']))
         
         try:
             # Calculate optimal image size
             pdf_width = doc.width * 0.95
-            pdf_height = pdf_width * aspect_ratio
-            
-            # Log image details before adding to PDF
-            logger.info(f"Adding image to PDF: {actual_chart_image}")
-            logger.info(f"Image dimensions in PDF: width={pdf_width}, height={pdf_height}")
+            pdf_height = pdf_width
             
             # Add image to document with explicit width and height
-            elements.append(Image(actual_chart_image, width=pdf_width, height=pdf_height))
+            elements.append(Image(chart_image, width=pdf_width, height=pdf_height))
             elements.append(Spacer(1, 0.1*inch))
             
             # Add caption
@@ -184,6 +146,7 @@ def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_ima
     Returns:
         str: Path to the generated PDF or empty string on failure
     """
+
     try:
         # Create the PDF document
         doc = SimpleDocTemplate(pdf_file, pagesize=A4)
@@ -203,5 +166,6 @@ def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_ima
         return pdf_file
         
     except Exception:
+        # Clean up temporary files even if PDF generation fails
         traceback.print_exc()
         return ""
