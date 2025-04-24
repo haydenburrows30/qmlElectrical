@@ -49,7 +49,7 @@
             {% include toc.html html=content %}
           </div>
           <div id="markdown-content">
-            {{ content }}
+            {{ content | {% include toc.html html=content %} }}
           </div>
         </div>
 
