@@ -1,7 +1,6 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject
 import pandas as pd
 import json
-import os
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
 
@@ -44,8 +43,6 @@ class VoltageDropCalculator(QObject):
     fuseSizeChanged = Signal(str)
     conductorRatingChanged = Signal(float)
     combinedRatingChanged = Signal(str)
-    chartSaved = Signal(bool, str)
-    grabRequested = Signal(str, float)
     tableExportStatusChanged = Signal(bool, str)
     pdfExportStatusChanged = Signal(bool, str)
     tablePdfExportStatusChanged = Signal(bool, str)
@@ -436,25 +433,6 @@ class VoltageDropCalculator(QObject):
             error_msg = f"Error saving calculation: {e}"
             logger.error(error_msg)
             self.saveStatusChanged.emit(False, error_msg)
-            return False
-
-    @Slot(str)
-    def saveChart(self, image_data):
-        """Save chart as image with optional scale factor."""
-
-        chart_image_path = ""
-
-        if image_data and isinstance(image_data, str) and os.path.exists(image_data):
-                chart_image_path = image_data
-
-        print(chart_image_path)
-        result = self._file_saver.save_png(chart_image_path)
-
-        if result:
-                self._file_saver._emit_success_with_path(chart_image_path, "Table data exported to CSV")
-                return True
-        else:
-            self._file_saver._emit_failure_with_path(chart_image_path, "Failed to export table data")
             return False
 
     @Slot()

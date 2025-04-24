@@ -3,6 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
+import "../popups"
+
 Rectangle {
     id: logViewer
 
@@ -15,14 +17,6 @@ Rectangle {
     
     property var logManager: null
     property bool autoScroll: true
-    property var filterModel: ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    property string currentFilter: "INFO"
-
-    function refreshLogView() {
-        if (logManager) {
-            logManager.setFilterLevel(currentFilter)
-        }
-    }
 
     // Function to update statistics text
     function updateStatistics() {
@@ -57,6 +51,22 @@ Rectangle {
         }
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
+    Connections {
+        target: logManager
+
+        function onExportDataToFolderCompleted(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message);
+            } else {
+                messagePopup.showError(message);
+            }
+        }
+    }
+
     // Use Item instead of ColumnLayout to avoid recursion
     Item {
         id: mainContainer
@@ -69,33 +79,6 @@ Rectangle {
             width: parent.width
             height: 40
             spacing: 10
-
-            Label {
-                text: "Filter Level:"
-                color: textColor
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 14
-            }
-
-            ComboBox {
-                id: filterCombo
-                model: filterModel
-                currentIndex: filterModel.indexOf(currentFilter)
-                width: 120
-                anchors.verticalCenter: parent.verticalCenter
-                
-                onCurrentTextChanged: {
-                    if (currentText !== currentFilter) {
-                        currentFilter = currentText
-                        refreshLogView()
-                    }
-                }
-            }
-
-            Item { 
-                width: 10
-                height: 1 
-            }
 
             CheckBox {
                 id: autoScrollCheckbox
@@ -121,7 +104,11 @@ Rectangle {
             Button {
                 text: "Save Logs"
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: saveFileDialog.open()
+                onClicked: {
+                    if (logManager) {
+                        logManager.saveCurrentView()
+                    }
+                }
             }
             
             Button {
@@ -248,61 +235,11 @@ Rectangle {
         }
     }
     
-    FileDialog {
-        id: saveFileDialog
-        title: "Save Log File"
-        nameFilters: ["Text files (*.txt)", "All files (*)"]
-        fileMode: FileDialog.SaveFile
-        
-        onAccepted: {
-            // Collect all log data
-            let logContent = "";
-            if (logManager && logManager.model) {
-                let model = logManager.model;
-                
-                for (let i = 0; i < model.rowCount; i++) {
-                    let index = model.index(i, 0);
-                    let formatted = model.data(index, 3); // FormattedRole
-                    logContent += formatted + "\n";
-                }
-                
-                if (logManager.saveLogsToFile(selectedFile, logContent)) {
-                    // save
-                } else {
-                    // error
-                }
-            }
-        }
-    }
-    
-    FileDialog {
-        id: exportFileDialog
-        title: "Export All Log History"
-        nameFilters: ["Text files (*.txt)", "All files (*)"]
-        fileMode: FileDialog.SaveFile
-        
-        onAccepted: {
-            if (logManager && logManager.exportAllLogs) {
-                if (logManager.exportAllLogs(selectedFile)) {
-                } else {
-                }
-            }
-        }
-    }
-    
     Connections {
         target: logManager
         
         function onLogCountChanged(count) {
             updateStatistics()
-        }
-        
-        function onFilterLevelChanged(level) {
-            if (level !== currentFilter) {
-                currentFilter = level
-                filterCombo.currentIndex = filterModel.indexOf(level)
-                refreshLogView()
-            }
         }
         
         function onStatisticsChanged() {

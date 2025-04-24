@@ -1,7 +1,10 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 from datetime import datetime
-from services.file_saver import FileSaver  # Add import for FileSaver
+from services.file_saver import FileSaver
+
+from services.logger_config import configure_logger
+logger = configure_logger("qmltest", component="motor_calc")
 
 class MotorCalculator(QObject):
     """Calculator for motor starting characteristics"""
@@ -171,6 +174,12 @@ class MotorCalculator(QObject):
         self._starting_duration = 5.0  # Default starting duration in seconds
         self._ambient_temperature = 25.0  # Default ambient temperature in °C
         self._duty_cycle = "S1 (Continuous)"  # Default duty cycle
+
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.exportDataToFolderCompleted)
 
     def _calculate(self):
         """Calculate starting current and torque based on inputs"""
@@ -418,17 +427,18 @@ class MotorCalculator(QObject):
     def getMotorSpeedOptions(self):
         return self._motor_speeds
         
-    @Slot(str, result=bool)
-    def exportResults(self, filePath=None):
+    @Slot()
+    def exportResults(self):
         """Export motor starting results to CSV file."""
         try:
-            # If no filePath provided, use the file saver to get one
-            file_saver = FileSaver()
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            filePath = self._file_saver.get_save_filepath("csv", f"motor_starting_data_{timestamp}")
+
             if not filePath:
-                filePath = file_saver.get_save_filepath("csv", "motor_starting_data")
-                if not filePath:
-                    self.exportDataToFolderCompleted.emit(False, "CSV export canceled")
-                    return False
+                self.exportDataToFolderCompleted.emit(False, "CSV export canceled")
+                return False
             
             # Prepare data in the format expected by save_csv
             csv_data = []
@@ -462,19 +472,19 @@ class MotorCalculator(QObject):
                 csv_data.append([rec])
             
             # Call save_csv with the prepared data
-            result = file_saver.save_csv(filePath, csv_data)
+            result = self._file_saver.save_csv(filePath, csv_data)
             
             if result:
-                self.exportDataToFolderCompleted.emit(True, f"Data saved to {filePath}")
+                self._file_saver._emit_success_with_path(filePath, "Data saved:")
                 return True
             else:
-                self.exportDataToFolderCompleted.emit(False, f"Error saving to {filePath}")
+                self._file_saver._emit_failure_with_path(filePath, f"Error saving:")
                 return False
-                
+
         except Exception as e:
-            error_message = f"Error exporting motor data: {str(e)}"
-            print(error_message)
-            self.exportDataToFolderCompleted.emit(False, error_message)
+            error_msg = f"Error exporting motor data: {str(e)}"
+            logger.error(error_msg)
+            self.exportDataToFolderCompleted.emit(False, error_msg)
             return False
 
     @Slot(float)

@@ -236,7 +236,7 @@ Item {
                         id: exportButton
                         icon.source: "../../../icons/rounded/download.svg"
                         enabled: hasValidInputs && calculator.startingCurrent > 0
-                        onClicked: calculator.exportResults(null)
+                        onClicked: calculator.exportResults()
 
                         ToolTip.text: "Export results to CSV"
                         ToolTip.visible: hovered

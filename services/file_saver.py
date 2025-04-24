@@ -211,7 +211,7 @@ class FileSaver(QObject):
             
             # Use standardized success message    
             self._emit_success_with_path(filepath, "Text saved")
-            return True
+            return filepath, True
         except Exception as e:
             error_msg = f"Error saving text file: {e}"
             logger.error(error_msg)

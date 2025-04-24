@@ -1,0 +1,118 @@
+# Log export from QML Test Application
+# Export time: 2025-04-24 15:27:27
+# Filter level: INFO
+# Logs exported: 112
+# -------------------------------------------
+
+[15:27:19] INFO: Log viewer opened by user
+[15:27:15] INFO: Loaded 1 results from SQL storage
+[15:27:15] INFO: Initializing DataStore with database at: /home/hayden/Documents/qmltest/data/application_data.db
+[15:27:15] INFO: Application version set to: 1.2.0
+[15:27:14] INFO: Invalid input parameters, skipping calculation
+[15:27:14] INFO: • Grouping Factor: 1.00
+[15:27:14] INFO: • Temperature: 25.0°C
+[15:27:14] INFO: • Installation Method: D2 - Underground in conduit
+[15:27:14] INFO: • Length: 0.00 m
+[15:27:14] INFO: • Current: 0.00 A
+[15:27:14] INFO: Input Parameters:
+[15:27:14] INFO: • Current: 121.73 A
+[15:27:14] INFO: • Status: OK
+[15:27:14] INFO: • Voltage Drop: 0.59 V (0.14%)
+[15:27:14] INFO: • Rating: 57.0 A
+[15:27:14] INFO: • mV/A/m: 4.2
+[15:27:14] INFO: • Length: 1.00 m
+[15:27:14] INFO: • mV/A/m: 0.58
+[15:27:14] INFO: • Voltage Drop: 0.10 V (0.02%)
+[15:27:14] INFO: • Rating: 240.0 A
+[15:27:14] INFO: • mV/A/m: 0.72
+[15:27:14] INFO: • Voltage Drop: 0.15 V (0.04%)
+[15:27:14] INFO: • Rating: 140.0 A
+[15:27:14] INFO: • mV/A/m: 1.1
+[15:27:14] INFO: • Voltage Drop: 0.21 V (0.05%)
+[15:27:14] INFO: • Rating: 110.0 A
+[15:27:14] INFO: • mV/A/m: 1.5
+[15:27:14] INFO: • Voltage Drop: 0.28 V (0.07%)
+[15:27:14] INFO: • Rating: 92.0 A
+[15:27:14] INFO: • mV/A/m: 2.0
+[15:27:14] INFO: • Voltage Drop: 0.38 V (0.09%)
+[15:27:14] INFO: • Rating: 75.0 A
+[15:27:14] INFO: • mV/A/m: 2.7
+[15:27:14] INFO: • Voltage Drop: 0.04 V (0.01%)
+[15:27:14] INFO: • Rating: 410.0 A
+[15:27:14] INFO: • mV/A/m: 0.31
+[15:27:14] INFO: • Voltage Drop: 0.05 V (0.01%)
+[15:27:14] INFO: • Rating: 350.0 A
+[15:27:14] INFO: • mV/A/m: 0.39
+[15:27:14] INFO: • Rating: 225.0 A
+[15:27:14] INFO: • mV/A/m: 0.54
+[15:27:14] INFO: • Voltage Drop: 0.08 V (0.02%)
+[15:27:14] INFO: • Rating: 275.0 A
+[15:27:14] INFO: • Rating: 485.0 A
+[15:27:14] INFO: • mV/A/m: 0.21
+[15:27:14] INFO: • Voltage Drop: 0.03 V (0.01%)
+[15:27:14] INFO: • Rating: 435.0 A
+[15:27:14] INFO: • mV/A/m: 0.24
+[15:27:14] INFO: • Rating: 390.0 A
+[15:27:14] INFO: • Rating: 460.0 A
+[15:27:14] INFO: • mV/A/m: 0.27
+[15:27:14] INFO: • Drop Percentage: 0.01%
+[15:27:14] INFO: • Final Voltage Drop: 0.03 V
+[15:27:14] INFO: • Size: 630.0 mm²
+[15:27:14] INFO: • Length: 12.00 m
+[15:27:14] INFO: • Voltage Drop: 2.52 V (0.61%)
+[15:27:14] INFO: • Voltage Drop: 3.36 V (0.81%)
+[15:27:14] INFO: • Voltage Drop: 4.54 V (1.09%)
+[15:27:14] INFO: • Voltage Drop: 7.06 V (1.70%)
+[15:27:14] INFO: • Voltage Drop: 0.66 V (0.16%)
+[15:27:14] INFO: • Voltage Drop: 0.91 V (0.22%)
+[15:27:14] INFO: • Voltage Drop: 0.97 V (0.23%)
+[15:27:14] INFO: • Voltage Drop: 1.21 V (0.29%)
+[15:27:14] INFO: • Voltage Drop: 1.85 V (0.45%)
+[15:27:14] INFO: • Voltage Drop: 0.35 V (0.09%)
+[15:27:14] INFO: • Voltage Drop: 0.40 V (0.10%)
+[15:27:14] INFO: • Voltage Drop: 0.45 V (0.11%)
+[15:27:14] INFO: • Voltage Drop: 0.52 V (0.13%)
+[15:27:14] INFO: • Drop Percentage: 0.09%
+[15:27:14] INFO: • Final Voltage Drop: 0.35 V
+[15:27:14] INFO: • Voltage Drop: 46.49 V (11.20%)
+[15:27:14] INFO: • Status: SEVERE
+[15:27:14] INFO: • Voltage Drop: 72.32 V (17.43%)
+[15:27:14] INFO: • Length: 123.00 m
+[15:27:14] INFO: • Voltage Drop: 12.40 V (2.99%)
+[15:27:14] INFO: • Status: SUBMAIN
+[15:27:14] INFO: • Voltage Drop: 18.94 V (4.56%)
+[15:27:14] INFO: • Status: WARNING
+[15:27:14] INFO: • Voltage Drop: 25.83 V (6.22%)
+[15:27:14] INFO: • Voltage Drop: 34.44 V (8.30%)
+[15:27:14] INFO: • Voltage Drop: 5.34 V (1.29%)
+[15:27:14] INFO: • Voltage Drop: 6.72 V (1.62%)
+[15:27:14] INFO: • Voltage Drop: 9.30 V (2.24%)
+[15:27:14] INFO: • Voltage Drop: 9.99 V (2.41%)
+[15:27:14] INFO: • Voltage Drop: 3.62 V (0.87%)
+[15:27:14] INFO: • Voltage Drop: 4.13 V (1.00%)
+[15:27:14] INFO: • Voltage Drop: 4.65 V (1.12%)
+[15:27:14] INFO: • Drop Percentage: 0.87%
+[15:27:14] INFO: • Final Voltage Drop: 3.62 V
+[15:27:14] INFO: PDF saved: /home/hayden/Documents/voltage_drop_table.pdf
+[15:27:14] INFO: Log viewer opened by user
+[15:27:14] INFO: Loading configuration module from: /home/hayden/Documents/qmltest
+[15:27:14] INFO: Loading reference data
+[15:27:14] INFO: Verifying database schema: found 16 tables
+[15:27:14] INFO: Reference data loading complete
+[15:27:14] INFO: Application version set to: 1.2.0
+[15:27:14] INFO: Application starting...
+[15:27:14] INFO: Database initialization complete
+[15:27:14] INFO: Initializing database at /home/hayden/Documents/qmltest/data/application_data.db
+[15:27:14] INFO: Initializing DataStore with database at: /home/hayden/Documents/qmltest/data/application_data.db
+[15:27:14] INFO: Loaded 1 results from SQL storage
+[15:27:14] INFO: Debug mode enabled
+[15:27:14] INFO: Logger Debug Information:
+[15:27:14] INFO: Test log message from QML
+[15:27:14] INFO: Test complete - check for duplicate logs
+[15:27:14] INFO: Test log from results component
+[15:27:14] INFO: Test log from config component
+[15:27:14] INFO: Test log from main component
+[15:27:14] INFO: Logs reloaded from file
+[15:27:14] INFO: Saved 1 log entries to /home/hayden/Documents/qmltest/test.txt
+[15:27:14] INFO: FileSaver initialized with default folder: /home/hayden/Documents
+[15:27:14] INFO: CSV data saved: /home/hayden/Documents/motor_starting_data.csv

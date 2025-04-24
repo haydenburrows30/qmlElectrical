@@ -11,7 +11,6 @@ import "../../components/buttons"
 import "../../components/popups"
 import "../../components/style"
 import "../../components/visualizers"
-import "../../components/exports"
 import "../../components/charts"
 import "../../components/monitors"
 import "../voltage_drop/"
@@ -232,17 +231,19 @@ Page {
         id: messagePopup
     }
     
-    ExportFormatMenu {
+    // Inline menu component rather than using a separate file
+    Menu {
         id: exportFormatMenu
+        title: "Export Format"
         
-        Component.onCompleted: {
-            onCsvExport = function() {
-                voltageDrop.exportTableData()
-            }
-            
-            onPdfExport = function() {
-                voltageDrop.exportTableToPDF()
-            }
+        MenuItem {
+            text: "Export as CSV"
+            onTriggered: voltageDrop.exportTableData()
+        }
+
+        MenuItem {
+            text: "Export as PDF"
+            onTriggered: voltageDrop.exportTableToPDF()
         }
     }
 
@@ -257,21 +258,6 @@ Page {
             } else {
                 root.currentVoltageDropValue = value;
             }
-        }
-        
-        function onGrabRequested(filepath, scale) {
-            chartPopup.grabImage(function(result) {
-                if (result) {
-                    var saved = result.saveToFile(filepath)
-                    if (saved) {
-                        messagePopup.showSuccess("Chart image saved to: " + filepath)
-                    } else {
-                        messagePopup.showError("Failed to save chart")
-                    }
-                } else {
-                    messagePopup.showError("Failed to grab chart image")
-                }
-            }, scale)
         }
 
         function onTableExportStatusChanged(success, message) {

@@ -1,0 +1,7 @@
+# Log export from QML Test Application
+# Export time: 2025-04-24 15:14:42
+# Filter level: INFO
+# Logs exported: 1
+# -------------------------------------------
+
+[INFO] No log entries to display

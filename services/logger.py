@@ -1,13 +1,12 @@
 import logging
 import os
-import subprocess
-import platform
 import queue
 import threading
 import time
 from datetime import datetime
 from collections import deque
 from PySide6.QtCore import QObject, Signal, Property, Slot, QAbstractListModel, QByteArray, Qt, QModelIndex, QTimer
+from services.file_saver import FileSaver
 
 from .logger_config import configure_logger, get_log_dir, get_log_file
 
@@ -228,9 +227,17 @@ class QLogManager(QObject):
     modelChanged = Signal()  # Add signal for model property
     filterLevelChanged = Signal(str)  # Add signal for filter level changes
     statisticsChanged = Signal()  # New signal for statistics updates
+    exportDataToFolderCompleted = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self._file_saver = FileSaver()
+        # Connect FileSaver signals to our logging
+        self._file_saver.saveStatusChanged.connect(self._handle_save_status)
+        self._file_saver.saveStatusChanged.connect(self.exportDataToFolderCompleted)
+        
+        
         self._model = LogMessagesModel()
         
         # Use the standard logger from logger_config
@@ -278,6 +285,13 @@ class QLogManager(QObject):
         
         # Force initial rebuild of the model with existing logs
         self._load_existing_logs()
+    
+    def _handle_save_status(self, success, message):
+        """Handle save status messages from FileSaver."""
+        if success:
+            self._logger.info(message)
+        else:
+            self._logger.error(message)
     
     def _debug_logger_setup(self):
         """Debug the logger setup to identify duplicate handlers."""
@@ -593,114 +607,56 @@ class QLogManager(QObject):
     def count(self):
         """Get the total number of log messages."""
         return self._count
-        
-    @Slot(str, str, result=bool)
-    def saveLogsToFile(self, filePath, content):
-        """Save logs to a file.
-        
-        Args:
-            filePath: Path or URL of the file to save
-            content: The log content to save
-            
-        Returns:
-            bool: True if successful, False otherwise
-        """
+    
+    @Slot()
+    def saveCurrentView(self):
+        """Save the currently visible logs using FileSaver."""
         try:
-            # Convert QUrl to local path if needed
-            if hasattr(filePath, 'isLocalFile') and filePath.isLocalFile():
-                path = filePath.toLocalFile()
-            else:
-                path = str(filePath).replace('file://', '')
+            # Generate the log content from the model
+            content = []
             
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+            # Add header
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            header = [
+                f"# Log Export from QML Test Application",
+                f"# Export Date: {timestamp}",
+                f"# Filter Level: {self._filter_level}",
+                "# -------------------------------------------",
+                ""
+            ]
+            content.extend(header)
             
-            # Write content to file
-            with open(path, 'w', encoding='utf-8') as f:
-                f.write(content)
+            # Add log entries
+            for i in range(self._model.rowCount()):
+                index = self._model.index(i, 0)
+                formatted = self._model.data(index, self._model.FormattedRole)
+                if formatted:
+                    content.append(formatted)
             
-            return True
-        except Exception as e:
-            logger.error(f"Error saving logs: {e}")
-            return False
+            if not content:
+                content.append("[INFO] No log entries to display")
             
-    @Slot(result=bool)
-    def openLogFile(self):
-        """Open the current log file in the system's default text editor."""
-        # Run this in a separate thread to avoid blocking UI
-        def open_file():
-            try:
-                log_file = str(get_log_file())
-                
-                if not os.path.exists(log_file):
-                    logger.error(f"Log file not found: {log_file}")
-                    return False
-                    
-                if platform.system() == 'Windows':
-                    os.startfile(log_file)
-                elif platform.system() == 'Darwin':  # macOS
-                    subprocess.call(['open', log_file])
-                else:  # Linux and other Unix-like
-                    subprocess.call(['xdg-open', log_file])
-                    
+            # Generate default filename with timestamp
+            default_filename = f"qmltest_logs_{timestamp}"
+            
+            # Use FileSaver to save the content
+            path, result = self._file_saver.save_text_file(
+                filepath="",  # Empty filepath triggers file dialog
+                content="\n".join(content),
+                default_filename=default_filename
+            )
+
+            # Signal success or failure
+            if result:
+                self._file_saver._emit_success_with_path(path, "Log saved")
                 return True
-                
-            except Exception as e:
-                logger.error(f"Error opening log file: {e}")
-                return False
-        
-        # Start a thread to open the file
-        thread = threading.Thread(target=open_file)
-        thread.daemon = True
-        thread.start()
-        return True
-    
-    @Slot(str, result=bool)
-    def exportAllLogs(self, filePath):
-        """Export all logs to a file, not just filtered ones."""
-        # Start export in a separate thread to avoid blocking UI
-        export_thread = threading.Thread(
-            target=self._export_logs_thread,
-            args=(filePath,)
-        )
-        export_thread.daemon = True
-        export_thread.start()
-        return True
-    
-    def _export_logs_thread(self, filePath):
-        """Thread worker for exporting logs."""
-        try:
-            # Convert QUrl to local path if needed
-            if hasattr(filePath, 'isLocalFile') and filePath.isLocalFile():
-                path = filePath.toLocalFile()
             else:
-                path = str(filePath).replace('file://', '')
-            
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-            
-            # Make a copy of logs to prevent modification during export
-            with threading.Lock():
-                all_logs_list = list(self._all_logs)
-            
-            # Write all logs to file in chronological order
-            with open(path, 'w', encoding='utf-8') as f:
-                # Sort by timestamp (third element in tuple)
-                all_logs_list.sort(key=lambda x: x[2])
-                
-                # Write logs in chunks to avoid memory spikes
-                chunk_size = 1000
-                for i in range(0, len(all_logs_list), chunk_size):
-                    chunk = all_logs_list[i:i+chunk_size]
-                    for level, message, timestamp in chunk:
-                        time_str = timestamp.strftime("%H:%M:%S")
-                        f.write(f"[{time_str}] {level}: {message}\n")
-            
-            # Signal completion on the main thread
-            self.statisticsChanged.emit()
+                self._file_saver._emit_failure_with_path(path, "Error saving Log")
+                return False
             
         except Exception as e:
-            logger.error(f"Error exporting logs: {e}")
+            self._logger.error(f"Error saving logs: {e}")
+            return False
     
     @Slot(result=str)
     def getLogFilePath(self):
