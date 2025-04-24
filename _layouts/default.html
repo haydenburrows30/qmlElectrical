@@ -36,22 +36,13 @@
           <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP File</strong></a></li>
           <li><a href="{{ site.github.tar_url }}">Download <strong>TAR Ball</strong></a></li>
           <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
+          <li><a href="{{ site.github.repository_url }}">Download <strong>GitHub</strong></a></li>
         </ul>
         {% endif %}
       </header>
       <section>
 
-<!--       {{ content }} -->
-      
-
-        <div>
-          <div id="table-of-contents">
-            {% include toc.html html=content sanitize=true class="inline_toc" id="my_toc" h_min=2 h_max=3 %}
-          </div>
-          <div id="markdown-content">
-            {{ content }}
-          </div>
-        </div>
+            {{ content {% include toc.html html=content sanitize=true class="inline_toc" id="my_toc" h_min=2 h_max=3 %} }}
 
       </section>
       <footer>
