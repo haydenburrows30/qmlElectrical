@@ -10,7 +10,7 @@ A comprehensive electrical engineering calculator suite built with Python and QM
 - Vector and phase visualisations
 - Basic electrical calculations
 
-![Image](/assets/images/homepage.png)
+![Image](https://github.com/user-attachments/assets/857b621f-27da-4ad1-b36b-dfe8c9cc05e4)
 ![Image](https://github.com/user-attachments/assets/1f5ff68a-f3c8-4837-97db-bd3b9b2aa37f)
 ![Image](https://github.com/user-attachments/assets/e7a5ce45-a5d3-4e9e-b1b9-0734e8d3b352)
 ![Image](https://github.com/user-attachments/assets/a09813e2-0783-4222-b283-362717a21894)
