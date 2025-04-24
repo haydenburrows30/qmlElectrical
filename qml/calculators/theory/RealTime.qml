@@ -22,6 +22,44 @@ Page {
     property RealTimeChart calculator: RealTimeChart {}
     property color textColor: window.modeToggled ? "#ffffff" : "#000000"
 
+    // Add message popup for feedback
+    MessagePopup {
+        id: messagePopup
+    }
+
+    // Simplify and keep only the necessary function for debugging
+    function forceUpdateSliders() {
+        console.log("Forcing slider updates...")
+        for (var i = 0; i < 3; i++) {
+            console.log(`Wave ${i}: freq=${calculator.frequencies[i]}, amp=${calculator.amplitudes[i]}, offset=${calculator.offsets[i]}, phase=${calculator.phases[i]}`)
+        }
+    }
+
+    // Streamline the connection to calculator
+    Connections {
+        target: calculator
+        
+        function onSaveStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+                // If configuration was loaded, log the values
+                if (message.includes("loaded")) {
+                    loadUpdateTimer.start()
+                }
+            } else {
+                messagePopup.showError(message)
+            }
+        }
+    }
+    
+    // Keep the timer but simplify it
+    Timer {
+        id: loadUpdateTimer
+        interval: 100
+        repeat: false
+        onTriggered: forceUpdateSliders()
+    }
+
     background: Rectangle {
         color: window.modeToggled ? "#1a1a1a" : "#f5f5f5"
     }
@@ -166,9 +204,7 @@ Page {
                                 ToolTip.delay: 500
                                 icon.source: "../../../icons/rounded/save.svg"
 
-                                onClicked: {
-                                    calculator.saveConfiguration()
-                                }
+                                onClicked: calculator.saveConfiguration()
                             }
 
                             StyledButton {
@@ -179,9 +215,7 @@ Page {
                                 ToolTip.delay: 500
                                 icon.source: "../../../icons/rounded/folder_open.svg"
 
-                                onClicked: {
-                                    calculator.loadConfiguration()
-                                }
+                                onClicked: calculator.loadConfiguration()
                             }
                         }
 
@@ -201,6 +235,7 @@ Page {
                                         {name: "Gamma", color: "#0000ff"}]
                                     RowLayout {
                                         Layout.minimumWidth: 300
+                                        property int waveIndex: index
                                         
                                         Label { 
                                             text: modelData.name
@@ -208,11 +243,39 @@ Page {
                                             Layout.minimumWidth: 80
                                             font.bold: true
                                         }
+                                        
+                                        // Update ComboBox for wave type selection
                                         ComboBoxRound {
                                             id: waveTypeCombo
                                             model: ["Sine", "Square", "Sawtooth", "Triangle"]
                                             Layout.fillWidth: true
-                                            onCurrentIndexChanged: calculator.setWaveType(index, currentIndex)
+                                            property bool updating: false
+                                            
+                                            // Listen for changes to wave types from the backend
+                                            Connections {
+                                                target: calculator
+                                                
+                                                function onWaveTypeChanged(idx, value) {
+                                                    if (idx === waveIndex) {
+                                                        waveTypeCombo.updating = true;
+                                                        waveTypeCombo.currentIndex = value;
+                                                        waveTypeCombo.updating = false;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            Component.onCompleted: {
+                                                // Set initial value if available
+                                                if (calculator.waveTypes && calculator.waveTypes.length > index) {
+                                                    currentIndex = calculator.waveTypes[index];
+                                                }
+                                            }
+                                            
+                                            onCurrentIndexChanged: {
+                                                if (!updating) {
+                                                    calculator.setWaveType(index, currentIndex);
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -245,16 +308,32 @@ Page {
                                         
                                         Grid {
                                             columns: 2
-                                            
                                             width: parent.width
+                                            property int waveIndex: parent.index
 
                                             Label { text: "Frequency:" }
                                             Slider {
                                                 id: freqSlider
                                                 width: parent.width - 70
                                                 from: 0.1; to: 2.0
-                                                Component.onCompleted: value = calculator.frequencies[index]
-                                                onMoved: calculator.setFrequency(index, value)
+                                                value: calculator.frequencies[parent.waveIndex]
+                                                
+                                                // Track when user vs program is changing value
+                                                property bool userInteracting: false
+                                                
+                                                // Handle interaction with streamlined event handlers
+                                                onPressedChanged: {
+                                                    userInteracting = pressed
+                                                    if (!pressed) {
+                                                        calculator.setFrequency(parent.waveIndex, value)
+                                                    }
+                                                }
+                                                
+                                                onMoved: {
+                                                    if (userInteracting) {
+                                                        calculator.setFrequency(parent.waveIndex, value)
+                                                    }
+                                                }
                                             }
                                             
                                             Label { text: "Amplitude:" }
@@ -262,8 +341,24 @@ Page {
                                                 id: ampSlider
                                                 width: parent.width - 70
                                                 from: 10; to: 100
-                                                Component.onCompleted: value = calculator.amplitudes[index]
-                                                onMoved: calculator.setAmplitude(index, value)
+                                                value: calculator.amplitudes[parent.waveIndex]
+                                                
+                                                // Track when user vs program is changing value
+                                                property bool userInteracting: false
+                                                
+                                                // Handle user moves with live feedback
+                                                onPressedChanged: {
+                                                    userInteracting = pressed
+                                                    if (!pressed && value !== calculator.amplitudes[parent.waveIndex]) {
+                                                        calculator.setAmplitude(parent.waveIndex, value)
+                                                    }
+                                                }
+                                                
+                                                onMoved: {
+                                                    if (userInteracting) {
+                                                        calculator.setAmplitude(parent.waveIndex, value)
+                                                    }
+                                                }
                                             }
                                             
                                             Label { text: "Offset:" }
@@ -271,8 +366,24 @@ Page {
                                                 id: offsetSlider
                                                 width: parent.width - 70
                                                 from: 50; to: 250
-                                                Component.onCompleted: value = calculator.offsets[index]
-                                                onMoved: calculator.setOffset(index, value)
+                                                value: calculator.offsets[parent.waveIndex]
+                                                
+                                                // Track when user vs program is changing value
+                                                property bool userInteracting: false
+                                                
+                                                // Handle user moves with live feedback
+                                                onPressedChanged: {
+                                                    userInteracting = pressed
+                                                    if (!pressed && value !== calculator.offsets[parent.waveIndex]) {
+                                                        calculator.setOffset(parent.waveIndex, value)
+                                                    }
+                                                }
+                                                
+                                                onMoved: {
+                                                    if (userInteracting) {
+                                                        calculator.setOffset(parent.waveIndex, value)
+                                                    }
+                                                }
                                             }
                                             
                                             Label { text: "Phase:" }
@@ -280,8 +391,24 @@ Page {
                                                 id: phaseSlider
                                                 width: parent.width - 70
                                                 from: -Math.PI; to: Math.PI
-                                                Component.onCompleted: value = calculator.phases[index]
-                                                onMoved: calculator.setPhase(index, value)
+                                                value: calculator.phases[parent.waveIndex]
+                                                
+                                                // Track when user vs program is changing value
+                                                property bool userInteracting: false
+                                                
+                                                // Handle user moves with live feedback
+                                                onPressedChanged: {
+                                                    userInteracting = pressed
+                                                    if (!pressed && value !== calculator.phases[parent.waveIndex]) {
+                                                        calculator.setPhase(parent.waveIndex, value)
+                                                    }
+                                                }
+                                                
+                                                onMoved: {
+                                                    if (userInteracting) {
+                                                        calculator.setPhase(parent.waveIndex, value)
+                                                    }
+                                                }
                                             }
                                         }
                                     }

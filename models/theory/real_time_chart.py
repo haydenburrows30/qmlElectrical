@@ -1,7 +1,8 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot, QDateTime
 import numpy as np
-import json
 import os
+from services.file_saver import FileSaver
+from datetime import datetime
 
 class WaveType:
     SINE = 0
@@ -23,6 +24,10 @@ class RealTimeChart(QObject):
     amplitudesChanged = Signal('QVariantList')
     offsetsChanged = Signal('QVariantList')
     phasesChanged = Signal('QVariantList')
+    saveStatusChanged = Signal(bool, str)
+    # Add wave type signals
+    waveTypeChanged = Signal(int, int)
+    waveTypesChanged = Signal('QVariantList')
 
     # Add root path as class variable
     ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +45,20 @@ class RealTimeChart(QObject):
         self._amplitudes = [50.0, 50.0, 50.0]  # Individual amplitudes
         self._offsets = [150.0, 150.0, 150.0]  # Individual vertical offsets
         self._phases = [0.0, 0.0, 0.0]  # Phase shifts
+
+        self._file_saver = FileSaver()
+         # Connect file saver signal to our saveStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.saveStatusChanged)
+
+    # Add property to expose file_saver to QML
+    @Property(QObject)
+    def fileSaver(self):
+        return self._file_saver
+
+    # Add property to expose wave types
+    @Property('QVariantList', notify=waveTypesChanged)
+    def waveTypes(self):
+        return self._wave_types
 
     @Property(bool, notify=runningChanged)
     def isRunning(self):
@@ -120,6 +139,9 @@ class RealTimeChart(QObject):
     def setWaveType(self, series_index, wave_type):
         if 0 <= series_index < 3:
             self._wave_types[series_index] = wave_type
+            # Emit signals for the specific wave type and the list
+            self.waveTypeChanged.emit(series_index, wave_type)
+            self.waveTypesChanged.emit(self._wave_types)
 
     @Slot(int, float)
     def setFrequency(self, index, value):
@@ -149,9 +171,17 @@ class RealTimeChart(QObject):
             self.phaseChanged.emit(index, value)
             self.phasesChanged.emit(self._phases)
 
-    @Slot()  # Remove str parameter
+    @Slot(result=bool)
     def saveConfiguration(self):
-        """Save current configuration to a JSON file"""
+        """Save current configuration to a JSON file using FileSaver"""
+        # Create a timestamp for the filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        json_filepath = self._file_saver.get_save_filepath("json", f"realtime_{timestamp}")
+        if not json_filepath:
+            self.saveStatusChanged.emit(False, "JSON save canceled")
+            return ""
+        
         config = {
             'wave_types': self._wave_types,
             'frequencies': self._frequencies,
@@ -159,28 +189,54 @@ class RealTimeChart(QObject):
             'offsets': self._offsets,
             'phases': self._phases
         }
-        try:
-            config_path = os.path.join(self.ROOT_PATH, 'data', 'wave_config.json')
-            with open(config_path, 'w') as f:
-                json.dump(config, f)
-                print("Configuration saved successfully")
-        except Exception as e:
-            print(f"Error saving configuration: {e}")
+        
+        # Use FileSaver to save the configuration
+        return self._file_saver.save_json(json_filepath, config, "wave_configuration")
+    
 
-    @Slot()
+    @Slot(result=bool)
     def loadConfiguration(self):
-        """Load configuration from JSON file"""
+        """Load configuration from JSON file using FileSaver"""
         try:
-            config_path = os.path.join(self.ROOT_PATH, 'data', 'wave_config.json')
-            with open(config_path, 'r') as f:
-                config = json.load(f)
-                self._wave_types = config['wave_types']
-                self._frequencies = config['frequencies']
-                self._amplitudes = config['amplitudes']
-                self._offsets = config['offsets']
-                self._phases = config['phases']
-        except:
-            print("No saved configuration found")
+            config = self._file_saver.load_json_with_dialog()
+            
+            if not config:
+                self.saveStatusChanged.emit(False, "Failed to load configuration")
+                return False
+                
+            # Update configuration values - ensure type conversion for numeric values
+            self._wave_types = [int(wt) for wt in config.get('wave_types', [WaveType.SINE] * 3)]
+            self._frequencies = [float(f) for f in config.get('frequencies', [0.5, 0.7, 0.9])]
+            self._amplitudes = [float(a) for a in config.get('amplitudes', [50.0, 50.0, 50.0])]
+            self._offsets = [float(o) for o in config.get('offsets', [150.0, 150.0, 150.0])]
+            self._phases = [float(p) for p in config.get('phases', [0.0, 0.0, 0.0])]
+            
+            # Emit all necessary signals
+            self.waveTypesChanged.emit(self._wave_types)
+            self.frequenciesChanged.emit(self._frequencies)
+            self.amplitudesChanged.emit(self._amplitudes)
+            self.offsetsChanged.emit(self._offsets)
+            self.phasesChanged.emit(self._phases)
+            
+            # Individual signals for each parameter to ensure all UI elements update
+            for i in range(3):
+                self.waveTypeChanged.emit(i, self._wave_types[i])
+                self.frequencyChanged.emit(i, self._frequencies[i])
+                self.amplitudeChanged.emit(i, self._amplitudes[i])
+                self.offsetChanged.emit(i, self._offsets[i])
+                self.phaseChanged.emit(i, self._phases[i])
+            
+            # Reset the chart
+            self.resetChart.emit()
+            
+            # Signal successful loading
+            self.saveStatusChanged.emit(True, "Configuration loaded successfully")
+            return True
+        except Exception as e:
+            error_msg = f"Error loading configuration: {e}"
+            print(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return False
 
     @Slot()
     def update(self):

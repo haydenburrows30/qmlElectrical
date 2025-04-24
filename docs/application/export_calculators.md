@@ -20,6 +20,7 @@ This document lists all calculators that have export functionality.
 1. CalculatorSettings
 2. Switchboard
 3. VoltageDropOrion
+4. RealTimeChart
 
 ## PNG
 1. VR32CL7Calculator
