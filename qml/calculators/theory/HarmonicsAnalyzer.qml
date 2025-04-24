@@ -61,6 +61,7 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
+        anchors.margins: 5
 
         RowLayout {
             Layout.fillWidth: true
@@ -120,18 +121,10 @@ Item {
                         text: "Export to CSV"
                         icon.source: "../../../icons/rounded/download.svg"
                         Layout.fillWidth: true
-                        onClicked: calculator.exportDataToCSV(null)
+                        onClicked: calculator.exportDataToCSV()
                         ToolTip.text: "Export harmonic data to CSV file"
-                        ToolTip.visible: exportMouseArea.containsMouse
+                        ToolTip.visible: hovered
                         ToolTip.delay: 500
-                        
-                        MouseArea {
-                            id: exportMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            propagateComposedEvents: true
-                            onPressed: function(mouse) { mouse.accepted = false }
-                        }
                     }
                 }
             }

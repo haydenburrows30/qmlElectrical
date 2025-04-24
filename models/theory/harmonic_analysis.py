@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QApplication
 import numpy as np
 import math
 import time
+from datetime import datetime
 
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
@@ -183,6 +184,10 @@ class HarmonicAnalysisCalculator(QObject):
         # Add debouncing for rapid user input
         self._last_calculation_time = 0
         self._debounce_interval = 100  # ms
+
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        self._file_saver.saveStatusChanged.connect(self.exportDataToFolderCompleted)
         
         # Now we can safely call methods that depend on these attributes
         self._calculate()
@@ -675,20 +680,20 @@ class HarmonicAnalysisCalculator(QObject):
         """Get current THD (Total Harmonic Distortion) value."""
         return self._thd
 
-    @Slot(str, result=bool)
-    def exportDataToCSV(self, filePath=None):
+    @Slot(result=bool)
+    def exportDataToCSV(self):
         """Export harmonic data to CSV file.
         
         If filePath is None, a file dialog will be shown.
         """
         try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
             # If no filePath provided, use the file saver to get one
-            file_saver = FileSaver()
+            filePath = self._file_saver.get_save_filepath("csv", f"harmonics_data_{timestamp}")
             if not filePath:
-                filePath = file_saver.get_save_filepath("csv", "harmonics_data")
-                if not filePath:
-                    self.exportDataToFolderCompleted.emit(False, "CSV export canceled")
-                    return False
+                self.exportDataToFolderCompleted.emit(False, "CSV export canceled")
+                return False
             
             # Prepare data in the format expected by save_csv
             csv_data = []
@@ -717,15 +722,10 @@ class HarmonicAnalysisCalculator(QObject):
             csv_data.append(['Form Factor', f"{self._ff:.2f}"])
             
             # Call save_csv with the prepared data
-            result = file_saver.save_csv(filePath, csv_data)
+            result = self._file_saver.save_csv(filePath, csv_data)
             
-            # Let file_saver handle the success message for consistency
-            if result:
-                # Success message will be handled by FileSaver's signal
-                return True
-            else:
-                self.exportDataToFolderCompleted.emit(False, f"Error saving to {filePath}")
-                return False
+            # filesaver will handle the message generation for csv
+            return result
                 
         except Exception as e:
             error_message = f"Error exporting harmonic data: {str(e)}"

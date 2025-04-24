@@ -208,7 +208,7 @@ class FileSaver(QObject):
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
             
-            # Use standardized success message    
+            # Use standardized success message
             self._emit_success_with_path(filepath, "Text saved")
             return True
         except Exception as e:
@@ -329,9 +329,6 @@ class FileSaver(QObject):
             # Ensure we're not adding .pdf extension if it's already there
             if not filepath.lower().endswith(".pdf"):
                 filepath += ".pdf"
-                
-            # The actual PDF generation should be handled by the caller
-            # This method just provides a consistent interface
             
             # Signal success with file path
             self._emit_success_with_path(filepath, "PDF saved")

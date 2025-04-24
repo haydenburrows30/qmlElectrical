@@ -680,7 +680,7 @@ class QLogManager(QObject):
                 default_filename=default_filename
             )
 
-            # The FileSaver will handle emitting the appropriate signals
+            # filesaver will handle the message generation for text
             return result
             
         except Exception as e:

@@ -400,6 +400,7 @@ class VoltageDropCalculator(QObject):
         self.conductorRatingChanged.emit(self._conductor_rating)
         self.combinedRatingChanged.emit(self._combined_rating_info)
 
+    # method not implemented yet
     @Slot()
     def saveCurrentCalculation(self):
         """Save current calculation results."""
@@ -479,12 +480,8 @@ class VoltageDropCalculator(QObject):
 
             result = self._file_saver.save_csv(filepath, data, metadata, "cable_comparison")
             
-            if result:
-                self._file_saver._emit_success_with_path(filepath, "Table data exported to CSV")
-                return True
-            else:
-                self._file_saver._emit_failure_with_path(filepath, "Failed to export table data")
-                return False
+            # filesaver will handle the message generation for csv
+            return result
             
         except Exception as e:
             error_msg = f"Error exporting table data: {e}"
@@ -500,12 +497,8 @@ class VoltageDropCalculator(QObject):
             filepath = self._file_saver.get_save_filepath("json", "voltage_drop_chart")
             if filepath:
                 result = self._file_saver.save_json(filepath, data)
-                if result:
-                    self._file_saver._emit_success_with_path(filepath, "Chart data exported to JSON")
-                    return True
-                else:
-                    self._file_saver._emit_failure_with_path(filepath, "Failed to export chart data")
-                    return False
+                # filesaver will handle the message generation for json
+                return result
         except Exception as e:
             self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")
 
@@ -533,10 +526,8 @@ class VoltageDropCalculator(QObject):
                 df = pd.concat([current_point, comparison_points], ignore_index=True)
                 result = self._file_saver.save_csv(filepath, df)
 
-                if result:
-                    self._file_saver._emit_success_with_path(filepath, "Chart data exported to CSV")
-                else:
-                    self._file_saver._emit_failure_with_path(filepath, "Failed to export chart data")
+                # filesaver will handle the message generation for csv
+                return result
 
         except Exception as e:
             self.tableExportStatusChanged.emit(False, f"Error exporting chart data: {e}")

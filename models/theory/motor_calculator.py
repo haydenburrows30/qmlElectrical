@@ -474,12 +474,8 @@ class MotorCalculator(QObject):
             # Call save_csv with the prepared data
             result = self._file_saver.save_csv(filePath, csv_data)
             
-            if result:
-                self._file_saver._emit_success_with_path(filePath, "Data saved:")
-                return True
-            else:
-                self._file_saver._emit_failure_with_path(filePath, f"Error saving:")
-                return False
+            # filesaver will handle the message generation for csv
+            return result
 
         except Exception as e:
             error_msg = f"Error exporting motor data: {str(e)}"
