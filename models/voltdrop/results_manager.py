@@ -300,6 +300,10 @@ class ResultsManager(QObject):
         if hasattr(self, '_data_store'):
             self._data_store.close()
 
+
+
+
+    # old method of in memory storage below ----------------------------
     def save_calculation_history(self, calculation_data):
         """Save calculation history to in-memory storage with option to export."""
         try:

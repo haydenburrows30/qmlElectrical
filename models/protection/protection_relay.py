@@ -1,13 +1,19 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import os
 import sqlite3
-import json
 import math
 import sys
+import uuid
+from datetime import datetime
 
 # Import the database manager
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from services.database_manager import DatabaseManager
+from services.data_store import DataStore
+from services.logger_config import configure_logger
+
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="protection_relay")
 
 class ProtectionRelayCalculator(QObject):
     """Protection relay calculator and database interface."""
@@ -48,17 +54,79 @@ class ProtectionRelayCalculator(QObject):
         # Get database instance instead of path
         self.db_manager = DatabaseManager.get_instance()
         
+        # Create DataStore instance for persistent storage
+        self.data_store = DataStore(parent)
+        
+        logger.info("Initializing Protection Relay Calculator")
+        
+        # Ensure relay settings table exists
+        self._ensure_settings_table()
+        
         # Load device data using existing database connection
         self._load_device_data()
         
         # Add storage for saved settings
         self._saved_settings = []
         
-        # Load saved settings from file if it exists
-        self._settings_file = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'saved_relay_settings.json')
+        # Load saved settings from database
         self._load_saved_settings()
         
         self._calculate()
+        logger.info("Protection Relay Calculator initialized successfully")
+
+    def _ensure_settings_table(self):
+        """Ensure the relay_settings table exists in the database."""
+        try:
+            # Check if the table exists using the database manager
+            if not self.db_manager.table_exists("relay_settings"):
+                # Create table if it doesn't exist
+                self.db_manager.execute_query("""
+                    CREATE TABLE IF NOT EXISTS relay_settings (
+                        id TEXT PRIMARY KEY,
+                        name TEXT,
+                        device_type TEXT,
+                        rating REAL,
+                        curve_type TEXT,
+                        time_dial REAL,
+                        description TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        additional_data TEXT
+                    )
+                """)
+                logger.info("Created relay_settings table")
+                
+                # Create index for faster access by creation date
+                self.db_manager.execute_query("""
+                    CREATE INDEX IF NOT EXISTS idx_relay_settings_created ON relay_settings(created_at)
+                """)
+                
+                # Verify the table was created
+                if self.db_manager.table_exists("relay_settings"):
+                    logger.info("Successfully verified relay_settings table creation")
+                else:
+                    logger.warning("Failed to verify relay_settings table creation")
+            else:
+                logger.debug("Found existing relay_settings table")
+        except Exception as e:
+            logger.error(f"Error ensuring relay settings table: {e}")
+            # Still try to create the table with the IF NOT EXISTS clause as a fallback
+            try:
+                self.db_manager.execute_query("""
+                    CREATE TABLE IF NOT EXISTS relay_settings (
+                        id TEXT PRIMARY KEY,
+                        name TEXT,
+                        device_type TEXT,
+                        rating REAL,
+                        curve_type TEXT,
+                        time_dial REAL,
+                        description TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        additional_data TEXT
+                    )
+                """)
+                logger.info("Created relay_settings table in exception handler")
+            except Exception as inner_e:
+                logger.critical(f"Could not create relay_settings table: {inner_e}")
 
     def _load_device_data(self):
         """Load device data from SQLite database."""
@@ -76,8 +144,10 @@ class ProtectionRelayCalculator(QObject):
                     ORDER BY type
                 """)
                 self._device_types = cursor.fetchall() or []
-            except sqlite3.Error:
+                logger.debug(f"Loaded {len(self._device_types)} device types")
+            except sqlite3.Error as e:
                 self._device_types = []
+                logger.error(f"Error loading device types: {e}")
             
             # Load curve types with safe default
             try:
@@ -88,15 +158,17 @@ class ProtectionRelayCalculator(QObject):
                 """)
                 db_curves = [row[0] for row in cursor.fetchall()]
                 self._curve_types = db_curves if db_curves else list(self._curve_constants.keys())
-            except sqlite3.Error:
+                logger.debug(f"Loaded {len(self._curve_types)} curve types")
+            except sqlite3.Error as e:
                 self._curve_types = list(self._curve_constants.keys())
+                logger.error(f"Error loading curve types: {e}")
                 
             # Emit signals after data is loaded
             self.deviceTypesChanged.emit()
             self.curveTypesChanged.emit()
             
         except sqlite3.Error as e:
-            print(f"Error loading device data: {e}")
+            logger.error(f"Error loading device data: {e}")
             # Set safe defaults
             self._device_types = []
             self._curve_types = list(self._curve_constants.keys())
@@ -141,45 +213,49 @@ class ProtectionRelayCalculator(QObject):
         
         self.calculationsComplete.emit()
 
-    def _calculate_operating_time(self):
-        """Calculate relay operating time using database curve data."""
-        try:
-            conn = self.db_manager.connection
-            cursor = conn.cursor()
-            
-            # Get curve points from database
-            cursor.execute("""
-                SELECT current_multiplier, tripping_time
-                FROM protection_curves 
-                WHERE device_type = ? AND rating = ? AND curve_type = ?
-                ORDER BY current_multiplier
-            """, (self._device_type, self._rating, self._curve_type))
-            
-            points = cursor.fetchall()
-            if points:
-                self._curve_points = points
-                # Calculate operating time using curve points...
-        except Exception as e:
-            print(f"Error calculating operating time: {e}")
-
     def _load_saved_settings(self):
-        """Load saved settings from JSON file."""
+        """Load saved settings from database table."""
         try:
-            if os.path.exists(self._settings_file):
-                with open(self._settings_file, 'r') as f:
-                    self._saved_settings = json.load(f)
+            # Clear existing settings
+            self._saved_settings = []
+            
+            # Query the database for all saved settings
+            results = self.db_manager.fetch_all("""
+                SELECT id, name, device_type, rating, curve_type, time_dial, 
+                       description, created_at, additional_data
+                FROM relay_settings
+                ORDER BY created_at DESC
+            """)
+            
+            if results:
+                for row in results:
+                    # Convert database row to dictionary
+                    setting = {
+                        'id': row['id'],
+                        'name': row['name'],
+                        'deviceType': row['device_type'],
+                        'rating': row['rating'],
+                        'curveType': row['curve_type'],
+                        'timeDial': row['time_dial'],
+                        'description': row['description'],
+                        'createdAt': row['created_at']
+                    }
+                    
+                    # Add to in-memory list
+                    self._saved_settings.append(setting)
+                
                 self.savedSettingsChanged.emit()
+                logger.info(f"Loaded {len(self._saved_settings)} relay settings from database")
+            else:
+                logger.info("No saved relay settings found in database")
         except Exception as e:
-            print(f"Error loading saved settings: {e}")
+            logger.error(f"Error loading saved settings: {e}")
             self._saved_settings = []
 
     def _save_settings_to_file(self):
-        """Save settings to JSON file."""
-        try:
-            with open(self._settings_file, 'w') as f:
-                json.dump(self._saved_settings, f)
-        except Exception as e:
-            print(f"Error saving settings: {e}")
+        """Save settings to database (method name kept for compatibility)."""
+        # This method now does nothing as each setting is saved individually
+        pass
 
     # Properties and setters...
     @Property(float, notify=pickupCurrentChanged)
@@ -251,12 +327,44 @@ class ProtectionRelayCalculator(QObject):
         """Get list of saved settings."""
         return self._saved_settings
 
-    @Slot(dict)  # Changed QVariant to dict
+    @Slot(dict)
     def saveSettings(self, settings):
-        """Save current settings."""
-        self._saved_settings.append(settings)
-        self._save_settings_to_file()
-        self.savedSettingsChanged.emit()
+        """Save current settings to database."""
+        try:
+            # Generate a unique ID
+            setting_id = str(uuid.uuid4())
+            
+            # Prepare values for database
+            name = settings.get('name', f"Setting {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+            device_type = settings.get('deviceType', '')
+            rating = float(settings.get('rating', 0))
+            curve_type = settings.get('curveType', '')
+            time_dial = float(settings.get('timeDial', 0.5))
+            description = settings.get('description', '')
+            
+            logger.debug(f"Saving relay setting: {name}, {device_type}, {rating}A, {curve_type}")
+            
+            # Insert into database
+            self.db_manager.execute_query("""
+                INSERT INTO relay_settings (
+                    id, name, device_type, rating, curve_type, 
+                    time_dial, description, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """, (setting_id, name, device_type, rating, curve_type, time_dial, description))
+            
+            # Add ID to the settings dictionary
+            settings['id'] = setting_id
+            settings['createdAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Add to in-memory list
+            self._saved_settings.append(settings)
+            self.savedSettingsChanged.emit()
+            
+            logger.info(f"Saved relay setting '{name}' to database")
+            return True
+        except Exception as e:
+            logger.error(f"Error saving settings to database: {e}")
+            return False
 
     @Slot(int)
     def loadSavedCurve(self, index):
@@ -305,7 +413,7 @@ class ProtectionRelayCalculator(QObject):
                 self.savedCurveReady.emit(curve_points)
                 
             except Exception as e:
-                print(f"Error loading saved curve: {e}")
+                logger.error(f"Error loading saved curve: {e}")
                 # Emit empty curve points to prevent UI errors
                 self.savedCurveReady.emit([])
 
@@ -328,7 +436,7 @@ class ProtectionRelayCalculator(QObject):
                 'description': row[2]
             } for row in cursor.fetchall()]
         except Exception as e:
-            print(f"Error getting device ratings: {e}")
+            logger.error(f"Error getting device ratings: {e}")
             return []
 
     @Slot(str, result='QVariantList')
@@ -351,7 +459,7 @@ class ProtectionRelayCalculator(QObject):
                 'description': row[2]
             } for row in cursor.fetchall()]
         except Exception as e:
-            print(f"Error getting unique device ratings: {e}")
+            logger.error(f"Error getting unique device ratings: {e}")
             return []
 
     @Slot(str, float, result='QVariantList')
@@ -375,7 +483,7 @@ class ProtectionRelayCalculator(QObject):
                 'time': row[1]
             } for row in points]
         except Exception as e:
-            print(f"Error getting curve points: {e}")
+            logger.error(f"Error getting curve points: {e}")
             return []
 
     @Slot(str, int, result=bool)
@@ -392,14 +500,14 @@ class ProtectionRelayCalculator(QObject):
             if device_range:
                 min_capacity, max_capacity = device_range
                 if not (min_capacity <= breaking_capacity <= max_capacity):
-                    print(f"Breaking capacity {breaking_capacity} outside allowed range "
-                          f"({min_capacity}-{max_capacity}A) for {device_type}")
+                    logger.warning(f"Breaking capacity {breaking_capacity} outside allowed range "
+                              f"({min_capacity}-{max_capacity}A) for {device_type}")
                     return False
 
             conn = self.db_manager.connection
             cursor = conn.cursor()
             
-            print(f"Updating breaking capacity for {device_type} to {breaking_capacity}A")
+            logger.info(f"Updating breaking capacity for {device_type} to {breaking_capacity}A")
             
             # First update breaking capacity
             cursor.execute("""
@@ -432,7 +540,7 @@ class ProtectionRelayCalculator(QObject):
             return True
             
         except Exception as e:
-            print(f"Error updating breaking capacity: {e}")
+            logger.error(f"Error updating breaking capacity: {e}")
             return False
 
     @Slot(float)
@@ -515,12 +623,37 @@ class ProtectionRelayCalculator(QObject):
 
     @Slot()
     def clearSettings(self):
-        """Clear all saved settings."""
+        """Clear all saved settings from database."""
         try:
+            # Clear in-memory list
             self._saved_settings = []
-            if os.path.exists(self._settings_file):
-                os.remove(self._settings_file)
+            
+            # Delete all records from the database
+            self.db_manager.execute_query("DELETE FROM relay_settings")
+            
             self.savedSettingsChanged.emit()
-            print("All saved settings cleared")
+            logger.info("All saved relay settings cleared from database")
+            return True
         except Exception as e:
-            print(f"Error clearing settings: {e}")
+            logger.error(f"Error clearing settings: {e}")
+            return False
+            
+    @Slot(str)
+    def deleteSettingById(self, setting_id):
+        """Delete a specific setting by its ID."""
+        try:
+            # Delete from database
+            self.db_manager.execute_query(
+                "DELETE FROM relay_settings WHERE id = ?", 
+                (setting_id,)
+            )
+            
+            # Remove from in-memory list
+            self._saved_settings = [s for s in self._saved_settings if s.get('id') != setting_id]
+            self.savedSettingsChanged.emit()
+            
+            logger.info(f"Deleted relay setting with ID: {setting_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting setting: {e}")
+            return False

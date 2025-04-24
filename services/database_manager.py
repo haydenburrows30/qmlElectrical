@@ -243,10 +243,25 @@ class DatabaseManager:
             value TEXT
         )''')
         
+        # Relay settings table for protection relay calculations
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS relay_settings (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            device_type TEXT,
+            rating REAL,
+            curve_type TEXT,
+            time_dial REAL,
+            description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            additional_data TEXT
+        )''')
+        
         # Create indexes for performance
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_material ON cable_data(material)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_size ON cable_data(size)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_diversity_houses ON diversity_factors(houses)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_relay_settings_created ON relay_settings(created_at)')
         
         self.connection.commit()
         logger.info("Schema creation complete")
@@ -385,6 +400,19 @@ class DatabaseManager:
                 value TEXT
             )'''),
             
+            ("relay_settings", '''
+            CREATE TABLE IF NOT EXISTS relay_settings (
+                id TEXT PRIMARY KEY,
+                name TEXT,
+                device_type TEXT,
+                rating REAL,
+                curve_type TEXT,
+                time_dial REAL,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                additional_data TEXT
+            )'''),
+            
             ("voltage_systems", '''
             CREATE TABLE IF NOT EXISTS voltage_systems (
                 id INTEGER PRIMARY KEY,
@@ -431,6 +459,7 @@ class DatabaseManager:
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_material ON cable_data(material)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_size ON cable_data(size)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_diversity_houses ON diversity_factors(houses)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_relay_settings_created ON relay_settings(created_at)')
         except Exception as e:
             logger.error(f"Error creating indexes: {e}")
             
@@ -450,7 +479,7 @@ class DatabaseManager:
             expected_tables = [
                 'schema_version', 'config', 'cable_data', 'installation_methods', 'temperature_factors',
                 'cable_materials', 'standards_reference', 'circuit_breakers', 'protection_curves',
-                'diversity_factors', 'fuse_sizes', 'calculation_history', 'settings',
+                'diversity_factors', 'fuse_sizes', 'calculation_history', 'settings', 'relay_settings',
                 'voltage_systems', 'insulation_types', 'soil_resistivity'
             ]
             
@@ -588,7 +617,7 @@ class DatabaseManager:
         self._load_default_config()
         
         logger.info("Reference data loading complete")
-    
+
     def _load_diversity_factors(self):
         """Load diversity factors from CSV if available, or use defaults."""
         cursor = self.connection.cursor()
@@ -1071,6 +1100,48 @@ class DatabaseManager:
         
         self.connection.commit()
         logger.info("Loaded default configuration values")
+    
+    def list_tables(self):
+        """List all tables in the database."""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+            return [table[0] for table in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"Error listing tables: {e}")
+            return []
+    
+    def get_table_schema(self, table_name):
+        """Get the schema for a specific table."""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns = cursor.fetchall()
+            
+            schema = []
+            for col in columns:
+                schema.append({
+                    'cid': col[0],
+                    'name': col[1],
+                    'type': col[2],
+                    'notnull': col[3],
+                    'default_value': col[4],
+                    'pk': col[5]
+                })
+            return schema
+        except Exception as e:
+            logger.error(f"Error getting schema for table {table_name}: {e}")
+            return []
+    
+    def table_exists(self, table_name):
+        """Check if a table exists in the database."""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+            return cursor.fetchone() is not None
+        except Exception as e:
+            logger.error(f"Error checking if table {table_name} exists: {e}")
+            return False
     
     def get_config(self, key, default=None):
         """Get configuration value."""
