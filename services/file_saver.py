@@ -75,7 +75,7 @@ class FileSaver(QObject):
         print(f"SUCCESS: {success_message}")
     
     def _emit_failure_with_path(self, filepath, message=None):
-        """Emit success with standardized message including file path."""
+        """Emit failure with standardized message including file path."""
         if message:
             failure_message = f"{message}: {filepath}"
         else:
@@ -83,9 +83,8 @@ class FileSaver(QObject):
         
         logger.info(failure_message)
         
-        # Directly emit the signal without trying/catching
-        # This makes behavior more predictable
-        self.saveStatusChanged.emit(True, failure_message)
+        # Fix: Change True to False for failure status
+        self.saveStatusChanged.emit(False, failure_message)
         
         # Also log to console for debugging
         print(f"FAILURE: {failure_message}")
@@ -211,7 +210,7 @@ class FileSaver(QObject):
             
             # Use standardized success message    
             self._emit_success_with_path(filepath, "Text saved")
-            return filepath, True
+            return True
         except Exception as e:
             error_msg = f"Error saving text file: {e}"
             logger.error(error_msg)

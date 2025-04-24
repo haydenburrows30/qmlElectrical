@@ -1,5 +1,7 @@
 import logging
 import os
+import subprocess
+import platform
 import queue
 import threading
 import time
@@ -608,6 +610,37 @@ class QLogManager(QObject):
         """Get the total number of log messages."""
         return self._count
     
+    @Slot(result=bool)
+    def openLogFile(self):
+        """Open the current log file in the system's default text editor."""
+        # Run this in a separate thread to avoid blocking UI
+        def open_file():
+            try:
+                log_file = str(get_log_file())
+                
+                if not os.path.exists(log_file):
+                    logger.error(f"Log file not found: {log_file}")
+                    return False
+                    
+                if platform.system() == 'Windows':
+                    os.startfile(log_file)
+                elif platform.system() == 'Darwin':  # macOS
+                    subprocess.call(['open', log_file])
+                else:  # Linux and other Unix-like
+                    subprocess.call(['xdg-open', log_file])
+                    
+                return True
+                
+            except Exception as e:
+                logger.error(f"Error opening log file: {e}")
+                return False
+        
+        # Start a thread to open the file
+        thread = threading.Thread(target=open_file)
+        thread.daemon = True
+        thread.start()
+        return True
+    
     @Slot()
     def saveCurrentView(self):
         """Save the currently visible logs using FileSaver."""
@@ -637,25 +670,22 @@ class QLogManager(QObject):
                 content.append("[INFO] No log entries to display")
             
             # Generate default filename with timestamp
-            default_filename = f"qmltest_logs_{timestamp}"
+            timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+            default_filename = f"qmltest_logs_{timestamp_str}"
             
             # Use FileSaver to save the content
-            path, result = self._file_saver.save_text_file(
+            result = self._file_saver.save_text_file(
                 filepath="",  # Empty filepath triggers file dialog
                 content="\n".join(content),
                 default_filename=default_filename
             )
 
-            # Signal success or failure
-            if result:
-                self._file_saver._emit_success_with_path(path, "Log saved")
-                return True
-            else:
-                self._file_saver._emit_failure_with_path(path, "Error saving Log")
-                return False
+            # The FileSaver will handle emitting the appropriate signals
+            return result
             
         except Exception as e:
             self._logger.error(f"Error saving logs: {e}")
+            self._file_saver.saveStatusChanged.emit(False, f"Error saving logs: {e}")
             return False
     
     @Slot(result=str)
