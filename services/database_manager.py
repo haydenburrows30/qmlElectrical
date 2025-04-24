@@ -1088,7 +1088,7 @@ class DatabaseManager:
             "app_name": "Electrical",
             "org_name": "QtProject",
             "icon_path": "icons/gallery/24x24/Wave_dark.ico",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "performance_monitor_enabled": True
         }
         

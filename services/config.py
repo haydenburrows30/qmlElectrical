@@ -48,7 +48,7 @@ class AppConfig:
             logger.debug(f"Loaded setting {key}: {value}")
         
         # Ensure version is set correctly (always use the value from code)
-        self.version = "1.2.0"
+        self.version = "1.3.0"
         self.db_manager.set_config("version", self.version)
         logger.info(f"Application version set to: {self.version}")
 
