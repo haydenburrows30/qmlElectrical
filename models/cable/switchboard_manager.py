@@ -522,7 +522,6 @@ class SwitchboardManager(QObject):
     def loadFromJSON(self, filepath):
         """Load switchboard data from JSON"""
         try:
-            # Use the FileSaver to load the JSON properly handling file:/// URLs
             data = self._file_saver.load_json(filepath)
             
             if not data:

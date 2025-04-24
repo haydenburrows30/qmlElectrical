@@ -51,6 +51,7 @@ QtObject {
         { name: qsTr("Real Time"), source: "calculators/theory/RealTime.qml", icon: "general_device" },
         { name: qsTr("Three Phase Waveforms"), source: "calculators/three_phase/ThreePhase.qml", icon: "density_medium" },
         { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml", icon: "calculate" },
+        { name: qsTr("Sequence Calculator"), source: "calculators/theory/SequenceCalculator.qml", icon: "calculate" },
     ]
 
     property var renewables: [

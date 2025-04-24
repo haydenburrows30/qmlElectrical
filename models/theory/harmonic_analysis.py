@@ -689,7 +689,6 @@ class HarmonicAnalysisCalculator(QObject):
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-            # If no filePath provided, use the file saver to get one
             filePath = self._file_saver.get_save_filepath("csv", f"harmonics_data_{timestamp}")
             if not filePath:
                 self.exportDataToFolderCompleted.emit(False, "CSV export canceled")

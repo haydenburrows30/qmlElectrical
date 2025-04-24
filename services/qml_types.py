@@ -28,6 +28,7 @@ from models.protection.fault_current_calculator import FaultCurrentCalculator
 from models.protection.ref_rgf_calculator import RefRgfCalculator
 from models.basic.voltage_divider_calculator import VoltageDividerCalculator
 from models.basic.ohms_law_calculator import OhmsLawCalculator
+from models.theory.sequence_component_calculator import SequenceComponentCalculator
 from utils.series_helper import SeriesHelper
 from models.theory.three_phase import ThreePhaseSineWaveModel
 from models.theory.rlc import RLCChart
@@ -95,4 +96,5 @@ def register_qml_types(engine, current_dir):
         (BaseImpedanceCalculator, "BaseImpedanceCalculator", 1, 0, "BaseImpedanceCalculator"),
         (PerUnitImpedanceCalculator, "PerUnitImpedance", 1, 0, "PerUnitImpedanceCalculator"),
         (NetworkCabinetCalculator, "NetworkCabinetCalculator", 1, 0, "NetworkCabinetCalculator"),
+        (SequenceComponentCalculator, "SequenceComponentCalculator", 1, 0, "SequenceComponentCalculator")
     ]
