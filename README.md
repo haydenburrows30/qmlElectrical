@@ -1,7 +1,3 @@
-# Electrical Calculator
-
-A comprehensive electrical engineering calculator suite built with Python and QML that provides tools for cable sizing, voltage drop calculations, vector and phase visualisation, basic electrical calculations and more.
-
 ## Features
 
 ### Core Calculations
