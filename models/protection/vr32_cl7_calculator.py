@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from PySide6.QtCore import QObject, Signal, Slot, Property
+from datetime import datetime
+from services.file_saver import FileSaver
 
 from services.logger_config import configure_logger
 
@@ -21,7 +23,7 @@ class VR32CL7Calculator(QObject):
     cableRPerKmChanged = Signal()
     cableXPerKmChanged = Signal()
     loadDistanceChanged = Signal()
-    exportComplete = Signal(bool, str)  # Add signal for export status
+    exportComplete = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -43,6 +45,10 @@ class VR32CL7Calculator(QObject):
         
         # Initial calculation
         self.calculate()
+
+        # Get the file_saver instance
+        self._file_saver = FileSaver()
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
     
     # PySide6 property getters and setters
     def _get_generation_capacity_kw(self):
@@ -272,26 +278,20 @@ class VR32CL7Calculator(QObject):
             str: Path to saved file or empty string if failed/canceled
         """
         try:
-            from datetime import datetime
-            from services.file_saver import FileSaver
-            
             # Create a timestamp for the filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             default_filename = f"vr32_cl7_plot_{timestamp}"
-            
-            # Get the file_saver instance
-            file_saver = FileSaver()
-            
+
             # Get save filepath from user using FileSaver service
-            filepath = file_saver.get_save_filepath("png", default_filename)
+            filepath = self._file_saver.get_save_filepath("png", default_filename)
             
             if not filepath:
                 self.exportComplete.emit(False, "Export canceled")
                 return ""
             
             # Clean up filepath using FileSaver's helper methods
-            filepath = file_saver.clean_filepath(filepath)
-            filepath = file_saver.ensure_file_extension(filepath, "png")
+            filepath = self._file_saver.clean_filepath(filepath)
+            filepath = self._file_saver.ensure_file_extension(filepath, "png")
             
             # Generate the plot directly
             results_df = pd.DataFrame({
@@ -319,8 +319,7 @@ class VR32CL7Calculator(QObject):
             
             plt.savefig(filepath)
             plt.close()
-            
-            logger.info(f"Plot saved to: {filepath}")
+
             self.exportComplete.emit(True, f"Plot saved to: {filepath}")
             return filepath
                 
