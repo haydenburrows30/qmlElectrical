@@ -1,67 +1,6 @@
 import json
 from PySide6.QtCore import QUrl
 
-def save_config(calculator, file_path):
-    """
-    Save the cabinet configuration to a JSON file
-    
-    Args:
-        calculator: The NetworkCabinetCalculator instance with configuration
-        file_path: The file path to save the configuration (from QML file dialog)
-        
-    Returns:
-        tuple: (success, message)
-    """
-    try:
-        # Convert QUrl to local path if needed
-        if file_path.startswith('file:///'):
-            file_path = QUrl(file_path).toLocalFile()
-        
-        # If no extension is provided, add .json
-        if not file_path.lower().endswith('.json'):
-            file_path += '.json'
-        
-        # Create a dictionary with all configuration data
-        config_data = {
-            "active_ways": calculator._active_ways,
-            "cable_sizes": calculator._cable_sizes,
-            "show_streetlighting_panel": calculator._show_streetlighting_panel,
-            "show_service_panel": calculator._show_service_panel,
-            "show_dropper_plates": calculator._show_dropper_plates,
-            "way_types": calculator._way_types,
-            "fuse_ratings": calculator._fuse_ratings,
-            "service_cable_sizes": calculator._service_cable_sizes,
-            "conductor_types": calculator._conductor_types,
-            "service_conductor_types": calculator._service_conductor_types,
-            "connection_counts": calculator._connection_counts,
-            "cable_lengths": calculator._cable_lengths,
-            "service_panel_length": calculator._service_panel_length,
-            "service_panel_cable_size": calculator._service_panel_cable_size,
-            "service_panel_conductor_type": calculator._service_panel_conductor_type,
-            "service_panel_connection_count": calculator._service_panel_connection_count,
-            "site_name": calculator._site_name,
-            "site_number": calculator._site_number,
-            "sources": calculator._sources,
-            "destinations": calculator._destinations,
-            "notes": calculator._notes,
-            "service_panel_source": calculator._service_panel_source,
-            "service_panel_destination": calculator._service_panel_destination,
-            "service_panel_notes": calculator._service_panel_notes,
-            "phases": calculator._phases,
-            "service_panel_phase": calculator._service_panel_phase,
-            "general_notes": calculator._general_notes
-        }
-        
-        # Write to the file
-        with open(file_path, 'w') as f:
-            json.dump(config_data, f, indent=4)
-        
-        return True, f"Configuration saved to: {file_path}"
-        
-    except Exception as e:
-        return False, f"Error saving configuration: {str(e)}"
-
-
 def load_config(calculator, file_path):
     """
     Load cabinet configuration from a JSON file
@@ -247,6 +186,42 @@ def load_config(calculator, file_path):
         
         if "general_notes" in config_data:
             calculator._general_notes = config_data["general_notes"]
+        
+        # Load header information
+        if "customer_name" in config_data:
+            calculator._customer_name = config_data["customer_name"]
+        
+        if "customer_email" in config_data:
+            calculator._customer_email = config_data["customer_email"]
+        
+        if "project_name" in config_data:
+            calculator._project_name = config_data["project_name"]
+        
+        if "orn" in config_data:
+            calculator._orn = config_data["orn"]
+        
+        # Load footer information
+        if "designer" in config_data:
+            calculator._designer = config_data["designer"]
+        
+        if "revision_number" in config_data:
+            calculator._revision_number = config_data["revision_number"]
+        
+        if "revision_description" in config_data:
+            calculator._revision_description = config_data["revision_description"]
+        
+        if "checked_by" in config_data:
+            calculator._checked_by = config_data["checked_by"]
+        
+        # Load revision management data
+        if "revision_count" in config_data:
+            calculator._revision_count = config_data["revision_count"]
+        
+        if "revisions" in config_data:
+            calculator._revisions = config_data["revisions"]
+            # Ensure we have at least one revision
+            if not calculator._revisions:
+                calculator._revisions = [{"number": "1", "description": "", "designer": calculator._designer or "", "date": "", "checkedBy": calculator._checked_by or ""}]
         
         return True, f"Configuration loaded from: {file_path}"
         

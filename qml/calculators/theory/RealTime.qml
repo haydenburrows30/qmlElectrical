@@ -27,14 +27,6 @@ Page {
         id: messagePopup
     }
 
-    // Simplify and keep only the necessary function for debugging
-    function forceUpdateSliders() {
-        console.log("Forcing slider updates...")
-        for (var i = 0; i < 3; i++) {
-            console.log(`Wave ${i}: freq=${calculator.frequencies[i]}, amp=${calculator.amplitudes[i]}, offset=${calculator.offsets[i]}, phase=${calculator.phases[i]}`)
-        }
-    }
-
     // Streamline the connection to calculator
     Connections {
         target: calculator
@@ -42,22 +34,10 @@ Page {
         function onSaveStatusChanged(success, message) {
             if (success) {
                 messagePopup.showSuccess(message)
-                // If configuration was loaded, log the values
-                if (message.includes("loaded")) {
-                    loadUpdateTimer.start()
-                }
             } else {
                 messagePopup.showError(message)
             }
         }
-    }
-    
-    // Keep the timer but simplify it
-    Timer {
-        id: loadUpdateTimer
-        interval: 100
-        repeat: false
-        onTriggered: forceUpdateSliders()
     }
 
     background: Rectangle {

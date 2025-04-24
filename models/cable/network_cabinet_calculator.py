@@ -4,7 +4,7 @@ from services.file_saver import FileSaver
 
 # Import the PDF generator module
 from utils.pdf.pdf_generator_dcm import generate_dcm_pdf
-from .config_manager_dcm import save_config, load_config
+from .config_manager_dcm import load_config
 from services.logger_config import configure_logger
 
 logger = configure_logger("qmltest", component="dc_m1")
@@ -159,7 +159,6 @@ class NetworkCabinetCalculator(QObject):
             return True
         return False
     
-    # Property definitions - implement ALL properties needed by QML
     # Cable lengths
     @Property(list, notify=cableLengthsChanged)
     def cableLengths(self):
@@ -688,24 +687,56 @@ class NetworkCabinetCalculator(QObject):
                     self.saveLoadStatusChanged.emit(False, "Save cancelled")
                     return False
             
-            # Ensure we don't double-add extension
-            if not file_path.lower().endswith(".json"):
-                file_path += ".json"
+            config_data = {
+                "active_ways": self._active_ways,
+                "cable_sizes": self._cable_sizes,
+                "show_streetlighting_panel": self._show_streetlighting_panel,
+                "show_service_panel": self._show_service_panel,
+                "show_dropper_plates": self._show_dropper_plates,
+                "way_types": self._way_types,
+                "fuse_ratings": self._fuse_ratings,
+                "service_cable_sizes": self._service_cable_sizes,
+                "conductor_types": self._conductor_types,
+                "service_conductor_types": self._service_conductor_types,
+                "connection_counts": self._connection_counts,
+                "cable_lengths": self._cable_lengths,
+                "service_panel_length": self._service_panel_length,
+                "service_panel_cable_size": self._service_panel_cable_size,
+                "service_panel_conductor_type": self._service_panel_conductor_type,
+                "service_panel_connection_count": self._service_panel_connection_count,
+                "site_name": self._site_name,
+                "site_number": self._site_number,
+                "sources": self._sources,
+                "destinations": self._destinations,
+                "notes": self._notes,
+                "service_panel_source": self._service_panel_source,
+                "service_panel_destination": self._service_panel_destination,
+                "service_panel_notes": self._service_panel_notes,
+                "phases": self._phases,
+                "service_panel_phase": self._service_panel_phase,
+                "general_notes": self._general_notes,
+                # Add header information
+                "customer_name": self._customer_name,
+                "customer_email": self._customer_email,
+                "project_name": self._project_name,
+                "orn": self._orn,
+                # Add footer information
+                "designer": self._designer,
+                "revision_number": self._revision_number,
+                "revision_description": self._revision_description,
+                "checked_by": self._checked_by,
+                # Add revision management data
+                "revision_count": self._revision_count,
+                "revisions": self._revisions
+            }
             
-            # Use the dedicated config manager module
-            success, result = save_config(self, file_path)
-            
-            # Use standardized success message with file path
-            if success:
-                self._file_saver._emit_success_with_path(file_path, "Configuration saved")
-                return True
-            else:
-                self.saveLoadStatusChanged.emit(False, f"Error saving to {file_path}")
-                return False
+            # Use FileSaver to save the configuration
+            return self._file_saver.save_json(file_path, config_data)
+        
         except Exception as e:
             self.saveLoadStatusChanged.emit(False, str(e))
             return False
-    
+
     @Slot(str)
     def loadConfig(self, file_path):
         """
