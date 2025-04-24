@@ -41,8 +41,17 @@
       </header>
       <section>
 
-      {{ content }}
-      {% include toc.html html=content %}
+<!--       {{ content }} -->
+      
+
+        <div>
+          <div id="table-of-contents">
+            {% include toc.html html=content %}
+          </div>
+          <div id="markdown-content">
+            {{ content }}
+          </div>
+        </div>
 
       </section>
       <footer>
