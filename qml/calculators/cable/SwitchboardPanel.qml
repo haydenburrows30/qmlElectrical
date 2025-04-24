@@ -35,6 +35,10 @@ Item {
         heightFactor: 0.5
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.leftMargin: 5
@@ -425,33 +429,13 @@ Item {
                             MenuItem {
                                 text: "Export as CSV"
                                 onTriggered: {
-                                    let result = manager.exportCSV()
-                                    messageDialog.text = result
-                                    messageDialog.open()
-                                }
-                            }
-                            MenuItem {
-                                text: "Export as PDF"
-                                onTriggered: {
-                                    let result = manager.exportPDF()
-                                    messageDialog.text = result
-                                    messageDialog.open()
-                                }
-                            }
-                            MenuItem {
-                                text: "Print Schedule"
-                                onTriggered: {
-                                    let result = manager.printSchedule()
-                                    messageDialog.text = result
-                                    messageDialog.open()
+                                    manager.exportCSV()
                                 }
                             }
                             MenuItem {
                                 text: "Save as JSON"
                                 onTriggered: {
-                                    let result = manager.saveToJSON()
-                                    messageDialog.text = result
-                                    messageDialog.open()
+                                    manager.saveToJSON()
                                 }
                             }
                         }
@@ -460,7 +444,9 @@ Item {
                     StyledButton {
                         text: "Load Schedule"
                         icon.source: "../../../icons/rounded/folder_open.svg"
-                        onClicked: fileDialog.open()
+                        onClicked: {
+                            manager.loadFromJSONWithDialog()
+                        }
                     }
                     
                     Item { Layout.fillWidth: true } // Spacer
@@ -671,39 +657,16 @@ Item {
             }
         }
     }
-
-    Dialog {
-        id: messageDialog
-        title: "Switchboard Manager"
-        width: 400
-        height: 200
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        modal: true
-        standardButtons: Dialog.Ok
-        
-        property string text: ""
-        
-        ColumnLayout {
-            anchors.fill: parent
-            
-            Label {
-                text: messageDialog.text
-                wrapMode: Text.WordWrap
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+    
+    // connections for saving popups
+    Connections {
+        target: manager
+        function onExportCSVCompleted(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message);
+            } else {
+                messagePopup.showError(message);
             }
-        }
-    }
-
-    FileDialog {
-        id: fileDialog
-        title: "Load Switchboard Schedule"
-        nameFilters: ["JSON files (*.json)"]
-        onAccepted: {
-            let result = manager.loadFromJSON(fileDialog.selectedFile.toString())
-            messageDialog.text = result
-            messageDialog.open()
         }
     }
 }

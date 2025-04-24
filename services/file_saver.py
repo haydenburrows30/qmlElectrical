@@ -438,6 +438,81 @@ class FileSaver(QObject):
             self.saveStatusChanged.emit(False, error_msg)
             return False
 
+    @Slot(str, result='QVariant')
+    def load_json(self, filepath):
+        """
+        Load JSON data from a file.
+        
+        Args:
+            filepath: Path to the JSON file (can be a URL from QML FileDialog)
+            
+        Returns:
+            The parsed JSON data or None if loading failed
+        """
+        try:
+            # Clean the filepath (handle file:/// URLs)
+            clean_path = self.clean_filepath(filepath)
+            
+            if not clean_path:
+                error_msg = "No filepath provided"
+                logger.error(error_msg)
+                self.saveStatusChanged.emit(False, error_msg)
+                return None
+                
+            if not os.path.exists(clean_path):
+                error_msg = f"File does not exist: {clean_path}"
+                logger.error(error_msg)
+                self.saveStatusChanged.emit(False, error_msg)
+                return None
+            
+            with open(clean_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            logger.info(f"Successfully loaded JSON from: {clean_path}")
+            self.saveStatusChanged.emit(True, f"JSON loaded from: {clean_path}")
+            return data
+            
+        except json.JSONDecodeError as e:
+            error_msg = f"Invalid JSON file: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return None
+            
+        except Exception as e:
+            error_msg = f"Error loading JSON file: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return None
+
+    @Slot(str, result='QVariant')
+    def load_json_with_dialog(self, default_filename=""):
+        """
+        Show a file open dialog and load the selected JSON file.
+        
+        Args:
+            default_filename: Optional default filename (without extension)
+            
+        Returns:
+            The parsed JSON data or None if loading failed or canceled
+        """
+        try:
+            # Get filepath from dialog
+            filepath = self.get_load_filepath("json")
+            
+            if not filepath:
+                logger.info("JSON file selection canceled by user")
+                self.saveStatusChanged.emit(False, "JSON loading canceled")
+                return None
+                
+            # Now load the JSON file
+            return self.load_json(filepath)
+            
+        except Exception as e:
+            error_msg = f"Error loading JSON file with dialog: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return None
+
     @Property(str)
     def defaultFolder(self):
         """Get the default save folder path."""

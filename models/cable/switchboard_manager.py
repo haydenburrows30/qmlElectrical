@@ -4,7 +4,12 @@ import csv
 import json
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
-import datetime
+from datetime import datetime
+
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="switchboard")
 
 @dataclass
 class Circuit:
@@ -158,6 +163,7 @@ class SwitchboardManager(QObject):
     utilizationPercentChanged = Signal()
     circuitsChanged = Signal()
     circuitCountChanged = Signal(int)
+    exportCSVCompleted = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -170,6 +176,10 @@ class SwitchboardManager(QObject):
         self._circuit_model = CircuitModel()
         self._next_circuit_number = 1
         self._circuit_count = 0
+
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        self._file_saver.saveStatusChanged.connect(self.exportCSVCompleted)
         
     # Properties
     def get_name(self) -> str:
@@ -423,70 +433,71 @@ class SwitchboardManager(QObject):
     def exportCSV(self):
         """Export switchboard schedule to CSV"""
         try:
-            directory = os.path.expanduser("~/Downloads")
-            filename = f"{self._name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-            filepath = os.path.join(directory, filename)
-            
-            with open(filepath, 'w', newline='') as csvfile:
-                writer = csv.writer(csvfile)
-                
-                # Write header
-                writer.writerow(["Switchboard Schedule:", self._name])
-                writer.writerow(["Location:", self._location])
-                writer.writerow(["Voltage:", self._voltage])
-                writer.writerow(["Phases:", self._phases])
-                writer.writerow(["Main Rating:", f"{self._main_rating}A"])
-                writer.writerow(["Type:", self._type])
-                writer.writerow([])  # Empty row
-                
-                # Write circuit table headers
-                writer.writerow([
-                    "Circuit #", "Destination", "Rating (A)", "Poles", 
-                    "Type", "Load (kW)", "Cable Size", "Cable Cores", 
-                    "Length (m)", "Status", "Notes"
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            filePath = self._file_saver.get_save_filepath("csv", f"switchboard_{timestamp}")
+            if not filePath:
+                self.exportCSVCompleted.emit(False, "CSV export canceled")
+                return False
+
+            # Prepare data in the format expected by save_csv
+            csv_data = []
+
+            # Write circuit table headers
+            csv_data.append([
+                "Circuit #", "Destination", "Rating (A)", "Poles", 
+                "Type", "Load (kW)", "Cable Size", "Cable Cores", 
+                "Length (m)", "Status", "Notes"
+            ])
+
+            # Add data
+            csv_data.append(["Switchboard Schedule:", self._name])
+            csv_data.append(["Location:", self._location])
+            csv_data.append(["Voltage:", self._voltage])
+            csv_data.append(["Phases:", self._phases])
+            csv_data.append(["Main Rating:", f"{self._main_rating}A"])
+            csv_data.append(["Type:", self._type])
+            csv_data.append([])  # Empty row
+
+            # Write circuit data
+            for circuit in self._circuit_model.get_all_circuits():
+                csv_data.append([
+                    circuit.number,
+                    circuit.destination,
+                    circuit.rating,
+                    circuit.poles,
+                    circuit.type,
+                    circuit.load,
+                    circuit.cableSize,
+                    circuit.cableCores,
+                    circuit.length,
+                    circuit.status,
+                    circuit.notes
                 ])
-                
-                # Write circuit data
-                for circuit in self._circuit_model.get_all_circuits():
-                    writer.writerow([
-                        circuit.number,
-                        circuit.destination,
-                        circuit.rating,
-                        circuit.poles,
-                        circuit.type,
-                        circuit.load,
-                        circuit.cableSize,
-                        circuit.cableCores,
-                        circuit.length,
-                        circuit.status,
-                        circuit.notes
-                    ])
             
-            return f"Exported to {filepath}"
+            # Call save_csv with the prepared data
+            result = self._file_saver.save_csv(filePath, csv_data)
+            
+            return result
+        
         except Exception as e:
-            return f"Export failed: {str(e)}"
-    
-    @Slot(result=str)
-    def exportPDF(self):
-        """Export switchboard schedule to PDF"""
-        # This would require a PDF generation library like ReportLab
-        # For now, we'll return a message
-        return "PDF export not implemented yet"
-    
-    @Slot(result=str)
-    def printSchedule(self):
-        """Print the switchboard schedule"""
-        # This would require printer integration
-        return "Print functionality not implemented yet"
+            error_message = f"Error exporting csv: {str(e)}"
+            logger.error(error_message)
+            logger.exception(e)
+            self.exportCSVCompleted.emit(False, error_message)
+            return False
     
     @Slot(result=str)
     def saveToJSON(self):
         """Save the switchboard data to JSON"""
         try:
-            directory = os.path.expanduser("~/Documents")
-            filename = f"{self._name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            filepath = os.path.join(directory, filename)
-            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            filePath = self._file_saver.get_save_filepath("json", f"switchboard_{timestamp}")
+            if not filePath:
+                self.exportCSVCompleted.emit(False, "JSON export canceled")
+                return False
+
             data = {
                 "name": self._name,
                 "location": self._location,
@@ -496,20 +507,26 @@ class SwitchboardManager(QObject):
                 "type": self._type,
                 "circuits": [c.to_dict() for c in self._circuit_model.get_all_circuits()]
             }
-            
-            with open(filepath, 'w') as f:
-                json.dump(data, f, indent=2)
-                
-            return f"Saved to {filepath}"
+
+            result = self._file_saver.save_json(filePath, data)
+
+            return result
         except Exception as e:
-            return f"Save failed: {str(e)}"
-    
+            error_message = f"Error exporting json: {str(e)}"
+            logger.error(error_message)
+            logger.exception(e)
+            self.exportCSVCompleted.emit(False, error_message)
+            return False
+
     @Slot(str, result=str)
     def loadFromJSON(self, filepath):
         """Load switchboard data from JSON"""
         try:
-            with open(filepath, 'r') as f:
-                data = json.load(f)
+            # Use the FileSaver to load the JSON properly handling file:/// URLs
+            data = self._file_saver.load_json(filepath)
+            
+            if not data:
+                return "Failed to load JSON data"
             
             self.setName(data.get('name', 'Unknown'))
             self.setLocation(data.get('location', ''))
@@ -539,6 +556,53 @@ class SwitchboardManager(QObject):
             self.utilizationPercentChanged.emit()
             self.circuitCountChanged.emit(len(self._circuit_model._circuits))
             
-            return f"Loaded from {filepath}"
+            return f"Loaded switchboard data successfully"
         except Exception as e:
-            return f"Load failed: {str(e)}"
+            error_message = f"Load failed: {str(e)}"
+            logger.error(error_message)
+            return error_message
+
+    @Slot(result=str)
+    def loadFromJSONWithDialog(self):
+        """Load switchboard data from JSON using a file dialog"""
+        try:
+            # Use the FileSaver to show dialog and load the JSON
+            data = self._file_saver.load_json_with_dialog()
+            
+            if not data:
+                return "JSON load canceled or failed"
+            
+            # Process the loaded data - reusing existing code
+            self.setName(data.get('name', 'Unknown'))
+            self.setLocation(data.get('location', ''))
+            self.setVoltage(data.get('voltage', '400V'))
+            self.setPhases(data.get('phases', '3Ø + N'))
+            self.setMainRating(data.get('mainRating', 100))
+            self.setType(data.get('type', 'Main Switchboard'))
+            
+            # Clear existing circuits without creating a new model instance
+            self._circuit_model.clear_circuits()
+            
+            # Add circuits from JSON
+            for circuit_data in data.get('circuits', []):
+                circuit = Circuit.from_dict(circuit_data, circuit_data.get('number', '0'))
+                self._circuit_model.add_circuit(circuit)
+            
+            # Update next circuit number
+            if self._circuit_model._circuits:
+                max_num = max(int(c.number) for c in self._circuit_model._circuits if c.number.isdigit())
+                self._next_circuit_number = max_num + 1
+            else:
+                self._next_circuit_number = 1
+            
+            # Emit signals
+            self.circuitsChanged.emit()
+            self.totalLoadChanged.emit()
+            self.utilizationPercentChanged.emit()
+            self.circuitCountChanged.emit(len(self._circuit_model._circuits))
+            
+            return
+        except Exception as e:
+            error_message = f"Load failed: {str(e)}"
+            logger.error(error_message)
+            return error_message
