@@ -2,6 +2,17 @@
 
 A comprehensive electrical engineering calculator suite built with Python and QML that provides tools for cable sizing, voltage drop calculations, vector and phase visualisation, basic electrical calculations and more.
 
+This application was developed in Linux, but checks were made in Windows (bare metal).
+
+The goal for this application is:
+
+- Learn Python, QML & SQL
+- Make a nice looking application without going overboard
+- Able to run from Linux & Windows (runs much better in Linux)
+- Package it for usage in Windows & Linux (.exe & .pkg)
+
+Maybe I will port backend to C++ at a later date, but will mean learning C++. I'm sure this will speed up the application immensely using Qt framework. This was what drew me to QML as I can develop the frontend and replace the backend if necessary.  I have tried to decouple QML from Python as much as I can and just let QML display visuals.
+
 ## Features
 
 ### Core Calculations
