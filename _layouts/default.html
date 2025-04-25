@@ -31,6 +31,8 @@
         <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
         {% endif %}
 
+        {% include toc.html html=content %}
+
         {% if site.show_downloads %}
         <ul class="downloads">
           <li><a href="{{ site.github.zip_url }}">Download <strong>ZIP File</strong></a></li>
@@ -40,10 +42,8 @@
         </ul>
         {% endif %}
 
-        {% include toc.html html=content %}
       </header>
       <section>
-            {% include toc.html html=content %}
             {{ content }}
 
       </section>
