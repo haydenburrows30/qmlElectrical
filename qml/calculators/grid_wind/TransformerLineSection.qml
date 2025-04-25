@@ -656,7 +656,7 @@ Item {
                                 Label { text: "Enable Voltage Regulator:" }
                                 Switch {
                                     id: regulatorEnabledSwitch
-                                    checked: calculatorReady && calculator ? safeValueFunction(calculator.voltageRegulatorEnabled, true) : true
+                                    // checked: calculatorReady && calculator ? safeValueFunction(calculator.voltageRegulatorEnabled, true) : true
                                     onToggled: if (calculatorReady) calculator.setVoltageRegulatorEnabled(checked)
                                 }
 

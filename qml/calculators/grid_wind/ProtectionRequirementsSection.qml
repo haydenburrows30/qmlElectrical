@@ -72,7 +72,7 @@ Item {
                         anchors.fill: parent
                         
                         Label {
-                            text: "Protection Requirements for Wind Turbine Connection"
+                            text: "Protection Requirements"
                             font.pixelSize: 20
                             font.bold: true
                         }
