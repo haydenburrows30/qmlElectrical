@@ -242,6 +242,11 @@ Item {
 
                                 darkMode: cabinetCalculator.darkMode
                                 calculator: networkCabinet
+
+                                onDarkModeChanged: {
+                                    // Update the diagram when dark mode changes
+                                    cabinetDiagram.forceRefresh()
+                                }
                                 
                                 onConfigChanged: {
                                     // Force diagram to update when config changes

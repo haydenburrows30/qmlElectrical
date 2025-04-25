@@ -87,14 +87,14 @@ class PDFGenerator:
                 # Create system parameters table
                 system_data = [
                     ["Parameter", "Value"],
-                    ["Wind Turbine Rating", f"{generator.get('power', 'N/A')} kW"],
-                    ["Wind Turbine Output Current", f"{generator.get('current', 'N/A')} A"],
+                    ["Wind Turbine Rating", f"{generator.get('power', 'N/A'):.2f} kW"],
+                    ["Wind Turbine Output Current", f"{generator.get('current', 'N/A'):.2f} A"],
                     ["Transformer Rating", f"{transformer.get('rating', 'N/A')} kVA"],
                     ["Transformer Voltage", f"{transformer.get('voltage', 'N/A')}"],
-                    ["Fault Current HV", f"{transformer.get('fault_current', 'N/A')} kA"],
-                    ["Ground Fault Current", f"{transformer.get('ground_fault', 'N/A')} kA"],
+                    ["Fault Current HV", f"{transformer.get('fault_current', 'N/A'):.2f} kA"],
+                    ["Ground Fault Current", f"{transformer.get('ground_fault', 'N/A'):.6f} kA"],
                     ["Line Length", f"{line.get('length', 'N/A')} km"],
-                    ["Line Voltage Drop", f"{line.get('voltage_drop', 'N/A')} %"]
+                    ["Line Voltage Drop", f"{line.get('voltage_drop', 'N/A'):.2f} %"]
                 ]
                 
                 # Create system table
@@ -126,7 +126,7 @@ class PDFGenerator:
                 
                 generator_protection = [
                     ["Protection", "Setting/Value"],
-                    ["Overcurrent Pickup", f"{generator.get('overcurrent_pickup', 'N/A')} A ({generator.get('ct_ratio', 'N/A')})"],
+                    ["Overcurrent Pickup", f"{generator.get('overcurrent_pickup', 'N/A'):.2f} A ({generator.get('ct_ratio', 'N/A')})"],
                     ["Under/Over Voltage", f"{generator.get('voltage_range', 'N/A')}"],
                     ["Under/Over Frequency", f"{generator.get('frequency_range', 'N/A')}"],
                     ["Earth Fault Setting", f"{generator.get('earth_fault', 'N/A')}"],
@@ -158,10 +158,10 @@ class PDFGenerator:
                 transformer_protection = [
                     ["Protection", "Setting/Value"],
                     ["CT Ratio", f"{transformer.get('ct_ratio', 'N/A')}"],
-                    ["Relay Pickup Current", f"{transformer.get('relay_pickup_current', 'N/A')} A"],
+                    ["Relay Pickup Current", f"{transformer.get('relay_pickup_current', 'N/A'):.2f} A"],
                     ["Time-Current Curve", f"{transformer.get('relay_curve_type', 'N/A')}"],
                     ["Time Dial Setting", f"{transformer.get('time_dial', 'N/A')}"],
-                    ["Instantaneous Pickup", f"{transformer.get('instantaneous_pickup', 'N/A')} A"],
+                    ["Instantaneous Pickup", f"{transformer.get('instantaneous_pickup', 'N/A'):.2f} A"],
                     ["Differential Protection", f"Slope: {transformer.get('differential_slope', 'N/A')}%"],
                     ["Reverse Power Protection", f"{transformer.get('reverse_power', 'N/A')}"]
                 ]
@@ -190,7 +190,7 @@ class PDFGenerator:
                 
                 line_protection = [
                     ["Protection", "Setting/Value"],
-                    ["Fault Current at 11kV", f"{line.get('fault_current', 'N/A')} kA"],
+                    ["Fault Current at 11kV", f"{line.get('fault_current', 'N/A'):.2f} kA"],
                     ["Minimum Cable Size", f"{line.get('cable_size', 'N/A')}"],
                     ["Distance Protection", f"{'Required' if line.get('length', 0) > 10 else 'Not Required'}"],
                     ["Auto-Reclosure", "Single-shot"]
@@ -376,8 +376,8 @@ class PDFGenerator:
                 ["Rating", f"{data.get('transformer_rating', 'N/A')} kVA"],
                 ["HV Voltage", f"{data.get('transformer_hv_voltage', 'N/A')} V"],
                 ["LV Voltage", f"{data.get('transformer_lv_voltage', 'N/A')} V"],
-                ["HV Current", f"{data.get('transformer_flc_hv', 'N/A')} A"],
-                ["LV Current", f"{data.get('transformer_flc_lv', 'N/A')} A"],
+                ["HV Current", f"{data.get('transformer_flc_hv', 'N/A'):.2f} A"],
+                ["LV Current", f"{data.get('transformer_flc_lv', 'N/A'):.2f} A"],
                 ["Impedance", f"{data.get('transformer_impedance', 'N/A')} %"],
                 ["X/R Ratio", f"{data.get('transformer_xr_ratio', 'N/A')}"],
                 ["Transformer Z", f"{data.get('transformer_z', 'N/A'):.3f} Ω"],
