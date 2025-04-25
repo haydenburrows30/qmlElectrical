@@ -73,8 +73,8 @@ Item {
                         
                         Label {
                             text: "Protection Requirements for Wind Turbine Connection"
+                            font.pixelSize: 20
                             font.bold: true
-                            font.pixelSize: 16
                         }
                         
                         Item { Layout.fillWidth: true }
@@ -88,7 +88,8 @@ Item {
                         }
                         
                         StyledButton {
-                            text: "Export Settings"
+                            Layout.alignment: Qt.AlignRight
+                            icon.source: "../../../icons/rounded/download.svg"
                             onClicked: {
                                 if (transformerReady && windTurbineReady) {
                                     exportProtectionSettings()

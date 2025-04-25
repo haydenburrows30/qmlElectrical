@@ -90,6 +90,12 @@ Item {
                     Layout.maximumWidth: topLayout.width
                     Layout.alignment: Qt.AlignHCenter
 
+                    Label {
+                            text: "Wind Turbine"
+                            font.pixelSize: 20
+                            font.bold: true
+                    }
+
                     Label {Layout.fillWidth: true}
 
                     StyledButton {

@@ -45,8 +45,7 @@ Item {
 
     ColumnLayout {
         id: mainLayout
-        anchors.fill: parent
-        anchors.margins: 5
+        anchors.centerIn: parent
 
         // Header with title and help button
         RowLayout {
@@ -76,7 +75,8 @@ Item {
 
             // Left side - inputs and results
             ColumnLayout {
-                Layout.maximumWidth: 300
+                id: leftSide
+                Layout.minimumWidth: 300
                 Layout.alignment: Qt.AlignTop
 
                 // Grid Parameters
@@ -251,12 +251,11 @@ Item {
             }
 
             WaveCard {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.minimumWidth: 900
+                Layout.minimumHeight: leftSide.height
 
                 EarthingViz {
                     anchors.fill: parent
-                    anchors.margins: 5
                     
                     gridLength: parseFloat(gridLengthInput.text || "20")
                     gridWidth: parseFloat(gridWidthInput.text || "20")

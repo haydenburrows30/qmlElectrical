@@ -32,22 +32,23 @@ Item {
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
-        
-        TabBar {
-            id: tabBar
-            Layout.fillWidth: true
-            Layout.topMargin: 5
+
+        // TabBar {
+        //     id: tabBar
+        //     Layout.fillWidth: true
+        //     Layout.topMargin: 5
+        //     font.pixelSize: 20
             
-            TabButton {
-                text: "Wind Turbine"
-            }
-            TabButton {
-                text: "Transformer and Line"
-            }
-            TabButton {
-                text: "Protection Requirements"
-            }
-        }
+        //     TabButton {
+        //         text: "Wind Turbine"
+        //     }
+        //     TabButton {
+        //         text: "Transformer and Line" 
+        //     }
+        //     TabButton {
+        //         text: "Protection Requirements"
+        //     }
+        // }
 
         StackLayout {
             Layout.fillWidth: true

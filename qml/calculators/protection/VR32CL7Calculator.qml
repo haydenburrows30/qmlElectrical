@@ -38,14 +38,42 @@ Item {
                 font.bold: true
                 Layout.fillWidth: true
             }
+            // StyledButton {
+            //     Layout.alignment: Qt.AlignHCenter
+            //     text: "Calculate"
+            //     ToolTip.text: "Calculate"
+            //     ToolTip.visible: hovered
+            //     ToolTip.delay: 500
+
+            //     onClicked: {
+            //         if (calculator) {
+            //             calculator.calculate()
+            //         }
+            //     }
+            // }
+
+            StyledButton {
+                ToolTip.text: "Generate bar chart"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                Layout.alignment: Qt.AlignRight
+                icon.source: "../../../icons/rounded/download.svg"
+
+                onClicked: {
+                    if (calculator) {
+                        calculator.exportPlot()
+                    }
+                }
+            }
         }
 
         // Input parameters section
         RowLayout {
 
             WaveCard {
+                id: inputPara
                 Layout.minimumWidth: 400
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: 280
                 title: "Input Parameters"
                 
                 GridLayout {
@@ -225,40 +253,13 @@ Item {
                         text: "km" 
                         Layout.fillWidth: true
                     }
-
-                    StyledButton {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: "Calculate"
-                        Layout.fillWidth: true
-
-                        onClicked: {
-                            if (calculator) {
-                                calculator.calculate()
-                            }
-                        }
-                    }
-
-                    StyledButton {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: "Generate Plot"
-                        Layout.fillWidth: true
-                        ToolTip.text: "Generate bar chart"
-                        ToolTip.visible: hovered
-                        ToolTip.delay: 500
-
-                        onClicked: {
-                            if (calculator) {
-                                calculator.exportPlot()
-                            }
-                        }
-                    }
                 }
             }
 
             // Results section
             WaveCard {
                 Layout.minimumWidth: 400
-                Layout.minimumHeight: 300
+                Layout.minimumHeight: inputPara.height
                 title: "Results"
                 
                 ColumnLayout {
