@@ -30,12 +30,6 @@ Popup {
             } else voltageComboBox.currentIndex = 0
 
             componentInit = true
-            // for (var i = 0; i < voltageComboBox.model.length; i++) {
-            //     if (voltageComboBox.model[i] === defaultVoltage) {
-            //         voltageComboBox.currentIndex = i;
-            //         break;
-            //     }
-            // }
         }
     }
     

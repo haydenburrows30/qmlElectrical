@@ -13,11 +13,6 @@ import "../components/popups"
 Page {
     id: home
 
-    About {
-        id: about
-        configBridge: appConfig
-    }
-
     WhatsNew {
         id: whatsNewPopup
     }

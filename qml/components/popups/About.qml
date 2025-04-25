@@ -6,7 +6,8 @@ Popup {
     id: aboutProgram
 
     width: 600
-    height: 300
+    height: 310
+    modal: true
 
     anchors.centerIn: Overlay.overlay
 

@@ -37,8 +37,17 @@ ApplicationWindow {
         id: logViewerPopup
     }
 
+    Help {
+        id: help
+    }
+
     SettingsMenu {
         id: settingsMenu
+    }
+
+    About {
+        id: about
+        configBridge: appConfig
     }
 
     // Initialize logManager with a Timer to avoid binding loops
@@ -215,6 +224,14 @@ ApplicationWindow {
                     MenuItem {
                         text: "Log Viewer"
                         onTriggered: logViewerPopup.open()
+                    }
+                    MenuItem {
+                        text: "Help"
+                        onTriggered: help.open()
+                    }
+                    MenuItem {
+                        text: "About"
+                        onTriggered: about.open()
                     }
                 }
             }

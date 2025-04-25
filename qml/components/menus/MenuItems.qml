@@ -57,4 +57,9 @@ QtObject {
     property var renewables: [
         { name: qsTr("Wind & Grid Connection"), source: "calculators/grid_wind/WindTransformerLineCalculator.qml", icon: "air" }
     ]
+    // not used
+    property var settings: [
+        { name: qsTr("Settings"), source: "components/menus/SettingsMenu.qml", icon: "air" },
+        { name: qsTr("Log"), source: "components/logging/LogViewer.qml", icon: "air" },
+    ]
 }
