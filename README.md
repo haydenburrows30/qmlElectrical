@@ -89,31 +89,6 @@ The executable will be in the `dist` folder, and the installer will be created a
 - PySide6
 - NSIS (for creating installer)
 
-### Cross-Platform Building
-
-#### Building Windows Executable from Linux
-1. Install Wine:
-```bash
-sudo apt install wine64
-```
-
-2. Run cross-platform build script:
-```bash
-python scripts/cross_build.py
-```
-
-The script will automatically:
-- Download Python 3.12.10 for Windows
-- Set up Wine environment
-- Install Python in Wine
-- Install dependencies in Wine Python
-- Build the Windows executable
-
-```bash
-pip install -r build_requirements.txt
-python scripts/windows_build.py
-```
-
 ## Development
 
 ### Project Structure
