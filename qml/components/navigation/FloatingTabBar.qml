@@ -3,116 +3,51 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 
-import "../../components/style"
-import "../../components/buttons"
-
-import TransformerLine 1.0
-import WindTurbine 1.0
-
 Item {
     id: root
-    property TransformerLineCalculator transformerCalculator : TransformerLineCalculator {}
-    property WindTurbineCalculator windTurbineCalculator : WindTurbineCalculator {}
     
-    property bool transformerReady: transformerCalculator !== null
-    property bool windTurbineReady: windTurbineCalculator !== null
-    property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.actualPower : 0
+    // Public properties that can be set from outside
+    property var tabModel: []  // Model for tab items
+    property int currentIndex: 0 // Current active tab index
+    property color barColor: "#4a86e8" // Default bar color
+    property color textColor: "#FFFFFF" // Default text color
+    property color highlightColor: "#FFFFFF" // Default highlight color
+    property bool darkMode: false // Dark mode state
     
-    function safeValue(value, defaultVal) {
-        if (value === undefined || value === null) {
-            return defaultVal;
-        }
-        
-        if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
-            return defaultVal;
-        }
-        
-        return value;
-    }
-                
-    ColumnLayout {
-        id: mainLayout
-        anchors.fill: parent
-        spacing: 0
-        
-        // Main content stack
-        StackLayout {
-            id: contentStack
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            currentIndex: floatingBar.currentIndex
-            
-            // Tab 1: Wind Turbine Parameters - operates independently
-            WindTurbineSection {
-                id: windTurbineSection
-                Layout.fillWidth: true
-
-                // Pass only necessary properties and functions
-                calculator: windTurbineCalculator
-                calculatorReady: windTurbineReady
-
-                onCalculate: {
-                    if (windTurbineReady) {
-                        windTurbineCalculator.refreshCalculations()
-                    }
-                }
-                safeValueFunction: safeValue
-            }
-
-            // Tab 2: Transformer & Line Parameters - operates independently
-            TransformerLineSection {
-                id: transformerLineSection
-                Layout.fillWidth: true
-
-                // Pass only necessary properties and functions
-                calculator: transformerCalculator
-                calculatorReady: transformerReady
-
-                onCalculate: {
-                    if (transformerReady) {
-                        transformerCalculator.refreshCalculations()
-                    }
-                }
-                safeValueFunction: safeValue
-            }
-
-            // Tab 3: Protection Requirements - still needs access to both
-            ProtectionRequirementsSection {
-                Layout.fillWidth: true
-
-                // Pass the required properties
-                transformerCalculator: root.transformerCalculator
-                windTurbineCalculator: root.windTurbineCalculator
-                transformerReady: root.transformerReady
-                windTurbineReady: root.windTurbineReady
-                totalGeneratedPower: root.totalGeneratedPower
-
-                onCalculate: {
-                    // For the protection tab, we need data from both systems
-                    if (transformerReady && windTurbineReady) {
-                        windTurbineCalculator.refreshCalculations()
-                        transformerCalculator.refreshCalculations()
-                    }
-                }
-                safeValueFunction: safeValue
+    // Signals
+    signal tabSelected(int index)
+    
+    // Read-only properties
+    readonly property bool isOnLeftSide: floatingBar.isOnLeftSide
+    
+    // Size properties
+    width: floatingBar.width
+    height: floatingBar.height
+    
+    // Watch for currentIndex changes
+    onCurrentIndexChanged: {
+        // Update all tab states
+        for (var i = 0; i < tabButtonRepeater.count; i++) {
+            var tab = tabButtonRepeater.itemAt(i)
+            if (tab) {
+                tab.updateActiveState()
             }
         }
     }
     
-    // Refined floating navigation bar with snap points and animations - now vertical
+    // The actual floating bar rectangle
     Rectangle {
         id: floatingBar
         width: compactMode ? 70 : 80 // Adjust width based on screen size
         height: tabButtonColumn.height + 40 // Add padding (20px on top and bottom)
         radius: 28
-        // Use window.modeToggled for theme-aware colors
-        color: window.modeToggled ? "#2D2D2D" : "#4a86e8"
+        color: root.darkMode ? "#2D2D2D" : root.barColor
         
         // Add property to track theme colors
-        property color textColor: window.modeToggled ? "#FFFFFF" : "#FFFFFF"
-        property color activeTextColor: window.modeToggled ? "#FFFFFF" : "#FFFFFF"
-        property color inactiveTextColor: window.modeToggled ? "#B0B0B0" : "#FFFFFFB0"
-        property color highlightColor: window.modeToggled ? "#505050" : "#FFFFFF"
+        property color textColor: root.textColor
+        property color activeTextColor: root.textColor
+        property color inactiveTextColor: darkMode ? "#B0B0B0" : "#FFFFFFB0"
+        property color highlightColor: root.highlightColor
         
         // Add shadow for better floating appearance
         layer.enabled: true
@@ -128,10 +63,25 @@ Item {
         property bool showTooltips: true
         
         // Add property for screen adaptation
-        property bool compactMode: parent.width < 800
+        property bool compactMode: parent.parent ? parent.parent.width < 800 : false
         
         // Add keyboard focus properties for accessibility
         activeFocusOnTab: true
+        
+        // Add property to track if bar is on the left side
+        property bool isOnLeftSide: false
+        
+        // Function to update the side property
+        function updateSidePosition() {
+            // Consider it on the left side if it's closer to the left edge than the right edge
+            isOnLeftSide = x < (parent.parent ? (parent.parent.width - width - x) : 0)
+        }
+        
+        // Update the side position whenever x changes
+        onXChanged: updateSidePosition()
+        
+        // Initialize side position on component completion
+        Component.onCompleted: updateSidePosition()
         
         // Merged states array that combines keyboard focus and dragging states
         states: [
@@ -158,10 +108,14 @@ Item {
         // Handle keyboard navigation
         Keys.onPressed: function(event) {
             if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
-                currentIndex = Math.max(0, currentIndex - 1)
+                var newIndex = Math.max(0, root.currentIndex - 1)
+                root.currentIndex = newIndex
+                root.tabSelected(newIndex)
                 event.accepted = true
             } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
-                currentIndex = Math.min(2, currentIndex + 1)
+                var newIndex = Math.min(root.tabModel.length - 1, root.currentIndex + 1)
+                root.currentIndex = newIndex
+                root.tabSelected(newIndex)
                 event.accepted = true
             }
         }
@@ -171,55 +125,9 @@ Item {
             ColorAnimation { duration: 200 }
         }
         
-        // Initial position - right side
-        x: parent.width - width - 20
-        y: (parent.height - height) / 2
-        
         // Properties for animations and snap points
         property bool snapToEdges: true
         property real snapThreshold: 40 // Distance in pixels to snap to edge
-        property var snapPositions: [
-            {x: 0, y: (parent.height - height) / 2}, // Left center
-            {x: parent.width - width, y: (parent.height - height) / 2}, // Right center
-            {x: (parent.width - width) / 2, y: 0}, // Top center
-            {x: (parent.width - width) / 2, y: parent.height - height}, // Bottom center
-            {x: 0, y: 0}, // Top left
-            {x: parent.width - width, y: 0}, // Top right
-            {x: 0, y: parent.height - height}, // Bottom left
-            {x: parent.width - width, y: parent.height - height} // Bottom right
-        ]
-        
-        // Property for current tab index with proper change handling
-        property int currentIndex: 0
-        
-        // Add property to track if bar is on the left side
-        property bool isOnLeftSide: false
-        
-        // Function to update the side property
-        function updateSidePosition() {
-            // Consider it on the left side if it's closer to the left edge than the right edge
-            isOnLeftSide = x < (parent.width - width - x)
-        }
-        
-        // Update the side position whenever x changes
-        onXChanged: updateSidePosition()
-        
-        // Initialize side position on component completion
-        Component.onCompleted: updateSidePosition()
-        
-        // Observe changes to the currentIndex property
-        Connections {
-            target: floatingBar
-            function onCurrentIndexChanged() {
-                // Update all tab states
-                for (var i = 0; i < tabButtonRepeater.count; i++) {
-                    var tab = tabButtonRepeater.itemAt(i)
-                    if (tab) {
-                        tab.updateActiveState()
-                    }
-                }
-            }
-        }
         
         // Smooth position animations
         Behavior on x {
@@ -282,11 +190,7 @@ Item {
             
             Repeater {
                 id: tabButtonRepeater
-                model: [
-                    { text: "Wind Turbine", icon: "⚡", index: 0 },
-                    { text: "Transformer", icon: "🔌", index: 1 },
-                    { text: "Protection", icon: "🛡️", index: 2 }
-                ]
+                model: root.tabModel
                 
                 Item {
                     id: tabButton
@@ -302,7 +206,7 @@ Item {
                     
                     // Function to update active state
                     function updateActiveState() {
-                        isActive = (floatingBar.currentIndex === tabButtonIndex)
+                        isActive = (root.currentIndex === tabButtonIndex)
                     }
                     
                     // Initialize on component completion
@@ -354,7 +258,7 @@ Item {
                         width: 5
                         height: 5
                         radius: 2.5
-                        color: window.modeToggled ? floatingBar.textColor : "#333333" // Dark in light mode
+                        color: root.darkMode ? floatingBar.textColor : "#333333" // Dark in light mode
                         anchors.verticalCenter: parent.verticalCenter
                         
                         // Fix the shape issue by ensuring aspect ratio and size is maintained
@@ -475,7 +379,8 @@ Item {
                         hoverEnabled: true
                         
                         onClicked: {
-                            floatingBar.currentIndex = tabButtonIndex
+                            root.currentIndex = tabButtonIndex
+                            root.tabSelected(tabButtonIndex)
                             rippleEffect.opacity = 0.4
                             rippleAnimation.start()
                         }
@@ -509,9 +414,9 @@ Item {
             anchors.fill: parent
             drag.target: floatingBar
             drag.minimumX: 0
-            drag.maximumX: root.width - floatingBar.width
+            drag.maximumX: root.parent ? root.parent.width - floatingBar.width : 0
             drag.minimumY: 0
-            drag.maximumY: root.height - floatingBar.height
+            drag.maximumY: root.parent ? root.parent.height - floatingBar.height : 0
             drag.threshold: 5
             z: 1
             
@@ -521,7 +426,7 @@ Item {
             // Enable mouse events to pass through to children when not dragging
             propagateComposedEvents: true
             
-            function onPressed(mouse) {
+            onPressed: function(mouse) {
                 startPosition = Qt.point(floatingBar.x, floatingBar.y)
                 // Use the top 20px as drag handle area
                 if (mouseX < 20) {
@@ -536,7 +441,7 @@ Item {
                 }
             }
             
-            function onPositionChanged(mouse) {
+            onPositionChanged: function(mouse) {
                 if (!isDragging) {
                     drag.target = null
                     mouse.accepted = false
@@ -546,7 +451,7 @@ Item {
                 }
             }
             
-            function onReleased(mouse) {
+            onReleased: function(mouse) {
                 cursorShape = Qt.ArrowCursor
                 isDragging = false
                 
@@ -560,67 +465,71 @@ Item {
                         return
                     }
                     
-                    // Snap to closest position if enabled
-                    var closestDist = Number.MAX_VALUE
-                    var closestPos = null
+                    if (floatingBar.snapToEdges && root.parent) {
+                        // Calculate snap positions dynamically based on parent size
+                        var parentWidth = root.parent.width
+                        var parentHeight = root.parent.height
+                        var snapPositions = [
+                            {x: 0, y: (parentHeight - floatingBar.height) / 2}, // Left center
+                            {x: parentWidth - floatingBar.width, y: (parentHeight - floatingBar.height) / 2}, // Right center
+                            {x: (parentWidth - floatingBar.width) / 2, y: 0}, // Top center
+                            {x: (parentWidth - floatingBar.width) / 2, y: parentHeight - floatingBar.height}, // Bottom center
+                            {x: 0, y: 0}, // Top left
+                            {x: parentWidth - floatingBar.width, y: 0}, // Top right
+                            {x: 0, y: parentHeight - floatingBar.height}, // Bottom left
+                            {x: parentWidth - floatingBar.width, y: parentHeight - floatingBar.height} // Bottom right
+                        ]
                     
-                    for (var i = 0; i < floatingBar.snapPositions.length; i++) {
-                        var pos = floatingBar.snapPositions[i]
-                        var dist = Math.sqrt(
-                            Math.pow(floatingBar.x - pos.x, 2) + 
-                            Math.pow(floatingBar.y - pos.y, 2)
-                        )
+                        // Snap to closest position if enabled
+                        var closestDist = Number.MAX_VALUE
+                        var closestPos = null
                         
-                        if (dist < closestDist) {
-                            closestDist = dist
-                            closestPos = pos
+                        for (var i = 0; i < snapPositions.length; i++) {
+                            var pos = snapPositions[i]
+                            var dist = Math.sqrt(
+                                Math.pow(floatingBar.x - pos.x, 2) + 
+                                Math.pow(floatingBar.y - pos.y, 2)
+                            )
+                            
+                            if (dist < closestDist) {
+                                closestDist = dist
+                                closestPos = pos
+                            }
                         }
-                    }
-                    
-                    // Add edge snap detection
-                    var leftDist = Math.abs(floatingBar.x)
-                    var rightDist = Math.abs((root.width - floatingBar.width) - floatingBar.x)
-                    var topDist = Math.abs(floatingBar.y)
-                    var bottomDist = Math.abs((root.height - floatingBar.height) - floatingBar.y)
-                    
-                    if (leftDist < floatingBar.snapThreshold && leftDist < closestDist) {
-                        closestPos = {x: 0, y: floatingBar.y}
-                        closestDist = leftDist
-                    }
-                    if (rightDist < floatingBar.snapThreshold && rightDist < closestDist) {
-                        closestPos = {x: root.width - floatingBar.width, y: floatingBar.y}
-                        closestDist = rightDist
-                    }
-                    if (topDist < floatingBar.snapThreshold && topDist < closestDist) {
-                        closestPos = {x: floatingBar.x, y: 0}
-                        closestDist = topDist
-                    }
-                    if (bottomDist < floatingBar.snapThreshold && bottomDist < closestDist) {
-                        closestPos = {x: floatingBar.x, y: root.height - floatingBar.height}
-                        closestDist = bottomDist
-                    }
-                    
-                    // Apply the snap position
-                    if (closestPos) {
-                        floatingBar.x = closestPos.x
-                        floatingBar.y = closestPos.y
+                        
+                        // Add edge snap detection
+                        var leftDist = Math.abs(floatingBar.x)
+                        var rightDist = Math.abs((parentWidth - floatingBar.width) - floatingBar.x)
+                        var topDist = Math.abs(floatingBar.y)
+                        var bottomDist = Math.abs((parentHeight - floatingBar.height) - floatingBar.y)
+                        
+                        if (leftDist < floatingBar.snapThreshold && leftDist < closestDist) {
+                            closestPos = {x: 0, y: floatingBar.y}
+                            closestDist = leftDist
+                        }
+                        if (rightDist < floatingBar.snapThreshold && rightDist < closestDist) {
+                            closestPos = {x: parentWidth - floatingBar.width, y: floatingBar.y}
+                            closestDist = rightDist
+                        }
+                        if (topDist < floatingBar.snapThreshold && topDist < closestDist) {
+                            closestPos = {x: floatingBar.x, y: 0}
+                            closestDist = topDist
+                        }
+                        if (bottomDist < floatingBar.snapThreshold && bottomDist < closestDist) {
+                            closestPos = {x: floatingBar.x, y: parentHeight - floatingBar.height}
+                            closestDist = bottomDist
+                        }
+                        
+                        // Apply the snap position
+                        if (closestPos) {
+                            floatingBar.x = closestPos.x
+                            floatingBar.y = closestPos.y
+                        }
                     }
                 } else {
                     // Not dragging, let other MouseAreas handle it
                     mouse.accepted = false
                 }
-            }
-            
-            // Helper function to walk up parent chain looking for tabButton
-            function getTabButtonParent(item) {
-                var current = item
-                while (current) {
-                    if (current.objectName === "tabButton") {
-                        return current
-                    }
-                    current = current.parent
-                }
-                return null
             }
             
             // Handle cursor appearance during hover over handle
@@ -641,45 +550,19 @@ Item {
                 }
             }
         }
-
-        Connections {
-            target: window
-            function onModeToggledChanged() {
-                var isDarkTheme = window.modeToggled
-                floatingBar.color = isDarkTheme ? "#2D2D2D" : "#4a86e8"
-                floatingBar.textColor = isDarkTheme ? "#FFFFFF" : "#FFFFFF"
-                floatingBar.activeTextColor = isDarkTheme ? "#FFFFFF" : "#FFFFFF"
-                floatingBar.inactiveTextColor = isDarkTheme ? "#B0B0B0" : "#FFFFFFB0"
-                floatingBar.highlightColor = isDarkTheme ? "#505050" : "#FFFFFF"
-            }
-        }
     }
     
-    // Add a double-click shortcut to reset bar position
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onDoubleClicked: {
-            // Reset floatingBar to default position (right center)
+    // Public methods
+    function resetPosition() {
+        if (parent) {
             floatingBar.x = parent.width - floatingBar.width - 20
             floatingBar.y = (parent.height - floatingBar.height) / 2
         }
-        z: -1 // Place below other elements
     }
     
-    // Add keyboard shortcut for tab switching
-    Shortcut {
-        sequence: "Ctrl+1"
-        onActivated: floatingBar.currentIndex = 0
-    }
-    
-    Shortcut {
-        sequence: "Ctrl+2"
-        onActivated: floatingBar.currentIndex = 1
-    }
-    
-    Shortcut {
-        sequence: "Ctrl+3"
-        onActivated: floatingBar.currentIndex = 2
+    // Function to position the tabbar initially
+    function setPosition(x, y) {
+        floatingBar.x = x
+        floatingBar.y = y
     }
 }
