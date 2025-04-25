@@ -63,82 +63,55 @@ class WindTurbineCalculator(QObject):
     def _calculate(self):
         """Calculate wind turbine parameters based on inputs"""
         try:
-            logger.info("\n=== Starting Wind Turbine Calculations ===")
-            logger.info(f"Input Parameters:")
-            logger.info(f"• Blade Radius: {self._blade_radius} m")
-            logger.info(f"• Wind Speed: {self._wind_speed} m/s")
-            logger.info(f"• Air Density: {self._air_density} kg/m³")
-            logger.info(f"• Power Coefficient: {self._power_coefficient}")
-            logger.info(f"• Generator Efficiency: {self._efficiency*100}%")
-            
             # Calculate swept area
             self._swept_area = math.pi * self._blade_radius * self._blade_radius
-            logger.info(f"\nSwept Area: {self._swept_area:.2f} m²")
             
             # Calculate theoretical power
             self._theoretical_power = 0.5 * self._air_density * self._swept_area * math.pow(self._wind_speed, 3)
-            logger.info(f"Theoretical Power: {self._theoretical_power/1000:.2f} kW")
             
             # Calculate actual power with proper handling of rated power
             if self._wind_speed < self._cut_in_speed:
-                logger.info(f"Wind speed below cut-in speed ({self._cut_in_speed} m/s)")
                 self._actual_power = 0.0
             elif self._wind_speed > self._cut_out_speed:
-                logger.info(f"Wind speed above cut-out speed ({self._cut_out_speed} m/s)")
                 self._actual_power = 0.0
             else:
                 # Check if we have rated power and are above rated wind speed
                 has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
                 
                 if has_rated_specs:
-                    # Log rated power information
-                    logger.info(f"Turbine has specified rated power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s")
-                    
                     # For V27 and similar commercial turbines with a fixed rated power
                     if self._wind_speed >= self._rated_wind_speed:
                         # When above rated wind speed, use the rated power (constant power region)
                         self._actual_power = self._rated_power
-                        logger.info(f"Wind speed ({self._wind_speed} m/s) >= rated speed, using rated power of {self._rated_power/1000:.2f} kW")
                     else:
                         # Below rated wind speed, calculate power normally
                         calculated_power = self._theoretical_power * self._power_coefficient * self._efficiency
                         # Make sure we don't exceed rated power
                         self._actual_power = min(calculated_power, self._rated_power)
-                        logger.info(f"Wind speed below rated speed, calculated power: {calculated_power/1000:.2f} kW, limited to: {self._actual_power/1000:.2f} kW")
                 else:
                     # Normal power calculation based on wind speed cubed (for generic turbines)
                     self._actual_power = self._theoretical_power * self._power_coefficient * self._efficiency
-                    logger.info(f"Generic turbine calculation: {self._actual_power/1000:.2f} kW")
-                
-                logger.info(f"Final power output: {self._actual_power/1000:.2f} kW")
-            
+
             # Calculate annual energy
             # Fix: Use a more accurate capacity factor approach for annual energy
             hours_in_year = 8760
             capacity_factor = 0.35  # A typical capacity factor for wind turbines
             self._annual_energy = (self._actual_power / 1000) * capacity_factor * hours_in_year / 1000
-            logger.info(f"\nAnnual Energy Production: {self._annual_energy:.2f} MWh")
 
             # Calculate generator capacity (kVA)
             # Fix: Power factor of ~0.85 is typical for wind turbines
             power_factor = 0.85
             self._rated_capacity = (self._actual_power / 1000) / power_factor
-            logger.info(f"\nRated Capacity: {self._rated_capacity:.2f} kVA")
 
             # Calculate output current at 400V (3-phase)
             if self._actual_power > 0:
                 self._output_current = (self._actual_power) / (math.sqrt(3) * 400 * power_factor)
-                logger.info(f"\nOutput Current: {self._output_current:.2f} A")
             else:
                 self._output_current = 0.0
-                logger.info("\nOutput Current: 0.00 A (no power generation)")
             
             # Generate power curve
-            logger.info("\nGenerating Power Curve...")
             self._generate_power_curve()
-            
-            logger.info("=== Wind Turbine Calculations Complete ===\n")
-            
+
             # Emit signals
             self.calculationCompleted.emit()
             self.calculationsComplete.emit()
@@ -161,11 +134,9 @@ class WindTurbineCalculator(QObject):
             
             # Print debug info about rated specs
             if has_rated_specs:
-                logger.info(f"Using rated specs: Power = {self._rated_power/1000} kW at {self._rated_wind_speed} m/s")
                 rated_power = self._rated_power
                 rated_wind_speed = self._rated_wind_speed
             else:
-                logger.info("No rated specs defined, using standard calculation")
                 rated_power = None
                 # Without rated specs, we'll use a calculated wind speed that gives max power
                 rated_wind_speed = self._wind_speed if self._wind_speed > 0 else 12.0
@@ -220,11 +191,9 @@ class WindTurbineCalculator(QObject):
         has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
         if has_rated_specs and speed >= self._rated_wind_speed:
             # Use debug level for detailed calculation info instead of info level
-            logger.debug(f"Using rated power: {self._rated_power/1000:.2f} kW (speed: {speed} >= rated: {self._rated_wind_speed})")
             return self._rated_power
         elif has_rated_specs:
             limited_power = min(calculated_power, self._rated_power)
-            logger.debug(f"Limited power: {limited_power/1000:.2f} kW (speed: {speed}, rated: {self._rated_wind_speed})")
             return limited_power
         else:
             return calculated_power
@@ -436,9 +405,7 @@ class WindTurbineCalculator(QObject):
                                     self._power_coefficient * self._efficiency), 
                 1/3
             )
-            
-            logger.info(f"V27 Parameters loaded - Rated power: {self._rated_power/1000:.2f} kW at {self._rated_wind_speed:.2f} m/s")
-            
+
             # Important: Set wind speed to at least the rated wind speed to show full power capability
             # This ensures the UI shows the rated power immediately
             if self._wind_speed < self._rated_wind_speed:
@@ -459,7 +426,6 @@ class WindTurbineCalculator(QObject):
             self.calculationsComplete.emit()
             self.calculationCompleted.emit()
             
-            logger.info(f"Loaded Vestas V27 parameters (rated power: 225kW at {self._rated_wind_speed:.1f} m/s)")
             return True
         except Exception as e:
             logger.error(f"Error loading Vestas V27 parameters: {e}")
@@ -473,12 +439,12 @@ class WindTurbineCalculator(QObject):
     @Slot()
     def refreshCalculations(self):
         """Force refresh of all calculations"""
-        logger.info("Refreshing wind turbine calculations")
         self._calculate()
         # Ensure the power curve is regenerated
         self._generate_power_curve()
         return True
-        
+    
+    # not used in qml anymore
     @Slot()
     def debugTurbineState(self):
         """Print debug information about the turbine state"""

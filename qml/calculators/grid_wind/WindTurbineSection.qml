@@ -306,6 +306,7 @@ Item {
 
                             RowLayout {
                                 Layout.columnSpan: 2
+                                Layout.alignment: Qt.AlignHCenter
 
                                 StyledButton {
                                     text: "Vestas V27"
@@ -327,7 +328,6 @@ Item {
                                             
                                             // Force immediate recalculation and update
                                             updatePowerCurve()
-                                            calculator.debugTurbineState()
                                         }
                                     }
                                 }
@@ -340,21 +340,6 @@ Item {
                                     ToolTip.text: "View Vestas V27 statistics"
                                     ToolTip.delay: 500
                                     ToolTip.visible: hovered
-                                }
-                                
-                                StyledButton {
-                                    text: "Debug"
-                                    visible: true // Set to true to show debug button
-                                    Layout.alignment: Qt.AlignRight
-                                    ToolTip.text: "Debug turbine state. View information via the log button on the home page"
-                                    ToolTip.visible: hovered
-                                    ToolTip.delay: 500
-                                    
-                                    onClicked: {
-                                        if (calculatorReady) {
-                                            calculator.debugTurbineState()
-                                        }
-                                    }
                                 }
                             }
                         }

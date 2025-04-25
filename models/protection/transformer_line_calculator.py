@@ -17,10 +17,10 @@ class TransformerLineCalculator(QObject):
     transformerChanged = Signal()
     lineChanged = Signal()
     loadChanged = Signal()
-    voltageRegulatorChanged = Signal()  # New signal for voltage regulator
+    voltageRegulatorChanged = Signal()
     calculationCompleted = Signal()  # Main signal
     calculationsComplete = Signal()  # Additional alias signal for QML compatibility
-    pdfExportStatusChanged = Signal(bool, str)  # Add new signal for PDF export status
+    pdfExportStatusChanged = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -31,6 +31,7 @@ class TransformerLineCalculator(QObject):
         self._transformer_rating = 300.0  # kVA
         self._transformer_impedance = 4.5  # %
         self._transformer_x_r_ratio = 8.0  # X/R ratio
+        self._transformer_flc = 29.2 # HV FLC
         
         # Line parameters (5km cable)
         self._line_length = 5.0  # km
@@ -139,21 +140,17 @@ class TransformerLineCalculator(QObject):
     def exportTransformerReport(self):
         """Export transformer calculations to PDF"""
         try:
-            # Create timestamp for filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
             # If no filepath provided, use FileSaver to get one
             pdf_file = self._file_saver.get_save_filepath("pdf", f"transformer_line_results_{timestamp}")
             if not pdf_file:
-                # Let QML know the export was canceled
                 self.pdfExportStatusChanged.emit(False, "PDF export canceled")
                 return False
-            
-            # Clean up filepath using FileSaver's helper methods
+
             pdf_file = self._file_saver.clean_filepath(pdf_file)
             pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
 
-            # Prepare data for export
             export_data = {
                 # Transformer parameters
                 "transformer_rating": self._transformer_rating,
@@ -207,13 +204,11 @@ class TransformerLineCalculator(QObject):
                 "thd_limit": self._thd_limit,
                 "differential_settings": self._differential_settings
             }
-            
-            # Generate PDF content
+
             generator = PDFGenerator()
 
             result = generator.generate_transformer_report(export_data, pdf_file)
 
-            # Signal success or failure
             if result:
                 self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
                 return True
@@ -224,7 +219,6 @@ class TransformerLineCalculator(QObject):
         except Exception as e:
             error_msg = (f"Error exporting transformer report: {e}")
             logger.error(error_msg)
-            # Send error to QML
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 
@@ -238,26 +232,22 @@ class TransformerLineCalculator(QObject):
             else:
                 js_data = data
 
-            # Create timestamp for filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
             # If no filepath provided, use FileSaver to get one
             pdf_file = self._file_saver.get_save_filepath("pdf", f"wind_protection_results_{timestamp}")
             if not pdf_file:
-                # Let QML know the export was canceled
                 self.pdfExportStatusChanged.emit(False, "PDF export canceled")
                 return False
             
             # Clean up filepath using FileSaver's helper methods
             pdf_file = self._file_saver.clean_filepath(pdf_file)
             pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
-            
-            # Generate PDF content
+
             generator = PDFGenerator()
 
             result = generator.generate_protection_report(js_data, pdf_file)
 
-            # Signal success or failure
             if result:
                 self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
                 return True
@@ -269,8 +259,7 @@ class TransformerLineCalculator(QObject):
             logger.error(f"Error exporting protection report: {e}")
             import traceback
             logger.error(traceback.format_exc())
-            
-            # Consistent error reporting
+
             error_msg = f"Error saving PDF: {str(e)}"
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
@@ -321,7 +310,7 @@ class TransformerLineCalculator(QObject):
             if not curve:
                 return 0.0
             
-            # Improved IEC standard formula implementation
+            # IEC standard formula implementation
             numerator = curve["a"] * self._relay_time_dial
             denominator = (current_multiple**curve["b"]) - 1
             
@@ -384,6 +373,69 @@ class TransformerLineCalculator(QObject):
         except Exception as e:
             logger.error(f"Error calculating differential protection: {e}")
             return None
+    @Slot()
+    def debug_calculations(self):
+        try:
+            logger.info("\nTransformer Impedance:")
+            logger.info(f"Total Z: {self._transformer_z:.2f} ohm")
+            logger.info(f"R: {self._transformer_r:.2f} ohm")
+            logger.info(f"X: {self._transformer_x:.2f} ohm")
+
+            logger.info("\nLine Parameters:")
+            logger.info(f"R per km: {self._line_r:.3f} ohm")
+            logger.info(f"X per km: {self._line_x:.3f} ohm")
+            logger.info(f"Length: {self._line_length:.2f} km")
+            logger.info(f"Total Z: {abs(self._line_total_z):.2f} ohm at angle {math.degrees(cmath.phase(self._line_total_z)):.1f} deg")
+
+            logger.info("\nGround Fault Calculation:")
+            logger.info(f"Z0 Transformer: {abs(self._z0_transformer):.2f} ohms")
+            logger.info(f"Z0 Line: {abs(self._z0_line):.2f} ohms")
+            if 'z_ng' in locals(): logger.info(f"NGR (referred to HV): {abs(self._z_ng_referred):.2f} ohms")
+            logger.info(f"Ground Fault Current: {self._ground_fault_current:.3f} kA")
+
+            logger.info(f"\nLV Fault Current Calculation:")
+            logger.info(f"LV Fault Current: {self._fault_current_lv:.2f} kA")
+            
+            logger.info("\nFault Current Calculations:")
+            logger.info(f"Three-phase fault: {self._fault_current_hv:.2f} kA")
+            logger.info(f"SLG fault: {self._fault_current_slg:.2f} kA")
+            logger.info(f"Ground fault: {self._ground_fault_current:.2f} kA")
+
+            logger.info("\nVoltage Drop Calculation:")
+            logger.info(f"Voltage Drop: {self._voltage_drop:.2f}%")
+            logger.info(f"Unregulated Voltage: {self._unregulated_voltage:.2f} kV")
+
+            diff_settings = self._differential_settings
+
+            logger.info("\nDifferential Protection Settings:")
+            logger.info(f"HV CT Ratio: {diff_settings['hv_ct_ratio']}")
+            logger.info(f"LV CT Ratio: {diff_settings['lv_ct_ratio']}")
+            logger.info(f"Pickup Current: {diff_settings['pickup_current']:.2f} A")
+            logger.info(f"Slope 1: {diff_settings['slope1']*100:.0f}%")
+            logger.info(f"Slope 2: {diff_settings['slope2']*100:.0f}%")
+
+            logger.info("\nVoltage Regulator:")
+            logger.info(f"Target Voltage: {self._voltage_regulator_target:.2f} kV")
+            logger.info(f"Tap Position: {self._regulator_tap_position}")
+            logger.info(f"Regulated Voltage: {self._regulated_voltage:.2f} kV")
+            logger.info(f"Single Phase Capacity: {self._voltage_regulator_capacity:.1f} kVA")
+            logger.info(f"Three Phase Capacity: {self._regulator_three_phase_capacity:.1f} kVA")
+
+            logger.info(f"\nProtection Settings:")
+            logger.info(f"Transformer FLC: {self._transformer_flc:.2f} A")
+            logger.info(f"Relay Pickup: {self._relay_pickup_current:.2f} A")
+            logger.info(f"Selected CT Ratio: {self._relay_ct_ratio}")
+
+            logger.info("\nHarmonic Current Limits:")
+
+            # Calculate harmonic limits
+            harmonic_limits = self._calculate_harmonic_limits(self._transformer_flc)
+
+            for harmonic, limit in harmonic_limits.items():
+                logger.info(f"{harmonic}th harmonic: {limit:.2f} A")
+
+        except Exception as e:
+            logger.error(f"Error logging values: {str(e)}")
 
     def _calculate_harmonic_limits(self, current):
         """Calculate harmonic current limits"""
@@ -399,8 +451,6 @@ class TransformerLineCalculator(QObject):
     def _calculate(self):
         """Calculate transformer-line-load parameters"""
         try:
-            logger.info("\n=== Starting Transformer-Line Calculations ===")
-            
             # 1. Calculate base values
             base_mva = self._transformer_rating / 1000  # Convert kVA to MVA
             base_v_hv = self._transformer_hv_voltage / 1000  # Convert V to kV
@@ -414,25 +464,12 @@ class TransformerLineCalculator(QObject):
             angle = math.atan(self._transformer_x_r_ratio)
             self._transformer_r = self._transformer_z * math.cos(angle)
             self._transformer_x = self._transformer_z * math.sin(angle)
-            
-            logger.info("\nTransformer Impedance:")
-            logger.info(f"Base Z: {base_z_hv:.2f} ohm")
-            logger.info(f"Z (pu): {z_pu:.3f}")
-            logger.info(f"Total Z: {self._transformer_z:.2f} ohm")
-            logger.info(f"R: {self._transformer_r:.2f} ohm")
-            logger.info(f"X: {self._transformer_x:.2f} ohm")
-            
+
             # Calculate line impedance
             self._line_total_z = complex(self._line_r * self._line_length, 
                                          self._line_x * self._line_length)
-            
-            logger.info("\nLine Parameters:")
-            logger.info(f"R per km: {self._line_r:.3f} ohm")
-            logger.info(f"X per km: {self._line_x:.3f} ohm")
-            logger.info(f"Length: {self._line_length:.2f} km")
-            logger.info(f"Total Z: {abs(self._line_total_z):.2f} ohm at angle {math.degrees(cmath.phase(self._line_total_z)):.1f} deg")
-            
-            # Improved fault current calculations using sequence components
+
+            # Fault current calculations using sequence components
             # Calculate transformer impedance
             z1_transformer = complex(self._transformer_r, self._transformer_x)  # Positive sequence
             z2_transformer = z1_transformer  # Negative sequence equals positive
@@ -451,7 +488,7 @@ class TransformerLineCalculator(QObject):
             z0_total = z0_transformer + z0_line
             
             # Three-phase fault current (uses only positive sequence)
-            # Fixed calculation using line-to-line voltage
+            # Calculation using line-to-line voltage
             self._fault_current_hv = (self._transformer_hv_voltage / (math.sqrt(3) * abs(z1_total))) / 1000  # kA
             
             # Single-line-to-ground fault current (uses all sequences)
@@ -459,7 +496,7 @@ class TransformerLineCalculator(QObject):
             v_ln = self._transformer_hv_voltage / math.sqrt(3)  # Line-to-neutral voltage
             self._fault_current_slg = (3 * v_ln / abs(z1_total + z2_total + z0_total)) / 1000  # kA
             
-            # Improved ground fault current calculation
+            # Ground fault current calculation
             # First check transformer configuration (assume delta-wye with grounded neutral)
             is_delta_primary = True  # HV side is typically delta in distribution transformers
             
@@ -499,33 +536,15 @@ class TransformerLineCalculator(QObject):
             self._z0_line = abs(z0_line)
             self._z_ng_referred = abs(z_ng) if 'z_ng' in locals() else 0.0
             
-            logger.info("\nGround Fault Calculation:")
-            logger.info(f"Transformer Configuration: {'Delta-Wye' if is_delta_primary else 'Wye-Delta/Wye'}")
-            logger.info(f"Z0 Transformer: {abs(z0_transformer):.2f} ohms")
-            logger.info(f"Z0 Line: {abs(z0_line):.2f} ohms")
-            if 'z_ng' in locals():
-                logger.info(f"NGR (referred to HV): {abs(z_ng):.2f} ohms")
-            logger.info(f"Ground Fault Current: {self._ground_fault_current:.3f} kA")
-            
             # Calculate LV fault current using transformer impedance referred to LV side
             z_base_lv = (self._transformer_lv_voltage**2) / (self._transformer_rating * 1000)
             z_t_lv = z_pu * z_base_lv
             
-            # Fixed LV fault current calculation using proper three-phase formula
-            # For three-phase fault current, we use line-to-line voltage
+            # LV fault current calculation
+            # Use line-to-line voltage
             self._fault_current_lv = (self._transformer_lv_voltage / (math.sqrt(3) * abs(z_t_lv))) / 1000  # Convert to kA
-            
-            logger.info(f"\nLV Fault Current Calculation:")
-            logger.info(f"Base Z (LV): {z_base_lv:.4f} ohm")
-            logger.info(f"Transformer Z (LV): {z_t_lv:.4f} ohm")
-            logger.info(f"LV Fault Current: {self._fault_current_lv:.2f} kA")
-            
-            logger.info("\nFault Current Calculations:")
-            logger.info(f"Three-phase fault: {self._fault_current_hv:.2f} kA")
-            logger.info(f"SLG fault: {self._fault_current_slg:.2f} kA")
-            logger.info(f"Ground fault: {self._ground_fault_current:.2f} kA")
-            
-            # Calculate voltage drop with improved accuracy using complex power factor
+
+            # Calculate voltage drop using complex power factor
             # Get load current with power factor
             load_current = (self._load_mva * 1e6) / (math.sqrt(3) * self._transformer_hv_voltage)
             load_angle = math.acos(self._load_pf)
@@ -545,12 +564,6 @@ class TransformerLineCalculator(QObject):
             # Calculate voltage drop percentage more accurately
             self._voltage_drop = (1 - abs(receiving_voltage_complex) / abs(sending_voltage_complex)) * 100.0
             self._unregulated_voltage = (abs(receiving_voltage_complex) * math.sqrt(3)) / 1000.0  # Convert to kV L-L
-            
-            logger.info("\nVoltage Drop Calculation:")
-            logger.info(f"Load Current: {load_current:.2f} A at angle {math.degrees(-load_angle):.1f} deg")
-            logger.info(f"Total Impedance: {abs(total_impedance):.2f} ohm at angle {math.degrees(cmath.phase(total_impedance)):.1f} deg")
-            logger.info(f"Voltage Drop: {self._voltage_drop:.2f}%")
-            logger.info(f"Unregulated Voltage: {self._unregulated_voltage:.2f} kV")
             
             # Calculate regulator tap position and regulated voltage
             if self._voltage_regulator_enabled:
@@ -572,50 +585,26 @@ class TransformerLineCalculator(QObject):
                 
                 # Calculate final regulated voltage
                 self._regulated_voltage = self._unregulated_voltage * (1 + actual_percent / 100.0)
-                
-                logger.info("\nVoltage Regulator:")
-                logger.info(f"Target Voltage: {target_voltage:.2f} kV")
-                logger.info(f"Required Boost: {required_percent:.2f}%")
-                logger.info(f"Actual Boost: {actual_percent:.2f}%")
-                logger.info(f"Tap Position: {self._regulator_tap_position}")
-                logger.info(f"Regulated Voltage: {self._regulated_voltage:.2f} kV")
+
             else:
                 self._regulated_voltage = self._unregulated_voltage
                 self._regulator_tap_position = 0
             
             # Calculate protection settings
-            transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
-            self._relay_pickup_current = transformer_flc * 1.25  # 125% of FLC
+            self._transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            self._relay_pickup_current = self._transformer_flc * 1.25  # 125% of FLC
             self._relay_time_dial = 0.3  # Default time dial setting
-            
-            # Calculate example trip times
-            trip_times = {
-                "2× pickup": self._calculate_trip_time(2.0),
-                "5× pickup": self._calculate_trip_time(5.0),
-                "10× pickup": self._calculate_trip_time(10.0)
-            }
-            
-            logger.info("\nRelay Trip Times:")
-            for condition, time in trip_times.items():
-                logger.info(f"{condition}: {time:.3f}s")
-            
+
             # CT ratio selection
             standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200]
-            ct_primary = next((x for x in standard_ct_ratios if x > transformer_flc * 1.25), 1200)
+            ct_primary = next((x for x in standard_ct_ratios if x > self._transformer_flc * 1.25), 1200)
             self._relay_ct_ratio = f"{ct_primary}/1"
-            
-            logger.info(f"\nProtection Settings:")
-            logger.info(f"Transformer FLC: {transformer_flc:.2f} A")
-            logger.info(f"Relay Pickup: {self._relay_pickup_current:.2f} A")
-            logger.info(f"Selected CT Ratio: {self._relay_ct_ratio}")
-            
+
             # Calculate voltage regulator values
             if self._voltage_regulator_enabled:
                 # For delta configuration, calculate the effective three-phase power capacity
                 self._regulator_three_phase_capacity = self._voltage_regulator_capacity * 3.0
-                logger.info(f"\nVoltage Regulator:")
-                logger.info(f"Single Phase Capacity: {self._voltage_regulator_capacity:.1f} kVA")
-                logger.info(f"Three Phase Capacity: {self._regulator_three_phase_capacity:.1f} kVA")
+
             else:
                 self._regulator_three_phase_capacity = 0.0
             
@@ -623,23 +612,11 @@ class TransformerLineCalculator(QObject):
             diff_settings = self._calculate_differential_protection()
             if diff_settings:
                 self._differential_settings = diff_settings
-                logger.info("\nDifferential Protection Settings:")
-                logger.info(f"HV CT Ratio: {diff_settings['hv_ct_ratio']}")
-                logger.info(f"LV CT Ratio: {diff_settings['lv_ct_ratio']}")
-                logger.info(f"Pickup Current: {diff_settings['pickup_current']:.2f} A")
-                logger.info(f"Slope 1: {diff_settings['slope1']*100:.0f}%")
-                logger.info(f"Slope 2: {diff_settings['slope2']*100:.0f}%")
-            
-            # Calculate harmonic limits
-            harmonic_limits = self._calculate_harmonic_limits(transformer_flc)
-            logger.info("\nHarmonic Current Limits:")
-            for harmonic, limit in harmonic_limits.items():
-                logger.info(f"{harmonic}th harmonic: {limit:.2f} A")
-            
-            # 4. Calculate cable sizes based on actual currents
+
+            # Calculate cable sizes based on actual currents
             self._calculate_cable_sizes()
 
-            # Add additional calculations that were previously in QML
+            # Calculate advanced parameters
             self._calculate_additional_parameters()
             
             # Ensure signal emission after all calculations
@@ -647,7 +624,6 @@ class TransformerLineCalculator(QObject):
             self.calculationsComplete.emit()
             
         except Exception as e:
-            print(f"Error in calculations: {str(e)}")
             logger.error(f"Error in transformer-line calculations: {e}")
             logger.exception(e)
     
@@ -668,7 +644,6 @@ class TransformerLineCalculator(QObject):
             logger.debug(f"Recalculated load values: FLC={self._full_load_current:.2f}A, Pickup={self._relay_pickup_current:.2f}A")
             
         except Exception as e:
-            print(f"Error in recalculate_load_values: {str(e)}")
             logger.error(f"Error in recalculate_load_values: {str(e)}")
     
     def _calculate_additional_parameters(self):
@@ -860,7 +835,7 @@ class TransformerLineCalculator(QObject):
         """Update power factor while maintaining constant real power"""
         try:
             if new_pf <= 0 or new_pf > 1:
-                print(f"Invalid power factor value: {new_pf}")
+                logger.error(f"Invalid power factor value: {new_pf}")
                 return
                 
             # Calculate current real power
@@ -868,10 +843,6 @@ class TransformerLineCalculator(QObject):
             
             # Calculate new MVA needed to maintain same real power at new PF
             new_mva = current_real_power / new_pf
-            
-            logger.info(f"Updating power factor from {self._load_pf:.2f} to {new_pf:.2f}")
-            logger.info(f"Maintaining real power at {current_real_power:.4f} MW")
-            logger.info(f"New apparent power: {new_mva:.4f} MVA")
             
             # Update both values
             self._load_pf = new_pf
@@ -882,7 +853,7 @@ class TransformerLineCalculator(QObject):
             self.loadChanged.emit()
             
         except Exception as e:
-            print(f"Error updating power factor: {e}")
+            logger.error(f"Error updating power factor: {e}")
 
     # Add properties for voltage regulator
     @Property(bool, notify=voltageRegulatorChanged)
@@ -1178,7 +1149,6 @@ class TransformerLineCalculator(QObject):
         
     @Slot(float)
     def setLoadMVA(self, value):
-        logger.debug(f"setLoadMVA called with value: {value}")
         self._load_mva = value
         self.loadChanged.emit()
         # Don't immediately calculate to avoid repeated calculations

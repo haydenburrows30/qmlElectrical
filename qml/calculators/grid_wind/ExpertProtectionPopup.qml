@@ -610,6 +610,16 @@ Popup {
         RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight
+
+            StyledButton {
+                text: "Debug"
+                icon.source: "../../../icons/rounded/restart_alt.svg"
+                Layout.alignment: Qt.AlignRight
+                ToolTip.visible: hovered
+                ToolTip.text: "Debug calculations.  Check log for output."
+                ToolTip.delay: 500
+                onClicked: calculator.debug_calculations();
+            }
             
             StyledButton {
                 text: "Refresh Values"
