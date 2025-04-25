@@ -35,8 +35,7 @@ Item {
 
     ColumnLayout {
         id: mainLayout
-        anchors.fill: parent
-        anchors.margins: 10
+        anchors.centerIn: parent
 
         // Header with title and help button
         RowLayout {
@@ -67,8 +66,8 @@ Item {
             // Left side - inputs and results
             ColumnLayout {
                 id: leftColumn
-                Layout.maximumWidth: 350
-                Layout.alignment: Qt.AlignTop
+                Layout.minimumWidth: 350
+                // Layout.alignment: Qt.AlignTop
 
                 WaveCard {
                     title: "System Parameters"
@@ -140,6 +139,7 @@ Item {
 
                     GridLayout {
                         columns: 2
+                        anchors.fill: parent
 
                         Label { text: "Base Ampacity:" ;Layout.minimumWidth: 180}
                         TextFieldBlue { 
@@ -170,13 +170,12 @@ Item {
 
             // Right side - visualization
             WaveCard {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                
+                Layout.minimumHeight: leftColumn.height
+                Layout.minimumWidth: 700
+
                 CableAmpacityViz {
                     anchors.fill: parent
-                    anchors.margins: 5
-                    
+
                     cableSize: parseFloat(cableSizeCombo.currentText || "0")
                     insulationType: insulationCombo.currentText || "PVC"
                     installMethod: installMethodCombo.currentText || "Conduit"

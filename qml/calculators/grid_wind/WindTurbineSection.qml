@@ -503,7 +503,7 @@ Item {
                             icon.source: "../../../icons/rounded/restart_alt.svg"
                             anchors.top: parent.top
                             anchors.right: parent.right
-                            anchors.margins: 10
+                            anchors.topMargin: -40
                             
                             ToolTip.text: "Update power curve"
                             ToolTip.delay: 500

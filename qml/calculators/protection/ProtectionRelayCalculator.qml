@@ -494,17 +494,20 @@ Item {
                             
                             // Add this property to control logarithmic point display
                             property bool useLogarithmicPoints: true
+
+                            // Add legend toggle
+                            CheckBox {
+                                text: "Show Legend"
+                                anchors.top: parent.top
+                                anchors.right: parent.right
+                                // anchors.margins: 10
+                                anchors.topMargin: -50
+                                checked: true
+                                onCheckedChanged: relayChart.legend.visible = checked
+                            }
                         }
 
-                        // Add legend toggle
-                        CheckBox {
-                            text: "Show Legend"
-                            anchors.top: parent.top
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            checked: true
-                            onCheckedChanged: relayChart.legend.visible = checked
-                        }
+                        
                     }
                 }
             }

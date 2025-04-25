@@ -35,18 +35,10 @@ Item {
         canvas.requestPaint()
     }
 
-    // Debug rectangle to show component boundaries
-    Rectangle {
-        anchors.fill: parent
-        border.width: 1
-        border.color: "red"
-        color: "transparent"
-        visible: false // Set to true for debugging
-    }
-
     Canvas {
         id: canvas
         anchors.fill: parent
+        anchors.margins: 0
 
         // Make sure we repaint when the component size changes
         onWidthChanged: requestPaint()
@@ -75,15 +67,15 @@ Item {
             var currentColor = darkMode ? "#FFD700" : "#FFA500";
             
             // Draw transmission line representation
-            drawTransmissionLine(ctx, width * 0.1, height * 0.2, width * 0.8, height * 0.2, lineColor);
+            drawTransmissionLine(ctx, width * 0.08, height * 0.2, width * 0.7, height * 0.3, lineColor);
             
             // Draw wave propagation
-            drawWavePropagation(ctx, width * 0.1, height * 0.5, width * 0.8, height * 0.2, 
+            drawWavePropagation(ctx, width * 0.08, height * 0.6, width * 0.7, height * 0.3, 
                               voltageColor, currentColor);
             
             // Fix phasor diagram drawing
-            var phasorSize = Math.min(width * 0.2, height * 0.2);
-            drawPhasorDiagram(ctx, width * 0.7, height * 0.8, phasorSize, voltageColor, currentColor);
+            var phasorSize = Math.min(width * 0.4, height * 0.4);
+            drawPhasorDiagram(ctx, width * 0.9, height * 0.2, phasorSize, voltageColor, currentColor);
         }
         
         function drawTransmissionLine(ctx, x, y, width, height, color) {
@@ -222,7 +214,7 @@ Item {
         
         function drawPhasorDiagram(ctx, centerX, centerY, size, vColor, iColor) {
             // Calculate a safe radius value
-            var phasorRadius = Math.max(10, Math.min(size/2, Math.min(canvas.width, canvas.height) * 0.15));
+            var phasorRadius = Math.max(10, Math.min(size/2, Math.min(canvas.width, canvas.height) * 0.2));
             
             // Draw circle
             ctx.strokeStyle = textColor.toString();

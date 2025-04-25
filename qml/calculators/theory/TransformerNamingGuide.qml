@@ -46,8 +46,8 @@ Item {
 
             ColumnLayout {
                 id: mainLayout
-                width: scrollView.width - 10
-                spacing: 10
+                // width: scrollView.width - 10
+                anchors.centerIn: parent
 
                 // Header with title and help button
                 RowLayout {
@@ -76,223 +76,214 @@ Item {
                 // Main content layout
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: 20
 
-                    // Left side - Inputs
-                    WaveCard {
-                        title: "Transformer Parameters"
-                        Layout.minimumWidth: 350
-                        Layout.fillHeight: true
-                        
-                        GridLayout {
-                            columns: 2
-                            columnSpacing: 10
-                            rowSpacing: 10
-                            width: parent.width
+                    ColumnLayout {
+                        id: leftColumn
+                        // Left side - Inputs
+                        WaveCard {
+                            title: "Transformer Parameters"
+                            Layout.minimumWidth: 350
+                            Layout.minimumHeight: 480
+                            
+                            GridLayout {
+                                columns: 2
+                                columnSpacing: 10
+                                rowSpacing: 10
+                                width: parent.width
 
-                            Label { 
-                                text: "Transformer Type:" 
-                                Layout.minimumWidth: 150
-                            }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                StyledButton {
-                                    text: "CT"
-                                    checkable: true
-                                    checked: calculator.transformerType === "CT"
-                                    Layout.fillWidth: true
-                                    onClicked: calculator.transformerType = "CT"
+                                Label { 
+                                    text: "Transformer Type:" 
+                                    Layout.minimumWidth: 150
                                 }
-                                StyledButton {
-                                    text: "VT"
-                                    checkable: true
-                                    checked: calculator.transformerType === "VT"
+                                RowLayout {
                                     Layout.fillWidth: true
-                                    onClicked: calculator.transformerType = "VT"
-                                }
-                            }
-
-                            // Primary rating - different label for CT vs VT
-                            Label { 
-                                text: calculator.transformerType === "CT" ? 
-                                      "Primary Current (A):" : 
-                                      "Primary Voltage (V):" 
-                            }
-                            ComboBoxRound {
-                                id: primaryRating
-                                model: calculator.transformerType === "CT" ? 
-                                       calculator.getRatedCurrents() : 
-                                       calculator.getRatedVoltages()
-                                currentIndex: model.indexOf(calculator.transformerType === "CT" ? 
-                                              calculator.ratedCurrent : 
-                                              calculator.ratedVoltage)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: {
-                                    if (calculator.transformerType === "CT") {
-                                        calculator.ratedCurrent = currentText
-                                    } else {
-                                        calculator.ratedVoltage = currentText
+                                    StyledButton {
+                                        text: "CT"
+                                        checkable: true
+                                        checked: calculator.transformerType === "CT"
+                                        Layout.fillWidth: true
+                                        onClicked: calculator.transformerType = "CT"
+                                    }
+                                    StyledButton {
+                                        text: "VT"
+                                        checkable: true
+                                        checked: calculator.transformerType === "VT"
+                                        Layout.fillWidth: true
+                                        onClicked: calculator.transformerType = "VT"
                                     }
                                 }
-                            }
 
-                            // Secondary rating
-                            Label { 
-                                text: calculator.transformerType === "CT" ? 
-                                      "Secondary Current (A):" : 
-                                      "Secondary Voltage (V):" 
-                            }
-                            ComboBoxRound {
-                                id: secondaryRating
-                                model: calculator.getSecondaryRatings()
-                                currentIndex: model.indexOf(calculator.secondaryRating)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.secondaryRating = currentText
-                            }
-
-                            // Accuracy class
-                            Label { text: "Accuracy Class:" }
-                            ComboBoxRound {
-                                id: accuracyClass
-                                model: calculator.getAccuracyClasses()
-                                currentIndex: model.indexOf(calculator.accuracyClass)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.accuracyClass = currentText
-                            }
-
-                            // Burden
-                            Label { text: "Burden (VA):" }
-                            TextFieldRound {
-                                id: burden
-                                text: calculator.burden
-                                Layout.fillWidth: true
-                                validator: DoubleValidator {
-                                    bottom: 1.0
-                                    top: 100.0
-                                    notation: DoubleValidator.StandardNotation
+                                // Primary rating - different label for CT vs VT
+                                Label { 
+                                    text: calculator.transformerType === "CT" ? 
+                                        "Primary Current (A):" : 
+                                        "Primary Voltage (V):" 
                                 }
-                                onTextChanged: {
-                                    if (acceptableInput) {
-                                        calculator.burden = text
+                                ComboBoxRound {
+                                    id: primaryRating
+                                    model: calculator.transformerType === "CT" ? 
+                                        calculator.getRatedCurrents() : 
+                                        calculator.getRatedVoltages()
+                                    currentIndex: model.indexOf(calculator.transformerType === "CT" ? 
+                                                calculator.ratedCurrent : 
+                                                calculator.ratedVoltage)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: {
+                                        if (calculator.transformerType === "CT") {
+                                            calculator.ratedCurrent = currentText
+                                        } else {
+                                            calculator.ratedVoltage = currentText
+                                        }
                                     }
                                 }
-                            }
 
-                            // Insulation level
-                            Label { text: "Insulation Level (kV):" }
-                            ComboBoxRound {
-                                id: insulation
-                                model: calculator.getInsulationLevels()
-                                currentIndex: model.indexOf(calculator.insulationLevel)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.insulationLevel = currentText
-                            }
+                                // Secondary rating
+                                Label { 
+                                    text: calculator.transformerType === "CT" ? 
+                                        "Secondary Current (A):" : 
+                                        "Secondary Voltage (V):" 
+                                }
+                                ComboBoxRound {
+                                    id: secondaryRating
+                                    model: calculator.getSecondaryRatings()
+                                    currentIndex: model.indexOf(calculator.secondaryRating)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.secondaryRating = currentText
+                                }
 
-                            // Application
-                            Label { text: "Application:" }
-                            ComboBoxRound {
-                                id: application
-                                model: calculator.getApplications()
-                                currentIndex: model.indexOf(calculator.application)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.application = currentText
-                            }
+                                // Accuracy class
+                                Label { text: "Accuracy Class:" }
+                                ComboBoxRound {
+                                    id: accuracyClass
+                                    model: calculator.getAccuracyClasses()
+                                    currentIndex: model.indexOf(calculator.accuracyClass)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.accuracyClass = currentText
+                                }
 
-                            // Installation
-                            Label { text: "Installation:" }
-                            ComboBoxRound {
-                                id: installation
-                                model: calculator.getInstallations()
-                                currentIndex: model.indexOf(calculator.installation)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.installation = currentText
-                            }
+                                // Burden
+                                Label { text: "Burden (VA):" }
+                                TextFieldRound {
+                                    id: burden
+                                    text: calculator.burden
+                                    Layout.fillWidth: true
+                                    validator: DoubleValidator {
+                                        bottom: 1.0
+                                        top: 100.0
+                                        notation: DoubleValidator.StandardNotation
+                                    }
+                                    onTextChanged: {
+                                        if (acceptableInput) {
+                                            calculator.burden = text
+                                        }
+                                    }
+                                }
 
-                            // Frequency
-                            Label { text: "Frequency (Hz):" }
-                            ComboBoxRound {
-                                id: frequency
-                                model: calculator.getFrequencies()
-                                currentIndex: model.indexOf(calculator.frequency)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.frequency = currentText
-                            }
+                                // Insulation level
+                                Label { text: "Insulation Level (kV):" }
+                                ComboBoxRound {
+                                    id: insulation
+                                    model: calculator.getInsulationLevels()
+                                    currentIndex: model.indexOf(calculator.insulationLevel)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.insulationLevel = currentText
+                                }
 
-                            // Thermal rating
-                            Label { text: "Thermal Rating Factor:" }
-                            ComboBoxRound {
-                                id: thermal
-                                model: calculator.getThermalRatings()
-                                currentIndex: model.indexOf(calculator.thermalRating)
-                                Layout.fillWidth: true
-                                onCurrentTextChanged: calculator.thermalRating = currentText
+                                // Application
+                                Label { text: "Application:" }
+                                ComboBoxRound {
+                                    id: application
+                                    model: calculator.getApplications()
+                                    currentIndex: model.indexOf(calculator.application)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.application = currentText
+                                }
+
+                                // Installation
+                                Label { text: "Installation:" }
+                                ComboBoxRound {
+                                    id: installation
+                                    model: calculator.getInstallations()
+                                    currentIndex: model.indexOf(calculator.installation)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.installation = currentText
+                                }
+
+                                // Frequency
+                                Label { text: "Frequency (Hz):" }
+                                ComboBoxRound {
+                                    id: frequency
+                                    model: calculator.getFrequencies()
+                                    currentIndex: model.indexOf(calculator.frequency)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.frequency = currentText
+                                }
+
+                                // Thermal rating
+                                Label { text: "Thermal Rating Factor:" }
+                                ComboBoxRound {
+                                    id: thermal
+                                    model: calculator.getThermalRatings()
+                                    currentIndex: model.indexOf(calculator.thermalRating)
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: calculator.thermalRating = currentText
+                                }
+                            }
+                        }
+
+                        // Naming results
+                        WaveCard {
+                            title: "Transformer Name"
+                            Layout.minimumWidth: 350
+                            Layout.minimumHeight: 230
+                            
+                            ColumnLayout {
+                                anchors.fill: parent
+
+                                StyledButton {
+                                    text: "Copy"
+                                    icon.source: "../../../icons/rounded/copy_all.svg"
+                                    onClicked: {
+                                        outputText.selectAll()
+                                        outputText.copy()
+                                        outputText.deselect()
+                                    }
+                                }
+
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    color: darkMode ? "#2a2a2a" : "#f0f0f0"
+                                    border.width: 1
+                                    border.color: darkMode ? "#404040" : "#d0d0d0"
+                                    radius: 4
+
+                                    TextEdit {
+                                        id: outputText
+                                        anchors.fill: parent
+                                        anchors.margins: 10
+                                        text: calculator.outputName
+                                        color: textColor
+                                        readOnly: true
+                                        wrapMode: TextEdit.WordWrap
+                                        selectByMouse: true
+                                        font.family: "Monospace"
+                                        font.pixelSize: 14
+                                    }
+                                }
                             }
                         }
                     }
 
                     // Right side - Results and visualization
                     ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 10
-
-                        // Naming results
-                        WaveCard {
-                            title: "Transformer Name"
-                            Layout.fillWidth: true
-                            Layout.minimumHeight: 230
-                            
-                            ColumnLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                spacing: 10
-
-                                ScrollView {
-                                    Layout.fillWidth: true
-                                    Layout.minimumHeight: 100
-                                    clip: true
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        color: darkMode ? "#2a2a2a" : "#f0f0f0"
-                                        border.width: 1
-                                        border.color: darkMode ? "#404040" : "#d0d0d0"
-                                        radius: 4
-
-                                        TextEdit {
-                                            id: outputText
-                                            anchors.fill: parent
-                                            anchors.margins: 10
-                                            text: calculator.outputName
-                                            color: textColor
-                                            readOnly: true
-                                            wrapMode: TextEdit.WordWrap
-                                            selectByMouse: true
-                                            font.family: "Monospace"
-                                            font.pixelSize: 14
-                                        }
-                                    }
-                                }
-
-                                RowLayout {
-                                    Layout.alignment: Qt.AlignRight
-                                    StyledButton {
-                                        text: "Copy"
-                                        icon.source: "../../../icons/rounded/copy_all.svg"
-                                        onClicked: {
-                                            outputText.selectAll()
-                                            outputText.copy()
-                                            outputText.deselect()
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        Layout.minimumWidth: 900
 
                         // Visual representation
                         WaveCard {
                             title: "Transformer Visualization " + (calculator.transformerType === "CT" ? "Current Transformer" : "Voltage Transformer")
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 400
+                            Layout.minimumHeight: 450
 
                             // CT or VT visualization based on selected type
                             InstrumentTxViz {
@@ -315,7 +306,7 @@ Item {
                         WaveCard {
                             title: "Naming Convention Explanation"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 250
+                            Layout.minimumHeight: 260
                             
                             ScrollView {
                                 anchors.fill: parent

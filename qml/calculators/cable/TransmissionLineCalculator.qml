@@ -97,7 +97,8 @@ Item {
 
             ColumnLayout {
                 id: mainLayout
-                width: flickableMain.width - 20
+                // width: flickableMain.width - 20
+                anchors.centerIn: parent
 
                 // Header with title and help button
                 RowLayout {
@@ -125,6 +126,8 @@ Item {
                 }
 
                 RowLayout {
+                    id: resultsRow
+                    Layout.minimumWidth: 650
 
                     ColumnLayout {
                         Layout.maximumWidth: 370
@@ -313,6 +316,12 @@ Item {
                                 }
                             }
                         }
+                    }
+
+                    ColumnLayout {
+                        Layout.maximumWidth: 370
+                        Layout.preferredWidth: 370
+                        Layout.alignment: Qt.AlignTop
 
                         // Results
                         WaveCard {
@@ -321,42 +330,6 @@ Item {
                             Layout.fillWidth: true
                             Layout.minimumHeight: 220
                             showSettings: true
-                            
-                            // Add info button to results card
-                            RowLayout {
-                                id: resultInfoButton
-                                x: parent.width - width - 10
-                                y: 5
-                                width: 30
-                                height: 20
-                                
-                                Rectangle {
-                                    width: 20
-                                    height: 20
-                                    radius: width/2
-                                    color: Universal.accent
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "?"
-                                        color: "white"
-                                        font.bold: true
-                                        font.pixelSize: 12
-                                    }
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: resultsInfoPopup.show()
-                                        
-                                        ToolTip {
-                                            visible: parent.containsMouse
-                                            text: "Click for explanation of parameter relationships"
-                                        }
-                                    }
-                                }
-                            }
 
                             GridLayout {
                                 columns: 2
@@ -497,37 +470,31 @@ Item {
                             }
                         }
                     }
+                }
 
-                    // Right side - Visualization - Fix layout issues
-                    ColumnLayout {
-                        Layout.fillWidth: true
+                // Visualization
+                ColumnLayout {
+                    Layout.minimumHeight: 400
+                    Layout.maximumWidth: resultsRow.width
+
+                    WaveCard {
                         Layout.fillHeight: true
-                        
-                        WaveCard {
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            title: "Line Parameters Visualization"
-                            
-                            // This ensures a minimum size for the visualization to render properly
-                            Layout.minimumWidth: 300
-                            Layout.minimumHeight: 400
+                        Layout.fillWidth: true
+                        title: "Line Parameters Visualization"
 
-                            TransmissionLineViz {
-                                anchors.fill: parent
-                                anchors.margins: 5
-                                
-                                // Pass all required properties correctly
-                                length: parseFloat(lengthInput.text || "100")
-                                characteristicImpedance: calculator.characteristicImpedance
-                                attenuationConstant: calculator.attenuationConstant
-                                phaseConstant: calculator.phaseConstant
-                                
-                                // Make sure calculator is passed to the visualization
-                                calculator: transmissionCard.calculator
-                                
-                                darkMode: Universal.theme === Universal.Dark
-                                textColor: transmissionCard.textColor
-                            }
+                        TransmissionLineViz {
+                            anchors.fill: parent
+                            anchors.margins: 0
+
+                            length: parseFloat(lengthInput.text || "100")
+                            characteristicImpedance: calculator.characteristicImpedance
+                            attenuationConstant: calculator.attenuationConstant
+                            phaseConstant: calculator.phaseConstant
+
+                            calculator: transmissionCard.calculator
+
+                            darkMode: Universal.theme === Universal.Dark
+                            textColor: transmissionCard.textColor
                         }
                     }
                 }
