@@ -11,10 +11,10 @@ QtObject {
         { name: qsTr("kVA / kw / A"), source: "calculators/basic/PowerCurrentCalculator.qml", icon: "electric_meter"  },
         { name: qsTr("Ohm's Law"), source: "calculators/basic/OhmsLawCalculator.qml", icon: "calculate"  },
         { name: qsTr("Power Factor Correction"), source: "calculators/basic/PowerFactorCorrection.qml", icon: "trending_down"  },
-        { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml", icon: "change_circle"  },
+        { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml", icon: "swap_vert"  },
         { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml", icon: "call_split"  },
-        { name: qsTr("Base Impedance"), source: "calculators/basic/BaseImpedanceCalculator.qml", icon: "call_split"  },
-        { name: qsTr("Per Unit Impedance"), source: "calculators/basic/PerUnitImpedanceCalculator.qml", icon: "call_split" }
+        { name: qsTr("Base Impedance"), source: "calculators/basic/BaseImpedanceCalculator.qml", icon: "functions"  },
+        { name: qsTr("Per Unit Impedance"), source: "calculators/basic/PerUnitImpedanceCalculator.qml", icon: "functions" }
     ]
 
     property var protection: [
@@ -29,7 +29,7 @@ QtObject {
         { name: qsTr("RGF"), source: "calculators/protection/RefRgfCalculator.qml", icon: "calculate" },
         { name: qsTr("Solkor Rf"), source: "calculators/protection/SolkorRf.qml", icon: "cell_tower" },
         { name: qsTr("Transformer + Line"), source: "calculators/protection/TransformerLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("VR Calculations"), source: "calculators/protection/VR32CL7Calculator.qml", icon: "cell_tower" }
+        { name: qsTr("VR Calculations"), source: "calculators/protection/VR32CL7Calculator.qml", icon: "arrow_upward" }
     ]
 
     property var cable: [
@@ -37,8 +37,8 @@ QtObject {
         { name: qsTr("Charging Current"), source: "calculators/cable/ChargingCurrentCalculator.qml", icon: "battery_saver" },
         { name: qsTr("Switchboard"), source: "calculators/cable/SwitchboardPanel.qml", icon: "power" },
         { name: qsTr("Transmission Line"), source: "calculators/cable/TransmissionLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("Voltage Drop"), source: "calculators/cable/VoltageDropCalculator.qml", icon: "bolt" },
-        { name: qsTr("Voltage Drop Orion"), source: "calculators/voltage_drop/VoltageDropOrion.qml", icon: "bolt" },
+        { name: qsTr("Voltage Drop"), source: "calculators/cable/VoltageDropCalculator.qml", icon: "south_east" },
+        { name: qsTr("Voltage Drop Orion"), source: "calculators/voltage_drop/VoltageDropOrion.qml", icon: "south_east" },
         { name: qsTr("Network Cabinet"), source: "calculators/cable/NetworkCabinetCalculator.qml", icon: "bolt" }
     ]
 
@@ -47,11 +47,11 @@ QtObject {
         { name: qsTr("Instrument Tx Naming"), source: "calculators/theory/TransformerNamingGuide.qml", icon: "density_medium" },
         { name: qsTr("Machine Calculator"), source: "calculators/theory/ElectricMachineCalculator.qml", icon: "forward_circle" },
         { name: qsTr("Motor Starting"), source: "calculators/theory/MotorStartingCalculator.qml", icon: "show_chart" },
-        { name: qsTr("RLC"), source: "calculators/theory/RLC.qml", icon: "general_device" },
-        { name: qsTr("Real Time"), source: "calculators/theory/RealTime.qml", icon: "general_device" },
-        { name: qsTr("Three Phase Waveforms"), source: "calculators/three_phase/ThreePhase.qml", icon: "density_medium" },
+        { name: qsTr("RLC"), source: "calculators/theory/RLC.qml", icon: "power_input" },
+        { name: qsTr("Real Time"), source: "calculators/theory/RealTime.qml", icon: "multiline_chart" },
+        { name: qsTr("Three Phase Waveforms"), source: "calculators/three_phase/ThreePhase.qml", icon: "line_axis" },
         { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml", icon: "calculate" },
-        { name: qsTr("Sequence Calculator"), source: "calculators/theory/SequenceCalculator.qml", icon: "calculate" },
+        { name: qsTr("Sequence Calculator"), source: "calculators/theory/SequenceCalculator.qml", icon: "data_exploration" },
     ]
 
     property var renewables: [
