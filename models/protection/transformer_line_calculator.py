@@ -31,8 +31,9 @@ class TransformerLineCalculator(QObject):
         self._transformer_rating = 300.0  # kVA
         self._transformer_impedance = 4.5  # %
         self._transformer_x_r_ratio = 8.0  # X/R ratio
-        self._transformer_flc = 29.2 # HV FLC
-        
+        self._transformer_flc_hv = 29.2 # HV FLC
+        self._transformer_flc_lv = 417.0 # HV FLC
+
         # Line parameters (5km cable)
         self._line_length = 5.0  # km
         self._line_r = 1.42  # Ohm/km
@@ -156,6 +157,8 @@ class TransformerLineCalculator(QObject):
                 "transformer_rating": self._transformer_rating,
                 "transformer_hv_voltage": self._transformer_hv_voltage,
                 "transformer_lv_voltage": self._transformer_lv_voltage,
+                "transformer_flc_hv": self._transformer_flc_hv,
+                "transformer_flc_lv": self._transformer_flc_lv,
                 "transformer_impedance": self._transformer_impedance,
                 "transformer_xr_ratio": self._transformer_x_r_ratio,
                 "transformer_z": self._transformer_z,
@@ -422,14 +425,14 @@ class TransformerLineCalculator(QObject):
             logger.info(f"Three Phase Capacity: {self._regulator_three_phase_capacity:.1f} kVA")
 
             logger.info(f"\nProtection Settings:")
-            logger.info(f"Transformer FLC: {self._transformer_flc:.2f} A")
+            logger.info(f"Transformer FLC: {self._transformer_flc_hv:.2f} A")
             logger.info(f"Relay Pickup: {self._relay_pickup_current:.2f} A")
             logger.info(f"Selected CT Ratio: {self._relay_ct_ratio}")
 
             logger.info("\nHarmonic Current Limits:")
 
             # Calculate harmonic limits
-            harmonic_limits = self._calculate_harmonic_limits(self._transformer_flc)
+            harmonic_limits = self._calculate_harmonic_limits(self._transformer_flc_hv)
 
             for harmonic, limit in harmonic_limits.items():
                 logger.info(f"{harmonic}th harmonic: {limit:.2f} A")
@@ -591,13 +594,14 @@ class TransformerLineCalculator(QObject):
                 self._regulator_tap_position = 0
             
             # Calculate protection settings
-            self._transformer_flc = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
-            self._relay_pickup_current = self._transformer_flc * 1.25  # 125% of FLC
+            self._transformer_flc_hv = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_hv_voltage)
+            self._transformer_flc_lv = (self._transformer_rating * 1000) / (math.sqrt(3) * self._transformer_lv_voltage )
+            self._relay_pickup_current = self._transformer_flc_hv * 1.25  # 125% of FLC
             self._relay_time_dial = 0.3  # Default time dial setting
 
             # CT ratio selection
             standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200]
-            ct_primary = next((x for x in standard_ct_ratios if x > self._transformer_flc * 1.25), 1200)
+            ct_primary = next((x for x in standard_ct_ratios if x > self._transformer_flc_hv * 1.25), 1200)
             self._relay_ct_ratio = f"{ct_primary}/1"
 
             # Calculate voltage regulator values
@@ -640,9 +644,7 @@ class TransformerLineCalculator(QObject):
             standard_ct_ratios = [50, 75, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000]
             ct_primary = next((x for x in standard_ct_ratios if x > self._relay_pickup_current), 2000)
             self._relay_ct_ratio = f"{ct_primary}/1"  # Using 1A secondary
-            
-            logger.debug(f"Recalculated load values: FLC={self._full_load_current:.2f}A, Pickup={self._relay_pickup_current:.2f}A")
-            
+
         except Exception as e:
             logger.error(f"Error in recalculate_load_values: {str(e)}")
     
@@ -956,6 +958,14 @@ class TransformerLineCalculator(QObject):
     def lineTotalZ(self):
         return abs(self._line_total_z)
     
+    @Property(float, notify=calculationCompleted)
+    def transformer_flc_hv(self):
+        return self._transformer_flc_hv
+    
+    @Property(float, notify=calculationCompleted)
+    def transformer_flc_lv(self):
+        return self._transformer_flc_lv
+
     @Property(float, notify=calculationCompleted)
     def voltageDrop(self):
         return self._voltage_drop

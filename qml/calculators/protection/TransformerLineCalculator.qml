@@ -14,12 +14,11 @@ import TransformerLine 1.0
 Item {
     id: root
 
-    property var calculator
+    property TransformerLineCalculator calculator : TransformerLineCalculator {}
     property bool calculatorReady: calculator !== null
 
-    Component.onCompleted: {
-        // Create the calculator instance when component is loaded
-        calculator = Qt.createQmlObject('import QtQuick; import TransformerLine 1.0; TransformerLineCalculator {}', root, "dynamicCalculator");
+    MessagePopup {
+        id: messagePopup
     }
 
     function safeValue(value, defaultVal) {
@@ -83,6 +82,19 @@ Item {
                 font.pixelSize: 20
                 font.bold: true
                 Layout.fillWidth: true
+            }
+
+            StyledButton {
+                text: "Export"
+                icon.source: "../../../icons/rounded/download.svg"
+
+                ToolTip.text: "Export report to PDF"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+
+                onClicked: {
+                    calculator.exportTransformerReport();
+                }
             }
 
             StyledButton {
@@ -371,7 +383,7 @@ Item {
                 WaveCard {
                     title: "System Calculation Results"
                     Layout.fillWidth: true
-                    Layout.minimumHeight: 320
+                    Layout.minimumHeight: 410
                     
                     GridLayout {
                         columns: 2
@@ -395,7 +407,19 @@ Item {
                             id: transformerXOhmsText
                             text: calculatorReady ? safeValue(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
                         }
-                        
+
+                        Label { text: "Transformer FLC HV (A):" }
+                        TextFieldBlue {
+                            id: transformerFLCHV
+                            text: calculatorReady ? safeValue(calculator.transformer_flc_hv, 0).toFixed(2) : "0.00"
+                        }
+
+                        Label { text: "Transformer FLC LV (A):" }
+                        TextFieldBlue {
+                            id: transformerFLCLV
+                            text: calculatorReady ? safeValue(calculator.transformer_flc_lv, 0).toFixed(2) : "0.00"
+                        }
+
                         Label { text: "Line Total Z (Ohms):" }
                         TextFieldBlue {
                             id: lineTotalZText
@@ -464,8 +488,8 @@ Item {
 
     Connections {
         target: calculator
-        // Changed from 'function onCalculationCompleted()' to 'function calculationCompleted()'
-        // to properly connect to the signal named 'calculationCompleted'
+        enabled: calculatorReady
+
         function calculationCompleted() {
             if (calculatorReady) {
                 transformerZOhmsText.text = safeValue(calculator.transformerZOhms, 0).toFixed(3)
@@ -480,6 +504,14 @@ Item {
                 relayTimeDialText.text = safeValue(calculator.relayTimeDial, 0).toFixed(2)
                 relayCtRatioText.text = calculator.relayCtRatio
                 relayCurveTypeText.text = calculator.relayCurveType
+            }
+        }
+
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message);
+            } else {
+                messagePopup.showError(message);
             }
         }
     }

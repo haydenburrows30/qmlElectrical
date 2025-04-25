@@ -376,6 +376,8 @@ class PDFGenerator:
                 ["Rating", f"{data.get('transformer_rating', 'N/A')} kVA"],
                 ["HV Voltage", f"{data.get('transformer_hv_voltage', 'N/A')} V"],
                 ["LV Voltage", f"{data.get('transformer_lv_voltage', 'N/A')} V"],
+                ["HV Current", f"{data.get('transformer_flc_hv', 'N/A')} A"],
+                ["LV Current", f"{data.get('transformer_flc_lv', 'N/A')} A"],
                 ["Impedance", f"{data.get('transformer_impedance', 'N/A')} %"],
                 ["X/R Ratio", f"{data.get('transformer_xr_ratio', 'N/A')}"],
                 ["Transformer Z", f"{data.get('transformer_z', 'N/A'):.3f} Ω"],

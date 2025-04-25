@@ -365,7 +365,7 @@ Item {
                     WaveCard {
                         title: "Electrical System Results"
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 430
+                        Layout.preferredHeight: 480
 
                         GridLayout {
                             anchors.fill: parent
@@ -387,6 +387,18 @@ Item {
                             TextFieldBlue {
                                 id: transformerXOhmsText
                                 text: calculatorReady ? safeValueFunction(calculator.transformerXOhms, 0).toFixed(3) : "0.000"
+                            }
+
+                            Label { text: "Transformer FLC HV (A):" }
+                            TextFieldBlue {
+                                id: transformerFLCHV
+                                text: calculatorReady ? safeValueFunction(calculator.transformer_flc_hv, 0).toFixed(2) : "0.00"
+                            }
+
+                            Label { text: "Transformer FLC LV (A):" }
+                            TextFieldBlue {
+                                id: transformerFLCLV
+                                text: calculatorReady ? safeValueFunction(calculator.transformer_flc_lv, 0).toFixed(2) : "0.00"
                             }
 
                             Label { text: "Line Total Z (Ohms):" }
