@@ -3,57 +3,115 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 
+import "../../components/style"
+import "../../components/buttons"
+
+import TransformerLine 1.0
+import WindTurbine 1.0
+
 Item {
     id: root
+    property TransformerLineCalculator transformerCalculator : TransformerLineCalculator {}
+    property WindTurbineCalculator windTurbineCalculator : WindTurbineCalculator {}
     
-    // Public properties that can be set from outside
-    property var tabModel: []  // Model for tab items
-    property int currentIndex: 0 // Current active tab index
-    property color barColor: "#4a86e8" // Default bar color
-    property color textColor: "#FFFFFF" // Default text color
-    property color highlightColor: "#FFFFFF" // Default highlight color
-    property bool darkMode: false // Dark mode state
+    property bool transformerReady: transformerCalculator !== null
+    property bool windTurbineReady: windTurbineCalculator !== null
+    property real totalGeneratedPower: windTurbineReady ? windTurbineCalculator.actualPower : 0
     
-    // Add property to control collapse behavior
-    property bool collapsedByDefault: true
-    property bool isCollapsed: collapsedByDefault
-    property int collapseDelay: 1000 // ms to wait before collapsing after mouse leaves
-    
-    // Signals
-    signal tabSelected(int index)
-    
-    // Read-only properties
-    readonly property bool isOnLeftSide: floatingBar.isOnLeftSide
-    readonly property bool isOnRightSide: floatingBar.isOnRightSide
-    
-    // Size properties
-    width: floatingBar.width
-    height: floatingBar.height
-    
-    // Watch for currentIndex changes
-    onCurrentIndexChanged: {
-        // Update all tab states
-        for (var i = 0; i < tabButtonRepeater.count; i++) {
-            var tab = tabButtonRepeater.itemAt(i)
-            if (tab) {
-                tab.updateActiveState()
+    function safeValue(value, defaultVal) {
+        if (value === undefined || value === null) {
+            return defaultVal;
+        }
+        
+        if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+            return defaultVal;
+        }
+        
+        return value;
+    }
+                
+    ColumnLayout {
+        id: mainLayout
+        anchors.fill: parent
+        spacing: 0
+        
+        // Main content stack
+        StackLayout {
+            id: contentStack
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            currentIndex: floatingBar.currentIndex
+            
+            // Tab 1: Wind Turbine Parameters - operates independently
+            WindTurbineSection {
+                id: windTurbineSection
+                Layout.fillWidth: true
+
+                // Pass only necessary properties and functions
+                calculator: windTurbineCalculator
+                calculatorReady: windTurbineReady
+
+                onCalculate: {
+                    if (windTurbineReady) {
+                        windTurbineCalculator.refreshCalculations()
+                    }
+                }
+                safeValueFunction: safeValue
+            }
+
+            // Tab 2: Transformer & Line Parameters - operates independently
+            TransformerLineSection {
+                id: transformerLineSection
+                Layout.fillWidth: true
+
+                // Pass only necessary properties and functions
+                calculator: transformerCalculator
+                calculatorReady: transformerReady
+
+                onCalculate: {
+                    if (transformerReady) {
+                        transformerCalculator.refreshCalculations()
+                    }
+                }
+                safeValueFunction: safeValue
+            }
+
+            // Tab 3: Protection Requirements - still needs access to both
+            ProtectionRequirementsSection {
+                Layout.fillWidth: true
+
+                // Pass the required properties
+                transformerCalculator: root.transformerCalculator
+                windTurbineCalculator: root.windTurbineCalculator
+                transformerReady: root.transformerReady
+                windTurbineReady: root.windTurbineReady
+                totalGeneratedPower: root.totalGeneratedPower
+
+                onCalculate: {
+                    // For the protection tab, we need data from both systems
+                    if (transformerReady && windTurbineReady) {
+                        windTurbineCalculator.refreshCalculations()
+                        transformerCalculator.refreshCalculations()
+                    }
+                }
+                safeValueFunction: safeValue
             }
         }
     }
     
-    // The actual floating bar rectangle
+    // Vertical tabbar
     Rectangle {
         id: floatingBar
-        width: isCollapsed ? 50 : (compactMode ? 70 : 80) // Narrower when collapsed
-        height: isCollapsed ? 50 : tabButtonColumn.height + 10 // Just enough for the menu icon
-        radius: 18
-        color: root.darkMode ? "#2D2D2D" : root.barColor
+        width: compactMode ? 70 : 80 // Adjust width based on screen size
+        height: tabButtonColumn.height + 15 // Add padding (20px on top and bottom)
+        radius: 15
+        color: window.modeToggled ? "#2D2D2D" : "#4a86e8"
         
         // Add property to track theme colors
-        property color textColor: root.textColor
-        property color activeTextColor: root.textColor
-        property color inactiveTextColor: darkMode ? "#B0B0B0" : "#FFFFFFB0"
-        property color highlightColor: root.highlightColor
+        property color textColor: window.modeToggled ? "#FFFFFF" : "#FFFFFF"
+        property color activeTextColor: window.modeToggled ? "#FFFFFF" : "#FFFFFF"
+        property color inactiveTextColor: window.modeToggled ? "#B0B0B0" : "#FFFFFFB0"
+        property color highlightColor: window.modeToggled ? "#505050" : "#FFFFFF"
         
         // Add shadow for better floating appearance
         layer.enabled: true
@@ -64,139 +122,10 @@ Item {
             shadowHorizontalOffset: 3
             shadowBlur: 12
         }
-        
-        // Add property for screen adaptation
-        property bool compactMode: parent.parent ? parent.parent.width < 800 : false
-        
-        // Add property to track if bar is on the left or right side
-        property bool isOnLeftSide: false
-        property bool isOnRightSide: false
-        
-        // Function to update the side property
-        function updateSidePosition() {
-            // Consider it on the left side if it's closer to the left edge than the right edge
-            isOnLeftSide = x < (parent.parent ? (parent.parent.width - width - x) : 0)
-            isOnRightSide = x > (parent.parent ? (parent.parent.width - width - x) : 0)
-        }
-        
-        // Update the side position whenever x changes
-        onXChanged: updateSidePosition()
-        
-        // Initialize side position on component completion
-        Component.onCompleted: updateSidePosition()
-        
-        // Add menu icon for collapsed state
-        Rectangle {
-            id: menuIcon
-            width: 40
-            height: 40
-            radius: 20
-            color: "transparent"
-            anchors.centerIn: isCollapsed ? parent : undefined
-            anchors.horizontalCenter: isCollapsed ? undefined : parent.horizontalCenter
-            anchors.top: isCollapsed ? undefined : parent.top
-            anchors.topMargin: isCollapsed ? 0 : 5
-            visible: true
-            
-            // Menu icon lines (hamburger menu)
-            Column {
-                anchors.centerIn: parent
-                spacing: 4
-                
-                Repeater {
-                    model: 3
-                    Rectangle {
-                        width: 20
-                        height: 2
-                        radius: 1
-                        color: floatingBar.textColor
-                    }
-                }
-            }
-            
-            // Show menu icon only in collapsed state
-            opacity: isCollapsed ? 1.0 : 0.0
-            
-            Behavior on opacity {
-                NumberAnimation { duration: 200 }
-            }
-        }
-        
-        // Timer to handle auto-collapse after mouse leaves
-        Timer {
-            id: collapseTimer
-            interval: root.collapseDelay
-            onTriggered: {
-                if (!hoverArea.containsMouse && !dragArea.isDragging) {
-                    root.isCollapsed = true
-                }
-            }
-        }
-        
-        // Hover area to detect mouse over the bar
-        MouseArea {
-            id: hoverArea
-            anchors.fill: parent
-            hoverEnabled: true
-            propagateComposedEvents: true
-            
-            onEntered: {
-                root.isCollapsed = false
-                collapseTimer.stop()
-            }
-            
-            onExited: {
-                if (collapsedByDefault && !dragArea.isDragging) {
-                    collapseTimer.restart()
-                }
-            }
-            
-            onPressed: mouse.accepted = false
-            onReleased: mouse.accepted = false
-            onClicked: mouse.accepted = false
-        }
 
-        // drag area
-        MouseArea {
-            id: dragArea
-            anchors.fill: parent
-            drag.target: floatingBar
-            drag.minimumX: 0
-            drag.maximumX: root.parent ? root.parent.width - floatingBar.width : 0
-            drag.minimumY: 0
-            drag.maximumY: root.parent ? root.parent.height - floatingBar.height : 0
-            drag.threshold: 5
-            z: 1
-            
-            property bool isDragging: false
-            property point startPosition
-            
-            // Enable mouse events to pass through to children when not dragging
-            propagateComposedEvents: true
-            
-            onPressed: function(mouse) {
-                startPosition = Qt.point(floatingBar.x, floatingBar.y)
-                isDragging = true
-                cursorShape = Qt.ClosedHandCursor
-                mouse.accepted = true
-                
-                // Expand when dragging
-                root.isCollapsed = false
-                collapseTimer.stop()
-            }
-            
-            onReleased: function(mouse) {
-                cursorShape = Qt.ArrowCursor
-                isDragging = false
-                
-                // Start collapse timer after releasing drag
-                if (collapsedByDefault && !hoverArea.containsMouse) {
-                    collapseTimer.restart()
-                }
-            }
-        }
-        
-        // dragging states
+        // Add property for screen adaptation
+        property bool compactMode: parent.width < 800
+
         states: [
             State {
                 name: "dragging"
@@ -212,6 +141,42 @@ Item {
         // Improve dark/light mode transitions
         Behavior on color {
             ColorAnimation { duration: 200 }
+        }
+        
+        // Initial position - right side
+        x: parent.width - width - 20
+        y: (parent.height - height) / 2
+        
+        // Property for current tab index with proper change handling
+        property int currentIndex: 0
+        
+        // Add property to track if bar is on the left side
+        property bool isOnLeftSide: false
+        
+        // Function to update the side property
+        function updateSidePosition() {
+            // Consider it on the left side if it's closer to the left edge than the right edge
+            isOnLeftSide = x < (parent.width - width - x)
+        }
+        
+        // Update the side position whenever x changes
+        onXChanged: updateSidePosition()
+        
+        // Initialize side position on component completion
+        Component.onCompleted: updateSidePosition()
+        
+        // Observe changes to the currentIndex property
+        Connections {
+            target: floatingBar
+            function onCurrentIndexChanged() {
+                // Update all tab states
+                for (var i = 0; i < tabButtonRepeater.count; i++) {
+                    var tab = tabButtonRepeater.itemAt(i)
+                    if (tab) {
+                        tab.updateActiveState()
+                    }
+                }
+            }
         }
         
         // Smooth position animations
@@ -230,8 +195,8 @@ Item {
                 easing.type: Easing.OutQuad
             }
         }
-        
-        // Visual feedback when dragging - transitions remain the same
+
+        // Visual feedback when dragging
         transitions: [
             Transition {
                 from: ""
@@ -254,21 +219,15 @@ Item {
         Column {
             id: tabButtonColumn
             anchors.centerIn: parent
-            spacing: 5
-            // Hide tabs in collapsed state
-            opacity: isCollapsed ? 0.0 : 1.0
-            visible: opacity > 0
-            
-            Behavior on opacity {
-                NumberAnimation { duration: 200 }
-            }
-            
-            // Move tabs down in expanded state to make room for the menu icon
-            anchors.verticalCenterOffset: isCollapsed ? 0 : 15
+            spacing: 20
             
             Repeater {
                 id: tabButtonRepeater
-                model: root.tabModel
+                model: [
+                    { text: "Wind Turbine", icon: "⚡", index: 0 },
+                    { text: "Transformer", icon: "🔌", index: 1 },
+                    { text: "Protection", icon: "🛡️", index: 2 }
+                ]
                 
                 Item {
                     id: tabButton
@@ -279,12 +238,12 @@ Item {
                     // Store the index directly in a property
                     property int tabButtonIndex: modelData.index
                     
-                    // Track if this is the active tab - fixed binding
+                    // Track if this is the active tab
                     property bool isActive: false
                     
                     // Function to update active state
                     function updateActiveState() {
-                        isActive = (root.currentIndex === tabButtonIndex)
+                        isActive = (floatingBar.currentIndex === tabButtonIndex)
                     }
                     
                     // Initialize on component completion
@@ -336,7 +295,7 @@ Item {
                         width: 5
                         height: 5
                         radius: 2.5
-                        color: root.darkMode ? floatingBar.textColor : "#333333" // Dark in light mode
+                        color: window.modeToggled ? floatingBar.textColor : "#333333" // Dark in light mode
                         anchors.verticalCenter: parent.verticalCenter
                         
                         // Fix the shape issue by ensuring aspect ratio and size is maintained
@@ -442,23 +401,15 @@ Item {
                             }
                         }
                     }
-                    
-                    // Tooltip for better UX
-                    ToolTip {
-                        visible: tabButtonMouse.containsMouse
-                        text: modelData.text
-                        delay: 700
-                    }
-                    
+
                     // Improve touch feedback
                     MouseArea {
                         id: tabButtonMouse
                         anchors.fill: parent
                         hoverEnabled: true
-                        
+
                         onClicked: {
-                            root.currentIndex = tabButtonIndex
-                            root.tabSelected(tabButtonIndex)
+                            floatingBar.currentIndex = tabButtonIndex
                             rippleEffect.opacity = 0.4
                             rippleAnimation.start()
                         }
@@ -469,41 +420,49 @@ Item {
                                 tabButtonBg.opacity = 0.15
                             }
                         }
-                        
+
                         onExited: {
                             if (!tabButton.isActive) {
                                 tabButtonBg.opacity = 0
                             }
                         }
-                        
+
                         // Make sure clicks aren't intercepted by the drag area
-                        z: 10
+                        z: 20
                     }
                 }
             }
         }
         
-        // Add smooth transitions for size changes
-        Behavior on width {
-            NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
+        // Add drag area with improved behaviors
+        MouseArea {
+            id: dragArea
+            anchors.fill: parent
+            drag.target: floatingBar
+            drag.minimumX: 0
+            drag.maximumX: root.width - floatingBar.width
+            drag.minimumY: 0
+            drag.maximumY: root.height - floatingBar.height
+            drag.threshold: 5
+            z: 1
+            
+            property bool isDragging: false
+            property point startPosition
+            
+            // Enable mouse events to pass through to children when not dragging
+            propagateComposedEvents: true
         }
-        
-        Behavior on height {
-            NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
+
+        Connections {
+            target: window
+            function onModeToggledChanged() {
+                var isDarkTheme = window.modeToggled
+                floatingBar.color = isDarkTheme ? "#2D2D2D" : "#4a86e8"
+                floatingBar.textColor = isDarkTheme ? "#FFFFFF" : "#FFFFFF"
+                floatingBar.activeTextColor = isDarkTheme ? "#FFFFFF" : "#FFFFFF"
+                floatingBar.inactiveTextColor = isDarkTheme ? "#B0B0B0" : "#FFFFFFB0"
+                floatingBar.highlightColor = isDarkTheme ? "#505050" : "#FFFFFF"
+            }
         }
-    }
-    
-    // Public methods
-    function resetPosition() {
-        if (parent) {
-            floatingBar.x = parent.width - floatingBar.width - 20
-            floatingBar.y = (parent.height - floatingBar.height) / 2
-        }
-    }
-    
-    // Function to position the tabbar initially
-    function setPosition(x, y) {
-        floatingBar.x = x
-        floatingBar.y = y
     }
 }
