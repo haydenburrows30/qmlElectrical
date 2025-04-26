@@ -319,8 +319,8 @@ Item {
                     }
 
                     ColumnLayout {
-                        Layout.maximumWidth: 370
-                        Layout.preferredWidth: 370
+                        Layout.maximumWidth: 400
+                        Layout.preferredWidth: 400
                         Layout.alignment: Qt.AlignTop
 
                         // Results
@@ -335,9 +335,9 @@ Item {
                                 columns: 2
 
                                 Label { 
-                                    text: "Characteristic Impedance:"
+                                    text: "Characteristic Impedance (Z₀):"
                                     Layout.minimumWidth: 200
-                                    Layout.alignment: Qt.AlignRight
+                                    Layout.alignment: Qt.AlignLeft
                                 }
 
                                 TextFieldBlue { 
@@ -346,6 +346,8 @@ Item {
                                         calculator.zAngle.toFixed(1) + "°"
                                     Layout.minimumWidth: 120
                                     Layout.alignment: Qt.AlignRight
+                                    verticalAlignment: TextInput.AlignBottom
+                                    bottomPadding: 1
                                     Connections {
                                         target: calculator
                                         function onResultsCalculated() {
@@ -358,7 +360,7 @@ Item {
                                     hoverEnabled: true
                                 }
 
-                                Label { text: "Attenuation Constant:" }
+                                Label { text: "Attenuation Constant (α):" }
                                 TextFieldBlue { 
                                     id: attenuationField
                                     text: calculator.attenuationConstant.toFixed(6) + " Np/km"
@@ -370,7 +372,7 @@ Item {
                                     }
                                 }
 
-                                Label { text: "Phase Constant:" }
+                                Label { text: "Phase Constant (β):" }
                                 TextFieldBlue { 
                                     id: phaseField
                                     text: calculator.phaseConstant.toFixed(4) + " rad/km"
@@ -382,7 +384,7 @@ Item {
                                     }
                                 }
                                 
-                                Label { text: "Surge Impedance Loading:" }
+                                Label { text: "Surge Impedance Loading (SIL):" }
                                 TextFieldBlue { 
                                     id: silField
                                     text: calculator.surgeImpedanceLoading.toFixed(1) + " MW"
@@ -419,6 +421,8 @@ Item {
                                     text: calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°"
                                     Layout.minimumWidth: 150
                                     Layout.alignment: Qt.AlignRight
+                                    verticalAlignment: TextInput.AlignBottom
+                                    bottomPadding: 1
                                     Connections {
                                         target: calculator
                                         function onResultsCalculated() {
@@ -433,6 +437,8 @@ Item {
                                     id: bParameterField
                                     text: calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°"
                                     Layout.alignment: Qt.AlignRight
+                                    verticalAlignment: TextInput.AlignBottom
+                                    bottomPadding: 1
                                     Connections {
                                         target: calculator
                                         function onResultsCalculated() {
@@ -446,6 +452,8 @@ Item {
                                 TextFieldBlue { 
                                     id: cParameterField
                                     text: calculator.cMagnitude.toFixed(6) + " ∠" + calculator.cAngle.toFixed(1) + "°"
+                                    verticalAlignment: TextInput.AlignBottom
+                                    bottomPadding: 1
                                     Connections {
                                         target: calculator
                                         function onResultsCalculated() {
@@ -459,6 +467,8 @@ Item {
                                 TextFieldBlue { 
                                     id: dParameterField
                                     text: calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°"
+                                    verticalAlignment: TextInput.AlignBottom
+                                    bottomPadding: 1
                                     Connections {
                                         target: calculator
                                         function onResultsCalculated() {
