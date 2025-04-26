@@ -99,13 +99,12 @@ Item {
         }
     }
     
-    // Refined floating navigation bar with snap points and animations - now vertical
+    // Vertical tabbar
     Rectangle {
         id: floatingBar
         width: compactMode ? 70 : 80 // Adjust width based on screen size
-        height: tabButtonColumn.height + 40 // Add padding (20px on top and bottom)
-        radius: 28
-        // Use window.modeToggled for theme-aware colors
+        height: tabButtonColumn.height + 15 // Add padding (20px on top and bottom)
+        radius: 15
         color: window.modeToggled ? "#2D2D2D" : "#4a86e8"
         
         // Add property to track theme colors
@@ -123,27 +122,11 @@ Item {
             shadowHorizontalOffset: 3
             shadowBlur: 12
         }
-        
-        // Add property for tooltip visibility
-        property bool showTooltips: true
-        
+
         // Add property for screen adaptation
         property bool compactMode: parent.width < 800
-        
-        // Add keyboard focus properties for accessibility
-        activeFocusOnTab: true
-        
-        // Merged states array that combines keyboard focus and dragging states
+
         states: [
-            State {
-                name: "keyboardFocus"
-                when: floatingBar.activeFocus
-                PropertyChanges {
-                    target: floatingBar
-                    border.width: 2
-                    border.color: "#FFFFFF"
-                }
-            },
             State {
                 name: "dragging"
                 when: dragArea.drag.active
@@ -155,17 +138,6 @@ Item {
             }
         ]
         
-        // Handle keyboard navigation
-        Keys.onPressed: function(event) {
-            if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
-                currentIndex = Math.max(0, currentIndex - 1)
-                event.accepted = true
-            } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
-                currentIndex = Math.min(2, currentIndex + 1)
-                event.accepted = true
-            }
-        }
-        
         // Improve dark/light mode transitions
         Behavior on color {
             ColorAnimation { duration: 200 }
@@ -176,18 +148,18 @@ Item {
         y: (parent.height - height) / 2
         
         // Properties for animations and snap points
-        property bool snapToEdges: true
-        property real snapThreshold: 40 // Distance in pixels to snap to edge
-        property var snapPositions: [
-            {x: 0, y: (parent.height - height) / 2}, // Left center
-            {x: parent.width - width, y: (parent.height - height) / 2}, // Right center
-            {x: (parent.width - width) / 2, y: 0}, // Top center
-            {x: (parent.width - width) / 2, y: parent.height - height}, // Bottom center
-            {x: 0, y: 0}, // Top left
-            {x: parent.width - width, y: 0}, // Top right
-            {x: 0, y: parent.height - height}, // Bottom left
-            {x: parent.width - width, y: parent.height - height} // Bottom right
-        ]
+        // property bool snapToEdges: true
+        // property real snapThreshold: 40 // Distance in pixels to snap to edge
+        // property var snapPositions: [
+        //     {x: 0, y: (parent.height - height) / 2}, // Left center
+        //     {x: parent.width - width, y: (parent.height - height) / 2}, // Right center
+        //     {x: (parent.width - width) / 2, y: 0}, // Top center
+        //     {x: (parent.width - width) / 2, y: parent.height - height}, // Bottom center
+        //     {x: 0, y: 0}, // Top left
+        //     {x: parent.width - width, y: 0}, // Top right
+        //     {x: 0, y: parent.height - height}, // Bottom left
+        //     {x: parent.width - width, y: parent.height - height} // Bottom right
+        // ]
         
         // Property for current tab index with proper change handling
         property int currentIndex: 0
@@ -237,8 +209,8 @@ Item {
                 easing.type: Easing.OutQuad
             }
         }
-        
-        // Visual feedback when dragging - transitions remain the same
+
+        // Visual feedback when dragging
         transitions: [
             Transition {
                 from: ""
@@ -254,23 +226,6 @@ Item {
                 NumberAnimation {
                     properties: "opacity,scale"
                     duration: 300
-                }
-            },
-            // Add transition for keyboard focus state
-            Transition {
-                from: ""
-                to: "keyboardFocus"
-                NumberAnimation {
-                    properties: "border.width"
-                    duration: 150
-                }
-            },
-            Transition {
-                from: "keyboardFocus"
-                to: ""
-                NumberAnimation {
-                    properties: "border.width"
-                    duration: 150
                 }
             }
         ]
@@ -460,44 +415,37 @@ Item {
                             }
                         }
                     }
-                    
-                    // Tooltip for better UX
-                    ToolTip {
-                        visible: tabButtonMouse.containsMouse && floatingBar.showTooltips
-                        text: modelData.text
-                        delay: 800
-                    }
-                    
+
                     // Improve touch feedback
                     MouseArea {
                         id: tabButtonMouse
                         anchors.fill: parent
                         hoverEnabled: true
-                        
+
                         onClicked: {
                             floatingBar.currentIndex = tabButtonIndex
                             rippleEffect.opacity = 0.4
                             rippleAnimation.start()
                         }
-                        
-                        // Make cursor a pointer on hover
-                        cursorShape: Qt.PointingHandCursor
-                        
+
+                        // // Make cursor a pointer on hover
+                        // cursorShape: Qt.PointingHandCursor
+
                         // Highlight on hover
                         onEntered: {
                             if (!tabButton.isActive) {
                                 tabButtonBg.opacity = 0.15
                             }
                         }
-                        
+
                         onExited: {
                             if (!tabButton.isActive) {
                                 tabButtonBg.opacity = 0
                             }
                         }
-                        
+
                         // Make sure clicks aren't intercepted by the drag area
-                        z: 10
+                        z: 20
                     }
                 }
             }
@@ -653,33 +601,5 @@ Item {
                 floatingBar.highlightColor = isDarkTheme ? "#505050" : "#FFFFFF"
             }
         }
-    }
-    
-    // Add a double-click shortcut to reset bar position
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onDoubleClicked: {
-            // Reset floatingBar to default position (right center)
-            floatingBar.x = parent.width - floatingBar.width - 20
-            floatingBar.y = (parent.height - floatingBar.height) / 2
-        }
-        z: -1 // Place below other elements
-    }
-    
-    // Add keyboard shortcut for tab switching
-    Shortcut {
-        sequence: "Ctrl+1"
-        onActivated: floatingBar.currentIndex = 0
-    }
-    
-    Shortcut {
-        sequence: "Ctrl+2"
-        onActivated: floatingBar.currentIndex = 1
-    }
-    
-    Shortcut {
-        sequence: "Ctrl+3"
-        onActivated: floatingBar.currentIndex = 2
     }
 }
