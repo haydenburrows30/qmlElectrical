@@ -41,6 +41,7 @@ from models.theory.transformer_naming import TransformerNamingGuide
 from models.basic.base_impedance_calculator import BaseImpedanceCalculator
 from models.basic.per_unit_impedance_calculator import PerUnitImpedanceCalculator
 from models.cable.network_cabinet_calculator import NetworkCabinetCalculator
+from models.theory.transform_calculator import TransformCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -96,5 +97,6 @@ def register_qml_types(engine, current_dir):
         (BaseImpedanceCalculator, "BaseImpedanceCalculator", 1, 0, "BaseImpedanceCalculator"),
         (PerUnitImpedanceCalculator, "PerUnitImpedance", 1, 0, "PerUnitImpedanceCalculator"),
         (NetworkCabinetCalculator, "NetworkCabinetCalculator", 1, 0, "NetworkCabinetCalculator"),
-        (SequenceComponentCalculator, "SequenceComponentCalculator", 1, 0, "SequenceComponentCalculator")
+        (SequenceComponentCalculator, "SequenceComponentCalculator", 1, 0, "SequenceComponentCalculator"),
+        (TransformCalculator, "TransformCalculator", 1, 0, "TransformCalculator")
     ]

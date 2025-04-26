@@ -29,9 +29,8 @@ from services.preload_manager import PreloadManager
 from services.lightweight_performance import LightweightPerformanceMonitor
 from services.logger_config import configure_logger
 from services.about_program import ConfigBridge
-# Import the new FileSaver class
+
 from services.file_saver import FileSaver
-# Import DatabaseManager for initialization
 from services.database_manager import DatabaseManager
 
 # Resources
@@ -95,7 +94,7 @@ class Application:
                 qmlRegisterType(type_class, uri, major, minor, name)
             except Exception as e:
                 self.logger.warning(f"Could not register type: {e}")
-        
+
         # Register the FileSaver class
         qmlRegisterType(FileSaver, "FileSaverUtils", 1, 0, "FileSaver")
 
@@ -126,7 +125,7 @@ class Application:
         
         # PlatformHelper keeps a context property for backward compatibility
         self.qml_engine.rootContext().setContextProperty("PlatformHelper", PlatformHelper())
-        
+
         # Load main QML file
         main_qml = CURRENT_DIR / "qml" / "main.qml"
         self.qml_engine.load(str(main_qml))
