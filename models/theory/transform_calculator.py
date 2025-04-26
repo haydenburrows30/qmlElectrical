@@ -41,9 +41,16 @@ class TransformCalculatorWorker(QRunnable):
                                     Q_ARG("QVariantList", magnitude),
                                     Q_ARG("QVariantList", phase))
             
-        except Exception:
-            # Silently handle the error without logging
-            pass
+        except Exception as e:
+            # Log the error and ensure we reset the calculator status
+            print(f"Error in calculation: {str(e)}")
+            # Ensure we always call updateResults to finish the calculation
+            QMetaObject.invokeMethod(self.parent, "updateResults", 
+                                    Qt.ConnectionType.QueuedConnection,
+                                    Q_ARG("QVariantList", []),
+                                    Q_ARG("QVariantList", []),
+                                    Q_ARG("QVariantList", []),
+                                    Q_ARG("QVariantList", []))
         finally:
             # Make sure to shut down the thread pool
             self.thread_pool.shutdown(wait=False)
@@ -140,6 +147,39 @@ class TransformCalculatorWorker(QRunnable):
             omega = 2 * np.pi * self.frequency
             # Create s_values centered around the resonant frequency for better visualization
             s_values = np.linspace(0, max(300, omega * 3), 200)  # Show up to 3x the resonant frequency
+        elif self.function_type == "Damped Sine":
+            omega = 2 * np.pi * self.frequency
+            # Create more data points around the expected resonance
+            s_values = np.linspace(0, max(200, omega * 3), 300)  # Higher resolution
+        elif self.function_type == "Impulse":
+            s_values = np.linspace(0, 200, 300)  # Higher resolution over wider range
+        elif self.function_type == "Square":
+            omega = 2 * np.pi * self.frequency
+            # Create s_values to show several harmonics
+            s_values = np.linspace(0, max(200, omega * 5), 300)  # Show up to 5x the fundamental frequency
+        elif self.function_type == "Sawtooth":
+            omega = 2 * np.pi * self.frequency
+            # Create s_values to show several harmonics
+            s_values = np.linspace(0, max(200, omega * 5), 300)  # Show up to 5x the fundamental frequency
+        elif self.function_type == "Exponential":
+            # For exponential, use a wider frequency range to show the frequency response
+            # The exponential decay has a low-pass characteristic
+            # Use a frequency range based on the decay constant (parameter_b)
+            cutoff = self.parameter_b
+            # Create more data points with a wider range for better visualization
+            s_values = np.linspace(0, max(200, cutoff * 10), 300)
+        elif self.function_type == "Gaussian":
+            # For Gaussian, use a wider frequency range
+            # The Gaussian has broad frequency content
+            center = self.parameter_b
+            # Width parameter - derived from the standard deviation
+            sigma = self.parameter_b/5 if self.parameter_b > 0 else 0.2
+            # Create more data points with a wider range for better visualization
+            s_values = np.linspace(0, 200, 300)  # Similar range to impulse
+        elif self.function_type == "Step":
+            # For step function, use a wider frequency range to show full response
+            # The step function has important low-frequency content
+            s_values = np.linspace(0, 200, 300)  # Higher resolution over wider range
         else:
             s_values = np.linspace(0.1, 5, 50)  # Standard range for other functions
         
@@ -150,38 +190,245 @@ class TransformCalculatorWorker(QRunnable):
         # Generate the transformed equation and compute values
         if self.function_type == "Sine":
             omega = 2 * np.pi * self.frequency
-            # More precise equation showing the resonant frequency explicitly
             self.parent._equation_transform = (f"L{{f(t)}} = {self.parameter_a}·ω/(s²+ω²), "
                                               f"where ω={omega:.1f} rad/s ({self.frequency:.1f} Hz)\n"
                                               f"Resonant peak at s=j·{omega:.1f} rad/s")
             
-            # This should create a resonant peak at s = jω, not a straight line
             for i, s_imag in enumerate(s_values):
                 s = complex(0.1, s_imag)  # Use small real part for numerical stability
-                # Calculate magnitude from the transfer function
                 complex_result = self.parameter_a * omega / (s**2 + omega**2)
                 magnitude[i] = abs(complex_result)
                 phase[i] = np.angle(complex_result, deg=True)
             
-            # Store the resonant frequency
             self.parent._resonant_frequency = omega
-        elif self.function_type == "Exponential":
-            self.parent._equation_transform = f"L{{f(t)}} = {self.parameter_a}/(s+{self.parameter_b})"
-            for i, s in enumerate(s_values):
-                magnitude[i] = self.parameter_a / (s + self.parameter_b)
-                phase[i] = 0  # Real-valued for simple exponential
-                
-            # No specific resonance for exponential
+        elif self.function_type == "Square":
+            omega = 2 * np.pi * self.frequency
+            period = 1.0 / self.frequency
+            amplitude = self.parameter_a
+            
+            self.parent._equation_transform = (f"L{{square(2π·{self.frequency}t)}} ≈ " 
+                                             f"{amplitude}·(1/s)·tanh(s·{period/2:.3f})\n"
+                                             f"Showing harmonic structure up to {int(5*omega/(2*np.pi))} Hz")
+            
+            for i, s_imag in enumerate(s_values):
+                try:
+                    s = complex(0.1, s_imag)  # Small real part for stability
+                    
+                    if s_imag < 0.001:  # Near zero frequency, use DC value
+                        complex_result = amplitude / s
+                    else:
+                        arg = np.clip(s * (period/2), -20, 20)  # Improved clipping for numerical stability
+                        complex_result = amplitude * (1/s) * np.tanh(arg)
+                    
+                    magnitude[i] = abs(complex_result)
+                    phase[i] = np.angle(complex_result, deg=True)
+                except Exception:
+                    magnitude[i] = 0
+                    phase[i] = 0
+            
             self.parent._resonant_frequency = -1
+        elif self.function_type == "Sawtooth":
+            omega = 2 * np.pi * self.frequency
+            period = 1.0 / self.frequency
+            amplitude = self.parameter_a
+            
+            self.parent._equation_transform = (f"L{{sawtooth(2π·{self.frequency}t)}} ≈ " 
+                                             f"{amplitude}/(s²·{period})·(1 - e^(-s·{period}))\n"
+                                             f"Showing harmonic structure up to {int(5*omega/(2*np.pi))} Hz")
+            
+            for i, s_imag in enumerate(s_values):
+                try:
+                    s = complex(0.1, s_imag)  # Small real part for stability
+                    
+                    if abs(s) < 0.001:
+                        magnitude[i] = amplitude * period / 2  # DC component
+                        phase[i] = 0
+                    else:
+                        complex_result = (amplitude / period) * (1 / s**2) * (1 - np.exp(-s * period))
+                        magnitude[i] = abs(complex_result)
+                        phase[i] = np.angle(complex_result, deg=True)
+                except Exception:
+                    magnitude[i] = 0
+                    phase[i] = 0
+            
+            self.parent._resonant_frequency = -1
+        elif self.function_type == "Damped Sine":
+            omega = 2 * np.pi * self.frequency
+            damping = self.parameter_b
+            
+            self.parent._equation_transform = (f"L{{f(t)}} = {self.parameter_a}·ω/((s+{damping})²+ω²), "
+                                             f"where ω={omega:.1f} rad/s\n"
+                                             f"Resonant peak at s=j·{omega:.1f} rad/s")
+            
+            for i, s_imag in enumerate(s_values):
+                s = complex(0.1, s_imag)  # Use small real part for numerical stability
+                complex_result = self.parameter_a * omega / ((s + damping)**2 + omega**2)
+                magnitude[i] = abs(complex_result)
+                phase[i] = np.angle(complex_result, deg=True)
+            
+            self.parent._resonant_frequency = omega
+        elif self.function_type == "Impulse":
+            delay = self.parameter_b
+            amplitude = self.parameter_a
+            
+            self.parent._equation_transform = (f"L{{f(t)}} = {amplitude}·e^(-{delay}s), " 
+                                             f"where delay={delay} s")
+            
+            for i, s_imag in enumerate(s_values):
+                s = complex(0.1, s_imag)  # Small real part for stability
+                
+                ideal_result = amplitude * np.exp(-s * delay)
+                
+                rolloff_factor = 1.0 / (1.0 + (s_imag/50.0)**2)
+                
+                complex_result = ideal_result * rolloff_factor
+                
+                magnitude[i] = abs(complex_result)
+                phase[i] = np.angle(complex_result, deg=True)
+            
+            self.parent._resonant_frequency = -1
+            
+            self.parent._equation_transform += "\n(Showing with realistic frequency roll-off)"
+        elif self.function_type == "Exponential":
+            decay_rate = self.parameter_b
+            amplitude = self.parameter_a
+            
+            self.parent._equation_transform = (f"L{{f(t)}} = {amplitude}/(s+{decay_rate})\n"
+                                             f"For t ≥ 0, this represents a first-order system with time constant τ = {1/decay_rate:.3f} s")
+            
+            for i, s_imag in enumerate(s_values):
+                try:
+                    s = complex(0.1, s_imag)
+                    
+                    complex_result = amplitude / (s + decay_rate)
+                    magnitude[i] = abs(complex_result)
+                    phase[i] = np.angle(complex_result, deg=True)
+                except Exception:
+                    magnitude[i] = 0
+                    phase[i] = 0
+            
+            self.parent._resonant_frequency = -1
+        elif self.function_type == "Gaussian":
+            # The Laplace transform of a Gaussian A*exp(-(t-b)²/(2σ²))
+            # is complex but can be approximated with numerical methods
+            center = self.parameter_b
+            amplitude = self.parameter_a
+            sigma = self.parameter_b/5 if self.parameter_b > 0 else 0.2
+            
+            # Set a descriptive equation for the transform
+            self.parent._equation_transform = (f"L{{f(t)}} = {amplitude}·e^(s·{center}-(s·σ)²/2)\n"
+                                             f"Gaussian centered at t={center} with σ={sigma:.3f}")
+            
+            # Calculate transform with numerical handling and prevent overflow
+            max_magnitude = 0
+            temp_magnitudes = np.zeros_like(s_values)
+            temp_phases = np.zeros_like(s_values)
+            
+            # First pass to calculate and find maximum
+            for i, s_imag in enumerate(s_values):
+                try:
+                    # Use complex s with small real part for stability
+                    s = complex(0.1, s_imag)
+                    
+                    # Prevent numerical overflow by limiting the exponent
+                    # Calculate the exponent first
+                    exponent = s * center - (s * sigma)**2 / 2
+                    
+                    # Limit the exponent to prevent overflow in exp function
+                    if exponent.real > 700:  # np.exp can overflow above ~709
+                        exponent = complex(700, exponent.imag)
+                    
+                    # Calculate exp(exponent) with overflow protection
+                    try:
+                        exp_value = np.exp(exponent)
+                    except:
+                        # Fallback if exp still overflows
+                        exp_value = 0 if exponent.real < 0 else float('inf')
+                    
+                    # Final complex result
+                    complex_result = amplitude * exp_value
+                    
+                    # Add a realistic decay for higher frequencies, with safety check
+                    rolloff_factor = 1.0 / (1.0 + (s_imag/100.0)**2)
+                    
+                    # Only multiply if complex_result is finite
+                    if np.isfinite(complex_result):
+                        complex_result *= rolloff_factor
+                    
+                    # Store magnitude and phase
+                    mag = abs(complex_result)
+                    phase = np.angle(complex_result, deg=True)
+                    
+                    # Check if result is valid before storing
+                    if np.isfinite(mag):
+                        temp_magnitudes[i] = mag
+                        temp_phases[i] = phase
+                        max_magnitude = max(max_magnitude, mag)
+                    else:
+                        temp_magnitudes[i] = 0
+                        temp_phases[i] = 0
+                        
+                except Exception as e:
+                    # Fallback for numerical issues
+                    temp_magnitudes[i] = 0
+                    temp_phases[i] = 0
+            
+            # Apply scaling/normalization in second pass
+            if max_magnitude > 5:
+                # Normalize to a reasonable range if values are too large
+                scale_factor = 3.0 / max_magnitude
+                magnitude = temp_magnitudes * scale_factor
+            else:
+                magnitude = temp_magnitudes
+            
+            phase = temp_phases
+            
+            # No specific resonance for Gaussian
+            self.parent._resonant_frequency = -1
+            
+            # Update the equation to indicate scaling if applied
+            if max_magnitude > 5:
+                self.parent._equation_transform += f"\n(Magnitude scaled by factor of {(3.0/max_magnitude):.3g} for display)"
+        elif self.function_type == "Step":
+            # The Laplace transform of a unit step function u(t-a) is e^(-as)/s
+            delay = self.parameter_b
+            amplitude = self.parameter_a
+            
+            self.parent._equation_transform = (f"L{{u(t-{delay})}} = {amplitude}·e^(-{delay}s)/s\n"
+                                             f"Step at t={delay} with height={amplitude}")
+            
+            # Calculate transform with better numerical handling
+            for i, s_imag in enumerate(s_values):
+                try:
+                    # Use a more stable approach for s with small real part
+                    s = complex(0.1, s_imag)  # Small real part for stability
+                    
+                    # Calculate the transform
+                    complex_result = amplitude * np.exp(-s * delay) / s
+                    
+                    # Add a realistic roll-off at higher frequencies
+                    rolloff_factor = 1.0 / (1.0 + (s_imag/50.0)**2)
+                    complex_result *= rolloff_factor
+                    
+                    magnitude[i] = abs(complex_result)
+                    phase[i] = np.angle(complex_result, deg=True)
+                except Exception:
+                    # Fallback for numerical issues
+                    magnitude[i] = 0
+                    phase[i] = 0
+            
+            # No specific resonance for step
+            self.parent._resonant_frequency = -1
+            
+            # Add an explanatory note to the equation about roll-off
+            self.parent._equation_transform += "\n(Showing with realistic frequency roll-off)"
         else:
-            # Numerical integration for other functions
             self.parent._equation_transform = "L{f(t)} = ∫₀^∞ f(t)·e^(-st)dt"
             for i, s in enumerate(s_values):
                 integrand = y * np.exp(-s * t)
                 magnitude[i] = np.trapz(integrand, t)
-                phase[i] = 0  # Simplified
+                phase[i] = 0
                 
-            # No specific resonance for other functions
             self.parent._resonant_frequency = -1
         
         return s_values.tolist(), magnitude.tolist(), phase.tolist()
@@ -373,18 +620,23 @@ class TransformCalculator(QObject):
         """Update results from worker thread (called via invokeMethod)"""
         try:
             # Update the result properties
-            self._time_domain = time_domain
-            self._frequencies = frequencies
-            self._transform_result = magnitude
-            self._phase_result = phase
+            self._time_domain = time_domain if time_domain else []
+            self._frequencies = frequencies if frequencies else []
+            self._transform_result = magnitude if magnitude else []
+            self._phase_result = phase if phase else []
             
-            # Signal that calculation has finished
+        except Exception as e:
+            # Log the error
+            print(f"Error updating results: {str(e)}")
+            # Ensure properties are at least empty lists, not None
+            self._time_domain = []
+            self._frequencies = []
+            self._transform_result = []
+            self._phase_result = []
+        finally:
+            # Always set calculating to false regardless of success or failure
             self.calculating = False
             self.resultsCalculated.emit()
-            
-        except Exception:
-            # Silently handle the error without logging
-            self.calculating = False
     
     # QML slots
     @Slot(str)

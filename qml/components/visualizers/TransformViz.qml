@@ -145,7 +145,7 @@ Item {
                 id: freqAxisX
                 min: 0
                 // Adjust max based on the transform type
-                max: transformType === "Fourier" ? 100 : 1000  // Much wider for Laplace to show resonance
+                max: transformType === "Fourier" ? 100 : 200  // Increased from 1000 to provide better visualization
                 labelFormat: "%.1f"
                 labelsColor: root.textColor
                 gridLineColor: root.gridColor
@@ -426,7 +426,7 @@ Item {
                 
                 freqAxisX.labelFormat = "%.1f";
             } else {
-                // For Laplace, automatically adjust the range to show the peak
+                // For Laplace, automatically adjust the range to show the peak or full response
                 // Find the location of the peak
                 let peakIndex = -1;
                 let peakValue = 0;
@@ -441,11 +441,26 @@ Item {
                 // If we found a peak, center the view around it
                 if (peakIndex >= 0) {
                     let peakFreq = frequencies[peakIndex];
-                    // Scale the axis to show 1.5x the peak frequency on each side
+                    // Scale the axis to show 3x the peak frequency
                     freqAxisX.max = Math.max(peakFreq * 3, 100);
                 } else {
-                    // Fallback
-                    freqAxisX.max = maxFreq > 0 ? Math.max(maxFreq * 1.5, 1000) : 1000;
+                    // Fallback - ensure we show at least 100 rad/s range
+                    freqAxisX.max = Math.max(maxFreq > 0 ? maxFreq * 1.5 : 100, 100);
+                }
+                
+                // For damped sine or impulse waves specifically, ensure we show enough range
+                if ((resonantFrequency > 0) || 
+                    (transformResult.length > 200 && maxFreq > 50)) { // Likely impulse or other wide-spectrum function
+                    
+                    // For wide-spectrum functions, ensure we show a reasonable range
+                    // Show at least 3x the frequency where we find the majority of energy
+                    let significantFreq = findSignificantFrequency(magnitudePoints, maxMagnitude);
+                    if (significantFreq > 0) {
+                        freqAxisX.max = Math.max(freqAxisX.max, significantFreq * 3);
+                    }
+                    
+                    // But cap it for readability
+                    freqAxisX.max = Math.min(freqAxisX.max, 200);
                 }
                 
                 freqAxisX.labelFormat = freqAxisX.max > 100 ? "%.0f" : "%.1f";
@@ -496,5 +511,23 @@ Item {
                 resonanceLabel.y = yPos - resonanceLabel.height - 5;
             }
         }
+    }
+    
+    // Helper function to find a significant frequency for proper scaling
+    function findSignificantFrequency(points, maxMagnitude) {
+        if (!points || points.length === 0) return 0;
+        
+        // Find the frequency where the magnitude drops to 50% of the max
+        // This is a good heuristic to set the display range
+        let threshold = maxMagnitude * 0.5;
+        
+        for (let i = 0; i < points.length; i++) {
+            if (points[i].y < threshold) {
+                return points[i].x;
+            }
+        }
+        
+        // If we didn't find a cutoff point, return the last frequency
+        return points[points.length - 1].x;
     }
 }
