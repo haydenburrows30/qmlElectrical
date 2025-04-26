@@ -106,7 +106,7 @@ Item {
         
         // Position initially on the right side
         Component.onCompleted: {
-            setPosition(parent.width - width - 20, (parent.height - height) / 2)
+            setPosition(10, 10)
         }
         
         // Set tab model
@@ -121,38 +121,6 @@ Item {
         barColor: window.modeToggled ? "#2D2D2D" : "#4a86e8"
         textColor: "#FFFFFF"
         highlightColor: window.modeToggled ? "#505050" : "#FFFFFF"
-        
-        // Handle tab selection
-        onTabSelected: function(index) {
-            contentStack.currentIndex = index
-        }
-    }
-    
-    // Add a double-click shortcut to reset bar position
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        onDoubleClicked: {
-            // Reset tabBar to default position (right center)
-            tabBar.resetPosition()
-        }
-        z: -1 // Place below other elements
-    }
-    
-    // Add keyboard shortcut for tab switching
-    Shortcut {
-        sequence: "Ctrl+1"
-        onActivated: tabBar.currentIndex = 0
-    }
-    
-    Shortcut {
-        sequence: "Ctrl+2"
-        onActivated: tabBar.currentIndex = 1
-    }
-    
-    Shortcut {
-        sequence: "Ctrl+3"
-        onActivated: tabBar.currentIndex = 2
     }
     
     // Listen for theme changes

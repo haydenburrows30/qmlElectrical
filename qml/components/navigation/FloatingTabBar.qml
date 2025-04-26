@@ -17,7 +17,7 @@ Item {
     // Add property to control collapse behavior
     property bool collapsedByDefault: true
     property bool isCollapsed: collapsedByDefault
-    property int collapseDelay: 1000 // ms to wait before collapsing after mouse leaves
+    property int collapseDelay: 2000 // ms to wait before collapsing after mouse leaves
     
     // Signals
     signal tabSelected(int index)
@@ -85,7 +85,7 @@ Item {
         // Initialize side position on component completion
         Component.onCompleted: updateSidePosition()
         
-        // Add menu icon for collapsed state
+        // menu icon for collapsed state
         Rectangle {
             id: menuIcon
             width: 40
@@ -231,7 +231,7 @@ Item {
             }
         }
         
-        // Visual feedback when dragging - transitions remain the same
+        // Visual feedback when dragging
         transitions: [
             Transition {
                 from: ""
@@ -251,6 +251,7 @@ Item {
             }
         ]
         
+        // main bar
         Column {
             id: tabButtonColumn
             anchors.centerIn: parent
@@ -264,7 +265,7 @@ Item {
             }
             
             // Move tabs down in expanded state to make room for the menu icon
-            anchors.verticalCenterOffset: isCollapsed ? 0 : 15
+            // anchors.verticalCenterOffset: isCollapsed ? 0 : 15
             
             Repeater {
                 id: tabButtonRepeater
@@ -496,8 +497,8 @@ Item {
     // Public methods
     function resetPosition() {
         if (parent) {
-            floatingBar.x = parent.width - floatingBar.width - 20
-            floatingBar.y = (parent.height - floatingBar.height) / 2
+            floatingBar.x = 10
+            floatingBar.y = 10
         }
     }
     
