@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtCharts
+import Qt.labs.platform
 
 Item {
     id: root
@@ -23,28 +24,25 @@ Item {
     property bool highPerformanceMode: true // Add a high performance mode property
     property real resonantFrequency: -1 // Add property for resonant frequency
     
+    // Detect operating system
+    readonly property bool isLinux: Qt.platform.os === "linux"
+    readonly property bool isWindows: Qt.platform.os === "windows"
+    
     // Update charts when data changes or component completes
     Component.onCompleted: {
         // Use callLater to make sure initialization is complete
-        Qt.callLater(updateTimeDomainChart)
-        Qt.callLater(updateTransformChart)
+        Qt.callLater(updateCharts)
     }
     
-    onTimeDomainChanged: {
-        Qt.callLater(updateTimeDomainChart)
-    }
+    onTimeDomainChanged: Qt.callLater(updateCharts)
+    onTransformResultChanged: Qt.callLater(updateCharts)
+    onShowPhaseChanged: Qt.callLater(updateCharts)
+    onHighPerformanceModeChanged: Qt.callLater(updateCharts)
     
-    onTransformResultChanged: {
-        Qt.callLater(updateTransformChart)
-    }
-    
-    onShowPhaseChanged: {
-        Qt.callLater(updateTransformChart)
-    }
-    
-    onHighPerformanceModeChanged: {
-        Qt.callLater(updateTimeDomainChart)
-        Qt.callLater(updateTransformChart)
+    // Update both charts together to ensure consistency
+    function updateCharts() {
+        updateTimeDomainChart()
+        updateTransformChart()
     }
     
     ColumnLayout {
@@ -127,7 +125,7 @@ Item {
                 axisY: timeAxisY
                 color: root.lineColor1
                 width: highPerformanceMode ? 1 : 2 // Thinner lines in high perf mode
-                useOpenGL: true // Use OpenGL for better rendering performance
+                useOpenGL: isLinux // Enable OpenGL only on Linux
             }
         }
         
@@ -193,7 +191,7 @@ Item {
                 axisY: magnitudeAxisY
                 color: root.lineColor1
                 width: highPerformanceMode ? 1 : 2
-                useOpenGL: true
+                useOpenGL: isLinux // Enable OpenGL only on Linux
             }
             
             LineSeries {
@@ -204,7 +202,7 @@ Item {
                 color: root.lineColor2
                 width: highPerformanceMode ? 1 : 2
                 visible: root.showPhase
-                useOpenGL: true
+                useOpenGL: isLinux // Enable OpenGL only on Linux
             }
             
             // Add a vertical line to indicate resonant frequency for Laplace transforms
@@ -216,6 +214,7 @@ Item {
                 color: "#ff5722"  // Orange color for visibility
                 width: 2
                 visible: transformType === "Laplace" && resonantFrequency > 0
+                useOpenGL: isLinux // Enable OpenGL only on Linux
             }
             
             // Add a text annotation to label the resonant frequency
@@ -244,22 +243,22 @@ Item {
     
     // Update functions
     function updateTimeDomainChart() {
-        // Clear existing points
-        timeSeries.clear()
+        // Create temporary arrays for points
+        let timePoints = [];
         
         // Check if we have data
         if (!timeDomain || timeDomain.length === 0) {
-            return
+            return;
         }
         
         // Add the points to the series
-        let minY = Number.MAX_VALUE
-        let maxY = -Number.MAX_VALUE
-        let maxX = 0
-        let pointsAdded = 0
+        let minY = Number.MAX_VALUE;
+        let maxY = -Number.MAX_VALUE;
+        let maxX = 0;
+        let pointsAdded = 0;
         
         try {
-            // Further optimize stride calculation by using a more adaptive approach
+            // Calculate stride for sampling points
             let stride = 1;
             if (highPerformanceMode) {
                 // Scale stride based on data size - larger datasets get more aggressive subsampling
@@ -275,66 +274,74 @@ Item {
             if (timeDomain.length > 0) {
                 // Handle different data formats
                 if (typeof timeDomain[0] === 'object' && 'x' in timeDomain[0] && 'y' in timeDomain[0]) {
-                    // Use append instead of replace for better compatibility
+                    // First collect points in array
                     for (let i = 0; i < timeDomain.length; i += stride) {
-                        let point = timeDomain[i]
+                        let point = timeDomain[i];
                         
                         if (point && isFinite(point.x) && isFinite(point.y)) {
-                            timeSeries.append(point.x, point.y)
+                            timePoints.push({ x: point.x, y: point.y });
                             
                             // Track min/max for axis scaling
-                            minY = Math.min(minY, point.y)
-                            maxY = Math.max(maxY, point.y)
-                            maxX = Math.max(maxX, point.x)
-                            pointsAdded++
+                            minY = Math.min(minY, point.y);
+                            maxY = Math.max(maxY, point.y);
+                            maxX = Math.max(maxX, point.x);
+                            pointsAdded++;
                         }
                     }
                 } 
                 // Array of arrays format
                 else if (Array.isArray(timeDomain[0])) {
                     for (let i = 0; i < timeDomain.length; i += stride) {
-                        let point = timeDomain[i]
+                        let point = timeDomain[i];
                         
                         if (point && point.length >= 2 && 
                             isFinite(point[0]) && isFinite(point[1])) {
                             
-                            timeSeries.append(point[0], point[1])
+                            timePoints.push({ x: point[0], y: point[1] });
                             
-                            minY = Math.min(minY, point[1])
-                            maxY = Math.max(maxY, point[1])
-                            maxX = Math.max(maxX, point[0])
-                            pointsAdded++
+                            minY = Math.min(minY, point[1]);
+                            maxY = Math.max(maxY, point[1]);
+                            maxX = Math.max(maxX, point[0]);
+                            pointsAdded++;
                         }
                     }
                 }
                 // Direct array of y values
                 else if (typeof timeDomain[0] === 'number') {
                     for (let i = 0; i < timeDomain.length; i += stride) {
-                        let y = timeDomain[i]
+                        let y = timeDomain[i];
                         
                         if (isFinite(y)) {
-                            timeSeries.append(i / 20, y)
+                            timePoints.push({ x: i / 20, y: y });
                             
-                            minY = Math.min(minY, y)
-                            maxY = Math.max(maxY, y)
-                            pointsAdded++
+                            minY = Math.min(minY, y);
+                            maxY = Math.max(maxY, y);
+                            pointsAdded++;
                         }
                     }
                     
-                    maxX = (timeDomain.length - 1) / 20
+                    maxX = (timeDomain.length - 1) / 20;
                 }
             }
             
             // Only update axes if we have valid data
             if (isFinite(minY) && isFinite(maxY) && minY !== Number.MAX_VALUE && pointsAdded > 0) {
                 // Update the axes with some padding
-                timeAxisX.min = 0
-                timeAxisX.max = maxX > 0 ? maxX : 5
+                timeAxisX.min = 0;
+                timeAxisX.max = maxX > 0 ? maxX : 5;
                 
                 // Ensure symmetric y-axis for visual clarity
-                const yRange = Math.max(Math.abs(minY), Math.abs(maxY)) * 1.2
-                timeAxisY.min = -yRange || -2  // Default to -2 if yRange is 0 or NaN
-                timeAxisY.max = yRange || 2    // Default to 2 if yRange is 0 or NaN
+                const yRange = Math.max(Math.abs(minY), Math.abs(maxY)) * 1.2;
+                timeAxisY.min = -yRange || -2;  // Default to -2 if yRange is 0 or NaN
+                timeAxisY.max = yRange || 2;    // Default to 2 if yRange is 0 or NaN
+                
+                // Clear and replace all points at once to ensure Windows compatibility
+                timeSeries.clear();
+                
+                // For Windows, use a more compatible approach to add points
+                for (let i = 0; i < timePoints.length; i++) {
+                    timeSeries.append(timePoints[i].x, timePoints[i].y);
+                }
             }
         } catch (e) {
             // Silently handle errors
@@ -342,39 +349,39 @@ Item {
     }
     
     function updateTransformChart() {
-        // Clear existing points
-        magnitudeSeries.clear()
-        phaseSeries.clear()
-        resonanceMarker.clear()  // Clear the resonance marker
+        // Temporary arrays for collecting points
+        let magnitudePoints = [];
+        let phasePoints = [];
+        let resonancePoints = [];
         
         // Check if we have data
-        if (!transformResult || transformResult.length === 0) return
+        if (!transformResult || transformResult.length === 0) return;
         
         // Add the points to the series
-        let maxMagnitude = 0
-        let maxFreq = 0
+        let maxMagnitude = 0;
+        let maxFreq = 0;
         
         // For large datasets, subsample in high performance mode
-        let stride = highPerformanceMode && transformResult.length > 1000 ? Math.floor(transformResult.length / 500) : 1
+        let stride = highPerformanceMode && transformResult.length > 1000 ? Math.floor(transformResult.length / 500) : 1;
         
-        // Use append instead of replace for points
+        // Collect points in arrays first
         for (let i = 0; i < transformResult.length; i += stride) {
             if (i < frequencies.length) {
-                let freq = frequencies[i]
-                let magnitude = transformResult[i]
+                let freq = frequencies[i];
+                let magnitude = transformResult[i];
                 
                 // Check for valid numbers
                 if (isFinite(freq) && isFinite(magnitude)) {
-                    magnitudeSeries.append(freq, magnitude)
-                    maxMagnitude = Math.max(maxMagnitude, magnitude)
-                    maxFreq = Math.max(maxFreq, freq)
+                    magnitudePoints.push({ x: freq, y: magnitude });
+                    maxMagnitude = Math.max(maxMagnitude, magnitude);
+                    maxFreq = Math.max(maxFreq, freq);
                 }
                 
                 // Add phase points if we have phase data
                 if (phaseResult && i < phaseResult.length) {
-                    let phase = phaseResult[i]
+                    let phase = phaseResult[i];
                     if (isFinite(freq) && isFinite(phase)) {
-                        phaseSeries.append(freq, phase)
+                        phasePoints.push({ x: freq, y: phase });
                     }
                 }
             }
@@ -383,7 +390,7 @@ Item {
         // Only update axes if we have valid data
         if (isFinite(maxMagnitude) && isFinite(maxFreq)) {
             // Update the magnitude axis with some padding
-            freqAxisX.min = 0
+            freqAxisX.min = 0;
             
             // Different axis handling for Fourier vs Laplace
             if (transformType === "Fourier") {
@@ -454,29 +461,40 @@ Item {
                     freqAxisX.max = resonantFrequency * 1.5;
                 }
             }
-        }
-        
-        // Update the resonance marker if applicable
-        if (transformType === "Laplace" && resonantFrequency > 0) {
-            // Create a vertical line at the resonant frequency
-            // Get the max magnitude to scale the line height
-            let maxMag = 0;
-            for (let i = 0; i < transformResult.length; i++) {
-                maxMag = Math.max(maxMag, transformResult[i]);
+            
+            // Clear and add all points at once to ensure Windows compatibility
+            magnitudeSeries.clear();
+            for (let i = 0; i < magnitudePoints.length; i++) {
+                magnitudeSeries.append(magnitudePoints[i].x, magnitudePoints[i].y);
             }
             
-            // Draw vertical line from 0 to slightly above max magnitude
-            resonanceMarker.append(resonantFrequency, 0);
-            resonanceMarker.append(resonantFrequency, maxMag * 1.1);
+            phaseSeries.clear();
+            for (let i = 0; i < phasePoints.length; i++) {
+                phaseSeries.append(phasePoints[i].x, phasePoints[i].y);
+            }
             
-            // Position the label near the resonant frequency peak
-            // We need to convert from value to pixel position
-            let xPos = transformChart.mapToPosition(Qt.point(resonantFrequency, maxMag), magnitudeSeries).x;
-            let yPos = transformChart.mapToPosition(Qt.point(resonantFrequency, maxMag * 0.8), magnitudeSeries).y;
-            
-            // Set the position of the label
-            resonanceLabel.x = xPos - resonanceLabel.width / 2;
-            resonanceLabel.y = yPos - resonanceLabel.height - 5;
+            // Update the resonance marker if applicable
+            if (transformType === "Laplace" && resonantFrequency > 0) {
+                // Create a vertical line at the resonant frequency
+                // Get the max magnitude to scale the line height
+                let maxMag = maxMagnitude;
+                
+                // Clear any existing points
+                resonanceMarker.clear();
+                
+                // Draw vertical line from 0 to slightly above max magnitude
+                resonanceMarker.append(resonantFrequency, 0);
+                resonanceMarker.append(resonantFrequency, maxMag * 1.1);
+                
+                // Position the label near the resonant frequency peak
+                // We need to convert from value to pixel position
+                let xPos = transformChart.mapToPosition(Qt.point(resonantFrequency, maxMag), magnitudeSeries).x;
+                let yPos = transformChart.mapToPosition(Qt.point(resonantFrequency, maxMag * 0.8), magnitudeSeries).y;
+                
+                // Set the position of the label
+                resonanceLabel.x = xPos - resonanceLabel.width / 2;
+                resonanceLabel.y = yPos - resonanceLabel.height - 5;
+            }
         }
     }
 }
