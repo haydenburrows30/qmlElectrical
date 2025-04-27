@@ -61,12 +61,18 @@ class CalculusCalculator(QObject):
         return self._parameter_a * np.sin(self._parameter_b * x)
     
     def _polynomial_function(self, x):
-        # Represents a*x^b
-        return self._parameter_a * np.power(x, self._parameter_b)
+        # Represents a*x^b, handling negative values properly
+        # Use np.sign to preserve sign for odd powers, handle non-integer powers
+        if self._parameter_b % 1 == 0:  # Integer exponent
+            return self._parameter_a * np.power(x, self._parameter_b)
+        else:  # Non-integer exponent: can't raise negative numbers
+            # Apply power to absolute value, then restore sign for odd integer powers
+            return self._parameter_a * np.power(np.abs(x), self._parameter_b)
     
     def _exponential_function(self, x):
-        # Represents a*e^(b*x)
-        return self._parameter_a * np.exp(self._parameter_b * x)
+        # Limit the maximum exponent to avoid overflow
+        safe_exp = np.clip(self._parameter_b * x, -100, 100)
+        return self._parameter_a * np.exp(safe_exp)
         
     def _power_function(self, x):
         # Represents x^a
@@ -83,7 +89,22 @@ class CalculusCalculator(QObject):
     def _polynomial_derivative(self, x):
         if self._parameter_b == 0:
             return np.zeros_like(x)
-        return self._parameter_a * self._parameter_b * np.power(x, self._parameter_b - 1)
+            
+        # Handle non-integer powers properly
+        if self._parameter_b % 1 == 0:  # Integer exponent
+            if self._parameter_b == 1:
+                return np.full_like(x, self._parameter_a)
+            else:
+                # Handle zeros in the domain for negative powers
+                safe_x = np.copy(x)
+                safe_x[x == 0] = 1e-10  # Small value to avoid division by zero
+                return self._parameter_a * self._parameter_b * np.power(safe_x, self._parameter_b - 1)
+        else:  # Non-integer exponent
+            # Avoid negative bases with non-integer exponents
+            safe_x = np.abs(x)
+            # Avoid zero for negative powers
+            safe_x[safe_x < 1e-10] = 1e-10
+            return self._parameter_a * self._parameter_b * np.power(safe_x, self._parameter_b - 1)
     
     def _exponential_derivative(self, x):
         return self._parameter_a * self._parameter_b * np.exp(self._parameter_b * x)
@@ -102,11 +123,19 @@ class CalculusCalculator(QObject):
         return -self._parameter_a / self._parameter_b * np.cos(self._parameter_b * x)
     
     def _polynomial_integral(self, x):
-        if self._parameter_b == -1:
+        if abs(self._parameter_b + 1) < 1e-10:  # Check for b = -1
             # For 1/x, integral is ln|x|
-            return self._parameter_a * np.log(np.abs(x))
+            # Avoid log(0)
+            safe_x = np.copy(x)
+            safe_x[np.abs(safe_x) < 1e-10] = 1e-10
+            return self._parameter_a * np.log(np.abs(safe_x))
         else:
-            return self._parameter_a / (self._parameter_b + 1) * np.power(x, self._parameter_b + 1)
+            # Handle non-integer powers properly
+            if self._parameter_b % 1 == 0:  # Integer exponent
+                return self._parameter_a / (self._parameter_b + 1) * np.power(x, self._parameter_b + 1)
+            else:  # Non-integer exponent
+                # Use absolute value and adjust sign if needed
+                return self._parameter_a / (self._parameter_b + 1) * np.power(np.abs(x), self._parameter_b + 1) * np.sign(x)
     
     def _exponential_integral(self, x):
         if self._parameter_b == 0:
@@ -132,6 +161,7 @@ class CalculusCalculator(QObject):
                 result[i] = np.trapz(y_values, x_range)
         return result
     
+    # Add error handling in the _calculate method
     def _calculate(self):
         """Calculate function, derivative and integral values"""
         try:
@@ -145,10 +175,20 @@ class CalculusCalculator(QObject):
             self._derivative_values = derivative(self._x_values)
             self._integral_values = integral(self._x_values)
             
+            # Handle any NaN or Inf values
+            self._function_values = np.nan_to_num(self._function_values, nan=0.0, posinf=10000, neginf=-10000)
+            self._derivative_values = np.nan_to_num(self._derivative_values, nan=0.0, posinf=10000, neginf=-10000)
+            self._integral_values = np.nan_to_num(self._integral_values, nan=0.0, posinf=10000, neginf=-10000)
+            
             # Signal that calculation is complete
             self.resultsCalculated.emit()
         except Exception as e:
             print(f"Error in calculus calculation: {e}")
+            # Set default values on error
+            self._function_values = np.zeros_like(self._x_values)
+            self._derivative_values = np.zeros_like(self._x_values)
+            self._integral_values = np.zeros_like(self._x_values)
+            self.resultsCalculated.emit()
     
     # Property getters/setters
     @Property(str, notify=functionTypeChanged)
@@ -203,71 +243,78 @@ class CalculusCalculator(QObject):
     
     @Property(str, notify=resultsCalculated)
     def functionFormula(self):
-        """Return the LaTeX formula for the current function"""
+        """Return the formula for the current function using HTML formatting"""
         if self._function_type == "Sine":
-            return f"{self._parameter_a} \\sin({self._parameter_b}x)"
+            return f"{self._parameter_a} &middot; sin({self._parameter_b}x)"
         elif self._function_type == "Polynomial":
             if self._parameter_b == 0:
                 return f"{self._parameter_a}"
             elif self._parameter_b == 1:
                 return f"{self._parameter_a}x"
             else:
-                return f"{self._parameter_a}x^{{{self._parameter_b}}}"
+                return f"{self._parameter_a}x<sup>{self._parameter_b}</sup>"
         elif self._function_type == "Exponential":
-            return f"{self._parameter_a}e^{{{self._parameter_b}x}}"
+            return f"{self._parameter_a}e<sup>{self._parameter_b}x</sup>"
         elif self._function_type == "Power":
-            return f"|x|^{{{self._parameter_a}}} \\cdot \\text{{sgn}}(x)"
+            return f"|x|<sup>{self._parameter_a}</sup> &middot; sign(x)"
         elif self._function_type == "Gaussian":
-            return f"{self._parameter_a}e^{{-(x-{self._parameter_b})^2}}"
+            return f"{self._parameter_a}e<sup>-(x-{self._parameter_b})<sup>2</sup></sup>"
         else:
             return "Unknown function"
     
     @Property(str, notify=resultsCalculated)
     def derivativeFormula(self):
-        """Return the LaTeX formula for the derivative"""
+        """Return the formula for the derivative using HTML formatting"""
         if self._function_type == "Sine":
-            return f"{self._parameter_a * self._parameter_b} \\cos({self._parameter_b}x)"
+            a_times_b = self._parameter_a * self._parameter_b
+            return f"{a_times_b:.2f} &middot; cos({self._parameter_b:.2f}x)"
         elif self._function_type == "Polynomial":
             if self._parameter_b == 0:
                 return "0"
             elif self._parameter_b == 1:
-                return f"{self._parameter_a}"
+                return f"{self._parameter_a:.2f}"
             else:
-                return f"{self._parameter_a * self._parameter_b}x^{{{self._parameter_b - 1}}}"
+                a_times_b = self._parameter_a * self._parameter_b
+                b_minus_1 = self._parameter_b - 1
+                return f"{a_times_b:.2f}x<sup>{b_minus_1:.2f}</sup>"
         elif self._function_type == "Exponential":
-            return f"{self._parameter_a * self._parameter_b}e^{{{self._parameter_b}x}}"
+            a_times_b = self._parameter_a * self._parameter_b
+            return f"{a_times_b:.2f}e<sup>{self._parameter_b:.2f}x</sup>"
         elif self._function_type == "Power":
             if self._parameter_a == 0:
                 return "0"
             else:
-                return f"{self._parameter_a}|x|^{{{self._parameter_a - 1}}}"
+                a_minus_1 = self._parameter_a - 1
+                return f"{self._parameter_a:.2f}|x|<sup>{a_minus_1:.2f}</sup>"
         elif self._function_type == "Gaussian":
-            return f"-2{self._parameter_a}(x-{self._parameter_b})e^{{-(x-{self._parameter_b})^2}}"
+            return f"-2{self._parameter_a:.2f}(x-{self._parameter_b:.2f})e<sup>-(x-{self._parameter_b:.2f})<sup>2</sup></sup>"
         else:
             return "Unknown derivative"
     
     @Property(str, notify=resultsCalculated)
     def integralFormula(self):
-        """Return the LaTeX formula for the integral"""
+        """Return the formula for the integral using HTML formatting"""
         if self._function_type == "Sine":
-            return f"-\\frac{{{self._parameter_a}}}{{{self._parameter_b}}} \\cos({self._parameter_b}x) + C"
+            return f"-({self._parameter_a}/{self._parameter_b}) &middot; cos({self._parameter_b}x) + C"
         elif self._function_type == "Polynomial":
             if self._parameter_b == -1:
-                return f"{self._parameter_a} \\ln|x| + C"
+                return f"{self._parameter_a} &middot; ln|x| + C"
             else:
-                return f"\\frac{{{self._parameter_a}}}{{{self._parameter_b + 1}}}x^{{{self._parameter_b + 1}}} + C"
+                b_plus_1 = self._parameter_b + 1
+                return f"({self._parameter_a}/{b_plus_1})x<sup>{b_plus_1}</sup> + C"
         elif self._function_type == "Exponential":
             if self._parameter_b == 0:
                 return f"{self._parameter_a}x + C"
             else:
-                return f"\\frac{{{self._parameter_a}}}{{{self._parameter_b}}}e^{{{self._parameter_b}x}} + C"
+                return f"({self._parameter_a}/{self._parameter_b})e<sup>{self._parameter_b}x</sup> + C"
         elif self._function_type == "Power":
             if self._parameter_a == -1:
-                return "\\ln|x| + C"
+                return "ln|x| + C"
             else:
-                return f"\\frac{{\\text{{sgn}}(x)|x|^{{{self._parameter_a + 1}}}}}{{{self._parameter_a + 1}}} + C"
+                a_plus_1 = self._parameter_a + 1
+                return f"(sign(x)|x|<sup>{a_plus_1}</sup>)/({a_plus_1}) + C"
         elif self._function_type == "Gaussian":
-            return f"\\text{{erf}}(x-{self._parameter_b}) \\cdot \\frac{{\\sqrt{{\\pi}}}}{2} \\cdot {self._parameter_a} + C"
+            return f"erf(x-{self._parameter_b}) &middot; (&radic;&pi;/2) &middot; {self._parameter_a} + C"
         else:
             return "Unknown integral"
     

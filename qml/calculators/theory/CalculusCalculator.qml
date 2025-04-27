@@ -25,19 +25,29 @@ Item {
         
         if (functionSeries && functionSeries.visible) {
             for (var i = 0; i < functionSeries.count; i++) {
-                allValues.push(functionSeries.at(i).y)
+                // Only include finite values
+                var y = functionSeries.at(i).y
+                if (isFinite(y) && Math.abs(y) < 1000) {
+                    allValues.push(y)
+                }
             }
         }
         
         if (derivativeSeries && derivativeSeries.visible) {
             for (var i = 0; i < derivativeSeries.count; i++) {
-                allValues.push(derivativeSeries.at(i).y)
+                var y = derivativeSeries.at(i).y
+                if (isFinite(y) && Math.abs(y) < 1000) {
+                    allValues.push(y)
+                }
             }
         }
         
         if (integralSeries && integralSeries.visible) {
             for (var i = 0; i < integralSeries.count; i++) {
-                allValues.push(integralSeries.at(i).y)
+                var y = integralSeries.at(i).y
+                if (isFinite(y) && Math.abs(y) < 1000) {
+                    allValues.push(y)
+                }
             }
         }
         
@@ -50,8 +60,19 @@ Item {
             var padding = (maxY - minY) * 0.1
             if (padding < 1) padding = 1
             
-            axisY.min = minY - padding
-            axisY.max = maxY + padding
+            // Ensure we have reasonable bounds
+            axisY.min = Math.max(-100, minY - padding)
+            axisY.max = Math.min(100, maxY + padding)
+            
+            // Ensure min is less than max (in case of extreme values or errors)
+            if (axisY.min >= axisY.max) {
+                axisY.min = -10
+                axisY.max = 10
+            }
+        } else {
+            // Default range if no valid points
+            axisY.min = -10
+            axisY.max = 10
         }
     }
     
@@ -275,11 +296,12 @@ Item {
                                 font.bold: true
                             }
                             
-                            TextFieldBlue {
+                            Label {
                                 text: "f(x) = " + calculator.functionFormula
                                 font.italic: true
                                 font.pixelSize: 16
                                 Layout.fillWidth: true
+                                textFormat: Text.RichText
                             }
 
                             RowLayout {
@@ -369,12 +391,16 @@ Item {
                                         text: "Original function: f(x) = " + calculator.functionFormula
                                         font.italic: true
                                         Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                        textFormat: Text.RichText
                                     }
 
                                     Label {
                                         text: "Derivative: f'(x) = " + calculator.derivativeFormula
                                         font.italic: true
                                         Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                        textFormat: Text.RichText
                                     }
 
                                     
@@ -420,12 +446,16 @@ Item {
                                         text: "Original function: f(x) = " + calculator.functionFormula
                                         font.italic: true
                                         Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                        textFormat: Text.RichText
                                     }
 
                                     Label {
                                         text: "Integral: ∫f(x)dx = " + calculator.integralFormula
                                         font.italic: true
                                         Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                        textFormat: Text.RichText
                                     }
 
                                     Label {
@@ -523,11 +553,17 @@ Item {
                             var yValues2 = calculator.derivativeValues
                             var yValues3 = calculator.integralValues
                             
-                            // Add points to series
+                            // Add points to series, with safety check for each point
                             for (var i = 0; i < xValues.length; i++) {
-                                functionSeries.append(xValues[i], yValues1[i])
-                                derivativeSeries.append(xValues[i], yValues2[i])
-                                integralSeries.append(xValues[i], yValues3[i])
+                                if (isFinite(yValues1[i])) {
+                                    functionSeries.append(xValues[i], yValues1[i])
+                                }
+                                if (isFinite(yValues2[i])) {
+                                    derivativeSeries.append(xValues[i], yValues2[i])
+                                }
+                                if (isFinite(yValues3[i])) {
+                                    integralSeries.append(xValues[i], yValues3[i])
+                                }
                             }
                             
                             // Update Y-axis range
