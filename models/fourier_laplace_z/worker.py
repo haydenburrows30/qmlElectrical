@@ -129,9 +129,11 @@ class TransformCalculatorWorker(QRunnable):
         n_padded = 2**int(np.ceil(np.log2(n)) + 2) 
         
         # Apply window function if specified
+        window_applied = False
         if self.window_type != "None":
             window = self._apply_window(n, self.window_type)
             y = y * window
+            window_applied = True
         
         # Use faster numpy operations where possible
         yf = np.fft.rfft(y, n=n_padded) * dt
@@ -142,7 +144,7 @@ class TransformCalculatorWorker(QRunnable):
         phase = np.angle(yf, deg=True)
         
         # Set the equation in a separate step
-        self._set_fourier_equation()
+        self._set_fourier_equation(window_applied)
         
         # Efficiently convert to list with proper data types
         return freq.astype(float).tolist(), magnitude.astype(float).tolist(), phase.astype(float).tolist()
@@ -177,7 +179,7 @@ class TransformCalculatorWorker(QRunnable):
         else:  # Default: Rectangular window (no windowing)
             return np.ones(n)
     
-    def _set_fourier_equation(self):
+    def _set_fourier_equation(self, window_applied=False):
         """Set the equation for the Fourier transform"""
         window_desc = "" if self.window_type == "None" else f" with {self.window_type} window"
         
@@ -186,15 +188,24 @@ class TransformCalculatorWorker(QRunnable):
             self.parent._equation_transform = f"F(ω){window_desc} = ∫f(t)·e^(-iωt)dt"
             # Add a helpful explanation about harmonics
             if self.transform_type == "Fourier":
-                self.parent._equation_transform += "\nHarmonics will appear as peaks at multiples of the base frequency"
+                if window_applied:
+                    self.parent._equation_transform += "\nWindow functions can attenuate harmonics but improve frequency resolution"
+                else:
+                    self.parent._equation_transform += "\nHarmonics will appear as peaks at multiples of the base frequency"
         elif self.function_type == "Sine":
             self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a/2}i[δ(ω-{self.frequency}) - δ(ω+{self.frequency})]"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow broadens the main peak and reduces spectral leakage"
         elif self.function_type == "Square":
             self.parent._equation_transform = f"F(ω){window_desc} = {2*self.parameter_a/np.pi}·sum(sin(nπ/2)/(n)·δ(ω-n·{self.frequency}))"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow attenuates harmonics but improves frequency resolution"
         elif self.function_type == "Exponential":
             self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}/{self.parameter_b}·1/(1+iω/{self.parameter_b})"
         else:
             self.parent._equation_transform = f"F(ω){window_desc} = ∫f(t)·e^(-iωt)dt"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow functions affect sidelobes and harmonic content"
     
     def _calculate_laplace_transform(self, time_domain):
         """Calculate the Laplace transform"""

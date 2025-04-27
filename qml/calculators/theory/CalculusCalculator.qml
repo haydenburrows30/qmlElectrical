@@ -210,7 +210,7 @@ Item {
                     WaveCard {
                         title: "Function Parameters"
                         Layout.minimumWidth: 450
-                        Layout.preferredHeight: 280
+                        Layout.preferredHeight: resultsCard.height
 
                         GridLayout {
                             anchors.fill: parent
@@ -224,8 +224,6 @@ Item {
                             
                             ComboBoxRound {
                                 id: functionTypeCombo
-                                // Use a direct binding to a standard JavaScript array
-                                // instead of relying on the calculator's availableFunctions property
                                 model: ["Sine", "Polynomial", "Exponential", "Power", "Gaussian"]
                                 Layout.fillWidth: true
                                 currentIndex: model.indexOf(calculator.functionType)
@@ -346,17 +344,19 @@ Item {
                     }
 
                     ColumnLayout {
+                        id: resultsCard
 
                         // Practical applications
                         WaveCard {
-                            title: "Applications in Electrical Engineering"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 90
+                            Layout.preferredHeight: 50
+
+                            titleVisible: false
                                 
                             Label {
                                 id: applicationText
-                                anchors.fill: parent
-                                text: calculator.applicationExample.split('\n\n')[0] || ""
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "<b>Applications in Electrical Engineering: </b>" + calculator.applicationExample.split('\n\n')[0] || ""
                                 wrapMode: Text.WordWrap
                                 font.pixelSize: 14
                             }

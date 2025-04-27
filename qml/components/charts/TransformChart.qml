@@ -128,7 +128,29 @@ Item {
         }
         
         // Look for multiple peaks in the spectrum that could be harmonics
-        let peakThreshold = 0.10  // Peaks must be at least 10% of max value
+        // Adjust the threshold depending on the window type - windows attenuate harmonics
+        let peakThreshold = 0.10  // Default: Peaks must be at least 10% of max value
+        
+        // Lower the threshold when window functions are applied to detect smaller peaks
+        if (windowType !== "None") {
+            // Different window types affect harmonics differently
+            switch(windowType) {
+                case "Hann":
+                case "Hamming":
+                    peakThreshold = 0.05;  // 5% threshold for moderate windowing
+                    break;
+                case "Blackman":
+                case "Kaiser":
+                    peakThreshold = 0.03;  // 3% for stronger windowing functions
+                    break;
+                case "Flattop":
+                    peakThreshold = 0.02;  // 2% - flattop window heavily attenuates harmonics
+                    break;
+                default:
+                    peakThreshold = 0.07;  // Default for other windows
+            }
+        }
+        
         let peaks = []
         let maxValue = 0
         
@@ -854,6 +876,13 @@ Item {
                     if (i < harmonicFrequencies.length - 1) {
                         harmonicsSeries.append(freq, 0);
                     }
+                }
+                
+                // Add information about window's effect on harmonics in legend if a window is active
+                if (windowType !== "None") {
+                    harmonicsText.text = "Harmonics" + (windowType !== "None" ? " (attenuated)" : "");
+                } else {
+                    harmonicsText.text = "Harmonics";
                 }
             }
             
