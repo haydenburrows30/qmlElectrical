@@ -41,7 +41,7 @@ from models.theory.transformer_naming import TransformerNamingGuide
 from models.basic.base_impedance_calculator import BaseImpedanceCalculator
 from models.basic.per_unit_impedance_calculator import PerUnitImpedanceCalculator
 from models.cable.network_cabinet_calculator import NetworkCabinetCalculator
-from models.theory.transform_calculator import TransformCalculator
+from models.fourier_laplace.transform_calculator import TransformCalculator
 from models.theory.z_transform_calculator import ZTransformCalculator
 from models.theory.wavelet_plotter import WaveletPlotter
 

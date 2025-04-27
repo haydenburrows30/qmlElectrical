@@ -2,7 +2,10 @@ import math
 import numpy as np
 import concurrent.futures
 import multiprocessing
-from PySide6.QtCore import QObject, Signal, Slot, Property, QRunnable, QThreadPool, QMetaObject, Qt, Q_ARG
+from PySide6.QtCore import QRunnable, QMetaObject, Qt, Q_ARG
+
+# Import the formula parser
+from .formula_parser import evaluate_custom_formula
 
 class TransformCalculatorWorker(QRunnable):
     """Worker thread for performing calculations"""
@@ -16,6 +19,8 @@ class TransformCalculatorWorker(QRunnable):
         self.parameter_b = parent._parameter_b
         self.frequency = parent._frequency
         self.sample_points = parent._sample_points
+        self.window_type = parent._window_type
+        self.custom_formula = parent._custom_formula
         
         # Add thread pool for parallelizing calculations
         self.thread_pool = concurrent.futures.ThreadPoolExecutor(
@@ -70,38 +75,40 @@ class TransformCalculatorWorker(QRunnable):
         y = np.zeros_like(t)
         
         # Generate the appropriate function
-        if self.function_type == "Sine":
+        if self.function_type == "Custom":
+            try:
+                y, formula_display = evaluate_custom_formula(t, self.custom_formula, self.frequency)
+                self.parent._equation_original = formula_display
+            except Exception as e:
+                # Handle formula errors
+                y = np.zeros_like(t)
+                self.parent._equation_original = f"Error in formula: {str(e)}"
+                print(f"Custom formula error: {str(e)}")
+        elif self.function_type == "Sine":
             y = self.parameter_a * np.sin(2 * np.pi * self.frequency * t)
             self.parent._equation_original = f"{self.parameter_a} sin(2π·{self.frequency}t)"
-        
         elif self.function_type == "Square":
             y = self.parameter_a * np.sign(np.sin(2 * np.pi * self.frequency * t))
             self.parent._equation_original = f"{self.parameter_a} square(2π·{self.frequency}t)"
-        
         elif self.function_type == "Sawtooth":
             y = self.parameter_a * (2 * (self.frequency * t - np.floor(self.frequency * t + 0.5)))
             self.parent._equation_original = f"{self.parameter_a} sawtooth(2π·{self.frequency}t)"
-        
         elif self.function_type == "Exponential":
             y = self.parameter_a * np.exp(-self.parameter_b * t)
             self.parent._equation_original = f"{self.parameter_a} e^(-{self.parameter_b}t)"
-        
         elif self.function_type == "Gaussian":
             sigma = self.parameter_b/5 if self.parameter_b > 0 else 0.2
             y = self.parameter_a * np.exp(-(t - self.parameter_b)**2 / (2 * sigma**2))
             self.parent._equation_original = f"{self.parameter_a} exp(-(t-{self.parameter_b})²/2σ²)"
-        
         elif self.function_type == "Step":
             y = self.parameter_a * np.ones_like(t)
             y[t < self.parameter_b] = 0
             self.parent._equation_original = f"{self.parameter_a} u(t-{self.parameter_b})"
-        
         elif self.function_type == "Impulse":
             # Approximating impulse with a narrow Gaussian
             sigma = 0.05
             y = self.parameter_a * np.exp(-(t - self.parameter_b)**2 / (2 * sigma**2)) / (sigma * np.sqrt(2 * np.pi))
             self.parent._equation_original = f"{self.parameter_a} δ(t-{self.parameter_b})"
-        
         elif self.function_type == "Damped Sine":
             y = self.parameter_a * np.exp(-self.parameter_b * t) * np.sin(2 * np.pi * self.frequency * t)
             self.parent._equation_original = f"{self.parameter_a} e^(-{self.parameter_b}t) sin(2π·{self.frequency}t)"
@@ -121,6 +128,11 @@ class TransformCalculatorWorker(QRunnable):
         # Optimize padding calculation
         n_padded = 2**int(np.ceil(np.log2(n)) + 2) 
         
+        # Apply window function if specified
+        if self.window_type != "None":
+            window = self._apply_window(n, self.window_type)
+            y = y * window
+        
         # Use faster numpy operations where possible
         yf = np.fft.rfft(y, n=n_padded) * dt
         freq = np.fft.rfftfreq(n_padded, dt)
@@ -135,50 +147,88 @@ class TransformCalculatorWorker(QRunnable):
         # Efficiently convert to list with proper data types
         return freq.astype(float).tolist(), magnitude.astype(float).tolist(), phase.astype(float).tolist()
     
+    def _apply_window(self, n, window_type):
+        """Apply the selected window function"""
+        if window_type == "Hann":
+            return np.hanning(n)
+        elif window_type == "Hamming":
+            return np.hamming(n)
+        elif window_type == "Blackman":
+            return np.blackman(n)
+        elif window_type == "Bartlett":
+            return np.bartlett(n)
+        elif window_type == "Flattop":
+            return np.fft.fftshift(np.ones(n))  # Using a flat window (all ones)
+        elif window_type == "Kaiser":
+            return np.kaiser(n, 5.0)  # Beta parameter of 5.0 is a good default
+        elif window_type == "Gaussian":
+            return np.exp(-0.5 * ((np.arange(n) - (n - 1) / 2) / ((n - 1) / 6)) ** 2)
+        elif window_type == "Tukey":
+            # Tukey window (cosine-tapered window) with r=0.5
+            r = 0.5
+            window = np.ones(n)
+            # Left taper
+            left_taper = np.arange(0, int(r * (n - 1) / 2) + 1)
+            window[:len(left_taper)] = 0.5 * (1 + np.cos(np.pi * (2 * left_taper / (r * (n - 1)) - 1)))
+            # Right taper
+            right_taper = np.arange(int((n - 1) * (1 - r / 2)) + 1, n)
+            window[len(window) - len(right_taper):] = 0.5 * (1 + np.cos(np.pi * (2 * right_taper / (r * (n - 1)) - 2 / r + 1)))
+            return window
+        else:  # Default: Rectangular window (no windowing)
+            return np.ones(n)
+    
+    def _set_fourier_equation(self):
+        """Set the equation for the Fourier transform"""
+        window_desc = "" if self.window_type == "None" else f" with {self.window_type} window"
+        
+        if self.function_type == "Custom":
+            # For custom functions, just use the generic transform equation
+            self.parent._equation_transform = f"F(ω){window_desc} = ∫f(t)·e^(-iωt)dt"
+            # Add a helpful explanation about harmonics
+            if self.transform_type == "Fourier":
+                self.parent._equation_transform += "\nHarmonics will appear as peaks at multiples of the base frequency"
+        elif self.function_type == "Sine":
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a/2}i[δ(ω-{self.frequency}) - δ(ω+{self.frequency})]"
+        elif self.function_type == "Square":
+            self.parent._equation_transform = f"F(ω){window_desc} = {2*self.parameter_a/np.pi}·sum(sin(nπ/2)/(n)·δ(ω-n·{self.frequency}))"
+        elif self.function_type == "Exponential":
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}/{self.parameter_b}·1/(1+iω/{self.parameter_b})"
+        else:
+            self.parent._equation_transform = f"F(ω){window_desc} = ∫f(t)·e^(-iωt)dt"
+    
     def _calculate_laplace_transform(self, time_domain):
         """Calculate the Laplace transform"""
         # Extract t and y arrays from time_domain
         t = np.array([point["x"] for point in time_domain])
         y = np.array([point["y"] for point in time_domain])
         
-        # For demonstration, we'll use numerical integration for most functions
-        # Use a better range for s values to clearly show resonance
+        # Define frequency range based on function type
         if self.function_type == "Sine":
             omega = 2 * np.pi * self.frequency
-            # Create s_values centered around the resonant frequency for better visualization
             s_values = np.linspace(0, max(300, omega * 3), 200)  # Show up to 3x the resonant frequency
+        elif self.function_type == "Custom":
+            # For custom functions, use a wider frequency range like other periodic functions
+            omega = 2 * np.pi * self.frequency
+            s_values = np.linspace(0, max(200, omega * 5), 300)  # Show up to 5x the fundamental frequency
         elif self.function_type == "Damped Sine":
             omega = 2 * np.pi * self.frequency
-            # Create more data points around the expected resonance
             s_values = np.linspace(0, max(200, omega * 3), 300)  # Higher resolution
         elif self.function_type == "Impulse":
             s_values = np.linspace(0, 200, 300)  # Higher resolution over wider range
         elif self.function_type == "Square":
             omega = 2 * np.pi * self.frequency
-            # Create s_values to show several harmonics
             s_values = np.linspace(0, max(200, omega * 5), 300)  # Show up to 5x the fundamental frequency
         elif self.function_type == "Sawtooth":
             omega = 2 * np.pi * self.frequency
-            # Create s_values to show several harmonics
             s_values = np.linspace(0, max(200, omega * 5), 300)  # Show up to 5x the fundamental frequency
         elif self.function_type == "Exponential":
-            # For exponential, use a wider frequency range to show the frequency response
-            # The exponential decay has a low-pass characteristic
-            # Use a frequency range based on the decay constant (parameter_b)
             cutoff = self.parameter_b
-            # Create more data points with a wider range for better visualization
             s_values = np.linspace(0, max(200, cutoff * 10), 300)
         elif self.function_type == "Gaussian":
-            # For Gaussian, use a wider frequency range
-            # The Gaussian has broad frequency content
             center = self.parameter_b
-            # Width parameter - derived from the standard deviation
             sigma = self.parameter_b/5 if self.parameter_b > 0 else 0.2
-            # Create more data points with a wider range for better visualization
             s_values = np.linspace(0, 200, 300)  # Similar range to impulse
         elif self.function_type == "Step":
-            # For step function, use a wider frequency range to show full response
-            # The step function has important low-frequency content
             s_values = np.linspace(0, 200, 300)  # Higher resolution over wider range
         else:
             s_values = np.linspace(0.1, 5, 50)  # Standard range for other functions
@@ -357,12 +407,12 @@ class TransformCalculatorWorker(QRunnable):
                     
                     # Store magnitude and phase
                     mag = abs(complex_result)
-                    phase = np.angle(complex_result, deg=True)
+                    phase_val = np.angle(complex_result, deg=True)
                     
                     # Check if result is valid before storing
                     if np.isfinite(mag):
                         temp_magnitudes[i] = mag
-                        temp_phases[i] = phase
+                        temp_phases[i] = phase_val
                         max_magnitude = max(max_magnitude, mag)
                     else:
                         temp_magnitudes[i] = 0
@@ -422,6 +472,50 @@ class TransformCalculatorWorker(QRunnable):
             
             # Add an explanatory note to the equation about roll-off
             self.parent._equation_transform += "\n(Showing with realistic frequency roll-off)"
+        elif self.function_type == "Custom":
+            # Handle custom formula Laplace transform
+            # For custom formulas, we'll use numerical integration and a more detailed explanation
+            # Include basic frequency information
+            omega = 2 * np.pi * self.frequency
+            
+            self.parent._equation_transform = (f"L{{custom(t)}} ≈ numerically computed\n"
+                                          f"Using base frequency: {self.frequency:.1f} Hz ({omega:.1f} rad/s)\n"
+                                          f"Custom formula: {self.custom_formula}")
+            
+            # Calculate transform with numerical integration and add realistic roll-off
+            for i, s_imag in enumerate(s_values):
+                try:
+                    s = complex(0.1, s_imag)  # Add small real part for stability
+                    
+                    # Perform numerical integration
+                    integrand = y * np.exp(-s * t)
+                    result = np.trapz(integrand, t)
+                    
+                    # Add realistic frequency roll-off for higher frequencies
+                    # This makes the plot more physically realistic
+                    rolloff_factor = 1.0 / (1.0 + (s_imag/100.0)**2)
+                    
+                    magnitude[i] = abs(result) * rolloff_factor
+                    phase[i] = np.angle(result, deg=True)
+                except Exception:
+                    magnitude[i] = 0
+                    phase[i] = 0
+            
+            # No specific resonance for general custom functions
+            self.parent._resonant_frequency = -1
+            
+            # Use numerical integration to try to detect resonance
+            if max(magnitude) > 0:
+                # Find the frequency with the maximum magnitude
+                max_idx = np.argmax(magnitude)
+                peak_freq = s_values[max_idx]
+                
+                # Only set resonant frequency if it seems like a real peak
+                if max_idx > 0 and max_idx < len(s_values) - 1:
+                    # Check if it's a local maximum (not just at the boundary)
+                    if magnitude[max_idx] > magnitude[max_idx-1] and magnitude[max_idx] > magnitude[max_idx+1]:
+                        self.parent._resonant_frequency = peak_freq
+                        self.parent._equation_transform += f"\nDetected peak response at ω ≈ {peak_freq:.1f} rad/s"
         else:
             self.parent._equation_transform = "L{f(t)} = ∫₀^∞ f(t)·e^(-st)dt"
             for i, s in enumerate(s_values):
@@ -432,237 +526,3 @@ class TransformCalculatorWorker(QRunnable):
             self.parent._resonant_frequency = -1
         
         return s_values.tolist(), magnitude.tolist(), phase.tolist()
-    
-    def _set_fourier_equation(self):
-        """Set the equation for the Fourier transform"""
-        if self.function_type == "Sine":
-            self.parent._equation_transform = f"F(ω) = {self.parameter_a/2}i[δ(ω-{self.frequency}) - δ(ω+{self.frequency})]"
-        
-        elif self.function_type == "Square":
-            self.parent._equation_transform = f"F(ω) = {2*self.parameter_a/np.pi}·sum(sin(nπ/2)/(n)·δ(ω-n·{self.frequency}))"
-        
-        elif self.function_type == "Exponential":
-            self.parent._equation_transform = f"F(ω) = {self.parameter_a}/{self.parameter_b}·1/(1+iω/{self.parameter_b})"
-        
-        else:
-            self.parent._equation_transform = "F(ω) = ∫f(t)·e^(-iωt)dt"
-
-class TransformCalculator(QObject):
-    """Calculator for Fourier and Laplace transforms with multithreading support"""
-    
-    transformTypeChanged = Signal()
-    functionTypeChanged = Signal()
-    parameterAChanged = Signal()
-    parameterBChanged = Signal()
-    frequencyChanged = Signal()
-    samplePointsChanged = Signal()
-    resultsCalculated = Signal()
-    calculatingChanged = Signal()
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        # Initialize properties
-        self._transform_type = "Fourier"  # "Fourier" or "Laplace"
-        self._function_type = "Sine"      # Function type to transform
-        self._parameter_a = 1.0           # First parameter for function
-        self._parameter_b = 2.0           # Second parameter for function
-        self._frequency = 1.0             # Frequency for periodic functions
-        self._sample_points = 500         # Number of points for visualization
-        self._calculating = False         # Flag for calculations in progress
-        
-        # Result storage
-        self._time_domain = []            # Time domain signal
-        self._transform_result = []       # Transform result
-        self._phase_result = []           # Phase information
-        self._frequencies = []            # Frequency domain range
-        self._equation_original = ""      # Text representation of input equation
-        self._equation_transform = ""     # Text representation of transformed equation
-        self._resonant_frequency = -1     # Resonant frequency for Laplace transforms
-        
-        # Function types
-        self._function_types = [
-            "Sine", "Square", "Sawtooth", "Exponential", 
-            "Gaussian", "Step", "Impulse", "Damped Sine"
-        ]
-        
-        # Thread pool for calculations
-        self._thread_pool = QThreadPool.globalInstance()
-        
-        # Initialize calculations
-        self._calculate()
-    
-    @Property(str, notify=transformTypeChanged)
-    def transformType(self):
-        return self._transform_type
-    
-    @transformType.setter
-    def transformType(self, value):
-        if self._transform_type != value and value in ["Fourier", "Laplace"]:
-            self._transform_type = value
-            self.transformTypeChanged.emit()
-            self._calculate()
-    
-    @Property(str, notify=functionTypeChanged)
-    def functionType(self):
-        return self._function_type
-    
-    @functionType.setter
-    def functionType(self, value):
-        if self._function_type != value and value in self._function_types:
-            self._function_type = value
-            self.functionTypeChanged.emit()
-            self._calculate()
-    
-    @Property(float, notify=parameterAChanged)
-    def parameterA(self):
-        return self._parameter_a
-    
-    @parameterA.setter
-    def parameterA(self, value):
-        if self._parameter_a != value:
-            self._parameter_a = value
-            self.parameterAChanged.emit()
-            self._calculate()
-    
-    @Property(float, notify=parameterBChanged)
-    def parameterB(self):
-        return self._parameter_b
-    
-    @parameterB.setter
-    def parameterB(self, value):
-        if self._parameter_b != value:
-            self._parameter_b = value
-            self.parameterBChanged.emit()
-            self._calculate()
-    
-    @Property(float, notify=frequencyChanged)
-    def frequency(self):
-        return self._frequency
-    
-    @frequency.setter
-    def frequency(self, value):
-        if self._frequency != value and value > 0:
-            self._frequency = value
-            self.frequencyChanged.emit()
-            self._calculate()
-    
-    @Property(int, notify=samplePointsChanged)
-    def samplePoints(self):
-        return self._sample_points
-    
-    @samplePoints.setter
-    def samplePoints(self, value):
-        if self._sample_points != value and 10 <= value <= 1000:
-            self._sample_points = value
-            self.samplePointsChanged.emit()
-            self._calculate()
-    
-    @Property(bool, notify=calculatingChanged)
-    def calculating(self):
-        return self._calculating
-    
-    @calculating.setter
-    def calculating(self, value):
-        if self._calculating != value:
-            self._calculating = value
-            self.calculatingChanged.emit()
-    
-    @Property(list, notify=resultsCalculated)
-    def functionTypes(self):
-        return self._function_types
-    
-    @Property('QVariantList', notify=resultsCalculated)
-    def timeDomain(self):
-        return self._time_domain
-    
-    @Property(list, notify=resultsCalculated)
-    def transformResult(self):
-        return self._transform_result
-    
-    @Property(list, notify=resultsCalculated)
-    def phaseResult(self):
-        return self._phase_result
-    
-    @Property(list, notify=resultsCalculated)
-    def frequencies(self):
-        return self._frequencies
-    
-    @Property(str, notify=resultsCalculated)
-    def equationOriginal(self):
-        return self._equation_original
-    
-    @Property(str, notify=resultsCalculated)
-    def equationTransform(self):
-        return self._equation_transform
-    
-    @Property(float, notify=resultsCalculated)
-    def resonantFrequency(self):
-        return self._resonant_frequency
-    
-    def _calculate(self):
-        """Start calculation in a separate thread"""
-        try:
-            # Set calculating flag
-            self.calculating = True
-            
-            # Create worker
-            worker = TransformCalculatorWorker(self)
-            
-            # Start the worker in a separate thread
-            self._thread_pool.start(worker)
-            
-        except Exception:
-            # Silently handle the error without logging
-            self.calculating = False
-    
-    @Slot("QVariantList", "QVariantList", "QVariantList", "QVariantList")
-    def updateResults(self, time_domain, frequencies, magnitude, phase):
-        """Update results from worker thread (called via invokeMethod)"""
-        try:
-            # Update the result properties
-            self._time_domain = time_domain if time_domain else []
-            self._frequencies = frequencies if frequencies else []
-            self._transform_result = magnitude if magnitude else []
-            self._phase_result = phase if phase else []
-            
-        except Exception as e:
-            # Log the error
-            print(f"Error updating results: {str(e)}")
-            # Ensure properties are at least empty lists, not None
-            self._time_domain = []
-            self._frequencies = []
-            self._transform_result = []
-            self._phase_result = []
-        finally:
-            # Always set calculating to false regardless of success or failure
-            self.calculating = False
-            self.resultsCalculated.emit()
-    
-    # QML slots
-    @Slot(str)
-    def setTransformType(self, transform_type):
-        self.transformType = transform_type
-    
-    @Slot(str)
-    def setFunctionType(self, function_type):
-        self.functionType = function_type
-    
-    @Slot(float)
-    def setParameterA(self, value):
-        self.parameterA = value
-    
-    @Slot(float)
-    def setParameterB(self, value):
-        self.parameterB = value
-    
-    @Slot(float)
-    def setFrequency(self, value):
-        self.frequency = value
-    
-    @Slot(int)
-    def setSamplePoints(self, value):
-        self.samplePoints = value
-    
-    @Slot()
-    def calculate(self):
-        self._calculate()

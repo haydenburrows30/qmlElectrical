@@ -47,6 +47,14 @@ Item {
     readonly property bool isLinux: Qt.platform.os === "linux"
     readonly property bool isWindows: Qt.platform.os === "windows"
 
+    // Update window visualization properties
+    property string windowType: "None"  // Window function type to display in labels
+    property bool showWindowInfo: transformType === "Fourier" && windowType !== "None"
+
+    property bool isCustomWaveform: transformType === "Fourier" && false  // Will be set based on data
+    property var harmonicFrequencies: []  // To store detected harmonic frequencies
+    property bool showHarmonics: true     // Allow toggling harmonic markers
+
     Component.onCompleted: {
         // Initialize colors and then call update charts
         updateThemeColors()
@@ -58,7 +66,11 @@ Item {
         updateThemeColors()
     }
     onResonantFrequencyChanged: updateTransformSeries()
-    onTimeDomainChanged: Qt.callLater(updateCharts)
+    onTimeDomainChanged: {
+        Qt.callLater(updateCharts)
+        // Check if this looks like a custom waveform with harmonics
+        detectHarmonics()
+    }
     onTransformResultChanged: Qt.callLater(updateCharts)
     onShowPhaseChanged: Qt.callLater(updateCharts)
     onHighPerformanceModeChanged: Qt.callLater(updateCharts)
@@ -106,9 +118,84 @@ Item {
         updateTransformChart()
     }
     
+    // Detect harmonics in the spectrum
+    function detectHarmonics() {
+        // Only detect harmonics for Fourier transforms
+        if (transformType !== "Fourier" || !transformResult || transformResult.length < 10) {
+            isCustomWaveform = false
+            harmonicFrequencies = []
+            return
+        }
+        
+        // Look for multiple peaks in the spectrum that could be harmonics
+        let peakThreshold = 0.10  // Peaks must be at least 10% of max value
+        let peaks = []
+        let maxValue = 0
+        
+        // First find the maximum value
+        for (let i = 0; i < transformResult.length; i++) {
+            if (transformResult[i] > maxValue) {
+                maxValue = transformResult[i]
+            }
+        }
+        
+        // Then find all peaks above the threshold
+        for (let i = 5; i < transformResult.length - 5; i++) {
+            if (transformResult[i] > peakThreshold * maxValue) {
+                // Check if this is a local maximum
+                if (transformResult[i] > transformResult[i-1] && 
+                    transformResult[i] > transformResult[i+1]) {
+                    // Add this peak
+                    peaks.push({
+                        frequency: frequencies[i],
+                        magnitude: transformResult[i]
+                    })
+                }
+            }
+        }
+        
+        // Need at least 2 peaks to consider as having harmonics
+        if (peaks.length >= 2) {
+            // Sort peaks by frequency
+            peaks.sort((a, b) => a.frequency - b.frequency)
+            
+            // Store the harmonic frequencies
+            harmonicFrequencies = peaks.map(p => p.frequency)
+            
+            // Mark as custom waveform if we have multiple frequency components
+            isCustomWaveform = true
+        } else {
+            isCustomWaveform = false
+            harmonicFrequencies = []
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 10
+        
+        // Window function explanation when used
+        Rectangle {
+            id: windowInfoRect
+            visible: showWindowInfo
+            color: Qt.rgba(root.lineColor2.r, root.lineColor2.g, root.lineColor2.b, 0.2)
+            border.color: root.lineColor2
+            border.width: 1
+            radius: 5
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: windowInfoText.width + 20
+            Layout.preferredHeight: windowInfoText.height + 10
+            Layout.topMargin: 5
+            
+            Label {
+                id: windowInfoText
+                text: "Window: " + windowType
+                color: root.textColor
+                font.pixelSize: 12
+                font.bold: true
+                anchors.centerIn: parent
+            }
+        }
         
         // explanation for Laplace transforms
         Label {
@@ -278,6 +365,40 @@ Item {
                 
                 XYPoint { x: resonantFrequency/(2*Math.PI); y: 0 }
                 XYPoint { x: resonantFrequency/(2*Math.PI); y: magnitudeAxisY.max }
+            }
+
+            LineSeries {
+                id: harmonicsSeries
+                name: "Harmonics"
+                axisX: freqAxisX
+                axisY: magnitudeAxisY
+                color: "#E91E63"  // Pink color for harmonics
+                width: 1
+                style: Qt.DashLine
+                useOpenGL: isLinux
+                visible: isCustomWaveform && showHarmonics
+            }
+
+            Rectangle {
+                id: harmonicsLegend
+                visible: isCustomWaveform && showHarmonics
+                color: "#80E91E63"  // Semi-transparent pink
+                border.color: "#E91E63"
+                border.width: 1
+                radius: 5
+                width: harmonicsText.width + 12
+                height: harmonicsText.height + 8
+                x: parent.width - width - 10
+                y: 10
+
+                Text {
+                    id: harmonicsText
+                    text: "Harmonics"
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.pixelSize: 12
+                    font.bold: true
+                }
             }
 
             Rectangle {
@@ -644,8 +765,16 @@ Item {
                 
                 // If we found a peak frequency, scale the axis around it
                 if (expectedFrequency > 0) {
-                    // Show 2-3x the main frequency to include harmonics
-                    freqAxisX.max = Math.max(expectedFrequency * 3, 10);
+                    // For custom waveforms with harmonics, show a wider frequency range
+                    if (isCustomWaveform && harmonicFrequencies.length > 0) {
+                        // Find the highest harmonic frequency
+                        let maxHarmonic = harmonicFrequencies[harmonicFrequencies.length - 1];
+                        // Show range up to the highest harmonic plus some margin
+                        freqAxisX.max = Math.max(maxHarmonic * 1.2, expectedFrequency * 5);
+                    } else {
+                        // Show 2-3x the main frequency to include harmonics
+                        freqAxisX.max = Math.max(expectedFrequency * 3, 10);
+                    }
                 } else {
                     // Fallback to the previous calculation
                     freqAxisX.max = maxFreq > 0 ? Math.min(Math.max(maxFreq * 1.2, 5), 100) : 100;
@@ -653,42 +782,44 @@ Item {
                 
                 freqAxisX.labelFormat = "%.1f";
             } else {
-                // For Laplace, automatically adjust the range to show the peak or full response
-                // Find the location of the peak
-                let peakIndex = -1;
-                let peakValue = 0;
+                // For Laplace, ensure we use the full range of data
+                // Start by finding the maximum frequency that has meaningful data
+                let significantFreq = maxFreq;
                 
-                for (let i = 0; i < transformResult.length && i < frequencies.length; i++) {
-                    if (transformResult[i] > peakValue) {
-                        peakValue = transformResult[i];
-                        peakIndex = i;
+                // Find the frequency where the magnitude drops below a threshold
+                let threshold = maxMagnitude * 0.1; // 10% of max value
+                let foundCutoff = false;
+                
+                // Scan from high to low frequencies to find where signal becomes significant
+                for (let i = magnitudePoints.length - 1; i > 0; i--) {
+                    if (magnitudePoints[i].y > threshold) {
+                        significantFreq = magnitudePoints[i].x;
+                        foundCutoff = true;
+                        break;
                     }
                 }
                 
-                // If we found a peak, center the view around it
-                if (peakIndex >= 0) {
-                    let peakFreq = frequencies[peakIndex];
-                    // Scale the axis to show 3x the peak frequency
-                    freqAxisX.max = Math.max(peakFreq * 3, 100);
-                } else {
-                    // Fallback - ensure we show at least 100 rad/s range
-                    freqAxisX.max = Math.max(maxFreq > 0 ? maxFreq * 1.5 : 100, 100);
+                // If we couldn't find a cutoff, use the maximum frequency
+                if (!foundCutoff) {
+                    significantFreq = maxFreq;
                 }
                 
-                // For damped sine or impulse waves specifically, ensure we show enough range
+                // Ensure the x-axis range is always sufficient, at least 100 rad/s or higher if data warrants
+                freqAxisX.max = Math.max(significantFreq * 1.2, 100);
+                
+                // For resonant peaks, expand range further
                 if ((resonantFrequency > 0) || 
-                    (transformResult.length > 200 && maxFreq > 50)) { // Likely impulse or other wide-spectrum function
-                    
-                    // For wide-spectrum functions, ensure we show a reasonable range
-                    // Show at least 3x the frequency where we find the majority of energy
+                    (transformResult.length > 200 && maxFreq > 50)) {
                     let significantFreq = findSignificantFrequency(magnitudePoints, maxMagnitude);
                     if (significantFreq > 0) {
                         freqAxisX.max = Math.max(freqAxisX.max, significantFreq * 3);
                     }
                     
-                    // But cap it for readability
                     freqAxisX.max = Math.min(freqAxisX.max, 200);
                 }
+                
+                // Cap the maximum for readability
+                freqAxisX.max = Math.min(Math.max(freqAxisX.max, 200), 300);
                 
                 freqAxisX.labelFormat = freqAxisX.max > 100 ? "%.0f" : "%.1f";
             }
@@ -696,15 +827,12 @@ Item {
             magnitudeAxisY.min = 0;
             magnitudeAxisY.max = maxMagnitude > 0 ? maxMagnitude * 1.2 : 2;
             
-            // If we have a resonant frequency, make sure it's visible
             if (transformType === "Laplace" && resonantFrequency > 0) {
-                // Ensure the x-axis range shows the resonant frequency
                 if (resonantFrequency > freqAxisX.max) {
                     freqAxisX.max = resonantFrequency * 1.5;
                 }
             }
             
-            // Clear and add all points at once to ensure Windows compatibility
             magnitudeSeries.clear();
             for (let i = 0; i < magnitudePoints.length; i++) {
                 magnitudeSeries.append(magnitudePoints[i].x, magnitudePoints[i].y);
@@ -715,37 +843,40 @@ Item {
                 phaseSeries.append(phasePoints[i].x, phasePoints[i].y);
             }
             
-            // Update the resonance marker if applicable
+            if (isCustomWaveform && harmonicFrequencies.length > 0 && transformType === "Fourier") {
+                harmonicsSeries.clear();
+                
+                for (let i = 0; i < harmonicFrequencies.length; i++) {
+                    let freq = harmonicFrequencies[i];
+                    harmonicsSeries.append(freq, 0);
+                    harmonicsSeries.append(freq, maxMagnitude * 0.9);
+                    
+                    if (i < harmonicFrequencies.length - 1) {
+                        harmonicsSeries.append(freq, 0);
+                    }
+                }
+            }
+            
             if (transformType === "Laplace" && resonantFrequency > 0) {
-                // Create a vertical line at the resonant frequency
-                // Get the max magnitude to scale the line height
                 let maxMag = maxMagnitude;
                 
-                // Clear any existing points
                 resonanceMarker.clear();
                 
-                // Draw vertical line from 0 to slightly above max magnitude
                 resonanceMarker.append(resonantFrequency, 0);
                 resonanceMarker.append(resonantFrequency, maxMag * 1.1);
                 
-                // Position the label near the resonant frequency peak
-                // We need to convert from value to pixel position
                 let xPos = transformChart.mapToPosition(Qt.point(resonantFrequency, maxMag), magnitudeSeries).x;
                 let yPos = transformChart.mapToPosition(Qt.point(resonantFrequency, maxMag * 0.8), magnitudeSeries).y;
                 
-                // Set the position of the label
                 resonanceLabel.x = xPos - resonanceLabel.width / 2;
                 resonanceLabel.y = yPos - resonanceLabel.height - 5;
             }
         }
     }
     
-    // Helper function to find a significant frequency for proper scaling
     function findSignificantFrequency(points, maxMagnitude) {
         if (!points || points.length === 0) return 0;
         
-        // Find the frequency where the magnitude drops to 50% of the max
-        // This is a good heuristic to set the display range
         let threshold = maxMagnitude * 0.5;
         
         for (let i = 0; i < points.length; i++) {
@@ -754,7 +885,6 @@ Item {
             }
         }
         
-        // If we didn't find a cutoff point, return the last frequency
         return points[points.length - 1].x;
     }
     
@@ -775,7 +905,6 @@ Item {
                 }
             }
         } else {
-            // Default empty chart state
             magnitudeSeries.append(0, 0);
             magnitudeSeries.append(10, 0);
             
@@ -787,27 +916,29 @@ Item {
     }
 
     function updateThemeColors() {
-        // Set appropriate colors based on theme
         if (darkMode) {
             backgroundColor = "#1e1e1e"
             textColor = "#e0e0e0"
             gridColor = "#303030"
-            poleColor = "#E91E63"    // Bright pink for poles
-            zeroColor = "#00BCD4"    // Bright cyan for zeros
+            poleColor = "#E91E63"
+            zeroColor = "#00BCD4"
         } else {
             backgroundColor = "#ffffff"
             textColor = "#333333"
             gridColor = "#cccccc"
-            poleColor = "#d81b60"    // Darker pink for poles
-            zeroColor = "#0097a7"    // Darker cyan for zeros
+            poleColor = "#d81b60"
+            zeroColor = "#0097a7"
         }
         
-        // Force repaint of the canvas elements
         if (showPoleZero) {
             updatePoleZeroPlot()
         }
         if (show3D && transformType === "Wavelet") {
             wavelet3DPlot.threeDcanvas.requestPaint()
         }
+    }
+
+    onWindowTypeChanged: {
+        showWindowInfo = (transformType === "Fourier" && windowType !== "None")
     }
 }

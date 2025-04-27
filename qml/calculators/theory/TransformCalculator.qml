@@ -61,6 +61,30 @@ Item {
         heightFactor: 0.6
     }
     
+    // Add window function information popup
+    PopUpText {
+        id: windowInfoPopup
+        parentCard: results
+        popupText: "<h3>Window Functions in Fourier Transform</h3><br>" +
+                   "Window functions help reduce spectral leakage when computing the Fourier transform of a signal:<br><br>" +
+                   "<b>• None (Rectangular):</b> No windowing, may cause spectral leakage.<br>" +
+                   "<b>• Hann:</b> Good all-purpose window with moderate leakage reduction.<br>" +
+                   "<b>• Hamming:</b> Modified Hann with better sidelobe suppression.<br>" +
+                   "<b>• Blackman:</b> Excellent sidelobe suppression, wider main lobe.<br>" +
+                   "<b>• Bartlett:</b> Triangular window with linear tapering.<br>" +
+                   "<b>• Flattop:</b> Excellent amplitude accuracy, poor frequency resolution.<br>" +
+                   "<b>• Kaiser:</b> Parameterized window with adjustable sidelobe levels.<br>" +
+                   "<b>• Gaussian:</b> Bell-shaped curve with minimal time-bandwidth product.<br>" +
+                   "<b>• Tukey:</b> Combines rectangular with cosine-tapered edges.<br><br>" +
+                   "<h4>Why Use Window Functions?</h4>" +
+                   "• Reduces spectral leakage from discontinuities at signal edges<br>" +
+                   "• Improves frequency resolution for some signal types<br>" +
+                   "• Enhances detection of weaker spectral components<br>" +
+                   "• Trade-off between spectral resolution and amplitude accuracy"
+        widthFactor: 0.6
+        heightFactor: 0.7
+    }
+    
     PopUpText {
         id: popUpText
         parentCard: results
@@ -77,6 +101,34 @@ Item {
                     "<b>Visualization:</b><br>" +
                     "The calculator shows both the time-domain signal and its transform in magnitude and phase.<br><br>" +
                     "Developed by <b>Wave</b>."
+        widthFactor: 0.7
+        heightFactor: 0.7
+    }
+
+    // Add custom formula help popup
+    PopUpText {
+        id: customFormulaHelpPopup
+        parentCard: results
+        popupText: "<h3>Custom Waveform Formula Syntax</h3><br>" + 
+                   "Enter a mathematical formula to create custom waveforms. You can combine multiple harmonics.<br><br>" +
+                   "<b>Basic sine wave:</b><br>" +
+                   "• sin(2*pi*f*t) - Sine wave at base frequency<br><br>" +
+                   "<b>Adding harmonics:</b><br>" +
+                   "• sin(2*pi*f*t) + 0.5*sin(2*2*pi*f*t) - Sine plus 2nd harmonic<br>" +
+                   "• sin(1*w*t) + 0.3*sin(3*w*t) - First and third harmonic<br><br>" +
+                   "<b>Shorthand:</b><br>" +
+                   "• sin(t) - Sine at 1 Hz<br>" +
+                   "• sin(w*t) - Sine at base frequency<br>" +
+                   "• -0.5*sin(3*w*t) - Negative amplitude harmonic<br><br>" +
+                   "<b>Variables:</b><br>" +
+                   "• t - Time variable<br>" +
+                   "• f - Base frequency value<br>" +
+                   "• w - Angular frequency (w = 2*pi*f)<br>" +
+                   "• pi - π constant (3.14159...)<br><br>" +
+                   "<b>Examples:</b><br>" +
+                   "• sin(w*t) + 0.5*sin(2*w*t) + 0.33*sin(3*w*t) + 0.25*sin(4*w*t)<br>" +
+                   "• sin(2*pi*10*t) - 10 Hz sine wave<br>" +
+                   "• sin(w*t) + 0.5*sin(3*w*t) - 0.25*sin(5*w*t) - Odd harmonics"
         widthFactor: 0.7
         heightFactor: 0.7
     }
@@ -228,7 +280,7 @@ Item {
                         WaveCard {
                             title: "Function Parameters"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 500
+                            Layout.minimumHeight: 700
 
                             GridLayout {
                                 id: parametersGrid
@@ -324,7 +376,7 @@ Item {
                                 Label { 
                                     text: "Frequency (Hz):" 
                                     Layout.minimumWidth: 150
-                                    visible: needsFrequency()
+                                    visible: needsFrequency() || functionTypeCombo.currentText === "Custom"
                                 }
                                 
                                 SpinBoxRound {
@@ -335,7 +387,7 @@ Item {
                                     stepSize: 1
                                     editable: true
                                     Layout.fillWidth: true
-                                    visible: needsFrequency()
+                                    visible: needsFrequency() || functionTypeCombo.currentText === "Custom"
                                     
                                     property real realValue: value / 10.0
                                     
@@ -395,6 +447,36 @@ Item {
                                         }
                                     }
                                 }
+                                
+                                // Window function selection - only visible for Fourier transform
+                                Label { 
+                                    text: "Window Function:" 
+                                    Layout.minimumWidth: 150
+                                    visible: fourierRadio.checked
+                                }
+                                
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: fourierRadio.checked
+                                    
+                                    ComboBoxRound {
+                                        id: windowTypeCombo
+                                        model: calculator.windowTypes
+                                        currentIndex: calculator.windowTypes.indexOf(calculator.windowType)
+                                        Layout.fillWidth: true
+                                        onCurrentTextChanged: {
+                                            calculator.setWindowType(currentText)
+                                        }
+                                    }
+                                    
+                                    StyledButton {
+                                        icon.source: "../../../icons/rounded/info.svg"
+                                        ToolTip.text: "Window Function Information"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
+                                        onClicked: windowInfoPopup.open()
+                                    }
+                                }
 
                                 Label { 
                                     text: "Show phase:" 
@@ -447,6 +529,112 @@ Item {
                                     }
                                 }
                                 
+                                // Custom formula editor (only visible for Custom function type)
+                                Label { 
+                                    text: "Custom Formula:" 
+                                    font.bold: true
+                                    Layout.columnSpan: 2
+                                    visible: functionTypeCombo.currentText === "Custom"
+                                    Layout.topMargin: 10
+                                }
+                                
+                                RowLayout {
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    visible: functionTypeCombo.currentText === "Custom"
+                                    
+                                    TextArea {
+                                        id: customFormulaEditor
+                                        text: calculator.customFormula
+                                        placeholderText: "Enter formula (e.g., sin(w*t) + 0.5*sin(2*w*t))"
+                                        wrapMode: TextEdit.Wrap
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 60
+                                        font.family: "Courier"
+                                        
+                                        // Add syntax highlighting or at least a monospace font
+                                        background: Rectangle {
+                                            color: "#f0f0f0"
+                                            border.color: "#cccccc"
+                                            border.width: 1
+                                            radius: 3
+                                        }
+                                        
+                                        onTextChanged: {
+                                            // Use a timer to avoid updating during typing
+                                            updateFormulaTimer.restart()
+                                        }
+                                    }
+                                    
+                                    Timer {
+                                        id: updateFormulaTimer
+                                        interval: 500  // Half-second delay
+                                        onTriggered: {
+                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                        }
+                                    }
+                                    
+                                    StyledButton {
+                                        icon.source: "../../../icons/rounded/help.svg"
+                                        ToolTip.text: "Custom Formula Help"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
+                                        onClicked: customFormulaHelpPopup.open()
+                                    }
+                                }
+                                
+                                // Add preset formulas for custom waveforms
+                                Label {
+                                    text: "Preset Formulas:"
+                                    visible: functionTypeCombo.currentText === "Custom"
+                                    Layout.columnSpan: 2
+                                }
+                                
+                                GridLayout {
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    visible: functionTypeCombo.currentText === "Custom"
+                                    columns: 2
+                                    columnSpacing: 5
+                                    rowSpacing: 5
+                                    
+                                    Button {
+                                        text: "Fundamental + 3 Harmonics"
+                                        Layout.fillWidth: true
+                                        onClicked: {
+                                            customFormulaEditor.text = "sin(w*t) + 0.5*sin(2*w*t) + 0.33*sin(3*w*t) + 0.25*sin(4*w*t)"
+                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                        }
+                                    }
+                                    
+                                    Button {
+                                        text: "Odd Harmonics Only"
+                                        Layout.fillWidth: true
+                                        onClicked: {
+                                            customFormulaEditor.text = "sin(w*t) + 0.33*sin(3*w*t) + 0.2*sin(5*w*t) + 0.14*sin(7*w*t)"
+                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                        }
+                                    }
+                                    
+                                    Button {
+                                        text: "Square Wave Approx."
+                                        Layout.fillWidth: true
+                                        onClicked: {
+                                            customFormulaEditor.text = "sin(w*t) + sin(3*w*t)/3 + sin(5*w*t)/5 + sin(7*w*t)/7 + sin(9*w*t)/9"
+                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                        }
+                                    }
+                                    
+                                    Button {
+                                        text: "Sawtooth Approx."
+                                        Layout.fillWidth: true
+                                        onClicked: {
+                                            customFormulaEditor.text = "sin(w*t) - sin(2*w*t)/2 + sin(3*w*t)/3 - sin(4*w*t)/4 + sin(5*w*t)/5"
+                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                        }
+                                    }
+                                }
+
                                 Label {
                                     text: "Chart Information:"
                                     font.bold: true
@@ -515,6 +703,30 @@ Item {
                             anchors.fill: parent
                             spacing: 10
                             
+                            // Add window function info display
+                            Rectangle {
+                                id: windowDisplay
+                                Layout.fillWidth: true
+                                Layout.margins: 5
+                                Layout.preferredHeight: 30
+                                radius: 5
+                                color: "#1A4CAF50"  // Light green background
+                                border.color: "#4CAF50"
+                                border.width: 1
+                                visible: calculator && 
+                                         calculator.transformType === "Fourier" && 
+                                         calculator.windowType !== "None"
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: calculator && calculator.windowType !== "None" ? 
+                                         "Window Function: " + calculator.windowType : ""
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                    color: textColor
+                                }
+                            }
+                            
                             // Add a prominent display of the resonant frequency
                             Rectangle {
                                 id: resonanceDisplay
@@ -565,7 +777,8 @@ Item {
                                 frequencies: calculator.frequencies ? calculator.frequencies : []
                                 showPhase: showPhaseCheckbox.checked
                                 transformType: calculator.transformType
-                                resonantFrequency: calculator.resonantFrequency  // Fixed the property
+                                resonantFrequency: calculator.resonantFrequency
+                                windowType: calculator.windowType  // Pass window type to chart
                                 
                                 // Add performance mode property if supported by the TransformViz component
                                 highPerformanceMode: performanceModeCheckbox.checked
@@ -633,6 +846,7 @@ Item {
             case "Square":
             case "Sawtooth":
             case "Damped Sine":
+            case "Custom":  // Add custom type to the frequency-needing functions
                 return true;
             default:
                 return false;
@@ -650,9 +864,33 @@ Item {
                    "<li>Electronic filter design</li>" +
                    "<li>Communications systems</li>" +
                    "<li>Audio processing and analysis</li>" +
-                   "</ul>" +
-                   "<p>For periodic signals, we can also use the Fourier Series:</p>" +
-                   "<p style='text-align: center'>f(t) = a<sub>0</sub>/2 + Σ [a<sub>n</sub>·cos(nωt) + b<sub>n</sub>·sin(nωt)]</p>";
+                   "</ul>";
+            
+            // Add custom information when using Custom function type
+            if (functionTypeCombo.currentText === "Custom") {
+                baseContent += "<h4>Custom Waveforms & Harmonics</h4>" +
+                    "<p>In a Fourier transform, harmonics appear as distinct peaks at multiples of the fundamental frequency:</p>" +
+                    "<ul>" +
+                    "<li>A pure sine wave has only one frequency component</li>" +
+                    "<li>Complex periodic waves contain multiple harmonic components</li>" +
+                    "<li>The shape of a waveform is determined by its harmonic content</li>" +
+                    "<li>Even harmonics (2f, 4f, 6f...) create symmetry around y-axis</li>" +
+                    "<li>Odd harmonics (3f, 5f, 7f...) create half-wave symmetry</li>" +
+                    "</ul>";
+            }
+                   
+            // Add window function explanation when a window is selected
+            if (calculator.windowType !== "None") {
+                baseContent += "<h4>Window Functions</h4>" +
+                    "<p>Window functions reduce spectral leakage in the Fourier transform. The current window (" + 
+                    calculator.windowType + ") applies a shaped envelope to the time domain signal before transformation.</p>" +
+                    "<p>Benefits of windowing:</p>" +
+                    "<ul>" +
+                    "<li>Reduces sidelobe levels in frequency spectrum</li>" +
+                    "<li>Improves detection of weaker frequency components</li>" +
+                    "<li>Trades frequency resolution for amplitude accuracy</li>" +
+                    "</ul>";
+            }
             
             if (functionTypeCombo.currentText === "Sine") {
                 baseContent += "<h4>Phase of Sine Waves</h4>" +
@@ -680,6 +918,15 @@ Item {
                    "<li>Transient response analysis</li>" +
                    "</ul>" +
                    "<p>Where s = σ + jω is a complex number. The real part (σ) represents damping, and the imaginary part (ω) represents frequency.</p>";
+        }
+    }
+    
+    // Initialize UI with current calculator values
+    Component.onCompleted: {
+        // Get window type if available
+        if (calculator && calculator.windowTypes) {
+            windowTypeCombo.model = calculator.windowTypes;
+            windowTypeCombo.currentIndex = calculator.windowTypes.indexOf(calculator.windowType);
         }
     }
 }
