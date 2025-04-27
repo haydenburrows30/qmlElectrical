@@ -7,9 +7,10 @@ import "../../components"
 import "../../components/buttons"
 import "../../components/popups"
 import "../../components/style"
-import "../../components/visualizers"
+import "../../components/charts"
 
 import TransformCalculator 1.0
+import WaveletPlotter 1.0
 
 Item {
     id: transformCard
@@ -554,7 +555,7 @@ Item {
                                 ToolTip.visible: hovered
                             }
                             
-                            TransformViz {
+                            TransformChart {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 

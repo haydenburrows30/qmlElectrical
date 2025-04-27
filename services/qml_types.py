@@ -42,6 +42,8 @@ from models.basic.base_impedance_calculator import BaseImpedanceCalculator
 from models.basic.per_unit_impedance_calculator import PerUnitImpedanceCalculator
 from models.cable.network_cabinet_calculator import NetworkCabinetCalculator
 from models.theory.transform_calculator import TransformCalculator
+from models.theory.z_transform_calculator import ZTransformCalculator
+from models.theory.wavelet_plotter import WaveletPlotter
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -98,5 +100,7 @@ def register_qml_types(engine, current_dir):
         (PerUnitImpedanceCalculator, "PerUnitImpedance", 1, 0, "PerUnitImpedanceCalculator"),
         (NetworkCabinetCalculator, "NetworkCabinetCalculator", 1, 0, "NetworkCabinetCalculator"),
         (SequenceComponentCalculator, "SequenceComponentCalculator", 1, 0, "SequenceComponentCalculator"),
-        (TransformCalculator, "TransformCalculator", 1, 0, "TransformCalculator")
+        (TransformCalculator, "TransformCalculator", 1, 0, "TransformCalculator"),
+        (ZTransformCalculator, "ZTransformCalculator", 1, 0, "ZTransformCalculator"),
+        (WaveletPlotter, "WaveletPlotter", 1, 0, "WaveletPlotter"),
     ]
