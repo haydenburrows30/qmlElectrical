@@ -52,7 +52,8 @@ QtObject {
         { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml", icon: "calculate" },
         { name: qsTr("Sequence Calculator"), source: "calculators/theory/SequenceCalculator.qml", icon: "data_exploration" },
         { name: qsTr("Fourier & Laplace"), source: "calculators/theory/TransformCalculator.qml", icon: "data_exploration" },
-        { name: qsTr("Z-Transform & Wavelet"), source: "calculators/theory/ZTransformCalculator.qml", icon: "functions" }
+        { name: qsTr("Z-Transform & Wavelet"), source: "calculators/theory/ZTransformCalculator.qml", icon: "functions" },
+        { name: qsTr("Calculus"), source: "calculators/theory/CalculusCalculator.qml", icon: "functions" }
     ]
 
     property var renewables: [

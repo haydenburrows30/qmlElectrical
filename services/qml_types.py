@@ -43,6 +43,7 @@ from models.basic.per_unit_impedance_calculator import PerUnitImpedanceCalculato
 from models.cable.network_cabinet_calculator import NetworkCabinetCalculator
 from models.fourier_laplace_z.transform_calculator import TransformCalculator
 from models.fourier_laplace_z.z_transform_calculator import ZTransformCalculator
+from models.theory.calculus_calculator import CalculusCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -100,5 +101,6 @@ def register_qml_types(engine, current_dir):
         (NetworkCabinetCalculator, "NetworkCabinetCalculator", 1, 0, "NetworkCabinetCalculator"),
         (SequenceComponentCalculator, "SequenceComponentCalculator", 1, 0, "SequenceComponentCalculator"),
         (TransformCalculator, "TransformCalculator", 1, 0, "TransformCalculator"),
-        (ZTransformCalculator, "ZTransformCalculator", 1, 0, "ZTransformCalculator")
+        (ZTransformCalculator, "ZTransformCalculator", 1, 0, "ZTransformCalculator"),
+        (CalculusCalculator, "Calculus", 1, 0, "CalculusCalculator")
     ]

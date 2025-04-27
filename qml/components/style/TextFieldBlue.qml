@@ -9,7 +9,7 @@ TextField {
     Layout.fillWidth: true
 
     color: textField.activeFocus ? window.modeToggled ? "white" : "black" : window.modeToggled ? "white" : "black"
-    
+
     background: Rectangle {
         color: window.modeToggled ? "transparent":"#e8f6ff"
         border.color: "#0078d7"

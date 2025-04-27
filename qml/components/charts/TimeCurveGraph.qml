@@ -7,7 +7,7 @@ ChartView {
     title: "Time-Current Curves"
     antialiasing: true
     legend.visible: true
-    theme: ChartView.ChartThemeDark
+    theme: window.modeToggled ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
     
     LogValueAxis {
         id: axisY
