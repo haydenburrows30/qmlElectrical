@@ -10,7 +10,6 @@ import "../../components/style"
 import "../../components/charts"
 
 import TransformCalculator 1.0
-import WaveletPlotter 1.0
 
 Item {
     id: transformCard
