@@ -55,6 +55,10 @@ Item {
     property var harmonicFrequencies: []
     property bool showHarmonics: true
 
+    property bool showHilbertEnvelope: false
+    property bool showHilbertPhase: false
+    property bool isHilbertTransform: transformType === "Hilbert"
+
     Component.onCompleted: {
         updateThemeColors()
         Qt.callLater(updateCharts)
@@ -68,7 +72,12 @@ Item {
         Qt.callLater(updateCharts)
         detectHarmonics()
     }
-    onTransformResultChanged: Qt.callLater(updateCharts)
+    onTransformResultChanged: {
+        Qt.callLater(updateCharts)
+        if (isHilbertTransform) {
+            processHilbertData()
+        }
+    }
     onHighPerformanceModeChanged: Qt.callLater(updateCharts)
 
     onPoleLocationsChanged: {
@@ -749,6 +758,39 @@ Item {
         } else {
             isCustomWaveform = false
             harmonicFrequencies = []
+        }
+    }
+
+    function processHilbertData() {
+        // Ensure we have adequate data scaling for Hilbert transform
+        if (isHilbertTransform && transformResult && transformResult.length > 0) {
+            // Find min/max values for better scaling
+            let minVal = Number.MAX_VALUE;
+            let maxVal = Number.MIN_VALUE;
+            
+            for (let i = 0; i < transformResult.length; i++) {
+                minVal = Math.min(minVal, transformResult[i]);
+                maxVal = Math.max(maxVal, transformResult[i]);
+            }
+            
+            // Adjust the scale to show at least 40rad/s instead of 5rad/s
+            // This might involve setting your Y-axis range explicitly
+            if (transformChart && transformChart.axes) {
+                // If you have a ValueAxis for Y values on your bottom chart
+                let yAxis = transformChart.axes[1]; // Adjust index if needed
+                if (yAxis) {
+                    // Expand the range to ensure data is visible
+                    yAxis.min = minVal - (maxVal - minVal) * 0.1;
+                    yAxis.max = maxVal + (maxVal - minVal) * 0.1;
+                    
+                    // Ensure there's a minimum height for visibility
+                    if (yAxis.max - yAxis.min < 40) {
+                        let midpoint = (yAxis.max + yAxis.min) / 2;
+                        yAxis.min = midpoint - 20;
+                        yAxis.max = midpoint + 20;
+                    }
+                }
+            }
         }
     }
 }

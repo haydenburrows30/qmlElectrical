@@ -383,6 +383,21 @@ Item {
                                     editable: true
                                     Layout.fillWidth: true
                                     
+                                    // Add visual indicator for optimal Hilbert range
+                                    Rectangle {
+                                        visible: hilbertRadio.checked && parent.value <= 100
+                                        anchors.fill: parent
+                                        color: "transparent"
+                                        border.color: "#4CAF50"  // Green when in optimal range
+                                        border.width: 2
+                                        radius: 4
+                                        opacity: 0.7
+                                    }
+                                    
+                                    ToolTip.visible: hilbertRadio.checked && hovered
+                                    ToolTip.text: "Sampling rates between 10-100 Hz often show more pronounced Hilbert transform features"
+                                    ToolTip.delay: 500
+                                    
                                     onValueChanged: z_calculator.setSamplingRate(value)
                                 }
 
@@ -414,6 +429,8 @@ Item {
                                           (z_calculator.pywaveletAvailable ? 
                                            ["db1", "db2", "db4", "sym2", "coif1"] : 
                                            ["Basic"]) : 
+                                          hilbertRadio.checked ?
+                                          ["Envelope", "Phase", "Envelope & Phase"] :
                                           ["Magnitude", "Phase", "Poles/Zeros", "Magnitude & Phase"]
                                     Layout.fillWidth: true
                                     onCurrentTextChanged: {
@@ -423,7 +440,14 @@ Item {
                                             z_calculator.setDisplayOption(currentText)
                                             // Update chart properties when display option changes
                                             if (transformChart) {
-                                                transformChart.showPoleZero = currentText.includes("Poles") && zTransformRadio.checked
+                                                transformChart.showPoleZero = displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
+                                                
+                                                // Check if the properties exist before setting them
+                                                if (transformChart.hasOwnProperty("showHilbertEnvelope"))
+                                                    transformChart.showHilbertEnvelope = currentText.includes("Envelope") && hilbertRadio.checked
+                                                
+                                                if (transformChart.hasOwnProperty("showHilbertPhase"))
+                                                    transformChart.showHilbertPhase = currentText.includes("Phase") && hilbertRadio.checked
                                             }
                                         }
                                     }
@@ -467,6 +491,28 @@ Item {
                                         anchors.centerIn: parent
                                         width: parent.width - 16
                                         text: "Pole-Zero Plot: Poles (×) determine system resonances, zeros (○) determine notches. For stability, all poles must be inside the unit circle (|z| < 1)."
+                                        wrapMode: Text.Wrap
+                                        color: "#0D47A1"  // Dark blue text color
+                                        font.pixelSize: 12
+                                    }
+                                }
+
+                                // Add information about Hilbert transform visualization
+                                Rectangle {
+                                    visible: hilbertRadio.checked
+                                    color: "#E3F2FD"  // Light blue info color
+                                    border.color: "#BBDEFB"
+                                    border.width: 1
+                                    radius: 4
+                                    Layout.fillWidth: true
+                                    Layout.columnSpan: 2
+                                    Layout.preferredHeight: hilbertInfo.height + 16
+                                    
+                                    Text {
+                                        id: hilbertInfo
+                                        anchors.centerIn: parent
+                                        width: parent.width - 16
+                                        text: "For best Hilbert transform visualization, try Chirp or Sinusoidal signals. Lower sampling rates (10-100 Hz) often show more pronounced features. The envelope shows instantaneous amplitude, and phase shows frequency variations."
                                         wrapMode: Text.Wrap
                                         color: "#0D47A1"  // Dark blue text color
                                         font.pixelSize: 12
@@ -558,12 +604,23 @@ Item {
                                 frequencies: z_calculator.frequencies ? z_calculator.frequencies : []
                                 transformType: z_calculator.transformType
                                 showPoleZero: displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
+                                
                                 poleLocations: z_calculator.poleLocations ? z_calculator.poleLocations : []
                                 zeroLocations: z_calculator.zeroLocations ? z_calculator.zeroLocations : []
                                 darkMode: Universal.theme === Universal.Dark
                                 textColor: zTransformCard.textColor
 
                                 calculator: z_calculator
+                                
+                                // After component is loaded, set the Hilbert properties if they exist
+                                Component.onCompleted: {
+                                    if (transformChart.hasOwnProperty("showHilbertEnvelope"))
+                                        transformChart.showHilbertEnvelope = (displayOptionsCombo.currentText.includes("Envelope") || 
+                                                                             displayOptionsCombo.currentIndex === 0) && hilbertRadio.checked
+                                    
+                                    if (transformChart.hasOwnProperty("showHilbertPhase"))
+                                        transformChart.showHilbertPhase = displayOptionsCombo.currentText.includes("Phase") && hilbertRadio.checked
+                                }
                             }
 
                             WaveletChart {
@@ -595,6 +652,12 @@ Item {
         function onCurrentTextChanged() {
             if (transformChart) {
                 transformChart.showPoleZero = displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
+                
+                if (transformChart.hasOwnProperty("showHilbertEnvelope"))
+                    transformChart.showHilbertEnvelope = displayOptionsCombo.currentText.includes("Envelope") && hilbertRadio.checked
+                
+                if (transformChart.hasOwnProperty("showHilbertPhase"))
+                    transformChart.showHilbertPhase = displayOptionsCombo.currentText.includes("Phase") && hilbertRadio.checked
             }
         }
     }
@@ -686,7 +749,13 @@ Item {
         } else if (waveletRadio.checked) {
             return "• Top chart: Original signal\n• Bottom chart: " + "2D wavelet coefficient map with scales and translations";
         } else {
-            return "• Top chart: Original signal\n• Bottom chart: Hilbert transform with envelope (magnitude) and instantaneous phase";
+            if (displayOptionsCombo.currentText.includes("Envelope") && !displayOptionsCombo.currentText.includes("Phase")) {
+                return "• Top chart: Original signal\n• Bottom chart: Hilbert transform envelope (magnitude of analytic signal)\n• Tip: Try Chirp or Sinusoidal signals with sampling rates 10-100 Hz for best results";
+            } else if (displayOptionsCombo.currentText.includes("Phase") && !displayOptionsCombo.currentText.includes("Envelope")) {
+                return "• Top chart: Original signal\n• Bottom chart: Instantaneous phase of analytic signal\n• Tip: Lower sampling rates show more pronounced phase variations";
+            } else {
+                return "• Top chart: Original signal\n• Bottom chart: Hilbert transform with envelope (red) and original signal (blue)\n• The difference between the two shows the transform effect\n• For best results, try sampling rates between 10-100 Hz";
+            }
         }
     }
     

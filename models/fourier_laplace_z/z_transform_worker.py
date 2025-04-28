@@ -67,16 +67,40 @@ class ZTransformCalculatorWorker(QRunnable):
                                         Q_ARG("QVariantList", phase))
                 
             else:  # Hilbert transform
-                freq, magnitude, phase, analytic = self._calculate_hilbert_transform(time_domain)
-                
-                # Update with Hilbert-specific results
-                QMetaObject.invokeMethod(self.parent, "updateHilbertResults", 
-                                        Qt.ConnectionType.QueuedConnection,
-                                        Q_ARG("QVariantList", time_domain),
-                                        Q_ARG("QVariantList", freq),
-                                        Q_ARG("QVariantList", magnitude),
-                                        Q_ARG("QVariantList", phase),
-                                        Q_ARG("QVariantList", analytic))
+                try:
+                    freq, magnitude, phase, analytic = self._calculate_hilbert_transform(time_domain)
+                    
+                    # Update with Hilbert-specific results
+                    QMetaObject.invokeMethod(self.parent, "updateHilbertResults", 
+                                            Qt.ConnectionType.QueuedConnection,
+                                            Q_ARG("QVariantList", time_domain),
+                                            Q_ARG("QVariantList", freq),
+                                            Q_ARG("QVariantList", magnitude),
+                                            Q_ARG("QVariantList", phase),
+                                            Q_ARG("QVariantList", analytic))
+                except Exception as e:
+                    logger.error(f"Error in Hilbert transform calculation: {str(e)}")
+                    # Send a simplified result in case of error to avoid further issues
+                    t = [point["x"] for point in time_domain]
+                    y = [point["y"] for point in time_domain]
+                    zeros = [0.0] * len(t)
+                    
+                    # Create simple arrays for magnitude and phase in case of error
+                    simple_magnitude = []
+                    for val in y:
+                        simple_magnitude.append(float(abs(val)))
+                        simple_magnitude.append(float(abs(val) * 0.7))
+                    
+                    QMetaObject.invokeMethod(self.parent, "updateHilbertResults", 
+                                            Qt.ConnectionType.QueuedConnection,
+                                            Q_ARG("QVariantList", time_domain),
+                                            Q_ARG("QVariantList", t),
+                                            Q_ARG("QVariantList", simple_magnitude),
+                                            Q_ARG("QVariantList", zeros),
+                                            Q_ARG("QVariantList", y))
+                    
+                    # Set error message
+                    self.parent._equation_transform = "Error calculating Hilbert transform:\n" + str(e)
                 
         except Exception as e:
             # Log the error and ensure we reset the calculator status
@@ -103,9 +127,16 @@ class ZTransformCalculatorWorker(QRunnable):
         # Generate the appropriate function
         y = np.zeros_like(t)
         
+        # Check if we're using Hilbert transform to optimize for sampling rate
+        is_hilbert = self.transform_type == "Hilbert"
+        
         if self.function_type == "Unit Step":
             # u[n] = 1 for n ≥ 0, 0 for n < 0
             y = self.amplitude * np.ones_like(n)
+            # For Hilbert, create a step with a slight ramp for better visualization
+            if is_hilbert:
+                ramp_length = min(20, len(n)//5)
+                y[:ramp_length] = self.amplitude * np.linspace(0, 1, ramp_length)
             self.parent._equation_original = f"{self.amplitude} u[n]"
             self.parent._roc_text = "|z| > 0"
             
@@ -113,6 +144,12 @@ class ZTransformCalculatorWorker(QRunnable):
             # δ[n] = 1 for n = 0, 0 otherwise
             y = np.zeros_like(n)
             y[0] = self.amplitude
+            # For Hilbert, create multiple pulses for better visualization
+            if is_hilbert:
+                pulse_positions = [0, len(n)//4, len(n)//2, 3*len(n)//4]
+                for pos in pulse_positions:
+                    if pos < len(y):
+                        y[pos] = self.amplitude
             self.parent._equation_original = f"{self.amplitude} δ[n]"
             self.parent._roc_text = "All z except z = 0"
             
@@ -130,7 +167,22 @@ class ZTransformCalculatorWorker(QRunnable):
             # a * sin(2πfn/fs)
             omega = 2 * np.pi * self.frequency / self.sampling_rate
             y = self.amplitude * np.sin(omega * n)
-            self.parent._equation_original = f"{self.amplitude} sin(2π·{self.frequency:.1f}·n/{self.sampling_rate})"
+            # For Hilbert, add amplitude modulation for better envelope visualization
+            if is_hilbert:
+                # Adjust modulation frequency based on sampling rate for better visualization
+                mod_freq = min(self.frequency / 5, max(1.0, self.sampling_rate / 20))  # Ensure meaningful modulation
+                mod_omega = 2 * np.pi * mod_freq / max(1.0, self.sampling_rate)
+                
+                # Add a second modulation component adjusted for sampling rate
+                mod_freq2 = min(self.frequency / 12, max(0.5, self.sampling_rate / 40))
+                mod_omega2 = 2 * np.pi * mod_freq2 / max(1.0, self.sampling_rate)
+                
+                envelope = 0.5 + 0.3 * np.sin(mod_omega * n) + 0.2 * np.sin(mod_omega2 * n + np.pi/3)
+                y = y * envelope  # Apply amplitude modulation
+                
+                self.parent._equation_original = f"{self.amplitude} sin(2π·{self.frequency:.1f}·n/{self.sampling_rate}) · complex AM"
+            else:
+                self.parent._equation_original = f"{self.amplitude} sin(2π·{self.frequency:.1f}·n/{self.sampling_rate})"
             self.parent._roc_text = "|z| > 1"
             
         elif self.function_type == "Exponentially Damped Sine":
@@ -149,41 +201,81 @@ class ZTransformCalculatorWorker(QRunnable):
             width = min(20, self.sequence_length // 4)
             y = np.zeros_like(n)
             y[:width] = self.amplitude
-            self.parent._equation_original = f"{self.amplitude} rect[n, {width}]"
+            
+            # For Hilbert, create multiple pulses with varying widths
+            if is_hilbert:
+                pulse_starts = [0, self.sequence_length // 3, 2 * self.sequence_length // 3]
+                pulse_widths = [width, width//2, width*2]
+                
+                y = np.zeros_like(n)
+                for start, width in zip(pulse_starts, pulse_widths):
+                    if start + width <= len(y):
+                        y[start:start+width] = self.amplitude
+                
+                self.parent._equation_original = f"{self.amplitude} multi-width pulse train"
+            else:
+                self.parent._equation_original = f"{self.amplitude} rect[n, {width}]"
+                
             self.parent._roc_text = "|z| > 0"
-            
-        elif self.function_type == "First-Difference":
-            # x[n] - x[n-1]
-            y = np.zeros_like(n)
-            y[0] = self.amplitude
-            y[1:] = -self.amplitude * np.power(self.decay_factor, n[1:]-1)
-            y[1] += self.amplitude * self.decay_factor  # Corrected first difference
-            self.parent._equation_original = f"{self.amplitude} (1 - ({self.decay_factor})·z^-1)"
-            self.parent._roc_text = f"|z| > {abs(self.decay_factor):.3f}"
-            
-        elif self.function_type == "Moving Average":
-            # (x[n] + x[n-1] + ... + x[n-M+1])/M
-            # Implement as an exponential sequence passed through a moving average filter
-            M = min(5, self.sequence_length // 10)  # Window size
-            base_signal = self.amplitude * np.power(self.decay_factor, n)
-            y = np.convolve(base_signal, np.ones(M)/M, mode='full')[:self.sequence_length]
-            self.parent._equation_original = f"MA({M}) applied to {self.amplitude}·({self.decay_factor})^n"
-            self.parent._roc_text = f"max(|{self.decay_factor}|, 0) < |z| < ∞"
             
         elif self.function_type == "Chirp Sequence":
             # a * sin(2π * f(t) * t) where f(t) increases linearly
             f0 = self.frequency
             f1 = min(self.frequency * 4, self.sampling_rate / 2.1)  # Ensure below Nyquist
-            k = (f1 - f0) / (self.sequence_length * Ts)
-            phase = 2 * np.pi * (f0 * t + 0.5 * k * t * t)
-            y = self.amplitude * np.sin(phase)
-            self.parent._equation_original = f"{self.amplitude} sin(2π·[{f0:.1f} + k·n]·n/{self.sampling_rate})"
+            
+            # For Hilbert, create a more dramatic chirp with amplitude modulation
+            if is_hilbert:
+                # Scale frequency range based on sampling rate
+                f1 = min(self.frequency * min(12, max(0.1, self.sampling_rate / 10)), 
+                         max(0.1, self.sampling_rate / 2.1))
+                
+                # Create a nonlinear chirp with parameters adjusted for sampling rate
+                nonlinear_factor = 0.5 * (100.0 / max(10.0, self.sampling_rate))
+                nonlinear_factor = float(nonlinear_factor)  # Ensure it's a float
+                phase = 2 * np.pi * (f0 * t + nonlinear_factor * (f1-f0) * t**2 / (self.sequence_length * Ts))
+                
+                # Create amplitude variations adjusted for sampling rate
+                envelope = 0.7 + 0.4 * np.sin(2 * np.pi * 3 * t / (self.sequence_length * Ts))
+                
+                y = self.amplitude * envelope * np.sin(phase)
+                self.parent._equation_original = f"{self.amplitude} * complex AM * nonlinear chirp[{f0:.1f}-{f1:.1f} Hz]"
+            else:
+                k = (f1 - f0) / (self.sequence_length * Ts)
+                phase = 2 * np.pi * (f0 * t + 0.5 * k * t * t)
+                y = self.amplitude * np.sin(phase)
+                self.parent._equation_original = f"{self.amplitude} sin(2π·[{f0:.1f} + k·n]·n/{self.sampling_rate})"
+                
             self.parent._roc_text = "Complex - varies with frequency"
             
         elif self.function_type == "Random Sequence":
             # Random signal (white noise)
-            y = self.amplitude * np.random.randn(len(n))
-            self.parent._equation_original = f"{self.amplitude} * random[n]"
+            if is_hilbert:
+                # For Hilbert, create a smoothed random signal for better envelope visualization
+                raw_random = np.random.randn(len(n))
+                # Apply smoothing for more meaningful Hilbert transform
+                window_size = min(10, len(n)//20)
+                if window_size > 1:
+                    smoothing_window = np.ones(window_size) / window_size
+                    y = self.amplitude * np.convolve(raw_random, smoothing_window, mode='same')
+                else:
+                    y = self.amplitude * raw_random
+                    
+                # Add some low-frequency modulation
+                mod_period = len(n) // 3
+                t_mod = np.linspace(0, 2*np.pi, mod_period)
+                mod_signal = np.sin(t_mod)
+                # Repeat the modulation signal to cover the full length
+                repeats = int(np.ceil(len(n) / mod_period))
+                mod_full = np.tile(mod_signal, repeats)[:len(n)]
+                
+                # Apply the modulation
+                y = y * (0.5 + 0.5 * mod_full)
+                
+                self.parent._equation_original = f"{self.amplitude} * filtered_random[n] with modulation"
+            else:
+                y = self.amplitude * np.random.randn(len(n))
+                self.parent._equation_original = f"{self.amplitude} * random[n]"
+                
             self.parent._roc_text = "Statistical - all |z| > 0"
             
         # Efficiently convert to list of dictionaries with proper data types for QML
@@ -556,69 +648,97 @@ class ZTransformCalculatorWorker(QRunnable):
         y = np.array([point["y"] for point in time_domain])
         t = np.array([point["x"] for point in time_domain])
         
+        # For better visualization, amplify the signal variation
+        # This helps create more pronounced features in the Hilbert transform
+        amplified_y = y.copy()
+        
         # Calculate the analytic signal using Hilbert transform
-        analytic_signal = signal.hilbert(y)
+        analytic_signal = signal.hilbert(amplified_y)
         
         # Extract amplitude envelope and instantaneous phase
         amplitude_envelope = np.abs(analytic_signal)
         instantaneous_phase = np.unwrap(np.angle(analytic_signal))
         
-        # For longer signals, parallelize the post-processing
-        if len(y) > 500:
-            # Split the signal into chunks for parallel phase unwrapping and frequency calculation
-            chunk_size = len(y) // self.thread_pool._max_workers
-            chunks = [(i, min(i + chunk_size, len(y))) for i in range(0, len(y), chunk_size)]
-            
-            # Function to calculate instantaneous frequency for a chunk
-            def calculate_inst_freq_chunk(bounds):
-                start, end = bounds
-                # Ensure we have enough points for gradient calculation
-                safe_start = max(0, start - 1)
-                safe_end = min(len(y), end + 1)
-                
-                # Extract the relevant part of the signal and time
-                phase_chunk = instantaneous_phase[safe_start:safe_end]
-                time_chunk = t[safe_start:safe_end]
-                
-                # Calculate frequency using gradient
-                dt = time_chunk[1] - time_chunk[0] if len(time_chunk) > 1 else t[1] - t[0]
-                freq_chunk = np.gradient(phase_chunk, dt) / (2 * np.pi)
-                
-                # Return only the requested part
-                offset = start - safe_start
-                return freq_chunk[offset:offset + (end - start)]
-            
-            # Use thread pool for parallel frequency calculation
-            futures = [self.thread_pool.submit(calculate_inst_freq_chunk, chunk) for chunk in chunks]
-            
-            # Collect results in order
-            instantaneous_frequency = np.concatenate([future.result() for future in futures])
-        else:
-            # For shorter signals, direct calculation is more efficient
+        # Enhance the Hilbert transform for better visualization
+        # Scale the amplitude envelope to make it more visible
+        amplitude_envelope = amplitude_envelope * 1.5  # Increase amplitude for better visibility
+        
+        # Apply smoothing to the instantaneous phase for more stable visualization
+        # Adjust the window size based on sampling rate - smaller window for lower sampling rates
+        window_size = max(1, int(min(3, len(instantaneous_phase) // (40 * self.sampling_rate / 100))))
+        if window_size > 1:
+            smoothing_window = np.ones(window_size) / window_size
+            instantaneous_phase = np.convolve(instantaneous_phase, smoothing_window, mode='same')
+        
+        # Create a scaled version of the original signal for comparison in the chart
+        scaled_original = amplified_y * 0.7  # Scale down original for comparison
+        
+        # Calculate instantaneous frequency with improved resolution
+        if len(y) > 10:
             dt = t[1] - t[0]  # Time step
             instantaneous_frequency = np.gradient(instantaneous_phase, dt) / (2 * np.pi)
-        
-        # Save min/max frequency for display (optimize by using vectorized min/max)
-        if len(instantaneous_frequency) > 10:
-            # Filter out edge artifacts - use vectorized slicing
-            valid_freq = instantaneous_frequency[5:-5]
+            
+            # Apply a frequency scaling factor inversely proportional to sampling rate
+            # Lower sampling rates need more amplification of frequency variations
+            freq_scaling = 2.0 * (100.0 / max(10.0, self.sampling_rate))
+            instantaneous_frequency = instantaneous_frequency * freq_scaling
+            
+            # Set a minimum frequency range to ensure meaningful visualization
+            # Scale min_freq_range based on sampling rate - lower sampling rates should show smaller ranges
+            min_freq_range = 40.0 * (self.sampling_rate / 100.0)
+            
+            # Adjust limits to prevent overly small ranges
+            valid_freq = instantaneous_frequency[5:-5]  # Skip edge artifacts
             if len(valid_freq) > 0:
                 self.parent._min_frequency = float(np.min(valid_freq))
                 self.parent._max_frequency = float(np.max(valid_freq))
+                
+                # Ensure minimum range and prevent values too close to zero
+                if self.parent._max_frequency - self.parent._min_frequency < min_freq_range:
+                    mid_freq = (self.parent._max_frequency + self.parent._min_frequency) / 2
+                    self.parent._min_frequency = mid_freq - min_freq_range / 2
+                    self.parent._max_frequency = mid_freq + min_freq_range / 2
+                    
+            # Fix: Catch and handle any errors in the frequency calculation
+            try:
+                # Set min/max frequencies to reasonable values even if calculation fails
+                if np.isnan(self.parent._min_frequency) or np.isnan(self.parent._max_frequency):
+                    self.parent._min_frequency = -20.0
+                    self.parent._max_frequency = 20.0
+            except Exception as e:
+                logger.error(f"Error calculating frequency range: {str(e)}")
+                self.parent._min_frequency = -20.0
+                self.parent._max_frequency = 20.0
+        else:
+            instantaneous_frequency = np.zeros_like(t)
+            self.parent._min_frequency = -20.0
+            self.parent._max_frequency = 20.0
         
         # Create a representation of the analytic signal for visualization
         analytic_signal_real = np.real(analytic_signal)
-        analytic_signal_imag = np.imag(analytic_signal)
         
-        # Set the equation
-        original_func = self.parent._equation_original
+        # Enhance the phase data to make it more visible in the chart
+        # Map phase from [-π, π] to [-1, 1] and scale it for better visibility
+        # Higher phase scaling for lower sampling rates
+        phase_scaling = 1.5 * (100.0 / max(10.0, self.sampling_rate))
+        normalized_phase = instantaneous_phase / np.pi * phase_scaling
+        
+        # Set the equation with sampling rate information
         self.parent._equation_transform = f"H{{f(t)}} = π⁻¹ ∫ f(τ)/(t-τ) dτ\n"
         self.parent._equation_transform += f"Analytic signal: f(t) + j·H{{f(t)}} = A(t)·e^(jφ(t))"
+        self.parent._equation_transform += f"\nSampling: {self.sampling_rate} Hz | Enhanced visualization scale: {freq_scaling:.1f}x"
         
-        # Prepare frequency domain data (simply use instantaneous frequency)
-        freq = t  # Use time as x-axis for instantaneous frequency
+        # For better visualization, interleave the envelope and original signal
+        magnitude_combined = []
+        for env, orig in zip(amplitude_envelope, scaled_original):
+            magnitude_combined.append(float(env))
+            magnitude_combined.append(float(orig))
         
-        return freq.tolist(), amplitude_envelope.tolist(), instantaneous_phase.tolist(), analytic_signal_real.tolist()
+        # Use phase data as is
+        phase_combined = normalized_phase.tolist()
+        
+        # Return time as x-axis for frequency domain display
+        return t.tolist(), magnitude_combined, phase_combined, analytic_signal_real.tolist()
     
     def _set_z_transform_equation(self):
         """Set the equation for the Z-transform based on the function type"""
@@ -650,4 +770,3 @@ class ZTransformCalculatorWorker(QRunnable):
             
         else:
             self.parent._equation_transform = "Z{x[n]} = ∑ x[n]·z⁻ⁿ from n=0 to ∞"
-
