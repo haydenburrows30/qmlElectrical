@@ -3,6 +3,10 @@ from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool, Qt
 from .z_transform_worker import ZTransformCalculatorWorker
 from .transform_utils import PYWT_AVAILABLE
 
+from services.logger_config import configure_logger
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="z_transform_calculator")
+
 class ZTransformCalculator(QObject):
     """Calculator for Z-transform, Wavelet, and Hilbert transforms with multithreading support"""
     
@@ -50,6 +54,8 @@ class ZTransformCalculator(QObject):
         # Additional properties for wavelets
         self._wavelet_levels = 5              # Number of wavelet decomposition levels
         self._edge_handling = "symmetric"     # How edges are handled in wavelet transform
+        self._wavelet_magnitude_2d = []       # 2D array of wavelet magnitude data
+        self._wavelet_phase_2d = []           # 2D array of wavelet phase data
         
         # Additional properties for Hilbert
         self._min_frequency = 0.0             # Minimum instantaneous frequency
@@ -154,7 +160,7 @@ class ZTransformCalculator(QObject):
             if not PYWT_AVAILABLE and value != "Basic":
                 # If PyWavelets is not available, only allow "Basic" type
                 self._wavelet_type = "Basic"
-                print("PyWavelets not available. Using basic implementation.")
+                logger.warning("PyWavelets not available. Using basic implementation.")
             else:
                 self._wavelet_type = value
                 
@@ -254,6 +260,14 @@ class ZTransformCalculator(QObject):
     def pywaveletAvailable(self):
         return PYWT_AVAILABLE
     
+    @Property(list, notify=resultsCalculated)
+    def waveletMagnitude2D(self):
+        return self._wavelet_magnitude_2d
+    
+    @Property(list, notify=resultsCalculated)
+    def waveletPhase2D(self):
+        return self._wavelet_phase_2d
+    
     def _calculate(self):
         """Start calculation in a separate thread"""
         try:
@@ -267,7 +281,7 @@ class ZTransformCalculator(QObject):
             self._thread_pool.start(worker)
             
         except Exception as e:
-            print(f"Error starting calculation: {str(e)}")
+            logger.error(f"Error starting calculation: {str(e)}")
             self.calculating = False
     
     @Slot("QVariantList", "QVariantList", "QVariantList", "QVariantList", "QVariantList", "QVariantList")
@@ -283,7 +297,7 @@ class ZTransformCalculator(QObject):
             self._zero_locations = zeros if zeros else []
             
         except Exception as e:
-            print(f"Error updating Z-transform results: {str(e)}")
+            logger.error(f"Error updating Z-transform results: {str(e)}")
             self._resetResults()
         finally:
             # Always set calculating to false regardless of success or failure
@@ -300,8 +314,14 @@ class ZTransformCalculator(QObject):
             self._transform_result = magnitude if magnitude else []
             self._phase_result = phase if phase else []
             
+            # Store the 2D arrays for better visualization if they're available
+            # If they weren't set in the worker, use the flattened data
+            if not hasattr(self, '_wavelet_magnitude_2d') or len(self._wavelet_magnitude_2d) == 0:
+                self._wavelet_magnitude_2d = magnitude
+                self._wavelet_phase_2d = phase
+            
         except Exception as e:
-            print(f"Error updating Wavelet results: {str(e)}")
+            logger.error(f"Error updating Wavelet results: {str(e)}")
             self._resetResults()
         finally:
             # Always set calculating to false regardless of success or failure
@@ -319,7 +339,7 @@ class ZTransformCalculator(QObject):
             self._phase_result = phase if phase else []
             
         except Exception as e:
-            print(f"Error updating Hilbert results: {str(e)}")
+            logger.error(f"Error updating Hilbert results: {str(e)}")
             self._resetResults()
         finally:
             # Always set calculating to false regardless of success or failure
@@ -342,6 +362,8 @@ class ZTransformCalculator(QObject):
         self._pole_locations = []
         self._zero_locations = []
         self._equation_transform = "Error in calculation"
+        self._wavelet_magnitude_2d = []
+        self._wavelet_phase_2d = []
     
     # QML slots
     @Slot(str)

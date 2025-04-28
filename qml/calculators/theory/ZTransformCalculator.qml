@@ -579,10 +579,12 @@ Item {
                                 ToolTip.delay: 500
                             }
 
+                            // Transform Domain Chart
                             TransformChart {
                                 id: transformChart
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                visible: !waveletRadio.checked //|| (waveletRadio.checked && !show3DCheckbox.checked) 
                                 
                                 // Bind properties directly
                                 timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
@@ -599,6 +601,28 @@ Item {
 
                                 calculator: z_calculator
                             }
+                            
+                            // Specialized Wavelet Chart 
+                            WaveletChart {
+                                id: waveletChart
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                visible: waveletRadio.checked && !show3DCheckbox.checked
+                                
+                                timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
+                                scaleData: z_calculator.frequencies ? z_calculator.frequencies : []
+                                magnitudeData: z_calculator.waveletMagnitude2D ? z_calculator.waveletMagnitude2D : []
+                                phaseData: z_calculator.waveletPhase2D ? z_calculator.waveletPhase2D : []
+                                waveletType: displayOptionsCombo.currentText
+                                darkMode: Universal.theme === Universal.Dark
+                                textColor: zTransformCard.textColor
+                                // highPerformanceMode: performanceModeCheckbox.checked
+                            }
+
+                            // TransformViz {
+                            //     id: wavelet3DPlot
+                            //     visible: waveletRadio.checked && show3DCheckbox.checked
+                            // }
                         }
                     }
                 }
@@ -666,6 +690,16 @@ Item {
                 transformChart.frequencies = z_calculator.frequencies ? z_calculator.frequencies : []
                 transformChart.poleLocations = z_calculator.poleLocations ? z_calculator.poleLocations : []
                 transformChart.zeroLocations = z_calculator.zeroLocations ? z_calculator.zeroLocations : []
+            }
+            
+            // Update wavelet chart when new results are calculated
+            if (waveletChart && waveletRadio.checked) {
+                waveletChart.timeDomain = z_calculator.timeDomain ? z_calculator.timeDomain : []
+                waveletChart.scaleData = z_calculator.frequencies ? z_calculator.frequencies : []
+                waveletChart.magnitudeData = z_calculator.waveletMagnitude2D ? z_calculator.waveletMagnitude2D : []
+                waveletChart.phaseData = z_calculator.waveletPhase2D ? z_calculator.waveletPhase2D : []
+                waveletChart.waveletType = displayOptionsCombo.currentText
+                waveletChart.refresh()
             }
         }
     }
