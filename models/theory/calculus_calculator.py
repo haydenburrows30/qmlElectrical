@@ -388,3 +388,7 @@ class CalculusCalculator(QObject):
     @Slot(float)
     def setParameterB(self, value):
         self.parameterB = value
+        
+    @Slot()
+    def calculate(self):
+        self._calculate()

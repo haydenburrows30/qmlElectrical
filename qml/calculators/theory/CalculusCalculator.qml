@@ -17,7 +17,14 @@ Item {
 
     property CalculusCalculator calculator: CalculusCalculator {}
     property color textColor: Universal.foreground
-    
+
+    Component.onCompleted: {
+        if (calculator) {
+            // Trigger initial calculation
+            calculator.calculate()
+        }
+    }   
+
     // Function to update the Y-axis range based on visible series
     function updateYAxisRange() {
         // Get all values from visible series

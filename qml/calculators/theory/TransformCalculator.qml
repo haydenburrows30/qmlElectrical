@@ -20,10 +20,10 @@ Item {
     property int calculationThrottleMs: 300
     property var throttleTimer: null
 
-    // Add the phase information popup
+    // phase info
     PopUpText {
         id: phaseInfoPopup
-        parentCard: results
+        parentCard: functionParams
         popupText: "<h3>Sine Wave Phase Information</h3><br>" + 
                    "For a sine wave, the phase in the Fourier transform appears jagged because:<br><br>" +
                    "• The phase jumps between -90° and +90° at the fundamental frequency<br>" +
@@ -41,10 +41,10 @@ Item {
         heightFactor: 0.6
     }
     
-    // Add Laplace transform information popup
+    // Laplace transform
     PopUpText {
         id: laplaceInfoPopup
-        parentCard: results
+        parentCard: functionParams
         popupText: "<h3>Laplace Transform Visualization</h3><br>" + 
                    "The Laplace transform shown in this calculator has these characteristics:<br><br>" +
                    "• For sine waves, a resonant peak appears at jω = 2πf rad/s<br>" +
@@ -60,10 +60,10 @@ Item {
         heightFactor: 0.6
     }
     
-    // Add window function information popup
+    // window function
     PopUpText {
         id: windowInfoPopup
-        parentCard: results
+        parentCard: functionParams
         popupText: "<h3>Window Functions in Fourier Transform</h3><br>" +
                    "Window functions help reduce spectral leakage when computing the Fourier transform of a signal:<br><br>" +
                    "<b>• None (Rectangular):</b> No windowing, may cause spectral leakage.<br>" +
@@ -84,6 +84,7 @@ Item {
         heightFactor: 0.7
     }
     
+    // main info
     PopUpText {
         id: popUpText
         parentCard: results
@@ -104,10 +105,10 @@ Item {
         heightFactor: 0.7
     }
 
-    // Add custom formula help popup
+    // custom formula
     PopUpText {
         id: customFormulaHelpPopup
-        parentCard: results
+        parentCard: functionParams
         popupText: "<h3>Custom Waveform Formula Syntax</h3><br>" + 
                    "Enter a mathematical formula to create custom waveforms. You can combine multiple harmonics.<br><br>" +
                    "<b>Basic sine wave:</b><br>" +
@@ -132,7 +133,7 @@ Item {
         heightFactor: 0.7
     }
 
-    // Add loading indicator for calculations
+    // loading indicator
     BusyIndicator {
         id: calculationIndicator
         anchors.centerIn: parent
@@ -174,7 +175,7 @@ Item {
             
             ColumnLayout {
                 id: mainLayout
-                width: parent.width
+                width: parent.width - 10
                 
                 RowLayout {
                     width: parent.width
@@ -188,7 +189,7 @@ Item {
                         font.bold: true
                         Layout.fillWidth: true
                     }
-                    
+
                     StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
@@ -214,7 +215,7 @@ Item {
                         WaveCard {
                             title: "Transform Type"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 280
+                            Layout.minimumHeight: 250
 
                             ColumnLayout {
                                 anchors.fill: parent
@@ -253,22 +254,36 @@ Item {
                                     font.pixelSize: 16
                                 }
 
-                                ComboBoxRound {
-                                    id: functionTypeCombo
-                                    model: calculator.functionTypes
-                                    onCurrentTextChanged: calculator.setFunctionType(currentText)
-                                    Layout.minimumWidth: 270
-                                    Layout.margins: 10
+                                RowLayout {
+
+
+                                    ComboBoxRound {
+                                        id: functionTypeCombo
+                                        model: calculator.functionTypes
+                                        onCurrentTextChanged: calculator.setFunctionType(currentText)
+                                        Layout.fillWidth: true
+                                    }
+
+
+                                    StyledButton {
+                                        // text: "Charts"
+                                        icon.source: "../../../icons/rounded/refresh.svg"
+                                        ToolTip.text: "Refresh charts"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
+
+                                        // Layout.minimumWidth: 50
+
+                                        onClicked: {
+                                            calculator.calculate()
+                                        }
+                                    }
                                 }
-                                
+
                                 TextFieldBlue {
                                     id: equationField
                                     text: calculator ? calculator.equationOriginal : ""
-                                    readOnly: true
                                     Layout.fillWidth: true
-                                    Layout.leftMargin: 10
-                                    Layout.rightMargin: 10
-                                    Layout.bottomMargin: 10
                                     font.italic: true
                                     horizontalAlignment: Text.AlignHCenter
                                 }
@@ -277,9 +292,10 @@ Item {
 
                         // Function parameters
                         WaveCard {
+                            id: functionParams
                             title: "Function Parameters"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 700
+                            Layout.minimumHeight: functionTypeCombo.currentText === "Custom" ? 510 : 310
 
                             GridLayout {
                                 id: parametersGrid
@@ -479,55 +495,64 @@ Item {
 
                                 Label { 
                                     text: "Show phase:" 
-                                    Layout.minimumWidth: 150
+                                    // Layout.minimumWidth: 150
                                 }
-                                
-                                CheckBox {
-                                    id: showPhaseCheckbox
-                                    checked: true
+
+                                RowLayout {
                                     Layout.fillWidth: true
+                                
+                                    CheckBox {
+                                        id: showPhaseCheckbox
+                                        checked: true
+                                        text: showPhaseCheckbox.checked ? "On" : "Off"
+
+                                        Layout.alignment: Qt.AlignLeft
+                                    }
+
+                                    Label{Layout.fillWidth: true}
+
+                                    // Phase information button - update to show for both Fourier and Laplace
+                                    StyledButton {
+                                        id: phaseInfoButton
+                                        ToolTip.text: fourierRadio.checked ? "Phase Info" : "Laplace Info"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
+                                        
+                                        icon.source: "../../../icons/rounded/info.svg"
+                                        // Make visible for both Fourier sine waves and any Laplace transform
+                                        Layout.alignment: Qt.AlignRight
+                                        visible: (functionTypeCombo.currentText === "Sine" && fourierRadio.checked) || 
+                                                laplaceRadio.checked
+                                        
+                                        onClicked: {
+                                            if (fourierRadio.checked) {
+                                                phaseInfoPopup.open()
+                                            } else {
+                                                laplaceInfoPopup.open()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Performance mode
+                                Label { 
+                                    text: "Performance:"
                                 }
 
                                 // Performance options
-                                Label { 
-                                    text: "Performance Options:" 
-                                    font.bold: true
-                                    Layout.columnSpan: 2
-                                    Layout.topMargin: 10
-                                }
-                                
+
                                 CheckBox {
                                     id: performanceModeCheckbox
-                                    text: "High performance mode"
+                                    text: performanceModeCheckbox.checked ? "High" : "Normal"
                                     checked: true
-                                    Layout.columnSpan: 2
-                                    
+
+                                    Layout.fillWidth: true
+
                                     ToolTip.text: "Optimizes rendering for better performance"
                                     ToolTip.visible: hovered
                                     ToolTip.delay: 500
                                 }
 
-                                // Phase information button - update to show for both Fourier and Laplace
-                                Button {
-                                    id: phaseInfoButton
-                                    text: fourierRadio.checked ? "Phase Information" : "Laplace Transform Info"
-                                    icon.source: "../../../icons/rounded/info.svg"
-                                    // Make visible for both Fourier sine waves and any Laplace transform
-                                    visible: (functionTypeCombo.currentText === "Sine" && fourierRadio.checked) || 
-                                            laplaceRadio.checked
-                                    Layout.columnSpan: 2
-                                    Layout.topMargin: 10
-                                    Layout.alignment: Qt.AlignHCenter
-                                    
-                                    onClicked: {
-                                        if (fourierRadio.checked) {
-                                            phaseInfoPopup.open()
-                                        } else {
-                                            laplaceInfoPopup.open()
-                                        }
-                                    }
-                                }
-                                
                                 // Custom formula editor (only visible for Custom function type)
                                 Label { 
                                     text: "Custom Formula:" 
@@ -634,38 +659,7 @@ Item {
                                     }
                                 }
 
-                                Label {
-                                    text: "Chart Information:"
-                                    font.bold: true
-                                    Layout.columnSpan: 2
-                                    Layout.topMargin: 10
-                                }
-                                
-                                TextArea {
-                                    readOnly: true
-                                    text: "The visualization shows:\n• Top chart: Time domain signal\n• Bottom chart: " + 
-                                          (calculator.transformType === "Fourier" ? 
-                                           "Frequency domain with magnitude and phase" : 
-                                           "s-domain with magnitude and phase")
-                                    wrapMode: TextEdit.Wrap
-                                    Layout.columnSpan: 2
-                                    Layout.fillWidth: true
-                                    background: Rectangle {
-                                        color: "transparent"
-                                    }
-                                }
-                                
-                                Button {
-                                    text: "Refresh Charts"
-                                    icon.source: "../../../icons/rounded/refresh.svg"
-                                    Layout.columnSpan: 2
-                                    Layout.alignment: Qt.AlignHCenter
-                                    Layout.topMargin: 10
-                                    
-                                    onClicked: {
-                                        calculator.calculate()
-                                    }
-                                }
+                                Label {Layout.fillHeight: true}
                             }
                         }
                         
@@ -700,8 +694,28 @@ Item {
 
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: 10
+
+                            Label {
+                                text: "Chart Information:"
+                                font.bold: true
+                                Layout.columnSpan: 2
+                                Layout.topMargin: 10
+                            }
                             
+                            TextArea {
+                                readOnly: true
+                                text: "• Top chart: Time domain signal\n• Bottom chart: " + 
+                                        (calculator.transformType === "Fourier" ? 
+                                        "Frequency domain with magnitude and phase" : 
+                                        "s-domain with magnitude and phase")
+                                wrapMode: TextEdit.Wrap
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                                background: Rectangle {
+                                    color: "transparent"
+                                }
+                            }
+
                             // Add window function info display
                             Rectangle {
                                 id: windowDisplay
@@ -725,7 +739,7 @@ Item {
                                     color: textColor
                                 }
                             }
-                            
+
                             // Add a prominent display of the resonant frequency
                             Rectangle {
                                 id: resonanceDisplay

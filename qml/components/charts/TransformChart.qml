@@ -194,52 +194,6 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 10
-        
-        // Window function explanation when used
-        Rectangle {
-            id: windowInfoRect
-            visible: showWindowInfo
-            color: Qt.rgba(root.lineColor2.r, root.lineColor2.g, root.lineColor2.b, 0.2)
-            border.color: root.lineColor2
-            border.width: 1
-            radius: 5
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: windowInfoText.width + 20
-            Layout.preferredHeight: windowInfoText.height + 10
-            Layout.topMargin: 5
-            
-            Label {
-                id: windowInfoText
-                text: "Window: " + windowType
-                color: root.textColor
-                font.pixelSize: 12
-                font.bold: true
-                anchors.centerIn: parent
-            }
-        }
-        
-        // explanation for Laplace transforms
-        Label {
-            id: laplaceExplanation
-            text: {
-                if (root.transformType === "Laplace" && resonantFrequency > 0) {
-                    return "Resonant frequency: " + resonantFrequency.toFixed(1) + " rad/s (" + 
-                           (resonantFrequency/(2*Math.PI)).toFixed(1) + " Hz)";
-                }
-                return "";
-            }
-            color: root.textColor
-            font.pixelSize: 14
-            font.bold: true
-            visible: transformType === "Laplace" && resonantFrequency > 0
-            Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 5
-            Layout.preferredWidth: parent.width * 0.9
-            Layout.maximumWidth: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            z: 10
-        }
 
         BusyIndicator {
             id: busyIndicator
