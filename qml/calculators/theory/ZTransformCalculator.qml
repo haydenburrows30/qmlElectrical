@@ -549,24 +549,10 @@ Item {
                                 }
                             }
 
-                            // key parameters
-                            Rectangle {
-                                id: parametersDisplay
-                                Layout.fillWidth: true
-                                Layout.margins: 5
-                                Layout.preferredHeight: 30
-                                radius: 5
-                                color: "#1A2196F3"  // Light blue background
-                                border.color: "#2196F3"
-                                border.width: 1
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: getKeyParametersText()
-                                    font.pixelSize: 14
-                                    font.bold: true
-                                    color: textColor
-                                }
+                            TextFieldBlue {
+                                text: getKeyParametersText()
+                                font.pixelSize: 14
+                                font.bold: true
                             }
 
                             TextFieldBlue {
@@ -579,14 +565,12 @@ Item {
                                 ToolTip.delay: 500
                             }
 
-                            // Transform Domain Chart
                             TransformChart {
                                 id: transformChart
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                visible: !waveletRadio.checked //|| (waveletRadio.checked && !show3DCheckbox.checked) 
-                                
-                                // Bind properties directly
+                                visible: !waveletRadio.checked
+
                                 timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
                                 transformResult: z_calculator.transformResult ? z_calculator.transformResult : []
                                 phaseResult: z_calculator.phaseResult ? z_calculator.phaseResult : []
@@ -601,14 +585,13 @@ Item {
 
                                 calculator: z_calculator
                             }
-                            
-                            // Specialized Wavelet Chart 
+
                             WaveletChart {
                                 id: waveletChart
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                visible: waveletRadio.checked && !show3DCheckbox.checked
-                                
+                                visible: waveletRadio.checked
+
                                 timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
                                 scaleData: z_calculator.frequencies ? z_calculator.frequencies : []
                                 magnitudeData: z_calculator.waveletMagnitude2D ? z_calculator.waveletMagnitude2D : []
@@ -616,13 +599,7 @@ Item {
                                 waveletType: displayOptionsCombo.currentText
                                 darkMode: Universal.theme === Universal.Dark
                                 textColor: zTransformCard.textColor
-                                // highPerformanceMode: performanceModeCheckbox.checked
                             }
-
-                            // TransformViz {
-                            //     id: wavelet3DPlot
-                            //     visible: waveletRadio.checked && show3DCheckbox.checked
-                            // }
                         }
                     }
                 }

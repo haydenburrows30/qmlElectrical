@@ -15,7 +15,7 @@ Item {
     property var transformResult: []
     property var phaseResult: []
     property var frequencies: []
-    property string transformType: "Fourier" // "Fourier", "Laplace", "Z-Transform", "Wavelet", "Hilbert"
+    property string transformType: "Fourier"
     property color lineColor1: "#2196f3"
     property color lineColor2: "#4caf50"
     property color gridColor: "#303030"
@@ -48,28 +48,24 @@ Item {
     readonly property bool isLinux: Qt.platform.os === "linux"
     readonly property bool isWindows: Qt.platform.os === "windows"
 
-    // Update window visualization properties
-    property string windowType: "None"  // Window function type to display in labels
+    property string windowType: "None"
     property bool showWindowInfo: transformType === "Fourier" && windowType !== "None"
 
-    property bool isCustomWaveform: transformType === "Fourier" && false  // Will be set based on data
-    property var harmonicFrequencies: []  // To store detected harmonic frequencies
-    property bool showHarmonics: true     // Allow toggling harmonic markers
+    property bool isCustomWaveform: transformType === "Fourier" && false
+    property var harmonicFrequencies: []
+    property bool showHarmonics: true
 
     Component.onCompleted: {
-        // Initialize colors and then call update charts
         updateThemeColors()
         Qt.callLater(updateCharts)
     }
 
     onDarkModeChanged: {
-        // Update colors based on dark/light mode
         updateThemeColors()
     }
     onResonantFrequencyChanged: updateTransformSeries()
     onTimeDomainChanged: {
         Qt.callLater(updateCharts)
-        // Check if this looks like a custom waveform with harmonics
         detectHarmonics()
     }
     onTransformResultChanged: Qt.callLater(updateCharts)
@@ -96,19 +92,6 @@ Item {
         } else {
             transformChart.visible = true
             poleZeroPlot.visible = false
-        }
-    }
-
-    onShow3DChanged: {
-        if (transformType === "Wavelet") {
-            // Toggle visibility of the 3D wavelet plot
-            wavelet3DPlot.visible = show3D;
-            transformChart.visible = !show3D;
-            
-            // Force a repaint of the 3D canvas when shown
-            if (show3D) {
-                wavelet3DPlot.threeDcanvas.requestPaint();
-            }
         }
     }
 
@@ -183,7 +166,7 @@ Item {
             Layout.fillHeight: true
             Layout.preferredHeight: parent.height / 2
             antialiasing: !highPerformanceMode
-            animationOptions: ChartView.NoAnimation // Always disable animations for better performance
+            animationOptions: ChartView.NoAnimation
             legend.visible: legendCheckBox.checked
             backgroundColor: root.backgroundColor
             theme: root.darkMode ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
@@ -332,7 +315,6 @@ Item {
             CheckBox {
                 id: showPhaseCheckbox
                 checked: false
-                // text: showPhaseCheckbox.checked ? "On" : "Off"
 
                 Layout.alignment: Qt.AlignLeft
                 ToolTip.text: "Turn phase on/off"
@@ -396,28 +378,22 @@ Item {
             visible: show3D && transformType === "Wavelet"
         }
     }
-    
-    // Update functions
+
     function updateTimeDomainChart() {
-        // Create temporary arrays for points
         let timePoints = [];
-        
-        // Check if we have data
+
         if (!timeDomain || timeDomain.length === 0) {
             return;
         }
-        
-        // Add the points to the series
+
         let minY = Number.MAX_VALUE;
         let maxY = -Number.MAX_VALUE;
         let maxX = 0;
         let pointsAdded = 0;
         
         try {
-            // Calculate stride for sampling points
             let stride = 1;
             if (highPerformanceMode) {
-                // Scale stride based on data size - larger datasets get more aggressive subsampling
                 if (timeDomain.length > 10000) {
                     stride = Math.max(1, Math.floor(timeDomain.length / 1000));
                 } else if (timeDomain.length > 5000) {
@@ -428,16 +404,12 @@ Item {
             }
             
             if (timeDomain.length > 0) {
-                // Handle different data formats
                 if (typeof timeDomain[0] === 'object' && 'x' in timeDomain[0] && 'y' in timeDomain[0]) {
-                    // First collect points in array
                     for (let i = 0; i < timeDomain.length; i += stride) {
                         let point = timeDomain[i];
                         
                         if (point && isFinite(point.x) && isFinite(point.y)) {
                             timePoints.push({ x: point.x, y: point.y });
-                            
-                            // Track min/max for axis scaling
                             minY = Math.min(minY, point.y);
                             maxY = Math.max(maxY, point.y);
                             maxX = Math.max(maxX, point.x);
@@ -445,7 +417,6 @@ Item {
                         }
                     }
                 } 
-                // Array of arrays format
                 else if (Array.isArray(timeDomain[0])) {
                     for (let i = 0; i < timeDomain.length; i += stride) {
                         let point = timeDomain[i];
@@ -462,7 +433,6 @@ Item {
                         }
                     }
                 }
-                // Direct array of y values
                 else if (typeof timeDomain[0] === 'number') {
                     for (let i = 0; i < timeDomain.length; i += stride) {
                         let y = timeDomain[i];
@@ -479,61 +449,48 @@ Item {
                     maxX = (timeDomain.length - 1) / 20;
                 }
             }
-            
-            // Only update axes if we have valid data
+
             if (isFinite(minY) && isFinite(maxY) && minY !== Number.MAX_VALUE && pointsAdded > 0) {
-                // Update the axes with some padding
                 timeAxisX.min = 0;
                 timeAxisX.max = maxX > 0 ? maxX : 5;
-                
-                // Ensure symmetric y-axis for visual clarity
+
                 const yRange = Math.max(Math.abs(minY), Math.abs(maxY)) * 1.2;
-                timeAxisY.min = -yRange || -2;  // Default to -2 if yRange is 0 or NaN
-                timeAxisY.max = yRange || 2;    // Default to 2 if yRange is 0 or NaN
-                
-                // Clear and replace all points at once to ensure Windows compatibility
+                timeAxisY.min = -yRange || -2;
+                timeAxisY.max = yRange || 2;
+
                 timeSeries.clear();
-                
-                // For Windows, use a more compatible approach to add points
+
                 for (let i = 0; i < timePoints.length; i++) {
                     timeSeries.append(timePoints[i].x, timePoints[i].y);
                 }
             }
         } catch (e) {
-            // Silently handle errors
         }
     }
     
     function updateTransformChart() {
-        // Temporary arrays for collecting points
         let magnitudePoints = [];
         let phasePoints = [];
         let resonancePoints = [];
-        
-        // Check if we have data
+
         if (!transformResult || transformResult.length === 0) return;
-        
-        // Add the points to the series
+
         let maxMagnitude = 0;
         let maxFreq = 0;
-        
-        // For large datasets, subsample in high performance mode
+
         let stride = highPerformanceMode && transformResult.length > 1000 ? Math.floor(transformResult.length / 500) : 1;
-        
-        // Collect points in arrays first
+
         for (let i = 0; i < transformResult.length; i += stride) {
             if (i < frequencies.length) {
                 let freq = frequencies[i];
                 let magnitude = transformResult[i];
-                
-                // Check for valid numbers
+
                 if (isFinite(freq) && isFinite(magnitude)) {
                     magnitudePoints.push({ x: freq, y: magnitude });
                     maxMagnitude = Math.max(maxMagnitude, magnitude);
                     maxFreq = Math.max(maxFreq, freq);
                 }
-                
-                // Add phase points if we have phase data
+
                 if (phaseResult && i < phaseResult.length) {
                     let phase = phaseResult[i];
                     if (isFinite(freq) && isFinite(phase)) {
@@ -542,20 +499,14 @@ Item {
                 }
             }
         }
-        
-        // Only update axes if we have valid data
+
         if (isFinite(maxMagnitude) && isFinite(maxFreq)) {
-            // Update the magnitude axis with some padding
             freqAxisX.min = 0;
-            
-            // Different axis handling for Fourier vs Laplace
+
             if (transformType === "Fourier") {
-                // Auto-adjust scale based on the data frequency content
                 let expectedFrequency = -1;
-                
-                // Try to extract frequency from the data
+
                 if (frequencies && frequencies.length > 0) {
-                    // Find the frequency with the highest magnitude
                     let maxMagIndex = 0;
                     let maxMagValue = 0;
                     
@@ -570,35 +521,24 @@ Item {
                         expectedFrequency = frequencies[maxMagIndex];
                     }
                 }
-                
-                // If we found a peak frequency, scale the axis around it
+
                 if (expectedFrequency > 0) {
-                    // For custom waveforms with harmonics, show a wider frequency range
                     if (isCustomWaveform && harmonicFrequencies.length > 0) {
-                        // Find the highest harmonic frequency
                         let maxHarmonic = harmonicFrequencies[harmonicFrequencies.length - 1];
-                        // Show range up to the highest harmonic plus some margin
                         freqAxisX.max = Math.max(maxHarmonic * 1.2, expectedFrequency * 5);
                     } else {
-                        // Show 2-3x the main frequency to include harmonics
                         freqAxisX.max = Math.max(expectedFrequency * 3, 10);
                     }
                 } else {
-                    // Fallback to the previous calculation
                     freqAxisX.max = maxFreq > 0 ? Math.min(Math.max(maxFreq * 1.2, 5), 100) : 100;
                 }
                 
                 freqAxisX.labelFormat = "%.1f";
             } else {
-                // For Laplace, ensure we use the full range of data
-                // Start by finding the maximum frequency that has meaningful data
                 let significantFreq = maxFreq;
-                
-                // Find the frequency where the magnitude drops below a threshold
-                let threshold = maxMagnitude * 0.1; // 10% of max value
+                let threshold = maxMagnitude * 0.1;
                 let foundCutoff = false;
-                
-                // Scan from high to low frequencies to find where signal becomes significant
+
                 for (let i = magnitudePoints.length - 1; i > 0; i--) {
                     if (magnitudePoints[i].y > threshold) {
                         significantFreq = magnitudePoints[i].x;
@@ -606,16 +546,13 @@ Item {
                         break;
                     }
                 }
-                
-                // If we couldn't find a cutoff, use the maximum frequency
+
                 if (!foundCutoff) {
                     significantFreq = maxFreq;
                 }
-                
-                // Ensure the x-axis range is always sufficient, at least 100 rad/s or higher if data warrants
+
                 freqAxisX.max = Math.max(significantFreq * 1.2, 100);
-                
-                // For resonant peaks, expand range further
+
                 if ((resonantFrequency > 0) || 
                     (transformResult.length > 200 && maxFreq > 50)) {
                     let significantFreq = findSignificantFrequency(magnitudePoints, maxMagnitude);
@@ -625,10 +562,8 @@ Item {
                     
                     freqAxisX.max = Math.min(freqAxisX.max, 200);
                 }
-                
-                // Cap the maximum for readability
+
                 freqAxisX.max = Math.min(Math.max(freqAxisX.max, 200), 300);
-                
                 freqAxisX.labelFormat = freqAxisX.max > 100 ? "%.0f" : "%.1f";
             }
             
@@ -663,8 +598,7 @@ Item {
                         harmonicsSeries.append(freq, 0);
                     }
                 }
-                
-                // Add information about window's effect on harmonics in legend if a window is active
+
                 if (windowType !== "None") {
                     harmonicsText.text = "Harmonics" + (windowType !== "None" ? " (attenuated)" : "");
                 } else {
@@ -753,62 +687,51 @@ Item {
         }
     }
 
-    // Update both charts together
     function updateCharts() {
         updateTimeDomainChart()
         updateTransformChart()
     }
-    
-    // Detect harmonics in the spectrum
+
     function detectHarmonics() {
-        // Only detect harmonics for Fourier transforms
         if (transformType !== "Fourier" || !transformResult || transformResult.length < 10) {
             isCustomWaveform = false
             harmonicFrequencies = []
             return
         }
-        
-        // Look for multiple peaks in the spectrum that could be harmonics
-        // Adjust the threshold depending on the window type - windows attenuate harmonics
-        let peakThreshold = 0.10  // Default: Peaks must be at least 10% of max value
-        
-        // Lower the threshold when window functions are applied to detect smaller peaks
+
+        let peakThreshold = 0.10
+
         if (windowType !== "None") {
-            // Different window types affect harmonics differently
             switch(windowType) {
                 case "Hann":
                 case "Hamming":
-                    peakThreshold = 0.05;  // 5% threshold for moderate windowing
+                    peakThreshold = 0.05;
                     break;
                 case "Blackman":
                 case "Kaiser":
-                    peakThreshold = 0.03;  // 3% for stronger windowing functions
+                    peakThreshold = 0.03;
                     break;
                 case "Flattop":
-                    peakThreshold = 0.02;  // 2% - flattop window heavily attenuates harmonics
+                    peakThreshold = 0.02;
                     break;
                 default:
-                    peakThreshold = 0.07;  // Default for other windows
+                    peakThreshold = 0.07;
             }
         }
         
         let peaks = []
         let maxValue = 0
-        
-        // First find the maximum value
+
         for (let i = 0; i < transformResult.length; i++) {
             if (transformResult[i] > maxValue) {
                 maxValue = transformResult[i]
             }
         }
-        
-        // Then find all peaks above the threshold
+
         for (let i = 5; i < transformResult.length - 5; i++) {
             if (transformResult[i] > peakThreshold * maxValue) {
-                // Check if this is a local maximum
                 if (transformResult[i] > transformResult[i-1] && 
                     transformResult[i] > transformResult[i+1]) {
-                    // Add this peak
                     peaks.push({
                         frequency: frequencies[i],
                         magnitude: transformResult[i]
@@ -816,16 +739,12 @@ Item {
                 }
             }
         }
-        
-        // Need at least 2 peaks to consider as having harmonics
+
         if (peaks.length >= 2) {
-            // Sort peaks by frequency
             peaks.sort((a, b) => a.frequency - b.frequency)
-            
-            // Store the harmonic frequencies
+
             harmonicFrequencies = peaks.map(p => p.frequency)
-            
-            // Mark as custom waveform if we have multiple frequency components
+
             isCustomWaveform = true
         } else {
             isCustomWaveform = false

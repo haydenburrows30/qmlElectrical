@@ -627,7 +627,6 @@ Item {
             chartView.grabToImage(function(result) {
                 if (result) {
                     result.saveToFile(tempImagePath)
-                    console.log("saved to:" + tempImagePath)
                 }
             })
         }

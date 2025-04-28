@@ -164,46 +164,34 @@ ChartView {
         updateRanges(discriminationAnalyzerCard.calculator.defaultRanges)
     }
 
-    // Add a signal to communicate with Python
     signal svgContentReady(string svgContent, string filename)
 
-    // Modify the saveChartImage function to match WindTurbineSection.qml approach
     function saveChartImage(filename) {
-        console.log("Saving chart image to: " + filename)
-        
-        // Simply call grabToImage and save to file
+
         chart.grabToImage(function(result) {
             if (result) {
                 var success = result.saveToFile(filename)
-                console.log("Image save result: " + success)
             } else {
                 console.error("Failed to grab chart image")
             }
         })
     }
 
-    // High resolution image backup function
     function saveHighResImage(filename) {
-        // Save current antialiasing state
         let originalAntialiasing = chart.antialiasing
-        
-        // Apply maximum quality settings for export
+
         chart.antialiasing = true
-        
-        // Calculate proper aspect ratio based on current chart dimensions
+
         let originalWidth = chart.width
         let originalHeight = chart.height
         let aspectRatio = originalHeight / originalWidth
-        
-        // Use extremely high resolution for vector-like quality
+
         let targetWidth = 8000
         let targetHeight = Math.round(targetWidth * aspectRatio)
         
         return chart.grabToImage(function(result) {
-            // Restore original settings
             chart.antialiasing = originalAntialiasing
-            
-            // Save with maximum quality
+
             result.saveToFile(filename)
         }, Qt.size(targetWidth, targetHeight))
     }

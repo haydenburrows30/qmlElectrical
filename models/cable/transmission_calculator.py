@@ -135,11 +135,9 @@ class TransmissionLineCalculator(QObject):
                 if abs(abs(self._Z) - z_mag_alt) > z_mag_alt * 0.5:
                     # If large discrepancy, use the alternative calculation
                     self._Z = complex(z_mag_alt * math.cos(z_ang_alt), z_mag_alt * math.sin(z_ang_alt))
-                    print("Used alternative Z calculation")
             else:
                 # Handle zero or near-zero Y (open circuit)
                 self._Z = complex(1e6, 0)  # High impedance as fallback
-                print("Y near zero, using fallback impedance")
             
             # Calculate SIL - Surge Impedance Loading (more accurate formula)
             if abs(self._Z) > 0:

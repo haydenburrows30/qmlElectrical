@@ -191,7 +191,6 @@ class ThreePhaseSineWaveModel(QObject):
     
     @Property(list, notify=dataChanged)
     def yValuesA(self):
-        print("yValuesA")
         return self._y_values_a
     
     @Property(list, notify=dataChanged)

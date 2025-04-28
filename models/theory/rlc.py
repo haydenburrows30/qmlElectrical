@@ -245,11 +245,9 @@ class RLCChart(QObject):
             if isinstance(filepath, QUrl):
                 original_path = filepath.toString()
                 filepath = filepath.toLocalFile()
-                print(f"Converting QUrl {original_path} to local file path: {filepath}")
             elif filepath.startswith('file:///'):
                 original_path = filepath
                 filepath = QUrl(filepath).toLocalFile()
-                print(f"Converting file:/// URL {original_path} to local file path: {filepath}")
             
             # Get absolute path and directory
             import os
@@ -260,11 +258,9 @@ class RLCChart(QObject):
             if not os.path.exists(directory):
                 try:
                     os.makedirs(directory, exist_ok=True)
-                    print(f"Created directory: {directory}")
                 except Exception as e:
                     print(f"Failed to create directory {directory}: {e}")
-            
-            print(f"Saving chart to: {filepath} (absolute: {abs_path}) with scale {scale}")
+
             self.grabRequested.emit(filepath, scale)
             return True
         except Exception as e:
