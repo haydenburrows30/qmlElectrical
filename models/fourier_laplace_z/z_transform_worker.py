@@ -196,7 +196,7 @@ class ZTransformCalculatorWorker(QRunnable):
         
         # For Z-transform visualization, evaluate the Z-transform around the unit circle
         # to get the frequency response (equivalent to DTFT)
-        N = 512  # Number of points for frequency response
+        N = 1024  # Number of points for frequency response
         
         # Frequency points from 0 to π (normalized frequency)
         omega = np.linspace(0, np.pi, N)

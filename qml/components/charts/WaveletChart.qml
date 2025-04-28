@@ -20,6 +20,8 @@ Item {
     property bool highPerformanceMode: false
     property string waveletType: "db1"
 
+    property bool waveLetEnabled: false
+
     property var colorGradient: [
         "#000033", // Dark blue (lowest value)
         "#0000FF", // Blue
@@ -57,7 +59,6 @@ Item {
                        (magnitudeData.length > 0 && Array.isArray(magnitudeData[0]) ? 
                        magnitudeData[0].length : "not array")) : "null")
             if (magnitudeData && magnitudeData.length > 0) {
-                // Try to figure out the data structure
                 console.log("Data structure check:")
                 console.log("- First element type:", typeof magnitudeData[0])
                 if (Array.isArray(magnitudeData[0])) {
@@ -136,10 +137,11 @@ Item {
 
                 onPaint: {
                     var ctx = getContext("2d");
-                    drawWaveletScalogram(ctx);
+                    if (waveLetEnabled) {
+                        drawWaveletScalogram(ctx)
+                    }
                 }
-                
-                // Draw axes labels
+
                 Text {
                     id: yAxisTitle
                     text: "Scales"
@@ -318,7 +320,6 @@ Item {
                         }
                         standardizedData.push(row);
                     }
-
                 } else {
                     ctx.fillStyle = "#808080";
                     ctx.fillRect(0, 0, width, height);

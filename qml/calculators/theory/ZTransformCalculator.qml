@@ -572,6 +572,8 @@ Item {
                                 Layout.fillHeight: true
                                 visible: waveletRadio.checked
 
+                                waveLetEnabled: waveletRadio.checked
+
                                 timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
                                 scaleData: z_calculator.frequencies ? z_calculator.frequencies : []
                                 magnitudeData: z_calculator.waveletMagnitude2D ? z_calculator.waveletMagnitude2D : []
