@@ -472,25 +472,6 @@ Item {
                                         font.pixelSize: 12
                                     }
                                 }
-
-                                Label { 
-                                    text: "Show 3D view:" 
-                                    Layout.minimumWidth: 150
-                                    visible: waveletRadio.checked
-                                }
-                                
-                                CheckBox {
-                                    id: show3DCheckbox
-                                    checked: false
-                                    Layout.fillWidth: true
-                                    visible: waveletRadio.checked
-                                    onCheckedChanged: {
-                                        z_calculator.setShow3D(checked)
-                                        if (transformChart) {
-                                            transformChart.show3D = checked
-                                        }
-                                    }
-                                }
                             }
                         }
 
@@ -579,7 +560,6 @@ Item {
                                 showPoleZero: displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
                                 poleLocations: z_calculator.poleLocations ? z_calculator.poleLocations : []
                                 zeroLocations: z_calculator.zeroLocations ? z_calculator.zeroLocations : []
-                                show3D: show3DCheckbox.checked && waveletRadio.checked
                                 darkMode: Universal.theme === Universal.Dark
                                 textColor: zTransformCard.textColor
 
@@ -603,16 +583,6 @@ Item {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    // checkbox changes
-    Connections {
-        target: show3DCheckbox
-        function onCheckedChanged() {
-            if (transformChart) {
-                transformChart.show3D = show3DCheckbox.checked
             }
         }
     }
@@ -712,7 +682,7 @@ Item {
             }
             return "• Top chart: Discrete-time sequence\n• Bottom chart: Z-transform representation in the selected format (magnitude, phase, or pole-zero plot)";
         } else if (waveletRadio.checked) {
-            return "• Top chart: Original signal\n• Bottom chart: " + (show3DCheckbox.checked ? "3D wavelet scalogram showing time-scale energy distribution" : "2D wavelet coefficient map with scales and translations");
+            return "• Top chart: Original signal\n• Bottom chart: " + "2D wavelet coefficient map with scales and translations";
         } else {
             return "• Top chart: Original signal\n• Bottom chart: Hilbert transform with envelope (magnitude) and instantaneous phase";
         }
