@@ -8,18 +8,12 @@ Rectangle {
     id: wavelet3DPlot
     width: parent.width
     height: parent.height * 0.45
-    visible: show3D && transformType === "Wavelet"
 
     property var threeDcanvas: wavelet3DCanvas
-    // color: root.backgroundColor
-    // border.color: root.gridColor
-    // border.width: 1
-    // radius: 5
 
     Canvas {
         id: wavelet3DCanvas
         anchors.fill: parent
-        anchors.margins: 10
         
         // Handle the array structure properly
         property real xScale: width / (transformResult.length > 0 ? transformResult[0].length || 100 : 100)
@@ -559,50 +553,50 @@ Rectangle {
         onVisibleChanged: if (visible) requestPaint()
     }
 
-    MouseArea {
-        anchors.fill: parent
-        property real lastX: 0
-        property real lastY: 0
+    // MouseArea {
+    //     anchors.fill: parent
+    //     property real lastX: 0
+    //     property real lastY: 0
         
-        onPressed: {
-            lastX = mouseX
-            lastY = mouseY
-        }
+    //     onPressed: {
+    //         lastX = mouseX
+    //         lastY = mouseY
+    //     }
         
-        onPositionChanged: {
-            if (pressed) {
-                var deltaY = mouseY - lastY
-                wavelet3DCanvas.zScale = Math.max(5, Math.min(200, wavelet3DCanvas.zScale - deltaY))
+    //     onPositionChanged: {
+    //         if (pressed) {
+    //             var deltaY = mouseY - lastY
+    //             wavelet3DCanvas.zScale = Math.max(5, Math.min(200, wavelet3DCanvas.zScale - deltaY))
                 
-                lastX = mouseX
-                lastY = mouseY
+    //             lastX = mouseX
+    //             lastY = mouseY
                 
-                wavelet3DCanvas.requestPaint()
-            }
-        }
+    //             wavelet3DCanvas.requestPaint()
+    //         }
+    //     }
         
-        hoverEnabled: true
-        ToolTip.visible: containsMouse
-        ToolTip.text: "Drag vertically to adjust visualization scale"
-    }
+    //     hoverEnabled: true
+    //     ToolTip.visible: containsMouse
+    //     ToolTip.text: "Drag vertically to adjust visualization scale"
+    // }
 
-    Text {
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: 5
-        text: "3D Wavelet Transform Visualization"
-        color: root.textColor
-        font.pixelSize: 14
-        font.bold: true
-    }
+    // Text {
+    //     anchors.top: parent.top
+    //     anchors.horizontalCenter: parent.horizontalCenter
+    //     anchors.topMargin: 5
+    //     text: "3D Wavelet Transform Visualization"
+    //     color: root.textColor
+    //     font.pixelSize: 14
+    //     font.bold: true
+    // }
 
-    Text {
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottomMargin: 5
-        text: "Showing time-scale representation of signal energy (drag to adjust scale)"
-        color: root.textColor
-        font.pixelSize: 12
-        opacity: 0.8
-    }
+    // Text {
+    //     anchors.bottom: parent.bottom
+    //     anchors.horizontalCenter: parent.horizontalCenter
+    //     anchors.bottomMargin: 5
+    //     text: "Showing time-scale representation of signal energy (drag to adjust scale)"
+    //     color: root.textColor
+    //     font.pixelSize: 12
+    //     opacity: 0.8
+    // }
 }

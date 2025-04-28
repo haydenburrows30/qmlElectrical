@@ -21,7 +21,7 @@ Item {
     property int calculationThrottleMs: 300
     property var throttleTimer: null
 
-    // Add the Z-transform information popup
+    // Z-transform popup
     PopUpText {
         id: zTransformInfoPopup
         parentCard: results
@@ -40,7 +40,7 @@ Item {
         heightFactor: 0.6
     }
     
-    // Add Wavelet transform information popup
+    // Wavelet popup
     PopUpText {
         id: waveletInfoPopup
         parentCard: results
@@ -59,7 +59,7 @@ Item {
         heightFactor: 0.6
     }
     
-    // Add Hilbert transform information popup
+    // Hilbert popup
     PopUpText {
         id: hilbertInfoPopup
         parentCard: results
@@ -99,7 +99,7 @@ Item {
         heightFactor: 0.7
     }
 
-    // Add loading indicator for calculations
+    // Loading indicator
     BusyIndicator {
         id: calculationIndicator
         anchors.centerIn: parent
@@ -135,20 +135,20 @@ Item {
         
         Flickable {
             id: flickableContainer
-            contentWidth: parent.width
+            contentWidth: parent.width - 10
             contentHeight: mainLayout.height
             bottomMargin: 5
-            
+            leftMargin: 5
+            rightMargin: 5
+            topMargin: 5
+
             ColumnLayout {
                 id: mainLayout
-                width: parent.width
-                
+                width: parent.width - 10
+
                 RowLayout {
-                    width: parent.width
-                    Layout.leftMargin: 5
-                    Layout.rightMargin: 5
-                    Layout.topMargin: 5
-                    
+                    Layout.fillWidth: true
+
                     Label {
                         text: "Digital Transforms Calculator"
                         font.pixelSize: 26
@@ -171,6 +171,7 @@ Item {
 
                     // Left column - inputs
                     ColumnLayout {
+                        id: leftColumn
                         Layout.preferredWidth: 400
                         Layout.fillWidth: false
 
@@ -217,6 +218,34 @@ Item {
                                             }
                                         }
                                     }
+
+                                    Label {Layout.fillWidth: true}
+
+                                    // Information buttons
+                                    StyledButton {
+                                        id: transformInfoButton
+                                        text: zTransformRadio.checked ? "Z-Transform" : 
+                                            waveletRadio.checked ? "Wavelet" : 
+                                            "Hilbert"
+                                        icon.source: "../../../icons/rounded/info.svg"
+                                        Layout.alignment: Qt.AlignRight
+
+                                        ToolTip.visible: transformInfoButton.hovered
+                                        ToolTip.delay: 500
+                                        ToolTip.text: zTransformRadio.checked ? "Z-Transform info" : 
+                                            waveletRadio.checked ? "Wavelet info" : 
+                                            "Hilbert info"
+
+                                        onClicked: {
+                                            if (zTransformRadio.checked) {
+                                                zTransformInfoPopup.open()
+                                            } else if (waveletRadio.checked) {
+                                                waveletInfoPopup.open()
+                                            } else {
+                                                hilbertInfoPopup.open()
+                                            }
+                                        }
+                                    }
                                 }
 
                                 Label { 
@@ -248,7 +277,7 @@ Item {
                         WaveCard {
                             title: "Sequence Parameters"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: waveletRadio.checked ? 540: 500
+                            Layout.minimumHeight: waveletRadio.checked ? 350: 280
 
                             GridLayout {
                                 id: parametersGrid
@@ -462,66 +491,14 @@ Item {
                                         }
                                     }
                                 }
-
-                                // Information buttons
-                                Button {
-                                    id: transformInfoButton
-                                    text: zTransformRadio.checked ? "Z-Transform Info" : 
-                                          waveletRadio.checked ? "Wavelet Transform Info" : 
-                                          "Hilbert Transform Info"
-                                    icon.source: "../../../icons/rounded/info.svg"
-                                    Layout.columnSpan: 2
-                                    Layout.topMargin: 10
-                                    Layout.alignment: Qt.AlignHCenter
-                                    
-                                    onClicked: {
-                                        if (zTransformRadio.checked) {
-                                            zTransformInfoPopup.open()
-                                        } else if (waveletRadio.checked) {
-                                            waveletInfoPopup.open()
-                                        } else {
-                                            hilbertInfoPopup.open()
-                                        }
-                                    }
-                                }
-                                
-                                Label {
-                                    text: "Chart Information:"
-                                    font.bold: true
-                                    Layout.columnSpan: 2
-                                    Layout.topMargin: 10
-                                }
-                                
-                                TextArea {
-                                    readOnly: true
-                                    text: getChartInfoText()
-                                    wrapMode: TextEdit.Wrap
-                                    Layout.columnSpan: 2
-                                    Layout.fillWidth: true
-                                    background: Rectangle {
-                                        color: "transparent"
-                                    }
-                                }
-                                
-                                Button {
-                                    text: "Refresh Charts"
-                                    icon.source: "../../../icons/rounded/refresh.svg"
-                                    Layout.columnSpan: 2
-                                    Layout.alignment: Qt.AlignHCenter
-                                    Layout.topMargin: 10
-                                    
-                                    onClicked: {
-                                        z_calculator.calculate()
-                                    }
-                                }
                             }
                         }
-                        
-                        // notes
+
+                        // Notes
                         WaveCard {
                             title: "Applications in Electrical Engineering"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 250
+                            Layout.minimumHeight: 350
                             
                             ScrollView {
                                 anchors.fill: parent
@@ -533,25 +510,46 @@ Item {
                                     wrapMode: TextEdit.Wrap
                                     textFormat: TextEdit.RichText
                                     text: getApplicationContent()
+
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
                                 }
                             }
                         }
                     }
 
+                    // Right column - results
                     WaveCard {
                         id: results
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Layout.minimumHeight: 1000
+                        Layout.minimumHeight: 800
                         
                         title: "Transform Results"
-                        showSettings: true
+                        showSettings: false
 
                         ColumnLayout {
                             anchors.fill: parent
-                            spacing: 10
-                            
-                            // Add a display of key parameters
+
+                            Label {
+                                text: "Chart Information:"
+                                font.bold: true
+                                Layout.columnSpan: 2
+                            }
+
+                            TextArea {
+                                readOnly: true
+                                text: getChartInfoText()
+                                wrapMode: TextEdit.Wrap
+                                Layout.columnSpan: 2
+                                Layout.fillWidth: true
+                                background: Rectangle {
+                                    color: "transparent"
+                                }
+                            }
+
+                            // key parameters
                             Rectangle {
                                 id: parametersDisplay
                                 Layout.fillWidth: true
@@ -570,20 +568,17 @@ Item {
                                     color: textColor
                                 }
                             }
-                            
+
                             TextFieldBlue {
                                 id: transformEquationField
                                 text: z_calculator ? z_calculator.equationTransform : ""
-                                readOnly: true
-                                Layout.fillWidth: true
-                                Layout.margins: 10
                                 font.italic: true
                                 horizontalAlignment: Text.AlignHCenter
                                 ToolTip.text: "Transform equation"
                                 ToolTip.visible: hovered
+                                ToolTip.delay: 500
                             }
-                            
-                            // Direct embedding of chart instead of using a Loader
+
                             TransformChart {
                                 id: transformChart
                                 Layout.fillWidth: true
@@ -601,6 +596,8 @@ Item {
                                 show3D: show3DCheckbox.checked && waveletRadio.checked
                                 darkMode: Universal.theme === Universal.Dark
                                 textColor: zTransformCard.textColor
+
+                                calculator: z_calculator
                             }
                         }
                     }
@@ -608,21 +605,8 @@ Item {
             }
         }
     }
-    
-    // Replace existing Connections with property bindings
-    onWidthChanged: {
-        if (transformChart) {
-            transformChart.width = Qt.binding(function() { return results.width; })
-        }
-    }
-    
-    onHeightChanged: {
-        if (transformChart) {
-            transformChart.height = Qt.binding(function() { return results.height; })
-        }
-    }
-    
-    // Watch for checkbox changes and directly update the chart
+
+    // checkbox changes
     Connections {
         target: show3DCheckbox
         function onCheckedChanged() {
@@ -631,7 +615,7 @@ Item {
             }
         }
     }
-    
+
     // Watch for display option changes
     Connections {
         target: displayOptionsCombo
@@ -641,7 +625,7 @@ Item {
             }
         }
     }
-    
+
     // Connections for transform type radio buttons
     Connections {
         target: zTransformRadio
@@ -670,7 +654,7 @@ Item {
         }
     }
     
-    // Watch for z_calculator updates
+    // z_calculator updates
     Connections {
         target: z_calculator
         
@@ -713,13 +697,13 @@ Item {
     function getChartInfoText() {
         if (zTransformRadio.checked) {
             if (displayOptionsCombo.currentText.includes("Poles")) {
-                return "The pole-zero plot shows:\n• Unit circle (|z| = 1)\n• Poles (×) create resonances/instability\n• Zeros (○) create notches/nulls\n• Stability requires poles inside the unit circle";
+                return "• Unit circle (|z| = 1)\n• Poles (×) create resonances/instability\n• Zeros (○) create notches/nulls\n• Stability requires poles inside the unit circle";
             }
-            return "The visualization shows:\n• Top chart: Discrete-time sequence\n• Bottom chart: Z-transform representation in the selected format (magnitude, phase, or pole-zero plot)";
+            return "• Top chart: Discrete-time sequence\n• Bottom chart: Z-transform representation in the selected format (magnitude, phase, or pole-zero plot)";
         } else if (waveletRadio.checked) {
-            return "The visualization shows:\n• Top chart: Original signal\n• Bottom chart: " + (show3DCheckbox.checked ? "3D wavelet scalogram showing time-scale energy distribution" : "2D wavelet coefficient map with scales and translations");
+            return "• Top chart: Original signal\n• Bottom chart: " + (show3DCheckbox.checked ? "3D wavelet scalogram showing time-scale energy distribution" : "2D wavelet coefficient map with scales and translations");
         } else {
-            return "The visualization shows:\n• Top chart: Original signal\n• Bottom chart: Hilbert transform with envelope (magnitude) and instantaneous phase";
+            return "• Top chart: Original signal\n• Bottom chart: Hilbert transform with envelope (magnitude) and instantaneous phase";
         }
     }
     

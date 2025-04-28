@@ -14,7 +14,7 @@ import TransformCalculator 1.0
 Item {
     id: transformCard
 
-    property TransformCalculator calculator: TransformCalculator {}
+    property TransformCalculator t_calculator: TransformCalculator {}
     property color textColor: Universal.foreground
     property int waveHeight: 310
     property int calculationThrottleMs: 300
@@ -137,7 +137,7 @@ Item {
     BusyIndicator {
         id: calculationIndicator
         anchors.centerIn: parent
-        running: calculator ? calculator.calculating : false
+        running: t_calculator ? t_calculator.calculating : false
         visible: running
         z: 10
         width: 100
@@ -169,20 +169,20 @@ Item {
         
         Flickable {
             id: flickableContainer
-            contentWidth: parent.width
+            contentWidth: parent.width - 10
             contentHeight: mainLayout.height
             bottomMargin: 5
+            leftMargin: 5
+            rightMargin: 5
+            topMargin: 5
             
             ColumnLayout {
                 id: mainLayout
                 width: parent.width - 10
                 
                 RowLayout {
-                    width: parent.width
-                    Layout.leftMargin: 5
-                    Layout.rightMargin: 5
-                    Layout.topMargin: 5
-                    
+                    Layout.fillWidth: true
+
                     Label {
                         text: "Transform Calculator"
                         font.pixelSize: 26
@@ -202,9 +202,6 @@ Item {
 
                 RowLayout {
                     Layout.fillWidth: true
-                    Layout.leftMargin: 5
-                    Layout.rightMargin: 5
-                    spacing: 10
 
                     // Left column - inputs
                     ColumnLayout {
@@ -231,7 +228,7 @@ Item {
                                         checked: true
                                         onCheckedChanged: {
                                             if (checked) {
-                                                calculator.setTransformType("Fourier")
+                                                t_calculator.setTransformType("Fourier")
                                             }
                                         }
                                     }
@@ -241,7 +238,7 @@ Item {
                                         text: "Laplace Transform"
                                         onCheckedChanged: {
                                             if (checked) {
-                                                calculator.setTransformType("Laplace")
+                                                t_calculator.setTransformType("Laplace")
                                             }
                                         }
                                     }
@@ -258,8 +255,8 @@ Item {
 
                                     ComboBoxRound {
                                         id: functionTypeCombo
-                                        model: calculator.functionTypes
-                                        onCurrentTextChanged: calculator.setFunctionType(currentText)
+                                        model: t_calculator.functionTypes
+                                        onCurrentTextChanged: t_calculator.setFunctionType(currentText)
                                         Layout.fillWidth: true
                                     }
 
@@ -296,14 +293,14 @@ Item {
                                         // Layout.minimumWidth: 50
 
                                         onClicked: {
-                                            calculator.calculate()
+                                            t_calculator.calculate()
                                         }
                                     }
                                 }
 
                                 TextFieldBlue {
                                     id: equationField
-                                    text: calculator ? calculator.equationOriginal : ""
+                                    text: t_calculator ? t_calculator.equationOriginal : ""
                                     Layout.fillWidth: true
                                     font.italic: true
                                     horizontalAlignment: Text.AlignHCenter
@@ -332,21 +329,21 @@ Item {
                                     id: parameterASpinBox
                                     from: -50
                                     to: 50
-                                    value: calculator.parameterA * 10
+                                    value: t_calculator.parameterA * 10
                                     stepSize: 1
                                     editable: true
                                     Layout.fillWidth: true
                                     
                                     property real realValue: value / 10.0
                                     
-                                    onValueChanged: calculator.setParameterA(realValue)
+                                    onValueChanged: t_calculator.setParameterA(realValue)
                                     
                                     onValueModified: {
-                                        calculator.setParameterA(realValue)
+                                        t_calculator.setParameterA(realValue)
                                     }
                                     
                                     onRealValueChanged: {
-                                        calculator.setParameterA(realValue)
+                                        t_calculator.setParameterA(realValue)
                                     }
                                     
                                     textFromValue: function(value) {
@@ -359,7 +356,7 @@ Item {
                                     
                                     Keys.onPressed: function(event) {
                                         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            calculator.setParameterA(realValue)
+                                            t_calculator.setParameterA(realValue)
                                             event.accepted = true
                                         }
                                     }
@@ -375,7 +372,7 @@ Item {
                                     id: parameterBSpinBox
                                     from: 1
                                     to: 200
-                                    value: calculator.parameterB * 10
+                                    value: t_calculator.parameterB * 10
                                     stepSize: 1
                                     editable: true
                                     Layout.fillWidth: true
@@ -383,14 +380,14 @@ Item {
                                     
                                     property real realValue: value / 10.0
                                     
-                                    onValueChanged: calculator.setParameterB(realValue)
+                                    onValueChanged: t_calculator.setParameterB(realValue)
                                     
                                     onValueModified: {
-                                        calculator.setParameterB(realValue)
+                                        t_calculator.setParameterB(realValue)
                                     }
                                     
                                     onRealValueChanged: {
-                                        calculator.setParameterB(realValue)
+                                        t_calculator.setParameterB(realValue)
                                     }
                                     
                                     textFromValue: function(value) {
@@ -403,7 +400,7 @@ Item {
                                     
                                     Keys.onPressed: function(event) {
                                         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            calculator.setParameterB(realValue)
+                                            t_calculator.setParameterB(realValue)
                                             event.accepted = true
                                         }
                                     }
@@ -419,7 +416,7 @@ Item {
                                     id: frequencySpinBox
                                     from: 1
                                     to: 1000
-                                    value: calculator.frequency * 10
+                                    value: t_calculator.frequency * 10
                                     stepSize: 1
                                     editable: true
                                     Layout.fillWidth: true
@@ -430,12 +427,12 @@ Item {
                                     // Fix the update behavior
                                     onValueModified: {
                                         // This is called when Enter is pressed or editing is done
-                                        calculator.setFrequency(realValue)
+                                        t_calculator.setFrequency(realValue)
                                     }
                                     
                                     onRealValueChanged: {
                                         // Explicitly update values when changed via arrows
-                                        calculator.setFrequency(realValue)
+                                        t_calculator.setFrequency(realValue)
                                     }
                                     
                                     // Keep existing formatting functions
@@ -450,7 +447,7 @@ Item {
                                     // Add key event handling for immediate update on Enter
                                     Keys.onPressed: function(event) {
                                         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            calculator.setFrequency(realValue)
+                                            t_calculator.setFrequency(realValue)
                                             event.accepted = true
                                         }
                                     }
@@ -470,15 +467,15 @@ Item {
                                     editable: true
                                     Layout.fillWidth: true
                                     
-                                    onValueChanged: calculator.setSamplePoints(value)
+                                    onValueChanged: t_calculator.setSamplePoints(value)
                                     
                                     onValueModified: {
-                                        calculator.setSamplePoints(value)
+                                        t_calculator.setSamplePoints(value)
                                     }
                                     
                                     Keys.onPressed: function(event) {
                                         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            calculator.setSamplePoints(value)
+                                            t_calculator.setSamplePoints(value)
                                             event.accepted = true
                                         }
                                     }
@@ -497,11 +494,11 @@ Item {
                                     
                                     ComboBoxRound {
                                         id: windowTypeCombo
-                                        model: calculator.windowTypes
-                                        currentIndex: calculator.windowTypes.indexOf(calculator.windowType)
+                                        model: t_calculator.windowTypes
+                                        currentIndex: t_calculator.windowTypes.indexOf(t_calculator.windowType)
                                         Layout.fillWidth: true
                                         onCurrentTextChanged: {
-                                            calculator.setWindowType(currentText)
+                                            t_calculator.setWindowType(currentText)
                                         }
                                     }
                                     
@@ -530,7 +527,7 @@ Item {
                                     
                                     TextArea {
                                         id: customFormulaEditor
-                                        text: calculator.customFormula
+                                        text: t_calculator.customFormula
                                         placeholderText: "Enter formula (e.g., sin(w*t) + 0.5*sin(2*w*t))"
                                         wrapMode: TextEdit.Wrap
                                         Layout.fillWidth: true
@@ -555,7 +552,7 @@ Item {
                                         id: updateFormulaTimer
                                         interval: 500  // Half-second delay
                                         onTriggered: {
-                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                            t_calculator.setCustomFormula(customFormulaEditor.text)
                                         }
                                     }
                                     
@@ -588,7 +585,7 @@ Item {
                                         Layout.fillWidth: true
                                         onClicked: {
                                             customFormulaEditor.text = "sin(w*t) + 0.5*sin(2*w*t) + 0.33*sin(3*w*t) + 0.25*sin(4*w*t)"
-                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                            t_calculator.setCustomFormula(customFormulaEditor.text)
                                         }
                                     }
                                     
@@ -597,7 +594,7 @@ Item {
                                         Layout.fillWidth: true
                                         onClicked: {
                                             customFormulaEditor.text = "sin(w*t) + 0.33*sin(3*w*t) + 0.2*sin(5*w*t) + 0.14*sin(7*w*t)"
-                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                            t_calculator.setCustomFormula(customFormulaEditor.text)
                                         }
                                     }
                                     
@@ -606,7 +603,7 @@ Item {
                                         Layout.fillWidth: true
                                         onClicked: {
                                             customFormulaEditor.text = "sin(w*t) + sin(3*w*t)/3 + sin(5*w*t)/5 + sin(7*w*t)/7 + sin(9*w*t)/9"
-                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                            t_calculator.setCustomFormula(customFormulaEditor.text)
                                         }
                                     }
                                     
@@ -615,7 +612,7 @@ Item {
                                         Layout.fillWidth: true
                                         onClicked: {
                                             customFormulaEditor.text = "sin(w*t) - sin(2*w*t)/2 + sin(3*w*t)/3 - sin(4*w*t)/4 + sin(5*w*t)/5"
-                                            calculator.setCustomFormula(customFormulaEditor.text)
+                                            t_calculator.setCustomFormula(customFormulaEditor.text)
                                         }
                                     }
                                 }
@@ -623,7 +620,7 @@ Item {
                                 Label {Layout.fillHeight: true}
                             }
                         }
-                        
+
                         WaveCard {
                             title: "Mathematical Background"
                             Layout.fillWidth: true
@@ -639,19 +636,24 @@ Item {
                                     wrapMode: TextEdit.Wrap
                                     textFormat: TextEdit.RichText
                                     text: getEducationalContent()
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
                                 }
                             }
                         }
                     }
 
+                    // Right column - results
                     WaveCard {
                         id: results
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.minimumHeight: 800
-                        
+
                         title: "Transform Results"
-                        showSettings: true
+                        showSettings: false
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -660,102 +662,102 @@ Item {
                                 text: "Chart Information:"
                                 font.bold: true
                                 Layout.columnSpan: 2
-                                Layout.topMargin: 10
                             }
+
+                            RowLayout {
                             
-                            TextArea {
-                                readOnly: true
-                                text: "• Top chart: Time domain signal\n• Bottom chart: " + 
-                                        (calculator.transformType === "Fourier" ? 
-                                        "Frequency domain with magnitude and phase" : 
-                                        "s-domain with magnitude and phase")
-                                wrapMode: TextEdit.Wrap
-                                Layout.columnSpan: 2
-                                Layout.fillWidth: true
-                                background: Rectangle {
-                                    color: "transparent"
-                                }
-                            }
-
-                            // Add window function info display
-                            Rectangle {
-                                id: windowDisplay
-                                Layout.fillWidth: true
-                                Layout.margins: 5
-                                Layout.preferredHeight: 30
-                                radius: 5
-                                color: "#1A4CAF50"  // Light green background
-                                border.color: "#4CAF50"
-                                border.width: 1
-                                visible: calculator && 
-                                         calculator.transformType === "Fourier" && 
-                                         calculator.windowType !== "None"
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: calculator && calculator.windowType !== "None" ? 
-                                         "Window Function: " + calculator.windowType : ""
-                                    font.pixelSize: 14
-                                    font.bold: true
-                                    color: textColor
-                                }
-                            }
-
-                            // Add a prominent display of the resonant frequency
-                            Rectangle {
-                                id: resonanceDisplay
-                                Layout.fillWidth: true
-                                Layout.margins: 5
-                                Layout.preferredHeight: 30
-                                radius: 5
-                                color: "#1A2196F3"  // Light blue background
-                                border.color: "#2196F3"
-                                border.width: 1
-                                visible: calculator && calculator.transformType === "Laplace" && calculator.resonantFrequency > 0
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: {
-                                        if (calculator && calculator.resonantFrequency > 0) {
-                                            let omega = calculator.resonantFrequency;
-                                            let freq = omega/(2*Math.PI);
-                                            return "Resonant frequency: " + omega.toFixed(1) + " rad/s (" + freq.toFixed(1) + " Hz)";
-                                        }
-                                        return "";
+                                TextArea {
+                                    readOnly: true
+                                    text: "• Top chart: Time domain signal\n• Bottom chart: " + 
+                                            (t_calculator.transformType === "Fourier" ? 
+                                            "Frequency domain with magnitude and phase" : 
+                                            "s-domain with magnitude and phase")
+                                    wrapMode: TextEdit.Wrap
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    background: Rectangle {
+                                        color: "transparent"
                                     }
-                                    font.pixelSize: 16
-                                    font.bold: true
-                                    color: textColor
+                                }
+
+                                // Add a prominent display of the resonant frequency
+                                Rectangle {
+                                    id: resonanceDisplay
+                                    Layout.minimumWidth: 350
+                                    Layout.preferredHeight: 30
+                                    radius: 5
+                                    color: "#1A2196F3"  // Light blue background
+                                    border.color: "#2196F3"
+                                    border.width: 1
+                                    visible: t_calculator && t_calculator.transformType === "Laplace" && t_calculator.resonantFrequency > 0
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: {
+                                            if (t_calculator && t_calculator.resonantFrequency > 0) {
+                                                let omega = t_calculator.resonantFrequency;
+                                                let freq = omega/(2*Math.PI);
+                                                return "Resonant frequency: " + omega.toFixed(1) + " rad/s (" + freq.toFixed(1) + " Hz)";
+                                            }
+                                            return "";
+                                        }
+                                        font.pixelSize: 16
+                                        font.bold: true
+                                        color: textColor
+                                    }
+                                }
+
+                                // Add window function info display
+                                Rectangle {
+                                    id: windowDisplay
+                                    Layout.minimumWidth: 200
+                                    Layout.preferredHeight: 30
+                                    radius: 5
+                                    color: "#1A4CAF50"  // Light green background
+                                    border.color: "#4CAF50"
+                                    border.width: 1
+                                    visible: t_calculator && 
+                                            t_calculator.transformType === "Fourier" && 
+                                            t_calculator.windowType !== "None"
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: t_calculator && t_calculator.windowType !== "None" ? 
+                                            "Window Function: " + t_calculator.windowType : ""
+                                        font.pixelSize: 14
+                                        font.bold: true
+                                        color: textColor
+                                    }
                                 }
                             }
-                            
+
                             TextFieldBlue {
                                 id: transformEquationField
-                                text: calculator ? calculator.equationTransform : ""
-                                readOnly: true
-                                Layout.fillWidth: true
-                                Layout.margins: 10
+                                text: t_calculator ? t_calculator.equationTransform : ""
                                 font.italic: true
                                 horizontalAlignment: Text.AlignHCenter
                                 ToolTip.text: "Transform equation"
                                 ToolTip.visible: hovered
+                                ToolTip.delay: 500
                             }
-                            
+
                             TransformChart {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 
-                                timeDomain: calculator.timeDomain ? calculator.timeDomain : []
-                                transformResult: calculator.transformResult ? calculator.transformResult : []
-                                phaseResult: calculator.phaseResult ? calculator.phaseResult : []
-                                frequencies: calculator.frequencies ? calculator.frequencies : []
+                                timeDomain: t_calculator.timeDomain ? t_calculator.timeDomain : []
+                                transformResult: t_calculator.transformResult ? t_calculator.transformResult : []
+                                phaseResult: t_calculator.phaseResult ? t_calculator.phaseResult : []
+                                frequencies: t_calculator.frequencies ? t_calculator.frequencies : []
                                 
-                                transformType: calculator.transformType
-                                resonantFrequency: calculator.resonantFrequency
-                                windowType: calculator.windowType
+                                transformType: t_calculator.transformType
+                                resonantFrequency: t_calculator.resonantFrequency
+                                windowType: t_calculator.windowType
                                 
                                 darkMode: Universal.theme === Universal.Dark
                                 textColor: transformCard.textColor
+
+                                calculator: t_calculator
                             }
                         }
                     }
@@ -825,7 +827,7 @@ Item {
     }
     
     function getEducationalContent() {
-        if (calculator.transformType === "Fourier") {
+        if (t_calculator.transformType === "Fourier") {
             let baseContent = "<h3>Fourier Transform</h3>" +
                    "<p>The Fourier Transform decomposes a signal into its frequency components:</p>" +
                    "<p style='text-align: center'><b>F(ω) = ∫<sub>-∞</sub><sup>∞</sup> f(t)·e<sup>-jωt</sup> dt</b></p>" +
@@ -851,10 +853,10 @@ Item {
             }
                    
             // Add window function explanation when a window is selected
-            if (calculator.windowType !== "None") {
+            if (t_calculator.windowType !== "None") {
                 baseContent += "<h4>Window Functions</h4>" +
                     "<p>Window functions reduce spectral leakage in the Fourier transform. The current window (" + 
-                    calculator.windowType + ") applies a shaped envelope to the time domain signal before transformation.</p>" +
+                    t_calculator.windowType + ") applies a shaped envelope to the time domain signal before transformation.</p>" +
                     "<p>Benefits of windowing:</p>" +
                     "<ul>" +
                     "<li>Reduces sidelobe levels in frequency spectrum</li>" +
@@ -892,12 +894,12 @@ Item {
         }
     }
     
-    // Initialize UI with current calculator values
+    // Initialize UI with current t_calculator values
     Component.onCompleted: {
         // Get window type if available
-        if (calculator && calculator.windowTypes) {
-            windowTypeCombo.model = calculator.windowTypes;
-            windowTypeCombo.currentIndex = calculator.windowTypes.indexOf(calculator.windowType);
+        if (t_calculator && t_calculator.windowTypes) {
+            windowTypeCombo.model = t_calculator.windowTypes;
+            windowTypeCombo.currentIndex = t_calculator.windowTypes.indexOf(t_calculator.windowType);
         }
     }
 }
