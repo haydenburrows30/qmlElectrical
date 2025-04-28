@@ -256,12 +256,33 @@ Item {
 
                                 RowLayout {
 
-
                                     ComboBoxRound {
                                         id: functionTypeCombo
                                         model: calculator.functionTypes
                                         onCurrentTextChanged: calculator.setFunctionType(currentText)
                                         Layout.fillWidth: true
+                                    }
+
+                                    // Phase information button - update to show for both Fourier and Laplace
+                                    StyledButton {
+                                        id: phaseInfoButton
+                                        ToolTip.text: fourierRadio.checked ? "Phase Info" : "Laplace Info"
+                                        ToolTip.visible: hovered
+                                        ToolTip.delay: 500
+                                        
+                                        icon.source: "../../../icons/rounded/info.svg"
+                                        // Make visible for both Fourier sine waves and any Laplace transform
+                                        Layout.alignment: Qt.AlignRight
+                                        visible: (functionTypeCombo.currentText === "Sine" && fourierRadio.checked) || 
+                                                laplaceRadio.checked
+                                        
+                                        onClicked: {
+                                            if (fourierRadio.checked) {
+                                                phaseInfoPopup.open()
+                                            } else {
+                                                laplaceInfoPopup.open()
+                                            }
+                                        }
                                     }
 
 
@@ -295,7 +316,7 @@ Item {
                             id: functionParams
                             title: "Function Parameters"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: functionTypeCombo.currentText === "Custom" ? 510 : 310
+                            Layout.minimumHeight: functionTypeCombo.currentText === "Custom" ? 440 : 250
 
                             GridLayout {
                                 id: parametersGrid
@@ -493,66 +514,6 @@ Item {
                                     }
                                 }
 
-                                Label { 
-                                    text: "Show phase:" 
-                                    // Layout.minimumWidth: 150
-                                }
-
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                
-                                    CheckBox {
-                                        id: showPhaseCheckbox
-                                        checked: true
-                                        text: showPhaseCheckbox.checked ? "On" : "Off"
-
-                                        Layout.alignment: Qt.AlignLeft
-                                    }
-
-                                    Label{Layout.fillWidth: true}
-
-                                    // Phase information button - update to show for both Fourier and Laplace
-                                    StyledButton {
-                                        id: phaseInfoButton
-                                        ToolTip.text: fourierRadio.checked ? "Phase Info" : "Laplace Info"
-                                        ToolTip.visible: hovered
-                                        ToolTip.delay: 500
-                                        
-                                        icon.source: "../../../icons/rounded/info.svg"
-                                        // Make visible for both Fourier sine waves and any Laplace transform
-                                        Layout.alignment: Qt.AlignRight
-                                        visible: (functionTypeCombo.currentText === "Sine" && fourierRadio.checked) || 
-                                                laplaceRadio.checked
-                                        
-                                        onClicked: {
-                                            if (fourierRadio.checked) {
-                                                phaseInfoPopup.open()
-                                            } else {
-                                                laplaceInfoPopup.open()
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // Performance mode
-                                Label { 
-                                    text: "Performance:"
-                                }
-
-                                // Performance options
-
-                                CheckBox {
-                                    id: performanceModeCheckbox
-                                    text: performanceModeCheckbox.checked ? "High" : "Normal"
-                                    checked: true
-
-                                    Layout.fillWidth: true
-
-                                    ToolTip.text: "Optimizes rendering for better performance"
-                                    ToolTip.visible: hovered
-                                    ToolTip.delay: 500
-                                }
-
                                 // Custom formula editor (only visible for Custom function type)
                                 Label { 
                                     text: "Custom Formula:" 
@@ -666,7 +627,7 @@ Item {
                         WaveCard {
                             title: "Mathematical Background"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 200
+                            Layout.minimumHeight: 300
                             
                             ScrollView {
                                 anchors.fill: parent
@@ -687,7 +648,7 @@ Item {
                         id: results
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Layout.minimumHeight: 600
+                        Layout.minimumHeight: 800
                         
                         title: "Transform Results"
                         showSettings: true
@@ -788,13 +749,10 @@ Item {
                                 transformResult: calculator.transformResult ? calculator.transformResult : []
                                 phaseResult: calculator.phaseResult ? calculator.phaseResult : []
                                 frequencies: calculator.frequencies ? calculator.frequencies : []
-                                showPhase: showPhaseCheckbox.checked
+                                
                                 transformType: calculator.transformType
                                 resonantFrequency: calculator.resonantFrequency
-                                windowType: calculator.windowType  // Pass window type to chart
-                                
-                                // Add performance mode property if supported by the TransformViz component
-                                highPerformanceMode: performanceModeCheckbox.checked
+                                windowType: calculator.windowType
                                 
                                 darkMode: Universal.theme === Universal.Dark
                                 textColor: transformCard.textColor

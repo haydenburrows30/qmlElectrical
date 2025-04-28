@@ -394,7 +394,6 @@ Item {
                                             z_calculator.setDisplayOption(currentText)
                                             // Update chart properties when display option changes
                                             if (transformChart) {
-                                                transformChart.showPhase = currentText.includes("Phase")
                                                 transformChart.showPoleZero = currentText.includes("Poles") && zTransformRadio.checked
                                             }
                                         }
@@ -595,7 +594,6 @@ Item {
                                 transformResult: z_calculator.transformResult ? z_calculator.transformResult : []
                                 phaseResult: z_calculator.phaseResult ? z_calculator.phaseResult : []
                                 frequencies: z_calculator.frequencies ? z_calculator.frequencies : []
-                                showPhase: displayOptionsCombo.currentText.includes("Phase")
                                 transformType: z_calculator.transformType
                                 showPoleZero: displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
                                 poleLocations: z_calculator.poleLocations ? z_calculator.poleLocations : []
@@ -639,7 +637,6 @@ Item {
         target: displayOptionsCombo
         function onCurrentTextChanged() {
             if (transformChart) {
-                transformChart.showPhase = displayOptionsCombo.currentText.includes("Phase")
                 transformChart.showPoleZero = displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
             }
         }

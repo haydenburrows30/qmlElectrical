@@ -5,6 +5,7 @@ import QtCharts
 import Qt.labs.platform
 
 import "../visualizers/"
+import "../buttons/"
 
 Item {
     id: root
@@ -13,7 +14,6 @@ Item {
     property var transformResult: []
     property var phaseResult: []
     property var frequencies: []
-    property bool showPhase: true
     property string transformType: "Fourier" // "Fourier", "Laplace", "Z-Transform", "Wavelet", "Hilbert"
     property color lineColor1: "#2196f3"
     property color lineColor2: "#4caf50"
@@ -22,7 +22,7 @@ Item {
     property color backgroundColor: "#1e1e1e"
     property bool darkMode: true
     property bool isCalculating: false
-    property bool highPerformanceMode: true
+    property bool highPerformanceMode: performanceModeCheckbox.checked
     property real resonantFrequency: -1
 
     property bool showPoleZero: false
@@ -72,7 +72,6 @@ Item {
         detectHarmonics()
     }
     onTransformResultChanged: Qt.callLater(updateCharts)
-    onShowPhaseChanged: Qt.callLater(updateCharts)
     onHighPerformanceModeChanged: Qt.callLater(updateCharts)
 
     onPoleLocationsChanged: {
@@ -112,84 +111,8 @@ Item {
         }
     }
 
-    // Update both charts together
-    function updateCharts() {
-        updateTimeDomainChart()
-        updateTransformChart()
-    }
-    
-    // Detect harmonics in the spectrum
-    function detectHarmonics() {
-        // Only detect harmonics for Fourier transforms
-        if (transformType !== "Fourier" || !transformResult || transformResult.length < 10) {
-            isCustomWaveform = false
-            harmonicFrequencies = []
-            return
-        }
-        
-        // Look for multiple peaks in the spectrum that could be harmonics
-        // Adjust the threshold depending on the window type - windows attenuate harmonics
-        let peakThreshold = 0.10  // Default: Peaks must be at least 10% of max value
-        
-        // Lower the threshold when window functions are applied to detect smaller peaks
-        if (windowType !== "None") {
-            // Different window types affect harmonics differently
-            switch(windowType) {
-                case "Hann":
-                case "Hamming":
-                    peakThreshold = 0.05;  // 5% threshold for moderate windowing
-                    break;
-                case "Blackman":
-                case "Kaiser":
-                    peakThreshold = 0.03;  // 3% for stronger windowing functions
-                    break;
-                case "Flattop":
-                    peakThreshold = 0.02;  // 2% - flattop window heavily attenuates harmonics
-                    break;
-                default:
-                    peakThreshold = 0.07;  // Default for other windows
-            }
-        }
-        
-        let peaks = []
-        let maxValue = 0
-        
-        // First find the maximum value
-        for (let i = 0; i < transformResult.length; i++) {
-            if (transformResult[i] > maxValue) {
-                maxValue = transformResult[i]
-            }
-        }
-        
-        // Then find all peaks above the threshold
-        for (let i = 5; i < transformResult.length - 5; i++) {
-            if (transformResult[i] > peakThreshold * maxValue) {
-                // Check if this is a local maximum
-                if (transformResult[i] > transformResult[i-1] && 
-                    transformResult[i] > transformResult[i+1]) {
-                    // Add this peak
-                    peaks.push({
-                        frequency: frequencies[i],
-                        magnitude: transformResult[i]
-                    })
-                }
-            }
-        }
-        
-        // Need at least 2 peaks to consider as having harmonics
-        if (peaks.length >= 2) {
-            // Sort peaks by frequency
-            peaks.sort((a, b) => a.frequency - b.frequency)
-            
-            // Store the harmonic frequencies
-            harmonicFrequencies = peaks.map(p => p.frequency)
-            
-            // Mark as custom waveform if we have multiple frequency components
-            isCustomWaveform = true
-        } else {
-            isCustomWaveform = false
-            harmonicFrequencies = []
-        }
+    onWindowTypeChanged: {
+        showWindowInfo = (transformType === "Fourier" && windowType !== "None")
     }
 
     ColumnLayout {
@@ -260,7 +183,7 @@ Item {
             Layout.preferredHeight: parent.height / 2
             antialiasing: !highPerformanceMode
             animationOptions: ChartView.NoAnimation // Always disable animations for better performance
-            legend.visible: root.showPhase
+            legend.visible: legendCheckBox.checked
             backgroundColor: root.backgroundColor
             theme: root.darkMode ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
             
@@ -305,6 +228,7 @@ Item {
                 titleFont.pixelSize: 12
                 titleFont.bold: true
                 tickCount: highPerformanceMode ? 6 : 11 // Reduce ticks in high perf mode
+                visible: showPhaseCheckbox.checked
             }
             
             LineSeries {
@@ -324,7 +248,7 @@ Item {
                 axisY: phaseAxisY
                 color: root.lineColor2
                 width: highPerformanceMode ? 1 : 2
-                visible: root.showPhase
+                visible: showPhaseCheckbox.checked
                 useOpenGL: isLinux // Enable OpenGL only on Linux
             }
             
@@ -394,6 +318,70 @@ Item {
                     color: "white"
                     font.pixelSize: 12
                     font.bold: true
+                }
+            }
+        }
+
+
+        RowLayout {
+
+            Label { 
+                text: "Show phase:" 
+            }
+
+            CheckBox {
+                id: showPhaseCheckbox
+                checked: true
+                text: showPhaseCheckbox.checked ? "On" : "Off"
+
+                Layout.alignment: Qt.AlignLeft
+
+                onToggled: updateCharts()
+            }
+
+            Label { 
+                text: "Performance:"
+            }
+
+            CheckBox {
+                id: performanceModeCheckbox
+                text: performanceModeCheckbox.checked ? "High" : "Normal"
+                checked: true
+
+                Layout.minimumWidth: 80
+
+                ToolTip.text: "Optimizes rendering for better performance"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+            }
+
+            Label { 
+                text: "Legend:"
+            }
+
+            CheckBox {
+                id: legendCheckBox
+                text: legendCheckBox.checked ? "On" : "Off"
+                checked: true
+
+                Layout.minimumWidth: 80
+
+                ToolTip.text: "Turns legend on/off"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+            }
+
+            Label {Layout.fillWidth: true}
+
+            StyledButton {
+                icon.source: "../../../icons/rounded/refresh.svg"
+                ToolTip.text: "Refresh charts"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                Layout.alignment: Qt.AlignRight
+
+                onClicked: {
+                    calculator.calculate()
                 }
             }
         }
@@ -883,7 +871,7 @@ Item {
             for (let i = 0; i < Math.min(frequencies.length, transformResult.length); i++) {
                 magnitudeSeries.append(frequencies[i], transformResult[i]);
                 
-                if (phaseResult.length > i && showPhase) {
+                if (phaseResult.length > i && (showPhaseCheckbox.checked)) {
                     phaseSeries.append(frequencies[i], phaseResult[i]);
                 }
             }
@@ -891,7 +879,7 @@ Item {
             magnitudeSeries.append(0, 0);
             magnitudeSeries.append(10, 0);
             
-            if (showPhase) {
+            if (showPhaseCheckbox.checked) {
                 phaseSeries.append(0, 0);
                 phaseSeries.append(10, 0);
             }
@@ -921,7 +909,83 @@ Item {
         }
     }
 
-    onWindowTypeChanged: {
-        showWindowInfo = (transformType === "Fourier" && windowType !== "None")
+    // Update both charts together
+    function updateCharts() {
+        updateTimeDomainChart()
+        updateTransformChart()
+    }
+    
+    // Detect harmonics in the spectrum
+    function detectHarmonics() {
+        // Only detect harmonics for Fourier transforms
+        if (transformType !== "Fourier" || !transformResult || transformResult.length < 10) {
+            isCustomWaveform = false
+            harmonicFrequencies = []
+            return
+        }
+        
+        // Look for multiple peaks in the spectrum that could be harmonics
+        // Adjust the threshold depending on the window type - windows attenuate harmonics
+        let peakThreshold = 0.10  // Default: Peaks must be at least 10% of max value
+        
+        // Lower the threshold when window functions are applied to detect smaller peaks
+        if (windowType !== "None") {
+            // Different window types affect harmonics differently
+            switch(windowType) {
+                case "Hann":
+                case "Hamming":
+                    peakThreshold = 0.05;  // 5% threshold for moderate windowing
+                    break;
+                case "Blackman":
+                case "Kaiser":
+                    peakThreshold = 0.03;  // 3% for stronger windowing functions
+                    break;
+                case "Flattop":
+                    peakThreshold = 0.02;  // 2% - flattop window heavily attenuates harmonics
+                    break;
+                default:
+                    peakThreshold = 0.07;  // Default for other windows
+            }
+        }
+        
+        let peaks = []
+        let maxValue = 0
+        
+        // First find the maximum value
+        for (let i = 0; i < transformResult.length; i++) {
+            if (transformResult[i] > maxValue) {
+                maxValue = transformResult[i]
+            }
+        }
+        
+        // Then find all peaks above the threshold
+        for (let i = 5; i < transformResult.length - 5; i++) {
+            if (transformResult[i] > peakThreshold * maxValue) {
+                // Check if this is a local maximum
+                if (transformResult[i] > transformResult[i-1] && 
+                    transformResult[i] > transformResult[i+1]) {
+                    // Add this peak
+                    peaks.push({
+                        frequency: frequencies[i],
+                        magnitude: transformResult[i]
+                    })
+                }
+            }
+        }
+        
+        // Need at least 2 peaks to consider as having harmonics
+        if (peaks.length >= 2) {
+            // Sort peaks by frequency
+            peaks.sort((a, b) => a.frequency - b.frequency)
+            
+            // Store the harmonic frequencies
+            harmonicFrequencies = peaks.map(p => p.frequency)
+            
+            // Mark as custom waveform if we have multiple frequency components
+            isCustomWaveform = true
+        } else {
+            isCustomWaveform = false
+            harmonicFrequencies = []
+        }
     }
 }

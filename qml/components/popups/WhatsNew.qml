@@ -28,7 +28,6 @@ Popup {
     Button {
         text: "Close"
         anchors.right: parent.right
-        anchors.bottomMargin: 50
         onClicked: whatsNewPopup.close()
     }
 
