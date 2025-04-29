@@ -446,7 +446,7 @@ Item {
                                            ["Basic"]) : 
                                           hilbertRadio.checked ?
                                           ["Envelope", "Phase", "Envelope & Phase"] :
-                                          ["Magnitude", "Phase", "Poles/Zeros", "Magnitude & Phase"]
+                                          ["Magnitude & Phase", "Poles/Zeros"]
                                     Layout.fillWidth: true
                                     onCurrentTextChanged: {
                                         if (waveletRadio.checked) {
