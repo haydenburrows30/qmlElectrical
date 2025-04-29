@@ -300,7 +300,7 @@ Item {
                                     
                                     property real realValue: value / 10.0
                                     
-                                    onValueChanged: z_calculator.setAmplitude(realValue)
+                                    onValueModified: z_calculator.setAmplitude(realValue)
                                     
                                     textFromValue: function(value) {
                                         return (value / 10.0).toFixed(1);
@@ -308,6 +308,10 @@ Item {
                                     
                                     valueFromText: function(text) {
                                         return Math.round(parseFloat(text) * 10);
+                                    }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
 
@@ -329,7 +333,7 @@ Item {
                                     
                                     property real realValue: value / 10.0
                                     
-                                    onValueChanged: z_calculator.setDecayFactor(realValue)
+                                    onValueModified: z_calculator.setDecayFactor(realValue)
                                     
                                     textFromValue: function(value) {
                                         return (value / 10.0).toFixed(1);
@@ -337,6 +341,10 @@ Item {
                                     
                                     valueFromText: function(text) {
                                         return Math.round(parseFloat(text) * 10);
+                                    }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
 
@@ -358,7 +366,7 @@ Item {
                                     
                                     property real realValue: value / 10.0
                                     
-                                    onValueChanged: z_calculator.setFrequency(realValue)
+                                    onValueModified: z_calculator.setFrequency(realValue)
                                     
                                     textFromValue: function(value) {
                                         return (value / 10.0).toFixed(1);
@@ -366,6 +374,10 @@ Item {
                                     
                                     valueFromText: function(text) {
                                         return Math.round(parseFloat(text) * 10);
+                                    }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
                                 
@@ -376,29 +388,32 @@ Item {
                                 
                                 SpinBoxRound {
                                     id: samplingRateSpinBox
-                                    from: 10
+                                    from: 1
                                     to: 2000
                                     value: z_calculator.samplingRate
-                                    stepSize: 10
+                                    stepSize: 1
                                     editable: true
                                     Layout.fillWidth: true
-                                    
-                                    // Add visual indicator for optimal Hilbert range
-                                    Rectangle {
-                                        visible: hilbertRadio.checked && parent.value <= 100
-                                        anchors.fill: parent
-                                        color: "transparent"
-                                        border.color: "#4CAF50"  // Green when in optimal range
-                                        border.width: 2
-                                        radius: 4
-                                        opacity: 0.7
+
+                                    property real realValue: value
+
+                                    textFromValue: function(value) {
+                                        return value.toFixed(0);
+                                    }
+
+                                    valueFromText: function(text) {
+                                        return Math.round(parseFloat(text));
+                                    }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                     
                                     ToolTip.visible: hilbertRadio.checked && hovered
-                                    ToolTip.text: "Sampling rates between 10-100 Hz often show more pronounced Hilbert transform features"
+                                    ToolTip.text: "Sampling rates between 1-100 Hz often show more pronounced Hilbert transform features"
                                     ToolTip.delay: 500
                                     
-                                    onValueChanged: z_calculator.setSamplingRate(value)
+                                    onValueModified: z_calculator.setSamplingRate(realValue)
                                 }
 
                                 Label { 

@@ -673,6 +673,7 @@ class ZTransformCalculatorWorker(QRunnable):
         # Create a scaled version of the original signal for comparison in the chart
         scaled_original = amplified_y * 0.7  # Scale down original for comparison
         
+        freq_scaling = 2.0 * (100.0 / max(10.0, self.sampling_rate))
         # Calculate instantaneous frequency with improved resolution
         if len(y) > 10:
             dt = t[1] - t[0]  # Time step
@@ -680,7 +681,7 @@ class ZTransformCalculatorWorker(QRunnable):
             
             # Apply a frequency scaling factor inversely proportional to sampling rate
             # Lower sampling rates need more amplification of frequency variations
-            freq_scaling = 2.0 * (100.0 / max(10.0, self.sampling_rate))
+            
             instantaneous_frequency = instantaneous_frequency * freq_scaling
             
             # Set a minimum frequency range to ensure meaningful visualization

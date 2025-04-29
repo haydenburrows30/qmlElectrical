@@ -335,16 +335,8 @@ Item {
                                     Layout.fillWidth: true
                                     
                                     property real realValue: value / 10.0
-                                    
-                                    onValueChanged: t_calculator.setParameterA(realValue)
-                                    
-                                    onValueModified: {
-                                        t_calculator.setParameterA(realValue)
-                                    }
-                                    
-                                    onRealValueChanged: {
-                                        t_calculator.setParameterA(realValue)
-                                    }
+
+                                    onValueModified: t_calculator.setParameterA(realValue)
                                     
                                     textFromValue: function(value) {
                                         return (value / 10.0).toFixed(1);
@@ -353,12 +345,9 @@ Item {
                                     valueFromText: function(text) {
                                         return Math.round(parseFloat(text) * 10);
                                     }
-                                    
-                                    Keys.onPressed: function(event) {
-                                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            t_calculator.setParameterA(realValue)
-                                            event.accepted = true
-                                        }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
 
@@ -377,32 +366,21 @@ Item {
                                     editable: true
                                     Layout.fillWidth: true
                                     visible: needsParameterB()
-                                    
+
                                     property real realValue: value / 10.0
-                                    
-                                    onValueChanged: t_calculator.setParameterB(realValue)
-                                    
-                                    onValueModified: {
-                                        t_calculator.setParameterB(realValue)
-                                    }
-                                    
-                                    onRealValueChanged: {
-                                        t_calculator.setParameterB(realValue)
-                                    }
-                                    
+
+                                    onValueModified: t_calculator.setParameterB(realValue)
+
                                     textFromValue: function(value) {
                                         return (value / 10.0).toFixed(1);
                                     }
-                                    
+
                                     valueFromText: function(text) {
                                         return Math.round(parseFloat(text) * 10);
                                     }
-                                    
-                                    Keys.onPressed: function(event) {
-                                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            t_calculator.setParameterB(realValue)
-                                            event.accepted = true
-                                        }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
 
@@ -421,35 +399,21 @@ Item {
                                     editable: true
                                     Layout.fillWidth: true
                                     visible: needsFrequency() || functionTypeCombo.currentText === "Custom"
-                                    
+
                                     property real realValue: value / 10.0
-                                    
-                                    // Fix the update behavior
-                                    onValueModified: {
-                                        // This is called when Enter is pressed or editing is done
-                                        t_calculator.setFrequency(realValue)
-                                    }
-                                    
-                                    onRealValueChanged: {
-                                        // Explicitly update values when changed via arrows
-                                        t_calculator.setFrequency(realValue)
-                                    }
-                                    
-                                    // Keep existing formatting functions
+
+                                    onValueModified: t_calculator.setFrequency(realValue)
+
                                     textFromValue: function(value) {
                                         return (value / 10.0).toFixed(1);
                                     }
-                                    
+
                                     valueFromText: function(text) {
                                         return Math.round(parseFloat(text) * 10);
                                     }
-                                    
-                                    // Add key event handling for immediate update on Enter
-                                    Keys.onPressed: function(event) {
-                                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            t_calculator.setFrequency(realValue)
-                                            event.accepted = true
-                                        }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
 
@@ -463,21 +427,24 @@ Item {
                                     from: 100
                                     to: 1000
                                     value: 500
-                                    stepSize: 100
+                                    stepSize: 50
                                     editable: true
                                     Layout.fillWidth: true
-                                    
-                                    onValueChanged: t_calculator.setSamplePoints(value)
-                                    
-                                    onValueModified: {
-                                        t_calculator.setSamplePoints(value)
+
+                                    property real realValue: value
+
+                                    onValueModified: t_calculator.setSamplePoints(value)
+
+                                    textFromValue: function(value) {
+                                        return value.toFixed(1);
                                     }
                                     
-                                    Keys.onPressed: function(event) {
-                                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                            t_calculator.setSamplePoints(value)
-                                            event.accepted = true
-                                        }
+                                    valueFromText: function(text) {
+                                        return Math.round(parseFloat(text));
+                                    }
+
+                                    validator: RegularExpressionValidator {
+                                        regularExpression: /[0-9]*\.?[0-9]*/
                                     }
                                 }
                                 
