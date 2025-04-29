@@ -13,7 +13,8 @@ QtObject {
         { name: qsTr("Power Factor Correction"), source: "calculators/basic/PowerFactorCorrection.qml", icon: "trending_down"  },
         { name: qsTr("Unit Converter"), source: "calculators/basic/UnitConverter.qml", icon: "swap_vert"  },
         { name: qsTr("Voltage Divider"), source: "calculators/basic/VoltageDividerCalculator.qml", icon: "call_split"  },
-        { name: qsTr("Impedance Converter"), source: "calculators/basic/ImpedanceConverterCalculator.qml", icon: "functions" }
+        { name: qsTr("Impedance Converter"), source: "calculators/basic/ImpedanceConverterCalculator.qml", icon: "functions" },
+        { name: qsTr("Textfield"), source: "calculators/basic/test.qml", icon: "functions" }
     ]
 
     property var protection: [

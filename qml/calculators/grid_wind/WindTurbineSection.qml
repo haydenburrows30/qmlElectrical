@@ -182,7 +182,7 @@ Item {
                                 to: 100
                                 value: calculatorReady ? calculator.bladeRadius : 40
                                 stepSize: 1
-                                editable: true
+                                readOnly: true
                                 Layout.fillWidth: true
                                 onValueModified: {
                                     if (calculatorReady) {

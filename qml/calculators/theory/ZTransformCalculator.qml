@@ -453,17 +453,6 @@ Item {
                                             z_calculator.setWaveletType(currentText)
                                         } else {
                                             z_calculator.setDisplayOption(currentText)
-                                            // Update chart properties when display option changes
-                                            if (transformChart) {
-                                                transformChart.showPoleZero = displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
-                                                
-                                                // Check if the properties exist before setting them
-                                                if (transformChart.hasOwnProperty("showHilbertEnvelope"))
-                                                    transformChart.showHilbertEnvelope = currentText.includes("Envelope") && hilbertRadio.checked
-                                                
-                                                if (transformChart.hasOwnProperty("showHilbertPhase"))
-                                                    transformChart.showHilbertPhase = currentText.includes("Phase") && hilbertRadio.checked
-                                            }
                                         }
                                     }
                                 }
@@ -611,7 +600,7 @@ Item {
                                 id: transformChart
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                visible: !waveletRadio.checked
+                                visible: !waveletRadio.checked && !hilbertRadio.checked
 
                                 timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
                                 transformResult: z_calculator.transformResult ? z_calculator.transformResult : []
@@ -626,16 +615,23 @@ Item {
                                 textColor: zTransformCard.textColor
 
                                 calculator: z_calculator
+                            }
+
+                            HilbertChart {
+                                id: hilbertChart
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                visible: hilbertRadio.checked
+
+                                timeDomain: z_calculator.timeDomain ? z_calculator.timeDomain : []
+                                transformResult: z_calculator.transformResult ? z_calculator.transformResult : []
+                                phaseResult: z_calculator.phaseResult ? z_calculator.phaseResult : []
+                                frequencies: z_calculator.frequencies ? z_calculator.frequencies : []
+                                displayMode: displayOptionsCombo.currentText
+                                darkMode: Universal.theme === Universal.Dark
+                                textColor: zTransformCard.textColor
                                 
-                                // After component is loaded, set the Hilbert properties if they exist
-                                Component.onCompleted: {
-                                    if (transformChart.hasOwnProperty("showHilbertEnvelope"))
-                                        transformChart.showHilbertEnvelope = (displayOptionsCombo.currentText.includes("Envelope") || 
-                                                                             displayOptionsCombo.currentIndex === 0) && hilbertRadio.checked
-                                    
-                                    if (transformChart.hasOwnProperty("showHilbertPhase"))
-                                        transformChart.showHilbertPhase = displayOptionsCombo.currentText.includes("Phase") && hilbertRadio.checked
-                                }
+                                calculator: z_calculator
                             }
 
                             WaveletChart {
@@ -667,12 +663,10 @@ Item {
         function onCurrentTextChanged() {
             if (transformChart) {
                 transformChart.showPoleZero = displayOptionsCombo.currentText.includes("Poles") && zTransformRadio.checked
-                
-                if (transformChart.hasOwnProperty("showHilbertEnvelope"))
-                    transformChart.showHilbertEnvelope = displayOptionsCombo.currentText.includes("Envelope") && hilbertRadio.checked
-                
-                if (transformChart.hasOwnProperty("showHilbertPhase"))
-                    transformChart.showHilbertPhase = displayOptionsCombo.currentText.includes("Phase") && hilbertRadio.checked
+            }
+            
+            if (hilbertChart && hilbertRadio.checked) {
+                hilbertChart.displayMode = displayOptionsCombo.currentText
             }
         }
     }
@@ -727,6 +721,15 @@ Item {
                 waveletChart.phaseData = z_calculator.waveletPhase2D ? z_calculator.waveletPhase2D : []
                 waveletChart.waveletType = displayOptionsCombo.currentText
                 waveletChart.refresh()
+            }
+            
+            // Update Hilbert chart when new results are calculated
+            if (hilbertChart && hilbertRadio.checked) {
+                hilbertChart.timeDomain = z_calculator.timeDomain ? z_calculator.timeDomain : []
+                hilbertChart.transformResult = z_calculator.transformResult ? z_calculator.transformResult : []
+                hilbertChart.phaseResult = z_calculator.phaseResult ? z_calculator.phaseResult : []
+                hilbertChart.frequencies = z_calculator.frequencies ? z_calculator.frequencies : []
+                hilbertChart.displayMode = displayOptionsCombo.currentText
             }
         }
     }
