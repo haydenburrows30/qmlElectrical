@@ -38,22 +38,9 @@ Item {
                 font.bold: true
                 Layout.fillWidth: true
             }
-            // StyledButton {
-            //     Layout.alignment: Qt.AlignHCenter
-            //     text: "Calculate"
-            //     ToolTip.text: "Calculate"
-            //     ToolTip.visible: hovered
-            //     ToolTip.delay: 500
-
-            //     onClicked: {
-            //         if (calculator) {
-            //             calculator.calculate()
-            //         }
-            //     }
-            // }
 
             StyledButton {
-                ToolTip.text: "Generate bar chart"
+                ToolTip.text: "Export results to PDF"
                 ToolTip.visible: hovered
                 ToolTip.delay: 500
                 Layout.alignment: Qt.AlignRight
