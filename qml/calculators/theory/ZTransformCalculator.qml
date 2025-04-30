@@ -542,6 +542,8 @@ Item {
                                     textFormat: TextEdit.RichText
                                     text: getApplicationContent()
 
+                                    activeFocusOnPress : false
+
                                     background: Rectangle {
                                         color: "transparent"
                                     }
@@ -569,15 +571,11 @@ Item {
                                 Layout.columnSpan: 2
                             }
 
-                            TextArea {
-                                readOnly: true
+                            Label {
                                 text: getChartInfoText()
                                 wrapMode: TextEdit.Wrap
                                 Layout.columnSpan: 2
                                 Layout.fillWidth: true
-                                background: Rectangle {
-                                    color: "transparent"
-                                }
                             }
 
                             TextFieldBlue {
@@ -586,7 +584,7 @@ Item {
                                 font.bold: true
                             }
 
-                            TextFieldBlue {
+                            TextAreaBlue {
                                 id: transformEquationField
                                 text: z_calculator ? z_calculator.equationTransform : ""
                                 font.italic: true
@@ -594,6 +592,9 @@ Item {
                                 ToolTip.text: "Transform equation"
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
+                                Layout.minimumHeight: 30
+                                readOnly: true
+                                activeFocusOnPress : false
                             }
 
                             TransformChart {

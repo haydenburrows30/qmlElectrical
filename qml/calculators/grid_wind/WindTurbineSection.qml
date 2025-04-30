@@ -108,21 +108,8 @@ Item {
 
                         onClicked: {
                             if (calculatorReady) {
-                                // Create a temporary file path for the chart image
-                                var tempImagePath = applicationDirPath + (Qt.platform.os === "windows" ? "\\temp_wind_chart.png" : "/temp_wind_chart.png")
-                                
-                                // Capture the chart image and save it to the temporary file
-                                powerCurveChart.grabToImage(function(result) {
-                                    if (result) {
-                                        result.saveToFile(tempImagePath)
-                                        
-                                        // Export the PDF with the saved image path
-                                        calculator.exportWindTurbineReport(tempImagePath)
-                                    } else {
-                                        // Export without image if grabToImage fails
-                                        calculator.exportWindTurbineReport("")
-                                    }
-                                })
+                                // Export PDF directly using matplotlib for chart generation
+                                calculator.exportWindTurbineReport("")
                             }
                         }
                     }
@@ -182,7 +169,6 @@ Item {
                                 to: 100
                                 value: calculatorReady ? calculator.bladeRadius : 40
                                 stepSize: 1
-                                readOnly: true
                                 Layout.fillWidth: true
                                 onValueModified: {
                                     if (calculatorReady) {

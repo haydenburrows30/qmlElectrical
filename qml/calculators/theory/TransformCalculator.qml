@@ -20,6 +20,27 @@ Item {
     property int calculationThrottleMs: 300
     property var throttleTimer: null
 
+    // Message popup for notifications
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
+    // Use a simple toast notification system
+    function showToast(message, type = "info") {
+        console.log(message);  // Simple fallback logging
+        
+        // Create a temporary notification element
+        var component = Qt.createComponent("qrc:/qml/components/SimpleToast.qml");
+        if (component.status === Component.Ready) {
+            var toast = component.createObject(transformCard, {
+                "message": message,
+                "type": type
+            });
+            toast.show();
+        }
+    }
+
     // phase info
     PopUpText {
         id: phaseInfoPopup
@@ -252,7 +273,8 @@ Item {
                                 }
 
                                 RowLayout {
-
+                                    Layout.fillWidth: true
+                                    
                                     ComboBoxRound {
                                         id: functionTypeCombo
                                         model: t_calculator.functionTypes
@@ -282,15 +304,11 @@ Item {
                                         }
                                     }
 
-
                                     StyledButton {
-                                        // text: "Charts"
                                         icon.source: "../../../icons/rounded/refresh.svg"
                                         ToolTip.text: "Refresh charts"
                                         ToolTip.visible: hovered
                                         ToolTip.delay: 500
-
-                                        // Layout.minimumWidth: 50
 
                                         onClicked: {
                                             t_calculator.calculate()
@@ -501,14 +519,6 @@ Item {
                                         Layout.preferredHeight: 60
                                         font.family: "Courier"
                                         
-                                        // Add syntax highlighting or at least a monospace font
-                                        background: Rectangle {
-                                            color: "#f0f0f0"
-                                            border.color: "#cccccc"
-                                            border.width: 1
-                                            radius: 3
-                                        }
-                                        
                                         onTextChanged: {
                                             // Use a timer to avoid updating during typing
                                             updateFormulaTimer.restart()
@@ -603,7 +613,9 @@ Item {
                                     wrapMode: TextEdit.Wrap
                                     textFormat: TextEdit.RichText
                                     text: getEducationalContent()
-                                    
+
+                                    activeFocusOnPress: false
+
                                     background: Rectangle {
                                         color: "transparent"
                                     }
@@ -632,18 +644,42 @@ Item {
                             }
 
                             RowLayout {
+                                Layout.fillWidth: true
                             
-                                TextArea {
-                                    readOnly: true
+                                Label {
                                     text: "• Top chart: Time domain signal\n• Bottom chart: " + 
                                             (t_calculator.transformType === "Fourier" ? 
                                             "Frequency domain with magnitude and phase" : 
                                             "s-domain with magnitude and phase")
-                                    wrapMode: TextEdit.Wrap
                                     Layout.columnSpan: 2
                                     Layout.fillWidth: true
-                                    background: Rectangle {
-                                        color: "transparent"
+                                }
+
+                                // Export PDF Button
+                                Button {
+                                    text: "Export PDF"
+                                    icon.source: "../../../icons/rounded/download.svg"
+                                    ToolTip.text: "Export results to PDF"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    
+                                    onClicked: {
+                                        // Call export_to_pdf directly on the calculator instance
+                                        t_calculator.export_to_pdf()
+                                    }
+                                }
+                                
+                                // Export Plot Button
+                                Button {
+                                    text: "Export Plot"
+                                    icon.source: "../../../icons/rounded/image.svg"
+                                    ToolTip.text: "Export plot as image"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    
+                                    onClicked: {
+                                        // Use the calculator's plot export function directly
+                                        t_calculator.generate_plot_for_file_saver()
                                     }
                                 }
 
@@ -658,7 +694,7 @@ Item {
                                     border.width: 1
                                     visible: t_calculator && t_calculator.transformType === "Laplace" && t_calculator.resonantFrequency > 0
                                     
-                                    Text {
+                                    Label {
                                         anchors.centerIn: parent
                                         text: {
                                             if (t_calculator && t_calculator.resonantFrequency > 0) {
@@ -687,7 +723,7 @@ Item {
                                             t_calculator.transformType === "Fourier" && 
                                             t_calculator.windowType !== "None"
                                     
-                                    Text {
+                                    Label {
                                         anchors.centerIn: parent
                                         text: t_calculator && t_calculator.windowType !== "None" ? 
                                             "Window Function: " + t_calculator.windowType : ""
@@ -698,7 +734,7 @@ Item {
                                 }
                             }
 
-                            TextFieldBlue {
+                            TextAreaBlue {
                                 id: transformEquationField
                                 text: t_calculator ? t_calculator.equationTransform : ""
                                 font.italic: true
@@ -706,6 +742,9 @@ Item {
                                 ToolTip.text: "Transform equation"
                                 ToolTip.visible: hovered
                                 ToolTip.delay: 500
+                                Layout.minimumHeight: 30
+                                readOnly: true
+                                activeFocusOnPress: false
                             }
 
                             TransformChart {
@@ -861,12 +900,29 @@ Item {
         }
     }
     
+    // Connect to PDF export status signals
+    Connections {
+        target: t_calculator
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
+        }
+    }
+
     // Initialize UI with current t_calculator values
     Component.onCompleted: {
         // Get window type if available
         if (t_calculator && t_calculator.windowTypes) {
             windowTypeCombo.model = t_calculator.windowTypes;
             windowTypeCombo.currentIndex = t_calculator.windowTypes.indexOf(t_calculator.windowType);
+        }
+
+        // Check if the popup needs to be parented to the Overlay
+        if (typeof Overlay !== 'undefined') {
+            messagePopup.parent = Overlay.overlay
         }
     }
 }

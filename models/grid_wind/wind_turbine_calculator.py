@@ -3,6 +3,8 @@ import math
 import numpy as np
 from datetime import datetime
 import os
+import tempfile
+import matplotlib.pyplot as plt
 
 from utils.pdf.pdf_generator import PDFGenerator
 from services.logger_config import configure_logger
@@ -513,15 +515,14 @@ class WindTurbineCalculator(QObject):
             rated_capacity = self._actual_power / (1000 * power_factor)  # Convert W to kVA
             output_current = self._actual_power / (math.sqrt(3) * 400 * power_factor)
             
-            # Process image file path if provided
-            chart_image_path = ""
-            temp_image = False
+            # Create a temporary file for the chart image using matplotlib
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "wind_power_curve.png")
+            temp_image = True
             
-            if image_data and isinstance(image_data, str) and os.path.exists(image_data):
-                chart_image_path = image_data
-                # Mark as temporary if it's a temp file
-                if "temp_wind_chart" in chart_image_path:
-                    temp_image = True
+            # Generate the power curve chart using matplotlib
+            self._generate_matplotlib_chart(chart_image_path)
+            
             # Prepare power curve data (to be used if chart image isn't available)
             power_curve_data = {
                 'wind_speeds': [point[0] for point in self._power_curve],
@@ -544,7 +545,7 @@ class WindTurbineCalculator(QObject):
                 "output_current": output_current,
                 "capacity_factor": self.calculateCapacityFactor(self._wind_speed),
                 "power_curve": power_curve_data,
-                "chart_image_path": chart_image_path if chart_image_path else ""
+                "chart_image_path": chart_image_path if os.path.exists(chart_image_path) else ""
             }
             
             # Generate the PDF using the PDF generator
@@ -555,6 +556,7 @@ class WindTurbineCalculator(QObject):
             if temp_image and os.path.exists(chart_image_path):
                 try:
                     os.unlink(chart_image_path)
+                    os.rmdir(temp_dir)
                 except Exception:
                     pass
             
@@ -571,6 +573,70 @@ class WindTurbineCalculator(QObject):
             logger.error(error_msg)
             # Send error to QML
             self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    def _generate_matplotlib_chart(self, filepath):
+        """Generate a power curve chart using matplotlib and save it to a file
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Extract data from power curve
+            wind_speeds = [point[0] for point in self._power_curve]
+            power_values = [point[1] for point in self._power_curve]
+            
+            # Create figure and plot
+            plt.figure(figsize=(10, 6))
+            plt.plot(wind_speeds, power_values, 'b-', linewidth=2)
+            
+            # Set labels and title
+            plt.title('Wind Turbine Power Curve')
+            plt.xlabel('Wind Speed (m/s)')
+            plt.ylabel('Power Output (kW)')
+            
+            # Add cut-in and cut-out lines
+            if self._cut_in_speed > 0:
+                plt.axvline(x=self._cut_in_speed, color='green', linestyle='--', label=f'Cut-in: {self._cut_in_speed} m/s')
+            
+            if self._cut_out_speed > 0:
+                plt.axvline(x=self._cut_out_speed, color='red', linestyle='--', label=f'Cut-out: {self._cut_out_speed} m/s')
+            
+            # Add rated power line if applicable
+            has_rated_specs = hasattr(self, '_rated_power') and hasattr(self, '_rated_wind_speed')
+            if has_rated_specs:
+                rated_power_kw = self._rated_power / 1000
+                plt.axhline(y=rated_power_kw, color='orange', linestyle='--', 
+                          label=f'Rated Power: {rated_power_kw:.2f} kW')
+                plt.axvline(x=self._rated_wind_speed, color='purple', linestyle=':', 
+                          label=f'Rated Wind Speed: {self._rated_wind_speed:.1f} m/s')
+            
+            # Add grid and legend
+            plt.grid(True)
+            plt.legend()
+            
+            # Set axis limits
+            plt.xlim(0, self._cut_out_speed + 5)
+            max_power = max(power_values) if power_values else 10
+            plt.ylim(0, max_power * 1.1)
+            
+            # Add turbine info
+            plt.figtext(0.5, 0.01, 
+                      f"Blade Radius: {self._blade_radius}m | Efficiency: {self._efficiency*100:.0f}% | Power Coef: {self._power_coefficient:.2f}", 
+                      ha="center", fontsize=9, bbox={"facecolor":"lightblue", "alpha":0.2, "pad":5})
+            
+            # Save the figure to the specified file
+            plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+            plt.savefig(filepath, dpi=100)
+            plt.close()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating matplotlib chart: {e}")
             return False
 
     # Advanced analysis methods

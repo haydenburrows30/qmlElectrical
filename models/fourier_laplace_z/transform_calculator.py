@@ -1,9 +1,15 @@
-import math
-import numpy as np
+import tempfile
+import os
+import matplotlib.pyplot as plt
 from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool, Qt, Q_ARG
 
-# Import the worker class from the new file
-from .worker import TransformCalculatorWorker
+from datetime import datetime
+from .transform_worker import TransformCalculatorWorker
+
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+
+logger = configure_logger("qmltest", component="transform_calculator")
 
 class TransformCalculator(QObject):
     """Calculator for Fourier and Laplace transforms with multithreading support"""
@@ -18,6 +24,9 @@ class TransformCalculator(QObject):
     customFormulaChanged = Signal()
     resultsCalculated = Signal()
     calculatingChanged = Signal()
+    
+    # Add PDF export status signal
+    pdfExportStatusChanged = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -55,6 +64,12 @@ class TransformCalculator(QObject):
         
         # Thread pool for calculations
         self._thread_pool = QThreadPool.globalInstance()
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         # Initialize calculations
         self._calculate()
@@ -270,3 +285,239 @@ class TransformCalculator(QObject):
     @Slot()
     def calculate(self):
         self._calculate()
+    
+    @Slot(result=bool)
+    def export_to_pdf(self):
+        """Export the transform results to a PDF file
+        
+        Args:
+            filepath: Path to save the PDF report
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            from utils.pdf.pdf_generator import PDFGenerator
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            filepath = self._file_saver.get_save_filepath("pdf", f"fourier_report{timestamp}")
+            if not filepath:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return ""
+            
+            # Clean up filepath using FileSaver's clean_filepath method
+            filepath = self._file_saver.clean_filepath(filepath)
+            filepath = self._file_saver.ensure_file_extension(filepath, "pdf")
+            
+            # Create temporary directory for chart images
+            temp_dir = tempfile.mkdtemp()
+            time_domain_path = os.path.join(temp_dir, "time_domain.png")
+            transform_path = os.path.join(temp_dir, "transform.png")
+            
+            # Generate charts
+            self._generate_chart_for_pdf(time_domain_path, transform_path)
+            
+            # Determine which parameters are needed based on function type
+            needs_param_b = self._function_type not in ["Sine", "Square", "Sawtooth"]
+            needs_frequency = self._function_type in ["Sine", "Square", "Sawtooth", "Damped Sine", "Custom"]
+            
+            # Prepare data for PDF generation
+            data = {
+                'transform_type': self._transform_type,
+                'function_type': self._function_type,
+                'parameter_a': self._parameter_a,
+                'parameter_b': self._parameter_b,
+                'frequency': self._frequency,
+                'sample_points': self._sample_points,
+                'window_type': self._window_type,
+                'equation_original': self._equation_original,
+                'equation_transform': self._equation_transform,
+                'resonant_frequency': self._resonant_frequency,
+                'needs_parameter_b': needs_param_b,
+                'needs_frequency': needs_frequency,
+                'time_domain_image_path': time_domain_path if os.path.exists(time_domain_path) else None,
+                'transform_image_path': transform_path if os.path.exists(transform_path) else None
+            }
+            
+            # Generate PDF
+            pdf_generator = PDFGenerator()
+            success = pdf_generator.generate_transform_report(data, filepath)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(time_domain_path):
+                    os.remove(time_domain_path)
+                if os.path.exists(transform_path):
+                    os.remove(transform_path)
+                os.rmdir(temp_dir)
+            except:
+                pass
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(filepath, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(filepath, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting to PDF: {str(e)}"
+            logger.error(error_msg)
+            # Send error to QML via signal
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    def _generate_chart_for_pdf(self, time_domain_path, transform_path):
+        """Generate charts for PDF export
+        
+        Args:
+            time_domain_path: Path to save time domain chart
+            transform_path: Path to save transform chart
+        """
+        try:
+            # Use matplotlib to generate charts
+            plt.figure(figsize=(8, 4))
+            
+            # Time domain chart
+            if self._time_domain:
+                t_vals = [point['x'] for point in self._time_domain]
+                y_vals = [point['y'] for point in self._time_domain]
+                
+                plt.plot(t_vals, y_vals, 'b-')
+                plt.title(f"Time Domain: {self._function_type} Function")
+                plt.xlabel("Time (s)")
+                plt.ylabel("Amplitude")
+                plt.grid(True)
+                plt.tight_layout()
+                plt.savefig(time_domain_path, dpi=100)
+                plt.close()
+            
+            # Transform domain chart
+            if self._frequencies and self._transform_result:
+                plt.figure(figsize=(8, 4))
+                
+                # Plot magnitude
+                plt.plot(self._frequencies, self._transform_result, 'r-')
+                
+                # Add resonant frequency line for Laplace
+                if self._transform_type == "Laplace" and self._resonant_frequency > 0:
+                    # Find y-range
+                    y_max = max(self._transform_result) * 1.1
+                    plt.axvline(x=self._resonant_frequency, color='orange', linestyle='--')
+                    plt.annotate(f"Resonant: {self._resonant_frequency:.1f} rad/s", 
+                                xy=(self._resonant_frequency, y_max*0.9),
+                                xytext=(self._resonant_frequency + 5, y_max*0.9),
+                                arrowprops=dict(facecolor='orange', shrink=0.05),
+                                )
+                
+                plt.title(f"{self._transform_type} Transform Magnitude")
+                x_label = "Frequency (Hz)" if self._transform_type == "Fourier" else "jω (rad/s)"
+                plt.xlabel(x_label)
+                plt.ylabel("Magnitude")
+                plt.grid(True)
+                plt.tight_layout()
+                plt.savefig(transform_path, dpi=100)
+                plt.close()
+                
+        except Exception as e:
+            print(f"Error generating charts for PDF: {str(e)}")
+
+    @Slot()
+    def generate_plot_for_file_saver(self):
+        """Generate and save a plot image
+        
+        Args:
+            default_filename: Default name to suggest
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            filepath = self._file_saver.get_save_filepath("png", f"fourier_plot{timestamp}")
+            if not filepath:
+                self.pdfExportStatusChanged.emit(False, "Plot save canceled")
+                return False
+                
+            # Generate the plot directly
+            result_path = self.generate_plot(filepath)
+            
+            if result_path:
+                # Use standardized success message
+                self._file_saver._emit_success_with_path(result_path, "Plot saved")
+                return True
+            else:
+                error_msg = "Failed to generate plot"
+                logger.error(error_msg)
+                self._file_saver._emit_failure_with_path(result_path, "Plot save failed")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error saving plot: {str(e)}"
+            logger.error(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+
+    def generate_plot(self, filepath):
+        """Generate a plot image for the file saver
+        
+        Args:
+            filepath: Path to save the generated image
+            
+        Returns:
+            str: Path to the saved image or empty string on failure
+        """
+        try:
+            # Create a combined plot with both time and frequency domains
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+            
+            # Time domain plot
+            if self._time_domain:
+                t_vals = [point['x'] for point in self._time_domain]
+                y_vals = [point['y'] for point in self._time_domain]
+                
+                ax1.plot(t_vals, y_vals, 'b-')
+                ax1.set_title(f"Time Domain: {self._function_type} Function")
+                ax1.set_xlabel("Time (s)")
+                ax1.set_ylabel("Amplitude")
+                ax1.grid(True)
+            
+            # Transform domain plot
+            if self._frequencies and self._transform_result:
+                ax2.plot(self._frequencies, self._transform_result, 'r-')
+                
+                # Add resonant frequency line for Laplace
+                if self._transform_type == "Laplace" and self._resonant_frequency > 0:
+                    # Find y-range
+                    y_max = max(self._transform_result) * 1.1
+                    ax2.axvline(x=self._resonant_frequency, color='orange', linestyle='--')
+                    ax2.annotate(f"Resonant: {self._resonant_frequency:.1f} rad/s", 
+                                xy=(self._resonant_frequency, y_max*0.9),
+                                xytext=(self._resonant_frequency + 5, y_max*0.9),
+                                arrowprops=dict(facecolor='orange', shrink=0.05),
+                                )
+                
+                ax2.set_title(f"{self._transform_type} Transform Magnitude")
+                x_label = "Frequency (Hz)" if self._transform_type == "Fourier" else "jω (rad/s)"
+                ax2.set_xlabel(x_label)
+                ax2.set_ylabel("Magnitude")
+                ax2.grid(True)
+            
+            # Add summary information
+            plt.figtext(0.5, 0.01, 
+                      f"Transform: {self._transform_type} | Function: {self._function_type} | Equation: {self._equation_original}", 
+                      ha="center", fontsize=9, bbox={"facecolor":"orange", "alpha":0.2, "pad":5})
+            
+            plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+            plt.savefig(filepath, dpi=100)
+            plt.close()
+            
+            return filepath
+            
+        except Exception as e:
+            print(f"Error generating plot: {str(e)}")
+            return ""
+    

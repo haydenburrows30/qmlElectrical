@@ -197,11 +197,32 @@ class TransformCalculatorWorker(QRunnable):
             if window_applied:
                 self.parent._equation_transform += f"\nWindow broadens the main peak and reduces spectral leakage"
         elif self.function_type == "Square":
-            self.parent._equation_transform = f"F(ω){window_desc} = {2*self.parameter_a/np.pi}·sum(sin(nπ/2)/(n)·δ(ω-n·{self.frequency}))"
+            self.parent._equation_transform = f"F(ω){window_desc} = {(2*self.parameter_a/np.pi):.2f}·sum(sin(nπ/2)/(n)·δ(ω-n·{self.frequency}))"
             if window_applied:
                 self.parent._equation_transform += f"\nWindow attenuates harmonics but improves frequency resolution"
         elif self.function_type == "Exponential":
             self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}/{self.parameter_b}·1/(1+iω/{self.parameter_b})"
+        elif self.function_type == "Sawtooth":
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}·sum((-1)^(n+1)/(n)·δ(ω-n·{self.frequency}))"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow attenuates higher harmonics which define the sharp edges"
+        elif self.function_type == "Damped Sine":
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}·{self.frequency}/((iω+{self.parameter_b})^2+(2π·{self.frequency})^2)"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow affects the shape of the resonant peak"
+        elif self.function_type == "Gaussian":
+            sigma = self.parameter_b/5 if self.parameter_b > 0 else 0.2
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}·σ·√(2π)·e^(-σ^2ω^2/2)·e^(-iω·{self.parameter_b})"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow has minimal effect on already smooth Gaussian spectrum"
+        elif self.function_type == "Step":
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}·πδ(ω) + {self.parameter_a}/(iω)·e^(-iω·{self.parameter_b})"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow reduces the low-frequency components of the step response"
+        elif self.function_type == "Impulse":
+            self.parent._equation_transform = f"F(ω){window_desc} = {self.parameter_a}·e^(-iω·{self.parameter_b})"
+            if window_applied:
+                self.parent._equation_transform += f"\nWindow has minimal effect on already wide impulse spectrum"
         else:
             self.parent._equation_transform = f"F(ω){window_desc} = ∫f(t)·e^(-iωt)dt"
             if window_applied:
