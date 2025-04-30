@@ -31,6 +31,9 @@ class TransformerCalculator(QObject):
     temperatureRiseChanged = Signal()
     warningsChanged = Signal()
     vectorGroupApplicationsChanged = Signal()  # Add new signal
+    
+    # Add export signal
+    exportComplete = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -161,6 +164,13 @@ class TransformerCalculator(QObject):
         self._iron_losses = 0.0  # No-load losses in watts
         self._temperature_rise = 0.0  # Temperature rise in Celsius
         self._warnings = []  # List of warning messages
+
+        # Initialize file saver
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
 
     @Property(float, notify=primaryVoltageChanged)
     def primaryVoltage(self):
@@ -588,3 +598,70 @@ class TransformerCalculator(QObject):
     @Slot(float)
     def setIronLosses(self, value):
         self.ironLosses = value
+
+    @Slot()
+    def exportReport(self):
+        """Export transformer calculator report to PDF"""
+        try:
+            # Create timestamp for filename
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"transformer_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Prepare data for PDF
+            data = {
+                'apparent_power': self._apparent_power,
+                'vector_group': self._vector_group,
+                'vector_group_description': self._vector_group_description,
+                'primary_voltage': self._primary_voltage,
+                'secondary_voltage': self._secondary_voltage,
+                'primary_current': self._primary_current,
+                'secondary_current': self._secondary_current,
+                'turns_ratio': self._turns_ratio,
+                'corrected_ratio': self._corrected_ratio,
+                'impedance_percent': self._impedance_percent,
+                'resistance_percent': self._resistance_percent,
+                'reactance_percent': self._reactance_percent,
+                'copper_losses': self._copper_losses,
+                'iron_losses': self._iron_losses,
+                'short_circuit_power': self._short_circuit_power,
+                'voltage_drop': self._voltage_drop,
+                'temperature_rise': self._temperature_rise,
+                'efficiency': self._efficiency,
+                'warnings': self._warnings,
+                'vector_group_applications': self._vector_group_applications.get(self._vector_group, [])
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_transformer import TransformerPdfGenerator
+            pdf_generator = TransformerPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            from services.logger_config import configure_logger
+            logger = configure_logger("qmltest", component="transformer_calculator")
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False

@@ -17,6 +17,11 @@ Page {
     property color textColorPhase: window.modeToggled ? "#ffffff" : "#000000"
     property SequenceComponentCalculator calculator: SequenceComponentCalculator {}
     
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+    
     PopUpText {
         id: popUpText
         parentCard: topHeader
@@ -109,6 +114,21 @@ Page {
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+                    
+                    // Add PDF export button
+                    StyledButton {
+                        ToolTip.text: "Export report to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportReport()
+                            }
+                        }
                     }
                     
                     StyledButton {
@@ -875,6 +895,19 @@ Page {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    // Add connections for export status notifications
+    Connections {
+        target: calculator
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

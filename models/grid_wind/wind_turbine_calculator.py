@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
 import matplotlib.pyplot as plt
 
-from utils.pdf.pdf_generator import PDFGenerator
+from utils.pdf.pdf_generator_grid_wind import PDFGenerator
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
 

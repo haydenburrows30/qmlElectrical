@@ -22,6 +22,7 @@ class ZTransformCalculator(QObject):
     show3DChanged = Signal()
     resultsCalculated = Signal()
     calculatingChanged = Signal()
+    exportComplete = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -73,6 +74,13 @@ class ZTransformCalculator(QObject):
         
         # Initialize calculations
         self._calculate()
+        
+        # Initialize file saver
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
     
     @Property(str, notify=transformTypeChanged)
     def transformType(self):
@@ -409,3 +417,86 @@ class ZTransformCalculator(QObject):
     @Slot()
     def calculate(self):
         self._calculate()
+    
+    @Slot()
+    def exportReport(self):
+        """Export Z-transform analysis to PDF"""
+        try:
+            # Create timestamp for filename
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"{self._transform_type.lower()}_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Determine whether certain parameters are applicable
+            needs_decay_factor = False
+            needs_frequency = False
+            
+            if self._function_type in ["Exponential Sequence", "Exponentially Damped Sine"]:
+                needs_decay_factor = True
+                
+            if self._function_type in ["Sinusoidal", "Exponentially Damped Sine", "Chirp Sequence"]:
+                needs_frequency = True
+            
+            # Prepare data for PDF
+            data = {
+                'transform_type': self._transform_type,
+                'function_type': self._function_type,
+                'amplitude': self._amplitude,
+                'decay_factor': self._decay_factor,
+                'frequency': self._frequency,
+                'sampling_rate': self._sampling_rate,
+                'sequence_length': self._sequence_length,
+                'wavelet_type': self._wavelet_type,
+                'display_option': self._display_option,
+                'time_domain': self._time_domain,
+                'frequencies': self._frequencies,
+                'transform_result': self._transform_result,
+                'phase_result': self._phase_result,
+                'pole_locations': self._pole_locations,
+                'zero_locations': self._zero_locations,
+                'equation_original': self._equation_original,
+                'equation_transform': self._equation_transform,
+                'roc_text': self._roc_text,
+                'wavelet_levels': self._wavelet_levels,
+                'edge_handling': self._edge_handling,
+                'min_frequency': self._min_frequency,
+                'max_frequency': self._max_frequency,
+                'wavelet_magnitude_2d': self._wavelet_magnitude_2d,
+                'wavelet_phase_2d': self._wavelet_phase_2d,
+                'needs_decay_factor': needs_decay_factor,
+                'needs_frequency': needs_frequency
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_z_transform import ZTransformPdfGenerator
+            pdf_generator = ZTransformPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            from services.logger_config import configure_logger
+            logger = configure_logger("qmltest", component="z_transform_calculator")
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False

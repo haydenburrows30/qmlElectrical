@@ -18,6 +18,7 @@ class PowerCalculator(QObject):
     currentCalculated = Signal(float)
     series_appended = Signal()
     dataChanged = Signal()
+    exportComplete = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -25,6 +26,10 @@ class PowerCalculator(QObject):
         self._voltage = 0.0
         self._current = 0.0
         self._phase = "Three Phase"
+
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
 
     @Slot(float)
     def setKva(self, kva):
@@ -74,6 +79,52 @@ class PowerCalculator(QObject):
     @Slot()
     def calculate(self):
         self.calculateCurrent()
+
+    @Slot()
+    def exportReport(self):
+        """Export power calculator report to PDF"""
+        try:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"transformer_current_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            data = {
+                'transformer': True,
+                'transformer_phase': self._phase,
+                'transformer_kva': self._kva,
+                'transformer_voltage': self._voltage,
+                'transformer_current': self._current,
+                'power': False
+            }
+            
+            from utils.pdf.pdf_generator_power import PowerCurrentPdfGenerator
+            pdf_generator = PowerCurrentPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            import gc
+            gc.collect()
+            
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            from services.logger_config import configure_logger
+            logger = configure_logger("qmltest", component="power_calculator")
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False
 
 class ChargingCalculator(QObject):
     """Calculator for capacitive charging current.
@@ -323,6 +374,7 @@ class KwFromCurrentCalculator(QObject):
     kwCalculated = Signal(float)
     kvaCalculated = Signal(float)
     dataChanged = Signal()
+    exportComplete = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -332,6 +384,10 @@ class KwFromCurrentCalculator(QObject):
         self._kw = 0.0
         self._voltage = 415.0  # Default voltage
         self._kva = 0.0
+
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
 
     @Slot(float)
     def setCurrent(self, current):
@@ -371,16 +427,12 @@ class KwFromCurrentCalculator(QObject):
     def calculateKw(self):
         if self._current > 0:
             if self._phase == "Single Phase":
-                # Calculate kVA first
                 self._kva = self._voltage * self._current / 1000
             elif self._phase == "Three Phase":
-                # Calculate kVA first
                 self._kva = math.sqrt(3) * self._voltage * self._current / 1000
                 
-            # Calculate kW after kVA
             self._kw = self._kva * self._power_factor
             
-            # Always emit both signals
             self.kvaCalculated.emit(self._kva)
             self.kwCalculated.emit(self._kw)
 
@@ -404,3 +456,51 @@ class KwFromCurrentCalculator(QObject):
     @Slot()
     def calculate(self):
         self.calculateKw()
+
+    @Slot()
+    def exportReport(self):
+        """Export power from current calculator report to PDF"""
+        try:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"power_current_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            data = {
+                'transformer': False,
+                'power': True,
+                'power_phase': self._phase,
+                'power_current': self._current,
+                'power_voltage': self._voltage,
+                'power_pf': self._power_factor,
+                'power_kw': self._kw,
+                'power_kva': self._kva
+            }
+            
+            from utils.pdf.pdf_generator_power import PowerCurrentPdfGenerator
+            pdf_generator = PowerCurrentPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            import gc
+            gc.collect()
+            
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            from services.logger_config import configure_logger
+            logger = configure_logger("qmltest", component="power_calculator")
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False

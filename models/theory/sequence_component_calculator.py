@@ -19,6 +19,7 @@ class SequenceComponentCalculator(QObject):
     """
     
     dataChanged = Signal()
+    exportComplete = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -49,6 +50,13 @@ class SequenceComponentCalculator(QObject):
         
         # Calculate initial values
         self._calculate_sequence_components()
+        
+        # Initialize file saver
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
     
     def _get_cache_key(self) -> tuple:
         """Create a tuple key for caching calculated values"""
@@ -456,3 +464,127 @@ class SequenceComponentCalculator(QObject):
         
         self._calculate_sequence_components()
         self.dataChanged.emit()
+    
+    @Slot()
+    def exportReport(self):
+        """Export sequence component analysis to PDF"""
+        try:
+            # Create timestamp for filename
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"sequence_component_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Determine system status, dominant issue and recommendation
+            system_status = ""
+            dominant_issue = ""
+            recommendation = ""
+            
+            # Calculate unbalance factors (just in case cache is not updated)
+            self._calculate_sequence_components()
+            v_unbalance = self._cache.get('unbalance_factor_v', 0)
+            i_unbalance = self._cache.get('unbalance_factor_i', 0)
+            
+            # Voltage magnitudes 
+            v_pos_mag = self._cache.get('v_pos_mag', 0)
+            v_neg_mag = self._cache.get('v_neg_mag', 0)
+            v_zero_mag = self._cache.get('v_zero_mag', 0)
+            
+            # Determine system status
+            if v_unbalance <= 1.0 and i_unbalance <= 5.0:
+                system_status = "Balanced System"
+            elif v_unbalance <= 2.0 and i_unbalance <= 10.0:
+                system_status = "Minor Unbalance"
+            elif v_zero_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.05:
+                system_status = "Ground Fault Likely"
+            else:
+                system_status = "Significant Unbalance"
+            
+            # Determine dominant issue
+            if v_zero_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.05:
+                dominant_issue = "Ground Fault (Zero Sequence)"
+                recommendation = "Check for ground faults"
+            elif v_neg_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.05:
+                dominant_issue = "Phase-Phase Unbalance (Negative Sequence)"
+                recommendation = "Redistribute single-phase loads"
+            else:
+                dominant_issue = "Minor Phase Imbalance"
+                recommendation = "Monitor for changes"
+            
+            # Determine fault type (if available)
+            fault_type = "Custom"
+            if v_unbalance <= 1.0 and i_unbalance <= 5.0:
+                fault_type = "Balanced System"
+            elif v_zero_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.2 and v_neg_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.2:
+                fault_type = "Single Line-to-Ground Fault"
+            elif v_neg_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.2 and v_zero_mag / (v_pos_mag if v_pos_mag > 0 else 1) < 0.05:
+                fault_type = "Line-to-Line Fault"
+            elif v_zero_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.1 and v_neg_mag / (v_pos_mag if v_pos_mag > 0 else 1) > 0.1:
+                fault_type = "Double Line-to-Ground Fault"
+            
+            # Prepare data for PDF
+            data = {
+                'voltage_a': self._voltageA,
+                'voltage_b': self._voltageB,
+                'voltage_c': self._voltageC,
+                'voltage_angle_a': self._voltageAngleA,
+                'voltage_angle_b': self._voltageAngleB,
+                'voltage_angle_c': self._voltageAngleC,
+                'current_a': self._currentA,
+                'current_b': self._currentB,
+                'current_c': self._currentC,
+                'current_angle_a': self._currentAngleA,
+                'current_angle_b': self._currentAngleB,
+                'current_angle_c': self._currentAngleC,
+                'v_pos_mag': self._cache.get('v_pos_mag', 0),
+                'v_pos_ang': self._cache.get('v_pos_ang', 0),
+                'v_neg_mag': self._cache.get('v_neg_mag', 0),
+                'v_neg_ang': self._cache.get('v_neg_ang', 0),
+                'v_zero_mag': self._cache.get('v_zero_mag', 0),
+                'v_zero_ang': self._cache.get('v_zero_ang', 0),
+                'i_pos_mag': self._cache.get('i_pos_mag', 0),
+                'i_pos_ang': self._cache.get('i_pos_ang', 0),
+                'i_neg_mag': self._cache.get('i_neg_mag', 0),
+                'i_neg_ang': self._cache.get('i_neg_ang', 0),
+                'i_zero_mag': self._cache.get('i_zero_mag', 0),
+                'i_zero_ang': self._cache.get('i_zero_ang', 0),
+                'v_unbalance': v_unbalance,
+                'i_unbalance': i_unbalance,
+                'system_status': system_status,
+                'dominant_issue': dominant_issue,
+                'recommendation': recommendation,
+                'fault_type': fault_type
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_sequence import SequencePdfGenerator
+            pdf_generator = SequencePdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            from services.logger_config import configure_logger
+            logger = configure_logger("qmltest", component="sequence_calculator")
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False

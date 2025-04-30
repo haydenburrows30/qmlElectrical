@@ -99,6 +99,11 @@ Item {
         heightFactor: 0.7
     }
 
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
     // Loading indicator
     BusyIndicator {
         id: calculationIndicator
@@ -154,6 +159,20 @@ Item {
                         font.pixelSize: 26
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+                    
+                    // Add PDF export button
+                    StyledButton {
+                        id: exportButton
+                        icon.source: "../../../icons/rounded/download.svg"
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        onClicked: {
+                            if (z_calculator) {
+                                z_calculator.exportReport()
+                            }
+                        }
                     }
                     
                     StyledButton {
@@ -731,6 +750,14 @@ Item {
                 hilbertChart.phaseResult = z_calculator.phaseResult ? z_calculator.phaseResult : []
                 hilbertChart.frequencies = z_calculator.frequencies ? z_calculator.frequencies : []
                 hilbertChart.displayMode = displayOptionsCombo.currentText
+            }
+        }
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

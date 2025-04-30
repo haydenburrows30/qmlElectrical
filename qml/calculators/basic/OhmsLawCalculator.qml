@@ -200,6 +200,11 @@ Item {
         return `Recommended power supply: ${recommendedVoltage.toFixed(1)}V @ ${recommendedCurrent.toFixed(1)}A`;
     }
 
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
     PopUpText {
         id: popUpText
         widthFactor: 0.3
@@ -282,6 +287,29 @@ Item {
                 Layout.columnSpan: 2
                 Layout.minimumWidth: 100
                 Layout.alignment: Qt.AlignLeft
+            }
+
+            StyledButton {
+                id: exportButton
+                icon.source: "../../../icons/rounded/download.svg"
+                ToolTip.text: "Export to PDF"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                
+                onClicked: {
+                    // Get input data for the PDF
+                    var inputData = {
+                        param1_name: selectedParam1.currentText.replace(" (V)", "").replace(" (I)", "").replace(" (R)", "").replace(" (P)", ""),
+                        param1_value: parseFloat(param1Value.text),
+                        param1_unit: param1Unit.currentText,
+                        param2_name: selectedParam2.currentText.replace(" (V)", "").replace(" (I)", "").replace(" (R)", "").replace(" (P)", ""),
+                        param2_value: parseFloat(param2Value.text),
+                        param2_unit: param2Unit.currentText
+                    }
+                    
+                    // Call the export function
+                    calculator.exportReport(inputData)
+                }
             }
 
             StyledButton {
@@ -467,5 +495,17 @@ Item {
     
     Component.onCompleted: {
         calculateOhmsLaw()
+    }
+
+    Connections {
+        target: calculator
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
+        }
     }
 }

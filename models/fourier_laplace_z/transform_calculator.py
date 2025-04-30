@@ -1,5 +1,6 @@
 import tempfile
 import os
+import io
 import matplotlib
 # Set non-interactive backend before importing pyplot
 matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
@@ -291,35 +292,32 @@ class TransformCalculator(QObject):
     
     @Slot(result=bool)
     def export_to_pdf(self):
-        """Export the transform results to a PDF file
+        """Export the transform results to a PDF file using in-memory image generation
         
-        Args:
-            filepath: Path to save the PDF report
-            
         Returns:
             bool: True if successful, False otherwise
         """
         try:
-            from utils.pdf.pdf_generator import PDFGenerator
+            from utils.pdf.pdf_generator_transform import TransformPdfGenerator
+            import io
+            import matplotlib.pyplot as plt
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-            filepath = self._file_saver.get_save_filepath("pdf", f"fourier_report{timestamp}")
+            
+            # Create filename based on transform type to make it clear which type is being exported
+            transform_type = self._transform_type.lower()
+            filepath = self._file_saver.get_save_filepath("pdf", f"{transform_type}_report_{timestamp}")
             if not filepath:
                 self.pdfExportStatusChanged.emit(False, "PDF export canceled")
-                return ""
+                return False
             
             # Clean up filepath using FileSaver's clean_filepath method
             filepath = self._file_saver.clean_filepath(filepath)
             filepath = self._file_saver.ensure_file_extension(filepath, "pdf")
             
-            # Create temporary directory for chart images
-            temp_dir = tempfile.mkdtemp()
-            time_domain_path = os.path.join(temp_dir, "time_domain.png")
-            transform_path = os.path.join(temp_dir, "transform.png")
-            
-            # Generate charts
-            self._generate_chart_for_pdf(time_domain_path, transform_path)
+            # Generate charts in memory
+            time_domain_bytes = self._generate_time_domain_chart_bytes()
+            transform_bytes = self._generate_transform_chart_bytes()
             
             # Determine which parameters are needed based on function type
             needs_param_b = self._function_type not in ["Sine", "Square", "Sawtooth"]
@@ -339,23 +337,13 @@ class TransformCalculator(QObject):
                 'resonant_frequency': self._resonant_frequency,
                 'needs_parameter_b': needs_param_b,
                 'needs_frequency': needs_frequency,
-                'time_domain_image_path': time_domain_path if os.path.exists(time_domain_path) else None,
-                'transform_image_path': transform_path if os.path.exists(transform_path) else None
+                'time_domain_image_bytes': time_domain_bytes,
+                'transform_image_bytes': transform_bytes
             }
             
-            # Generate PDF
-            pdf_generator = PDFGenerator()
-            success = pdf_generator.generate_transform_report(data, filepath)
-            
-            # Clean up temporary files
-            try:
-                if os.path.exists(time_domain_path):
-                    os.remove(time_domain_path)
-                if os.path.exists(transform_path):
-                    os.remove(transform_path)
-                os.rmdir(temp_dir)
-            except:
-                pass
+            # Generate PDF using the new dedicated PDF generator
+            pdf_generator = TransformPdfGenerator()
+            success = pdf_generator.generate_report(data, filepath)
             
             # Force garbage collection to ensure resources are freed
             import gc
@@ -376,37 +364,64 @@ class TransformCalculator(QObject):
             self.pdfExportStatusChanged.emit(False, error_msg)
             return False
 
-    def _generate_chart_for_pdf(self, time_domain_path, transform_path):
-        """Generate charts for PDF export
+    def _generate_time_domain_chart_bytes(self):
+        """Generate time domain chart in memory
         
-        Args:
-            time_domain_path: Path to save time domain chart
-            transform_path: Path to save transform chart
+        Returns:
+            BytesIO: Image data as BytesIO object or None if generation failed
         """
         try:
-            # Use matplotlib to generate charts
-            plt.figure(figsize=(8, 4))
+            # Create figure with better aspect ratio for time domain
+            plt.figure(figsize=(10, 4))
             
             # Time domain chart
             if self._time_domain:
                 t_vals = [point['x'] for point in self._time_domain]
                 y_vals = [point['y'] for point in self._time_domain]
                 
-                plt.plot(t_vals, y_vals, 'b-')
+                plt.plot(t_vals, y_vals, 'b-', linewidth=2)
                 plt.title(f"Time Domain: {self._function_type} Function")
                 plt.xlabel("Time (s)")
                 plt.ylabel("Amplitude")
-                plt.grid(True)
-                plt.tight_layout()
-                plt.savefig(time_domain_path, dpi=100)
-                plt.close()
-            
-            # Transform domain chart
-            if self._frequencies and self._transform_result:
-                plt.figure(figsize=(8, 4))
+                plt.grid(True, linestyle='--', alpha=0.7)
                 
-                # Plot magnitude
-                plt.plot(self._frequencies, self._transform_result, 'r-')
+                # Adjust y-axis limits for better visualization
+                if y_vals:
+                    y_min = min(y_vals)
+                    y_max = max(y_vals)
+                    y_range = y_max - y_min
+                    
+                    # Add some padding to y-axis
+                    padding = y_range * 0.1 if y_range > 0 else 0.1
+                    plt.ylim([y_min - padding, y_max + padding])
+            
+            # Save the figure to BytesIO object
+            buf = io.BytesIO()
+            plt.tight_layout()
+            plt.savefig(buf, format='png', dpi=150)
+            plt.close()
+            buf.seek(0)
+            
+            return buf
+            
+        except Exception as e:
+            logger.error(f"Error generating time domain chart: {e}")
+            plt.close('all')  # Ensure figures are closed
+            return None
+
+    def _generate_transform_chart_bytes(self):
+        """Generate transform domain chart in memory
+        
+        Returns:
+            BytesIO: Image data as BytesIO object or None if generation failed
+        """
+        try:
+            # Create figure
+            plt.figure(figsize=(10, 6))
+            
+            # Plot magnitude
+            if self._frequencies and self._transform_result:
+                plt.plot(self._frequencies, self._transform_result, 'r-', linewidth=2)
                 
                 # Add resonant frequency line for Laplace
                 if self._transform_type == "Laplace" and self._resonant_frequency > 0:
@@ -423,119 +438,18 @@ class TransformCalculator(QObject):
                 x_label = "Frequency (Hz)" if self._transform_type == "Fourier" else "jω (rad/s)"
                 plt.xlabel(x_label)
                 plt.ylabel("Magnitude")
-                plt.grid(True)
-                plt.tight_layout()
-                plt.savefig(transform_path, dpi=100)
-                plt.close('all')  # Close all figures to prevent resource leaks
-                
-                # Force garbage collection
-                import gc
-                gc.collect()
-                
-        except Exception as e:
-            print(f"Error generating charts for PDF: {str(e)}")
-            # Make sure to close any open figures even on error
-            plt.close('all')
-
-    @Slot()
-    def generate_plot_for_file_saver(self):
-        """Generate and save a plot image
-        
-        Args:
-            default_filename: Default name to suggest
+                plt.grid(True, linestyle='--', alpha=0.7)
             
-        Returns:
-            bool: True if successful, False otherwise
-        """
-        try:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            # Save the figure to BytesIO object
+            buf = io.BytesIO()
+            plt.tight_layout()
+            plt.savefig(buf, format='png', dpi=150)
+            plt.close()
+            buf.seek(0)
             
-            filepath = self._file_saver.get_save_filepath("png", f"fourier_plot{timestamp}")
-            if not filepath:
-                self.pdfExportStatusChanged.emit(False, "Plot save canceled")
-                return False
-                
-            # Generate the plot directly
-            result_path = self.generate_plot(filepath)
-            
-            if result_path:
-                # Use standardized success message
-                self._file_saver._emit_success_with_path(result_path, "Plot saved")
-                return True
-            else:
-                error_msg = "Failed to generate plot"
-                logger.error(error_msg)
-                self._file_saver._emit_failure_with_path(result_path, "Plot save failed")
-                return False
-                
-        except Exception as e:
-            error_msg = f"Error saving plot: {str(e)}"
-            logger.error(error_msg)
-            self.pdfExportStatusChanged.emit(False, error_msg)
-            return False
-
-    def generate_plot(self, filepath):
-        """Generate a plot image for the file saver
-        
-        Args:
-            filepath: Path to save the generated image
-            
-        Returns:
-            str: Path to the saved image or empty string on failure
-        """
-        try:
-            # Create a combined plot with both time and frequency domains
-            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
-            
-            # Time domain plot
-            if self._time_domain:
-                t_vals = [point['x'] for point in self._time_domain]
-                y_vals = [point['y'] for point in self._time_domain]
-                
-                ax1.plot(t_vals, y_vals, 'b-')
-                ax1.set_title(f"Time Domain: {self._function_type} Function")
-                ax1.set_xlabel("Time (s)")
-                ax1.set_ylabel("Amplitude")
-                ax1.grid(True)
-            
-            # Transform domain plot
-            if self._frequencies and self._transform_result:
-                ax2.plot(self._frequencies, self._transform_result, 'r-')
-                
-                # Add resonant frequency line for Laplace
-                if self._transform_type == "Laplace" and self._resonant_frequency > 0:
-                    # Find y-range
-                    y_max = max(self._transform_result) * 1.1
-                    ax2.axvline(x=self._resonant_frequency, color='orange', linestyle='--')
-                    ax2.annotate(f"Resonant: {self._resonant_frequency:.1f} rad/s", 
-                                xy=(self._resonant_frequency, y_max*0.9),
-                                xytext=(self._resonant_frequency + 5, y_max*0.9),
-                                arrowprops=dict(facecolor='orange', shrink=0.05),
-                                )
-                
-                ax2.set_title(f"{self._transform_type} Transform Magnitude")
-                x_label = "Frequency (Hz)" if self._transform_type == "Fourier" else "jω (rad/s)"
-                ax2.set_xlabel(x_label)
-                ax2.set_ylabel("Magnitude")
-                ax2.grid(True)
-            
-            # Add summary information
-            plt.figtext(0.5, 0.01, 
-                      f"Transform: {self._transform_type} | Function: {self._function_type} | Equation: {self._equation_original}", 
-                      ha="center", fontsize=9, bbox={"facecolor":"orange", "alpha":0.2, "pad":5})
-            
-            plt.tight_layout(rect=[0, 0.03, 1, 0.97])
-            plt.savefig(filepath, dpi=100)
-            plt.close('all')  # Close all figures to prevent resource leaks
-            
-            # Force garbage collection
-            import gc
-            gc.collect()
-            
-            return filepath
+            return buf
             
         except Exception as e:
-            print(f"Error generating plot: {str(e)}")
-            # Make sure to close any open figures even on error
-            plt.close('all')
-            return ""
+            logger.error(f"Error generating transform chart: {e}")
+            plt.close('all')  # Ensure figures are closed
+            return None

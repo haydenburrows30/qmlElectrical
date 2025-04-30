@@ -10,6 +10,7 @@ class CalculusCalculator(QObject):
     parameterAChanged = Signal()
     parameterBChanged = Signal()
     resultsCalculated = Signal()
+    exportComplete = Signal(bool, str)
     
     def __init__(self, parent=None):
         """Initialize the calculator with default values"""
@@ -55,6 +56,13 @@ class CalculusCalculator(QObject):
         
         # Calculate with initial values
         self._calculate()
+        
+        # Initialize file saver
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
     
     # Function implementations
     def _sine_function(self, x):
@@ -392,3 +400,64 @@ class CalculusCalculator(QObject):
     @Slot()
     def calculate(self):
         self._calculate()
+    
+    @Slot()
+    def exportReport(self):
+        """Export calculus analysis to PDF"""
+        try:
+            # Create timestamp for filename
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"calculus_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Prepare data for PDF
+            data = {
+                'function_type': self._function_type,
+                'parameter_a': self._parameter_a,
+                'parameter_b': self._parameter_b,
+                'parameter_a_name': self.parameterAName,
+                'parameter_b_name': self.parameterBName,
+                'show_parameter_b': self.showParameterB,
+                'function_formula': self.functionFormula,
+                'derivative_formula': self.derivativeFormula,
+                'integral_formula': self.integralFormula,
+                'application_example': self.applicationExample,
+                'x_values': self._x_values.tolist(),
+                'function_values': self._function_values.tolist(),
+                'derivative_values': self._derivative_values.tolist(),
+                'integral_values': self._integral_values.tolist()
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_calculus import CalculusPdfGenerator
+            pdf_generator = CalculusPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            from services.logger_config import configure_logger
+            logger = configure_logger("qmltest", component="calculus_calculator")
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False

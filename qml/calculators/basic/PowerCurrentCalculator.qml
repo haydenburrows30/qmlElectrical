@@ -21,6 +21,11 @@ Item {
         visible: false
     }
 
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
     PopUpText {
         parentCard: results
         popupText: "<h3>Transformer Calculator </h3><br> Helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: <br><br>" +
@@ -54,6 +59,20 @@ Item {
                 font.pixelSize: 20
                 font.bold: true
                 Layout.fillWidth: true
+            }
+
+            // Add PDF export button to the header
+            StyledButton {
+                ToolTip.text: "Export report to PDF"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                Layout.alignment: Qt.AlignRight
+                icon.source: "../../../icons/rounded/download.svg"
+
+                onClicked: {
+                    // Show dialog to select which calculator to export
+                    exportChoiceDialog.open()
+                }
             }
 
             // StyledButton {
@@ -211,6 +230,19 @@ Item {
                                     clipboardHelper.text = currentOutput.text
                                     clipboardHelper.selectAll()
                                     clipboardHelper.copy()
+                                }
+                            }
+                        }
+
+                        // Add PDF export button for transformer calculator
+                        StyledButton {
+                            Layout.preferredWidth: 40
+                            ToolTip.text: "Export to PDF"
+                            ToolTip.visible: hovered
+                            icon.source: "../../../icons/rounded/download.svg"
+                            onClicked: {
+                                if (calculator) {
+                                    calculator.exportReport()
                                 }
                             }
                         }
@@ -430,6 +462,25 @@ Item {
                         }
                     }
 
+                    // Add export button in a new row at the bottom
+                    RowLayout {
+                        Layout.columnSpan: 3
+                        Layout.topMargin: 10
+                        Layout.alignment: Qt.AlignRight
+                        
+                        StyledButton {
+                            text: "Export to PDF"
+                            icon.source: "../../../icons/rounded/download.svg"
+                            ToolTip.text: "Export power calculation to PDF"
+                            ToolTip.visible: hovered
+                            onClicked: {
+                                if (calculator1) {
+                                    calculator1.exportReport()
+                                }
+                            }
+                        }
+                    }
+
                     Label {
                         text: phaseSelector1.currentText === "Single Phase" ? 
                             "Formula: P = V × I × PF / 1000" : 
@@ -450,6 +501,80 @@ Item {
                         Layout.columnSpan: 3
                     }
                 }
+            }
+        }
+    }
+    
+    // Add dialog for choosing which calculator to export
+    Dialog {
+        id: exportChoiceDialog
+        title: "Export to PDF"
+        modal: true
+        anchors.centerIn: parent
+        
+        ColumnLayout {
+            spacing: 20
+            
+            Label {
+                text: "Choose which calculation to export:"
+                font.pixelSize: 14
+            }
+            
+            RowLayout {
+                spacing: 10
+                
+                StyledButton {
+                    text: "Transformer Current"
+                    Layout.fillWidth: true
+                    onClicked: {
+                        exportChoiceDialog.close()
+                        calculator.exportReport()
+                    }
+                }
+                
+                StyledButton {
+                    text: "Power from Current"
+                    Layout.fillWidth: true
+                    onClicked: {
+                        exportChoiceDialog.close()
+                        calculator1.exportReport()
+                    }
+                }
+            }
+            
+            RowLayout {
+                spacing: 10
+                Layout.alignment: Qt.AlignRight
+                
+                StyledButton {
+                    text: "Cancel"
+                    onClicked: exportChoiceDialog.close()
+                }
+            }
+        }
+    }
+    
+    // Add connections for export status notifications
+    Connections {
+        target: calculator
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
+        }
+    }
+    
+    Connections {
+        target: calculator1
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

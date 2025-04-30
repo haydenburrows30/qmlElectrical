@@ -57,6 +57,11 @@ Item {
         }
     }
 
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -86,6 +91,21 @@ Item {
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+
+                    // Add PDF export button
+                    StyledButton {
+                        ToolTip.text: "Export report to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportReport()
+                            }
+                        }
                     }
 
                     StyledButton {
@@ -514,6 +534,13 @@ Item {
             // Only update if the user is not editing
             if (!ironLossesInput.activeFocus) {
                 ironLossesInput.text = calculator.ironLosses.toFixed(0)
+            }
+        }
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

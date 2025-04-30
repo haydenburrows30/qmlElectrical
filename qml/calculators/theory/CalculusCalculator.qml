@@ -83,6 +83,11 @@ Item {
         }
     }
     
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
     PopUpText {
         id: popUpText
         parentCard: helpButton
@@ -178,6 +183,21 @@ Item {
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+
+                    // Add PDF export button
+                    StyledButton {
+                        id: exportButton
+                        icon.source: "../../../icons/rounded/download.svg"
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportReport()
+                            }
+                        }
                     }
 
                     StyledButton {
@@ -578,6 +598,19 @@ Item {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // Add connections for export status notifications
+    Connections {
+        target: calculator
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }
