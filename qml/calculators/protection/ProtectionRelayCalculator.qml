@@ -50,6 +50,39 @@ Item {
                     }
 
                     StyledButton {
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            // Get additional data to include in the PDF
+                            let additionalData = {
+                                deviceInfo: {
+                                    type: deviceType.currentText,
+                                    rating: ratingCombo.currentText,
+                                    breaking_capacity: breakingCapacity.text,
+                                    description: deviceDescription.text
+                                },
+                                curveLetterMCB: deviceType.currentText === "MCB" ? breakerCurveCombo.currentText : null
+                            }
+                            
+                            // Add circuit parameters if advanced mode is enabled
+                            if (advancedMode.checked) {
+                                additionalData.circuitParameters = {
+                                    voltage: parseFloat(supplyVoltage.text),
+                                    length: parseFloat(cableLength.text),
+                                    size: parseFloat(cableSize.currentText),
+                                    calculated_fault_current: parseFloat(faultCurrent.text)
+                                }
+                            }
+                            
+                            relay.exportToPdf(additionalData)
+                        }
+                    }
+
+                    StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Information"
@@ -540,6 +573,10 @@ Item {
                     "ANSI/IEEE C37.112-1996<br>"
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     // Popup for saved settings
     Popup {
         id: savedSettingsPopup
@@ -735,6 +772,14 @@ Item {
             } else {
                 console.warn("Received empty curve points");
                 savedCurve.visible = false;
+            }
+        }
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

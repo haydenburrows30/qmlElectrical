@@ -21,6 +21,7 @@ class InstrumentTransformerCalculator(QObject):
     resetCompleted = Signal()
     saturationCurveChanged = Signal()
     harmonicsChanged = Signal()
+    pdfExportStatusChanged = Signal(bool, str)  # Add new signal for PDF export status
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -146,6 +147,13 @@ class InstrumentTransformerCalculator(QObject):
         
         # Saturation curve data points
         self._saturation_curve = []
+        
+        # Initialize FileSaver
+        from services.file_saver import FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         self._calculate()
 
@@ -706,3 +714,125 @@ class InstrumentTransformerCalculator(QObject):
             {"factor": "Saturation", "value": self.saturationFactor * 100, 
              "unit": "%", "effect": self.saturationFactor * 5 if self.saturationFactor > 0.5 else 0}
         ]
+    
+    @Slot()
+    def exportToPdf(self):
+        """Export instrument transformer calculations to PDF"""
+        try:
+            from datetime import datetime
+            import tempfile
+            import os
+            
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"instrument_transformer_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart images
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "saturation_curve.png")
+            harmonics_image_path = os.path.join(temp_dir, "harmonics.png")
+            
+            # Import the PDF generator
+            from utils.pdf.pdf_generator_instrument_transformer import InstrumentTransformerPdfGenerator
+            pdf_generator = InstrumentTransformerPdfGenerator()
+            
+            # Generate charts first
+            saturation_generated = pdf_generator.generate_saturation_curve(
+                {
+                    'knee_point_voltage': self._knee_point_voltage,
+                    'secondary_current': self._secondary_current,
+                    'saturation_curve': self._saturation_curve,
+                    'ct_ratio': f"{self._primary_current}/{self._secondary_current}",
+                    'accuracy_class': self._accuracy_class
+                },
+                chart_image_path
+            )
+            
+            harmonics_generated = pdf_generator.generate_harmonics_chart(
+                {
+                    'harmonics': self._harmonics,
+                    'saturation_status': self.saturationStatus,
+                    'saturation_factor': self.saturationFactor
+                },
+                harmonics_image_path
+            )
+            
+            # Prepare data for PDF generation
+            data = {
+                # CT parameters
+                'ct_type': self._current_ct_type.capitalize(),
+                'ct_ratio': f"{self._primary_current}/{self._secondary_current}",
+                'ct_burden': self._burden_va,
+                'power_factor': self._power_factor,
+                'temperature': self._temperature,
+                'accuracy_class': self._accuracy_class,
+                
+                # CT results
+                'knee_point_voltage': self._knee_point_voltage,
+                'max_fault_current': self._max_fault_current,
+                'min_accuracy_burden': self._min_accuracy_burden,
+                'error_margin': self._error_margin,
+                'temperature_effect': self._temperature_effect,
+                'saturation_status': self.saturationStatus,
+                'saturation_factor': self.saturationFactor,
+                'harmonics': self._harmonics,
+                
+                # VT parameters
+                'vt_ratio': f"{self._primary_voltage}/{self._secondary_voltage}",
+                'vt_burden': self._vt_burden,
+                'rated_voltage_factor': self._rated_voltage_factor,
+                
+                # VT results
+                'vt_rated_voltage': getattr(self, '_rated_secondary_voltage', 0),
+                'vt_impedance': getattr(self, '_vt_impedance', 0),
+                'vt_burden_status': getattr(self, '_vt_burden_status', ''),
+                'vt_burden_utilization': getattr(self, '_vt_burden_utilization', 0),
+                
+                # Additional info
+                'accuracy_recommendation': self.accuracyRecommendation,
+                'environmental_factors': self.environmentalFactors,
+                
+                # Chart images
+                'chart_image_path': chart_image_path if saturation_generated and os.path.exists(chart_image_path) else None,
+                'harmonics_image_path': harmonics_image_path if harmonics_generated and os.path.exists(harmonics_image_path) else None
+            }
+            
+            # Generate the PDF
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.unlink(chart_image_path)
+                if os.path.exists(harmonics_image_path):
+                    os.unlink(harmonics_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                print(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting to PDF: {str(e)}"
+            print(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False

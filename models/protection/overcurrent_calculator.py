@@ -1,6 +1,13 @@
 from PySide6.QtCore import QObject, Signal, Property, Slot
 from .time_curve_calculator import TimeCurveCalculator
 import math
+import tempfile
+import os
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from datetime import datetime
+from services.file_saver import FileSaver
 
 class OvercurrentProtectionCalculator(QObject):
     """Calculator for overcurrent protection settings for MV cables."""
@@ -27,6 +34,7 @@ class OvercurrentProtectionCalculator(QObject):
     transformerVectorGroupChanged = Signal()
     curveStandardChanged = Signal()
     availableCurvesChanged = Signal()
+    pdfExportStatusChanged = Signal(bool, str)  # Add PDF export status signal
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -92,6 +100,12 @@ class OvercurrentProtectionCalculator(QObject):
         self._upstream_device = None
         self._downstream_device = None
         self._grading_margin = 0.4  # seconds
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         # Calculate initial values
         self._calculate()
@@ -699,3 +713,189 @@ class OvercurrentProtectionCalculator(QObject):
     def cableImpedance(self):
         """Get cable impedance value"""
         return self._cable_impedance
+
+    @Slot()
+    def exportToReport(self):
+        """Export protection settings to a PDF report"""
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"overcurrent_protection_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "time_current_curves.png")
+            
+            # Generate matplotlib chart
+            self._generate_chart(chart_image_path)
+            
+            # Prepare data for PDF
+            data = {
+                'cable_cross_section': self._cable_cross_section,
+                'cable_length': self._cable_length,
+                'cable_voltage': self._cable_voltage,
+                'cable_material': self._cable_material,
+                'cable_type': self._cable_type,
+                'cable_installation': self._cable_installation,
+                'soil_resistivity': self._soil_resistivity,
+                'ambient_temperature': self._ambient_temperature,
+                'system_fault_level': self._system_fault_level,
+                'transformer_rating': self._transformer_rating,
+                'transformer_impedance': self._transformer_impedance,
+                'transformer_xr_ratio': self._transformer_x_r_ratio,
+                'transformer_vector_group': self._transformer_vector_group,
+                'ct_ratio': self._ct_ratio,
+                'curve_standard': self._curve_standard,
+                'cable_r': self._custom_cable_r,
+                'cable_x': self._custom_cable_x,
+                'cable_impedance': self._cable_impedance,
+                'max_load_current': self._max_load_current,
+                'fault_current_3ph': self._fault_current_3ph,
+                'fault_current_2ph': self._fault_current_2ph,
+                'fault_current_1ph': self._fault_current_1ph,
+                'i_pickup_50': self._i_pickup_50,
+                'time_delay_50': self._time_delay_50,
+                'i_pickup_51': self._i_pickup_51,
+                'time_dial_51': self._time_dial_51,
+                'curve_type_51': self._curve_type_51,
+                'i_pickup_50n': self._i_pickup_50n,
+                'time_delay_50n': self._time_delay_50n,
+                'i_pickup_51n': self._i_pickup_51n,
+                'time_dial_51n': self._time_dial_51n,
+                'curve_type_51n': self._curve_type_51n,
+                'i_pickup_50q': self._i_pickup_50q,
+                'time_delay_50q': self._time_delay_50q,
+                'chart_image_path': chart_image_path if os.path.exists(chart_image_path) else None
+            }
+            
+            # Generate PDF using the specialized PDF generator
+            from utils.pdf.pdf_generator_overcurrent_protection import OvercurrentPdfGenerator
+            pdf_generator = OvercurrentPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.unlink(chart_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                print(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error exporting report: {str(e)}"
+            import traceback
+            traceback.print_exc()
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+    
+    def _generate_chart(self, filepath):
+        """Generate time-current curve chart using matplotlib
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure with logarithmic axes
+            plt.figure(figsize=(10, 8))
+            plt.grid(True, which="both", ls="-", alpha=0.7)
+            plt.loglog()
+            
+            # Set labels and title
+            plt.title('Time-Current Curves')
+            plt.xlabel('Current (A)')
+            plt.ylabel('Time (s)')
+            
+            # Generate curve points
+            curve_points = self.getCurvePoints()
+            if len(curve_points) > 0:
+                # Extract currents and times
+                currents = [point[0] for point in curve_points if len(point) >= 2]
+                times = [point[1] for point in curve_points if len(point) >= 2]
+                
+                # Plot the overcurrent curve
+                if currents and times:
+                    plt.plot(currents, times, 'r-', linewidth=2, label=f'51: {self._curve_type_51}')
+                
+                # Add instantaneous setting (horizontal and vertical lines)
+                if self._i_pickup_50 > 0:
+                    y_min, y_max = plt.ylim()
+                    plt.axvline(x=self._i_pickup_50, color='b', linestyle='--', 
+                             label=f'50: {self._i_pickup_50:.1f}A')
+                    # Add horizontal time delay line
+                    x_min, x_max = plt.xlim()
+                    plt.axhline(y=self._time_delay_50, color='g', linestyle=':', 
+                             label=f'TD: {self._time_delay_50:.2f}s')
+                
+                # Add earth fault settings if they exist
+                if self._i_pickup_51n > 0:
+                    # Generate earth fault curve using similar timepoints but different pickup
+                    ef_currents = []
+                    ef_times = []
+                    # Use 20 points for a smooth curve
+                    for current_multiple in range(11, 210, 10):
+                        current = self._i_pickup_51n * current_multiple / 10
+                        # Use formula from TimeCurveCalculator based on curve type and time dial
+                        if self._curve_type_51n == "IEC Very Inverse":
+                            time = 13.5 * self._time_dial_51n / ((current / self._i_pickup_51n) - 1)
+                        elif self._curve_type_51n == "IEC Extremely Inverse":
+                            time = 80 * self._time_dial_51n / ((current / self._i_pickup_51n)**2 - 1)
+                        else:  # Standard/Normal Inverse as default
+                            time = 0.14 * self._time_dial_51n / ((current / self._i_pickup_51n)**0.02 - 1)
+                        
+                        ef_currents.append(current)
+                        ef_times.append(time)
+                    
+                    plt.plot(ef_currents, ef_times, 'g-', linewidth=2, label=f'51N: {self._curve_type_51n}')
+                    
+                    # Add 50N instantaneous line
+                    if self._i_pickup_50n > 0:
+                        plt.axvline(x=self._i_pickup_50n, color='m', linestyle='--', 
+                                 label=f'50N: {self._i_pickup_50n:.1f}A')
+            
+            # Set reasonable plot limits
+            plt.xlim(self._i_pickup_51 * 0.5, self._fault_current_3ph * 1.5)
+            plt.ylim(0.01, 10)
+            
+            # Add legend
+            plt.legend(loc='upper right')
+            
+            # Save the figure and explicitly close all matplotlib resources
+            plt.tight_layout()
+            plt.savefig(filepath, dpi=150)
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection to clean up any remaining resources
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error generating matplotlib chart: {e}")
+            # Make sure to close any open figures even on error
+            plt.close('all')
+            return False

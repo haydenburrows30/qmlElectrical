@@ -94,6 +94,16 @@ Item {
             let ratedVoltageFactorIndex = ratedVoltageFactor.find(calculator.ratedVoltageFactor)
             if (ratedVoltageFactorIndex !== -1) ratedVoltageFactor.currentIndex = ratedVoltageFactorIndex
         }
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                errorPopup.errorMessage = "Success: " + message
+                errorPopup.open()
+            } else {
+                errorPopup.errorMessage = "Error: " + message
+                errorPopup.open()
+            }
+        }
     }
 
     ScrollView {
@@ -126,6 +136,18 @@ Item {
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+
+                    StyledButton {
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+                        
+                        onClicked: {
+                            calculator.exportToPdf()
+                        }
                     }
 
                     StyledButton {

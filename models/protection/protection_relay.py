@@ -5,14 +5,17 @@ import math
 import sys
 import uuid
 from datetime import datetime
+import tempfile
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
-# Import the database manager
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from services.database_manager import DatabaseManager
 from services.data_store import DataStore
 from services.logger_config import configure_logger
+from services.file_saver import FileSaver
 
-# Setup component-specific logger
 logger = configure_logger("qmltest", component="protection_relay")
 
 class ProtectionRelayCalculator(QObject):
@@ -27,6 +30,7 @@ class ProtectionRelayCalculator(QObject):
     deviceTypesChanged = Signal()
     savedSettingsChanged = Signal()
     savedCurveReady = Signal(list)
+    pdfExportStatusChanged = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -73,6 +77,12 @@ class ProtectionRelayCalculator(QObject):
         
         self._calculate()
         logger.info("Protection Relay Calculator initialized successfully")
+        
+        # Initialize FileSaver for PDF export
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
 
     def _ensure_settings_table(self):
         """Ensure the relay_settings table exists in the database."""
@@ -656,4 +666,166 @@ class ProtectionRelayCalculator(QObject):
             return True
         except Exception as e:
             logger.error(f"Error deleting setting: {e}")
+            return False
+
+    @Slot(dict)
+    def exportToPdf(self, additional_data=None):
+        """Export protection relay settings and results to PDF
+        
+        Args:
+            additional_data: Additional data to include in the PDF
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"protection_relay_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "relay_curve.png")
+            
+            # Generate matplotlib chart
+            self._generate_chart(chart_image_path)
+            
+            # Get device info if available
+            device_info = {}
+            if additional_data and 'deviceInfo' in additional_data:
+                device_info = additional_data['deviceInfo']
+            
+            # Get circuit parameters if available
+            circuit_params = None
+            if additional_data and 'circuitParameters' in additional_data:
+                circuit_params = additional_data['circuitParameters']
+            
+            # Get curve letter for MCB if available
+            curve_letter = None
+            if additional_data and 'curveLetterMCB' in additional_data:
+                curve_letter = additional_data['curveLetterMCB']
+            
+            # Prepare data for PDF
+            data = {
+                'device_type': device_info.get('type', 'N/A'),
+                'rating': device_info.get('rating', self._pickup_current),
+                'breaking_capacity': device_info.get('breaking_capacity', 'N/A'),
+                'description': device_info.get('description', 'N/A'),
+                'pickup_current': self._pickup_current,
+                'time_dial': self._time_dial,
+                'curve_type': self._curve_type,
+                'fault_current': self._fault_current,
+                'operating_time': self._operating_time,
+                'curve_letter': curve_letter,
+                'circuit_parameters': circuit_params,
+                'chart_image_path': chart_image_path if os.path.exists(chart_image_path) else None
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_protection_relay import ProtectionRelayPdfGenerator
+            pdf_generator = ProtectionRelayPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.unlink(chart_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error exporting results: {str(e)}"
+            logger.error(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+    
+    def _generate_chart(self, filepath):
+        """Generate protection relay curve chart using matplotlib
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure with logarithmic axes
+            plt.figure(figsize=(10, 8))
+            plt.grid(True, which="both", ls="-", alpha=0.7)
+            plt.loglog()
+            
+            # Set labels and title
+            plt.title('Time-Current Curve and Trip Point')
+            plt.xlabel('Current (A)')
+            plt.ylabel('Operating Time (s)')
+            
+            # Plot the relay curve using the existing curve points
+            if self._curve_points:
+                currents = [point["current"] for point in self._curve_points]
+                times = [point["time"] for point in self._curve_points]
+                
+                # Plot relay curve
+                plt.plot(currents, times, 'b-', linewidth=2, label=f"{self._curve_type}")
+            
+            # Add a point for current fault current
+            if self._fault_current > 0 and self._operating_time > 0 and self._operating_time < 100:
+                plt.scatter(self._fault_current, self._operating_time, color='red', 
+                         marker='o', s=100, label=f"Trip: {self._operating_time:.2f}s @ {self._fault_current}A")
+                
+                # Add a line to the trip point
+                plt.plot([self._fault_current, self._fault_current], 
+                      [0.01, self._operating_time], 'r--', alpha=0.5)
+            
+            # Set reasonable plot limits
+            plt.xlim(self._pickup_current * 0.5, self._fault_current * 2 if self._fault_current else 1000)
+            plt.ylim(0.01, 100)
+            
+            # Add pickup current line
+            plt.axvline(x=self._pickup_current, color='green', linestyle='--', 
+                     label=f"Pickup: {self._pickup_current}A")
+            
+            # Add legend
+            plt.legend(loc='upper right')
+            
+            # Add equation and parameters as text
+            plt.figtext(0.5, 0.01, 
+                     f"Curve Type: {self._curve_type} | Pickup: {self._pickup_current}A | TDS: {self._time_dial}", 
+                     ha="center", fontsize=9, bbox={"facecolor":"lightblue", "alpha":0.2, "pad":5})
+            
+            # Save the figure
+            plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+            plt.savefig(filepath, dpi=150)
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating chart: {e}")
+            plt.close('all')  # Make sure to close figures on error
             return False

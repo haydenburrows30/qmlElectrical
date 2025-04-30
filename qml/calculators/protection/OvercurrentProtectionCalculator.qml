@@ -125,6 +125,20 @@ Item {
                     }
 
                     StyledButton {
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportToReport();
+                            }
+                        }
+                    }
+
+                    StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Information"
@@ -679,6 +693,11 @@ Item {
         }
     }
 
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
     Connections {
         target: calculator
         function onCalculationsComplete() {
@@ -697,6 +716,14 @@ Item {
                 spinPickup50Q.text = calculator.iPickup50Q.toFixed(1) + " A"
             }
             timeCurveGraph.updateCurves(calculator)
+        }
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
         }
     }
 }
