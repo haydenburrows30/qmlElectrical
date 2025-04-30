@@ -290,6 +290,23 @@ Popup {
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.Wrap
                     }
+                    Label {
+                        text: "1.4.0"
+                        font.pixelSize: 18
+                        font.bold: true
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.alignment: Qt.AlignTop
+                    }
+                
+                    Label {
+                        text: "New calculus, Fourier, Laplace & Z transform calculators. " +
+                               "PDF exports for most calculators."
+                        font.pixelSize: 14
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignLeft
+                        wrapMode: Text.Wrap
+                    }
                 }
             }
         }
