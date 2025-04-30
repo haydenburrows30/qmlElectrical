@@ -6,8 +6,8 @@ import os
 from datetime import datetime
 import matplotlib
 import numpy as np
-# Set non-interactive backend before importing pyplot
-matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from services.file_saver import FileSaver

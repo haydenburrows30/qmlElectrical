@@ -7,7 +7,7 @@ from utils.pdf.pdf_generator_grid_wind import PDFGenerator
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="transformer_line")
 
 class TransformerLineCalculator(QObject):

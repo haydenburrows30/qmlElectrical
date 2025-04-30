@@ -1,7 +1,5 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
 import tempfile
 import os
 from datetime import datetime

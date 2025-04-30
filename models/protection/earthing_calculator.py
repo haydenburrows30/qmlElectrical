@@ -1,8 +1,5 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
-import matplotlib.pyplot as plt
 import os
 import tempfile
 from datetime import datetime
@@ -10,7 +7,7 @@ from datetime import datetime
 from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="earthing")
 
 class EarthingCalculator(QObject):

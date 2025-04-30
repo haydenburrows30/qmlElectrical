@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 import gc
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 

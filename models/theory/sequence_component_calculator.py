@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from PySide6.QtCore import QObject, Signal, Slot, Property
 import logging

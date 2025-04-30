@@ -8,7 +8,6 @@ from .table_model import VoltageDropTableModel
 from utils.pdf.pdf_generator_volt_drop import PDFGenerator
 from services.voltage_drop_service import VoltageDropService
 
-# Setup component-specific logger (will now log to the shared log file)
 logger = configure_logger("qmltest", component="voltdrop")
 
 class VoltageDropCalculator(QObject):

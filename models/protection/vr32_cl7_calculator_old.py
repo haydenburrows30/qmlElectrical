@@ -7,7 +7,7 @@ from services.file_saver import FileSaver
 
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="vr32")
 
 class VR32CL7Calculator(QObject):

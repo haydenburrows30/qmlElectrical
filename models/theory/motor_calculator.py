@@ -7,8 +7,8 @@ from services.logger_config import configure_logger
 logger = configure_logger("qmltest", component="motor_calc")
 
 import matplotlib
-# Set non-interactive backend before importing pyplot
-matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import tempfile
 import os

@@ -1,6 +1,5 @@
-from PySide6.QtCore import QObject, Property, Signal, Slot, QPointF
+from PySide6.QtCore import QObject, Property, Signal, Slot
 import numpy as np
-import math
 
 class CalculusCalculator(QObject):
     """Calculator for demonstrating differentiation and integration concepts"""

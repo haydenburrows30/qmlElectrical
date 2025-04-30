@@ -7,7 +7,7 @@ from datetime import datetime
 from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="rlc")
 
 class RLCChart(QObject):

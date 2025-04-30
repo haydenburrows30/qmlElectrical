@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import tempfile
 import os

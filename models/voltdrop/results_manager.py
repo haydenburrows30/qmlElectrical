@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Dict, Any
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
 logger = configure_logger("qmltest", component="results_manager")
 
 @dataclass

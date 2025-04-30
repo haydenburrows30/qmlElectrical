@@ -4,7 +4,7 @@ import tempfile
 import os
 from datetime import datetime
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from services.file_saver import FileSaver

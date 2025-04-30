@@ -1,15 +1,10 @@
-import tempfile
-import os
 import io
 import matplotlib
-# Set non-interactive backend before importing pyplot
-matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool, Qt, Q_ARG
-
+from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool
 from datetime import datetime
 from .transform_worker import TransformCalculatorWorker
-
 from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 
@@ -299,8 +294,6 @@ class TransformCalculator(QObject):
         """
         try:
             from utils.pdf.pdf_generator_transform import TransformPdfGenerator
-            import io
-            import matplotlib.pyplot as plt
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             

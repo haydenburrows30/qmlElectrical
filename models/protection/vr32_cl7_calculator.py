@@ -11,7 +11,7 @@ from utils.pdf.pdf_generator_vr32cl7 import VR32CL7PdfGenerator
 from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="vr32cl7")
 
 class VR32CL7Calculator(QObject):

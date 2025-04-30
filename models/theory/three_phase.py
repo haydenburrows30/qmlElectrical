@@ -2,8 +2,8 @@ from PySide6.QtCore import Slot, Signal, Property, QObject, QPointF
 from PySide6.QtCharts import QXYSeries
 import numpy as np
 import matplotlib
-# Set non-interactive backend before importing pyplot
-matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 import tempfile

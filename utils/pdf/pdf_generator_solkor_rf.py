@@ -7,7 +7,7 @@ from reportlab.lib.units import mm
 
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="solkor_rf_pdf")
 
 class SolkorRfPdfGenerator:

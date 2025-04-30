@@ -6,7 +6,7 @@ from PySide6.QtCore import QObject, Signal, Slot, Property, QThread, QCoreApplic
 
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="file_saver")
 
 class FileSaver(QObject):

@@ -6,7 +6,7 @@ from scipy import signal
 from .transform_utils import PYWT_AVAILABLE
 
 from services.logger_config import configure_logger
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="z_transform_worker")
 
 # Try to import pywt only if it's available

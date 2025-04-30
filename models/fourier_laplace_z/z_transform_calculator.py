@@ -1,10 +1,8 @@
-import numpy as np
-from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool, Qt
+from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool
 from .z_transform_worker import ZTransformCalculatorWorker
 from .transform_utils import PYWT_AVAILABLE
 
 from services.logger_config import configure_logger
-# Setup component-specific logger
 logger = configure_logger("qmltest", component="z_transform_calculator")
 
 class ZTransformCalculator(QObject):

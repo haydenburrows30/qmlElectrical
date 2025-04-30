@@ -1,5 +1,3 @@
-import numpy as np
-
 # Try to import pywt, but provide fallback if not available
 try:
     import pywt

@@ -13,7 +13,7 @@ from services.file_saver import FileSaver
 from services.calculation_cache import CalculationCache, generate_cache_key
 from services.worker_pool_manager import WorkerPoolManager, ManagedWorker
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="harmonic_analysis")
 
 class CalculationWorker(ManagedWorker):

@@ -4,7 +4,7 @@ import matplotlib
 from matplotlib import rcParams
 
 # Configure matplotlib for rendering without LaTeX dependencies
-matplotlib.use("Agg")  # Use non-interactive backend
+matplotlib.use("Agg")
 
 # Use a simpler font configuration that avoids the Computer Modern Roman font
 rcParams['text.usetex'] = False  # Don't use real LaTeX

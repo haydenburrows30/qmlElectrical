@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import concurrent.futures
 import multiprocessing

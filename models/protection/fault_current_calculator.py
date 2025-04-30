@@ -1,8 +1,8 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
 import matplotlib
-# Set non-interactive backend before importing pyplot
-matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import tempfile
 import os
@@ -11,7 +11,7 @@ from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 import numpy as np
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="fault_current")
 
 class FaultCurrentCalculator(QObject):

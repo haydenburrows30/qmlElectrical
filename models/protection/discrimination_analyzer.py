@@ -4,14 +4,14 @@ import os
 import tempfile
 import numpy as np
 import matplotlib
-# Set non-interactive backend before importing pyplot
-matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import datetime
 from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 
-# Setup component-specific logger
+
 logger = configure_logger("qmltest", component="discrimination")
 
 from utils.pdf.pdf_generator_overcurrent import generate_pdf
