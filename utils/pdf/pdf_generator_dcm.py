@@ -6,7 +6,6 @@ from reportlab.lib.units import inch, cm
 import os
 import base64
 import io
-from PySide6.QtCore import QUrl
 import datetime
 
 # Add path to the cabinet image

@@ -32,7 +32,6 @@ Item {
 
         Component.onCompleted: {
             calculator.updateComparisons()
-            console.log(mainLayout.height)
         }
     }
 

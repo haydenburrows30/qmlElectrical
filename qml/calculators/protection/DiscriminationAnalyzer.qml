@@ -21,15 +21,6 @@ Item {
     property string applicationDirPath: Qt.application.directoryPath || "."
     property bool isDestructing: false  // Add this flag to track destruction
     
-    Component.onDestruction: {
-        console.log("DiscriminationAnalyzer component is being destroyed")
-        isDestructing = true
-        
-        if (calculator) {
-            // Any specific cleanup needed for the calculator
-        }
-    }
-    
     function safeCalculatorProperty(propertyName, defaultValue) {
         if (isDestructing || !calculator) return defaultValue
         return calculator[propertyName]

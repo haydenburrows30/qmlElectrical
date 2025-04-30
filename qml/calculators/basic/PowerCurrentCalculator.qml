@@ -74,13 +74,6 @@ Item {
                     exportChoiceDialog.open()
                 }
             }
-
-            // StyledButton {
-            //     id: helpButton
-            //     icon.source: "../../../icons/rounded/info.svg"
-            //     ToolTip.text: "Help"
-            //     onClicked: popUpText.open()
-            // }
         }
 
         RowLayout {
@@ -230,19 +223,6 @@ Item {
                                     clipboardHelper.text = currentOutput.text
                                     clipboardHelper.selectAll()
                                     clipboardHelper.copy()
-                                }
-                            }
-                        }
-
-                        // Add PDF export button for transformer calculator
-                        StyledButton {
-                            Layout.preferredWidth: 40
-                            ToolTip.text: "Export to PDF"
-                            ToolTip.visible: hovered
-                            icon.source: "../../../icons/rounded/download.svg"
-                            onClicked: {
-                                if (calculator) {
-                                    calculator.exportReport()
                                 }
                             }
                         }
@@ -458,25 +438,6 @@ Item {
                                 clipboardHelper.text = kvaOutput.text
                                 clipboardHelper.selectAll()
                                 clipboardHelper.copy()
-                            }
-                        }
-                    }
-
-                    // Add export button in a new row at the bottom
-                    RowLayout {
-                        Layout.columnSpan: 3
-                        Layout.topMargin: 10
-                        Layout.alignment: Qt.AlignRight
-                        
-                        StyledButton {
-                            text: "Export to PDF"
-                            icon.source: "../../../icons/rounded/download.svg"
-                            ToolTip.text: "Export power calculation to PDF"
-                            ToolTip.visible: hovered
-                            onClicked: {
-                                if (calculator1) {
-                                    calculator1.exportReport()
-                                }
                             }
                         }
                     }

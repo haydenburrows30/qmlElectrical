@@ -11,7 +11,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-import tempfile
 
 from services.logger_config import configure_logger
 logger = configure_logger("qmltest", component="sequence_pdf")
