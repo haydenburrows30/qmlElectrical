@@ -40,6 +40,10 @@ Item {
         heightFactor: 0.7
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -69,6 +73,20 @@ Item {
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+
+                    StyledButton {
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportMachineReport()
+                            }
+                        }
                     }
 
                     StyledButton {
@@ -381,6 +399,18 @@ Item {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    Connections {
+        target: calculator
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

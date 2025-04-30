@@ -62,6 +62,21 @@ Page {
                     }
 
                     StyledButton {
+                        ToolTip.text: "Export results to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportToPdf()
+                            }
+                        }
+                    }
+
+                    StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Information"
@@ -278,6 +293,20 @@ Page {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    Connections {
+        target: calculator
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                // Show success message
+                console.log("PDF export successful:", message)
+            } else {
+                // Show error message
+                console.error("PDF export failed:", message)
             }
         }
     }

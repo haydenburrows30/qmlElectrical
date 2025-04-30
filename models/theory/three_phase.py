@@ -1,7 +1,17 @@
 from PySide6.QtCore import Slot, Signal, Property, QObject, QPointF
 from PySide6.QtCharts import QXYSeries
-
 import numpy as np
+import matplotlib
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+import matplotlib.pyplot as plt
+import os
+import tempfile
+from datetime import datetime
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+
+logger = configure_logger("qmltest", component="three_phase")
 
 class ThreePhaseSineWaveModel(QObject):
     """Three-phase sine wave generator and calculator.
@@ -12,6 +22,7 @@ class ThreePhaseSineWaveModel(QObject):
 
     Signals:
         dataChanged: Emitted when any waveform parameters are updated
+        pdfExportStatusChanged: Emitted when PDF export status changes
 
     Properties:
         frequency (float): Wave frequency in Hz
@@ -20,7 +31,8 @@ class ThreePhaseSineWaveModel(QObject):
     """
 
     dataChanged = Signal()
-    
+    pdfExportStatusChanged = Signal(bool, str)
+
     def __init__(self):
         """Initialize the three-phase sine wave model with default values."""
         super().__init__()
@@ -58,6 +70,12 @@ class ThreePhaseSineWaveModel(QObject):
         self._apparent_power = 0.0
         self._reactive_power = 0.0
         self.update_wave()
+
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
     @Slot(QXYSeries,QXYSeries,QXYSeries)
     def fill_series(self, seriesA,seriesB,seriesC):
@@ -539,3 +557,238 @@ class ThreePhaseSineWaveModel(QObject):
         
         # Convert all numpy arrays to Python lists
         return [time_ms.tolist(), phase_a.tolist(), phase_b.tolist(), phase_c.tolist()]
+
+    @Slot()
+    def exportToPdf(self):
+        """Export three-phase analysis results to PDF"""
+        try:
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"three_phase_report_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart images
+            temp_dir = tempfile.mkdtemp()
+            waveform_chart_path = os.path.join(temp_dir, "waveform_chart.png")
+            phasor_chart_path = os.path.join(temp_dir, "phasor_chart.png")
+            
+            # Generate matplotlib charts
+            self._generate_waveform_chart(waveform_chart_path)
+            self._generate_phasor_chart(phasor_chart_path)
+            
+            # Calculate voltage and current unbalance
+            voltage_unbalance = (self.negativeSeq / self.positiveSeq * 100) if self.positiveSeq > 0 else 0
+            current_unbalance = (self.negativeSeqCurrent / self.positiveSeqCurrent * 100) if self.positiveSeqCurrent > 0 else 0
+            
+            # Prepare data for PDF generator
+            data = {
+                'frequency': self._frequency,
+                'three_wire': True,  # Assumed to be a three-wire system
+                'rms_a': self._rms_a,
+                'rms_b': self._rms_b,
+                'rms_c': self._rms_c,
+                'peak_a': self._peak_a,
+                'peak_b': self._peak_b,
+                'peak_c': self._peak_c,
+                'current_a': self._currentA,
+                'current_b': self._currentB,
+                'current_c': self._currentC,
+                'phase_angle_a': self._phase_angle_a,
+                'phase_angle_b': self._phase_angle_b,
+                'phase_angle_c': self._phase_angle_c,
+                'current_angle_a': self._current_angle_a,
+                'current_angle_b': self._current_angle_b,
+                'current_angle_c': self._current_angle_c,
+                'rms_ab': self._rms_ab,
+                'rms_bc': self._rms_bc,
+                'rms_ca': self._rms_ca,
+                'positive_seq': self.positiveSeq,
+                'negative_seq': self.negativeSeq,
+                'zero_seq': self.zeroSeq,
+                'positive_seq_current': self.positiveSeqCurrent,
+                'negative_seq_current': self.negativeSeqCurrent,
+                'zero_seq_current': self.zeroSeqCurrent,
+                'voltage_unbalance': voltage_unbalance,
+                'current_unbalance': current_unbalance,
+                'active_power': self.activePower,
+                'reactive_power': self.reactivePower,
+                'apparent_power': self.apparentPower,
+                'power_factor_a': self.powerFactorA,
+                'power_factor_b': self.powerFactorB,
+                'power_factor_c': self.powerFactorC,
+                'avg_power_factor': self.averagePowerFactor,
+                'thd': self.thd * 100,  # Convert to percentage
+                'waveform_chart_path': waveform_chart_path if os.path.exists(waveform_chart_path) else None,
+                'phasor_chart_path': phasor_chart_path if os.path.exists(phasor_chart_path) else None
+            }
+            
+            # Generate PDF using the specialized ThreePhasePdfGenerator
+            from utils.pdf.pdf_generator_three_phase import ThreePhasePdfGenerator
+            pdf_generator = ThreePhasePdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(waveform_chart_path):
+                    os.unlink(waveform_chart_path)
+                if os.path.exists(phasor_chart_path):
+                    os.unlink(phasor_chart_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting three-phase report: {str(e)}"
+            logger.error(error_msg)
+            # Send error to QML
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+    
+    def _generate_waveform_chart(self, filepath):
+        """Generate a waveform chart using matplotlib and save to file
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure
+            plt.figure(figsize=(10, 6))
+            
+            # Generate time array for one full cycle at current frequency
+            omega = 2 * np.pi * self._frequency
+            t = np.linspace(0, 1/self._frequency, 1000)
+            
+            # Calculate waveforms
+            wave_a = self._amplitudeA * np.sin(omega * t + np.radians(self._phase_angle_a))
+            wave_b = self._amplitudeB * np.sin(omega * t + np.radians(self._phase_angle_b))
+            wave_c = self._amplitudeC * np.sin(omega * t + np.radians(self._phase_angle_c))
+            
+            # Plot waveforms
+            plt.plot(t * 1000, wave_a, 'r-', linewidth=2, label=f'Phase A: {self._phase_angle_a}°')
+            plt.plot(t * 1000, wave_b, 'g-', linewidth=2, label=f'Phase B: {self._phase_angle_b}°')
+            plt.plot(t * 1000, wave_c, 'b-', linewidth=2, label=f'Phase C: {self._phase_angle_c}°')
+            
+            # Set labels and title
+            plt.title('Three-Phase Voltage Waveforms')
+            plt.xlabel('Time (ms)')
+            plt.ylabel('Voltage (V)')
+            plt.grid(True)
+            plt.legend()
+            
+            # Add system info
+            plt.figtext(0.5, 0.01, 
+                      f"Frequency: {self._frequency} Hz | RMS Values: A={self._rms_a:.1f}V, B={self._rms_b:.1f}V, C={self._rms_c:.1f}V", 
+                      ha="center", fontsize=9, bbox={"facecolor":"lightblue", "alpha":0.2, "pad":5})
+            
+            # Save the figure
+            plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+            plt.savefig(filepath, dpi=150)
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating waveform chart: {e}")
+            plt.close('all')  # Make sure to close figures on error
+            return False
+    
+    def _generate_phasor_chart(self, filepath):
+        """Generate a phasor diagram using matplotlib and save to file
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure
+            plt.figure(figsize=(8, 8))
+            ax = plt.subplot(111, projection='polar')
+            
+            # Convert angles from degrees to radians
+            angle_a_rad = np.radians(self._phase_angle_a)
+            angle_b_rad = np.radians(self._phase_angle_b)
+            angle_c_rad = np.radians(self._phase_angle_c)
+            
+            current_angle_a_rad = np.radians(self._current_angle_a)
+            current_angle_b_rad = np.radians(self._current_angle_b)
+            current_angle_c_rad = np.radians(self._current_angle_c)
+            
+            # Normalize magnitudes for better visualization
+            v_mag = max(self._rms_a, self._rms_b, self._rms_c)
+            i_mag = max(self._currentA, self._currentB, self._currentC)
+            
+            v_scale = 1.0
+            i_scale = 0.7 * v_mag / i_mag if i_mag > 0 else 0.5  # Scale current to 70% of voltage magnitude
+            
+            # Plot voltage phasors
+            ax.quiver(0, 0, angle_a_rad, self._rms_a * v_scale, angles='xy', scale_units='xy', scale=1, color='r', 
+                     width=0.005, label=f'Va: {self._rms_a:.1f}V ∠{self._phase_angle_a}°')
+            ax.quiver(0, 0, angle_b_rad, self._rms_b * v_scale, angles='xy', scale_units='xy', scale=1, color='g', 
+                     width=0.005, label=f'Vb: {self._rms_b:.1f}V ∠{self._phase_angle_b}°')
+            ax.quiver(0, 0, angle_c_rad, self._rms_c * v_scale, angles='xy', scale_units='xy', scale=1, color='b', 
+                     width=0.005, label=f'Vc: {self._rms_c:.1f}V ∠{self._phase_angle_c}°')
+            
+            # Plot current phasors with dashed lines
+            ax.quiver(0, 0, current_angle_a_rad, self._currentA * i_scale, angles='xy', scale_units='xy', scale=1, 
+                     color='r', width=0.005, alpha=0.7, linestyle='--', 
+                     label=f'Ia: {self._currentA:.1f}A ∠{self._current_angle_a}°')
+            ax.quiver(0, 0, current_angle_b_rad, self._currentB * i_scale, angles='xy', scale_units='xy', scale=1, 
+                     color='g', width=0.005, alpha=0.7, linestyle='--', 
+                     label=f'Ib: {self._currentB:.1f}A ∠{self._current_angle_b}°')
+            ax.quiver(0, 0, current_angle_c_rad, self._currentC * i_scale, angles='xy', scale_units='xy', scale=1, 
+                     color='b', width=0.005, alpha=0.7, linestyle='--', 
+                     label=f'Ic: {self._currentC:.1f}A ∠{self._current_angle_c}°')
+            
+            # Customize the plot
+            ax.set_title('Voltage and Current Phasors')
+            ax.set_theta_zero_location('E')  # 0 degrees at the right
+            ax.set_theta_direction(-1)  # Clockwise rotation
+            ax.grid(True)
+            
+            # Add legend outside the plot area
+            plt.legend(loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=3)
+            
+            # Save the figure
+            plt.tight_layout()
+            plt.savefig(filepath, dpi=150, bbox_inches='tight')
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating phasor chart: {e}")
+            plt.close('all')  # Make sure to close figures on error
+            return False

@@ -126,6 +126,16 @@ Item {
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                     }
+                    
+                    StyledButton {
+                        text: "Export to PDF"
+                        icon.source: "../../../icons/rounded/description.svg"
+                        Layout.fillWidth: true
+                        onClicked: calculator.exportToPDF()
+                        ToolTip.text: "Export harmonic analysis to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                    }
                 }
             }
 

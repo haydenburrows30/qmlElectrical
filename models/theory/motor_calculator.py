@@ -6,6 +6,13 @@ from services.file_saver import FileSaver
 from services.logger_config import configure_logger
 logger = configure_logger("qmltest", component="motor_calc")
 
+import matplotlib
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+import matplotlib.pyplot as plt
+import tempfile
+import os
+
 class MotorCalculator(QObject):
     """Calculator for motor starting characteristics"""
 
@@ -612,3 +619,88 @@ class MotorCalculator(QObject):
     @Slot(result=str)
     def getStartingRecommendations(self):
         return self.startingRecommendations
+
+    @Slot()
+    def exportPdfReport(self):
+        """Export motor starting results to PDF file."""
+        try:
+            # Create a timestamp for the filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"motor_starting_report_{timestamp}")
+            if not pdf_file:
+                self.exportDataToFolderCompleted.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up filepath
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "motor_starting_chart.png")
+            
+            # Create comparison data if available
+            comparison_data = []
+            
+            # Prepare data for PDF
+            data = {
+                'motor_type': self._motor_type,
+                'motor_power': self._motor_power,
+                'voltage': self._voltage,
+                'efficiency': self._efficiency,
+                'power_factor': self._power_factor,
+                'starting_method': self._starting_method,
+                'motor_speed': self._motor_speed,
+                'full_load_current': self._full_load_current,
+                'starting_current': self._starting_current,
+                'current_multiplier': self._current_multipliers.get(self._motor_type, {}).get(self._starting_method, 6.0),
+                'nominal_torque': self._nominal_torque,
+                'starting_torque': self._starting_torque,
+                'temperature_rise': self.estimateTemperatureRise(),
+                'start_duration': self.estimateStartDuration(),
+                'energy_usage': self.calculateStartingEnergy(),
+                'cable_size': self.recommendCableSize(),
+                'recommendations': self.getStartingRecommendations(),
+                'duty_cycle': self._duty_cycle,
+                'ambient_temperature': self._ambient_temperature,
+                'starting_duration': self._starting_duration,
+                'comparison_data': comparison_data,
+                'chart_image_path': chart_image_path
+            }
+            
+            # Generate chart image using matplotlib
+            from utils.pdf.pdf_generator_motor import MotorPdfGenerator
+            pdf_generator = MotorPdfGenerator()
+            
+            # Generate the starting chart
+            pdf_generator.generate_starting_chart(data, chart_image_path)
+            
+            # Generate the PDF
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.unlink(chart_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting PDF report: {str(e)}"
+            logger.error(error_msg)
+            self.exportDataToFolderCompleted.emit(False, error_msg)
+            return False

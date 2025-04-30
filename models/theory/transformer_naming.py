@@ -1,4 +1,16 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+import tempfile
+import os
+import numpy as np
+from datetime import datetime
+
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+
+logger = configure_logger("qmltest", component="transformer_naming")
 
 class TransformerNamingGuide(QObject):
     """Model for transformer naming conventions"""
@@ -17,6 +29,7 @@ class TransformerNamingGuide(QObject):
     applicationChanged = Signal()
     installationChanged = Signal()
     thermalRatingChanged = Signal()
+    pdfExportStatusChanged = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -76,7 +89,13 @@ class TransformerNamingGuide(QObject):
         
         # Generate initial name
         self._generate_name()
-    
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
+
     def _generate_name(self):
         """Generate transformer name based on selected parameters"""
         try:
@@ -167,6 +186,253 @@ class TransformerNamingGuide(QObject):
         except Exception as e:
             self._error_message = f"Error generating name: {str(e)}"
             self.errorMessageChanged.emit()
+    
+    @Slot()
+    def exportToPdf(self):
+        """Export the transformer naming guide to a PDF file
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"transformer_naming_guide_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for diagram images
+            temp_dir = tempfile.mkdtemp()
+            diagram_path = os.path.join(temp_dir, "transformer_diagram.png")
+            
+            # Generate diagram image using matplotlib
+            self._generate_diagram(diagram_path)
+            
+            # Prepare data for PDF
+            names = {}
+            for std in ["IEC", "ANSI", "ABB", "Siemens"]:
+                if self._transformer_type == "CT":
+                    iec_params = {
+                        "type": self._transformer_type,
+                        "ratio": f"{self._rated_current}/{self._secondary_rating}",
+                        "accuracy_class": self._accuracy_class,
+                        "burden": self._burden,
+                        "insulation": self._insulation_level,
+                        "application": self._application.capitalize(),
+                        "thermal": self._thermal_rating,
+                        "installation": self._installation.capitalize(),
+                        "frequency": self._frequency
+                    }
+                else:  # VT
+                    iec_params = {
+                        "type": self._transformer_type,
+                        "ratio": f"{self._rated_voltage}/{self._secondary_rating}",
+                        "accuracy_class": self._accuracy_class,
+                        "burden": self._burden,
+                        "insulation": self._insulation_level,
+                        "application": self._application.capitalize(),
+                        "thermal": self._thermal_rating,
+                        "installation": self._installation.capitalize(),
+                        "frequency": self._frequency
+                    }
+                names[std] = self._naming_formats[std][self._transformer_type].format(**iec_params)
+            
+            data = {
+                'transformer_type': self._transformer_type,
+                'primary_rating': self._rated_current if self._transformer_type == "CT" else self._rated_voltage,
+                'secondary_rating': self._secondary_rating,
+                'accuracy_class': self._accuracy_class,
+                'burden': self._burden,
+                'insulation_level': self._insulation_level,
+                'application': self._application,
+                'installation': self._installation,
+                'frequency': self._frequency,
+                'thermal_rating': self._thermal_rating,
+                'diagram_path': diagram_path if os.path.exists(diagram_path) else None,
+                'naming_standards': names,
+                'description': self._description.replace('<br>', '\n').replace('<b>', '').replace('</b>', '')
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_transformer_naming import TransformerNamingPdfGenerator
+            pdf_generator = TransformerNamingPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(diagram_path):
+                    os.unlink(diagram_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error exporting to PDF: {str(e)}"
+            logger.error(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False
+    
+    def _generate_diagram(self, filepath):
+        """Generate a diagram of the transformer using matplotlib
+        
+        Args:
+            filepath: Path to save the diagram image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure
+            plt.figure(figsize=(10, 8))
+            
+            # Set up the plot area
+            ax = plt.subplot(1, 1, 1)
+            
+            # Draw different diagrams based on transformer type
+            if self._transformer_type == "CT":
+                self._draw_ct_diagram(ax)
+            else:
+                self._draw_vt_diagram(ax)
+            
+            # Set title
+            plt.title(f"{self._transformer_type} - {self._rated_current if self._transformer_type == 'CT' else self._rated_voltage}/{self._secondary_rating} - {self._accuracy_class} - {self._burden}VA", fontsize=14)
+            
+            # Remove axis ticks
+            plt.axis('off')
+            
+            # Add key parameters as text
+            info_text = [
+                f"{'Current' if self._transformer_type == 'CT' else 'Voltage'} Transformer ({self._transformer_type})",
+                f"Ratio: {self._rated_current if self._transformer_type == 'CT' else self._rated_voltage}/{self._secondary_rating}",
+                f"Accuracy Class: {self._accuracy_class}",
+                f"Burden: {self._burden} VA",
+                f"Insulation Level: {self._insulation_level} kV",
+                f"Application: {self._application.capitalize()}",
+                f"Installation: {self._installation.capitalize()}",
+                f"Frequency: {self._frequency} Hz",
+                f"Thermal Rating: {self._thermal_rating}x"
+            ]
+            
+            plt.figtext(0.5, 0.05, '\n'.join(info_text), ha='center', fontsize=12, 
+                       bbox={'facecolor': 'lightblue', 'alpha': 0.3, 'pad': 10})
+            
+            # Save the figure
+            plt.tight_layout(rect=[0, 0.15, 1, 0.95])
+            plt.savefig(filepath, dpi=150)
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating diagram: {e}")
+            plt.close('all')  # Make sure to close figures on error
+            return False
+    
+    def _draw_ct_diagram(self, ax):
+        """Draw a Current Transformer diagram
+        
+        Args:
+            ax: Matplotlib axis to draw on
+        """
+        # Primary conductor
+        ax.plot([-3, 3], [2, 2], 'k-', linewidth=4)
+        ax.text(-3.5, 2, "Primary", fontsize=12)
+        ax.text(3.2, 2, f"{self._rated_current}A", fontsize=12)
+        
+        # Core
+        circle = plt.Circle((0, 0), 1.5, fill=False, linewidth=2, color='blue')
+        ax.add_patch(circle)
+        
+        # Secondary winding
+        for i in range(0, 360, 40):
+            angle = i * 3.14159 / 180
+            x = 1.5 * 0.8 * np.cos(angle)
+            y = 1.5 * 0.8 * np.sin(angle)
+            rect = plt.Rectangle((x-0.2, y-0.2), 0.4, 0.4, angle=i, fc='orange', ec='k')
+            ax.add_patch(rect)
+        
+        # Secondary terminals
+        ax.plot([-2, -1.5], [-2, -1.5], 'k-', linewidth=2)
+        ax.plot([2, 1.5], [-2, -1.5], 'k-', linewidth=2)
+        
+        # Load
+        ax.plot([-2, 2], [-2, -2], 'k-', linewidth=2)
+        rectangle = plt.Rectangle((-1, -2.5), 2, 1, fc='green', alpha=0.3, ec='k')
+        ax.add_patch(rectangle)
+        ax.text(0, -2.3, f"Burden\n{self._burden}VA", ha='center', fontsize=10)
+        
+        # Secondary current
+        ax.text(0, -3.2, f"Secondary: {self._secondary_rating}A", ha='center', fontsize=12)
+        
+        # Set view limits
+        ax.set_xlim(-4, 4)
+        ax.set_ylim(-4, 3)
+    
+    def _draw_vt_diagram(self, ax):
+        """Draw a Voltage Transformer diagram
+        
+        Args:
+            ax: Matplotlib axis to draw on
+        """
+        # Primary side
+        ax.plot([-3, -1], [2, 2], 'k-', linewidth=2)
+        ax.plot([-3, -1], [-2, -2], 'k-', linewidth=2)
+        ax.text(-3.5, 2, "Primary", fontsize=12)
+        ax.text(-3.5, -2, f"{self._rated_voltage}V", fontsize=12)
+        
+        # Transformer core
+        rect = plt.Rectangle((-0.75, -1.5), 1.5, 3, fc='gray', alpha=0.3, ec='k')
+        ax.add_patch(rect)
+        
+        # Primary winding
+        for i in range(-1, 2, 1):
+            circ = plt.Circle((-0.75, i), 0.4, fc='red', alpha=0.3, ec='k')
+            ax.add_patch(circ)
+            ax.text(-0.75, i, "P", ha='center', va='center', fontsize=10)
+        
+        # Secondary winding
+        for i in range(-1, 2, 1):
+            circ = plt.Circle((0.75, i), 0.4, fc='blue', alpha=0.3, ec='k')
+            ax.add_patch(circ)
+            ax.text(0.75, i, "S", ha='center', va='center', fontsize=10)
+        
+        # Secondary side
+        ax.plot([1, 3], [2, 2], 'k-', linewidth=2)
+        ax.plot([1, 3], [-2, -2], 'k-', linewidth=2)
+        ax.text(3.2, 2, "Secondary", fontsize=12)
+        ax.text(3.2, -2, f"{self._secondary_rating}V", fontsize=12)
+        
+        # Load
+        rect = plt.Rectangle((2, -1.5), 1, 3, fc='green', alpha=0.3, ec='k')
+        ax.add_patch(rect)
+        ax.text(2.5, 0, f"Burden\n{self._burden}VA", ha='center', fontsize=10)
+        
+        # Set view limits
+        ax.set_xlim(-4, 4)
+        ax.set_ylim(-3, 3)
     
     @Property(str, notify=outputNameChanged)
     def outputName(self):

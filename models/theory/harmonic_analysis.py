@@ -5,6 +5,8 @@ import numpy as np
 import math
 import time
 from datetime import datetime
+import os
+import tempfile
 
 from services.logger_config import configure_logger
 from services.file_saver import FileSaver
@@ -121,6 +123,7 @@ class HarmonicAnalysisCalculator(QObject):
     calculationStatusChanged = Signal()
     calculationProgressChanged = Signal(float)
     exportDataToFolderCompleted = Signal(bool, str)  # New signal for export completion
+    pdfExportStatusChanged = Signal(bool, str)  # Signal for PDF export status
 
     def __init__(self, parent=None):
         """Initialize the calculator."""
@@ -731,6 +734,114 @@ class HarmonicAnalysisCalculator(QObject):
             logger.error(error_message)
             logger.exception(e)
             self.exportDataToFolderCompleted.emit(False, error_message)
+            return False
+
+    @Slot(result=bool)
+    def exportToPDF(self):
+        """Export harmonic analysis results to PDF
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"harmonics_analysis_{timestamp}")
+            if not pdf_file:
+                self.exportDataToFolderCompleted.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart images
+            temp_dir = tempfile.mkdtemp()
+            waveform_chart_path = os.path.join(temp_dir, "waveform_chart.png")
+            spectrum_chart_path = os.path.join(temp_dir, "spectrum_chart.png")
+            
+            # Check if we have cached values or need to calculate
+            if not self._waveform:
+                logger.warning("No waveform data available, recalculating...")
+                # This shouldn't typically be needed, but as a fallback
+                self._calculate()
+            
+            # Import PDF generator
+            from utils.pdf.pdf_generator_harmonics import HarmonicsPdfGenerator
+            pdf_generator = HarmonicsPdfGenerator()
+            
+            # Generate charts first
+            show_fundamental = True  # Always show fundamental in PDF export for clarity
+            
+            # Prepare data for waveform chart
+            waveform_data = {
+                'waveform_points': self._waveform_points,
+                'fundamental_points': self._fundamental_points,
+                'show_fundamental': show_fundamental,
+                'thd': self._thd,
+                'crest_factor': self._cf,
+                'form_factor': self._ff
+            }
+            
+            # Generate waveform chart
+            waveform_success = pdf_generator.generate_waveform_chart(waveform_data, waveform_chart_path)
+            
+            # Prepare data for spectrum chart
+            spectrum_data = {
+                'harmonic_orders': [1, 3, 5, 7, 11, 13],  # Standard orders for display
+                'individual_distortion': self._individual_distortion,
+                'harmonic_phases': self._harmonic_phases,
+                'show_phases': True,  # Always show phases in PDF export
+                'thd': self._thd
+            }
+            
+            # Generate spectrum chart
+            spectrum_success = pdf_generator.generate_spectrum_chart(spectrum_data, spectrum_chart_path)
+            
+            # Prepare data for PDF generation
+            pdf_data = {
+                'thd': self._thd,
+                'crest_factor': self._cf,
+                'form_factor': self._ff,
+                'harmonic_orders': [1, 3, 5, 7, 11, 13],
+                'individual_distortion': self._individual_distortion,
+                'harmonic_phases': self._harmonic_phases,
+                'waveform_image_path': waveform_chart_path if waveform_success and os.path.exists(waveform_chart_path) else None,
+                'spectrum_image_path': spectrum_chart_path if spectrum_success and os.path.exists(spectrum_chart_path) else None
+            }
+            
+            # Generate PDF
+            success = pdf_generator.generate_report(pdf_data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(waveform_chart_path):
+                    os.unlink(waveform_chart_path)
+                if os.path.exists(spectrum_chart_path):
+                    os.unlink(spectrum_chart_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temporary files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting PDF: {str(e)}"
+            logger.error(error_msg)
+            # Send error to QML via signal
+            self.exportDataToFolderCompleted.emit(False, error_msg)
             return False
 
     @Slot()

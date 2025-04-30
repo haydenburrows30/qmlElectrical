@@ -1,5 +1,12 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import tempfile
+import os
+from datetime import datetime
+
+from services.file_saver import FileSaver
 
 class MachineCalculator(QObject):
     """Calculator for electric machine characteristics"""
@@ -22,6 +29,7 @@ class MachineCalculator(QObject):
     coolingMethodChanged = Signal()
     coolingMethodsChanged = Signal()  # Add new signal
     temperatureClassesChanged = Signal()  # Add new signal
+    pdfExportStatusChanged = Signal(bool, str)  # Add new signal for PDF export status
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,6 +65,12 @@ class MachineCalculator(QObject):
         # Input mode
         self._input_mode = "VC"  # Voltage and Current input mode by default
                                  # Alternative: "VP" for Voltage and Power input
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         # Calculate initial values
         self._calculate()
@@ -437,3 +451,98 @@ class MachineCalculator(QObject):
     @Slot()
     def calculate(self):
         self._calculate()
+    
+    @Slot()
+    def exportMachineReport(self):
+        """Export machine calculations to PDF"""
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"machine_report_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart images
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "torque_speed_curve.png")
+            temp_image = True
+            
+            # Import the PDF generator here to avoid circular imports
+            from utils.pdf.pdf_generator_machine import MachinePdfGenerator
+            pdf_generator = MachinePdfGenerator()
+            
+            # Generate the torque-speed curve chart
+            pdf_generator.generate_torque_speed_curve({
+                'machine_type': self._machine_type,
+                'rotational_speed': self._rotational_speed,
+                'torque': self._torque,
+                'starting_torque': self._starting_torque,
+                'breakdown_torque': self._breakdown_torque,
+                'rated_power': self._rated_power,
+                'efficiency': self._efficiency,
+                'slip': self._slip
+            }, chart_image_path)
+            
+            # Prepare data for PDF
+            max_allowed_temp = self._temperature_classes.get(self._temperature_class, 155)
+            
+            data = {
+                'machine_type': self._machine_type,
+                'rated_voltage': self._rated_voltage,
+                'rated_current': self._rated_current,
+                'rated_power': self._rated_power,
+                'power_factor': self._power_factor,
+                'efficiency': self._efficiency,
+                'poles': self._poles,
+                'frequency': self._frequency,
+                'rotational_speed': self._rotational_speed,
+                'slip': self._slip,
+                'torque': self._torque,
+                'starting_torque': self._starting_torque,
+                'breakdown_torque': self._breakdown_torque,
+                'pullup_torque': self._pullup_torque,
+                'losses': self._losses,
+                'temperature_rise': self._temperature_rise,
+                'temperature_class': self._temperature_class,
+                'cooling_method': self._cooling_method,
+                'ambient_temp': self._ambient_temp,
+                'max_allowed_temp': max_allowed_temp,
+                'chart_image_path': chart_image_path if os.path.exists(chart_image_path) else None
+            }
+            
+            # Generate PDF
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            if temp_image and os.path.exists(chart_image_path):
+                try:
+                    os.unlink(chart_image_path)
+                    os.rmdir(temp_dir)
+                except Exception as e:
+                    print(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting report: {str(e)}"
+            print(error_msg)
+            # Send error to QML
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False

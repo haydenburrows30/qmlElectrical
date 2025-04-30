@@ -244,6 +244,17 @@ Item {
                     }
                     
                     StyledButton {
+                        id: exportPdfButton
+                        icon.source: "../../../icons/rounded/picture_as_pdf.svg"
+                        enabled: hasValidInputs && calculator.startingCurrent > 0
+                        onClicked: calculator.exportPdfReport()
+
+                        ToolTip.text: "Export report to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                    }
+                    
+                    StyledButton {
                         id: compareButton
                         icon.source: "../../../icons/rounded/compare.svg"
                         enabled: hasValidInputs
