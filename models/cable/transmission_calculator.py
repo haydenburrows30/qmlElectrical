@@ -1,6 +1,19 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import cmath
 import math
+import tempfile
+import os
+from datetime import datetime
+import matplotlib
+import numpy as np
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+import matplotlib.pyplot as plt
+
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+
+logger = configure_logger("qmltest", component="transmission_line")
 
 class TransmissionLineCalculator(QObject):
     # Define signals
@@ -17,6 +30,9 @@ class TransmissionLineCalculator(QObject):
     temperatureChanged = Signal()
     earthResistivityChanged = Signal()
     silCalculated = Signal()
+
+    # Add export status signal
+    exportComplete = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -50,6 +66,12 @@ class TransmissionLineCalculator(QObject):
         self._skin_factor = 1.0
         self._sil = 0.0  # Surge impedance loading
         self._earth_impedance = complex(0, 0)
+
+        # Initialize file saver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
 
         self._calculate()
 
@@ -176,6 +198,165 @@ class TransmissionLineCalculator(QObject):
             
         except Exception as e:
             print(f"Error in transmission line calculation: {e}")
+
+    @Slot()
+    def exportReport(self):
+        """Export transmission line analysis to PDF"""
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"transmission_line_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "transmission_line_viz.png")
+            
+            # Generate chart using matplotlib
+            self._generate_visualization_chart(chart_image_path)
+            
+            # Prepare data for PDF
+            data = {
+                'length': self._length,
+                'resistance': self._resistance,
+                'inductance': self._inductance,
+                'capacitance': self._capacitance,
+                'conductance': self._conductance,
+                'frequency': self._frequency,
+                'nominal_voltage': self._nominal_voltage,
+                'sub_conductors': self._sub_conductors,
+                'bundle_spacing': self._bundle_spacing,
+                'conductor_gmr': self._conductor_gmr,
+                'conductor_temperature': self._conductor_temperature,
+                'earth_resistivity': self._earth_resistivity,
+                'z_magnitude': abs(self._Z),
+                'z_angle': math.degrees(cmath.phase(self._Z)),
+                'alpha': self._alpha,
+                'beta': self._beta,
+                'sil': self._sil,
+                'a_magnitude': abs(self._A),
+                'a_angle': math.degrees(cmath.phase(self._A)),
+                'b_magnitude': abs(self._B),
+                'b_angle': math.degrees(cmath.phase(self._B)),
+                'c_magnitude': abs(self._C),
+                'c_angle': math.degrees(cmath.phase(self._C)),
+                'd_magnitude': abs(self._D),
+                'd_angle': math.degrees(cmath.phase(self._D)),
+                'chart_image_path': chart_image_path if os.path.exists(chart_image_path) else None
+            }
+            
+            # Generate PDF
+            from utils.pdf.pdf_generator_transmission import TransmissionPdfGenerator
+            pdf_generator = TransmissionPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.unlink(chart_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False
+    
+    def _generate_visualization_chart(self, filepath):
+        """Generate transmission line visualization chart
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure
+            plt.figure(figsize=(10, 6))
+            
+            # Calculate points for voltage and current profiles along the line
+            x_points = np.linspace(0, self._length, 100)
+            voltage_profile = []
+            current_profile = []
+            
+            # Calculate A, B, C, D parameters for varying lengths
+            for x in x_points:
+                gamma_x = self._gamma * x
+                a = cmath.cosh(gamma_x)
+                b = self._Z * cmath.sinh(gamma_x)
+                c = cmath.sinh(gamma_x) / self._Z
+                d = a  # D = A for symmetrical lines
+                
+                # Use simplified model with normalized voltage and current
+                v_ratio = abs(a)  # |V_sending/V_receiving| assuming I_r = 0
+                i_ratio = abs(c * 1.0)  # |I_sending| with normalized V_r
+                
+                voltage_profile.append(v_ratio)
+                current_profile.append(i_ratio)
+            
+            # Plot voltage and current profiles
+            plt.subplot(211)
+            plt.plot(x_points, voltage_profile, 'b-', linewidth=2, label='Voltage Magnitude')
+            plt.title('Voltage Profile Along the Line')
+            plt.ylabel('Voltage Ratio |V/Vr|')
+            plt.grid(True)
+            plt.legend()
+            
+            plt.subplot(212)
+            plt.plot(x_points, current_profile, 'r-', linewidth=2, label='Current Magnitude')
+            plt.title('Current Profile Along the Line')
+            plt.xlabel('Distance from Receiving End (km)')
+            plt.ylabel('Current Ratio |I/Ir|')
+            plt.grid(True)
+            plt.legend()
+            
+            # Add overall title
+            plt.suptitle(f'Transmission Line Analysis (Length: {self._length} km, Z₀: {abs(self._Z):.2f} Ω)', fontsize=14)
+            
+            # Add line parameters as text
+            plt.figtext(0.5, 0.01, 
+                      f"R: {self._resistance} Ω/km, L: {self._inductance} mH/km, C: {self._capacitance} μF/km, f: {self._frequency} Hz", 
+                      ha="center", fontsize=9, bbox={"facecolor":"lightblue", "alpha":0.2, "pad":5})
+            
+            # Save the figure
+            plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+            plt.savefig(filepath, dpi=150)
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating visualization chart: {e}")
+            # Make sure to close figures on error
+            plt.close('all')
+            return False
 
     # Properties
     @Property(float, notify=lengthChanged)

@@ -1,6 +1,14 @@
 from PySide6.QtCore import QObject, Slot, QPointF, Signal, Property, QUrl
 from PySide6.QtCharts import QXYSeries
 import numpy as np
+import tempfile
+import os
+from datetime import datetime
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="rlc")
 
 class RLCChart(QObject):
     chartDataChanged = Signal()
@@ -9,6 +17,7 @@ class RLCChart(QObject):
     formattedDataChanged = Signal(list)  
     grabRequested = Signal(str, float)
     circuitModeChanged = Signal(int)  # Add signal for mode changes
+    pdfExportStatusChanged = Signal(bool, str)  # Add PDF export signal
 
     # Circuit mode constants
     SERIES_MODE = 0
@@ -33,6 +42,12 @@ class RLCChart(QObject):
         self._circuit_mode = self.SERIES_MODE  # Default to series mode
         self._quality_factor = 0.0  # Add Q factor
         self.generateChartData()
+
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
 
     @Slot(float)
     def setResistance(self, resistance):
@@ -267,4 +282,79 @@ class RLCChart(QObject):
             print(f"Error saving chart: {e}")
             import traceback
             traceback.print_exc()
+            return False
+
+    @Slot(result=bool)
+    def exportToPdf(self):
+        """Export the RLC circuit analysis to a PDF file
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            circuit_type = "series" if self._circuit_mode == self.SERIES_MODE else "parallel"
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"rlc_{circuit_type}_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "rlc_response.png")
+            
+            # Prepare data for PDF
+            data = {
+                'circuit_mode': self._circuit_mode,
+                'resistance': self._resistance,
+                'inductance': self._inductance,
+                'capacitance': self._capacitance,
+                'resonant_freq': self._resonant_freq,
+                'quality_factor': self._quality_factor,
+                'freq_min': self._axis_x_min,
+                'freq_max': self._axis_x_max,
+            }
+            
+            # Generate matplotlib chart for PDF
+            from utils.pdf.pdf_generator_rlc import RLCPdfGenerator
+            pdf_generator = RLCPdfGenerator()
+            chart_generated = pdf_generator.generate_response_curve(data, chart_image_path)
+            
+            if chart_generated:
+                data['chart_image_path'] = chart_image_path
+            
+            # Generate PDF
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.remove(chart_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+            
+        except Exception as e:
+            error_msg = f"Error exporting to PDF: {str(e)}"
+            logger.error(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
             return False

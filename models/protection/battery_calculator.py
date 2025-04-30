@@ -1,4 +1,14 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
+import tempfile
+import os
+from datetime import datetime
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+logger = configure_logger("qmltest", component="battery_calculator")
 
 class BatteryCalculator(QObject):
     """Calculator for battery sizing and runtime calculations"""
@@ -9,6 +19,7 @@ class BatteryCalculator(QObject):
     depthOfDischargeChanged = Signal()
     batteryTypeChanged = Signal()
     calculationsComplete = Signal()
+    exportComplete = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -30,6 +41,9 @@ class BatteryCalculator(QObject):
             "Lithium Ion": 1.1,
             "AGM": 1.15
         }
+        
+        # Initialize file saver
+        self._file_saver = FileSaver()
         
         self._calculate()
 
@@ -152,3 +166,83 @@ class BatteryCalculator(QObject):
     @Slot(str)
     def setBatteryType(self, value):
         self.batteryType = value
+
+    @Slot()
+    def exportToPdf(self):
+        """Export battery calculations to PDF"""
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"battery_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "battery_chart.png")
+            
+            # Create PDF generator
+            from utils.pdf.pdf_generator_battery import BatteryPdfGenerator
+            pdf_generator = BatteryPdfGenerator()
+            
+            # Create battery visualization image
+            data = {
+                'recommended_capacity': self._recommended_capacity,
+                'depth_of_discharge': self._depth_of_discharge,
+                'battery_type': self._battery_type
+            }
+            pdf_generator.generate_battery_chart(data, chart_image_path)
+            
+            # Prepare full data for PDF
+            safety_factor = self._safety_factors.get(self._battery_type, 1.2)
+            data = {
+                'load': self._load,
+                'system_voltage': self._system_voltage,
+                'backup_time': self._backup_time,
+                'depth_of_discharge': self._depth_of_discharge,
+                'battery_type': self._battery_type,
+                'current_draw': self._current_draw,
+                'required_capacity': self._required_capacity,
+                'recommended_capacity': self._recommended_capacity,
+                'energy_storage': self._energy_storage,
+                'safety_factor': safety_factor,
+                'battery_image_path': chart_image_path if os.path.exists(chart_image_path) else None
+            }
+            
+            # Generate PDF
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(chart_image_path):
+                    os.unlink(chart_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                self.exportComplete.emit(True, "PDF saved successfully")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                self.exportComplete.emit(False, "Error saving PDF")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error exporting battery report: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False

@@ -121,6 +121,20 @@ Item {
                     }
 
                     StyledButton {
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+                        
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportToPdf()
+                            }
+                        }
+                    }
+
+                    StyledButton {
                         id: helpButton
                         icon.source: "../../../icons/rounded/info.svg"
                         ToolTip.text: "Information"
@@ -625,6 +639,25 @@ Item {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // Add message popup for export status
+    MessagePopup {
+        id: messagePopup
+        anchors.centerIn: parent
+    }
+
+    // Connections to handle export status
+    Connections {
+        target: calculator
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

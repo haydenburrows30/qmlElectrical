@@ -1,5 +1,18 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
+import matplotlib
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+import matplotlib.pyplot as plt
+import tempfile
+import os
+from datetime import datetime
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+import numpy as np
+
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="fault_current")
 
 class FaultCurrentCalculator(QObject):
     """Calculator for fault current analysis including system, transformer and cable impedances
@@ -14,6 +27,7 @@ class FaultCurrentCalculator(QObject):
     
     # Define signals for QML
     calculationComplete = Signal()
+    exportComplete = Signal(bool, str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -54,6 +68,12 @@ class FaultCurrentCalculator(QObject):
         self._transformer_pu_z = 0.0  # Transformer impedance in per-unit
         self._cable_pu_z = 0.0  # Cable impedance in per-unit
         self._effective_xr_ratio = 0.0  # Effective X/R ratio of the circuit
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our exportComplete signal
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
         
         # Initial calculation
         self._calculate()
@@ -184,6 +204,193 @@ class FaultCurrentCalculator(QObject):
             
         except Exception as e:
             print(f"Fault current calculation error: {e}")
+    
+    @Slot()
+    def exportToPdf(self):
+        """Export calculation results to PDF"""
+        try:
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"fault_current_report_{timestamp}")
+            if not pdf_file:
+                self.exportComplete.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for diagram image
+            temp_dir = tempfile.mkdtemp()
+            diagram_image_path = os.path.join(temp_dir, "fault_diagram.png")
+            
+            # Generate system diagram using matplotlib
+            self._generate_system_diagram(diagram_image_path)
+            
+            # Prepare data for PDF generation
+            data = {
+                'system_voltage': self._system_voltage,
+                'system_mva': self._system_mva,
+                'system_xr_ratio': self._system_xr_ratio,
+                'transformer_mva': self._transformer_mva,
+                'transformer_z': self._transformer_z,
+                'transformer_xr_ratio': self._transformer_xr_ratio,
+                'cable_length': self._cable_length,
+                'cable_r': self._cable_r,
+                'cable_x': self._cable_x,
+                'fault_type': self._fault_type,
+                'fault_resistance': self._fault_resistance,
+                'include_motors': self._include_motors,
+                'motor_mva': self._motor_mva,
+                'motor_contribution_factor': self._motor_contribution_factor,
+                'initial_sym_current': self._initial_sym_current,
+                'peak_fault_current': self._peak_fault_current,
+                'breaking_current': self._breaking_current,
+                'thermal_current': self._thermal_current,
+                'total_impedance': self._total_impedance,
+                'total_r': self._total_r,
+                'total_x': self._total_x,
+                'effective_xr_ratio': self._effective_xr_ratio,
+                'system_pu_z': self._system_pu_z,
+                'transformer_pu_z': self._transformer_pu_z,
+                'cable_pu_z': self._cable_pu_z,
+                'diagram_image_path': diagram_image_path if os.path.exists(diagram_image_path) else None
+            }
+            
+            # Generate PDF using the fault current PDF generator
+            from utils.pdf.pdf_generator_fault_current import FaultCurrentPdfGenerator
+            pdf_generator = FaultCurrentPdfGenerator()
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(diagram_image_path):
+                    os.unlink(diagram_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error exporting to PDF: {str(e)}"
+            logger.error(error_msg)
+            self.exportComplete.emit(False, error_msg)
+            return False
+    
+    def _generate_system_diagram(self, filepath):
+        """Generate a system diagram using matplotlib and save it to a file
+        
+        Args:
+            filepath: Path to save the diagram image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure
+            plt.figure(figsize=(10, 6))
+            
+            # Set up coordinates
+            grid_x = [1, 3, 5, 7, 9]
+            center_y = 3
+            
+            # Draw system source
+            plt.plot([grid_x[0]], [center_y], 'o', markersize=20, 
+                    markerfacecolor='white', markeredgecolor='blue', markeredgewidth=2)
+            plt.text(grid_x[0], center_y + 0.4, f"{self._system_voltage} kV\n{self._system_mva} MVA", 
+                    ha='center', va='center', fontsize=9)
+            
+            # Draw busbar
+            plt.plot([grid_x[0], grid_x[4]], [center_y + 1, center_y + 1], 'k-', linewidth=3)
+            
+            # Draw transformer
+            plt.plot([grid_x[1]], [center_y], 's', markersize=20, 
+                    markerfacecolor='white', markeredgecolor='blue', markeredgewidth=2)
+            plt.text(grid_x[1], center_y + 0.4, f"TX: {self._transformer_mva} MVA\nZ: {self._transformer_z}%", 
+                    ha='center', va='center', fontsize=9)
+            
+            # Draw impedance lines for cable
+            x_points = [grid_x[1] + 0.2, grid_x[2] - 0.2]
+            y_points = [center_y, center_y]
+            plt.plot(x_points, y_points, 'k-', linewidth=2)
+            
+            # Draw cable with zigzag line
+            zigzag_x = np.linspace(grid_x[2], grid_x[3], 20)
+            zigzag_y = center_y + 0.2 * np.sin(np.linspace(0, 6*np.pi, 20))
+            plt.plot(zigzag_x, zigzag_y, 'k-', linewidth=2)
+            plt.text(grid_x[2] + 0.5, center_y + 0.5, 
+                   f"Cable: {self._cable_length} km\nR={self._cable_r}, X={self._cable_x} Ω/km", 
+                   ha='center', va='center', fontsize=9)
+            
+            # Draw fault location
+            fault_x = grid_x[3]
+            fault_y = center_y
+            plt.plot([fault_x], [fault_y], 'x', markersize=15, 
+                   markeredgecolor='red', markeredgewidth=3)
+            
+            # Draw lightning bolt for fault
+            bolt_x = [fault_x, fault_x - 0.2, fault_x + 0.2, fault_x - 0.1]
+            bolt_y = [fault_y, fault_y - 0.5, fault_y - 1, fault_y - 1.5]
+            plt.plot(bolt_x, bolt_y, 'r-', linewidth=2)
+            
+            # Add fault annotation
+            plt.text(fault_x, fault_y - 1.8, 
+                   f"{self._fault_type} Fault\nIf = {self._initial_sym_current:.1f} kA", 
+                   ha='center', va='top', fontsize=10, color='red', fontweight='bold')
+            
+            # Add motor contribution if included
+            if self._include_motors:
+                motor_x = grid_x[2]
+                motor_y = center_y - 1.5
+                plt.plot([motor_x], [motor_y], 'o', markersize=15, 
+                       markerfacecolor='white', markeredgecolor='purple', markeredgewidth=2)
+                plt.plot([motor_x, motor_x], [center_y, motor_y], 'k-', linewidth=1.5)
+                plt.text(motor_x, motor_y - 0.4, 
+                       f"Motor: {self._motor_mva} MVA", 
+                       ha='center', va='center', fontsize=9, color='purple')
+            
+            # Add impedance values
+            plt.text(grid_x[3] + 0.5, center_y + 1, 
+                   f"Total Z = {self._total_impedance:.3f} Ω\nR = {self._total_r:.3f} Ω, X = {self._total_x:.3f} Ω\nX/R = {self._effective_xr_ratio:.2f}", 
+                   ha='left', va='center', fontsize=9, 
+                   bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
+            
+            # Set plot limits and remove axes
+            plt.xlim(0.5, 10)
+            plt.ylim(0.5, 5)
+            plt.axis('off')
+            
+            # Add title
+            plt.title(f"Fault Current Analysis - {self._fault_type}", fontsize=14)
+            
+            # Save figure
+            plt.tight_layout()
+            plt.savefig(filepath, dpi=150, bbox_inches='tight')
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating system diagram: {e}")
+            plt.close('all')  # Make sure to close figures on error
+            return False
     
     # Property getters for QML - Results section
     @Property(float, notify=calculationComplete)

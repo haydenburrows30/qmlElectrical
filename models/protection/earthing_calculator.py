@@ -1,5 +1,17 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import math
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
+import os
+import tempfile
+from datetime import datetime
+
+from services.file_saver import FileSaver
+from services.logger_config import configure_logger
+
+# Setup component-specific logger
+logger = configure_logger("qmltest", component="earthing")
 
 class EarthingCalculator(QObject):
     """Calculator for earthing system design
@@ -22,6 +34,9 @@ class EarthingCalculator(QObject):
     faultCurrentChanged = Signal()
     faultDurationChanged = Signal()
     resultsCalculated = Signal()
+    
+    # Add PDF export status signal
+    pdfExportStatusChanged = Signal(bool, str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -41,6 +56,12 @@ class EarthingCalculator(QObject):
         self._step_voltage = 0.0
         self._conductor_size = 0.0
         self._voltage_rise = 0.0
+        
+        # Initialize FileSaver
+        self._file_saver = FileSaver()
+        
+        # Connect file saver signal to our pdfExportStatusChanged signal
+        self._file_saver.saveStatusChanged.connect(self.pdfExportStatusChanged)
         
         self._calculate()
 
@@ -99,7 +120,7 @@ class EarthingCalculator(QObject):
             self.resultsCalculated.emit()
             
         except Exception as e:
-            print(f"Error in earthing calculation: {e}")
+            logger.error(f"Error in earthing calculation: {e}")
 
     # Properties and setters
     @Property(float, notify=soilResistivityChanged)
@@ -242,3 +263,93 @@ class EarthingCalculator(QObject):
     @Slot(float)
     def setFaultDuration(self, value):
         self.faultDuration = value
+
+    @Slot()
+    def exportToPdf(self):
+        """Export the earthing system analysis to a PDF file
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            from utils.pdf.pdf_generator_earthing import EarthingPdfGenerator
+            
+            # Create timestamp for filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Get save location using FileSaver
+            pdf_file = self._file_saver.get_save_filepath("pdf", f"earthing_analysis_{timestamp}")
+            if not pdf_file:
+                self.pdfExportStatusChanged.emit(False, "PDF export canceled")
+                return False
+            
+            # Clean up and ensure proper filepath extension
+            pdf_file = self._file_saver.clean_filepath(pdf_file)
+            pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
+            
+            # Create temporary directory for chart image
+            temp_dir = tempfile.mkdtemp()
+            diagram_image_path = os.path.join(temp_dir, "earthing_diagram.png")
+            
+            # Generate diagram using the PDF generator
+            pdf_generator = EarthingPdfGenerator()
+            
+            # Prepare data for diagram
+            diagram_data = {
+                'grid_length': self._grid_length,
+                'grid_width': self._grid_width,
+                'rod_count': self._rod_count,
+                'rod_length': self._rod_length,
+                'grid_resistance': self._grid_resistance
+            }
+            
+            # Generate the diagram
+            pdf_generator.generate_diagram(diagram_data, diagram_image_path)
+            
+            # Prepare data for PDF
+            data = {
+                'soil_resistivity': self._soil_resistivity,
+                'grid_depth': self._grid_depth,
+                'grid_length': self._grid_length,
+                'grid_width': self._grid_width,
+                'grid_area': self._grid_length * self._grid_width,
+                'rod_length': self._rod_length,
+                'rod_count': self._rod_count,
+                'fault_current': self._fault_current,
+                'fault_duration': self._fault_duration,
+                'grid_resistance': self._grid_resistance,
+                'touch_voltage': self._touch_voltage,
+                'step_voltage': self._step_voltage,
+                'conductor_size': self._conductor_size,
+                'voltage_rise': self._voltage_rise,
+                'diagram_image_path': diagram_image_path if os.path.exists(diagram_image_path) else None
+            }
+            
+            # Generate PDF
+            success = pdf_generator.generate_report(data, pdf_file)
+            
+            # Clean up temporary files
+            try:
+                if os.path.exists(diagram_image_path):
+                    os.unlink(diagram_image_path)
+                os.rmdir(temp_dir)
+            except Exception as e:
+                logger.error(f"Error cleaning up temp files: {e}")
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
+            # Signal success or failure
+            if success:
+                self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
+                return True
+            else:
+                self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
+                return False
+                
+        except Exception as e:
+            error_msg = f"Error exporting to PDF: {str(e)}"
+            logger.error(error_msg)
+            self.pdfExportStatusChanged.emit(False, error_msg)
+            return False

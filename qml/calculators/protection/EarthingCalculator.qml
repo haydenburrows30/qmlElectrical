@@ -43,6 +43,10 @@ Item {
                 "Developed by <b>Wave</b>."
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     ColumnLayout {
         id: mainLayout
         anchors.centerIn: parent
@@ -59,6 +63,20 @@ Item {
                 font.pixelSize: 20
                 font.bold: true
                 Layout.fillWidth: true
+            }
+
+            StyledButton {
+                ToolTip.text: "Export results to PDF"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                Layout.alignment: Qt.AlignRight
+                icon.source: "../../../icons/rounded/download.svg"
+
+                onClicked: {
+                    if (calculator) {
+                        calculator.exportToPdf()
+                    }
+                }
             }
 
             StyledButton {
@@ -266,6 +284,18 @@ Item {
                     darkMode: Universal.theme === Universal.Dark
                     textColor: earthingCard.textColor
                 }
+            }
+        }
+    }
+
+    Connections {
+        target: calculator
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

@@ -29,6 +29,14 @@ Page {
 
     Connections {
         target: calculator
+        
+        function onPdfExportStatusChanged(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
+        }
     }
 
     function react() {
@@ -64,6 +72,20 @@ Page {
                         font.pixelSize: 20
                         font.bold: true
                         Layout.fillWidth: true
+                    }
+
+                    StyledButton {
+                        ToolTip.text: "Export to PDF"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 500
+                        Layout.alignment: Qt.AlignRight
+                        icon.source: "../../../icons/rounded/download.svg"
+
+                        onClicked: {
+                            if (calculator) {
+                                calculator.exportToPdf()
+                            }
+                        }
                     }
 
                     // StyledButton {

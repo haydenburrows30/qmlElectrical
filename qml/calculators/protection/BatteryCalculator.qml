@@ -49,6 +49,18 @@ Item {
             }
 
             StyledButton {
+                ToolTip.text: "Export to PDF"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                Layout.alignment: Qt.AlignRight
+                icon.source: "../../../icons/rounded/download.svg"
+
+                onClicked: {
+                    calculator.exportToPdf()
+                }
+            }
+
+            StyledButton {
                 id: helpButton
                 icon.source: "../../../icons/rounded/info.svg"
                 ToolTip.text: "Information"
@@ -182,9 +194,21 @@ Item {
         }
     }
     
+    MessagePopup {
+        id: messagePopup
+    }
+    
     Connections {
         target: calculator
         function onDepthOfDischargeChanged() { batteryVizCanvas.requestPaint() }
         function onRecommendedCapacityChanged() { batteryVizCanvas.requestPaint() }
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
+            }
+        }
     }
 }
