@@ -20,7 +20,7 @@ from models.protection.battery_calculator import BatteryCalculator
 from models.theory.machine_calculator import MachineCalculator
 from models.protection.earthing_calculator import EarthingCalculator
 from models.cable.transmission_calculator import TransmissionLineCalculator
-from models.protection.delta_transformer import DeltaTransformerCalculator
+from models.protection.open_delta_transformer import DeltaTransformerCalculator
 from models.cable.switchboard_manager import SwitchboardManager
 from models.grid_wind.wind_turbine_calculator import WindTurbineCalculator
 from models.protection.transformer_line_calculator import TransformerLineCalculator
@@ -44,6 +44,7 @@ from models.cable.network_cabinet_calculator import NetworkCabinetCalculator
 from models.fourier_laplace_z.transform_calculator import TransformCalculator
 from models.fourier_laplace_z.z_transform_calculator import ZTransformCalculator
 from models.theory.calculus_calculator import CalculusCalculator
+from models.protection.lightning_protection_calculator import LightningProtectionCalculator
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -102,5 +103,6 @@ def register_qml_types(engine, current_dir):
         (SequenceComponentCalculator, "SequenceComponentCalculator", 1, 0, "SequenceComponentCalculator"),
         (TransformCalculator, "TransformCalculator", 1, 0, "TransformCalculator"),
         (ZTransformCalculator, "ZTransformCalculator", 1, 0, "ZTransformCalculator"),
-        (CalculusCalculator, "Calculus", 1, 0, "CalculusCalculator")
+        (CalculusCalculator, "Calculus", 1, 0, "CalculusCalculator"),
+        (LightningProtectionCalculator, "LightningProtectionCalculator", 1, 0, "LightningProtectionCalculator"),
     ]

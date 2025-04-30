@@ -29,7 +29,8 @@ QtObject {
         { name: qsTr("RGF"), source: "calculators/protection/RefRgfCalculator.qml", icon: "calculate" },
         { name: qsTr("Solkor Rf"), source: "calculators/protection/SolkorRf.qml", icon: "cell_tower" },
         { name: qsTr("Transformer + Line"), source: "calculators/protection/TransformerLineCalculator.qml", icon: "cell_tower" },
-        { name: qsTr("VR Calculations"), source: "calculators/protection/VR32CL7Calculator.qml", icon: "arrow_upward" }
+        { name: qsTr("VR Calculations"), source: "calculators/protection/VR32CL7Calculator.qml", icon: "arrow_upward" },
+        { name: qsTr("Lightning"), source: "calculators/protection/LightningProtection.qml", icon: "arrow_upward" }
     ]
 
     property var cable: [
@@ -52,13 +53,13 @@ QtObject {
         { name: qsTr("Three Phase Waveforms"), source: "calculators/three_phase/ThreePhase.qml", icon: "line_axis" },
         { name: qsTr("Transformer Calculator"), source: "calculators/theory/TransformerCalculator.qml", icon: "calculate" },
         { name: qsTr("Sequence Calculator"), source: "calculators/theory/SequenceCalculator.qml", icon: "data_exploration" },
-        { name: qsTr("Fourier and Laplace"), source: "calculators/theory/TransformCalculator.qml", icon: "data_exploration" },
-        { name: qsTr("Z-Transform and Wavelet"), source: "calculators/theory/ZTransformCalculator.qml", icon: "functions" },
+        { name: qsTr("Fourier + Laplace"), source: "calculators/theory/TransformCalculator.qml", icon: "data_exploration" },
+        { name: qsTr("Z-Transform + Wavelet"), source: "calculators/theory/ZTransformCalculator.qml", icon: "functions" },
         { name: qsTr("Calculus"), source: "calculators/theory/CalculusCalculator.qml", icon: "functions" }
     ]
 
     property var renewables: [
-        { name: qsTr("Wind & Grid Connection"), source: "calculators/grid_wind/WindTransformerLineCalculator.qml", icon: "air" }
+        { name: qsTr("Wind + Grid Connection"), source: "calculators/grid_wind/WindTransformerLineCalculator.qml", icon: "air" }
     ]
     // not used
     property var settings: [
