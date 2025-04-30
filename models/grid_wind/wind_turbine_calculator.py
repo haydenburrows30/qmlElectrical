@@ -4,6 +4,9 @@ import numpy as np
 from datetime import datetime
 import os
 import tempfile
+import matplotlib
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
 import matplotlib.pyplot as plt
 
 from utils.pdf.pdf_generator import PDFGenerator
@@ -552,13 +555,17 @@ class WindTurbineCalculator(QObject):
             generator = PDFGenerator()
             result = generator.generate_wind_turbine_report(data, pdf_file)
             
-            # Clean up temporary file if created
+            # Clean up temporary files after PDF is generated
             if temp_image and os.path.exists(chart_image_path):
                 try:
                     os.unlink(chart_image_path)
                     os.rmdir(temp_dir)
                 except Exception:
                     pass
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
             
             # Signal success or failure
             if result:
@@ -631,12 +638,18 @@ class WindTurbineCalculator(QObject):
             # Save the figure to the specified file
             plt.tight_layout(rect=[0, 0.03, 1, 0.97])
             plt.savefig(filepath, dpi=100)
-            plt.close()
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection to clean up any remaining resources
+            import gc
+            gc.collect()
             
             return True
             
         except Exception as e:
             logger.error(f"Error generating matplotlib chart: {e}")
+            # Make sure to close any open figures even on error
+            plt.close('all')
             return False
 
     # Advanced analysis methods

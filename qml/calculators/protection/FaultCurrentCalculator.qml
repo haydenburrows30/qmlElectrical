@@ -105,14 +105,13 @@ Item {
             // Left side inputs and results
             ColumnLayout {
                 id: mainLayout
-                width: flickableContainer.width - 20
+                anchors.centerIn: parent
 
                 RowLayout {
                     id: topHeader
-                    Layout.maximumWidth: 800
+                    Layout.fillWidth: true
                     Layout.bottomMargin: 5
                     Layout.leftMargin: 5
-                    Layout.alignment: Qt.AlignHCenter
 
                     Label {
                         text: "Fault Current Calculator"
@@ -133,8 +132,6 @@ Item {
 
                 RowLayout {
                     id: firstRow
-                    Layout.maximumWidth: 800
-                    Layout.alignment: Qt.AlignHCenter
 
                     // Inputs
                     WaveCard {
@@ -346,7 +343,7 @@ Item {
                             }
                         }
                     }
-                
+
                     // Advanced parameters
                     WaveCard {
                         id: advancedPanel
@@ -437,8 +434,7 @@ Item {
                     Canvas {
                         id: faultDiagram
                         anchors.fill: parent
-                        anchors.margins: 10
-                        
+
                         onPaint: {
                             var ctx = getContext("2d")
                             ctx.reset()

@@ -30,7 +30,10 @@ Item {
             }
         }
 
-        Component.onCompleted: calculator.updateComparisons()
+        Component.onCompleted: {
+            calculator.updateComparisons()
+            console.log(mainLayout.height)
+        }
     }
 
     MessagePopup {
@@ -44,7 +47,7 @@ Item {
         
         Flickable {
             contentWidth: parent.width
-            contentHeight: mainLayout.height + 40
+            contentHeight: Math.max(mainLayout.height, scrollView.height)
             bottomMargin: 5
             leftMargin: 5
             rightMargin: 5
@@ -53,8 +56,6 @@ Item {
             ColumnLayout {
                 id: mainLayout
                 anchors.centerIn: parent
-                width: 880
-                spacing: 10
 
                 // Header with title and help button
                 RowLayout {
@@ -75,30 +76,21 @@ Item {
                         onClicked: saveToPdf()
                         Layout.preferredHeight: 30
                     }
-
-                    // StyledButton {
-                    //     id: helpButton
-                    //     icon.source: "../../../icons/rounded/info.svg"
-                    //     ToolTip.text: "Help"
-                    //     onClicked: popUpText.open()
-                    // }
                 }
 
                 // site information section
                 RowLayout {
-                    spacing: 10
 
                     WaveCard {
                         id: siteInfoCard
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 450
                         Layout.preferredHeight: 280
-                        Layout.alignment: Qt.AlignHCenter
 
                         title: "Site Information"
 
                         GridLayout {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
+                            anchors.fill: parent
                             columns: 2
 
                             Label {
@@ -180,12 +172,13 @@ Item {
                             }
                         }
                     }
+                    
                     // Resistance Calc
                     WaveCard {
                         id: resistanceCard
                         Layout.fillWidth: true
+                        Layout.minimumWidth: 450
                         Layout.preferredHeight: 280
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
 
                         title: "Resistance"
 
@@ -237,7 +230,6 @@ Item {
                 WaveCard {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 320
-                    Layout.alignment: Qt.AlignHCenter
                     titleVisible: false
 
                     TableView {

@@ -6,6 +6,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
+from PIL import Image as PILImage
 
 logger = logging.getLogger("qmltest.pdf_generator_overcurrent")
 
@@ -110,11 +111,18 @@ def create_chart_section(chart_image, styles, doc):
         elements.append(Paragraph("Time-Current Curves", styles['Heading2']))
         
         try:
-            # Calculate optimal image size
-            pdf_width = doc.width * 0.95
-            pdf_height = pdf_width
+            # Get the original image dimensions to maintain aspect ratio
+            with PILImage.open(chart_image) as img:
+                orig_width, orig_height = img.size
+                
+            # Calculate the aspect ratio
+            aspect_ratio = orig_height / orig_width
             
-            # Add image to document with explicit width and height
+            # Calculate optimal image size to fit the page width
+            pdf_width = doc.width * 0.95  # Use 95% of available width
+            pdf_height = pdf_width * aspect_ratio  # Maintain aspect ratio
+            
+            # Add image to document with proper dimensions
             elements.append(Image(chart_image, width=pdf_width, height=pdf_height))
             elements.append(Spacer(1, 0.1*inch))
             
@@ -163,9 +171,18 @@ def generate_pdf(pdf_file, relays, fault_levels, results, curve_types, chart_ima
         # Build the PDF
         doc.build(elements)
         
+        # Make sure to explicitly close any resources
+        import gc
+        gc.collect()
+        
         return pdf_file
         
     except Exception:
         # Clean up temporary files even if PDF generation fails
         traceback.print_exc()
+        
+        # Make sure to explicitly close any resources even on error
+        import gc
+        gc.collect()
+        
         return ""

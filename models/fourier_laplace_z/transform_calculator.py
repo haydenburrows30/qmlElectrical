@@ -1,5 +1,8 @@
 import tempfile
 import os
+import matplotlib
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
 import matplotlib.pyplot as plt
 from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool, Qt, Q_ARG
 
@@ -354,6 +357,10 @@ class TransformCalculator(QObject):
             except:
                 pass
             
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
+            
             # Signal success or failure
             if success:
                 self._file_saver._emit_success_with_path(filepath, "PDF saved")
@@ -419,10 +426,16 @@ class TransformCalculator(QObject):
                 plt.grid(True)
                 plt.tight_layout()
                 plt.savefig(transform_path, dpi=100)
-                plt.close()
+                plt.close('all')  # Close all figures to prevent resource leaks
+                
+                # Force garbage collection
+                import gc
+                gc.collect()
                 
         except Exception as e:
             print(f"Error generating charts for PDF: {str(e)}")
+            # Make sure to close any open figures even on error
+            plt.close('all')
 
     @Slot()
     def generate_plot_for_file_saver(self):
@@ -513,11 +526,16 @@ class TransformCalculator(QObject):
             
             plt.tight_layout(rect=[0, 0.03, 1, 0.97])
             plt.savefig(filepath, dpi=100)
-            plt.close()
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
             
             return filepath
             
         except Exception as e:
             print(f"Error generating plot: {str(e)}")
+            # Make sure to close any open figures even on error
+            plt.close('all')
             return ""
-    

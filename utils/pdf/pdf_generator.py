@@ -6,6 +6,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.platypus import Image
 import os
 from datetime import datetime
+import gc  # Import garbage collection
 
 from services.logger_config import configure_logger
 logger = configure_logger("qmltest", component="pdf_generator")
@@ -684,24 +685,31 @@ class PDFGenerator:
                     with PILImage.open(chart_image_path) as img:
                         orig_width, orig_height = img.size
                     
-                    # Calculate the aspect ratio and set maximum width
-                    max_width = 500  # Maximum width in points
+                    # Calculate the aspect ratio
                     aspect_ratio = orig_height / orig_width
                     
-                    # Create the image with proper scaling
-                    img = Image(chart_image_path)
-                    img.drawWidth = max_width
-                    img.drawHeight = max_width * aspect_ratio
+                    # Calculate appropriate image width based on available page width
+                    # Get the document width (accounting for margins)
+                    available_width = doc.width * 0.95  # Use 95% of available width
                     
-                    # Center the image 
+                    # Set the image width and calculate height to maintain aspect ratio
+                    img = Image(chart_image_path)
+                    img.drawWidth = available_width
+                    img.drawHeight = available_width * aspect_ratio
+                    
+                    # Add the image
                     story.append(img)
                     story.append(Spacer(1, 24))
                 except Exception as e:
                     import traceback
-                    traceback.print_exc()
+                    logger.error(f"Error adding chart image to PDF: {e}")
+                    logger.error(traceback.format_exc())
             
             # Build PDF
             doc.build(story)
+            
+            # Make sure to explicitly close any resources
+            gc.collect()
             
             return True
             
@@ -709,6 +717,10 @@ class PDFGenerator:
             import traceback
             logger.error(f"Error generating PDF: {e}")
             logger.error(traceback.format_exc())
+            
+            # Make sure to explicitly close any resources even on error
+            gc.collect()
+            
             return False, str(e)
 
     def generate_transform_report(self, data, filepath):
@@ -873,10 +885,17 @@ class PDFGenerator:
             # Build the PDF
             doc.build(story)
             
+            # Make sure to explicitly close any resources
+            gc.collect()
+            
             return True
             
         except Exception as e:
             import traceback
             logger.error(f"Error generating transform PDF: {e}")
             logger.error(traceback.format_exc())
+            
+            # Make sure to explicitly close any resources even on error
+            gc.collect()
+            
             return False

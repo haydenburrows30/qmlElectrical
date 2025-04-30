@@ -1,6 +1,12 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot, QAbstractListModel, Qt, QModelIndex
 import math
 import os
+import tempfile
+import numpy as np
+import matplotlib
+# Set non-interactive backend before importing pyplot
+matplotlib.use('Agg')  # Use Agg backend which doesn't require a display
+import matplotlib.pyplot as plt
 from datetime import datetime
 from services.file_saver import FileSaver
 from services.logger_config import configure_logger
@@ -123,8 +129,8 @@ class DiscriminationAnalyzer(QObject):
             self.relayCountChanged.emit()
             self._analyze_discrimination()
 
-    @Slot(str)
-    def exportResults(self, image_data=None):
+    @Slot()
+    def exportResults(self):
         """Export results to a PDF file
         Args:
             filename: Path to save the PDF report
@@ -144,15 +150,13 @@ class DiscriminationAnalyzer(QObject):
             pdf_file = self._file_saver.clean_filepath(pdf_file)
             pdf_file = self._file_saver.ensure_file_extension(pdf_file, "pdf")
             
-            # Process image file path if provided
-            chart_image_path = ""
-            temp_image = False
-
-            if image_data and isinstance(image_data, str) and os.path.exists(image_data):
-                chart_image_path = image_data
-                # Mark as temporary if it's a temp file
-                if "temp_overcurrent_chart" in chart_image_path:
-                    temp_image = True
+            # Create chart using matplotlib instead of relying on the QML chart image
+            temp_dir = tempfile.mkdtemp()
+            chart_image_path = os.path.join(temp_dir, "discrimination_chart.png")
+            temp_image = True
+            
+            # Generate the matplotlib chart
+            self._generate_matplotlib_chart(chart_image_path)
             
             # Generate PDF with chart image
             result = generate_pdf(
@@ -168,8 +172,13 @@ class DiscriminationAnalyzer(QObject):
             if temp_image and os.path.exists(chart_image_path):
                 try:
                     os.unlink(chart_image_path)
+                    os.rmdir(temp_dir)
                 except Exception:
                     pass
+            
+            # Force garbage collection to ensure resources are freed
+            import gc
+            gc.collect()
             
             # Signal success or failure
             if result:
@@ -185,6 +194,112 @@ class DiscriminationAnalyzer(QObject):
             # Send error to QML
             self.exportComplete.emit(False, error_msg)
             return ""
+            
+    def _generate_matplotlib_chart(self, filepath):
+        """Generate a discrimination chart using matplotlib and save it to a file
+        
+        Args:
+            filepath: Path to save the chart image
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Create figure with logarithmic axes
+            plt.figure(figsize=(10, 8))
+            plt.grid(True, which="both", ls="-", alpha=0.7)
+            plt.loglog()
+            
+            # Set labels and title
+            plt.title('Time-Current Curves and Discrimination Analysis')
+            plt.xlabel('Current (A)')
+            plt.ylabel('Operating Time (s)')
+            
+            # Generate curves for all relays
+            colors = ['blue', 'red', 'green', 'orange', 'purple', 'brown', 'cyan', 'magenta']
+            
+            # Add each relay's curve
+            for i, relay in enumerate(self._relays):
+                color = colors[i % len(colors)]
+                name = relay["name"]
+                pickup = float(relay["pickup"])
+                
+                # Create current range (logarithmic, more points in critical areas)
+                currents = []
+                # Close to pickup (1.01 to 2.0)
+                currents.extend([pickup * (1.01 + i * 0.1) for i in range(10)])
+                # Medium range (2.0 to 10.0)
+                currents.extend([pickup * (2.0 + i * 0.5) for i in range(17)])
+                # High range (logarithmic steps)
+                for j in range(1, 5):
+                    base = pickup * (10 ** j)
+                    currents.extend([base, 2 * base, 5 * base])
+                
+                # Calculate trip time for each current value
+                times = []
+                for current in currents:
+                    time = self._calculate_operating_time(relay, current)
+                    if time and time > 0 and time < 100:
+                        times.append(time)
+                    else:
+                        # Handle invalid time values
+                        times.append(np.nan)
+                
+                # Plot the relay curve
+                plt.plot(currents[:len(times)], times, color=color, linewidth=2, label=name)
+                
+            # Add fault points and margins if available
+            margin_points = []
+            for result in self._results_model._results:
+                if result.get("margins"):
+                    for margin in result["margins"]:
+                        if (margin.get("fault_current") and margin.get("margin") and 
+                            margin["margin"] > 0 and margin["margin"] < 10):
+                            margin_points.append((margin["fault_current"], margin["margin"]))
+            
+            # Plot margin points if available
+            if margin_points:
+                x_vals = [point[0] for point in margin_points]
+                y_vals = [point[1] for point in margin_points]
+                plt.scatter(x_vals, y_vals, color='black', marker='o', s=50, label='Margin Points')
+            
+            # Add minimum margin line
+            if self._min_margin > 0:
+                plt.axhline(y=self._min_margin, color='black', linestyle='--', 
+                          label=f'Min Margin: {self._min_margin:.2f}s')
+            
+            # Plot fault levels as vertical lines
+            for fault in self._fault_levels:
+                plt.axvline(x=fault, color='gray', linestyle=':', alpha=0.6)
+            
+            # Set reasonable plot limits based on data
+            x_min = min([float(relay["pickup"]) for relay in self._relays]) * 0.8 if self._relays else 10
+            x_max = max(self._fault_levels) * 1.5 if self._fault_levels else 10000
+            y_min = 0.01
+            y_max = 10
+            
+            plt.xlim(x_min, x_max)
+            plt.ylim(y_min, y_max)
+            
+            # Add legend
+            plt.legend(loc='upper right')
+            
+            # Save the figure and explicitly close all matplotlib resources
+            plt.tight_layout()
+            plt.savefig(filepath, dpi=150)
+            plt.close('all')  # Close all figures to prevent resource leaks
+            
+            # Force garbage collection to clean up any remaining resources
+            import gc
+            gc.collect()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating matplotlib chart: {e}")
+            # Make sure to close any open figures even on error
+            plt.close('all')
+            return False
 
     @Slot(float, result='QVariantList')
     def calculateFaultPoints(self, relayIndex):

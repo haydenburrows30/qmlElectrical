@@ -19,6 +19,21 @@ Item {
 
     property DiscriminationAnalyzer calculator: DiscriminationAnalyzer {}
     property string applicationDirPath: Qt.application.directoryPath || "."
+    property bool isDestructing: false  // Add this flag to track destruction
+    
+    Component.onDestruction: {
+        console.log("DiscriminationAnalyzer component is being destroyed")
+        isDestructing = true
+        
+        if (calculator) {
+            // Any specific cleanup needed for the calculator
+        }
+    }
+    
+    function safeCalculatorProperty(propertyName, defaultValue) {
+        if (isDestructing || !calculator) return defaultValue
+        return calculator[propertyName]
+    }
     
     PopUpText {
         id: popUpText
@@ -73,13 +88,15 @@ Item {
                         ToolTip.delay: 500
 
                         onClicked: {
-                            calculator.reset()
-                            relayName.text = ""
-                            pickupCurrent.text = ""
-                            tds.text = ""
-                            faultCurrent.text = ""
-                            marginChart.resetChart()
-                            showFaultPoints.checked = false
+                            if (!isDestructing && calculator) {
+                                calculator.reset()
+                                relayName.text = ""
+                                pickupCurrent.text = ""
+                                tds.text = ""
+                                faultCurrent.text = ""
+                                marginChart.resetChart()
+                                showFaultPoints.checked = false
+                            }
                         }
                     }
 
@@ -112,8 +129,8 @@ Item {
 
                                     Label {
                                         Layout.columnSpan: 2
-                                        text: "Relays added: " + calculator.relayCount + " (minimum 2 needed)"
-                                        color: calculator.relayCount < 2 ? 
+                                        text: "Relays added: " + safeCalculatorProperty("relayCount", 0) + " (minimum 2 needed)"
+                                        color: safeCalculatorProperty("relayCount", 0) < 2 ? 
                                             Universal.theme === Universal.Dark ? "#ff8080" : "red" : 
                                             Universal.theme === Universal.Dark ? "#90EE90" : "green"
                                         font.bold: true
@@ -123,7 +140,7 @@ Item {
                                         id: curveType
                                         Layout.fillWidth: true
                                         Layout.columnSpan: 2
-                                        model: calculator.curveTypes
+                                        model: safeCalculatorProperty("curveTypes", [])
                                         currentIndex: 0
                                     }
 
@@ -160,6 +177,8 @@ Item {
                                     icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
+                                        if (isDestructing || !calculator) return
+                                        
                                         if (!relayName.text) {
                                             relayName.focus = true
                                         } else if (!pickupCurrent.text || parseFloat(pickupCurrent.text) <= 0) {
@@ -190,7 +209,7 @@ Item {
 
                             ListView {
                                 anchors.fill: parent
-                                model: calculator.relayList
+                                model: safeCalculatorProperty("relayList", [])
                                 
                                 clip: true
 
@@ -244,7 +263,9 @@ Item {
                                             ToolTip.delay: 500
 
                                             onClicked: {
-                                                calculator.removeRelay(index)
+                                                if (!isDestructing && calculator) {
+                                                    calculator.removeRelay(index)
+                                                }
                                             }
                                         }
                                     }
@@ -268,12 +289,16 @@ Item {
                                     id: marginSlider
                                     Layout.minimumWidth: 200
                                     Layout.fillWidth: true
-                                    enabled: calculator.relayCount >= 2
+                                    enabled: safeCalculatorProperty("relayCount", 0) >= 2
                                     from: 0.1
                                     to: 1.0
-                                    value: calculator.minimumMargin
+                                    value: safeCalculatorProperty("minimumMargin", 0.1)
                                     stepSize: 0.05
-                                    onValueChanged: calculator.minimumMargin = value
+                                    onValueChanged: {
+                                        if (!isDestructing && calculator) {
+                                            calculator.minimumMargin = value
+                                        }
+                                    }
                                 }
 
                                 Label {
@@ -292,13 +317,13 @@ Item {
                                     Layout.fillWidth: true
                                     placeholderText: "Add Fault Current Level (A)"
                                     validator: DoubleValidator { bottom: 0 }
-                                    enabled: calculator.relayCount >= 2
+                                    enabled: safeCalculatorProperty("relayCount", 0) >= 2
                                 }
 
                                 StyledButton {
                                     id: addFaultLevel
                                     Layout.alignment: Qt.AlignHCenter
-                                    enabled: calculator.relayCount >= 2 && faultCurrent.text
+                                    enabled: safeCalculatorProperty("relayCount", 0) >= 2 && faultCurrent.text
 
                                     ToolTip.text: "Add Fault Level"
                                     ToolTip.visible: hovered
@@ -307,7 +332,9 @@ Item {
                                     icon.source: "../../../icons/rounded/add.svg"
 
                                     onClicked: {
-                                        if (calculator.relayCount < 2) {
+                                        if (isDestructing || !calculator) return
+                                        
+                                        if (safeCalculatorProperty("relayCount", 0) < 2) {
                                         } else if (!faultCurrent.text || parseFloat(faultCurrent.text) <= 0) {
                                             faultCurrent.focus = true
                                         } else {
@@ -321,7 +348,7 @@ Item {
 
                                 Label {
                                     text: "Export Data: "
-                                    visible: calculator.relayCount >= 2
+                                    visible: safeCalculatorProperty("relayCount", 0) >= 2
                                 }
 
                                 StyledButton {
@@ -333,38 +360,25 @@ Item {
                                     ToolTip.visible: hovered
                                     ToolTip.delay: 500
                                     
-                                    visible: calculator.relayCount >= 2
+                                    visible: safeCalculatorProperty("relayCount", 0) >= 2
                                     icon.source: "../../../icons/rounded/download.svg"
 
                                     onClicked: {
-                                        // Create a temporary file path for the chart image
-                                        var tempImagePath = applicationDirPath + (Qt.platform.os === "windows" ? "\\temp_overcurrent_chart.png" : "/temp_overcurrent_chart.png")
-                                        
-                                        // Capture the chart image and save it to the temporary file
-                                        marginChart.grabToImage(function(result) {
-                                            if (result) {
-                                                result.saveToFile(tempImagePath)
-                                                
-                                                // Export the PDF with the saved image path
-                                                calculator.exportResults(tempImagePath)
-                                            } else {
-                                                // Export without image if grabToImage fails
-                                                calculator.exportResults("")
-                                            }
-                                        })
+                                        if (isDestructing || !calculator || !marginChart) return
+                                            calculator.exportResults()
                                     }
                                 }
 
                                 Label {
                                     text: "Show Fault Points: "
-                                    visible: calculator.relayCount >= 2
+                                    visible: safeCalculatorProperty("relayCount", 0) >= 2
                                 }
 
                                 CheckBox {
                                     id: showFaultPoints
                                     checked: false
                                     Layout.columnSpan: 1
-                                    visible: calculator.relayCount >= 2
+                                    visible: safeCalculatorProperty("relayCount", 0) >= 2
                                     
                                     onCheckedChanged: {
                                         showFaultPointsGrid.updateFaultPoints()
@@ -373,7 +387,7 @@ Item {
                                 
                                 StyledButton {
                                     icon.source: "../../../icons/rounded/refresh.svg"
-                                    visible: calculator.relayCount >= 2 && showFaultPoints.checked
+                                    visible: safeCalculatorProperty("relayCount", 0) >= 2 && showFaultPoints.checked
 
                                     ToolTip.text: "Refresh Fault Points"
                                     ToolTip.visible: hovered
@@ -385,10 +399,12 @@ Item {
                                 }
 
                                 function updateFaultPoints() {
-                                    marginChart.updateFaultPoints(
-                                        calculator.faultPoints, 
-                                        showFaultPoints && showFaultPoints.checked
-                                    );
+                                    if (!isDestructing && calculator) {
+                                        marginChart.updateFaultPoints(
+                                            calculator.faultPoints, 
+                                            showFaultPoints && showFaultPoints.checked
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -404,10 +420,10 @@ Item {
 
                                 Text {
                                     text: "System Coordination Status: " + 
-                                          (calculator.isFullyCoordinated ? "Fully Coordinated" : "Coordination Issues")
-                                    visible: calculator.relayCount >= 2
+                                          (safeCalculatorProperty("isFullyCoordinated", false) ? "Fully Coordinated" : "Coordination Issues")
+                                    visible: safeCalculatorProperty("relayCount", 0) >= 2
                                     font.bold: true
-                                    color: calculator.isFullyCoordinated ? 
+                                    color: safeCalculatorProperty("isFullyCoordinated", false) ? 
                                            Universal.theme === Universal.Dark ? "#90EE90" : "green" : 
                                            Universal.theme === Universal.Dark ? "#ff8080" : "red"
                                     Layout.fillWidth: true
@@ -417,12 +433,12 @@ Item {
                                     id: resultsList
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    model: calculator.results
+                                    model: isDestructing ? null : calculator ? calculator.results : null
                                     clip: true
 
                                     Text {
                                         text: "Add at least 2 relays to see discrimination results"
-                                        visible: calculator.relayCount < 2
+                                        visible: safeCalculatorProperty("relayCount", 0) < 2
                                         anchors.fill: parent
                                         color: Universal.foreground
                                         wrapMode: Text.Wrap
@@ -509,26 +525,32 @@ Item {
 
     Connections {
         target: calculator
+        enabled: !isDestructing && calculator
         
         function onAnalysisComplete() {
+            if (isDestructing || !calculator || !marginChart) return
+            
             marginChart.scatterSeries.clear()
             let model = calculator.results
             try {
-                for(let i = 0; i < model.rowCount(); i++) {
-                    let modelIndex = model.index(i, 0)
-                    let result = model.data(modelIndex, calculator.results.DataRole)
-                    if (result && result.margins) {
-                        result.margins.forEach(function(margin) {
-                            if (margin.fault_current && margin.margin != null && 
-                                isFinite(margin.fault_current) && isFinite(margin.margin) &&
-                                margin.margin > 0 && margin.margin < 10) {
-                                marginChart.scatterSeries.append(margin.fault_current, margin.margin)
-                            }
-                        })
+                if (model) {
+                    for(let i = 0; i < model.rowCount(); i++) {
+                        let modelIndex = model.index(i, 0)
+                        let result = model.data(modelIndex, calculator.results.DataRole)
+                        if (result && result.margins) {
+                            result.margins.forEach(function(margin) {
+                                if (margin.fault_current && margin.margin != null && 
+                                    isFinite(margin.fault_current) && isFinite(margin.margin) &&
+                                    margin.margin > 0 && margin.margin < 10) {
+                                    marginChart.scatterSeries.append(margin.fault_current, margin.margin)
+                                }
+                            })
+                        }
                     }
                 }
                 
                 Qt.callLater(function() {
+                    if (isDestructing || !calculator) return
                     if (showFaultPoints && showFaultPoints.checked) {
                         showFaultPointsGrid.updateFaultPoints();
                     }
@@ -539,14 +561,17 @@ Item {
         }
         
         function onRelayCountChanged() {
+            if (isDestructing || !calculator || !marginChart) return
             marginChart.createRelaySeries()
         }
         
         function onMarginChanged() {
+            if (isDestructing || !calculator || !marginChart) return
             marginChart.updateMarginLine()
         }
         
         function onExportComplete(success, message) {
+            if (isDestructing) return
             if (success) {
                 messagePopup.showSuccess(message)
             } else {
@@ -555,12 +580,15 @@ Item {
         }
         
         function onExportChart(filename) {
+            if (isDestructing || !calculator || !marginChart) return
             marginChart.saveChartImage(filename)
         }
     }
         
     Component.onCompleted: {
         Qt.callLater(function() {
+            if (isDestructing || !calculator || !marginChart) return
+            
             if (marginChart && marginChart.createRelaySeries) {
                 marginChart.createRelaySeries();
             }

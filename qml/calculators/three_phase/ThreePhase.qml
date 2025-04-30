@@ -37,7 +37,7 @@ Page {
         Flickable {
             id: flickableContainer
             contentWidth: parent.width
-            contentHeight: mainLayout.height
+            contentHeight: mainLayout.height + 10
             bottomMargin : 5
             leftMargin : 5
             rightMargin : 5
@@ -45,7 +45,7 @@ Page {
 
             ColumnLayout {
                 id: mainLayout
-                width: flickableContainer.width - 20
+                anchors.centerIn: parent
 
                 // Header with title and help button
                 RowLayout {
