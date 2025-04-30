@@ -749,24 +749,38 @@ class ThreePhaseSineWaveModel(QObject):
             v_scale = 1.0
             i_scale = 0.7 * v_mag / i_mag if i_mag > 0 else 0.5  # Scale current to 70% of voltage magnitude
             
-            # Plot voltage phasors
-            ax.quiver(0, 0, angle_a_rad, self._rms_a * v_scale, angles='xy', scale_units='xy', scale=1, color='r', 
-                     width=0.005, label=f'Va: {self._rms_a:.1f}V ∠{self._phase_angle_a}°')
-            ax.quiver(0, 0, angle_b_rad, self._rms_b * v_scale, angles='xy', scale_units='xy', scale=1, color='g', 
-                     width=0.005, label=f'Vb: {self._rms_b:.1f}V ∠{self._phase_angle_b}°')
-            ax.quiver(0, 0, angle_c_rad, self._rms_c * v_scale, angles='xy', scale_units='xy', scale=1, color='b', 
-                     width=0.005, label=f'Vc: {self._rms_c:.1f}V ∠{self._phase_angle_c}°')
+            # Plot voltage phasors using manual arrow drawing to ensure they start from center
+            # For voltage phasors
+            voltage_a = ax.arrow(0, 0, angle_a_rad, self._rms_a * v_scale, alpha=1, width=0.02, 
+                               edgecolor='r', facecolor='r', lw=2, zorder=5, 
+                               length_includes_head=True)
+            voltage_b = ax.arrow(0, 0, angle_b_rad, self._rms_b * v_scale, alpha=1, width=0.02, 
+                               edgecolor='g', facecolor='g', lw=2, zorder=5, 
+                               length_includes_head=True)
+            voltage_c = ax.arrow(0, 0, angle_c_rad, self._rms_c * v_scale, alpha=1, width=0.02, 
+                               edgecolor='b', facecolor='b', lw=2, zorder=5, 
+                               length_includes_head=True)
             
-            # Plot current phasors with dashed lines
-            ax.quiver(0, 0, current_angle_a_rad, self._currentA * i_scale, angles='xy', scale_units='xy', scale=1, 
-                     color='r', width=0.005, alpha=0.7, linestyle='--', 
-                     label=f'Ia: {self._currentA:.1f}A ∠{self._current_angle_a}°')
-            ax.quiver(0, 0, current_angle_b_rad, self._currentB * i_scale, angles='xy', scale_units='xy', scale=1, 
-                     color='g', width=0.005, alpha=0.7, linestyle='--', 
-                     label=f'Ib: {self._currentB:.1f}A ∠{self._current_angle_b}°')
-            ax.quiver(0, 0, current_angle_c_rad, self._currentC * i_scale, angles='xy', scale_units='xy', scale=1, 
-                     color='b', width=0.005, alpha=0.7, linestyle='--', 
-                     label=f'Ic: {self._currentC:.1f}A ∠{self._current_angle_c}°')
+            # For current phasors (with lighter alpha to differentiate)
+            current_a = ax.arrow(0, 0, current_angle_a_rad, self._currentA * i_scale, alpha=0.7, width=0.02, 
+                                edgecolor='r', facecolor='r', lw=1, zorder=4, linestyle='--', 
+                                length_includes_head=True)
+            current_b = ax.arrow(0, 0, current_angle_b_rad, self._currentB * i_scale, alpha=0.7, width=0.02, 
+                                edgecolor='g', facecolor='g', lw=1, zorder=4, linestyle='--', 
+                                length_includes_head=True)
+            current_c = ax.arrow(0, 0, current_angle_c_rad, self._currentC * i_scale, alpha=0.7, width=0.02, 
+                                edgecolor='b', facecolor='b', lw=1, zorder=4, linestyle='--', 
+                                length_includes_head=True)
+            
+            # Create a custom legend
+            from matplotlib.patches import Patch
+            v_a_legend = Patch(facecolor='r', edgecolor='r', label=f'Va: {self._rms_a:.1f}V ∠{self._phase_angle_a}°')
+            v_b_legend = Patch(facecolor='g', edgecolor='g', label=f'Vb: {self._rms_b:.1f}V ∠{self._phase_angle_b}°')
+            v_c_legend = Patch(facecolor='b', edgecolor='b', label=f'Vc: {self._rms_c:.1f}V ∠{self._phase_angle_c}°')
+            
+            i_a_legend = Patch(facecolor='r', edgecolor='r', alpha=0.5, label=f'Ia: {self._currentA:.1f}A ∠{self._current_angle_a}°')
+            i_b_legend = Patch(facecolor='g', edgecolor='g', alpha=0.5, label=f'Ib: {self._currentB:.1f}A ∠{self._current_angle_b}°')
+            i_c_legend = Patch(facecolor='b', edgecolor='b', alpha=0.5, label=f'Ic: {self._currentC:.1f}A ∠{self._current_angle_c}°')
             
             # Customize the plot
             ax.set_title('Voltage and Current Phasors')
@@ -774,8 +788,20 @@ class ThreePhaseSineWaveModel(QObject):
             ax.set_theta_direction(-1)  # Clockwise rotation
             ax.grid(True)
             
-            # Add legend outside the plot area
-            plt.legend(loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=3)
+            # Set the radius limit to ensure all phasors are visible
+            max_radius = max(
+                self._rms_a * v_scale, 
+                self._rms_b * v_scale, 
+                self._rms_c * v_scale,
+                self._currentA * i_scale,
+                self._currentB * i_scale,
+                self._currentC * i_scale
+            )
+            ax.set_rlim(0, max_radius * 1.2)  # Add 20% margin
+            
+            # Add custom legend
+            ax.legend(handles=[v_a_legend, v_b_legend, v_c_legend, i_a_legend, i_b_legend, i_c_legend],
+                    loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=3)
             
             # Save the figure
             plt.tight_layout()

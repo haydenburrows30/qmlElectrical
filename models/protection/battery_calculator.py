@@ -3,7 +3,7 @@ import tempfile
 import os
 from datetime import datetime
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from services.file_saver import FileSaver
@@ -44,7 +44,8 @@ class BatteryCalculator(QObject):
         
         # Initialize file saver
         self._file_saver = FileSaver()
-        
+        self._file_saver.saveStatusChanged.connect(self.exportComplete)
+
         self._calculate()
 
     def _calculate(self):
@@ -234,11 +235,9 @@ class BatteryCalculator(QObject):
             # Signal success or failure
             if success:
                 self._file_saver._emit_success_with_path(pdf_file, "PDF saved")
-                self.exportComplete.emit(True, "PDF saved successfully")
                 return True
             else:
                 self._file_saver._emit_failure_with_path(pdf_file, "Error saving PDF")
-                self.exportComplete.emit(False, "Error saving PDF")
                 return False
                 
         except Exception as e:

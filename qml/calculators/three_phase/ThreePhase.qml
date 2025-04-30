@@ -29,6 +29,10 @@ Page {
         " This reduces the size of the conductors and the amount of power lost in transmission. The three-phase system also allows for the use of three-phase motors, which are more efficient and have a higher power-to-weight ratio than single-phase motors.<br>"
     }
 
+    MessagePopup {
+        id: messagePopup
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -302,11 +306,9 @@ Page {
         
         function onPdfExportStatusChanged(success, message) {
             if (success) {
-                // Show success message
-                console.log("PDF export successful:", message)
+                messagePopup.showSuccess(message)
             } else {
-                // Show error message
-                console.error("PDF export failed:", message)
+                messagePopup.showError(message)
             }
         }
     }

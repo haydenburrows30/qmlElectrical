@@ -49,6 +49,20 @@ Item {
                 Layout.fillWidth: true
             }
 
+            StyledButton {
+                ToolTip.text: "Export results to PDF"
+                ToolTip.visible: hovered
+                ToolTip.delay: 500
+                
+                Layout.alignment: Qt.AlignRight
+                icon.source: "../../../icons/rounded/download.svg"
+
+                onClicked: {
+                    if (calculator) {
+                        calculator.exportToPdf()
+                    }
+                }
+            }
 
             StyledButton {
                 text: "Reference Guide"
@@ -217,6 +231,24 @@ Item {
                         fillMode: Image.PreserveAspectFit
                     }
                 }
+            }
+        }
+    }
+
+    // Add a MessagePopup component
+    MessagePopup {
+        id: messagePopup
+    }
+
+    // Add Connections to handle export completion
+    Connections {
+        target: calculator
+        
+        function onExportComplete(success, message) {
+            if (success) {
+                messagePopup.showSuccess(message)
+            } else {
+                messagePopup.showError(message)
             }
         }
     }

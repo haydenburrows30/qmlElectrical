@@ -240,10 +240,10 @@ class BatteryPdfGenerator:
             return False
     
     def generate_battery_chart(self, data, filepath):
-        """Generate a battery visualization chart and save to file
+        """Generate a battery visualization chart
         
         Args:
-            data: Dictionary with battery calculation data
+            data: Dictionary containing battery data
             filepath: Path to save the chart image
             
         Returns:
@@ -255,68 +255,151 @@ class BatteryPdfGenerator:
             depth_of_discharge = data.get('depth_of_discharge', 50)
             battery_type = data.get('battery_type', 'Lead Acid')
             
-            # Create figure
-            plt.figure(figsize=(8, 4))
+            # Create figure with appropriate size and padding
+            fig, ax = plt.subplots(figsize=(10, 6))
+            fig.subplots_adjust(left=0.15, right=0.85, top=0.9, bottom=0.15)
             
-            # Create a visual battery representation
-            # Battery outer shape
-            battery_height = 2
-            battery_width = 6
-            battery_x = 1
-            battery_y = 1
+            # Create battery visualization
+            self._draw_battery(ax, recommended_capacity, depth_of_discharge, battery_type)
             
-            # Draw battery outline
-            plt.gca().add_patch(plt.Rectangle((battery_x, battery_y), battery_width, battery_height, 
-                                           fill=False, edgecolor='black', linewidth=2))
-            # Draw battery terminal
-            terminal_width = 0.3
-            terminal_height = 0.5
-            plt.gca().add_patch(plt.Rectangle((battery_x + (battery_width - terminal_width)/2, 
-                                            battery_y + battery_height), 
-                                           terminal_width, terminal_height, 
-                                           fill=True, facecolor='black'))
+            # Save figure
+            plt.savefig(filepath, dpi=150, bbox_inches='tight')
+            plt.close(fig)
+            return True
+        
+        except Exception as e:
+            logger.error(f"Error generating battery chart: {e}")
+            plt.close()  # Close any open figures
+            return False
+
+    def _draw_battery(self, ax, capacity, dod, battery_type):
+        """Draw a battery visualization
+        
+        Args:
+            ax: Matplotlib axis to draw on
+            capacity: Recommended capacity in Ah
+            dod: Depth of discharge percentage
+            battery_type: Type of battery
+        """
+        # Battery dimensions
+        width = 0.6
+        height = 0.8
+        terminal_width = 0.1
+        terminal_height = 0.05
+        
+        # Battery outline
+        battery = plt.Rectangle((0.2, 0.1), width, height, 
+                               fill=False, linewidth=2, color='black')
+        ax.add_patch(battery)
+        
+        # Battery terminal
+        terminal = plt.Rectangle((0.2 + width/2 - terminal_width/2, 0.1 + height), 
+                                terminal_width, terminal_height, 
+                                fill=True, color='black')
+        ax.add_patch(terminal)
+        
+        # Determine fill level - this is the usable portion (DoD)
+        fill_height = height * (dod / 100)
+        
+        # Battery fill (usable capacity)
+        fill = plt.Rectangle((0.2, 0.1), width, fill_height, 
+                             fill=True, alpha=0.5, color='green')
+        ax.add_patch(fill)
+        
+        # Add text for capacity and DoD
+        battery_type_colors = {
+            "Lead Acid": "blue",
+            "Lithium Ion": "purple",
+            "AGM": "darkgreen"
+        }
+        color = battery_type_colors.get(battery_type, "black")
+        
+        # Capacity text
+        ax.text(0.2 + width/2, 0.1 + height + terminal_height + 0.03, 
+               f"Capacity: {capacity:.1f} Ah", 
+               horizontalalignment='center', color=color, fontsize=12, fontweight='bold')
+        
+        # DoD text
+        ax.text(0.2 + width/2, 0.1 + fill_height/2, 
+               f"Usable\n{dod}%", 
+               horizontalalignment='center', color='black', fontsize=10)
+        
+        # Unusable text - if there's enough room
+        if (height - fill_height) > 0.1:
+            ax.text(0.2 + width/2, 0.1 + fill_height + (height - fill_height)/2, 
+                   f"Unusable\n{100-dod}%", 
+                   horizontalalignment='center', color='gray', fontsize=10)
+        
+        # Battery type
+        ax.text(0.2 + width/2, 0.05, 
+               f"Battery Type: {battery_type}", 
+               horizontalalignment='center', color=color, fontsize=10)
+        
+        # Set axis properties
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.set_aspect('equal')
+        ax.axis('off')
+        
+        # Add title
+        ax.set_title('Battery Capacity Visualization', fontsize=14, pad=20)
+
+    def generate_battery_usage_chart(self, data, filepath):
+        """Generate a chart showing battery usage over time
+        
+        Args:
+            data: Dictionary containing battery data
+            filepath: Path to save the chart image
             
-            # Calculate usable capacity based on DoD
-            usable_width = battery_width * (depth_of_discharge / 100)
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Extract data
+            backup_time = data.get('backup_time', 4)
+            depth_of_discharge = data.get('depth_of_discharge', 50)
+            battery_type = data.get('battery_type', 'Lead Acid')
             
-            # Draw usable capacity
-            plt.gca().add_patch(plt.Rectangle((battery_x, battery_y), usable_width, battery_height, 
-                                          fill=True, facecolor='green', alpha=0.5))
+            # Create figure with comfortable margins
+            plt.figure(figsize=(10, 6))
+            plt.subplots_adjust(left=0.12, right=0.88, top=0.9, bottom=0.15)
             
-            # Draw unusable capacity
-            plt.gca().add_patch(plt.Rectangle((battery_x + usable_width, battery_y), 
-                                          battery_width - usable_width, battery_height, 
-                                          fill=True, facecolor='red', alpha=0.3))
+            # Time points
+            hours = np.linspace(0, backup_time, 100)
             
-            # Add text annotations
-            plt.text(battery_x + battery_width/2, battery_y + battery_height/2, 
-                  f"{recommended_capacity:.1f} Ah", 
-                  horizontalalignment='center', verticalalignment='center', fontsize=12)
+            # Model the discharge curve based on battery type
+            if battery_type == "Lead Acid":
+                # Lead Acid batteries have more voltage drop
+                capacity_percent = 100 - (hours / backup_time) * depth_of_discharge - 5 * np.sin(hours * np.pi / backup_time)
+            elif battery_type == "Lithium Ion":
+                # Lithium Ion batteries maintain voltage better
+                capacity_percent = 100 - (hours / backup_time) * depth_of_discharge - 2 * np.sin(0.5 * hours * np.pi / backup_time)
+            else:  # AGM or other
+                # AGM is between Lead Acid and Lithium
+                capacity_percent = 100 - (hours / backup_time) * depth_of_discharge - 3 * np.sin(0.7 * hours * np.pi / backup_time)
             
-            plt.text(battery_x + usable_width/2, battery_y + battery_height/2, 
-                  f"Usable\n{depth_of_discharge}%", 
-                  horizontalalignment='center', verticalalignment='center', fontsize=10)
+            # Plot the discharge curve
+            plt.plot(hours, capacity_percent, 'b-', linewidth=2)
             
-            plt.text(battery_x + usable_width + (battery_width - usable_width)/2, battery_y + battery_height/2, 
-                  f"Reserve\n{100-depth_of_discharge}%", 
-                  horizontalalignment='center', verticalalignment='center', fontsize=10)
+            # Add the DoD threshold line
+            plt.axhline(y=100-depth_of_discharge, color='r', linestyle='--', label=f'DoD Threshold ({depth_of_discharge}%)')
             
-            # Add title and remove axes
-            plt.title(f"Battery Capacity: {recommended_capacity:.1f} Ah ({battery_type})")
-            plt.axis('off')
+            # Add labels and title
+            plt.xlabel('Time (hours)')
+            plt.ylabel('State of Charge (%)')
+            plt.title(f'Battery Discharge Curve: {battery_type}')
+            plt.grid(True)
+            plt.legend()
+            
+            # Set y-axis limits
+            plt.ylim(0, 110)
             
             # Save the figure
-            plt.tight_layout()
-            plt.savefig(filepath, dpi=150)
-            plt.close('all')  # Close all figures to prevent resource leaks
-            
-            # Force garbage collection
-            gc.collect()
-            
+            plt.savefig(filepath, dpi=150, bbox_inches='tight')
+            plt.close()
             return True
             
         except Exception as e:
-            logger.error(f"Error generating battery chart: {e}")
-            # Make sure to close figures on error
-            plt.close('all')
+            logger.error(f"Error generating battery usage chart: {e}")
+            plt.close()  # Close any open figures
             return False
