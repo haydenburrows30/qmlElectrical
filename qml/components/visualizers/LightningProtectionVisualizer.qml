@@ -12,7 +12,7 @@ Dialog {
     title: "Lightning Protection System - Visualization"
     modal: true
     width: 800
-    height: 600
+    height: 800
     
     property LightningProtectionCalculator calculator
     

@@ -44,7 +44,7 @@ cd electrical-calculator
 2. Install virtual environment via virtualenv:
 
 ```bash
-virtualenv venv
+virtualenv venv or python3.12 -m venv venv
 source venv/bin/activate
 ```
 

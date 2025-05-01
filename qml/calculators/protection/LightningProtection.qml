@@ -46,7 +46,8 @@ Item {
         
             ColumnLayout {
                 id: mainLayout
-                width: flickableMain.width -20
+                // width: flickableMain.width - 20
+                anchors.centerIn: parent
                 
                 // Header
                 RowLayout {
@@ -200,7 +201,7 @@ Item {
                         WaveCard {
                             title: "Protection System"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 300
+                            Layout.minimumHeight: 230
                             
                             GridLayout {
                                 anchors.fill: parent
@@ -253,6 +254,7 @@ Item {
                                         ToolTip.delay: 500
                                     }
                                 }
+
                                 CheckBox {
                                     checked: calculator ? calculator.useRollingSphere : true
                                     onCheckedChanged: {
@@ -263,27 +265,13 @@ Item {
                                         }
                                     }
                                 }
-                                
-                                // Add visualization button
-                                Item { width: 1; height: 10 } // Spacer
-                                Item { width: 1; height: 10 } // Spacer
-                                
+
                                 Button {
-                                    text: "Show 3D Visualization"
+                                    text: "Show Visualization"
                                     icon.source: "../../../icons/rounded/visibility.svg"
                                     Layout.columnSpan: 2
                                     Layout.fillWidth: true
-                                    onClicked: visualizationLoader.active = true
-                                }
-                                
-                                Item { width: 1; height: 5 } // Small spacer
-                                Item { width: 1; height: 5 } // Small spacer
-                                
-                                Button {
-                                    text: "Learn More About Methods"
-                                    Layout.columnSpan: 2
-                                    Layout.fillWidth: true
-                                    onClicked: methodInfoDialog.open()
+                                    onClicked: lightningProtectionVisualizer.open()
                                 }
                             }
                         }
@@ -291,8 +279,8 @@ Item {
                     
                     // Right column - Results
                     ColumnLayout {
-                        Layout.maximumWidth: 600
-                        Layout.minimumWidth: 600
+                        Layout.maximumWidth: 450
+                        Layout.minimumWidth: 450
                         Layout.alignment: Qt.AlignTop
 
                         WaveCard {
@@ -303,6 +291,7 @@ Item {
                             GridLayout {
                                 anchors.fill: parent
                                 columns: 2
+                                uniformCellWidths: true
                                 
                                 Label { text: "Ground flash density:" }
                                 Label { 
@@ -357,6 +346,7 @@ Item {
                             GridLayout {
                                 columns: 2
                                 anchors.fill: parent
+                                uniformCellWidths: true
                                 
                                 // Rolling sphere radius row
                                 Label { 
@@ -394,7 +384,7 @@ Item {
                                     
                                     Rectangle {
                                         width: parent.width
-                                        height: 0.5
+                                        height: rollingSphereRow.visible ? implicitHeight : 0
                                         color: "lightgray"
                                         visible: rollingSphereRow.visible
                                     }
@@ -409,7 +399,7 @@ Item {
                                     
                                     Rectangle {
                                         width: parent.width
-                                        height: 0.5
+                                        height: meshSizeRow.visible ? 0.5 : 0
                                         color: "lightgray"
                                         visible: meshSizeRow.visible
                                     }
@@ -504,161 +494,165 @@ Item {
                                 }
                             }
                         }
-                        
-                        WaveCard {
-                            title: "System Design Notes"
+
+                        StyledButton {
+                            id: designNotesButton
+                            text: "Design Notes"
+                            icon.source: "../../../icons/rounded/notes.svg"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 150
-                            
-                            Label {
-                                anchors.fill: parent
-                                wrapMode: Text.WordWrap
-                                text: "The lightning protection system should include air termination, down conductors, and earthing system. " +
-                                    "Ensure all metal parts are bonded to the lightning protection system with appropriate separation distances. " +
-                                    "Consider surge protection devices for electrical and communication systems."
-                            }
+                            onClicked: designNotes.open()
                         }
                     }
                 }
             }
         }
     }
-    
-    Loader {
-        id: visualizationLoader
-        active: false
-        sourceComponent: visualizationComponent
-        
-        onLoaded: item.open()
-        
-        Connections {
-            target: visualizationLoader.item
-            function onVisualizerClosed() {
-                visualizationLoader.active = false
-            }
-        }
-    }
-    
-    Component {
-        id: visualizationComponent
-        LightningProtectionVisualizer {
-            calculator: root.calculator
-        }
+
+    LightningProtectionVisualizer {
+        id: lightningProtectionVisualizer
+        anchors.centerIn: parent
+        calculator: root.calculator
     }
     
     Dialog {
         id: methodInfoDialog
         title: "Lightning Protection Methods"
-        width: 600
-        height: 500
+        width: Math.min(800, parent ? parent.width * 0.9 : 800)
+        height: Math.min(600, parent ? parent.height * 0.9 : 600)
         modal: true
         standardButtons: Dialog.Close
         anchors.centerIn: parent
         
         ScrollView {
+            id: methodInfoScroll
             anchors.fill: parent
             clip: true
-            
-            ColumnLayout {
-                width: parent.width
-                spacing: 15
+
+            Flickable {
+                id: flickableInfo
+                contentWidth: dialogLayout.width
+                contentHeight: dialogLayout.height + 20
+                bottomMargin : 5
+                leftMargin : 5
+                rightMargin : 5
+                topMargin : 5
+
+                ColumnLayout {
+                    id: dialogLayout
+                    width: flickableInfo.width - 40
                 
-                Label {
-                    text: "Rolling Sphere Method"
-                    font.pixelSize: 16
-                    font.bold: true
-                    Layout.fillWidth: true
-                }
-                
-                Label {
-                    text: "The Rolling Sphere Method is a technique used to determine where lightning protection is needed on a structure. It works on the principle that lightning strikes will attach to objects that the sphere touches as it rolls over and around a structure."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Label {
-                    text: "Key characteristics of the Rolling Sphere Method:"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    font.bold: true
-                }
-                
-                Label {
-                    text: "• The sphere radius represents the striking distance of lightning, which varies by protection level.\n\n" +
-                          "• For Protection Level I: 20m radius\n" +
-                          "• For Protection Level II: 30m radius\n" +
-                          "• For Protection Level III: 45m radius\n" +
-                          "• For Protection Level IV: 60m radius\n\n" +
-                          "• Areas where the sphere touches the structure need air termination devices (lightning rods).\n\n" +
-                          "• Areas that the sphere cannot touch are considered protected zones.\n\n" +
-                          "• The smaller the sphere radius, the more protection is required and the more air terminals needed."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 1
-                    color: "lightgray"
-                }
-                
-                Label {
-                    text: "Mesh Method"
-                    font.pixelSize: 16
-                    font.bold: true
-                    Layout.fillWidth: true
-                }
-                
-                Label {
-                    text: "The Mesh Method involves installing a grid of conductors on the roof of a structure to intercept lightning strikes. This method is particularly effective for flat or gently sloping roofs."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Label {
-                    text: "Key characteristics of the Mesh Method:"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    font.bold: true
-                }
-                
-                Label {
-                    text: "• The mesh size (grid spacing) varies based on the protection level:\n\n" +
-                          "• For Protection Level I: 5m × 5m\n" +
-                          "• For Protection Level II: 10m × 10m\n" +
-                          "• For Protection Level III: 15m × 15m\n" +
-                          "• For Protection Level IV: 20m × 20m\n\n" +
-                          "• The grid creates a Faraday cage effect, providing distributed interception points.\n\n" +
-                          "• All metallic objects on the roof should be bonded to the mesh.\n\n" +
-                          "• The mesh should be connected to down conductors that run to the grounding system.\n\n" +
-                          "• A smaller mesh size provides better protection but requires more conductor material."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-                
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 1
-                    color: "lightgray"
-                }
-                
-                Label {
-                    text: "Combined Application"
-                    font.pixelSize: 16
-                    font.bold: true
-                    Layout.fillWidth: true
-                }
-                
-                Label {
-                    text: "In practice, both methods are often used together to design a comprehensive lightning protection system:\n\n" +
-                          "• The Rolling Sphere Method determines where air terminals are needed, especially on irregular structures or buildings with multiple height levels.\n\n" +
-                          "• The Mesh Method provides a well-distributed interception network for flat roof areas.\n\n" +
-                          "• Both methods should be implemented according to the same protection level to ensure consistent protection.\n\n" +
-                          "• The more critical the structure or its contents, the higher the protection level should be and the more comprehensive the implementation of both methods."
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
+                    Label {
+                        text: "Rolling Sphere Method"
+                        font.pixelSize: 16
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label {
+                        text: "The Rolling Sphere Method is a technique used to determine where lightning protection is needed on a structure. It works on the principle that lightning strikes will attach to objects that the sphere touches as it rolls over and around a structure."
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label {
+                        text: "Key characteristics of the Rolling Sphere Method:"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                        font.bold: true
+                    }
+                    
+                    Label {
+                        text: "• The sphere radius represents the striking distance of lightning, which varies by protection level.\n\n" +
+                            "• For Protection Level I: 20m radius\n" +
+                            "• For Protection Level II: 30m radius\n" +
+                            "• For Protection Level III: 45m radius\n" +
+                            "• For Protection Level IV: 60m radius\n\n" +
+                            "• Areas where the sphere touches the structure need air termination devices (lightning rods).\n\n" +
+                            "• Areas that the sphere cannot touch are considered protected zones.\n\n" +
+                            "• The smaller the sphere radius, the more protection is required and the more air terminals needed."
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: "lightgray"
+                    }
+                    
+                    Label {
+                        text: "Mesh Method"
+                        font.pixelSize: 16
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label {
+                        text: "The Mesh Method involves installing a grid of conductors on the roof of a structure to intercept lightning strikes. This method is particularly effective for flat or gently sloping roofs."
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label {
+                        text: "Key characteristics of the Mesh Method:"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                        font.bold: true
+                    }
+                    
+                    Label {
+                        text: "• The mesh size (grid spacing) varies based on the protection level:\n\n" +
+                            "• For Protection Level I: 5m × 5m\n" +
+                            "• For Protection Level II: 10m × 10m\n" +
+                            "• For Protection Level III: 15m × 15m\n" +
+                            "• For Protection Level IV: 20m × 20m\n\n" +
+                            "• The grid creates a Faraday cage effect, providing distributed interception points.\n\n" +
+                            "• All metallic objects on the roof should be bonded to the mesh.\n\n" +
+                            "• The mesh should be connected to down conductors that run to the grounding system.\n\n" +
+                            "• A smaller mesh size provides better protection but requires more conductor material."
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
+                    
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: "lightgray"
+                    }
+                    
+                    Label {
+                        text: "Combined Application"
+                        font.pixelSize: 16
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    
+                    Label {
+                        text: "In practice, both methods are often used together to design a comprehensive lightning protection system:\n\n" +
+                            "• The Rolling Sphere Method determines where air terminals are needed, especially on irregular structures or buildings with multiple height levels.\n\n" +
+                            "• The Mesh Method provides a well-distributed interception network for flat roof areas.\n\n" +
+                            "• Both methods should be implemented according to the same protection level to ensure consistent protection.\n\n" +
+                            "• The more critical the structure or its contents, the higher the protection level should be and the more comprehensive the implementation of both methods."
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
+                    }
                 }
             }
+        }
+    }
+
+    Popup {
+        id: designNotes
+        width: 500
+        height: 300
+        anchors.centerIn: parent
+
+        Label {
+            anchors.fill: parent
+            wrapMode: Text.WordWrap
+            text: "The lightning protection system should include air termination, down conductors, and earthing system. " +
+                "Ensure all metal parts are bonded to the lightning protection system with appropriate separation distances. " +
+                "Consider surge protection devices for electrical and communication systems."
         }
     }
 }
