@@ -435,14 +435,35 @@ class ThreePhaseSineWaveModel(QObject):
     @Property(float, notify=dataChanged)
     def currentA(self):
         return self._currentA
+    
+    @currentA.setter
+    def currentA(self, value):
+        if self._currentA != value:
+            self._currentA = value
+            self._cache_key = None
+            self.update_wave()
 
     @Property(float, notify=dataChanged)
     def currentB(self):
         return self._currentB
+    
+    @currentB.setter
+    def currentB(self, value):
+        if self._currentB != value:
+            self._currentB = value
+            self._cache_key = None
+            self.update_wave()
 
     @Property(float, notify=dataChanged)
     def currentC(self):
         return self._currentC
+    
+    @currentC.setter
+    def currentC(self, value):
+        if self._currentC != value:
+            self._currentC = value
+            self._cache_key = None
+            self.update_wave()
 
     @Property(float, notify=dataChanged)
     def currentAngleA(self):

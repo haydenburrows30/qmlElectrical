@@ -185,4 +185,10 @@ ColumnLayout {
         color: phaseColor
         opacity: 0.3
     }
+
+    onAmplitudeChanged1: function(value) {
+        if (phase === "A") calculator.setCurrentA(value)
+        else if (phase === "B") calculator.setCurrentB(value)
+        else calculator.setCurrentC(value)
+    }
 }

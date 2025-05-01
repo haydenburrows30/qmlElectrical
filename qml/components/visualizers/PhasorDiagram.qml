@@ -12,10 +12,13 @@ Item {
     property var phaseAngles: [0, 120, 240]
     property var currentPhaseAngles: [30, 150, 270]
     property var currentMagnitudes: [1, 1, 1]
+    property var voltageMagnitudes: [1, 1, 1]  // Add property for voltage magnitudes
     property bool showCurrentPhasors: false
     
     signal angleChanged(int index, real angle)
     signal currentAngleChanged(int index, real angle)
+    signal magnitudeChanged(int index, real magnitude)  // New signal for voltage magnitude
+    signal currentMagnitudeChanged(int index, real magnitude)  // New signal for current magnitude
 
     property var colors: ["#f44336", "#4caf50", "#2196f3"]
     property var currentColors: ["#ffcdd2", "#c8e6c9", "#bbdefb"]
@@ -32,6 +35,7 @@ Item {
     onPhaseAnglesChanged: canvas.requestPaint()
     onCurrentPhaseAnglesChanged: canvas.requestPaint()
     onCurrentMagnitudesChanged: canvas.requestPaint()
+    onVoltageMagnitudesChanged: canvas.requestPaint()  // Add handler for voltage magnitude changes
     onShowCurrentPhasorsChanged: canvas.requestPaint()
 
     // Background circle and grid
@@ -89,8 +93,10 @@ Item {
                 // Draw voltage phasors
                 for (var i = 0; i < phaseAngles.length; i++) {
                     var angle = -phaseAngles[i] * Math.PI / 180
-                    var x = centerX + radius * Math.cos(angle)
-                    var y = centerY + radius * Math.sin(angle)
+                    var magnitude = voltageMagnitudes[i] || 1
+                    var pRad = phasorRadius * magnitude
+                    var x = centerX + pRad * Math.cos(angle)
+                    var y = centerY + pRad * Math.sin(angle)
 
                     // Draw phasor line with glow effect
                     ctx.strokeStyle = colors[i]
@@ -159,8 +165,10 @@ Item {
                 opacity: dragArea.drag.active ? 0.8 : 0.4
                 
                 // Position handle at end of phasor
-                x: phasorDisplay.width/2 + Math.cos(-phaseAngles[index] * Math.PI / 180) * phasorRadius - width/2
-                y: phasorDisplay.height/2 + Math.sin(-phaseAngles[index] * Math.PI / 180) * phasorRadius - height/2
+                x: phasorDisplay.width/2 + Math.cos(-phaseAngles[index] * Math.PI / 180) * 
+                   phasorRadius * (voltageMagnitudes[index] || 1) - width/2
+                y: phasorDisplay.height/2 + Math.sin(-phaseAngles[index] * Math.PI / 180) * 
+                   phasorRadius * (voltageMagnitudes[index] || 1) - height/2
 
                 MouseArea {
                     id: dragArea
@@ -175,13 +183,20 @@ Item {
                             var dx = parent.x + width/2 - cx
                             var dy = parent.y + height/2 - cy
                             
+                            // Calculate magnitude (distance from center / max radius)
+                            var distance = Math.sqrt(dx * dx + dy * dy)
+                            var magnitude = Math.min(Math.max(distance / phasorRadius, 0.1), 1.5)
+                            
                             // Calculate angle in degrees
                             var angle = Math.atan2(dy, dx) * 180 / Math.PI
                             
                             // Convert to clockwise angle starting from right (0°)
                             angle = (-angle + 360) % 360
                             
+                            // Emit both signals
                             phasorDiagram.angleChanged(index, angle)
+                            phasorDiagram.magnitudeChanged(index, magnitude)
+                            
                             canvas.requestPaint()
                         }
                     }
@@ -189,7 +204,8 @@ Item {
 
                 ToolTip.visible: dragArea.containsMouse
                 ToolTip.text: "Voltage Phase " + (["A", "B", "C"][index]) + "\n" +
-                             "Angle: " + phaseAngles[index].toFixed(1) + "°"
+                             "Angle: " + phaseAngles[index].toFixed(1) + "°\n" +
+                             "Magnitude: " + (voltageMagnitudes[index] || 1).toFixed(2)
 
                 color: colors[index]
                 border.color: "white"
@@ -229,13 +245,20 @@ Item {
                             var dx = parent.x + width/2 - cx
                             var dy = parent.y + height/2 - cy
                             
+                            // Calculate magnitude (distance from center / max radius)
+                            var distance = Math.sqrt(dx * dx + dy * dy)
+                            var magnitude = Math.min(Math.max(distance / currentPhasorRadius, 0.1), 2.0)
+                            
                             // Calculate angle in degrees
                             var angle = Math.atan2(dy, dx) * 180 / Math.PI
                             
                             // Convert to clockwise angle starting from right (0°)
                             angle = (-angle + 360) % 360
                             
+                            // Emit both signals
                             phasorDiagram.currentAngleChanged(index, angle)
+                            phasorDiagram.currentMagnitudeChanged(index, magnitude * 100)  // Scale back to original range
+                            
                             canvas.requestPaint()
                         }
                     }
@@ -244,6 +267,7 @@ Item {
                 ToolTip.visible: currentDragArea.containsMouse
                 ToolTip.text: "Current Phase " + (["A", "B", "C"][index]) + "\n" +
                              "Angle: " + currentPhaseAngles[index].toFixed(1) + "°\n" +
+                             "Magnitude: " + (currentMagnitudes[index] * 100).toFixed(1) + "A\n" +
                              "Power Factor: " + Math.cos((currentPhaseAngles[index] - phaseAngles[index]) * Math.PI / 180).toFixed(3)
 
                 color: currentColors[index]

@@ -42,10 +42,10 @@ Page {
             id: flickableContainer
             contentWidth: parent.width
             contentHeight: mainLayout.height + 10
-            bottomMargin : 5
-            leftMargin : 5
-            rightMargin : 5
-            topMargin : 5
+            bottomMargin: 5
+            leftMargin: 5
+            rightMargin: 5
+            topMargin: 5
 
             ColumnLayout {
                 id: mainLayout
@@ -104,7 +104,6 @@ Page {
                         }
 
                         ColumnLayout {
-
                             // Measurements
                             WaveCard {
                                 id: results
@@ -187,7 +186,6 @@ Page {
                         // Power Analysis
                         WaveCard {
                             title: "Power Analysis"
-                            // Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.minimumHeight: 460
                             Layout.minimumWidth: 500
@@ -255,6 +253,7 @@ Page {
                             Layout.fillHeight: true
                             
                             PhasorDiagram {
+                                id: phasorDiagram
                                 anchors.fill: parent
                                 // Update to include both voltage and current phasors
                                 phaseAngles: [
@@ -274,6 +273,12 @@ Page {
                                     calculator.currentB / 100,
                                     calculator.currentC / 100
                                 ]
+                                // Add voltage magnitudes
+                                voltageMagnitudes: [
+                                    calculator.rmsA / 230, // Scale based on default value
+                                    calculator.rmsB / 230,
+                                    calculator.rmsC / 230
+                                ]
                                 showCurrentPhasors: true // Flag to enable current phasors
                                 
                                 // Handle voltage angle changes
@@ -291,6 +296,32 @@ Page {
                                         case 0: calculator.setCurrentAngleA(angle); break;
                                         case 1: calculator.setCurrentAngleB(angle); break;
                                         case 2: calculator.setCurrentAngleC(angle); break;
+                                    }
+                                }
+                                
+                                // Handle voltage magnitude changes
+                                onMagnitudeChanged: function(index, magnitude) {
+                                    let voltageValue = magnitude * 230 * Math.SQRT2;
+                                    switch(index) {
+                                        case 0: calculator.setAmplitudeA(voltageValue); break;
+                                        case 1: calculator.setAmplitudeB(voltageValue); break;
+                                        case 2: calculator.setAmplitudeC(voltageValue); break;
+                                    }
+                                }
+                                
+                                // Handle current magnitude changes
+                                onCurrentMagnitudeChanged: function(index, magnitude) {
+                                    try {
+                                        // Now we have setters for current in the Python model
+                                        if (index === 0) {
+                                            calculator.currentA = magnitude;
+                                        } else if (index === 1) {
+                                            calculator.currentB = magnitude;
+                                        } else if (index === 2) {
+                                            calculator.currentC = magnitude;
+                                        }
+                                    } catch (e) {
+                                        console.error("Error updating current magnitude:", e);
                                     }
                                 }
                             }
