@@ -342,31 +342,20 @@ Item {
                                     text: getFunctionParameterALabel()
                                     Layout.minimumWidth: 150
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: parameterASpinBox
                                     from: -50
                                     to: 50
-                                    value: t_calculator.parameterA * 10
+                                    sliderDecimal: 0
+                                    value: t_calculator.parameterA
                                     stepSize: 1
-                                    editable: true
                                     Layout.fillWidth: true
-                                    
-                                    property real realValue: value / 10.0
 
-                                    onValueModified: t_calculator.setParameterA(realValue)
-                                    
-                                    textFromValue: function(value) {
-                                        return (value / 10.0).toFixed(1);
-                                    }
-                                    
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text) * 10);
-                                    }
+                                    property real realValue: value
 
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
+                                    onMoved: t_calculator.setParameterA(realValue)
+                                    onTextChangedSignal: t_calculator.setParameterA(realValue)
                                 }
 
                                 Label { 
@@ -407,72 +396,50 @@ Item {
                                     Layout.minimumWidth: 150
                                     visible: needsFrequency() || functionTypeCombo.currentText === "Custom"
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: frequencySpinBox
-                                    from: 1
-                                    to: 1000
-                                    value: t_calculator.frequency * 10
+                                    from: 10
+                                    to: 100
+                                    sliderDecimal: 0
+                                    value: t_calculator.frequency
                                     stepSize: 1
-                                    editable: true
                                     Layout.fillWidth: true
                                     visible: needsFrequency() || functionTypeCombo.currentText === "Custom"
 
-                                    property real realValue: value / 10.0
+                                    property real realValue: value
 
-                                    onValueModified: t_calculator.setFrequency(realValue)
-
-                                    textFromValue: function(value) {
-                                        return (value / 10.0).toFixed(1);
-                                    }
-
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text) * 10);
-                                    }
-
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
+                                    onMoved: t_calculator.setFrequency(realValue)
+                                    onTextChangedSignal: t_calculator.setFrequency(realValue)
                                 }
 
                                 Label { 
                                     text: "Sample Points:" 
                                     Layout.minimumWidth: 150
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: samplePointsSpinBox
                                     from: 100
                                     to: 1000
-                                    value: 500
-                                    stepSize: 50
-                                    editable: true
+                                    sliderDecimal: 0
+                                    value: t_calculator.samplePoints
+                                    stepSize: 1
                                     Layout.fillWidth: true
 
                                     property real realValue: value
 
-                                    onValueModified: t_calculator.setSamplePoints(value)
-
-                                    textFromValue: function(value) {
-                                        return value.toFixed(1);
-                                    }
-                                    
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text));
-                                    }
-
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
+                                    onMoved: t_calculator.setSamplePoints(realValue)
+                                    onTextChangedSignal: t_calculator.setSamplePoints(realValue)
                                 }
-                                
+
                                 // Window function selection - only visible for Fourier transform
                                 Label { 
                                     text: "Window Function:" 
                                     Layout.minimumWidth: 150
                                     visible: fourierRadio.checked
                                 }
-                                
+
                                 RowLayout {
                                     Layout.fillWidth: true
                                     visible: fourierRadio.checked
@@ -637,26 +604,18 @@ Item {
                         ColumnLayout {
                             anchors.fill: parent
 
-                            Label {
-                                text: "Chart Information:"
-                                font.bold: true
-                                Layout.columnSpan: 2
-                            }
-
                             RowLayout {
                                 Layout.fillWidth: true
-                            
+
                                 Label {
-                                    text: "• Top chart: Time domain signal\n• Bottom chart: " + 
-                                            (t_calculator.transformType === "Fourier" ? 
-                                            "Frequency domain with magnitude and phase" : 
-                                            "s-domain with magnitude and phase")
-                                    Layout.columnSpan: 2
+                                    text: "Chart Information:"
+                                    font.bold: true
                                     Layout.fillWidth: true
                                 }
 
                                 // Export PDF Button
                                 Button {
+                                    Layout.alignment: Qt.AlignRight
                                     text: "Export PDF"
                                     icon.source: "../../../icons/rounded/download.svg"
                                     ToolTip.text: "Export results to PDF"
@@ -671,6 +630,7 @@ Item {
                                 
                                 // Export Plot Button
                                 Button {
+                                    Layout.alignment: Qt.AlignRight
                                     text: "Export Plot"
                                     icon.source: "../../../icons/rounded/image.svg"
                                     ToolTip.text: "Export plot as image"
@@ -681,6 +641,20 @@ Item {
                                         // Use the calculator's plot export function directly
                                         t_calculator.generate_plot_for_file_saver()
                                     }
+                                }
+
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                            
+                                Label {
+                                    text: "• Top chart: Time domain signal\n• Bottom chart: " + 
+                                            (t_calculator.transformType === "Fourier" ? 
+                                            "Frequency domain with magnitude and phase" : 
+                                            "s-domain with magnitude and phase")
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
                                 }
 
                                 // Add a prominent display of the resonant frequency

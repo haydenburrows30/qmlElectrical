@@ -118,7 +118,7 @@ Page {
                 lifeSpanVariation: 500
                 size: 16
                 endSize: 32
-                Tracer { color: 'green' }
+                // Tracer { color: 'green' }
             }
 
             ImageParticle {
@@ -132,6 +132,15 @@ Page {
                 rotationVelocityVariation: 15
                 entryEffect: ImageParticle.Scale
             }
+        }
+
+        SliderText {
+            value: 50
+            from: 1
+            to: 100
+            stepSize: 1
+
+            sliderDecimal: 1
         }
     }
 }

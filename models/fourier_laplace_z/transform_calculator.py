@@ -34,7 +34,7 @@ class TransformCalculator(QObject):
         self._function_type = "Sine"      # Function type to transform
         self._parameter_a = 1.0           # First parameter for function
         self._parameter_b = 2.0           # Second parameter for function
-        self._frequency = 1.0             # Frequency for periodic functions
+        self._frequency = 10.0             # Frequency for periodic functions
         self._sample_points = 500         # Number of points for visualization
         self._window_type = "None"        # Window function type
         self._calculating = False         # Flag for calculations in progress

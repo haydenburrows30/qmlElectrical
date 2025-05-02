@@ -307,31 +307,20 @@ Item {
                                     text: "Amplitude:"
                                     Layout.minimumWidth: 150
                                 }
-                                
-                                SpinBoxRound {
-                                    id: amplitudeSpinBox
-                                    from: -50
-                                    to: 50
-                                    value: z_calculator.amplitude * 10
-                                    stepSize: 1
-                                    editable: true
-                                    Layout.fillWidth: true
-                                    
-                                    property real realValue: value / 10.0
-                                    
-                                    onValueModified: z_calculator.setAmplitude(realValue)
-                                    
-                                    textFromValue: function(value) {
-                                        return (value / 10.0).toFixed(1);
-                                    }
-                                    
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text) * 10);
-                                    }
 
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
+                                SliderText {
+                                    id: amplitudeSpinBox
+                                    from: -10
+                                    to: 10
+                                    sliderDecimal: 0
+                                    value: z_calculator.amplitude
+                                    stepSize: 1
+                                    Layout.fillWidth: true
+
+                                    property real realValue: value
+
+                                    onMoved: z_calculator.setAmplitude(realValue)
+                                    onTextChangedSignal: z_calculator.setAmplitude(realValue)
                                 }
 
                                 Label { 
@@ -339,32 +328,21 @@ Item {
                                     Layout.minimumWidth: 150
                                     visible: needsDecayFactor()
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: decayFactorSpinBox
                                     from: 1
                                     to: 100
-                                    value: z_calculator.decayFactor * 10
+                                    sliderDecimal: 0
+                                    value: z_calculator.decayFactor
                                     stepSize: 1
-                                    editable: true
                                     Layout.fillWidth: true
                                     visible: needsDecayFactor()
-                                    
-                                    property real realValue: value / 10.0
-                                    
-                                    onValueModified: z_calculator.setDecayFactor(realValue)
-                                    
-                                    textFromValue: function(value) {
-                                        return (value / 10.0).toFixed(1);
-                                    }
-                                    
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text) * 10);
-                                    }
 
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
+                                    property real realValue: value
+
+                                    onMoved: z_calculator.setDecayFactor(realValue)
+                                    onTextChangedSignal: z_calculator.setDecayFactor(realValue)
                                 }
 
                                 Label { 
@@ -372,84 +350,65 @@ Item {
                                     Layout.minimumWidth: 150
                                     visible: needsFrequency()
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: frequencySpinBox
-                                    from: 1
-                                    to: 1000
-                                    value: z_calculator.frequency * 10
+                                    from: 10
+                                    to: 100
+                                    sliderDecimal: 0
+                                    value: z_calculator.frequency
                                     stepSize: 1
-                                    editable: true
                                     Layout.fillWidth: true
                                     visible: needsFrequency()
-                                    
-                                    property real realValue: value / 10.0
-                                    
-                                    onValueModified: z_calculator.setFrequency(realValue)
-                                    
-                                    textFromValue: function(value) {
-                                        return (value / 10.0).toFixed(1);
-                                    }
-                                    
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text) * 10);
-                                    }
 
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
+                                    property real realValue: value
+
+                                    onMoved: z_calculator.setFrequency(realValue)
+                                    onTextChangedSignal: z_calculator.setFrequency(realValue)
                                 }
                                 
                                 Label { 
                                     text: "Sampling Rate (Hz):" 
                                     Layout.minimumWidth: 150
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: samplingRateSpinBox
-                                    from: 1
+                                    from: 10
                                     to: 2000
+                                    sliderDecimal: 0
                                     value: z_calculator.samplingRate
-                                    stepSize: 1
-                                    editable: true
+                                    stepSize: 10
                                     Layout.fillWidth: true
 
                                     property real realValue: value
 
-                                    textFromValue: function(value) {
-                                        return value.toFixed(0);
-                                    }
+                                    onMoved: z_calculator.setSamplingRate(realValue)
+                                    onTextChangedSignal: z_calculator.setSamplingRate(realValue)
 
-                                    valueFromText: function(text) {
-                                        return Math.round(parseFloat(text));
-                                    }
-
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /[0-9]*\.?[0-9]*/
-                                    }
-                                    
                                     ToolTip.visible: hilbertRadio.checked && hovered
                                     ToolTip.text: "Sampling rates between 1-100 Hz often show more pronounced Hilbert transform features"
                                     ToolTip.delay: 500
-                                    
-                                    onValueModified: z_calculator.setSamplingRate(realValue)
                                 }
 
                                 Label { 
                                     text: "Sequence Length:" 
                                     Layout.minimumWidth: 150
                                 }
-                                
-                                SpinBoxRound {
+
+                                SliderText {
                                     id: sequenceLengthSpinBox
                                     from: 10
                                     to: 500
+                                    sliderDecimal: 0
                                     value: z_calculator.sequenceLength
                                     stepSize: 10
-                                    editable: true
                                     Layout.fillWidth: true
-                                    
-                                    onValueChanged: z_calculator.setSequenceLength(value)
+
+                                    property real realValue: value
+
+                                    onMoved: z_calculator.setSequenceLength(value)
+                                    onTextChangedSignal: z_calculator.setSequenceLength(value)
                                 }
                                 
                                 Label { 
