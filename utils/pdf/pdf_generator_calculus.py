@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
+import re
 
 from services.logger_config import configure_logger
 logger = configure_logger("qmltest", component="calculus_pdf")
@@ -246,6 +247,54 @@ class CalculusPdfGenerator:
             
             return False
     
+    def _convert_html_formula_to_matplotlib(self, html_formula):
+        """Convert HTML-formatted formula to matplotlib-compatible format
+        
+        Args:
+            html_formula: Formula with HTML formatting
+            
+        Returns:
+            str: Matplotlib-compatible formula
+        """
+        if not html_formula:
+            return ""
+        
+        # Convert HTML to matplotlib format
+        result = html_formula
+        
+        # Handle superscripts: convert <sup>n</sup> to ^n (simpler format for matplotlib)
+        result = re.sub(r'<sup>(.*?)</sup>', r'^{\1}', result)
+        
+        # Handle subscripts: convert <sub>n</sub> to _n (simpler format for matplotlib)
+        result = re.sub(r'<sub>(.*?)</sub>', r'_{\1}', result)
+        
+        # Handle middle dot: replace &middot; with regular dot
+        result = result.replace('&middot;', '·')
+        
+        # Handle square root: replace &radic; with sqrt
+        result = result.replace('&radic;', 'sqrt')
+        
+        # Handle other HTML entities
+        result = result.replace('&pi;', 'π')
+        
+        # Replace LaTeX-style notations with simpler forms for matplotlib
+        # Replace error function with text
+        result = result.replace('erf(', 'error-function(')
+        
+        # Handle fractions: for better display in matplotlib, use a/b instead of \frac{a}{b}
+        result = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'\1/\2', result)
+        # Also catch patterns like (a/b)
+        result = re.sub(r'\(([^/]+)/([^)]+)\)', r'\1/\2', result)
+        
+        # Additional clean-up for matplotlib
+        # Remove HTML tags that might remain
+        result = re.sub(r'<[^>]+>', '', result)
+        
+        # Replace complex LaTeX with simpler notation
+        result = result.replace('\\', '')  # Remove backslashes
+        
+        return result
+    
     def _generate_function_chart_bytes(self, data):
         """Generate a visualization chart for the function, derivative, and integral in memory
         
@@ -283,19 +332,30 @@ class CalculusPdfGenerator:
             plt.figure(figsize=(10, 6))
             figure_created = True
             
-            # Plot function, derivative and integral
-            plt.plot(x_values, function_values, 'b-', linewidth=2, label=f"f(x) = {data.get('function_formula', '')}")
-            plt.plot(x_values, derivative_values, 'r-', linewidth=2, label=f"f'(x) = {data.get('derivative_formula', '')}")
-            plt.plot(x_values, integral_values, 'g-', linewidth=2, label=f"∫f(x)dx = {data.get('integral_formula', '')}")
+            # Get function type for title
+            function_type = data.get('function_type', '')
+            
+            # Use simple labels for the chart - no formulas
+            function_label = "f(x) - Original Function"
+            derivative_label = "f'(x) - Derivative"
+            integral_label = "∫f(x)dx - Integral"
+            
+            # Set matplotlib to use standard font
+            matplotlib.rcParams['mathtext.fontset'] = 'dejavusans'
+            
+            # Plot function, derivative and integral with simplified labels
+            plt.plot(x_values, function_values, 'b-', linewidth=2, label=function_label)
+            plt.plot(x_values, derivative_values, 'r-', linewidth=2, label=derivative_label)
+            plt.plot(x_values, integral_values, 'g-', linewidth=2, label=integral_label)
             
             # Add grid and legend
             plt.grid(True, linestyle='--', alpha=0.7)
-            plt.legend(loc='upper left')
+            plt.legend(loc='upper left', fontsize=10)
             
             # Add labels and title
             plt.xlabel('x')
             plt.ylabel('y')
-            plt.title(f"{data.get('function_type', '')} Function Analysis")
+            plt.title(f"{function_type} Function Analysis")
             
             # Set x and y axis limits to reasonable values
             y_values = function_values + derivative_values + integral_values
