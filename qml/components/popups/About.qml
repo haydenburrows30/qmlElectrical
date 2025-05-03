@@ -6,7 +6,7 @@ Popup {
     id: aboutProgram
 
     width: 600
-    height: 310
+    height: 400
     modal: true
 
     anchors.centerIn: Overlay.overlay
@@ -116,6 +116,30 @@ Popup {
             text: configBridge.processor
             font.pixelSize: 16
             font.bold: true
+        }
+
+        Label {
+            id: help
+            text: "Help"
+            font.pixelSize: 20
+            font.bold: true
+            Layout.columnSpan: 2
+            Layout.bottomMargin: 10
+            Layout.topMargin: 10
+        }
+
+        Label {
+            id: linkText
+            text: '<a href="https://github.com/haydenburrows30/qmlElectrical/wiki">https://github.com/haydenburrows30/qmlElectrical/wiki</a>'
+            font.pixelSize: 16
+            textFormat: Text.RichText
+            color: "blue"
+            wrapMode: Text.Wrap
+            Layout.columnSpan: 2
+            
+            onLinkActivated: function(linkUrl) {
+                Qt.openUrlExternally(linkUrl)
+            }
         }
     }
 }

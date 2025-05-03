@@ -37,10 +37,6 @@ ApplicationWindow {
         id: logViewerPopup
     }
 
-    Help {
-        id: help
-    }
-
     SettingsMenu {
         id: settingsMenu
     }
@@ -224,10 +220,6 @@ ApplicationWindow {
                     MenuItem {
                         text: "Log Viewer"
                         onTriggered: logViewerPopup.open()
-                    }
-                    MenuItem {
-                        text: "Help"
-                        onTriggered: help.open()
                     }
                     MenuItem {
                         text: "About"
