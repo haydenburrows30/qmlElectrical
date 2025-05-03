@@ -1,6 +1,8 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 import numpy as np
 
+from utils.series_helper import SeriesHelper
+
 class CalculusCalculator(QObject):
     """Calculator for demonstrating differentiation and integration concepts"""
 
@@ -17,8 +19,8 @@ class CalculusCalculator(QObject):
         
         # Parameters
         self._function_type = "Sine"  # Default function
-        self._parameter_a = 1.0       # Amplitude for most functions
-        self._parameter_b = 1.0       # Frequency for periodic functions or other parameters
+        self._parameter_a = 2.0       # Amplitude for most functions
+        self._parameter_b = 2.0       # Frequency for periodic functions or other parameters
         
         # Function mapping
         self._function_map = {
@@ -399,7 +401,180 @@ class CalculusCalculator(QObject):
     @Slot()
     def calculate(self):
         self._calculate()
+
+    @Slot(list, result="QVariantMap")
+    def getMinMax(self, array):
+        """Calculate min and max values from an array with safety checks and padding.
+        
+        Returns a dictionary with min and max values that can be used to set axis ranges.
+        """
+        if not array or len(array) < 1:
+            return {"min": 0, "max": 1}
+            
+        # Only sample a reasonable number of points for min/max calculation
+        max_sample_points = 1000
+        step = len(array) > max_sample_points and int(len(array) / max_sample_points) or 1
+            
+        # Use NumPy for faster calculation if possible
+        if isinstance(array, np.ndarray):
+            # Use efficient numpy operations
+            if step > 1:
+                sampled = array[::step]
+                min_val = np.min(sampled)
+                max_val = np.max(sampled)
+            else:
+                min_val = np.min(array)
+                max_val = np.max(array)
+        else:
+            # Fallback to list operations
+            min_val = array[0]
+            max_val = array[0]
+            
+            for i in range(0, len(array), step):
+                if array[i] < min_val:
+                    min_val = array[i]
+                if array[i] > max_val:
+                    max_val = array[i]
+        
+        # Avoid zero ranges that cause render issues
+        if abs(max_val - min_val) < 0.00001:
+            max_val = min_val + 1
+        
+        # Add padding (5%)
+        padding = (max_val - min_val) * 0.05
+        
+        return {"min": round(min_val), "max": round(max_val)}
+
+    @Slot(QObject, str)
+    def setAxisRange(self, axis, type):
+        """Set axis range based on data type.
+        
+        Args:
+            axis: The QValueAxis object
+            data_type: String indicating the type of data ('fft', 'phase', 'wave', etc.)
+        """
+
+        if type == "Polynomial" or type == "Exponential" or type == "Power":
+
+            data = self._function_values.tolist()
+            range_data = self.getMinMax(data)
+            axis.setMax(range_data["max"])
+
+        elif type == "Sine" or type == "Gaussian":
+            data = self._function_values.tolist()
+            range_data = self.getMinMax(data)
+            # Add extra padding for waves
+            padding = (range_data["max"] - range_data["min"]) * 0.15
+            axis.setMin(range_data["min"] - padding)
+            axis.setMax(range_data["max"] + padding)
+
+        else:
+            # Default to 0-1 range for other types
+            axis.setMin(1)
+            axis.setMax(10)
     
+    @Slot(QObject, str)
+    def configureLogAxis(self, axis, type):
+        """Configure logarithmic axis based on function type.
+        
+        Args:
+            axis: The LogValueAxis object
+            type: The function type string
+        """
+        # For exponential functions, use a wider range
+        if type == "Exponential":
+            axis.setMin(0.1)
+            axis.setMax(10000)
+            axis.setMinorTickCount(10)
+            axis.setLabelFormat("%.0e")  # Scientific notation
+        # For polynomial functions with positive exponents
+        elif type == "Polynomial" and self._parameter_b > 0:
+            axis.setMin(0.1)
+            axis.setMax(1000)
+            axis.setMinorTickCount(8)
+            axis.setLabelFormat("%.1f")
+        # For power functions
+        elif type == "Power" and self._parameter_a > 0:
+            axis.setMin(0.1)
+            axis.setMax(100)
+            axis.setMinorTickCount(5)
+            axis.setLabelFormat("%.1f")
+        # Default configuration
+        else:
+            axis.setMin(0.1)
+            axis.setMax(10)
+            axis.setMinorTickCount(5)
+            axis.setLabelFormat("%.1f")
+
+    @Slot('QVariantList', result='QVariantList')
+    def getPositiveValues(self, values):
+        """Convert data to strictly positive values for log scale display.
+        
+        Args:
+            values: List of values to process
+            
+        Returns:
+            List with positive values only (negatives and zeros replaced)
+        """
+        if not values:
+            return [0.1] * 10  # Default dataset if empty
+        
+        try:
+            # Convert to numpy for faster processing if needed
+            use_numpy = True
+            if use_numpy:
+                arr = np.array(values, dtype=float)
+                # Find min positive value for replacing zeros/negatives
+                pos_values = arr[arr > 0]
+                min_positive = 0.1
+                if len(pos_values) > 0:
+                    min_positive = np.min(pos_values) / 2
+                    if min_positive <= 0:
+                        min_positive = 0.1
+                
+                # Replace non-positive values
+                result = np.copy(arr)
+                result[result <= 0] = min_positive
+                return result.tolist()
+            else:
+                # Pure Python implementation (slower)
+                result = []
+                # Find minimum positive value
+                min_positive = 0.1
+                for val in values:
+                    if val > 0 and (val < min_positive or min_positive == 0.1):
+                        min_positive = val / 2
+                
+                if min_positive <= 0:
+                    min_positive = 0.1
+                    
+                # Replace non-positive values
+                for val in values:
+                    if val <= 0:
+                        result.append(min_positive)
+                    else:
+                        result.append(val)
+                return result
+        except Exception as e:
+            print(f"Error in getPositiveValues: {e}")
+            return [0.1] * len(values)  # Return safe values on error
+
+    @Slot()
+    def autoAdjustYAxis(self):
+        """Auto-adjust Y axis based on current function and parameters"""
+        if self._function_type == "Exponential":
+            # Adjust parameter ranges for better visualization
+            if self._parameter_b > 2:
+                self._parameter_b = 1
+            elif self._parameter_b < 0 and self._parameter_b > -2:
+                self._parameter_b = -0.5
+        elif self._function_type == "Polynomial" and self._parameter_b > 6:
+            # Scale down high exponents
+            self._parameter_b = 4
+        
+        # Recalculate with new parameters
+        self._calculate()
+
     @Slot()
     def exportReport(self):
         """Export calculus analysis to PDF"""

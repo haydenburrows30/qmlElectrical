@@ -11,78 +11,32 @@ import "../../components/style"
 import "../../components/visualizers"
 
 import Calculus 1.0
+import SeriesHelper 1.0
 
 Item {
     id: root
 
     property CalculusCalculator calculator: CalculusCalculator {}
+    property SeriesHelper seriesHelper: SeriesHelper {}
     property color textColor: Universal.foreground
+
+    function updateChartVisibility() {
+        if (scaleToggleButton.isLogScale) {
+            functionGraph.visible = false
+            logGraph.visible = true
+        } else {
+            functionGraph.visible = true
+            logGraph.visible = false
+        }
+    }
 
     Component.onCompleted: {
         if (calculator) {
             // Trigger initial calculation
             calculator.calculate()
         }
-    }   
-
-    // Function to update the Y-axis range based on visible series
-    function updateYAxisRange() {
-        // Get all values from visible series
-        var allValues = []
-        
-        if (functionSeries && functionSeries.visible) {
-            for (var i = 0; i < functionSeries.count; i++) {
-                // Only include finite values
-                var y = functionSeries.at(i).y
-                if (isFinite(y) && Math.abs(y) < 1000) {
-                    allValues.push(y)
-                }
-            }
-        }
-        
-        if (derivativeSeries && derivativeSeries.visible) {
-            for (var i = 0; i < derivativeSeries.count; i++) {
-                var y = derivativeSeries.at(i).y
-                if (isFinite(y) && Math.abs(y) < 1000) {
-                    allValues.push(y)
-                }
-            }
-        }
-        
-        if (integralSeries && integralSeries.visible) {
-            for (var i = 0; i < integralSeries.count; i++) {
-                var y = integralSeries.at(i).y
-                if (isFinite(y) && Math.abs(y) < 1000) {
-                    allValues.push(y)
-                }
-            }
-        }
-        
-        // If we have values, adjust the axis
-        if (allValues.length > 0) {
-            var minY = Math.min(...allValues)
-            var maxY = Math.max(...allValues)
-            
-            // Add some padding to the range
-            var padding = (maxY - minY) * 0.1
-            if (padding < 1) padding = 1
-            
-            // Ensure we have reasonable bounds
-            axisY.min = Math.max(-100, minY - padding)
-            axisY.max = Math.min(100, maxY + padding)
-            
-            // Ensure min is less than max (in case of extreme values or errors)
-            if (axisY.min >= axisY.max) {
-                axisY.min = -10
-                axisY.max = 10
-            }
-        } else {
-            // Default range if no valid points
-            axisY.min = -10
-            axisY.max = 10
-        }
     }
-    
+
     MessagePopup {
         id: messagePopup
         anchors.centerIn: parent
@@ -264,27 +218,20 @@ Item {
                                 text: calculator.parameterAName + ":"
                                 font.bold: true
                             }
-                            
-                            SpinBoxRound {
+
+                            SliderText {
                                 id: parameterASpinBox
-                                from: -10
+                                from: functionTypeCombo.currentText =="Sine" || functionTypeCombo.currentText =="Gaussian" ? -10 : 1
                                 to: 10
-                                stepSize: 1
+                                sliderDecimal: 0
                                 value: calculator.parameterA
-                                editable: true
+                                stepSize: 1
                                 Layout.fillWidth: true
-                                
-                                onValueModified: {
-                                    calculator.setParameterA(Number(value))
-                                }
-                                
-                                textFromValue: function(value, locale) {
-                                    return Number(value).toLocaleString(locale, 'f', 2)
-                                }
-                                
-                                valueFromText: function(text, locale) {
-                                    return Number.fromLocaleString(locale, text)
-                                }
+
+                                property real realValue: value
+
+                                onMoved: calculator.setParameterA(Number(value))
+                                onTextChangedSignal: calculator.setParameterA(Number(value))
                             }
                             
                             Label {
@@ -292,28 +239,22 @@ Item {
                                 font.bold: true
                                 visible: calculator.showParameterB
                             }
-                            
-                            SpinBoxRound {
+
+                            SliderText {
                                 id: parameterBSpinBox
-                                from: -100
-                                to: 100
-                                stepSize: 1
-                                value: Math.round(calculator.parameterB * 10)
-                                editable: true
+                                from: functionTypeCombo.currentText =="Sine" || functionTypeCombo.currentText =="Gaussian" ? 1 : 2
+                                to: functionTypeCombo.currentText =="Sine" || functionTypeCombo.currentText =="Gaussian" ? 100 : 12
+                                sliderDecimal: 0
+                                value: calculator.parameterB
+                                stepSize: functionTypeCombo.currentText =="Sine" || functionTypeCombo.currentText =="Gaussian" ? 1 : 2
                                 Layout.fillWidth: true
+
                                 visible: calculator.showParameterB
-                                
-                                onValueModified: {
-                                    calculator.setParameterB(value / 10)
-                                }
-                                
-                                textFromValue: function(value, locale) {
-                                    return (value / 10).toLocaleString(locale, 'f', 1)
-                                }
-                                
-                                valueFromText: function(text, locale) {
-                                    return Math.round(Number.fromLocaleString(locale, text) * 10)
-                                }
+
+                                property real realValue: value
+
+                                onMoved: calculator.setParameterB(value)
+                                onTextChangedSignal: calculator.setParameterB(value)
                             }
                             
                             Label {
@@ -343,7 +284,6 @@ Item {
                                     checked: true
                                     onCheckedChanged: {
                                         functionSeries.visible = checked
-                                        updateYAxisRange()
                                     }
                                 }
                                 
@@ -353,7 +293,6 @@ Item {
                                     checked: false
                                     onCheckedChanged: {
                                         derivativeSeries.visible = checked
-                                        updateYAxisRange()
                                     }
                                 }
                                 
@@ -363,7 +302,6 @@ Item {
                                     checked: false
                                     onCheckedChanged: {
                                         integralSeries.visible = checked
-                                        updateYAxisRange()
                                     }
                                 }
                             }
@@ -516,6 +454,7 @@ Item {
                         legend.alignment: Qt.AlignTop
                         theme: window.modeToggled ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
                         
+
                         ValueAxis {
                             id: axisX
                             min: -5
@@ -564,37 +503,192 @@ Item {
                             visible: integralCheckbox.checked
                         }
                     }
+
+                    ChartView {
+                        id: logGraph
+                        anchors.fill: parent
+                        antialiasing: true
+                        legend.visible: true
+                        legend.alignment: Qt.AlignTop
+                        theme: window.modeToggled ? ChartView.ChartThemeDark : ChartView.ChartThemeLight
+
+                        ValueAxis {
+                            id: axisX2
+                            min: -5
+                            max: 5
+                            tickCount: 11
+                            labelFormat: "%.0f"
+                            titleText: "x"
+                        }
+
+                        LogValueAxis {
+                            id: axisY2
+                            base: 10
+                            labelFormat: "%.0f"
+                            titleText: "y"
+                        }
+                        
+                        LineSeries {
+                            id: functionSeries2
+                            name: "f(x)"
+                            color: "#2196F3"
+                            width: 2
+                            axisX: axisX2
+                            axisY: axisY2
+                            visible: functionCheckbox.checked
+                        }
+                        
+                        LineSeries {
+                            id: derivativeSeries2
+                            name: "f'(x)"
+                            color: "#FF5722"
+                            width: 2
+                            axisX: axisX2
+                            axisY: axisY2
+                            visible: derivativeCheckbox.checked
+                        }
+                        
+                        LineSeries {
+                            id: integralSeries2
+                            name: "∫f(x)dx"
+                            color: "#4CAF50"
+                            width: 2
+                            axisX: axisX2
+                            axisY: axisY2
+                            visible: integralCheckbox.checked
+                        }
+                    }
+
+                    // Add a toggle button above the charts
+                    RowLayout {
+                        id: chartControls
+                        anchors {
+                            right: parent.right
+                            top: parent.top
+                            topMargin: 10
+                            rightMargin: 10
+                        }
+                        
+                        Label {
+                            text: "Scale:"
+                            font.bold: true
+                        }
+                        
+                        StyledButton {
+                            id: scaleToggleButton
+                            property bool isLogScale: false
+                            text: isLogScale ? "Log" : "Linear"
+                            implicitWidth: 80
+                            
+                            onClicked: {
+                                isLogScale = !isLogScale
+                                root.updateChartVisibility()
+                            }
+                            
+                            ToolTip.text: "Toggle between linear and logarithmic scale"
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
+                        }
+                        
+                        StyledButton {
+                            text: "Auto"
+                            implicitWidth: 60
+                            
+                            onClicked: {
+                                // Auto-adjust Y axis
+                                calculator.autoAdjustYAxis()
+                                calculator.resultsCalculated()
+                            }
+                            
+                            ToolTip.text: "Auto-adjust axis scaling"
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 500
+                        }
+                    }
                     
                     // Update the chart when data changes
                     Connections {
                         target: calculator
                         function onResultsCalculated() {
-                            // Clear existing data
+                            // Clear existing data for both charts
                             functionSeries.removePoints(0, functionSeries.count)
                             derivativeSeries.removePoints(0, derivativeSeries.count)
                             integralSeries.removePoints(0, integralSeries.count)
+                            
+                            functionSeries2.removePoints(0, functionSeries2.count)
+                            derivativeSeries2.removePoints(0, derivativeSeries2.count)
+                            integralSeries2.removePoints(0, integralSeries2.count)
                             
                             // Add new data points
                             var xValues = calculator.xValues
                             var yValues1 = calculator.functionValues
                             var yValues2 = calculator.derivativeValues
                             var yValues3 = calculator.integralValues
-                            
-                            // Add points to series, with safety check for each point
-                            for (var i = 0; i < xValues.length; i++) {
-                                if (isFinite(yValues1[i])) {
-                                    functionSeries.append(xValues[i], yValues1[i])
-                                }
-                                if (isFinite(yValues2[i])) {
-                                    derivativeSeries.append(xValues[i], yValues2[i])
-                                }
-                                if (isFinite(yValues3[i])) {
-                                    integralSeries.append(xValues[i], yValues3[i])
-                                }
+
+                            // Fill data for linear chart
+                            if (yValues1 && functionCheckbox.checked) {
+                                seriesHelper.fillSeriesFromArrays(
+                                    functionSeries,
+                                    xValues,
+                                    yValues1
+                                )
+                            }
+                            if (yValues2 && derivativeCheckbox.checked) {
+                                seriesHelper.fillSeriesFromArrays(
+                                    derivativeSeries,
+                                    xValues,
+                                    yValues2
+                                )
+                            }
+                            if (yValues3 && integralCheckbox.checked) {
+                                seriesHelper.fillSeriesFromArrays(
+                                    integralSeries,
+                                    xValues,
+                                    yValues3
+                                )
                             }
                             
-                            // Update Y-axis range
-                            updateYAxisRange()
+                            // Fill data for logarithmic chart
+                            // For log scale, we need positive values only
+                            if (yValues1 && functionCheckbox.checked) {
+                                var positiveValues1 = calculator.getPositiveValues(yValues1)
+                                seriesHelper.fillSeriesFromArrays(
+                                    functionSeries2,
+                                    xValues,
+                                    positiveValues1
+                                )
+                            }
+                            if (yValues2 && derivativeCheckbox.checked) {
+                                var positiveValues2 = calculator.getPositiveValues(yValues2)
+                                seriesHelper.fillSeriesFromArrays(
+                                    derivativeSeries2,
+                                    xValues,
+                                    positiveValues2
+                                )
+                            }
+                            if (yValues3 && integralCheckbox.checked) {
+                                var positiveValues3 = calculator.getPositiveValues(yValues3)
+                                seriesHelper.fillSeriesFromArrays(
+                                    integralSeries2,
+                                    xValues,
+                                    positiveValues3
+                                )
+                            }
+
+                            // Set axis ranges based on function type
+                            calculator.setAxisRange(axisY, functionTypeCombo.currentText)
+                            
+                            // Configure log axis
+                            calculator.configureLogAxis(axisY2, functionTypeCombo.currentText)
+                            
+                            // Decide which chart to show based on function type and toggle state
+                            if (functionTypeCombo.currentText === "Exponential") {
+                                // For exponential functions, suggest log scale
+                                scaleToggleButton.isLogScale = true
+                            }
+                            
+                            // Update chart visibility
+                            root.updateChartVisibility()
                         }
                     }
                 }
