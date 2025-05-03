@@ -108,6 +108,31 @@ class SequencePdfGenerator:
             
             story.append(phase_table)
             story.append(Spacer(1, 24))
+
+            # Add combined voltage and current waveform chart
+            waveform_image_data = self._generate_combined_waveform_bytes(data)
+            if waveform_image_data:
+                try:
+                    # Add waveform diagram section
+                    story.append(Paragraph("Three-Phase Waveforms", heading_style))
+                    story.append(Spacer(1, 12))
+                    
+                    # Create image directly from bytes
+                    img = Image(waveform_image_data)
+                    
+                    # Set appropriate dimensions
+                    available_width = doc.width * 0.9  # Use 90% of available width
+                    img.drawWidth = available_width
+                    img.drawHeight = available_width * 0.6  # Set height proportionally
+                    
+                    story.append(img)
+                    story.append(Spacer(1, 6))
+                    story.append(Paragraph("Voltage and Current Waveforms", caption_style))
+                    story.append(Spacer(1, 24))
+                except Exception as img_error:
+                    logger.error(f"Error processing waveform image: {img_error}")
+                    import traceback
+                    logger.error(traceback.format_exc())
             
             # Create a temporary image directly in memory instead of using a file
             phasor_image_data = self._generate_phasor_diagram_bytes(data)
@@ -278,6 +303,153 @@ class SequencePdfGenerator:
             gc.collect()
             
             return False
+    
+    def _generate_combined_waveform_bytes(self, data):
+        """Generate a combined waveform chart for voltage and current components on a single plot
+        
+        Args:
+            data: Dictionary containing sequence component data
+            
+        Returns:
+            BytesIO: Image data as BytesIO object or None if generation failed
+        """
+        plt_created = False
+        figure_created = False
+        
+        try:
+            # Check for valid values before attempting to create plot
+            va_mag = data.get('voltage_a', 0)
+            vb_mag = data.get('voltage_b', 0)
+            vc_mag = data.get('voltage_c', 0)
+            ia_mag = data.get('current_a', 0)
+            ib_mag = data.get('current_b', 0)
+            ic_mag = data.get('current_c', 0)
+            
+            # Only proceed if we have real values
+            if (va_mag <= 0 and vb_mag <= 0 and vc_mag <= 0) and (ia_mag <= 0 and ib_mag <= 0 and ic_mag <= 0):
+                logger.warning("Cannot generate waveform: all magnitudes are zero")
+                return None
+            
+            # Make sure matplotlib is properly configured for non-interactive backends
+            import matplotlib
+            matplotlib.use('Agg')  # Set Agg backend which doesn't require a display
+            import matplotlib.pyplot as plt
+            
+            plt_created = True
+            
+            # Close any existing figures to prevent resource leaks
+            plt.close('all')
+            
+            # Create figure with a single plot
+            fig, ax = plt.subplots(figsize=(10, 6))
+            figure_created = True
+            
+            # Time axis (one cycle)
+            t = np.linspace(0, 2*np.pi, 1000)
+            t_deg = t * 180/np.pi  # Convert to degrees for x-axis
+            
+            # Convert angles to radians for calculation
+            va_ang = np.radians(data.get('voltage_angle_a', 0))
+            vb_ang = np.radians(data.get('voltage_angle_b', 0))
+            vc_ang = np.radians(data.get('voltage_angle_c', 0))
+            ia_ang = np.radians(data.get('current_angle_a', 0))
+            ib_ang = np.radians(data.get('current_angle_b', 0))
+            ic_ang = np.radians(data.get('current_angle_c', 0))
+            
+            # Get max values for scaling (for normalization)
+            max_voltage = max(va_mag, vb_mag, vc_mag, 1.0)
+            max_current = max(ia_mag, ib_mag, ic_mag, 1.0)
+            
+            # Generate normalized voltage waveforms (scaled to 1.0)
+            va_wave = va_mag / max_voltage * np.cos(t + va_ang)
+            vb_wave = vb_mag / max_voltage * np.cos(t + vb_ang)
+            vc_wave = vc_mag / max_voltage * np.cos(t + vc_ang)
+            
+            # Generate normalized current waveforms (scaled to 0.8 to differentiate them)
+            ia_wave = ia_mag / max_current * 0.8 * np.cos(t + ia_ang)
+            ib_wave = ib_mag / max_current * 0.8 * np.cos(t + ib_ang)
+            ic_wave = ic_mag / max_current * 0.8 * np.cos(t + ic_ang)
+            
+            # Create lines with different styles for voltage (solid) and current (dashed)
+            ax.plot(t_deg, va_wave, 'r-', linewidth=2, label=f"Va: {va_mag:.1f}V ∠{data.get('voltage_angle_a', 0):.1f}°")
+            ax.plot(t_deg, vb_wave, 'g-', linewidth=2, label=f"Vb: {vb_mag:.1f}V ∠{data.get('voltage_angle_b', 0):.1f}°")
+            ax.plot(t_deg, vc_wave, 'b-', linewidth=2, label=f"Vc: {vc_mag:.1f}V ∠{data.get('voltage_angle_c', 0):.1f}°")
+            
+            ax.plot(t_deg, ia_wave, 'r--', linewidth=2, label=f"Ia: {ia_mag:.1f}A ∠{data.get('current_angle_a', 0):.1f}°")
+            ax.plot(t_deg, ib_wave, 'g--', linewidth=2, label=f"Ib: {ib_mag:.1f}A ∠{data.get('current_angle_b', 0):.1f}°")
+            ax.plot(t_deg, ic_wave, 'b--', linewidth=2, label=f"Ic: {ic_mag:.1f}A ∠{data.get('current_angle_c', 0):.1f}°")
+            
+            # Add dual y-axes for better interpretation
+            ax2 = ax.twinx()
+            ax2.set_ylim(-1.0, 1.0)  # Same range as primary axis
+            # Format the second y-axis with current values
+            max_display_current = max_current if max_current > 0 else 1.0
+            ax2.set_yticks([-0.8, -0.4, 0, 0.4, 0.8])
+            ax2.set_yticklabels([f'{-0.8 * max_display_current:.0f}A', 
+                                f'{-0.4 * max_display_current:.0f}A', 
+                                '0A', 
+                                f'{0.4 * max_display_current:.0f}A', 
+                                f'{0.8 * max_display_current:.0f}A'])
+            
+            # Configure primary axis
+            ax.set_title('Three-Phase Voltage and Current Waveforms')
+            ax.set_xlabel('Angle (degrees)')
+            ax.set_ylabel('Voltage (normalized)')
+            ax.grid(True)
+            ax.set_xlim(0, 360)
+            ax.set_ylim(-1.0, 1.0)
+            
+            # Format the primary y-axis with voltage values
+            ax.set_yticks([-1.0, -0.5, 0, 0.5, 1.0])
+            ax.set_yticklabels([f'{-1.0 * max_voltage:.0f}V', 
+                              f'{-0.5 * max_voltage:.0f}V', 
+                              '0V', 
+                              f'{0.5 * max_voltage:.0f}V', 
+                              f'{1.0 * max_voltage:.0f}V'])
+            
+            # Configure x-axis ticks
+            ax.set_xticks([0, 90, 180, 270, 360])
+            ax.set_xticklabels(['0°', '90°', '180°', '270°', '360°'])
+            
+            # Add a legend with two columns
+            ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3, frameon=False)
+            
+            # Add a grid for better readability
+            ax.grid(True, linestyle='--', alpha=0.7)
+            
+            # Add visual cues to distinguish voltage and current
+            plt.figtext(0.15, 0.02, "Solid lines: Voltage", fontsize=9, ha='left')
+            plt.figtext(0.85, 0.02, "Dashed lines: Current", fontsize=9, ha='right')
+            
+            plt.tight_layout()
+            
+            # Save the figure to a BytesIO object
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+            buf.seek(0)
+            
+            logger.info("Successfully generated combined waveform diagram in memory")
+            
+            return buf
+            
+        except Exception as e:
+            logger.error(f"Error generating combined waveform diagram: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
+        
+        finally:
+            try:
+                # Close all figures to prevent resource leaks
+                if plt_created and figure_created:
+                    import matplotlib.pyplot as plt
+                    plt.close('all')
+            except:
+                pass
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
     
     def _generate_phasor_diagram_bytes(self, data):
         """Generate a phasor diagram for the voltage components directly as bytes

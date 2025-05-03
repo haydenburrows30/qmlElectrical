@@ -152,11 +152,12 @@ Item {
                         title: "System Parameters"
                         Layout.fillWidth: true
                         Layout.minimumHeight: 500
-                        Layout.minimumWidth: 350
+                        Layout.minimumWidth: 400
 
                         GridLayout {
                             columns: 2
                             anchors.fill: parent
+                            uniformCellWidths: true
 
                             // System parameters
                             Label { text: "System Voltage (kV):" }
@@ -254,6 +255,8 @@ Item {
                                 Layout.alignment: Qt.AlignRight
                                 Layout.columnSpan: 2
 
+                                Layout.minimumWidth: parent.width / 2
+
                                 onClicked: {
                                     advancedPanel.visible = !advancedPanel.visible
                                     checked = advancedPanel.visible
@@ -267,11 +270,12 @@ Item {
                         title: "Results"
                         Layout.fillWidth: true
                         Layout.minimumHeight: 500
-                        Layout.minimumWidth: 350
+                        Layout.minimumWidth: 400
 
                         GridLayout {
                             anchors.fill: parent
                             columns: 2
+                            uniformCellWidths: true
 
                             // Main results
                             Label { 
