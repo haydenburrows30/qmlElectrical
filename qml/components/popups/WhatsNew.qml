@@ -307,6 +307,23 @@ Popup {
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.Wrap
                     }
+                    Label {
+                        text: "1.4.1"
+                        font.pixelSize: 18
+                        font.bold: true
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.alignment: Qt.AlignTop
+                    }
+                
+                    Label {
+                        text: "Bug fixes for calculus, laplace, z.  Updated pdf export." +
+                               " Modify 3 phase calculator vector diagram."
+                        font.pixelSize: 14
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignLeft
+                        wrapMode: Text.Wrap
+                    }
                 }
             }
         }
