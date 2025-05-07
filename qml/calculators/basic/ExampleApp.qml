@@ -9,13 +9,13 @@ import QtQuick.Shapes
 import "../../components/style"
 Page {
 
-    ColumnLayout {
+    GridLayout {
+        columns: 2
         anchors {
             fill: parent
             margins: 20
         }
-        spacing: 24
-        
+
         Label {
             text: "Material Design Text Fields"
             font.pixelSize: 24
@@ -108,17 +108,46 @@ Page {
                 id: particleSystem
             }
 
-            Emitter {
-                id: emitter
-                anchors.centerIn: parent
-                width: 160; height: 80
+            Turbulence {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 240; height: 120
                 system: particleSystem
-                emitRate: 10
-                lifeSpan: 1000
-                lifeSpanVariation: 500
-                size: 16
-                endSize: 32
-                // Tracer { color: 'green' }
+                strength: 100
+                Tracer {}
+
+                Emitter {
+                    id: emitter
+                    anchors.centerIn: parent
+                    width: 160; height: 80
+                    system: particleSystem
+                    emitRate: 10
+                    lifeSpan: 1000
+                    lifeSpanVariation: 500
+                    size: 16
+                    endSize: 32
+                }
+            }
+
+            Wander {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 240; height: 120
+                system: particleSystem
+                affectedParameter: Wander.Position
+                pace: 200
+                yVariance: 240
+                Tracer {}
+
+                Emitter {
+                    id: emitter1
+                    anchors.centerIn: parent
+                    width: 160; height: 80
+                    system: particleSystem
+                    emitRate: 10
+                    lifeSpan: 1000
+                    lifeSpanVariation: 500
+                    size: 16
+                    endSize: 32
+                }
             }
 
             ImageParticle {
@@ -134,93 +163,91 @@ Page {
             }
         }
 
-        Canvas {
-    id: canvas
-    width: 800; height: 450
-    
-    property real hue: 0
-    property real lastX: width * Math.random()
-    property real lastY: height * Math.random()
+        // Canvas {
+        //     id: canvas
+        //     width: 800; height: 450
+            
+        //     property real hue: 0
+        //     property real lastX: width * Math.random()
+        //     property real lastY: height * Math.random()
 
-// #region M1
-    property bool requestLine: false
-    property bool requestBlank: false
-// #endregion M1
+        //     // #region M1
+        //     property bool requestLine: false
+        //     property bool requestBlank: false
+        //     // #endregion M1
 
-// #region M2
-    Timer {
-        id: lineTimer
-        interval: 40
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: {
-            canvas.requestLine = true
-            canvas.requestPaint()
-        }
-    }
+        //     // #region M2
+        //     Timer {
+        //         id: lineTimer
+        //         interval: 40
+        //         repeat: true
+        //         triggeredOnStart: true
+        //         onTriggered: {
+        //             canvas.requestLine = true
+        //             canvas.requestPaint()
+        //         }
+        //     }
 
-    Timer {
-        id: blankTimer
-        interval: 50
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: {
-            canvas.requestBlank = true
-            canvas.requestPaint()
-        }
-    }
-// #endregion M2
+        //     Timer {
+        //         id: blankTimer
+        //         interval: 50
+        //         repeat: true
+        //         triggeredOnStart: true
+        //         onTriggered: {
+        //             canvas.requestBlank = true
+        //             canvas.requestPaint()
+        //         }
+        //     }
+        //     // #endregion M2
 
-    onPaint: {
-        var context = getContext('2d')
-        if(requestLine) {
-            line(context)
-            requestLine = false
-        }
-        if(requestBlank) {
-            blank(context)
-            requestBlank = false
-        }
-    }
+        //     onPaint: {
+        //         var context = getContext('2d')
+        //         if(requestLine) {
+        //             line(context)
+        //             requestLine = false
+        //         }
+        //         if(requestBlank) {
+        //             blank(context)
+        //             requestBlank = false
+        //         }
+        //     }
 
-    function line(context) {
-        context.save()
-        context.translate(canvas.width/2, canvas.height/2)
-        context.scale(0.9, 0.9)
-        context.translate(-canvas.width/2, -canvas.height/2)
-        context.beginPath()
-        context.lineWidth = 5 + Math.random() * 10
-        context.moveTo(lastX, lastY)
-        lastX = canvas.width * Math.random()
-        lastY = canvas.height * Math.random()
-        context.bezierCurveTo(canvas.width * Math.random(),
-                              canvas.height * Math.random(),
-                              canvas.width * Math.random(),
-                              canvas.height * Math.random(),
-                              lastX, lastY);
+        //     function line(context) {
+        //         context.save()
+        //         context.translate(canvas.width/2, canvas.height/2)
+        //         context.scale(0.9, 0.9)
+        //         context.translate(-canvas.width/2, -canvas.height/2)
+        //         context.beginPath()
+        //         context.lineWidth = 5 + Math.random() * 10
+        //         context.moveTo(lastX, lastY)
+        //         lastX = canvas.width * Math.random()
+        //         lastY = canvas.height * Math.random()
+        //         context.bezierCurveTo(canvas.width * Math.random(),
+        //                             canvas.height * Math.random(),
+        //                             canvas.width * Math.random(),
+        //                             canvas.height * Math.random(),
+        //                             lastX, lastY);
 
-        hue += Math.random()*0.1
-        if(hue > 1.0) {
-            hue -= 1
-        }
-        context.strokeStyle = Qt.hsla(hue, 0.5, 0.5, 1.0)
-        context.shadowColor = 'white';
-        context.shadowBlur = 10;
-        context.stroke()
-        context.restore()
-    }
+        //         hue += Math.random()*0.1
+        //         if(hue > 1.0) {
+        //             hue -= 1
+        //         }
+        //         context.strokeStyle = Qt.hsla(hue, 0.5, 0.5, 1.0)
+        //         context.shadowColor = 'white';
+        //         context.shadowBlur = 10;
+        //         context.stroke()
+        //         context.restore()
+        //     }
 
-    function blank(context) {
-        context.fillStyle = Qt.rgba(0,0,0,0.1)
-        context.fillRect(0, 0, canvas.width, canvas.height)
-    }
+        //     function blank(context) {
+        //         context.fillStyle = Qt.rgba(0,0,0,0.1)
+        //         context.fillRect(0, 0, canvas.width, canvas.height)
+        //     }
 
-    Component.onCompleted: {
-        lineTimer.start()
-        blankTimer.start()
-    }
-
-}
-
+        //     Component.onCompleted: {
+        //         lineTimer.start()
+        //         blankTimer.start()
+        //     }
+        // }
     }
 }
