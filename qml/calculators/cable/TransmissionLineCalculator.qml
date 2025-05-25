@@ -19,27 +19,53 @@ Item {
     property int colWidth: 195
 
     Component.onCompleted: {
+        // Initialize fields directly without using timers
         initializeFields()
     }
 
     function initializeFields() {
-        // Set input fields from calculator model
-        lengthInput.text = calculator.length.toString()
-        resistanceInput.text = calculator.resistance.toString()
-        inductanceInput.text = calculator.inductance.toString()
-        capacitanceInput.text = calculator.capacitance.toString()
-        conductanceInput.text = calculator.conductance.toString()
-        frequencyInput.text = calculator.frequency.toString()
-        
-        // Advanced parameters
-        subConductors.value = calculator.subConductors
-        bundleSpacing.text = calculator.bundleSpacing.toString()
-        conductorTemp.text = calculator.conductorTemperature.toString()
-        earthResistivity.text = calculator.earthResistivity.toString()
-        
-        // Additional parameters
-        conductorGMR.text = calculator.conductorGMR.toString()
-        nominalVoltage.text = calculator.nominalVoltage.toString()
+        // Set input fields from calculator model with null safety
+        if (calculator) {
+            lengthInput.text = calculator.length !== undefined ? calculator.length.toString() : "100"
+            resistanceInput.text = calculator.resistance !== undefined ? calculator.resistance.toString() : "0.1"
+            inductanceInput.text = calculator.inductance !== undefined ? calculator.inductance.toString() : "1.0"
+            capacitanceInput.text = calculator.capacitance !== undefined ? calculator.capacitance.toString() : "0.01"
+            conductanceInput.text = calculator.conductance !== undefined ? calculator.conductance.toString() : "0.00001"
+            frequencyInput.text = calculator.frequency !== undefined ? calculator.frequency.toString() : "50"
+            
+            // Advanced parameters
+            if (subConductors && calculator.subConductors !== undefined)
+                subConductors.value = calculator.subConductors
+            
+            bundleSpacing.text = calculator.bundleSpacing !== undefined ? calculator.bundleSpacing.toString() : "0.4"
+            conductorTemp.text = calculator.conductorTemperature !== undefined ? calculator.conductorTemperature.toString() : "75"
+            earthResistivity.text = calculator.earthResistivity !== undefined ? calculator.earthResistivity.toString() : "100"
+            
+            // Additional parameters
+            conductorGMR.text = calculator.conductorGMR !== undefined ? calculator.conductorGMR.toString() : "0.0078"
+            nominalVoltage.text = calculator.nominalVoltage !== undefined ? calculator.nominalVoltage.toString() : "400"
+            
+            // Add conductor spacing initialization
+            conductorSpacing.text = calculator.conductorSpacing !== undefined ? calculator.conductorSpacing.toString() : "0.3"
+        } else {
+            // Fallback default values if calculator isn't available
+            lengthInput.text = "100"
+            resistanceInput.text = "0.1"
+            inductanceInput.text = "1.0"
+            capacitanceInput.text = "0.01"
+            conductanceInput.text = "0.00001"
+            frequencyInput.text = "50"
+            
+            if (subConductors) subConductors.value = 2
+            bundleSpacing.text = "0.4"
+            conductorTemp.text = "75"
+            earthResistivity.text = "100"
+            conductorGMR.text = "0.0078"
+            nominalVoltage.text = "400"
+            
+            // Add conductor spacing fallback
+            conductorSpacing.text = "0.3"  // Default 300mm (0.3m) reference spacing
+        }
     }
 
     TransmissionPopUp {
@@ -79,6 +105,30 @@ Item {
                    "• Total line impedance\n" +
                    "• Receiving end voltage and current\n\n" +
                    "But does NOT affect characteristic impedance Z₀."
+    }
+
+    PopUpText {
+        id: bundleInfoPopup
+        parentCard: resultsCard
+        popupText: "Bundle Configuration Effects:\n\n" +
+                   "• More conductors per bundle = lower Z₀ and higher SIL\n" +
+                   "• Wider bundle spacing = higher effective GMR and lower inductance\n" +
+                   "• Bundle configuration mainly affects the inductive reactance\n" +
+                   "• Typical improvements from bundling:\n" +
+                   "  - 2 conductors: ~20-25% lower Z₀ than single conductor\n" +
+                   "  - 3 conductors: ~30-35% lower Z₀ than single conductor\n" +
+                   "  - 4 conductors: ~35-40% lower Z₀ than single conductor\n\n" +
+                   "Example: 400kV lines commonly use 2-4 conductors with 0.4-0.6m spacing"
+    }
+
+    PopUpText {
+        id: spacingInfoPopup
+        parentCard: parametersCard
+        popupText: "Conductor Spacing vs Bundle Spacing:\n\n" +
+                   "• Conductor Spacing: Distance between phase conductors (typically 0.3-10m)\n" +
+                   "• Bundle Spacing: Distance between subconductors within a single phase bundle (typically 0.3-0.6m)\n\n" +
+                   "Manufacturer datasheets typically specify R and X values at a standard reference spacing of 1 foot (0.3m) or 1 meter.\n\n" +
+                   "Increasing phase-to-phase spacing increases inductance and reactance."
     }
 
     ScrollView {
@@ -169,7 +219,13 @@ Item {
                                     id: lengthInput
                                     text: "100"
                                     validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setLength(parseFloat(text))
+                                    // Direct connection without timer
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            console.log("Setting length to: " + parseFloat(text))
+                                            calculator.setLength(parseFloat(text))
+                                        }
+                                    }
                                     Layout.minimumWidth: 120
                                     Layout.alignment: Qt.AlignRight
                                 }
@@ -179,7 +235,13 @@ Item {
                                     id: resistanceInput
                                     text: "0.1"
                                     validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setResistance(parseFloat(text))
+                                    // Direct connection without timer
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            console.log("QML sending resistance: " + parseFloat(text))
+                                            calculator.setResistance(parseFloat(text))
+                                        }
+                                    }
                                     Layout.fillWidth: true
                                 }
 
@@ -263,8 +325,18 @@ Item {
                                     id: nominalVoltage
                                     text: "400"
                                     validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setNominalVoltage(parseFloat(text))
+                                    // Direct connection - make sure it properly updates the SIL
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            console.log("Setting nominal voltage to: " + parseFloat(text))
+                                            calculator.setNominalVoltage(parseFloat(text))
+                                        }
+                                    }
                                     Layout.fillWidth: true
+                                    // Add tooltip to explain voltage effect on SIL
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Nominal voltage directly affects Surge Impedance Loading (SIL = kV²/Z₀)"
                                 }
                             }
                         }
@@ -273,11 +345,41 @@ Item {
                         WaveCard {
                             title: "Advanced Parameters"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 250
+                            Layout.minimumHeight: 350
                             Layout.minimumWidth: 300
 
                             GridLayout {
                                 columns: 2
+
+                                // Add conductor spacing field (before bundle configuration)
+                                Label {
+                                    text: "Conductor Spacing (m):" 
+                                    Layout.minimumWidth: 200
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: spacingInfoPopup.open()
+                                    }
+                                }
+                                TextFieldRound {
+                                    id: conductorSpacing
+                                    text: "0.3"
+                                    validator: DoubleValidator { bottom: 0.1; top: 15.0 }
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            console.log("QML sending conductor spacing: " + parseFloat(text))
+                                            calculator.setConductorSpacing(parseFloat(text))
+                                            // Force an immediate UI update
+                                            updateResultsDisplay()
+                                        }
+                                    }
+                                    Layout.fillWidth: true
+                                    // Add tooltip to explain the parameter
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Distance between phase conductors (reference: 0.3m/1ft)\nTypical values: 69kV=2-3m, 138kV=3-4.5m, 345kV=7-9m, 765kV=12-15m"
+                                }
 
                                 Label { 
                                     text: "Bundle Configuration:" 
@@ -288,27 +390,98 @@ Item {
                                     from: 1
                                     to: 4
                                     value: 2
-                                    onValueChanged: calculator.setSubConductors(value)
+                                    // Direct connection without timer
+                                    onValueChanged: {
+                                        calculator.setSubConductors(value)
+                                        // Enable/disable bundle spacing based on subconductors
+                                        bundleSpacing.enabled = value > 1
+                                        bundleSpacingLabel.opacity = value > 1 ? 1.0 : 0.5
+                                        
+                                        if (value === 1 && bundleSpacing.enabled !== false) {
+                                            // Add hint when switching to single conductor
+                                            messagePopup.showInfo("Bundle spacing has no effect with a single conductor")
+                                        }
+                                    }
                                     Layout.minimumWidth: 120
                                     Layout.fillWidth: true
+                                    
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Select number of subconductors per phase (1-4)"
                                 }
 
-                                Label { text: "Bundle Spacing (m):" }
+                                Label { 
+                                    id: bundleSpacingLabel
+                                    text: "Bundle Spacing (m):" 
+                                    opacity: subConductors.value > 1 ? 1.0 : 0.5
+                                }
                                 TextFieldRound {
                                     id: bundleSpacing
                                     text: "0.4"
-                                    validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setBundleSpacing(parseFloat(text))
+                                    enabled: subConductors.value > 1  // Disable when only 1 conductor
+                                    validator: DoubleValidator { bottom: 0.001 }  // Prevent zero or negative values
+                                    // Enhanced handling for bundle spacing changes
+                                    onTextChanged: {
+                                        if(text && acceptableInput && enabled) {
+                                            console.log("QML sending bundle spacing: " + parseFloat(text))
+                                            calculator.setBundleSpacing(parseFloat(text))
+                                            
+                                            // Force immediate UI update for better feedback
+                                            updateResultsDisplay()
+                                            
+                                            // Add slight delay and update again to ensure changes are visible
+                                            refreshTimer.start()
+                                        }
+                                    }
                                     Layout.fillWidth: true
+                                    
+                                    // Add tooltip to help guide typical values
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: subConductors.value > 1 ? 
+                                        "Larger spacing reduces inductance and Z₀. Try values between 0.2-0.8m to see effects." : 
+                                        "Bundle spacing only applies when using multiple conductors"
                                 }
 
-                                Label { text: "Conductor GMR (m):" }
+                                Label { 
+                                    text: "Conductor GMR (m):"
+                                    Layout.minimumWidth: 200
+                                }
                                 TextFieldRound {
                                     id: conductorGMR
                                     text: "0.0078"
-                                    validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setConductorGMR(parseFloat(text))
+                                    validator: DoubleValidator { bottom: 0.0001 }  // Prevent zero or very small values
+                                    // Enhanced change handling - force immediate update
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            console.log("QML sending conductor GMR: " + parseFloat(text))
+                                            calculator.setConductorGMR(parseFloat(text))
+                                            // Force an immediate UI update
+                                            updateResultsDisplay()
+                                        }
+                                    }
                                     Layout.fillWidth: true
+                                    // Add tooltip to explain GMR effect
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Larger GMR reduces inductance and Z₀. Typical values: ACSR Drake = 0.0103m, Bluebird = 0.0122m"
+                                }
+
+                                // Add GMR test values
+                                CheckBox {
+                                    id: useCalculatedInductanceCheckbox
+                                    text: "Use GMR for inductance"
+                                    checked: true  // Default to true to make GMR changes visible
+                                    Layout.columnSpan: 2
+                                    Layout.alignment: Qt.AlignHCenter
+                                    onCheckedChanged: {
+                                        calculator.setUseCalculatedInductance(checked)
+                                        
+                                        // When we change this setting, disable/enable the inductance field
+                                        inductanceInput.enabled = !checked
+                                        
+                                        // Update the UI immediately
+                                        updateResultsDisplay()
+                                    }
                                 }
 
                                 Label { text: "Conductor Temperature (°C):" }
@@ -316,7 +489,13 @@ Item {
                                     id: conductorTemp
                                     text: "75"
                                     validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setConductorTemperature(parseFloat(text))
+                                    // Direct connection without timer
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            console.log("QML sending conductor temperature: " + parseFloat(text))
+                                            calculator.setConductorTemperature(parseFloat(text))
+                                        }
+                                    }
                                     Layout.fillWidth: true
                                 }
 
@@ -324,9 +503,36 @@ Item {
                                 TextFieldRound {
                                     id: earthResistivity
                                     text: "100"
-                                    validator: DoubleValidator { bottom: 0 }
-                                    onTextChanged: if(text && acceptableInput) calculator.setEarthResistivity(parseFloat(text))
+                                    validator: DoubleValidator { 
+                                        bottom: 1.0  // Minimum realistic value
+                                        top: 10000.0 // Maximum realistic value
+                                    }
+                                    // Enhanced error handling for earth resistivity changes
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            // Add delay to prevent rapid changes that could cause issues
+                                            earthResistivityTimer.stop()
+                                            earthResistivityTimer.start()
+                                        }
+                                    }
                                     Layout.fillWidth: true
+                                    // Add tooltip to help guide typical values
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Typical values: wet soil=10-100, dry soil=100-500, rock=500-10000 Ω⋅m"
+                                }
+
+                                // Add information about bundle configuration effects
+                                StyledButton {
+                                    id: bundleInfoButton
+                                    text: "Bundle Effects"
+                                    ToolTip.text: "View the effects of bundle configuration"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    Layout.columnSpan: 2
+                                    Layout.alignment: Qt.AlignHCenter
+                                    
+                                    onClicked: bundleInfoPopup.open()
                                 }
                             }
                         }
@@ -411,6 +617,38 @@ Item {
                                             silField.text = calculator.surgeImpedanceLoading.toFixed(1) + " MW"
                                         }
                                     }
+                                    // Add tooltip to explain formula
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "SIL = kV²/Z₀. Increasing voltage or decreasing Z₀ raises SIL."
+                                }
+                                
+                                // Add Series Reactance display
+                                Label { 
+                                    text: "Series Reactance (X):"
+                                    Layout.minimumWidth: 200
+                                    Layout.alignment: Qt.AlignLeft
+                                }
+                                TextFieldBlue { 
+                                    id: reactanceField
+                                    text: calculator.reactancePerKm.toFixed(4) + " Ω/km"
+                                    Layout.minimumWidth: 120
+                                    Layout.alignment: Qt.AlignRight
+                                    verticalAlignment: TextInput.AlignBottom
+                                    bottomPadding: 1
+                                    
+                                    // Add connections to update on reactance change
+                                    Connections {
+                                        target: calculator
+                                        function onReactanceCalculated() {
+                                            reactanceField.text = calculator.reactancePerKm.toFixed(4) + " Ω/km"
+                                        }
+                                    }
+                                    
+                                    // Add tooltip explaining the reactance
+                                    hoverEnabled: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Inductive reactance (X = 2πfL). Reference values are often specified at 1-foot (0.3m) spacing."
                                 }
                             }
                         }
@@ -510,7 +748,8 @@ Item {
                             anchors.fill: parent
                             anchors.margins: 0
 
-                            length: parseFloat(lengthInput.text || "100")
+                            // Use calculator.length directly instead of lengthInput.text
+                            length: calculator.length
                             characteristicImpedance: calculator.characteristicImpedance
                             attenuationConstant: calculator.attenuationConstant
                             phaseConstant: calculator.phaseConstant
@@ -531,6 +770,71 @@ Item {
         anchors.centerIn: parent
     }
 
+    // Add a debug/refresh button to help troubleshoot parameter updates
+    RowLayout {
+        id: debugRow
+        Layout.fillWidth: true
+        Layout.topMargin: 5
+        Layout.bottomMargin: 10
+        
+        Item { Layout.fillWidth: true }
+        
+        StyledButton {
+            text: "Refresh Results"
+            ToolTip.text: "Force refresh of all calculation results"
+            ToolTip.visible: hovered
+            ToolTip.delay: 500
+            
+            onClicked: {
+                // Force UI update by manually triggering calculator
+                calculator.calculate()
+                updateResultsDisplay()
+            }
+        }
+    }
+    
+    // Replace the refresh timer with a direct function to update the UI
+    function updateResultsDisplay() {
+        // Force update all result fields
+        if (calculator) {
+            impedanceField.text = calculator.zMagnitude.toFixed(2) + " Ω ∠" + 
+                            calculator.zAngle.toFixed(1) + "°"
+            attenuationField.text = calculator.attenuationConstant.toFixed(6) + " Np/km"
+            phaseField.text = calculator.phaseConstant.toFixed(4) + " rad/km"
+            silField.text = calculator.surgeImpedanceLoading.toFixed(1) + " MW"
+            aParameterField.text = calculator.aMagnitude.toFixed(3) + " ∠" + calculator.aAngle.toFixed(1) + "°"
+            bParameterField.text = calculator.bMagnitude.toFixed(3) + " ∠" + calculator.bAngle.toFixed(1) + "°"
+            cParameterField.text = calculator.cMagnitude.toFixed(6) + " ∠" + calculator.cAngle.toFixed(1) + "°"
+            dParameterField.text = calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°"
+            
+            // Fix reactance update by using the value from the signal instead of property access
+            try {
+                // Use a global variable to store the latest reactance value
+                if (transmissionCard.lastReactanceValue !== undefined) {
+                    reactanceField.text = transmissionCard.lastReactanceValue.toFixed(4) + " Ω/km";
+                } else {
+                    // Force calculation to get initial value
+                    calculator.calculate();
+                }
+            } catch (e) {
+                console.error("Error updating reactance: " + e);
+                reactanceField.text = "0.0000 Ω/km";  // Fallback with zeros
+            }
+            
+            // Also update visualization if present
+            let viz = transmissionCard.children.find(child => child instanceof TransmissionLineViz)
+            if (viz) {
+                viz.characteristicImpedance = calculator.characteristicImpedance
+                viz.attenuationConstant = calculator.attenuationConstant
+                viz.phaseConstant = calculator.phaseConstant
+                viz.length = calculator.length
+            }
+        }
+    }
+
+    // Add a property to store the latest reactance value
+    property double lastReactanceValue: 0.0
+
     Connections {
         target: calculator
         
@@ -539,6 +843,65 @@ Item {
                 messagePopup.showSuccess(message)
             } else {
                 messagePopup.showError(message)
+            }
+        }
+        
+        // Connect all result update signals to the same function
+        function onResultsCalculated() { updateResultsDisplay() }
+        function onBundleConfigChanged() { updateResultsDisplay() }
+        function onTemperatureChanged() { updateResultsDisplay() }
+        function onEarthResistivityChanged() { updateResultsDisplay() }
+        function onResistanceChanged() { updateResultsDisplay() }
+        function onNominalVoltageChanged() { updateResultsDisplay() }
+        function onSilCalculated() { updateResultsDisplay() }
+        function onLengthChanged() { updateResultsDisplay() }
+        // Add reactance update to the signals
+        function onReactanceCalculated(value) { 
+            console.log("Reactance calculated signal received: " + value);
+            // Store the value in our item property for later use
+            transmissionCard.lastReactanceValue = value;
+            reactanceField.text = value.toFixed(4) + " Ω/km";
+        }
+    }
+
+    // Force initial calculation to make sure we have reactance
+    Component.onCompleted: {
+        initializeFields();
+        
+        // Force calculation once loaded
+        if (calculator) {
+            calculator.calculate();
+        }
+    }
+
+    // Add a delayed refresh timer to handle bundle spacing changes properly
+    Timer {
+        id: refreshTimer
+        interval: 300
+        running: false
+        repeat: false
+        onTriggered: {
+            calculator.calculate()
+            updateResultsDisplay()
+        }
+    }
+
+    // Add a delayed timer specifically for earth resistivity changes to prevent rapid changes
+    Timer {
+        id: earthResistivityTimer
+        interval: 500
+        running: false
+        repeat: false
+        onTriggered: {
+            try {
+                var value = parseFloat(earthResistivity.text)
+                if (!isNaN(value) && isFinite(value) && value > 0) {
+                    console.log("QML sending earth resistivity: " + value)
+                    calculator.setEarthResistivity(value)
+                    updateResultsDisplay()
+                }
+            } catch (e) {
+                console.error("Error processing earth resistivity: " + e)
             }
         }
     }

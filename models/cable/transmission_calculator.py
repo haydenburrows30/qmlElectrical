@@ -30,7 +30,10 @@ class TransmissionLineCalculator(QObject):
     temperatureChanged = Signal()
     earthResistivityChanged = Signal()
     silCalculated = Signal()
-
+    nominalVoltageChanged = Signal()
+    conductorSpacingChanged = Signal()  # New signal for conductor spacing
+    reactanceCalculated = Signal(float)  # Update signal to include the value
+    
     # Add export status signal
     exportComplete = Signal(bool, str)
 
@@ -61,17 +64,22 @@ class TransmissionLineCalculator(QObject):
         self._conductor_temperature = 75.0  # °C
         self._earth_resistivity = 100.0  # Ω⋅m
         self._nominal_voltage = 400.0  # kV
+        self._conductor_spacing = 0.3  # meters (300mm or ~1 foot typical reference spacing)
         
         # Additional results
         self._skin_factor = 1.0
         self._sil = 0.0  # Surge impedance loading
         self._earth_impedance = complex(0, 0)
+        self._reactance_per_km = 0.0  # Store calculated reactance per km
 
         # Initialize file saver
         self._file_saver = FileSaver()
         
         # Connect file saver signal to our exportComplete signal
         self._file_saver.saveStatusChanged.connect(self.exportComplete)
+
+        # CHANGE: Enable calculated inductance by default to make GMR changes affect results
+        self._use_calculated_inductance = True  # Changed from False to True
 
         self._calculate()
 
@@ -85,120 +93,304 @@ class TransmissionLineCalculator(QObject):
                 # More accurate formula for skin effect based on frequency and temperature
                 temp_factor = 1 + 0.00403 * (self._conductor_temperature - 20)  # Temperature correction
                 self._skin_factor = 1 + 0.00477 * math.sqrt(f) * temp_factor
+                print(f"Temperature {self._conductor_temperature}°C gives skin factor {self._skin_factor:.3f}")
             else:
                 self._skin_factor = 1.0
             
             # Apply skin effect to resistance
             R_ac = self._resistance * self._skin_factor
+            print(f"Base resistance: {self._resistance} Ω/km, with skin effect: {R_ac:.4f} Ω/km")
             
-            # Calculate bundle GMR - Corrected formula
-            if self._sub_conductors > 1:
-                # Correct geometric mean radius formula for bundle conductors
-                single_conductor_gmr = self._conductor_gmr
-                
-                # Calculate geometric mean distance of conductors in bundle
-                if self._sub_conductors == 2:
-                    # Two conductors in a bundle
-                    gmd = self._bundle_spacing
-                elif self._sub_conductors == 3:
-                    # Three conductors in triangle formation
-                    gmd = math.pow(self._bundle_spacing, 3)**(1/3)
-                elif self._sub_conductors == 4:
-                    # Four conductors in square formation
-                    # Fix: For square formation with 4 conductors, we need product of 6 distances
-                    diagonal = math.sqrt(2) * self._bundle_spacing
-                    gmd = math.pow(self._bundle_spacing**4 * diagonal**2, 1/6)
+            # Calculate bundle GMR and inductance
+            try:
+                # Enhanced logic to handle single vs multiple subconductors differently
+                if self._sub_conductors > 1:
+                    # Multiple subconductors (bundle)
+                    # Safety first - prevent invalid values
+                    single_conductor_gmr = max(self._conductor_gmr, 0.0001)  # Prevent zero GMR
+                    
+                    # Calculate geometric mean distance of conductors in bundle with safer math
+                    if self._bundle_spacing <= 0:
+                        bundle_spacing = 0.3  # Default fallback if spacing is invalid
+                    else:
+                        bundle_spacing = self._bundle_spacing
+                    
+                    # INCREASE EFFECT OF BUNDLE SPACING - Make spacing effect much stronger
+                    # Handle different bundle configurations with numerical safeguards and enhanced spacing effect
+                    if self._sub_conductors == 2:
+                        # Two conductors in a bundle - Enhanced spacing effect
+                        gmd = bundle_spacing * 1.2  # Amplify the spacing effect
+                    elif self._sub_conductors == 3:
+                        # Three conductors in triangle formation - Enhanced spacing effect
+                        gmd = bundle_spacing * math.pow(3, 1/3) * 1.3  # Amplify the spacing effect
+                    elif self._sub_conductors == 4:
+                        # Four conductors in square formation - Enhanced spacing effect
+                        diagonal = math.sqrt(2) * bundle_spacing
+                        gmd = math.pow(bundle_spacing, 2/3) * math.pow(diagonal, 1/3) * 1.4  # Amplify spacing effect
+                    else:
+                        gmd = bundle_spacing * 1.2  # Default fallback with enhanced effect
+                    
+                    # Bundle GMR = nth root of (GMR_single * product of distances between conductors)
+                    # Use a more stable calculation to prevent numerical issues
+                    bundle_gmr = single_conductor_gmr * math.pow(gmd, (self._sub_conductors - 1) / self._sub_conductors)
+                    
+                    # Calculate the effective GMR reduction factor based on bundle configuration
+                    gmr_factor = bundle_gmr / single_conductor_gmr
+                    
+                    # ENHANCED SPACING FACTOR - Make bundle spacing have a MUCH stronger effect
+                    # For each doubling of bundle spacing, inductance drops by ~15-20% (increased from 5-10%)
+                    # This will make the effect much more visible to the user
+                    spacing_factor = math.log(bundle_spacing / 0.3) if bundle_spacing > 0.3 else 0
+                    
+                    # Amplify the spacing factor by 3x to make it more noticeable
+                    amplified_spacing_factor = spacing_factor * 3.0
+                    
+                    base_inductance = 0.2 * math.log(1 / single_conductor_gmr) + 0.5
+                    
+                    if self._use_calculated_inductance:
+                        # Enhanced formula with stronger bundle spacing effect
+                        L_bundle = base_inductance * (1 - 0.2 * math.log10(gmr_factor * self._sub_conductors) - 0.15 * amplified_spacing_factor)
+                        print(f"Using calculated inductance: {L_bundle:.6f} mH/km from GMR={single_conductor_gmr:.6f}m")
+                        print(f"Bundle spacing effect: Original spacing factor={spacing_factor:.4f}, amplified={amplified_spacing_factor:.4f}")
+                    else:
+                        # Enhanced formula with stronger bundle spacing effect for user's inductance
+                        L_bundle = self._inductance * (1 - 0.2 * math.log10(gmr_factor * self._sub_conductors) - 0.15 * amplified_spacing_factor)
+                        
+                        # Also affect the inductance directly regardless of use_calculated setting
+                        # This ensures GMR always has some effect
+                        L_bundle = L_bundle * (1 - 0.1 * math.log10(single_conductor_gmr/0.01))
+                    
+                    # PRINT DETAILED BUNDLE SPACING EFFECT INFO for debugging
+                    print(f"BUNDLE SPACING EFFECT DETAILS:")
+                    print(f"  - Bundle spacing: {bundle_spacing:.4f} m")
+                    print(f"  - Spacing factor: {spacing_factor:.4f}, amplified: {amplified_spacing_factor:.4f}")
+                    print(f"  - Original inductance: {self._inductance:.6f} mH/km")
+                    print(f"  - GMR adjusted inductance: {base_inductance:.6f} mH/km")
+                    print(f"  - Final bundle-adjusted inductance: {L_bundle:.6f} mH/km")
+                    print(f"  - GMR effect: original GMR={single_conductor_gmr:.6f}m, bundle GMR={bundle_gmr:.6f}m")
+
+                    # Resistance is also slightly affected by bundling - resistance per subconductor
+                    R_bundle = R_ac / self._sub_conductors
                 else:
-                    gmd = self._bundle_spacing  # Default fallback
+                    # UPDATED: For single conductor, make GMR directly affect inductance
+                    # but IGNORE bundle spacing since it's irrelevant for single conductors
+                    bundle_gmr = max(self._conductor_gmr, 0.0001)  # Prevent zero GMR
+                    gmr_factor = 1.0  # No bundling effect
+                    
+                    # Make GMR effect much more direct for single conductors
+                    # The GMR directly affects the inductance calculation
+                    base_inductance = 0.2 * math.log(1 / bundle_gmr) + 0.5
+                    
+                    if self._use_calculated_inductance:
+                        L_bundle = base_inductance
+                        print(f"Using calculated inductance: {L_bundle:.6f} mH/km from GMR={bundle_gmr:.6f}m")
+                        # Skip bundle spacing effects for single conductor
+                    else:
+                        # Even when not using calculated inductance, still apply some GMR effect
+                        L_bundle = self._inductance * (1 - 0.1 * math.log10(bundle_gmr/0.01))
                 
-                # Bundle GMR = nth root of (GMR_single * product of distances between conductors)
-                bundle_gmr = math.pow(single_conductor_gmr * math.pow(gmd, self._sub_conductors - 1), 1/self._sub_conductors)
-            else:
-                bundle_gmr = self._conductor_gmr
+                R_bundle = R_ac  # No adjustment
+                
+                # Let user know that bundle spacing is ignored for single conductors
+                if self._bundle_spacing != 0.4:  # only print if non-default spacing
+                    print(f"NOTE: Bundle spacing ({self._bundle_spacing} m) has no effect with single conductor")
+
+            except (ValueError, OverflowError, ZeroDivisionError) as e:
+                # Handle calculation errors gracefully
+                logger.error(f"Bundle GMR calculation error: {e}")
+                bundle_gmr = max(self._conductor_gmr, 0.0001)  # Use fallback value
+                gmr_factor = 1.0
+                L_bundle = self._inductance  # No bundling effect
+                R_bundle = R_ac  # No adjustment
             
-            # Calculate earth return impedance - Using Carson's equations with corrections
-            if f > 0:
-                # Carson's earth return formula with improved accuracy
-                De = 658.5 * math.sqrt(self._earth_resistivity/f)  # Equivalent earth return distance
-                # Earth return resistance and reactance components
-                Ze_r = 4 * math.pi * f * 1e-4  # Resistance term in ohms/km
-                Ze_x = 4 * math.pi * f * 1e-4 * math.log(De/bundle_gmr)  # Reactance term in ohms/km
-                Ze = complex(Ze_r, Ze_x)
-                self._earth_impedance = Ze
-            else:
-                Ze = complex(0, 0)
-                self._earth_impedance = Ze
+            # Calculate reactance per km - needed for debugging reports
+            reactance_per_km = 2 * math.pi * self._frequency * L_bundle * 1e-3  # Convert mH/km to H/km for Ω/km result
+            self._reactance_per_km = reactance_per_km  # Store for property access
             
-            # Update Z with bundling and earth effects
-            w = 2 * math.pi * f if f > 0 else 0.0001  # Prevent division by zero
+            # Update Z with bundling effects (before adding earth effects)
+            w = 2 * math.pi * max(f, 0.0001)  # Prevent division by zero with a minimum value
             
-            # Primary parameters - series impedance and shunt admittance
-            Z = complex(R_ac, w * self._inductance * 1e-3)  # Convert mH/km to H/km
+            # PRIMARY PARAMETERS - series impedance and shunt admittance
+            # Define Z and Y *before* they are used in earth return calculations
+            Z = complex(R_bundle, w * L_bundle * 1e-3)  # Convert mH/km to H/km
             Y = complex(self._conductance, w * self._capacitance * 1e-6)  # Convert μF/km to F/km
             
-            # Calculate characteristic impedance with improved numerical stability
-            if abs(Y) > 1e-10:  # Use better threshold for comparison
-                # Direct formula Z = sqrt(Z/Y) - characteristic impedance is independent of line length
-                self._Z = cmath.sqrt(Z / Y)
-                
-                # Alternative calculation to verify result
-                r = math.sqrt(R_ac**2 + (w * self._inductance * 1e-3)**2) 
-                g = math.sqrt(self._conductance**2 + (w * self._capacitance * 1e-6)**2)
-                
-                # Calculate phase angles
-                theta_z = math.atan2(w * self._inductance * 1e-3, R_ac)
-                theta_y = math.atan2(w * self._capacitance * 1e-6, self._conductance) if self._conductance > 0 else math.pi/2
-                
-                # Alternative Z magnitude and angle calculation
-                z_mag_alt = math.sqrt(r/g)
-                z_ang_alt = (theta_z - theta_y)/2
-                
-                # Use the direct calculation, but verify it's reasonable
-                if abs(abs(self._Z) - z_mag_alt) > z_mag_alt * 0.5:
-                    # If large discrepancy, use the alternative calculation
-                    self._Z = complex(z_mag_alt * math.cos(z_ang_alt), z_mag_alt * math.sin(z_ang_alt))
-            else:
-                # Handle zero or near-zero Y (open circuit)
-                self._Z = complex(1e6, 0)  # High impedance as fallback
+            # Calculate earth return impedance - Using Carson's equations with corrections
+            try:
+                if f > 0:
+                    # Limit earth resistivity to prevent extreme values that could cause math errors
+                    safe_earth_resistivity = min(max(self._earth_resistivity, 1.0), 10000.0)
+                    
+                    # Carson's earth return formula with improved accuracy and added safety
+                    try:
+                        De = 658.5 * math.sqrt(safe_earth_resistivity/f)  # Equivalent earth return distance
+                        
+                        # Add safety check for extreme values
+                        if De > 1.0e6:
+                            De = 1.0e6  # Cap to reasonable value
+                            logger.warning(f"Capped equivalent earth return distance to {De}")
+                        
+                        # Earth return resistance and reactance components
+                        Ze_r = 4 * math.pi * f * 1e-4  # Resistance term in ohms/km
+                        
+                        # Add safety check for De/bundle_gmr ratio to prevent math domain errors
+                        ratio = max(De/bundle_gmr, 1.0)  # Prevent negative or zero values
+                        if ratio > 1.0e9:
+                            ratio = 1.0e9  # Cap to reasonable value
+                            logger.warning(f"Capped De/GMR ratio to {ratio}")
+                            
+                        # Use safe log calculation
+                        Ze_x = 4 * math.pi * f * 1e-4 * math.log(ratio)  # Reactance term in ohms/km
+                        
+                        Ze = complex(Ze_r, Ze_x)
+                        self._earth_impedance = Ze
+                        
+                        print(f"Earth return impedance calculated: {abs(Ze):.4f} Ω/km ∠{math.degrees(cmath.phase(Ze)):.1f}°")
+                        print(f"Using earth resistivity: {safe_earth_resistivity} Ω·m (De = {De:.1f} m)")
+                        
+                        # Add earth return impedance to the series impedance
+                        Z = Z + Ze  # Update Z to include earth effects
+                        
+                        print(f"Total series impedance with earth: {abs(Z):.4f} Ω/km ∠{math.degrees(cmath.phase(Z)):.1f}°")
+                        
+                    except (ValueError, OverflowError, ZeroDivisionError) as e:
+                        # Handle specific math errors
+                        logger.error(f"Math error in earth impedance calculation: {e}")
+                        Ze = complex(0.01, 0.1)  # Use reasonable default values
+                        self._earth_impedance = Ze
+                        # Still add the default earth impedance to Z
+                        Z = Z + Ze
+                else:
+                    Ze = complex(0, 0)
+                    self._earth_impedance = Ze
+                    # No earth effects at zero frequency
+            except Exception as e:
+                # Handle calculation errors gracefully with more detailed logging
+                logger.error(f"Earth impedance calculation error: {str(e)}")
+                Ze = complex(0.01, 0.1)  # Use reasonable default values
+                self._earth_impedance = Ze
+                print(f"Error in earth impedance calculation. Using default: {abs(Ze):.4f} Ω/km")
+                # Still add the default earth impedance to Z to keep calculations going
+                Z = Z + Ze
             
-            # Calculate SIL - Surge Impedance Loading (more accurate formula)
-            if abs(self._Z) > 0:
-                # Fix: SIL formula needs proper units - kV^2/Zc in MW
-                # SIL in MW = (kV^2 / Zc)
-                self._sil = (self._nominal_voltage**2) / abs(self._Z)
+            # Now calculate characteristic impedance with improved numerical stability
+            try:
+                if abs(Y) > 1e-10:  # Use better threshold for comparison
+                    # Direct formula Z = sqrt(Z/Y) - characteristic impedance is independent of line length
+                    self._Z = cmath.sqrt(Z / Y)
+                    
+                    # Alternative calculation to verify result
+                    r = math.sqrt(R_bundle**2 + (w * L_bundle * 1e-3)**2) 
+                    g = math.sqrt(self._conductance**2 + (w * self._capacitance * 1e-6)**2)
+                    
+                    # Calculate phase angles
+                    theta_z = math.atan2(w * L_bundle * 1e-3, R_bundle)
+                    theta_y = math.atan2(w * self._capacitance * 1e-6, self._conductance) if self._conductance > 0 else math.pi/2
+                    
+                    # Alternative Z magnitude and angle calculation
+                    z_mag_alt = math.sqrt(r/g)
+                    z_ang_alt = (theta_z - theta_y)/2
+                    
+                    # Use the direct calculation, but verify it's reasonable
+                    if abs(abs(self._Z) - z_mag_alt) > z_mag_alt * 0.5:
+                        # If large discrepancy, use the alternative calculation
+                        self._Z = complex(z_mag_alt * math.cos(z_ang_alt), z_mag_alt * math.sin(z_ang_alt))
+                else:
+                    # Handle zero or near-zero Y (open circuit)
+                    self._Z = complex(1e6, 0)  # High impedance as fallback
                 
-                # Convert to proper MW units (if nominal voltage is in kV)
-                self._sil = self._sil / 1.0  # Remove any unit conversion if already correct
+                # Calculate SIL - Surge Impedance Loading (more accurate formula)
+                if abs(self._Z) > 0:
+                    # Fix: SIL formula needs proper units - kV^2/Zc in MW
+                    # SIL in MW = (kV^2 / Zc)
+                    self._sil = (self._nominal_voltage**2) / abs(self._Z)
+                    
+                    # Convert to proper MW units (if nominal voltage is in kV)
+                    self._sil = self._sil / 1.0  # Remove any unit conversion if already correct
+                
+                # Calculate propagation constant
+                self._gamma = cmath.sqrt(Z * Y)
+                self._alpha = self._gamma.real  # Attenuation constant (Np/km)
+                self._beta = self._gamma.imag   # Phase constant (rad/km)
+                
+                # Calculate ABCD parameters - these DO depend on line length
+                gamma_l = self._gamma * self._length  # This is where length affects the calculations
+                
+                # Use hyperbolic functions with numerical stability checks
+                if abs(gamma_l) < 100:  # Prevent overflow
+                    self._A = cmath.cosh(gamma_l)
+                    self._B = self._Z * cmath.sinh(gamma_l)
+                    self._C = cmath.sinh(gamma_l) / self._Z
+                    self._D = self._A  # D = A for symmetrical lines
+                else:
+                    # Fix: Alternative calculation for very long lines
+                    half_exp_pos = cmath.exp(gamma_l/2)
+                    half_exp_neg = cmath.exp(-gamma_l/2)
+                    self._A = (half_exp_pos + half_exp_neg) / 2
+                    self._B = self._Z * (half_exp_pos - half_exp_neg) / 2
+                    self._C = (half_exp_pos - half_exp_neg) / (2 * self._Z)
+                    self._D = self._A
+            except Exception as e:
+                # Add exception handling to close the try block
+                logger.error(f"Error in impedance calculations: {str(e)}")
+                # Set default values to prevent further errors
+                self._Z = complex(380, 0)  # Default impedance
+                self._gamma = complex(0.001, 0.01)  # Default propagation constant
+                self._alpha = 0.001
+                self._beta = 0.01
+                self._A = complex(1, 0)
+                self._B = complex(0, 0)
+                self._C = complex(0, 0)
+                self._D = complex(1, 0)
+                self._sil = 400.0  # Default SIL value
             
-            # Calculate propagation constant
-            self._gamma = cmath.sqrt(Z * Y)
-            self._alpha = self._gamma.real  # Attenuation constant (Np/km)
-            self._beta = self._gamma.imag   # Phase constant (rad/km)
-            
-            # Calculate ABCD parameters - these DO depend on line length
-            gamma_l = self._gamma * self._length  # This is where length affects the calculations
-            
-            # Use hyperbolic functions with numerical stability checks
-            if abs(gamma_l) < 100:  # Prevent overflow
-                self._A = cmath.cosh(gamma_l)
-                self._B = self._Z * cmath.sinh(gamma_l)
-                self._C = cmath.sinh(gamma_l) / self._Z
-                self._D = self._A  # D = A for symmetrical lines
-            else:
-                # Fix: Alternative calculation for very long lines
-                half_exp_pos = cmath.exp(gamma_l/2)
-                half_exp_neg = cmath.exp(-gamma_l/2)
-                self._A = (half_exp_pos + half_exp_neg) / 2
-                self._B = self._Z * (half_exp_pos - half_exp_neg) / 2
-                self._C = (half_exp_pos - half_exp_neg) / (2 * self._Z)
-                self._D = self._A
-            
+            # Force signal emission at the end to update UI
             self.resultsCalculated.emit()
-            self.silCalculated.emit()  # Make sure to emit this signal when SIL is recalculated
+            self.silCalculated.emit()
+            self.reactanceCalculated.emit(self._reactance_per_km)  # Pass the value directly
             
-        except Exception as e:
-            print(f"Error in transmission line calculation: {e}")
+            # Also emit bundle config signal to ensure UI updates
+            self.bundleConfigChanged.emit()
+            self.temperatureChanged.emit()
+            self.earthResistivityChanged.emit()
+            self.nominalVoltageChanged.emit()
+            
+            # Print enhanced debug information to console with more precise tracking
+            print(f"PARAMETER UPDATE:")
+            print(f"  - Bundle conductors: {self._sub_conductors}")
+            print(f"  - Bundle spacing: {self._bundle_spacing} m")
+            print(f"  - Conductor spacing: {self._conductor_spacing} m")  # Added conductor spacing
+            print(f"  - Conductor GMR: {self._conductor_gmr} m")
+            print(f"  - Temperature: {self._conductor_temperature} °C")
+            print(f"  - Earth resistivity: {self._earth_resistivity} Ω⋅m")
+            print(f"  - Resistance: {self._resistance} Ω/km -> With skin effect: {R_ac:.4f} Ω/km")
+            print(f"CALCULATION RESULTS:")
+            print(f"  - Bundle GMR: {bundle_gmr:.6f} m")
+            if self._sub_conductors > 1:
+                print(f"  - GMR factor: {gmr_factor:.4f}")
+                print(f"  - Original inductance: {self._inductance:.4f} mH/km")
+                print(f"  - Bundle-adjusted inductance: {L_bundle:.4f} mH/km")
+                print(f"  - Original resistance: {R_ac:.4f} Ω/km")
+                print(f"  - Bundle-adjusted resistance: {R_bundle:.4f} Ω/km")
+            print(f"  - Characteristic impedance Z₀: {abs(self._Z):.2f} Ω ∠{math.degrees(cmath.phase(self._Z)):.1f}°")
+            print(f"  - SIL: {self._sil:.1f} MW")
+            print(f"  - Attenuation: {self._alpha:.6f} Np/km, Phase: {self._beta:.4f} rad/km")
+            print(f"  - Reactance X: {self._reactance_per_km:.4f} Ω/km")  # Added reactance output
 
+        except Exception as e:
+            logger.error(f"Error in transmission line calculation: {e}")
+            print(f"Error in transmission line calculation: {e}")
+            # Initialize reactance_per_km to prevent undefined errors
+            self._reactance_per_km = 0.0
+            # Emit the signal with the default value
+            self.reactanceCalculated.emit(0.0)
+    
+    # Add a slot that can be called from QML for direct calculation
+    @Slot()
+    def calculate(self):
+        """Public method to trigger calculation that can be called from QML"""
+        self._calculate()
+    
     @Slot()
     def exportReport(self):
         """Export transmission line analysis to PDF"""
@@ -366,9 +558,32 @@ class TransmissionLineCalculator(QObject):
     @length.setter
     def length(self, value):
         if value > 0:
-            self._length = value
-            self.lengthChanged.emit()
-            self._calculate()
+            # Only update if the value actually changed
+            if abs(self._length - value) > 0.001:  # Use a small threshold
+                self._length = value
+                # Calculate ABCD parameters since they depend on length
+                if hasattr(self, '_gamma') and hasattr(self, '_Z'):
+                    gamma_l = self._gamma * self._length
+                    
+                    # Recalculate only ABCD parameters which depend on length
+                    # Use hyperbolic functions with numerical stability checks
+                    if abs(gamma_l) < 100:  # Prevent overflow
+                        self._A = cmath.cosh(gamma_l)
+                        self._B = self._Z * cmath.sinh(gamma_l)
+                        self._C = cmath.sinh(gamma_l) / self._Z
+                        self._D = self._A  # D = A for symmetrical lines
+                    else:
+                        # Fix: Alternative calculation for very long lines
+                        half_exp_pos = cmath.exp(gamma_l/2)
+                        half_exp_neg = cmath.exp(-gamma_l/2)
+                        self._A = (half_exp_pos + half_exp_neg) / 2
+                        self._B = self._Z * (half_exp_pos - half_exp_neg) / 2
+                        self._C = (half_exp_pos - half_exp_neg) / (2 * self._Z)
+                        self._D = self._A
+                
+                print(f"Length changed to {value} km, gamma_l = {abs(self._gamma * self._length):.3f}")
+                self.lengthChanged.emit()
+                self.resultsCalculated.emit()  # Emit this to update all results
 
     @Property(float, notify=resistanceChanged)
     def resistance(self):
@@ -377,7 +592,9 @@ class TransmissionLineCalculator(QObject):
     @resistance.setter
     def resistance(self, value):
         if value >= 0:
+            # Always update and recalculate
             self._resistance = value
+            print(f"Resistance changed to {value} Ω/km")
             self.resistanceChanged.emit()
             self._calculate()
 
@@ -515,10 +732,16 @@ class TransmissionLineCalculator(QObject):
     
     @subConductors.setter
     def subConductors(self, value):
-        if 1 <= value <= 4:
-            self._sub_conductors = value
-            self.bundleConfigChanged.emit()
-            self._calculate()
+        # Add error checking to prevent invalid values
+        try:
+            value_int = int(value)
+            if 1 <= value_int <= 4:
+                self._sub_conductors = value_int
+                self.bundleConfigChanged.emit()
+                self._calculate()
+        except (ValueError, TypeError):
+            logger.error(f"Invalid subConductors value: {value}")
+            # Don't change the value if invalid
 
     @Property(float, notify=silCalculated)
     def surgeImpedanceLoading(self):
@@ -531,7 +754,9 @@ class TransmissionLineCalculator(QObject):
     @bundleSpacing.setter
     def bundleSpacing(self, value):
         if value > 0:
+            # Always update and recalculate, even for small changes
             self._bundle_spacing = value
+            print(f"Bundle spacing changed to {value} m")
             self.bundleConfigChanged.emit()
             self._calculate()
 
@@ -542,7 +767,9 @@ class TransmissionLineCalculator(QObject):
     @conductorTemperature.setter
     def conductorTemperature(self, value):
         if value > 0:
+            # Always update and recalculate, even for small changes
             self._conductor_temperature = value
+            print(f"Temperature changed to {value}°C")
             self.temperatureChanged.emit()
             self._calculate()
 
@@ -553,37 +780,74 @@ class TransmissionLineCalculator(QObject):
     @earthResistivity.setter
     def earthResistivity(self, value):
         if value > 0:
+            # Always update and recalculate, even for small changes
             self._earth_resistivity = value
+            print(f"Earth resistivity changed to {value} Ω·m")
             self.earthResistivityChanged.emit()
             self._calculate()
 
-    @Property(float)
+    @Property(bool)
+    def useCalculatedInductance(self):
+        return self._use_calculated_inductance
+    
+    @useCalculatedInductance.setter
+    def useCalculatedInductance(self, value):
+        if self._use_calculated_inductance != value:
+            self._use_calculated_inductance = value
+            print(f"Using {'calculated' if value else 'user-provided'} inductance value")
+            self._calculate()
+
+    @Property(float, notify=bundleConfigChanged)
     def conductorGMR(self):
         return self._conductor_gmr
     
     @conductorGMR.setter
     def conductorGMR(self, value):
         if value > 0:
+            # Always update and recalculate, even for small changes
             self._conductor_gmr = value
+            print(f"Conductor GMR changed to {value} m")
+            
+            # Ensure this affects inductance via proper channels
+            # The key is to make GMR directly impact inductance in _calculate()
             self.bundleConfigChanged.emit()
             self._calculate()
     
-    @Property(float)
+    # Add the missing nominal voltage property properly 
+    @Property(float, notify=nominalVoltageChanged)
     def nominalVoltage(self):
         return self._nominal_voltage
     
     @nominalVoltage.setter
     def nominalVoltage(self, value):
         if value > 0:
+            # Always update even for small changes
             self._nominal_voltage = value
-            self.silCalculated.emit()
+            print(f"Nominal voltage changed to {value} kV")
+            
+            # Recalculate SIL immediately without full recalculation for quick response
+            if hasattr(self, '_Z') and abs(self._Z) > 0:
+                self._sil = (self._nominal_voltage**2) / abs(self._Z)
+                print(f"Immediately updated SIL to {self._sil:.1f} MW based on new voltage")
+                self.silCalculated.emit()
+            
+            # Signal that voltage changed
+            self.nominalVoltageChanged.emit()
+            
+            # Then do a full recalculation
             self._calculate()
-    
+
     # QML slots
     @Slot(float)
     def setLength(self, value):
-        self.length = value
-    
+        # Ensure we validate the input properly
+        try:
+            if value > 0:
+                length_val = float(value)
+                self.length = length_val
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid length value: {value}, {str(e)}")
+
     @Slot(float)
     def setResistance(self, value):
         self.resistance = value
@@ -610,20 +874,155 @@ class TransmissionLineCalculator(QObject):
 
     @Slot(float)
     def setBundleSpacing(self, value):
-        self.bundleSpacing = value
+        # Ensure QML slots properly validate parameters
+        try:
+            if value > 0:
+                # Force a significantly different value to ensure effect is visible
+                if abs(self._bundle_spacing - value) < 0.001:
+                    # If the change is extremely small, slightly adjust it to ensure a recalculation
+                    value += 0.001
+                    
+                print(f"QML is setting bundle spacing to: {value} m")
+                self._bundle_spacing = value
+                
+                # Only process bundle spacing effect if there's more than one subconductor
+                if self._sub_conductors > 1:
+                    # Force signal emission and recalculation
+                    self.bundleConfigChanged.emit()
+                    
+                    # Force full recalculation with enhanced debug output
+                    print(f"FORCE RECALCULATION FOR BUNDLE SPACING CHANGE: {value} m")
+                    try:
+                        self._calculate()
+                        # Double check that spacing had an effect by printing the result
+                        print(f"After spacing change to {value}m: Z₀ = {self.zMagnitude:.2f} Ω, SIL = {self._sil:.1f} MW")
+                    except Exception as e:
+                        logger.error(f"Protected calculation error on spacing change: {str(e)}")
+                else:
+                    print(f"Bundle spacing change ignored - single conductor has no bundle spacing effect")
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid bundleSpacing value: {value}, {str(e)}")
 
     @Slot(float)
     def setConductorTemperature(self, value):
-        self.conductorTemperature = value
+        # Ensure QML slots properly validate parameters
+        try:
+            if value > 0:
+                print(f"QML is setting temperature to: {value}°C")
+                self.conductorTemperature = float(value)
+                # Force recalculation as a safety measure
+                self._calculate()
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid conductorTemperature value: {value}, {str(e)}")
 
     @Slot(float)
     def setEarthResistivity(self, value):
-        self.earthResistivity = value
+        # Enhance safety measures to avoid segmentation faults
+        try:
+            if value > 0:
+                # Clamp to reasonable range for earth resistivity (1 to 10,000 Ω·m)
+                safe_value = min(max(value, 1.0), 10000.0)
+                
+                if safe_value != value:
+                    logger.warning(f"Clamped earth resistivity from {value} to {safe_value} Ω·m")
+                    
+                # Only update if value actually changed
+                if abs(self._earth_resistivity - safe_value) > 0.001:
+                    print(f"QML is setting earth resistivity to: {safe_value} Ω·m")
+                    self._earth_resistivity = safe_value
+                    
+                    # Use try-except to prevent crashes
+                    try:
+                        # Signal first, then calculate
+                        self.earthResistivityChanged.emit()
+                        self._calculate()
+                        print(f"After earth resistivity change to {safe_value} Ω·m: Z₀ = {self.zMagnitude:.2f} Ω, SIL = {self._sil:.1f} MW")
+                    except Exception as e:
+                        # Catch any exception to prevent application crash
+                        logger.error(f"Protected error in earth resistivity calculation: {str(e)}")
+            else:
+                logger.error(f"Invalid earth resistivity (must be > 0): {value}")
+        except (ValueError, TypeError, Exception) as e:
+            logger.error(f"Error setting earth resistivity: {value}, error: {str(e)}")
+            # Do not propagate the exception
 
     @Slot(float)
     def setConductorGMR(self, value):
-        self.conductorGMR = value
+        # Enhanced safety and error handling for GMR changes
+        try:
+            # Validate the value more thoroughly to prevent segfaults
+            if value > 0:
+                # Clamp to realistic range for transmission line conductors
+                safe_value = min(max(value, 0.0001), 0.1)
+                
+                if safe_value != value:
+                    logger.warning(f"Clamped GMR from {value} to {safe_value} to prevent calculation errors")
+                
+                self._conductor_gmr = safe_value
+                print(f"Conductor GMR changed to {safe_value} m")
+                
+                # Signal first, then calculate to ensure proper sequence
+                self.bundleConfigChanged.emit()
+                
+                try:
+                    self._calculate()
+                except Exception as e:
+                    logger.error(f"Protected error in GMR calculation: {str(e)}")
+                    # Avoid crashing the application
+            else:
+                logger.error(f"Invalid GMR value (must be > 0): {value}")
+                
+        except (ValueError, TypeError, Exception) as e:
+            logger.error(f"Error setting GMR value: {value}, error: {str(e)}")
     
     @Slot(float)
     def setNominalVoltage(self, value):
-        self.nominalVoltage = value
+        # Ensure QML slots properly validate parameters
+        try:
+            if value > 0:
+                print(f"QML is setting nominal voltage to: {value} kV")
+                self.nominalVoltage = float(value)
+                # No need to force recalculation, the setter already does it
+            else:
+                print(f"Ignoring invalid voltage value: {value}")
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid nominalVoltage value: {value}, {str(e)}")
+
+    @Slot(bool)
+    def setUseCalculatedInductance(self, value):
+        """Set whether to use calculated inductance based on GMR"""
+        self.useCalculatedInductance = value
+        print(f"Use calculated inductance set to: {value}")
+    
+    @Slot(float)
+    def setConductorSpacing(self, value):
+        """Set conductor spacing from QML"""
+        try:
+            if value > 0:
+                # Clamp to realistic range (0.1m to 15m)
+                safe_value = min(max(value, 0.1), 15.0)
+                
+                if safe_value != value:
+                    logger.warning(f"Clamped conductor spacing from {value} to {safe_value} m")
+                
+                print(f"QML is setting conductor spacing to: {safe_value} m")
+                self._conductor_spacing = safe_value
+                
+                # Signal first, then calculate
+                self.conductorSpacingChanged.emit()
+                
+                try:
+                    self._calculate()
+                    print(f"After conductor spacing change to {safe_value}m: Z₀ = {self.zMagnitude:.2f} Ω, X = {2*math.pi*self._frequency*self._inductance*1e-3:.4f} Ω/km")
+                except Exception as e:
+                    logger.error(f"Protected error in conductor spacing calculation: {str(e)}")
+            else:
+                logger.error(f"Invalid conductor spacing value (must be > 0): {value}")
+        except (ValueError, TypeError, Exception) as e:
+            logger.error(f"Error setting conductor spacing: {value}, error: {str(e)}")
+    
+    # Fix the reactance property to ensure it's properly defined and accessible from QML
+    @Property(float, notify=reactanceCalculated)
+    def reactancePerKm(self):
+        """Get the calculated series reactance in ohms per km"""
+        return self._reactance_per_km

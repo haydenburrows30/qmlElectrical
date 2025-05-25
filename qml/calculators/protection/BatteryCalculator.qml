@@ -114,30 +114,20 @@ Item {
                             onTextChanged: if(text) calculator.backupTime = parseFloat(text)
                             Layout.fillWidth: true
                         }
-                        
+
                         Label { text: "Depth of Discharge (%):" }
 
-                        RowLayout {
+                        SliderText {
                             Layout.fillWidth: true
-                            
-                            Slider {
-                                id: dodSlider
+                            id: dodSlider
                                 from: 30
                                 to: 80
                                 value: 50
                                 stepSize: 5
                                 onValueChanged: calculator.depthOfDischarge = value
-                                Layout.maximumWidth: 150
-                            }
-
-                            Label { 
-                                text: dodSlider.value + "%" 
-                                Layout.alignment: Qt.AlignRight
-                                Layout.minimumWidth: 50
-                                Layout.fillWidth: true
-                            }
+                                sliderDecimal: 0
                         }
-                        
+
                         Label { text: "Battery Type:" }
                         ComboBoxRound {
                             id: batteryType
