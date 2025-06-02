@@ -37,6 +37,11 @@ class TransmissionLineCalculator(QObject):
     # Add export status signal
     exportComplete = Signal(bool, str)
 
+    # New signals for voltage drop calculation
+    nominalMvaChanged = Signal()
+    powerFactorChanged = Signal()
+    voltageDropCalculated = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         # Initialize properties
@@ -71,6 +76,12 @@ class TransmissionLineCalculator(QObject):
         self._sil = 0.0  # Surge impedance loading
         self._earth_impedance = complex(0, 0)
         self._reactance_per_km = 0.0  # Store calculated reactance per km
+
+        # New properties for voltage drop
+        self._nominal_mva = 100.0  # MVA
+        self._power_factor = 0.9  # lagging
+        self._receiving_end_voltage_kv = 0.0 # kV
+        self._voltage_drop_percent = 0.0 # %
 
         # Initialize file saver
         self._file_saver = FileSaver()
@@ -355,6 +366,52 @@ class TransmissionLineCalculator(QObject):
             self.earthResistivityChanged.emit()
             self.nominalVoltageChanged.emit()
             
+            # Calculate Sending End Current (Is) and Voltage (Vs) for voltage drop
+            # Assume nominal voltage is the sending end voltage for this calculation
+            Vs_phase_kv = self._nominal_voltage / math.sqrt(3) # Phase voltage at sending end
+            
+            # Calculate nominal current based on MVA
+            if self._nominal_voltage > 0 and self._nominal_mva > 0:
+                # Current in kA
+                Inom_kA = self._nominal_mva / (math.sqrt(3) * self._nominal_voltage)
+                # Angle of current (lagging power factor)
+                pf_angle_rad = -math.acos(self._power_factor) # Negative for lagging
+                Is_phase_kA = Inom_kA * cmath.exp(1j * pf_angle_rad) # Sending end current as complex
+            else:
+                Is_phase_kA = complex(0,0)
+
+            # Calculate Receiving End Voltage (Vr)
+            # Vs = A*Vr + B*Ir. For this, we assume Is is known (Inom) and Vs is nominal.
+            # We need to find Vr.
+            # Vr = (Vs - B*Is) / A  -- this is incorrect, this is if Vs and Is are known.
+            # We have Vs (nominal voltage) and want to calculate Vr based on a load current Ir.
+            # Let's assume the calculated Is_phase_kA is the *receiving end current* Ir for simplicity of voltage drop.
+            Ir_phase_kA = Is_phase_kA
+            Vs_complex_phase_kv = complex(Vs_phase_kv, 0) # Assuming Vs is reference angle 0
+
+            # Vr_phase = (D*Vs_phase - B*Is_phase) / (A*D - B*C) -> this is general form
+            # For a passive line, AD-BC = 1
+            # Vr_phase = D*Vs_phase - B*Ir_phase (if Ir is receiving end current)
+            # Or, if Vs is sending end voltage and Ir is receiving end current:
+            # Vs = A*Vr + B*Ir  => Vr = (Vs - B*Ir) / A
+            if abs(self._A) > 1e-9: # Avoid division by zero
+                Vr_complex_phase_kv = (Vs_complex_phase_kv - self._B * Ir_phase_kA) / self._A
+            else:
+                Vr_complex_phase_kv = Vs_complex_phase_kv # Fallback
+
+            self._receiving_end_voltage_kv = abs(Vr_complex_phase_kv) * math.sqrt(3) # Line-to-line
+
+            # Calculate Voltage Drop
+            Vs_mag_kv = self._nominal_voltage # Line-to-line sending voltage
+            Vr_mag_kv = self._receiving_end_voltage_kv
+
+            if Vs_mag_kv > 0:
+                self._voltage_drop_percent = ((Vs_mag_kv - Vr_mag_kv) / Vs_mag_kv) * 100.0
+            else:
+                self._voltage_drop_percent = 0.0
+            
+            self.voltageDropCalculated.emit()
+
             # Print enhanced debug information to console with more precise tracking
             print(f"PARAMETER UPDATE:")
             print(f"  - Bundle conductors: {self._sub_conductors}")
@@ -376,6 +433,9 @@ class TransmissionLineCalculator(QObject):
             print(f"  - SIL: {self._sil:.1f} MW")
             print(f"  - Attenuation: {self._alpha:.6f} Np/km, Phase: {self._beta:.4f} rad/km")
             print(f"  - Reactance X: {self._reactance_per_km:.4f} Ω/km")  # Added reactance output
+            print(f"  - Nominal MVA: {self._nominal_mva:.1f} MVA, PF: {self._power_factor:.2f}")
+            print(f"  - Receiving End Voltage: {self._receiving_end_voltage_kv:.2f} kV")
+            print(f"  - Voltage Drop: {self._voltage_drop_percent:.2f}%")
 
         except Exception as e:
             logger.error(f"Error in transmission line calculation: {e}")
@@ -442,7 +502,11 @@ class TransmissionLineCalculator(QObject):
                 'c_angle': math.degrees(cmath.phase(self._C)),
                 'd_magnitude': abs(self._D),
                 'd_angle': math.degrees(cmath.phase(self._D)),
-                'chart_image_path': chart_image_path if os.path.exists(chart_image_path) else None
+                'chart_image_path': chart_image_path if os.path.exists(chart_image_path) else None,
+                'nominal_mva': self._nominal_mva,
+                'power_factor': self._power_factor,
+                'voltage_drop_percent': self._voltage_drop_percent,
+                'receiving_end_voltage_kv': self._receiving_end_voltage_kv
             }
             
             # Generate PDF
@@ -837,6 +901,45 @@ class TransmissionLineCalculator(QObject):
             # Then do a full recalculation
             self._calculate()
 
+    # New properties for MVA, Power Factor, and Voltage Drop
+    @Property(float, notify=nominalMvaChanged)
+    def nominalMVA(self):
+        return self._nominal_mva
+
+    @nominalMVA.setter
+    def nominalMVA(self, value):
+        if value > 0:
+            if abs(self._nominal_mva - value) > 0.01:
+                self._nominal_mva = value
+                print(f"Nominal MVA changed to {value} MVA")
+                self.nominalMvaChanged.emit()
+                self._calculate()
+
+    @Property(float, notify=powerFactorChanged)
+    def powerFactor(self):
+        return self._power_factor
+
+    @powerFactor.setter
+    def powerFactor(self, value):
+        if 0 <= abs(value) <= 1: # Power factor is between -1 and 1
+            if abs(self._power_factor - value) > 0.001:
+                self._power_factor = value
+                print(f"Power Factor changed to {value}")
+                self.powerFactorChanged.emit()
+                self._calculate()
+        else:
+            logger.warning(f"Invalid power factor: {value}. Must be between -1 and 1.")
+
+
+    @Property(float, notify=voltageDropCalculated)
+    def voltageDropPercent(self):
+        return self._voltage_drop_percent
+
+    @Property(float, notify=voltageDropCalculated)
+    def receivingEndVoltageKv(self):
+        return self._receiving_end_voltage_kv
+    
+
     # QML slots
     @Slot(float)
     def setLength(self, value):
@@ -987,6 +1090,30 @@ class TransmissionLineCalculator(QObject):
                 print(f"Ignoring invalid voltage value: {value}")
         except (ValueError, TypeError) as e:
             logger.error(f"Invalid nominalVoltage value: {value}, {str(e)}")
+
+    @Slot(float)
+    def setNominalMVA(self, value):
+        try:
+            val = float(value)
+            if val > 0:
+                self.nominalMVA = val
+            else:
+                logger.warning(f"Invalid Nominal MVA: {val}")
+        except (ValueError, TypeError) as e:
+            logger.error(f"Error setting Nominal MVA: {value}, error: {str(e)}")
+
+    @Slot(float)
+    def setPowerFactor(self, value):
+        try:
+            val = float(value)
+            # Allow for leading PF by checking absolute value against 1
+            if 0 <= abs(val) <= 1:
+                 # Store actual value which might be negative for leading
+                self.powerFactor = val
+            else:
+                logger.warning(f"Invalid Power Factor: {val}. Must be between -1.0 and 1.0.")
+        except (ValueError, TypeError) as e:
+            logger.error(f"Error setting Power Factor: {value}, error: {str(e)}")
 
     @Slot(bool)
     def setUseCalculatedInductance(self, value):

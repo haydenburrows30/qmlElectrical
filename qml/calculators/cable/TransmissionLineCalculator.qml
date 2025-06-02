@@ -18,10 +18,10 @@ Item {
     property color textColor: Universal.foreground
     property int colWidth: 195
 
-    Component.onCompleted: {
-        // Initialize fields directly without using timers
-        initializeFields()
-    }
+    // Component.onCompleted: {
+    //     // Initialize fields directly without using timers
+    //     initializeFields()
+    // }
 
     function initializeFields() {
         // Set input fields from calculator model with null safety
@@ -47,6 +47,8 @@ Item {
             
             // Add conductor spacing initialization
             conductorSpacing.text = calculator.conductorSpacing !== undefined ? calculator.conductorSpacing.toString() : "0.3"
+            nominalMvaInput.text = calculator.nominalMVA !== undefined ? calculator.nominalMVA.toString() : "100"
+            powerFactorInput.text = calculator.powerFactor !== undefined ? calculator.powerFactor.toString() : "0.9"
         } else {
             // Fallback default values if calculator isn't available
             lengthInput.text = "100"
@@ -65,6 +67,8 @@ Item {
             
             // Add conductor spacing fallback
             conductorSpacing.text = "0.3"  // Default 300mm (0.3m) reference spacing
+            nominalMvaInput.text = "100"
+            powerFactorInput.text = "0.9"
         }
     }
 
@@ -202,7 +206,7 @@ Item {
                             id: parametersCard
                             title: "Line Parameters"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 320
+                            Layout.minimumHeight: 400
 
                             showSettings: true
 
@@ -337,6 +341,36 @@ Item {
                                     hoverEnabled: true
                                     ToolTip.visible: hovered
                                     ToolTip.text: "Nominal voltage directly affects Surge Impedance Loading (SIL = kV²/Z₀)"
+                                }
+
+                                Label { text: "Nominal MVA:" }
+                                TextFieldRound {
+                                    id: nominalMvaInput
+                                    text: "100"
+                                    validator: DoubleValidator { bottom: 0 }
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            calculator.setNominalMVA(parseFloat(text))
+                                        }
+                                    }
+                                    Layout.fillWidth: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Nominal MVA of the line/load"
+                                }
+
+                                Label { text: "Power Factor:" }
+                                TextFieldRound {
+                                    id: powerFactorInput
+                                    text: "0.9"
+                                    validator: DoubleValidator { bottom: -1.0; top: 1.0 }
+                                    onTextChanged: {
+                                        if(text && acceptableInput) {
+                                            calculator.setPowerFactor(parseFloat(text))
+                                        }
+                                    }
+                                    Layout.fillWidth: true
+                                    ToolTip.visible: hovered
+                                    ToolTip.text: "Load power factor (e.g., 0.9 lagging, -0.9 leading)"
                                 }
                             }
                         }
@@ -548,7 +582,7 @@ Item {
                             id: resultsCard
                             title: "Results"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 220
+                            Layout.minimumHeight: 320
                             showSettings: true
 
                             GridLayout {
@@ -650,6 +684,30 @@ Item {
                                     ToolTip.visible: hovered
                                     ToolTip.text: "Inductive reactance (X = 2πfL). Reference values are often specified at 1-foot (0.3m) spacing."
                                 }
+
+                                Label { text: "Receiving End Voltage:" }
+                                TextFieldBlue {
+                                    id: receivingVoltageField
+                                    text: calculator.receivingEndVoltageKv.toFixed(2) + " kV"
+                                    Connections {
+                                        target: calculator
+                                        function onVoltageDropCalculated() {
+                                            receivingVoltageField.text = calculator.receivingEndVoltageKv.toFixed(2) + " kV"
+                                        }
+                                    }
+                                }
+
+                                Label { text: "Voltage Drop (%):" }
+                                TextFieldBlue {
+                                    id: voltageDropField
+                                    text: calculator.voltageDropPercent.toFixed(2) + " %"
+                                    Connections {
+                                        target: calculator
+                                        function onVoltageDropCalculated() {
+                                            voltageDropField.text = calculator.voltageDropPercent.toFixed(2) + " %"
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -735,32 +793,32 @@ Item {
                 }
 
                 // Visualization
-                ColumnLayout {
-                    Layout.minimumHeight: 400
-                    Layout.maximumWidth: resultsRow.width
+                // ColumnLayout {
+                //     Layout.minimumHeight: 400
+                //     Layout.maximumWidth: resultsRow.width
 
-                    WaveCard {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                        title: "Line Parameters Visualization"
+                //     WaveCard {
+                //         Layout.fillHeight: true
+                //         Layout.fillWidth: true
+                //         title: "Line Parameters Visualization"
 
-                        TransmissionLineViz {
-                            anchors.fill: parent
-                            anchors.margins: 0
+                //         TransmissionLineViz {
+                //             anchors.fill: parent
+                //             anchors.margins: 0
 
-                            // Use calculator.length directly instead of lengthInput.text
-                            length: calculator.length
-                            characteristicImpedance: calculator.characteristicImpedance
-                            attenuationConstant: calculator.attenuationConstant
-                            phaseConstant: calculator.phaseConstant
+                //             // Use calculator.length directly instead of lengthInput.text
+                //             length: calculator.length
+                //             characteristicImpedance: calculator.characteristicImpedance
+                //             attenuationConstant: calculator.attenuationConstant
+                //             phaseConstant: calculator.phaseConstant
 
-                            calculator: transmissionCard.calculator
+                //             calculator: transmissionCard.calculator
 
-                            darkMode: Universal.theme === Universal.Dark
-                            textColor: transmissionCard.textColor
-                        }
-                    }
-                }
+                //             darkMode: Universal.theme === Universal.Dark
+                //             textColor: transmissionCard.textColor
+                //         }
+                //     }
+                // }
             }
         }
     }
@@ -807,6 +865,9 @@ Item {
             cParameterField.text = calculator.cMagnitude.toFixed(6) + " ∠" + calculator.cAngle.toFixed(1) + "°"
             dParameterField.text = calculator.dMagnitude.toFixed(3) + " ∠" + calculator.dAngle.toFixed(1) + "°"
             
+            receivingVoltageField.text = calculator.receivingEndVoltageKv.toFixed(2) + " kV"
+            voltageDropField.text = calculator.voltageDropPercent.toFixed(2) + " %"
+
             // Fix reactance update by using the value from the signal instead of property access
             try {
                 // Use a global variable to store the latest reactance value
@@ -862,6 +923,7 @@ Item {
             transmissionCard.lastReactanceValue = value;
             reactanceField.text = value.toFixed(4) + " Ω/km";
         }
+        function onVoltageDropCalculated() { updateResultsDisplay() }
     }
 
     // Force initial calculation to make sure we have reactance
