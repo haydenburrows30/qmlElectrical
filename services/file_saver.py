@@ -600,3 +600,105 @@ class FileSaver(QObject):
         except Exception as e:
             logger.error(f"Error ensuring file extension: {e}")
             return filepath
+        
+    @Slot(str, result='QVariant')
+    def load_csv(self, filepath):
+        """
+        Load CSV data from a file.
+        
+        Args:
+            filepath: Path to the CSV file (can be a URL from QML FileDialog)
+            
+        Returns:
+            A dictionary containing:
+            - 'data': The parsed CSV data as a list of lists
+            - 'headers': CSV column headers
+            - 'status': Boolean indicating success/failure
+            - 'message': Status message for display
+            - 'filepath': Cleaned file path
+        """
+        try:
+            import pandas as pd
+            
+            # Clean the filepath (handle file:/// URLs)
+            clean_path = self.clean_filepath(filepath)
+            
+            if not clean_path:
+                error_msg = "No filepath provided"
+                logger.error(error_msg)
+                self.saveStatusChanged.emit(False, error_msg)
+                return {"status": False, "message": error_msg, "data": [], "headers": [], "filepath": ""}
+                
+            if not os.path.exists(clean_path):
+                error_msg = f"File does not exist: {clean_path}"
+                logger.error(error_msg)
+                self.saveStatusChanged.emit(False, error_msg)
+                return {"status": False, "message": error_msg, "data": [], "headers": [], "filepath": ""}
+            
+            # Read the CSV file using pandas
+            df = pd.read_csv(clean_path)
+            
+            # Extract headers and data
+            headers = df.columns.tolist()
+            data = df.values.tolist()
+            
+            success_msg = f"CSV loaded from: {clean_path}"
+            logger.info(success_msg)
+            self.saveStatusChanged.emit(True, success_msg)
+            
+            return {
+                "status": True, 
+                "message": success_msg, 
+                "data": data, 
+                "headers": headers,
+                "filepath": clean_path
+            }
+            
+        except pd.errors.EmptyDataError:
+            error_msg = "The CSV file is empty"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return {"status": False, "message": error_msg, "data": [], "headers": [], "filepath": filepath}
+            
+        except pd.errors.ParserError as e:
+            error_msg = f"CSV parsing error: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return {"status": False, "message": error_msg, "data": [], "headers": [], "filepath": filepath}
+            
+        except Exception as e:
+            error_msg = f"Error loading CSV file: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return {"status": False, "message": error_msg, "data": [], "headers": [], "filepath": filepath}
+
+    @Slot(str, result='QVariant')
+    def load_csv_with_dialog(self, default_filename=""):
+        """
+        Show a file open dialog and load the selected CSV file.
+        
+        Args:
+            default_filename: Optional default filename (without extension)
+            
+        Returns:
+            CSV data dictionary or failure information
+        """
+        try:
+            # Get filepath from dialog
+            filepath = self.get_load_filepath("csv")
+            
+            if not filepath:
+                logger.info("CSV file selection canceled by user")
+                msg = "CSV loading canceled"
+                self.saveStatusChanged.emit(False, msg)
+                return {"status": False, "message": msg, "data": [], "headers": [], "filepath": ""}
+                
+            # Now load the CSV file
+            return self.load_csv(filepath)
+            
+        except Exception as e:
+            error_msg = f"Error loading CSV file with dialog: {e}"
+            logger.error(error_msg)
+            self.saveStatusChanged.emit(False, error_msg)
+            return {"status": False, "message": error_msg, "data": [], "headers": [], "filepath": ""}
+
