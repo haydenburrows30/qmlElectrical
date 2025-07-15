@@ -4,6 +4,7 @@ import sqlite3
 import math
 import sys
 import uuid
+import gc
 from datetime import datetime
 import tempfile
 import matplotlib
@@ -31,6 +32,8 @@ class ProtectionRelayCalculator(QObject):
     savedSettingsChanged = Signal()
     savedCurveReady = Signal(list)
     pdfExportStatusChanged = Signal(bool, str)
+    fuseCurvesChanged = Signal()
+    fuseTypesChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -54,6 +57,9 @@ class ProtectionRelayCalculator(QObject):
         
         self._curve_points = []
         self._curve_type_names = list(self._curve_constants.keys())
+        
+        # Initialize fuse curves storage
+        self._fuse_curves = []
         
         # Get database instance instead of path
         self.db_manager = DatabaseManager.get_instance()
@@ -789,6 +795,18 @@ class ProtectionRelayCalculator(QObject):
                 # Plot relay curve
                 plt.plot(currents, times, 'b-', linewidth=2, label=f"{self._curve_type}")
             
+            # Plot fuse curves if available
+            if hasattr(self, '_fuse_curves') and self._fuse_curves:
+                colors = ['orange', 'purple', 'brown', 'pink', 'gray', 'olive']
+                for i, fuse_curve in enumerate(self._fuse_curves):
+                    if fuse_curve['points']:
+                        fuse_currents = [point['current'] for point in fuse_curve['points']]
+                        fuse_times = [point['time'] for point in fuse_curve['points']]
+                        
+                        color = colors[i % len(colors)]
+                        plt.plot(fuse_currents, fuse_times, color=color, linewidth=2, 
+                               linestyle='-', label=f"Fuse: {fuse_curve['label']}")
+            
             # Add a point for current fault current
             if self._fault_current > 0 and self._operating_time > 0 and self._operating_time < 100:
                 plt.scatter(self._fault_current, self._operating_time, color='red', 
@@ -820,7 +838,6 @@ class ProtectionRelayCalculator(QObject):
             plt.close('all')  # Close all figures to prevent resource leaks
             
             # Force garbage collection
-            import gc
             gc.collect()
             
             return True
@@ -829,3 +846,197 @@ class ProtectionRelayCalculator(QObject):
             logger.error(f"Error generating chart: {e}")
             plt.close('all')  # Make sure to close figures on error
             return False
+    
+    @Slot(str, result=list)
+    def getFuseTypes(self, manufacturer="ABB"):
+        """Get available fuse types for the specified manufacturer."""
+        try:
+            query = """
+                SELECT DISTINCT fuse_type, series 
+                FROM fuse_curves 
+                WHERE manufacturer = ? 
+                ORDER BY fuse_type, series
+            """
+            results = self.db_manager.fetch_all(query, (manufacturer,))
+            
+            fuse_types = []
+            for row in results:
+                fuse_types.append({
+                    'type': row['fuse_type'],
+                    'series': row['series']
+                })
+            
+            return fuse_types
+        except Exception as e:
+            logger.error(f"Error getting fuse types: {e}")
+            return []
+    
+    @Slot(str, str, result=list)
+    def getFuseRatings(self, fuse_type, manufacturer="ABB"):
+        """Get available fuse ratings for the specified type and manufacturer."""
+        try:
+            query = """
+                SELECT DISTINCT rating 
+                FROM fuse_curves 
+                WHERE fuse_type = ? AND manufacturer = ?
+                ORDER BY rating
+            """
+            results = self.db_manager.fetch_all(query, (fuse_type, manufacturer))
+            
+            ratings = [row['rating'] for row in results]
+            return ratings
+        except Exception as e:
+            logger.error(f"Error getting fuse ratings: {e}")
+            return []
+    
+    @Slot(str, float, str, result=list)
+    def getFuseCurveData(self, fuse_type, rating, manufacturer="ABB"):
+        """Get fuse curve data for plotting."""
+        try:
+            query = """
+                SELECT current_multiplier, melting_time, clearing_time, notes
+                FROM fuse_curves 
+                WHERE fuse_type = ? AND rating = ? AND manufacturer = ?
+                ORDER BY current_multiplier
+            """
+            results = self.db_manager.fetch_all(query, (fuse_type, rating, manufacturer))
+            
+            curve_data = []
+            for row in results:
+                current = rating * row['current_multiplier']
+                curve_data.append({
+                    'current': current,
+                    'melting_time': row['melting_time'],
+                    'clearing_time': row['clearing_time'] if row['clearing_time'] else row['melting_time'],
+                    'notes': row['notes'] or ''
+                })
+            
+            return curve_data
+        except Exception as e:
+            logger.error(f"Error getting fuse curve data: {e}")
+            return []
+    
+    @Slot(str, float, str, result=float)
+    def getFuseMeltingTime(self, fuse_type, rating, current, manufacturer="ABB"):
+        """Calculate fuse melting time for a given current using interpolation."""
+        try:
+            curve_data = self.getFuseCurveData(fuse_type, rating, manufacturer)
+            
+            if not curve_data:
+                return 0.0
+            
+            # Find the appropriate curve points for interpolation
+            current_multiplier = current / rating
+            
+            # Sort by current multiplier
+            sorted_data = sorted(curve_data, key=lambda x: x['current'] / rating)
+            
+            # Find the bounding points
+            lower_point = None
+            upper_point = None
+            
+            for point in sorted_data:
+                point_multiplier = point['current'] / rating
+                if point_multiplier <= current_multiplier:
+                    lower_point = point
+                elif point_multiplier > current_multiplier and upper_point is None:
+                    upper_point = point
+                    break
+            
+            if lower_point is None and upper_point is None:
+                return 0.0
+            elif lower_point is None:
+                return upper_point['melting_time']
+            elif upper_point is None:
+                return lower_point['melting_time']
+            else:
+                # Linear interpolation in log-log space
+                x1 = lower_point['current'] / rating
+                y1 = lower_point['melting_time']
+                x2 = upper_point['current'] / rating
+                y2 = upper_point['melting_time']
+                
+                # Avoid log(0) by ensuring positive values
+                if x1 > 0 and x2 > 0 and y1 > 0 and y2 > 0:
+                    log_x1 = math.log10(x1)
+                    log_y1 = math.log10(y1)
+                    log_x2 = math.log10(x2)
+                    log_y2 = math.log10(y2)
+                    log_x = math.log10(current_multiplier)
+                    
+                    # Linear interpolation in log space
+                    if log_x2 != log_x1:
+                        log_y = log_y1 + (log_y - log_x1) * (log_y2 - log_y1) / (log_x2 - log_x1)
+                        return 10 ** log_y
+                    else:
+                        return y1
+                else:
+                    # Fall back to linear interpolation
+                    if x2 != x1:
+                        return y1 + (current_multiplier - x1) * (y2 - y1) / (x2 - x1)
+                    else:
+                        return y1
+        except Exception as e:
+            logger.error(f"Error calculating fuse melting time: {e}")
+            return 0.0
+    
+    @Slot(str, float, str, result=bool)
+    def addFuseCurveToPlot(self, fuse_type, rating, manufacturer="ABB"):
+        """Add a fuse curve to the current plot data."""
+        try:
+            curve_data = self.getFuseCurveData(fuse_type, rating, manufacturer)
+            
+            if not curve_data:
+                return False
+            
+            # Convert to plot format
+            fuse_curve_points = []
+            for point in curve_data:
+                fuse_curve_points.append({
+                    'current': point['current'],
+                    'time': point['melting_time']
+                })
+            
+            # Store fuse curve data for plotting
+            if not hasattr(self, '_fuse_curves'):
+                self._fuse_curves = []
+            
+            self._fuse_curves.append({
+                'type': fuse_type,
+                'rating': rating,
+                'manufacturer': manufacturer,
+                'points': fuse_curve_points,
+                'label': f"{manufacturer} {fuse_type} {rating}A"
+            })
+            
+            # Recalculate and emit signal
+            self._calculate()
+            self.fuseCurvesChanged.emit()
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error adding fuse curve to plot: {e}")
+            return False
+    
+    @Slot()
+    def clearFuseCurves(self):
+        """Clear all fuse curves from the plot."""
+        if hasattr(self, '_fuse_curves'):
+            self._fuse_curves = []
+            self._calculate()
+            self.fuseCurvesChanged.emit()
+    
+    @Slot(result=list)
+    def getLoadedFuseCurves(self):
+        """Get list of currently loaded fuse curves."""
+        if hasattr(self, '_fuse_curves'):
+            return [
+                {
+                    'type': curve['type'],
+                    'rating': curve['rating'],
+                    'manufacturer': curve['manufacturer'],
+                    'label': curve['label']
+                }
+                for curve in self._fuse_curves
+            ]
+        return []

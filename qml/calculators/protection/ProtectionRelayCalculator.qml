@@ -525,6 +525,37 @@ Item {
                                 style: Qt.DashLine
                             }
                             
+                            // Fuse curves series (will be populated dynamically)
+                            LineSeries {
+                                id: fuseCurve1
+                                name: "Fuse Curve 1"
+                                visible: false
+                                axisX: currentAxis
+                                axisY: timeAxis
+                                color: "orange"
+                                width: 2
+                            }
+                            
+                            LineSeries {
+                                id: fuseCurve2
+                                name: "Fuse Curve 2"
+                                visible: false
+                                axisX: currentAxis
+                                axisY: timeAxis
+                                color: "purple"
+                                width: 2
+                            }
+                            
+                            LineSeries {
+                                id: fuseCurve3
+                                name: "Fuse Curve 3"
+                                visible: false
+                                axisX: currentAxis
+                                axisY: timeAxis
+                                color: "brown"
+                                width: 2
+                            }
+                            
                             // Add this property to control logarithmic point display
                             property bool useLogarithmicPoints: true
 
@@ -541,6 +572,132 @@ Item {
                         }
 
                         
+                    }
+                }
+                
+                // Fuse Curves card
+                WaveCard {
+                    title: "Fuse Curves"
+                    Layout.minimumHeight: 300
+                    Layout.fillWidth: true
+                    
+                    GridLayout {
+                        columns: 2
+                        anchors.fill: parent
+                        uniformCellWidths: true
+                        
+                        Label { text: "Manufacturer:" }
+                        ComboBoxRound {
+                            id: fuseManufacturer
+                            model: ["ABB"]
+                            currentIndex: 0
+                            Layout.fillWidth: true
+                            onCurrentTextChanged: {
+                                updateFuseTypes()
+                            }
+                        }
+                        
+                        Label { text: "Fuse Type:" }
+                        ComboBoxRound {
+                            id: fuseType
+                            model: []
+                            Layout.fillWidth: true
+                            onCurrentTextChanged: {
+                                updateFuseRatings()
+                            }
+                        }
+                        
+                        Label { text: "Fuse Rating:" }
+                        ComboBoxRound {
+                            id: fuseRating
+                            model: []
+                            Layout.fillWidth: true
+                        }
+                        
+                        StyledButton {
+                            text: "Add Fuse Curve"
+                            icon.source: "../../../icons/rounded/add.svg"
+                            Layout.columnSpan: 2
+                            Layout.fillWidth: true
+                            enabled: fuseType.currentIndex >= 0 && fuseRating.currentIndex >= 0
+                            onClicked: {
+                                if (fuseType.currentText && fuseRating.currentText) {
+                                    let success = relay.addFuseCurveToPlot(
+                                        fuseType.currentText,
+                                        parseFloat(fuseRating.currentText),
+                                        fuseManufacturer.currentText
+                                    )
+                                    if (success) {
+                                        updateLoadedFusesList()
+                                        updateFuseCurveChart()
+                                        messagePopup.showSuccess("Fuse curve added successfully")
+                                    } else {
+                                        messagePopup.showError("Failed to add fuse curve")
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Label { text: "Loaded Fuses:" }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 100
+                            Layout.maximumHeight: 150
+                            color: "transparent"
+                            border.color: "#cccccc"
+                            border.width: 1
+                            radius: 4
+                            
+                            ListView {
+                                id: loadedFusesList
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                model: []
+                                
+                                delegate: Rectangle {
+                                    width: parent.width
+                                    height: 30
+                                    color: "transparent"
+                                    
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 5
+                                        
+                                        Label {
+                                            text: modelData.label || ""
+                                            Layout.fillWidth: true
+                                            font.pixelSize: 12
+                                        }
+                                        
+                                        StyledButton {
+                                            text: "Remove"
+                                            icon.source: "../../../icons/rounded/close.svg"
+                                            Layout.preferredWidth: 60
+                                            Layout.preferredHeight: 25
+                                            onClicked: {
+                                                // Remove specific fuse curve (for now, clear all)
+                                                relay.clearFuseCurves()
+                                                updateLoadedFusesList()
+                                                updateFuseCurveChart()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        StyledButton {
+                            text: "Clear All Fuses"
+                            icon.source: "../../../icons/rounded/clear.svg"
+                            Layout.columnSpan: 2
+                            Layout.fillWidth: true
+                            onClicked: {
+                                relay.clearFuseCurves()
+                                updateLoadedFusesList()
+                                updateFuseCurveChart()
+                                messagePopup.showSuccess("All fuse curves cleared")
+                            }
+                        }
                     }
                 }
             }
@@ -782,6 +939,10 @@ Item {
                 messagePopup.showError(message)
             }
         }
+        
+        function onFuseCurvesChanged() {
+            updateFuseCurveChart()
+        }
     }
     
     // Add this function to ensure chart axis ranges adapt to the data
@@ -831,5 +992,74 @@ Item {
         currentAxis.max = Math.min(maxCurrent * 1.1, 10000)
         timeAxis.min = Math.max(minTime * 0.9, 0.01)
         timeAxis.max = Math.min(maxTime * 1.1, 100)
+    }
+    
+    // Fuse curve functions
+    function updateFuseTypes() {
+        let types = relay.getFuseTypes(fuseManufacturer.currentText)
+        fuseType.model = types.map(type => type.type)
+        fuseType.currentIndex = types.length > 0 ? 0 : -1
+        updateFuseRatings()
+    }
+    
+    function updateFuseRatings() {
+        if (fuseType.currentIndex >= 0 && fuseType.currentText) {
+            let ratings = relay.getFuseRatings(fuseType.currentText, fuseManufacturer.currentText)
+            fuseRating.model = ratings
+            fuseRating.currentIndex = ratings.length > 0 ? 0 : -1
+        } else {
+            fuseRating.model = []
+            fuseRating.currentIndex = -1
+        }
+    }
+    
+    function updateLoadedFusesList() {
+        let loadedFuses = relay.getLoadedFuseCurves()
+        loadedFusesList.model = loadedFuses
+    }
+    
+    function updateFuseCurveChart() {
+        // Clear existing fuse curves
+        fuseCurve1.clear()
+        fuseCurve2.clear()
+        fuseCurve3.clear()
+        fuseCurve1.visible = false
+        fuseCurve2.visible = false
+        fuseCurve3.visible = false
+        
+        // Get loaded fuse curves
+        let loadedFuses = relay.getLoadedFuseCurves()
+        let fuseSeriesArray = [fuseCurve1, fuseCurve2, fuseCurve3]
+        
+        // Update each fuse curve
+        for (let i = 0; i < Math.min(loadedFuses.length, fuseSeriesArray.length); i++) {
+            let fuse = loadedFuses[i]
+            let fuseSeries = fuseSeriesArray[i]
+            
+            // Get curve data for this fuse
+            let curveData = relay.getFuseCurveData(fuse.type, fuse.rating, fuse.manufacturer)
+            
+            if (curveData && curveData.length > 0) {
+                // Add points to the series
+                for (let j = 0; j < curveData.length; j++) {
+                    let point = curveData[j]
+                    fuseSeries.append(point.current, point.melting_time)
+                }
+                
+                // Set the curve name and make visible
+                fuseSeries.name = fuse.label
+                fuseSeries.visible = true
+            }
+        }
+        
+        // Update the chart axes
+        adjustAxisRanges()
+    }
+    
+    // Initialize fuse types when component completes
+    Component.onCompleted: {
+        updateFuseTypes()
+        updateLoadedFusesList()
+        updateFuseCurveChart()
     }
 }

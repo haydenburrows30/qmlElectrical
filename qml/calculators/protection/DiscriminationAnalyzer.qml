@@ -284,7 +284,7 @@ Item {
                                     from: 0.1
                                     to: 1.0
                                     value: safeCalculatorProperty("minimumMargin", 0.1)
-                                    stepSize: 0.05
+                                    stepSize: 0.01
                                     onValueChanged: {
                                         if (!isDestructing && calculator) {
                                             calculator.minimumMargin = value
@@ -297,6 +297,23 @@ Item {
                                     font.bold: true
                                     Layout.fillWidth: true
                                 }
+
+                                Label {text: "Current Level: "}
+
+                                TextFieldRound {
+                                    id: currentLevelSlider
+                                    Layout.fillWidth: true
+                                    text: "100"
+                                    placeholderText: "Current Level (A)"
+
+                                    onEditingFinished: {
+                                        if (!isDestructing && calculator) {
+                                            calculator.currentLevel = parseFloat(text)
+                                        }
+                                    }
+                                }
+
+                                Label {}
 
                                 Label {
                                     text: "Fault Level: "
@@ -395,6 +412,127 @@ Item {
                                             calculator.faultPoints, 
                                             showFaultPoints && showFaultPoints.checked
                                         );
+                                    }
+                                }
+                            }
+                        }
+
+                        WaveCard {
+                            title: "Fuse Curves"
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 300
+                            
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+                                uniformCellWidths: true
+                                
+                                Label { text: "Manufacturer:" }
+                                ComboBoxRound {
+                                    id: fuseManufacturer
+                                    model: ["ABB"]
+                                    currentIndex: 0
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: {
+                                        updateFuseTypes()
+                                    }
+                                }
+                                
+                                Label { text: "Fuse Type:" }
+                                ComboBoxRound {
+                                    id: fuseType
+                                    model: []
+                                    Layout.fillWidth: true
+                                    onCurrentTextChanged: {
+                                        updateFuseRatings()
+                                    }
+                                }
+                                
+                                Label { text: "Fuse Rating:" }
+                                ComboBoxRound {
+                                    id: fuseRating
+                                    model: []
+                                    Layout.fillWidth: true
+                                }
+                                
+                                StyledButton {
+                                    text: "Add Fuse Curve"
+                                    icon.source: "../../../icons/rounded/add.svg"
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    enabled: fuseType.currentIndex >= 0 && fuseRating.currentIndex >= 0
+                                    onClicked: {
+                                        if (fuseType.currentText && fuseRating.currentText) {
+                                            let success = calculator.addFuseCurveToPlot(
+                                                fuseType.currentText,
+                                                parseFloat(fuseRating.currentText),
+                                                fuseManufacturer.currentText
+                                            )
+                                            if (success) {
+                                                updateLoadedFusesList()
+                                                messagePopup.showSuccess("Fuse curve added successfully")
+                                            } else {
+                                                messagePopup.showError("Failed to add fuse curve")
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Label { text: "Loaded Fuses:" }
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 100
+                                    Layout.maximumHeight: 150
+                                    color: "transparent"
+                                    border.color: "#cccccc"
+                                    border.width: 1
+                                    radius: 4
+                                    
+                                    ListView {
+                                        id: loadedFusesList
+                                        anchors.fill: parent
+                                        anchors.margins: 5
+                                        model: []
+                                        
+                                        delegate: Rectangle {
+                                            width: parent.width
+                                            height: 30
+                                            color: "transparent"
+                                            
+                                            RowLayout {
+                                                anchors.fill: parent
+                                                anchors.margins: 5
+                                                
+                                                Label {
+                                                    text: modelData.label || ""
+                                                    Layout.fillWidth: true
+                                                    font.pixelSize: 12
+                                                }
+                                                
+                                                StyledButton {
+                                                    text: "Remove"
+                                                    icon.source: "../../../icons/rounded/close.svg"
+                                                    Layout.preferredWidth: 60
+                                                    Layout.preferredHeight: 25
+                                                    onClicked: {
+                                                        calculator.clearFuseCurves()
+                                                        updateLoadedFusesList()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                StyledButton {
+                                    text: "Clear All Fuses"
+                                    icon.source: "../../../icons/rounded/clear.svg"
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    onClicked: {
+                                        calculator.clearFuseCurves()
+                                        updateLoadedFusesList()
+                                        messagePopup.showSuccess("All fuse curves cleared")
                                     }
                                 }
                             }
@@ -560,6 +698,11 @@ Item {
             if (isDestructing || !calculator || !marginChart) return
             marginChart.updateMarginLine()
         }
+
+        function onCurrentLevelChanged() {
+            if (isDestructing || !calculator || !marginChart) return
+            marginChart.updateCurrentLevelLine()
+        }
         
         function onExportComplete(success, message) {
             if (isDestructing) return
@@ -574,6 +717,11 @@ Item {
             if (isDestructing || !calculator || !marginChart) return
             marginChart.saveChartImage(filename)
         }
+        
+        function onFuseCurvesChanged() {
+            if (isDestructing || !calculator || !marginChart) return
+            marginChart.updateFuseCurves()
+        }
     }
         
     Component.onCompleted: {
@@ -583,6 +731,36 @@ Item {
             if (marginChart && marginChart.createRelaySeries) {
                 marginChart.createRelaySeries();
             }
+            
+            updateFuseTypes()
+            updateLoadedFusesList()
         });
+    }
+    
+    // Fuse curve functions
+    function updateFuseTypes() {
+        if (!calculator) return
+        let types = calculator.getFuseTypes(fuseManufacturer.currentText)
+        fuseType.model = types
+        fuseType.currentIndex = types.length > 0 ? 0 : -1
+        updateFuseRatings()
+    }
+    
+    function updateFuseRatings() {
+        if (!calculator) return
+        if (fuseType.currentIndex >= 0 && fuseType.currentText) {
+            let ratings = calculator.getFuseRatings(fuseType.currentText, fuseManufacturer.currentText)
+            fuseRating.model = ratings
+            fuseRating.currentIndex = ratings.length > 0 ? 0 : -1
+        } else {
+            fuseRating.model = []
+            fuseRating.currentIndex = -1
+        }
+    }
+    
+    function updateLoadedFusesList() {
+        if (!calculator) return
+        let loadedFuses = calculator.getLoadedFuseCurves()
+        loadedFusesList.model = loadedFuses
     }
 }

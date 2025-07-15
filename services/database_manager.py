@@ -43,7 +43,7 @@ class DatabaseManager:
         self.db_path = db_path
         self._local = threading.local()
         self._ensure_db_directory()
-        self.current_version = 1  # Increment this when schema changes
+        self.current_version = 2  # Increment this when schema changes
         
         # Initialize on first creation if the file doesn't exist
         if not os.path.exists(db_path):
@@ -198,6 +198,23 @@ class DatabaseManager:
             notes TEXT
         )''')
         
+        # Fuse curves table for ABB CEF and other fuse types
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS fuse_curves (
+            id INTEGER PRIMARY KEY,
+            fuse_type TEXT NOT NULL,
+            rating REAL NOT NULL,
+            current_multiplier REAL NOT NULL,
+            melting_time REAL NOT NULL,
+            clearing_time REAL,
+            manufacturer TEXT,
+            series TEXT,
+            voltage_rating REAL,
+            breaking_capacity REAL,
+            temperature TEXT DEFAULT '25°C',
+            notes TEXT
+        )''')
+        
         # Diversity factors table
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS diversity_factors (
@@ -262,6 +279,8 @@ class DatabaseManager:
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_size ON cable_data(size)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_diversity_houses ON diversity_factors(houses)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_relay_settings_created ON relay_settings(created_at)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_fuse_curves_type_rating ON fuse_curves(fuse_type, rating)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_fuse_curves_manufacturer ON fuse_curves(manufacturer, series)')
         
         self.connection.commit()
         logger.info("Schema creation complete")
@@ -356,6 +375,22 @@ class DatabaseManager:
                 tripping_time REAL NOT NULL,
                 curve_type TEXT,
                 temperature TEXT,
+                notes TEXT
+            )'''),
+            
+            ("fuse_curves", '''
+            CREATE TABLE IF NOT EXISTS fuse_curves (
+                id INTEGER PRIMARY KEY,
+                fuse_type TEXT NOT NULL,
+                rating REAL NOT NULL,
+                current_multiplier REAL NOT NULL,
+                melting_time REAL NOT NULL,
+                clearing_time REAL,
+                manufacturer TEXT,
+                series TEXT,
+                voltage_rating REAL,
+                breaking_capacity REAL,
+                temperature TEXT DEFAULT '25°C',
                 notes TEXT
             )'''),
             
@@ -460,6 +495,8 @@ class DatabaseManager:
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_cable_size ON cable_data(size)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_diversity_houses ON diversity_factors(houses)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_relay_settings_created ON relay_settings(created_at)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_fuse_curves_type_rating ON fuse_curves(fuse_type, rating)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_fuse_curves_manufacturer ON fuse_curves(manufacturer, series)')
         except Exception as e:
             logger.error(f"Error creating indexes: {e}")
             
@@ -479,7 +516,7 @@ class DatabaseManager:
             expected_tables = [
                 'schema_version', 'config', 'cable_data', 'installation_methods', 'temperature_factors',
                 'cable_materials', 'standards_reference', 'circuit_breakers', 'protection_curves',
-                'diversity_factors', 'fuse_sizes', 'calculation_history', 'settings', 'relay_settings',
+                'fuse_curves', 'diversity_factors', 'fuse_sizes', 'calculation_history', 'settings', 'relay_settings',
                 'voltage_systems', 'insulation_types', 'soil_resistivity'
             ]
             
@@ -577,6 +614,8 @@ class DatabaseManager:
                 # Incremental upgrades
                 if current_version < 1:
                     self._migrate_to_v1()
+                if current_version < 2:
+                    self._migrate_to_v2()
                 
                 # Update version after migration
                 self._set_schema_version(self.current_version)
@@ -590,6 +629,44 @@ class DatabaseManager:
         cursor = self.connection.cursor()
         # Add migration SQL statements here
         self.connection.commit()
+    
+    def _migrate_to_v2(self):
+        """Migrate schema to version 2 - Add fuse_curves table."""
+        logger.info("Migrating to schema version 2: Adding fuse_curves table")
+        cursor = self.connection.cursor()
+        
+        try:
+            # Create fuse_curves table if it doesn't exist
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS fuse_curves (
+                id INTEGER PRIMARY KEY,
+                fuse_type TEXT NOT NULL,
+                rating REAL NOT NULL,
+                current_multiplier REAL NOT NULL,
+                melting_time REAL NOT NULL,
+                clearing_time REAL,
+                manufacturer TEXT,
+                series TEXT,
+                voltage_rating REAL,
+                breaking_capacity REAL,
+                temperature TEXT DEFAULT '25°C',
+                notes TEXT
+            )''')
+            
+            # Create indexes for fuse_curves
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_fuse_curves_type_rating ON fuse_curves(fuse_type, rating)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_fuse_curves_manufacturer ON fuse_curves(manufacturer, series)')
+            
+            self.connection.commit()
+            logger.info("Successfully migrated to schema version 2")
+            
+            # Load fuse curves data
+            self._load_fuse_curves()
+            
+        except Exception as e:
+            logger.error(f"Error migrating to version 2: {e}")
+            self.connection.rollback()
+            raise
     
     def _load_reference_data(self):
         """Load all reference data into database."""
@@ -612,6 +689,7 @@ class DatabaseManager:
         self._load_insulation_types()
         self._load_soil_resistivity()
         self._load_protection_curves()
+        self._load_fuse_curves()
         
         # Load default config values
         self._load_default_config()
@@ -1065,6 +1143,100 @@ class DatabaseManager:
         
         self.connection.commit()
         logger.info("Loaded protection curves reference data")
+    
+    def _load_fuse_curves(self):
+        """Load ABB CEF fuse curves and other fuse types."""
+        cursor = self.connection.cursor()
+        
+        # Check if table is already populated
+        cursor.execute("SELECT COUNT(*) FROM fuse_curves")
+        if cursor.fetchone()[0] > 0:
+            return
+        
+        # ABB CEF fuse curves - based on typical time-current characteristics
+        # Note: These are approximate values - actual values should be from manufacturer datasheets
+        abb_cef_curves = [
+            # ABB CEF 6A fuse
+            ("CEF", 6, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
+            ("CEF", 6, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
+            ("CEF", 6, 1.35, 600, 600, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 6, 1.5, 300, 300, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 6, 2.0, 60, 70, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 6, 3.0, 15, 20, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 6, 5.0, 3.0, 5.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 6, 10.0, 0.5, 1.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 6, 20.0, 0.1, 0.2, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 6, 50.0, 0.02, 0.05, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            
+            # ABB CEF 10A fuse
+            ("CEF", 10, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
+            ("CEF", 10, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
+            ("CEF", 10, 1.35, 600, 600, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 10, 1.5, 300, 300, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 10, 2.0, 60, 70, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 10, 3.0, 15, 20, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 10, 5.0, 3.0, 5.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 10, 10.0, 0.5, 1.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 10, 20.0, 0.1, 0.2, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 10, 50.0, 0.02, 0.05, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            
+            # ABB CEF 16A fuse
+            ("CEF", 16, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
+            ("CEF", 16, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
+            ("CEF", 16, 1.35, 600, 600, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 16, 1.5, 300, 300, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 16, 2.0, 60, 70, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 16, 3.0, 15, 20, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 16, 5.0, 3.0, 5.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 16, 10.0, 0.5, 1.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 16, 20.0, 0.1, 0.2, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 16, 50.0, 0.02, 0.05, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            
+            # ABB CEF 20A fuse
+            ("CEF", 20, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
+            ("CEF", 20, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
+            ("CEF", 20, 1.35, 600, 600, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 20, 1.5, 300, 300, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 20, 2.0, 60, 70, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 20, 3.0, 15, 20, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 20, 5.0, 3.0, 5.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 20, 10.0, 0.5, 1.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 20, 20.0, 0.1, 0.2, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 20, 50.0, 0.02, 0.05, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            
+            # ABB CEF 25A fuse
+            ("CEF", 25, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
+            ("CEF", 25, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
+            ("CEF", 25, 1.35, 600, 600, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 25, 1.5, 300, 300, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 25, 2.0, 60, 70, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 25, 3.0, 15, 20, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 25, 5.0, 3.0, 5.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 25, 10.0, 0.5, 1.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 25, 20.0, 0.1, 0.2, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 25, 50.0, 0.02, 0.05, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            
+            # ABB CEF 32A fuse
+            ("CEF", 32, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
+            ("CEF", 32, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
+            ("CEF", 32, 1.35, 600, 600, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 32, 1.5, 300, 300, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 32, 2.0, 60, 70, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 32, 3.0, 15, 20, "ABB", "CEF-S", 400, 100000, "25°C", "Pre-arcing time"),
+            ("CEF", 32, 5.0, 3.0, 5.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 32, 10.0, 0.5, 1.0, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 32, 20.0, 0.1, 0.2, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+            ("CEF", 32, 50.0, 0.02, 0.05, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
+        ]
+        
+        cursor.executemany("""
+            INSERT INTO fuse_curves 
+            (fuse_type, rating, current_multiplier, melting_time, clearing_time, manufacturer, series, voltage_rating, breaking_capacity, temperature, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, abb_cef_curves)
+        
+        self.connection.commit()
+        logger.info("Loaded ABB CEF fuse curves reference data")
     
     def _load_default_config(self):
         """Load default configuration values."""

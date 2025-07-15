@@ -18,8 +18,10 @@ ChartView {
     // We only need these properties as they're directly used by QML
     property var scatterSeries: null
     property var marginLine: null
+    property var currentLevelLine: null
     property var relaySeries: []
     property var faultPointsSeries: []
+    property var fuseCurvesSeries: []
 
     LogValueAxis {
         id: axisX
@@ -59,6 +61,16 @@ ChartView {
         axisY: axisY
     }
 
+    LineSeries {
+        id: currentLevelSeries
+        name: "Current Level"
+        color: Universal.theme === Universal.Dark ? "#90EE90" : "green" 
+        width: 2
+        style: Qt.DashLine
+        axisX: axisX
+        axisY: axisY
+    }
+
     Component.onCompleted: {
         // Initialize chart
         setAxisX(axisX, null)
@@ -70,6 +82,7 @@ ChartView {
         scatterSeries.color = Universal.accent
         
         marginLine = marginLineSeries
+        currentLevelLine = currentLevelSeries
         
         // Apply initial ranges from Python
         let ranges = discriminationAnalyzerCard.calculator.defaultRanges
@@ -95,6 +108,16 @@ ChartView {
             marginLine.append(axisX.min, margin)
             marginLine.append(axisX.max, margin)
         }
+    }
+
+    function updateCurrentLevelLine() {
+        if (!discriminationAnalyzerCard?.calculator) return
+        
+        let level = discriminationAnalyzerCard.calculator.currentLevel
+
+        currentLevelLine.clear()
+        currentLevelLine.append(level, axisY.min)
+        currentLevelLine.append(level, axisY.max)
     }
 
     function createRelaySeries() {
@@ -136,7 +159,9 @@ ChartView {
             series.color = "red"
             series.borderColor = "white"
             series.borderWidth = 1
-            
+            series.pointLabelsVisible = true
+            series.pointLabelsFormat = "@xPoint, @yPoint"
+
             points.forEach(point => series.append(point.current, point.time))
             faultPointsSeries.push(series)
         })
@@ -144,7 +169,49 @@ ChartView {
         updateRanges(discriminationAnalyzerCard.calculator.chartRanges)
     }
 
+    function updateFuseCurves() {
+        clearFuseCurves()
+        
+        if (!discriminationAnalyzerCard?.calculator) return
+        
+        let loadedFuses = discriminationAnalyzerCard.calculator.getLoadedFuseCurves()
+        if (!loadedFuses.length) return
+        
+        let fuseColors = ['orange', 'purple', 'brown', 'pink', 'gray', 'olive']
+        
+        loadedFuses.forEach((fuseInfo, index) => {
+            let curveData = discriminationAnalyzerCard.calculator.getFuseCurveData(
+                fuseInfo.type, 
+                fuseInfo.rating, 
+                fuseInfo.manufacturer
+            )
+            
+            if (curveData && curveData.length > 0) {
+                let series = chart.createSeries(ChartView.SeriesTypeLine, 
+                                             "Fuse: " + fuseInfo.label, 
+                                             axisX, axisY)
+                series.width = 2
+                series.color = fuseColors[index % fuseColors.length]
+                
+                curveData.forEach(point => {
+                    if (point.current > 0 && point.melting_time > 0) {
+                        series.append(point.current, point.melting_time)
+                    }
+                })
+                
+                fuseCurvesSeries.push(series)
+            }
+        })
+        
+        updateRanges(discriminationAnalyzerCard.calculator.chartRanges)
+    }
+
     // Basic cleanup functions
+    function clearFuseCurves() {
+        fuseCurvesSeries.forEach(series => chart.removeSeries(series))
+        fuseCurvesSeries = []
+    }
+
     function clearFaultPoints() {
         faultPointsSeries.forEach(series => chart.removeSeries(series))
         faultPointsSeries = []
@@ -155,12 +222,15 @@ ChartView {
         relaySeries.forEach(series => chart.removeSeries(series))
         relaySeries = []
         clearFaultPoints()
+        clearFuseCurves()
     }
 
     function resetChart() {
         clearAllSeries()
         marginLine?.clear()
         marginLine.visible = false
+        currentLevelLine?.clear()
+        currentLevelLine.visible = false
         updateRanges(discriminationAnalyzerCard.calculator.defaultRanges)
     }
 
