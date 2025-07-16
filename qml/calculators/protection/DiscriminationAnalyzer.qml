@@ -87,6 +87,12 @@ Item {
                                 faultCurrent.text = ""
                                 marginChart.resetChart()
                                 showFaultPoints.checked = false
+                                
+                                // Reset axis controls
+                                xAxisMin.text = marginChart.getXAxisMin().toString()
+                                xAxisMax.text = marginChart.getXAxisMax().toString()
+                                yAxisMin.text = marginChart.getYAxisMin().toString()
+                                yAxisMax.text = marginChart.getYAxisMax().toString()
                             }
                         }
                     }
@@ -418,6 +424,142 @@ Item {
                         }
 
                         WaveCard {
+                            title: "Axis Configuration"
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 250
+                            
+                            GridLayout {
+                                columns: 2
+                                anchors.fill: parent
+
+                                // X-Axis Controls
+                                Label {
+                                    text: "X-Axis Min (A): "
+                                    Layout.columnSpan: 1
+                                }
+
+                                TextFieldRound {
+                                    id: xAxisMin
+                                    Layout.fillWidth: true
+                                    text: "10"
+                                    placeholderText: "X-Axis Minimum"
+                                    validator: DoubleValidator { bottom: 0.1 }
+                                    
+                                    onEditingFinished: {
+                                        if (!isDestructing && marginChart) {
+                                            let minValue = parseFloat(text)
+                                            if (minValue > 0 && minValue < parseFloat(xAxisMax.text)) {
+                                                marginChart.setXAxisMin(minValue)
+                                            } else {
+                                                text = marginChart.getXAxisMin().toString()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Label {
+                                    text: "X-Axis Max (A): "
+                                }
+
+                                TextFieldRound {
+                                    id: xAxisMax
+                                    Layout.fillWidth: true
+                                    text: "10000"
+                                    placeholderText: "X-Axis Maximum"
+                                    validator: DoubleValidator { bottom: 1 }
+                                    
+                                    onEditingFinished: {
+                                        if (!isDestructing && marginChart) {
+                                            let maxValue = parseFloat(text)
+                                            if (maxValue > parseFloat(xAxisMin.text)) {
+                                                marginChart.setXAxisMax(maxValue)
+                                            } else {
+                                                text = marginChart.getXAxisMax().toString()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Y-Axis Controls
+                                Label {
+                                    text: "Y-Axis Min (s): "
+                                }
+
+                                TextFieldRound {
+                                    id: yAxisMin
+                                    Layout.fillWidth: true
+                                    text: "0.01"
+                                    placeholderText: "Y-Axis Minimum"
+                                    validator: DoubleValidator { bottom: 0.001 }
+                                    
+                                    onEditingFinished: {
+                                        if (!isDestructing && marginChart) {
+                                            let minValue = parseFloat(text)
+                                            if (minValue > 0 && minValue < parseFloat(yAxisMax.text)) {
+                                                marginChart.setYAxisMin(minValue)
+                                            } else {
+                                                text = marginChart.getYAxisMin().toString()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Label {
+                                    text: "Y-Axis Max (s): "
+                                }
+
+                                TextFieldRound {
+                                    id: yAxisMax
+                                    Layout.fillWidth: true
+                                    text: "10"
+                                    placeholderText: "Y-Axis Maximum"
+                                    validator: DoubleValidator { bottom: 0.01 }
+                                    
+                                    onEditingFinished: {
+                                        if (!isDestructing && marginChart) {
+                                            let maxValue = parseFloat(text)
+                                            if (maxValue > parseFloat(yAxisMin.text)) {
+                                                marginChart.setYAxisMax(maxValue)
+                                            } else {
+                                                text = marginChart.getYAxisMax().toString()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                StyledButton {
+                                    text: "Reset Axis"
+                                    icon.source: "../../../icons/rounded/refresh.svg"
+                                    Layout.columnSpan: 2
+                                    Layout.fillWidth: true
+                                    
+                                    ToolTip.text: "Reset axis to default ranges"
+                                    ToolTip.visible: hovered
+                                    ToolTip.delay: 500
+                                    
+                                    onClicked: {
+                                        if (!isDestructing && marginChart) {
+                                            marginChart.resetAxisToDefault()
+                                            xAxisMin.text = marginChart.getXAxisMin().toString()
+                                            xAxisMax.text = marginChart.getXAxisMax().toString()
+                                            yAxisMin.text = marginChart.getYAxisMin().toString()
+                                            yAxisMax.text = marginChart.getYAxisMax().toString()
+                                        }
+                                    }
+                                }
+
+                                function updateFaultPoints() {
+                                    if (!isDestructing && calculator) {
+                                        marginChart.updateFaultPoints(
+                                            calculator.faultPoints, 
+                                            showFaultPoints && showFaultPoints.checked
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+                        WaveCard {
                             title: "Fuse Curves"
                             Layout.fillWidth: true
                             Layout.minimumHeight: 350
@@ -430,7 +572,7 @@ Item {
                                 Label { text: "Manufacturer:" }
                                 ComboBoxRound {
                                     id: fuseManufacturer
-                                    model: ["ABB"]
+                                    model: ["ABB", "EATON"]
                                     currentIndex: 0
                                     Layout.fillWidth: true
                                     onCurrentTextChanged: {
@@ -733,6 +875,12 @@ Item {
             
             updateFuseTypes()
             updateLoadedFusesList()
+            
+            // Initialize axis controls with current chart values
+            xAxisMin.text = marginChart.getXAxisMin().toString()
+            xAxisMax.text = marginChart.getXAxisMax().toString()
+            yAxisMin.text = marginChart.getYAxisMin().toString()
+            yAxisMax.text = marginChart.getYAxisMax().toString()
         });
     }
     

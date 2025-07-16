@@ -1242,7 +1242,6 @@ class DatabaseManager:
             ("CEF", 63, 16.082, 0.019, 0.019, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
             ("CEF", 63, 19.195, 0.01, 0.01, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
 
-            
             # ABB CEF 100A fuse - CORRECTED
             ("CEF", 100, 1.0, 3600, 3600, "ABB", "CEF-S", 400, 100000, "25°C", "No melt at rated current"),
             ("CEF", 100, 1.1, 1800, 1800, "ABB", "CEF-S", 400, 100000, "25°C", "May melt region"),
@@ -1270,15 +1269,86 @@ class DatabaseManager:
             ("CEF", 125, 50.0, 0.07, 0.09, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
             ("CEF", 125, 100.0, 0.035, 0.045, "ABB", "CEF-S", 400, 100000, "25°C", "Fast melt region"),
         ]
+
+        eaton_elf_curves = [
+            # Eaton ELF 25A fuse
+            ("ELF", 25, 0.972, 986, 986, "EATON", "ELF", 400, 100000, "25°C", "No melt at rated current"),
+            ("ELF", 25, 1.107, 135.4, 135.4, "EATON", "ELF", 400, 100000, "25°C", "May melt region"),
+            ("ELF", 25, 1.13, 104.5, 104.5, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 1.154, 82.9, 82.9, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 1.193, 60.9, 60.9, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 1.27, 36.9, 36.9, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 1.35, 23.8, 23.8, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 1.42, 16.7, 16.7, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 1.506, 12.2, 12.2, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 1.63, 8.52, 8.52, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 1.726, 7.0, 7.0, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 1.888, 5.31, 5.31, "EATON", "ELF", 400, 100000, "25°C", "No melt at rated current"),
+            ("ELF", 25, 2.1, 3.97, 3.97, "EATON", "ELF", 400, 100000, "25°C", "May melt region"),
+            ("ELF", 25, 2.436, 2.83, 2.83, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 3.056, 1.83, 1.83, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 3.801, 1.29, 1.29, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 4.328, 1.03, 1.03, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 4.894, 0.81, 0.81, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 5.362, 0.63, 0.63, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 5.709, 0.51, 0.51, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 6.013, 0.38, 0.38, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 6.82, 0.2049, 0.2049, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 7.795, 0.1125, 0.1125, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 9.3525, 0.0513, 0.0513, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 10.46, 0.0339, 0.0339, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 25, 11.81, 0.0222, 0.0222, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 13.35, 0.0152, 0.0152, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 25, 15.55, 0.01, 0.01, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+
+            # Eaton ELF 40A fuse
+            ("ELF", 40, 1.56, 986, 986, "EATON", "ELF", 400, 100000, "25°C", "No melt at rated current"),
+            ("ELF", 40, 1.77, 135.4, 135.4, "EATON", "ELF", 400, 100000, "25°C", "May melt region"),
+            ("ELF", 40, 1.81, 104.5, 104.5, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 1.85, 82.9, 82.9, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 1.91, 60.9, 60.9, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 2.03, 36.9, 36.9, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 2.16, 23.8, 23.8, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 2.29, 16.7, 16.7, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 2.41, 12.2, 12.2, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 2.61, 8.52, 8.52, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 2.76, 7.0, 7.0, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 3.02, 5.31, 5.31, "EATON", "ELF", 400, 100000, "25°C", "No melt at rated current"),
+            ("ELF", 40, 3.36, 3.97, 3.97, "EATON", "ELF", 400, 100000, "25°C", "May melt region"),
+            ("ELF", 40, 3.90, 2.83, 2.83, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 4.89, 1.83, 1.83, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 6.08, 1.29, 1.29, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 6.93, 1.03, 1.03, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 7.83, 0.81, 0.81, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 8.58, 0.63, 0.63, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 9.13, 0.51, 0.51, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 9.62, 0.38, 0.38, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 10.91, 0.2049, 0.2049, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 12.47, 0.1125, 0.1125, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 14.96, 0.0513, 0.0513, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 16.74, 0.0339, 0.0339, "EATON", "ELF", 400, 100000, "25°C", "Pre-arcing time"),
+            ("ELF", 40, 18.95, 0.0222, 0.0222, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 21.37, 0.0152, 0.0152, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+            ("ELF", 40, 24.89, 0.01, 0.01, "EATON", "ELF", 400, 100000, "25°C", "Fast melt region"),
+        ]
         
         cursor.executemany("""
             INSERT INTO fuse_curves 
             (fuse_type, rating, current_multiplier, melting_time, clearing_time, manufacturer, series, voltage_rating, breaking_capacity, temperature, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, abb_cef_curves)
-        
-        self.connection.commit()
+
         logger.info("Loaded ABB CEF fuse curves reference data")
+
+        cursor.executemany("""
+            INSERT INTO fuse_curves 
+            (fuse_type, rating, current_multiplier, melting_time, clearing_time, manufacturer, series, voltage_rating, breaking_capacity, temperature, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, eaton_elf_curves)
+
+        logger.info("Loaded Eaton ELF fuse curves reference data")
+
+        self.connection.commit()
     
     def _load_default_config(self):
         """Load default configuration values."""

@@ -39,7 +39,7 @@ def update_fuse_curves():
         sample_data = db_manager.fetch_all("""
             SELECT fuse_type, rating, COUNT(*) as point_count
             FROM fuse_curves 
-            WHERE manufacturer = 'ABB' 
+            WHERE manufacturer = 'EATON' 
             GROUP BY fuse_type, rating 
             ORDER BY rating
         """)

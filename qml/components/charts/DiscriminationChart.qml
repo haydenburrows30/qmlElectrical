@@ -149,6 +149,52 @@ ChartView {
         axisY.max = ranges.yMax
     }
 
+    // Axis control functions
+    function setXAxisMin(value) {
+        if (value > 0 && value < axisX.max) {
+            axisX.min = value
+        }
+    }
+
+    function setXAxisMax(value) {
+        if (value > axisX.min) {
+            axisX.max = value
+        }
+    }
+
+    function setYAxisMin(value) {
+        if (value > 0 && value < axisY.max) {
+            axisY.min = value
+        }
+    }
+
+    function setYAxisMax(value) {
+        if (value > axisY.min) {
+            axisY.max = value
+        }
+    }
+
+    function getXAxisMin() {
+        return axisX.min
+    }
+
+    function getXAxisMax() {
+        return axisX.max
+    }
+
+    function getYAxisMin() {
+        return axisY.min
+    }
+
+    function getYAxisMax() {
+        return axisY.max
+    }
+
+    function resetAxisToDefault() {
+        let ranges = discriminationAnalyzerCard.calculator.defaultRanges
+        updateRanges(ranges)
+    }
+
     function updateMarginLine() {
         if (!discriminationAnalyzerCard?.calculator) return
         
@@ -214,7 +260,10 @@ ChartView {
             series.pointLabelsVisible = true
             series.pointLabelsFormat = "@xPoint, @yPoint"
 
-            points.forEach(point => series.append(point.current, point.time))
+            points.forEach(point => {
+                // Round the time value to 2 decimal places when appending
+                series.append(point.current, Math.round(point.time * 100) / 100)
+            })
             faultPointsSeries.push(series)
         })
         
