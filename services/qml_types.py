@@ -45,6 +45,7 @@ from models.fourier_laplace_z.transform_calculator import TransformCalculator
 from models.fourier_laplace_z.z_transform_calculator import ZTransformCalculator
 from models.theory.calculus_calculator import CalculusCalculator
 from models.protection.lightning_protection_calculator import LightningProtectionCalculator
+from models.templates.wind_turbine_protection import WindTurbineProtectionTemplate
 
 def register_qml_types(engine, current_dir):
     """Register all QML types and singletons."""
@@ -105,4 +106,5 @@ def register_qml_types(engine, current_dir):
         (ZTransformCalculator, "ZTransformCalculator", 1, 0, "ZTransformCalculator"),
         (CalculusCalculator, "Calculus", 1, 0, "CalculusCalculator"),
         (LightningProtectionCalculator, "LightningProtectionCalculator", 1, 0, "LightningProtectionCalculator"),
+        (WindTurbineProtectionTemplate, "WindTurbineProtection", 1, 0, "WindTurbineProtectionTemplate"),
     ]

@@ -1,16 +1,36 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Dialogs 1.3
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Dialogs
+import QtCharts
+import WindTurbineProtection 1.0
 
-ApplicationWindow {
+Page {
     id: windTurbineWindow
-    width: 1200
-    height: 800
+    
+    property var templateEngine: windTurbineProtectionTemplate
+    property var analysisResults: null
+    
     title: "Wind Turbine Protection Coordination Template"
     
-    property var templateEngine: null
-    property var analysisResults: null
+    // Create the template engine instance
+    WindTurbineProtectionTemplate {
+        id: windTurbineProtectionTemplate
+        
+        onAnalysisComplete: function(result) {
+            console.log("Analysis complete:", result)
+            analysisResults = JSON.parse(result)
+            updateAnalysisDisplay()
+        }
+        
+        onFuseDataReady: function(result) {
+            console.log("Fuse data ready:", result)
+        }
+        
+        onErrorOccurred: function(error) {
+            console.error("Error occurred:", error)
+        }
+    }
     
     // Main layout
     ColumnLayout {
@@ -329,7 +349,7 @@ ApplicationWindow {
                                                 anchors.left: parent.left
                                                 anchors.leftMargin: 10
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                text: `Issue at ${modelData.current}A: Time ratio ${modelData.time_ratio.toFixed(2)} < ${modelData.required_ratio.toFixed(2)}`
+                                                text: "Issue at " + modelData.current + "A: Time ratio " + modelData.time_ratio.toFixed(2) + " < " + modelData.required_ratio.toFixed(2)
                                                 font.pixelSize: 12
                                             }
                                         }
@@ -350,24 +370,24 @@ ApplicationWindow {
                                         anchors.fill: parent
                                         
                                         Text {
-                                            text: `Loading: ${fuse25AAnalysis.loading_factor.toFixed(2)}`
+                                            text: "Loading: " + fuse25AAnalysis.loading_factor.toFixed(2)
                                             font.family: "monospace"
                                         }
                                         
                                         Text {
-                                            text: `Full Load: ${fuse25AAnalysis.full_load_time.toFixed(0)}s`
+                                            text: "Full Load: " + fuse25AAnalysis.full_load_time.toFixed(0) + "s"
                                             color: fuse25AAnalysis.full_load_ok ? "#27ae60" : "#e74c3c"
                                             font.family: "monospace"
                                         }
                                         
                                         Text {
-                                            text: `Inrush: ${fuse25AAnalysis.inrush_time.toFixed(2)}s`
+                                            text: "Inrush: " + fuse25AAnalysis.inrush_time.toFixed(2) + "s"
                                             color: fuse25AAnalysis.inrush_ok ? "#27ae60" : "#e74c3c"
                                             font.family: "monospace"
                                         }
                                         
                                         Text {
-                                            text: `Fault: ${fuse25AAnalysis.fault_time.toFixed(2)}s`
+                                            text: "Fault: " + fuse25AAnalysis.fault_time.toFixed(2) + "s"
                                             color: fuse25AAnalysis.fault_ok ? "#27ae60" : "#e74c3c"
                                             font.family: "monospace"
                                         }
@@ -382,18 +402,18 @@ ApplicationWindow {
                                         anchors.fill: parent
                                         
                                         Text {
-                                            text: `Loading: ${fuse63AAnalysis.loading_factor.toFixed(2)}`
+                                            text: "Loading: " + fuse63AAnalysis.loading_factor.toFixed(2)
                                             font.family: "monospace"
                                         }
                                         
                                         Text {
-                                            text: `Full Load: ${fuse63AAnalysis.full_load_time.toFixed(0)}s`
+                                            text: "Full Load: " + fuse63AAnalysis.full_load_time.toFixed(0) + "s"
                                             color: fuse63AAnalysis.full_load_ok ? "#27ae60" : "#e74c3c"
                                             font.family: "monospace"
                                         }
                                         
                                         Text {
-                                            text: `System Fault: ${fuse63AAnalysis.system_fault_time.toFixed(2)}s`
+                                            text: "System Fault: " + fuse63AAnalysis.system_fault_time.toFixed(2) + "s"
                                             color: fuse63AAnalysis.system_fault_ok ? "#27ae60" : "#e74c3c"
                                             font.family: "monospace"
                                         }
@@ -404,38 +424,262 @@ ApplicationWindow {
                     }
                 }
                 
-                // Chart Display (placeholder)
+                // Chart Display
                 GroupBox {
                     title: "Time-Current Characteristic Curves"
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 300
+                    Layout.preferredHeight: 400
                     
-                    Rectangle {
+                    ColumnLayout {
                         anchors.fill: parent
-                        color: "#ecf0f1"
-                        radius: 5
+                        spacing: 10
                         
-                        ColumnLayout {
-                            anchors.centerIn: parent
+                        // Chart controls
+                        RowLayout {
+                            Layout.fillWidth: true
                             
-                            Text {
-                                text: "📊"
-                                font.pixelSize: 48
-                                horizontalAlignment: Text.AlignHCenter
-                                Layout.alignment: Qt.AlignHCenter
+                            CheckBox {
+                                id: show25AFuse
+                                text: "25A Fuse"
+                                checked: true
+                                onCheckedChanged: chartCanvas.updateChart()
                             }
                             
-                            Text {
-                                text: "Time-Current Curves"
-                                font.pixelSize: 16
-                                horizontalAlignment: Text.AlignHCenter
-                                Layout.alignment: Qt.AlignHCenter
+                            CheckBox {
+                                id: show63AFuse
+                                text: "63A Fuse"
+                                checked: true
+                                onCheckedChanged: chartCanvas.updateChart()
+                            }
+                            
+                            CheckBox {
+                                id: showOperatingPoints
+                                text: "Operating Points"
+                                checked: true
+                                onCheckedChanged: chartCanvas.updateChart()
+                            }
+                            
+                            Item { Layout.fillWidth: true }
+                            
+                            Button {
+                                text: "Auto Scale"
+                                onClicked: chartCanvas.autoScale()
                             }
                             
                             Button {
-                                text: "Open Discrimination Chart"
-                                onClicked: openDiscriminationChart()
-                                Layout.alignment: Qt.AlignHCenter
+                                text: "Export Chart"
+                                onClicked: exportChart()
+                            }
+                        }
+                        
+                        // Chart canvas
+                        ChartView {
+                            id: chartCanvas
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            backgroundColor: "white"
+                            
+                            title: "Time-Current Characteristic Curves"
+                            
+                            legend.alignment: Qt.AlignBottom
+                            legend.font.pixelSize: 12
+                            
+                            animationOptions: ChartView.NoAnimation
+                            
+                            LogValueAxis {
+                                id: xAxis
+                                titleText: "Current (A)"
+                                min: 1
+                                max: 10000
+                                base: 10
+                                labelFormat: "%.0f"
+                                gridVisible: true
+                            }
+                            
+                            LogValueAxis {
+                                id: yAxis
+                                titleText: "Time (s)"
+                                min: 0.01
+                                max: 10000
+                                base: 10
+                                labelFormat: "%.2f"
+                                gridVisible: true
+                            }
+                            
+                            LineSeries {
+                                id: fuse25ASeries
+                                name: "25A Fuse"
+                                color: "#e74c3c"
+                                width: 2
+                                visible: show25AFuse.checked
+                                axisX: xAxis
+                                axisY: yAxis
+                            }
+                            
+                            LineSeries {
+                                id: fuse63ASeries
+                                name: "63A Fuse"
+                                color: "#3498db"
+                                width: 2
+                                visible: show63AFuse.checked
+                                axisX: xAxis
+                                axisY: yAxis
+                            }
+                            
+                            ScatterSeries {
+                                id: operatingPointsSeries
+                                name: "Operating Points"
+                                color: "#27ae60"
+                                markerSize: 8
+                                visible: showOperatingPoints.checked
+                                axisX: xAxis
+                                axisY: yAxis
+                            }
+                            
+                            ScatterSeries {
+                                id: inrushPointSeries
+                                name: "Inrush Current"
+                                color: "#f39c12"
+                                markerSize: 8
+                                visible: showOperatingPoints.checked
+                                axisX: xAxis
+                                axisY: yAxis
+                            }
+                            
+                            ScatterSeries {
+                                id: faultPointSeries
+                                name: "Wind Fault"
+                                color: "#e74c3c"
+                                markerSize: 8
+                                visible: showOperatingPoints.checked
+                                axisX: xAxis
+                                axisY: yAxis
+                            }
+                            
+                            function updateChart() {
+                                // Clear existing data
+                                fuse25ASeries.clear()
+                                fuse63ASeries.clear()
+                                operatingPointsSeries.clear()
+                                inrushPointSeries.clear()
+                                faultPointSeries.clear()
+                                
+                                // Generate 25A fuse curve
+                                if (show25AFuse.checked) {
+                                    generateFuseCurve(fuse25ASeries, 25)
+                                }
+                                
+                                // Generate 63A fuse curve
+                                if (show63AFuse.checked) {
+                                    generateFuseCurve(fuse63ASeries, 63)
+                                }
+                                
+                                // Add operating points
+                                if (showOperatingPoints.checked) {
+                                    addOperatingPoints()
+                                }
+                            }
+                            
+                            function generateFuseCurve(series, rating) {
+                                // Use real CEF fuse curve data from database
+                                if (templateEngine) {
+                                    try {
+                                        // Get real fuse curve data from database as JSON
+                                        var curveDataJson = templateEngine.getFuseCurveDataJson(rating)
+                                        var curveData = JSON.parse(curveDataJson)
+                                        
+                                        if (curveData && curveData.length > 0) {
+                                            // Clear existing data
+                                            series.clear()
+                                            
+                                            // Use actual database data
+                                            for (var i = 0; i < curveData.length; i++) {
+                                                var multiplier = curveData[i].current_multiplier
+                                                var time = curveData[i].melting_time
+                                                var current = rating * multiplier
+                                                
+                                                // Only add points within chart bounds
+                                                if (current >= xAxis.min && current <= xAxis.max && 
+                                                    time >= yAxis.min && time <= yAxis.max) {
+                                                    series.append(current, time)
+                                                }
+                                            }
+                                            
+                                            console.log("Generated " + rating + "A fuse curve with " + curveData.length + " real data points")
+                                        } else {
+                                            // Fallback to simplified model if no database data
+                                            generateFuseCurveSimplified(series, rating)
+                                        }
+                                    } catch (error) {
+                                        console.log("Error getting fuse curve data: " + error)
+                                        // Fallback to simplified model
+                                        generateFuseCurveSimplified(series, rating)
+                                    }
+                                } else {
+                                    // No template engine available, use simplified model
+                                    generateFuseCurveSimplified(series, rating)
+                                }
+                            }
+                            
+                            function generateFuseCurveSimplified(series, rating) {
+                                // Simplified fuse curve generation (fallback)
+                                for (var mult = 1.1; mult <= 100; mult += 0.2) {
+                                    var current = rating * mult
+                                    if (current > xAxis.max) break
+                                    
+                                    var time = getFuseTime(mult, rating)
+                                    if (time < yAxis.min || time > yAxis.max) continue
+                                    
+                                    series.append(current, time)
+                                }
+                            }
+                            
+                            function getFuseTime(multiplier, rating) {
+                                // Simplified fuse time-current characteristic (fallback)
+                                // This is a basic model - real fuse data is preferred
+                                if (multiplier < 1.1) return 10000
+                                if (multiplier < 2) return 3600 / Math.pow(multiplier - 1, 2)
+                                if (multiplier < 10) return 100 / Math.pow(multiplier, 1.5)
+                                return 10 / Math.pow(multiplier, 2)
+                            }
+                            
+                            function addOperatingPoints() {
+                                // Get current system values
+                                var hvFullLoad = parseFloat(hvFullLoadCurrent.text.replace(" A", "")) || 0
+                                var inrush = parseFloat(inrushCurrent.text.replace(" A", "")) || 0
+                                var windFault = parseFloat(windFaultCurrent.text.replace(" A", "")) || 0
+                                
+                                // Add operating points if they're within chart bounds
+                                if (hvFullLoad > 0 && hvFullLoad >= xAxis.min && hvFullLoad <= xAxis.max) {
+                                    operatingPointsSeries.append(hvFullLoad, 3600)
+                                }
+                                
+                                if (inrush > 0 && inrush >= xAxis.min && inrush <= xAxis.max) {
+                                    inrushPointSeries.append(inrush, 0.1)
+                                }
+                                
+                                if (windFault > 0 && windFault >= xAxis.min && windFault <= xAxis.max) {
+                                    faultPointSeries.append(windFault, 1.0)
+                                }
+                            }
+                            
+                            function autoScale() {
+                                // Auto-scale chart based on current values
+                                var hvFullLoad = parseFloat(hvFullLoadCurrent.text.replace(" A", "")) || 100
+                                var inrush = parseFloat(inrushCurrent.text.replace(" A", "")) || 100
+                                var windFault = parseFloat(windFaultCurrent.text.replace(" A", "")) || 100
+                                
+                                var maxCurrent = Math.max(hvFullLoad, inrush, windFault) * 2
+                                var minCurrent = Math.min(hvFullLoad, inrush, windFault) * 0.5
+                                
+                                xAxis.max = Math.max(1000, maxCurrent)
+                                xAxis.min = Math.max(1, minCurrent)
+                                
+                                updateChart()
+                            }
+                            
+                            Component.onCompleted: {
+                                updateChart()
                             }
                         }
                     }
@@ -472,22 +716,22 @@ ApplicationWindow {
     FileDialog {
         id: saveConfigDialog
         title: "Save Configuration"
-        selectExisting: false
+        fileMode: FileDialog.SaveFile
         nameFilters: ["JSON files (*.json)"]
         onAccepted: {
             // Save configuration to selected file
-            console.log("Saving config to:", fileUrl)
+            console.log("Saving config to:", selectedFile)
         }
     }
     
     FileDialog {
         id: saveReportDialog
         title: "Save Report"
-        selectExisting: false
+        fileMode: FileDialog.SaveFile
         nameFilters: ["Markdown files (*.md)", "Text files (*.txt)"]
         onAccepted: {
             // Save report to selected file
-            console.log("Saving report to:", fileUrl)
+            console.log("Saving report to:", selectedFile)
         }
     }
     
@@ -495,28 +739,34 @@ ApplicationWindow {
     function generateAnalysisReport() {
         console.log("Generating analysis report...")
         
-        // Collect input values
+        // Collect input values and update system configuration
         var config = {
-            turbine_voltage: turbineVoltage.value,
-            turbine_power: turbinePower.value * 1000, // Convert to W
-            transformer_rating: transformerRating.value * 1000, // Convert to VA
-            transformer_voltage_hv: parseFloat(transformerHV.currentText) * 1000, // Convert to V
-            transformer_impedance: transformerImpedance.value / 1000.0, // Convert to decimal
-            wind_fault_factor: windFaultFactor.value / 100.0, // Convert to decimal
-            hv_fuse_rating: parseInt(hvFuseRating.currentText),
-            incomer_fuse_rating: parseInt(incomerFuseRating.currentText),
-            discrimination_time: discriminationTime.value / 100.0, // Convert to seconds
-            safety_margin: safetyMargin.value / 100.0, // Convert to decimal
-            coordination_ratio: coordinationRatio.value / 100.0, // Convert to decimal
-            max_fault_current: maxFaultCurrent.value
+            system_config: {
+                turbine_voltage: turbineVoltage.value,
+                turbine_power: turbinePower.value * 1000, // Convert to W
+                transformer_rating: transformerRating.value * 1000, // Convert to VA
+                transformer_voltage_hv: parseFloat(transformerHV.currentText) * 1000, // Convert to V
+                transformer_impedance: transformerImpedance.value / 1000.0, // Convert to decimal
+                wind_fault_factor: windFaultFactor.value / 100.0, // Convert to decimal
+                hv_fuse_rating: parseInt(hvFuseRating.currentText),
+                incomer_fuse_rating: parseInt(incomerFuseRating.currentText)
+            },
+            protection_settings: {
+                discrimination_time: discriminationTime.value / 100.0, // Convert to seconds
+                safety_margin: safetyMargin.value / 100.0, // Convert to decimal
+                coordination_ratio: coordinationRatio.value / 100.0, // Convert to decimal
+                max_fault_current: maxFaultCurrent.value
+            }
         }
         
-        // Call Python backend to generate analysis
+        // Update system configuration in Python backend
         if (templateEngine) {
-            templateEngine.generateAnalysis(config)
+            templateEngine.updateSystemConfiguration(JSON.stringify(config))
+            // Run the analysis
+            templateEngine.analyzeFuseCoordination()
         } else {
             // Simulate analysis results for demonstration
-            simulateAnalysisResults(config)
+            simulateAnalysisResults(config.system_config)
         }
     }
     
@@ -552,18 +802,84 @@ ApplicationWindow {
         coordinationStatus.issues = coordinationStatus.coordinated ? [] : [
             {current: 200, time_ratio: 1.5, required_ratio: 2.0}
         ]
+        
+        // Refresh the chart
+        chartCanvas.updateChart()
+    }
+    
+    function exportChart() {
+        console.log("Exporting chart...")
+        // In a real implementation, this would save the chart as an image
+        // For now, we'll just show the export dialog
+        var timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+        console.log("Chart would be saved as: wind_turbine_protection_chart_" + timestamp + ".png")
     }
     
     function saveConfiguration() {
         saveConfigDialog.open()
     }
     
-    function openDiscriminationChart() {
-        // Open the main discrimination analyzer with current configuration
-        console.log("Opening discrimination chart...")
+    function updateAnalysisDisplay() {
+        if (!analysisResults) {
+            console.log("No analysis results to display")
+            return
+        }
         
-        // This would typically open the main discrimination analyzer
-        // with the current fuse configuration pre-loaded
+        try {
+            // Update system currents display
+            if (analysisResults.system_currents) {
+                var currents = analysisResults.system_currents
+                lvFullLoadCurrent.text = (currents.lv_full_load || 0).toFixed(1) + " A"
+                hvFullLoadCurrent.text = (currents.hv_full_load || 0).toFixed(1) + " A"
+                transformerSCCurrent.text = (currents.transformer_sc_current || 0).toFixed(0) + " A"
+                windFaultCurrent.text = (currents.hv_fault_current || 0).toFixed(1) + " A"
+                inrushCurrent.text = (currents.inrush_current || 0).toFixed(0) + " A"
+            }
+            
+            // Update fuse analysis
+            if (analysisResults.fuse_25a_analysis) {
+                var fuse25a = analysisResults.fuse_25a_analysis
+                fuse25AAnalysis.loading_factor = fuse25a.loading_factor || 0
+                fuse25AAnalysis.full_load_time = fuse25a.full_load_time || 0
+                fuse25AAnalysis.full_load_ok = fuse25a.full_load_ok || false
+                fuse25AAnalysis.inrush_time = fuse25a.inrush_time || 0
+                fuse25AAnalysis.inrush_ok = fuse25a.inrush_ok || false
+                fuse25AAnalysis.fault_time = fuse25a.fault_time || 0
+                fuse25AAnalysis.fault_ok = fuse25a.fault_ok || false
+            }
+            
+            if (analysisResults.fuse_63a_analysis) {
+                var fuse63a = analysisResults.fuse_63a_analysis
+                fuse63AAnalysis.loading_factor = fuse63a.loading_factor || 0
+                fuse63AAnalysis.full_load_time = fuse63a.full_load_time || 0
+                fuse63AAnalysis.full_load_ok = fuse63a.full_load_ok || false
+                fuse63AAnalysis.system_fault_time = fuse63a.system_fault_time || 0
+                fuse63AAnalysis.system_fault_ok = fuse63a.system_fault_ok || false
+            }
+            
+            // Update coordination status
+            if (analysisResults.coordination_results) {
+                var coord = analysisResults.coordination_results
+                coordinationStatus.coordinated = coord.coordinated || false
+                coordinationStatus.issues = coord.issues || []
+            }
+            
+            // Update chart
+            if (chartCanvas && chartCanvas.updateChart) {
+                chartCanvas.updateChart()
+            }
+            
+            console.log("Analysis display updated successfully")
+            
+        } catch (error) {
+            console.error("Error updating analysis display:", error)
+        }
+    }
+    
+    function openDiscriminationChart() {
+        // Auto-scale chart based on current values
+        console.log("Auto-scaling chart...")
+        chartCanvas.autoScale()
     }
     
     Component.onCompleted: {
