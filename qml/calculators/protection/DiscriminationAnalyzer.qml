@@ -420,7 +420,7 @@ Item {
                         WaveCard {
                             title: "Fuse Curves"
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 300
+                            Layout.minimumHeight: 350
                             
                             GridLayout {
                                 columns: 2
@@ -482,7 +482,7 @@ Item {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.minimumHeight: 100
-                                    Layout.maximumHeight: 150
+                                    Layout.maximumHeight: 180
                                     color: "transparent"
                                     border.color: "#cccccc"
                                     border.width: 1
@@ -510,7 +510,6 @@ Item {
                                                 }
                                                 
                                                 StyledButton {
-                                                    text: "Remove"
                                                     icon.source: "../../../icons/rounded/close.svg"
                                                     Layout.preferredWidth: 60
                                                     Layout.preferredHeight: 25
@@ -526,7 +525,7 @@ Item {
                                 
                                 StyledButton {
                                     text: "Clear All Fuses"
-                                    icon.source: "../../../icons/rounded/clear.svg"
+                                    icon.source: "../../../icons/rounded/clear_all.svg"
                                     Layout.columnSpan: 2
                                     Layout.fillWidth: true
                                     onClicked: {

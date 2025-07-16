@@ -212,6 +212,19 @@ ApplicationWindow {
                     }
                 }
                 Menu {
+                    title: "Templates"
+                    Repeater {
+                        model: MenuItems.templates
+
+                        MenuItem {
+                            text: modelData.name
+                            onTriggered: {
+                                calculatorLoader.push(modelData.source)
+                            }
+                        }
+                    }
+                }
+                Menu {
                     title: "Tools"
                     MenuItem {
                         text: "Settings"
