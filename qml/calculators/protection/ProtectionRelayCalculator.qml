@@ -688,7 +688,7 @@ Item {
                         
                         StyledButton {
                             text: "Clear All Fuses"
-                            icon.source: "../../../icons/rounded/clear.svg"
+                            icon.source: "../../../icons/rounded/clear_all.svg"
                             Layout.columnSpan: 2
                             Layout.fillWidth: true
                             onClicked: {
