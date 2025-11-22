@@ -228,64 +228,64 @@ ChartView {
             }
 
             onPositionChanged: (mouse) => {
-            if (!mouse || !calculator) {
-                hideTracker();
-                return;
+                if (!mouse || !calculator) {
+                    hideTracker();
+                    return;
+                }
+
+                let chartPoint = mouse.x - chartView.plotArea.x
+                if (chartPoint < 0 || chartPoint > chartView.plotArea.width) {
+                    hideTracker();
+                    return;
+                }
+
+                let xValue = axisX.min + (chartPoint / chartView.plotArea.width) * (axisX.max - axisX.min)
+                trackerX = chartPoint + chartView.plotArea.x
+
+                let values = calculator.calculate_values_at(xValue)
+
+                if (!values || values.length !== 3) {
+                    hideTracker();
+                    return;
+                }
+
+                let valA = Number(values[0]);
+                let valB = Number(values[1]);
+                let valC = Number(values[2]);
+
+                if (isNaN(valA) || isNaN(valB) || isNaN(valC)) {
+                    hideTracker();
+                    return;
+                }
+
+                trackerValues = [
+                    { color: seriesA.color, value: valA },
+                    { color: seriesB.color, value: valB },
+                    { color: seriesC.color, value: valC }
+                ]
+
+                let posA = chartView.mapToPosition(Qt.point(xValue, valA), seriesA)
+                let posB = chartView.mapToPosition(Qt.point(xValue, valB), seriesB)
+                let posC = chartView.mapToPosition(Qt.point(xValue, valC), seriesC)
+
+                if (!isNaN(posA.x) && !isNaN(posA.y)) {
+                    dotA.x = posA.x - dotA.width/2
+                    dotA.y = posA.y - dotA.height/2
+                    dotA.visible = true
+                }
+
+                if (!isNaN(posB.x) && !isNaN(posB.y)) {
+                    dotB.x = posB.x - dotB.width/2
+                    dotB.y = posB.y - dotB.height/2
+                    dotB.visible = true
+                }
+
+                if (!isNaN(posC.x) && !isNaN(posC.y)) {
+                    dotC.x = posC.x - dotC.width/2
+                    dotC.y = posC.y - dotC.height/2
+                    dotC.visible = true
+                }
             }
-
-            let chartPoint = mouse.x - chartView.plotArea.x
-            if (chartPoint < 0 || chartPoint > chartView.plotArea.width) {
-                hideTracker();
-                return;
-            }
-
-            let xValue = axisX.min + (chartPoint / chartView.plotArea.width) * (axisX.max - axisX.min)
-            trackerX = chartPoint + chartView.plotArea.x
-
-            let values = calculator.calculate_values_at(xValue)
-
-            if (!values || values.length !== 3) {
-                hideTracker();
-                return;
-            }
-
-            let valA = Number(values[0]);
-            let valB = Number(values[1]);
-            let valC = Number(values[2]);
-
-            if (isNaN(valA) || isNaN(valB) || isNaN(valC)) {
-                hideTracker();
-                return;
-            }
-
-            trackerValues = [
-                { color: seriesA.color, value: valA },
-                { color: seriesB.color, value: valB },
-                { color: seriesC.color, value: valC }
-            ]
-
-            let posA = chartView.mapToPosition(Qt.point(xValue, valA), seriesA)
-            let posB = chartView.mapToPosition(Qt.point(xValue, valB), seriesB)
-            let posC = chartView.mapToPosition(Qt.point(xValue, valC), seriesC)
-
-            if (!isNaN(posA.x) && !isNaN(posA.y)) {
-                dotA.x = posA.x - dotA.width/2
-                dotA.y = posA.y - dotA.height/2
-                dotA.visible = true
-            }
-
-            if (!isNaN(posB.x) && !isNaN(posB.y)) {
-                dotB.x = posB.x - dotB.width/2
-                dotB.y = posB.y - dotB.height/2
-                dotB.visible = true
-            }
-
-            if (!isNaN(posC.x) && !isNaN(posC.y)) {
-                dotC.x = posC.x - dotC.width/2
-                dotC.y = posC.y - dotC.height/2
-                dotC.visible = true
-            }
-        }
 
         Menu {
             id: contextMenu
