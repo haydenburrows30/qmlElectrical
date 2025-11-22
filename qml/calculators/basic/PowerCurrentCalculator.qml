@@ -28,9 +28,10 @@ Item {
 
     PopUpText {
         parentCard: results
-        popupText: "<h3>Transformer Calculator </h3><br> Helps you calculate the current flowing through a transformer based on the kVA and voltage. The formula used is: <br><br>" +
-                   "Single Phase: I = kVA / V <br>" +
-                   "Three Phase: I = kVA / (V × √3)"
+        popupText: "<h3>Transformer Calculator </h3><br> Helps you calculate the current flowing through a transformer based on the kVA and voltage. The formulas used are: <br><br>" +
+                   "Single Phase Current: I = (kVA × 1000) / V <br>" +
+                   "Three Phase Current: I = (kVA × 1000) / (V × √3) <br><br>" +
+                   "Active Power: kW = kVA × Power Factor"
         widthFactor: 0.3
         heightFactor: 0.3
     }
@@ -94,7 +95,7 @@ Item {
 
                     Label {
                         text: "Phase:"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
 
                     ComboBoxRound {
@@ -112,7 +113,7 @@ Item {
 
                     Label {
                         text: "kVA:"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
 
                     ComboBoxRound {
@@ -151,8 +152,59 @@ Item {
                     }
 
                     Label {
+                        text: "Power Factor:"
+                        Layout.preferredWidth: 100
+                    }
+
+                    ComboBoxRound {
+                        id: pfPresetsTransformer
+                        model: ["Custom", "0.80", "0.85", "0.90", "0.95", "1.00"]
+                        Layout.preferredWidth: 120
+                        currentIndex: 5 // Default to unity power factor
+                        onCurrentTextChanged: {
+                            if (currentText !== "Custom") {
+                                let pf = parseFloat(currentText)
+                                calculator.setPowerFactor(pf)
+                                pfInputTransformer.text = pf.toFixed(2)
+                            } else {
+                                pfInputTransformer.text = ""
+                            }
+                        }
+                        Component.onCompleted: {
+                            if (currentText !== "Custom") {
+                                let pf = parseFloat(currentText)
+                                calculator.setPowerFactor(pf)
+                                pfInputTransformer.text = pf.toFixed(2)
+                            }
+                        }
+                    }
+
+                    TextFieldRound {
+                        id: pfInputTransformer
+                        Layout.fillWidth: true
+                        enabled: pfPresetsTransformer.currentText === "Custom"
+                        opacity: enabled ? 1.0 : 0.5
+                        placeholderText: "PF"
+                        validator: DoubleValidator {
+                            bottom: 0.0
+                            top: 1.0
+                            decimals: 2
+                        }
+                        onTextChanged: {
+                            if (acceptableInput && calculator && enabled) {
+                                calculator.setPowerFactor(parseFloat(text))
+                            }
+                        }
+                        Component.onCompleted: {
+                            if (!enabled && pfPresetsTransformer.currentText !== "Custom") {
+                                text = pfPresetsTransformer.currentText
+                            }
+                        }
+                    }
+
+                    Label {
                         text: "Voltage:"
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 100
                     }
 
                     ComboBoxRound {
@@ -167,6 +219,7 @@ Item {
                                 voltageInput.text = voltage.toString()
                             } else {
                                 voltageInput.enabled = true
+                                voltageInput.text = ""
                             }
                         }
                     }
@@ -197,7 +250,7 @@ Item {
 
                         Label {
                             text: "Current:"
-                            Layout.preferredWidth: 80
+                            Layout.preferredWidth: 100
                         }
 
                         TextFieldBlue {
@@ -213,7 +266,7 @@ Item {
                         }
 
                         StyledButton {
-                            Layout.preferredWidth: 80
+                            Layout.preferredWidth: 100
                             text: "Copy"
                             ToolTip.text: "Copy to clipboard"
                             ToolTip.visible: hovered
@@ -221,6 +274,39 @@ Item {
                             onClicked: {
                                 if (calculator && !isNaN(calculator.current)) {
                                     clipboardHelper.text = currentOutput.text
+                                    clipboardHelper.selectAll()
+                                    clipboardHelper.copy()
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.columnSpan: 3
+
+                        Label {
+                            text: "Active Power:"
+                            Layout.preferredWidth: 100
+                        }
+
+                        TextFieldBlue {
+                            id: kwOutputTransformer
+                            font.bold: true
+                            text: {
+                                if (!calculator || isNaN(calculator.kw)) return "0.00 kW"
+                                return calculator.kw.toFixed(2) + " kW"
+                            }
+                        }
+
+                        StyledButton {
+                            Layout.preferredWidth: 100
+                            text: "Copy"
+                            ToolTip.text: "Copy to clipboard"
+                            ToolTip.visible: hovered
+                            icon.source: "../../../icons/rounded/copy_all.svg"
+                            onClicked: {
+                                if (calculator && !isNaN(calculator.kw)) {
+                                    clipboardHelper.text = kwOutputTransformer.text
                                     clipboardHelper.selectAll()
                                     clipboardHelper.copy()
                                 }
@@ -240,7 +326,8 @@ Item {
                         id: errorMessage
                         color: "red"
                         visible: (!kvaInput.acceptableInput && kvaInput.text !== "") ||
-                                (!voltageInput.acceptableInput && voltageInput.text !== "")
+                                (!voltageInput.acceptableInput && voltageInput.text !== "") ||
+                                (pfInputTransformer.enabled && !pfInputTransformer.acceptableInput && pfInputTransformer.text !== "")
                         text: "Please enter valid numbers"
                     }
                 }

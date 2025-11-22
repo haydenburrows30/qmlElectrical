@@ -62,6 +62,8 @@ class PowerCurrentPdfGenerator:
                     ["Parameter", "Value"],
                     ["Phase Type", data.get('transformer_phase', 'Three Phase')],
                     ["Apparent Power", f"{data.get('transformer_kva', 0):.2f} kVA"],
+                    ["Power Factor", f"{data.get('transformer_pf', 1):.2f}"],
+                    ["Active Power", f"{data.get('transformer_kw', 0):.2f} kW"],
                     ["Voltage", f"{data.get('transformer_voltage', 0):.1f} V"],
                     ["Current", f"{data.get('transformer_current', 0):.2f} A"]
                 ]

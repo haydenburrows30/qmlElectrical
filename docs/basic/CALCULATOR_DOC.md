@@ -20,6 +20,12 @@ I = \frac{\text{kVA} \times 1000}{V}
 I = \frac{\text{kVA} \times 1000}{V \times \sqrt{3}}
 ```
 
+### b. Active Power Tracking
+
+```math
+	ext{kW} = \text{kVA} \times \text{Power Factor}
+```
+
 ---
 
 ## 2. ChargingCalculator

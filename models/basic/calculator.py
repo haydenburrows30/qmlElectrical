@@ -13,9 +13,11 @@ class PowerCalculator(QObject):
     Signals:
         currentCalculated: Emitted when current calculation completes
         series_appended: Emitted when new data series is added
+        kwCalculated: Emitted when active power recalculates
     """
     
     currentCalculated = Signal(float)
+    kwCalculated = Signal(float)
     series_appended = Signal()
     dataChanged = Signal()
     exportComplete = Signal(bool, str)
@@ -25,6 +27,8 @@ class PowerCalculator(QObject):
         self._kva = 0.0
         self._voltage = 0.0
         self._current = 0.0
+        self._power_factor = 1.0
+        self._kw = 0.0
         self._phase = "Three Phase"
 
         from services.file_saver import FileSaver
@@ -51,6 +55,17 @@ class PowerCalculator(QObject):
         self._phase = phase
         self.calculateCurrent()
 
+    @Slot(float)
+    def setPowerFactor(self, power_factor):
+        try:
+            value = float(power_factor)
+        except (TypeError, ValueError):
+            return
+        if math.isnan(value):
+            return
+        self._power_factor = max(0.0, min(value, 1.0))
+        self.calculateCurrent()
+
     def calculateCurrent(self):
         if self._voltage != 0:
             if self._phase == "Single Phase":
@@ -58,10 +73,16 @@ class PowerCalculator(QObject):
             elif self._phase == "Three Phase":
                 self._current = self._kva * 1000 / (self._voltage * 1.732)
             self.currentCalculated.emit(self._current)
+        self._kw = self._kva * self._power_factor
+        self.kwCalculated.emit(self._kw)
 
     @Property(float, notify=currentCalculated)
     def current(self):
         return self._current
+
+    @Property(float, notify=kwCalculated)
+    def kw(self):
+        return self._kw
 
     @Slot(str, list)
     def append_series(self, series_name, data_points):
@@ -74,7 +95,10 @@ class PowerCalculator(QObject):
         self._voltage = 0.0
         self._current = 0.0
         self._power_factor = 1.0
+        self._kw = 0.0
         self.dataChanged.emit()
+        self.currentCalculated.emit(self._current)
+        self.kwCalculated.emit(self._kw)
     
     @Slot()
     def calculate(self):
@@ -99,6 +123,8 @@ class PowerCalculator(QObject):
                 'transformer': True,
                 'transformer_phase': self._phase,
                 'transformer_kva': self._kva,
+                'transformer_pf': self._power_factor,
+                'transformer_kw': self._kw,
                 'transformer_voltage': self._voltage,
                 'transformer_current': self._current,
                 'power': False
